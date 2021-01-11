@@ -50,7 +50,7 @@ var logLevels = map[string]logging.Level{
 	"DEBUG":    logging.DEBUG,
 }
 
-// Returns a new config based on T2M_ENV
+// Returns a new config based on APT_ENV
 func NewConfig() *Config {
 	config := loadConfig()
 	config.expandPaths()
