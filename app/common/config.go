@@ -66,9 +66,9 @@ func NewConfig() *Config {
 // root directory.
 func configDirAndFile() (configDir string, configFile string) {
 	configDir, _ = os.Getwd()
-	envName := os.Getenv("T2M_ENV")
+	envName := os.Getenv("APT_ENV")
 	if envName == "" {
-		PrintAndExit("Set T2M_ENV: dev, test, or production")
+		PrintAndExit("Set APT_ENV: dev, test, or production")
 	}
 	configFile = ".env"
 	if envName != "" {
@@ -109,7 +109,7 @@ func loadConfig() *Config {
 			Driver:   v.GetString("DB_DRIVER"),
 			UseSSL:   v.GetBool("DB_USE_SSL"),
 		},
-		Cookies: {
+		Cookies: &CookieConfig{
 			Domain:        v.GetString("COOKIE_DOMAIN"),
 			Secure:        v.GetBool("SECURE_COOKIES"),
 			MaxAge:        v.GetInt("SESSION_MAX_AGE"),

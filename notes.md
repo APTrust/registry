@@ -139,13 +139,55 @@ Like Pharos, the registry will use a Postgres database and will likely sit behin
 ### Custom Listing
 * Sort on any field
 * Filter on any field
-* Combile filters
+* Combine filters
+
+### Admin Features
+* Edit item
+* Requeue item
 
 ## Alerts
 
 * list with sort, filter, and paging
 * view
 * mark read/unread
+
+## Web UI Admin Features
+
+The following features will be accessible only to APTrust admins.
+
+### AWS Account Management
+
+The admin panel will implement these features, which currently exist only in Ansible playbooks. This will vastly simplify common tasks associated with users and institutions.
+
+* New organization setup will create required buckets.
+* Admin can add and remove IAM users for each institution.
+* Admin can create and deactivate IAM user keys.
+
+### NSQ
+
+We currently manage NSQ through its built-in web UI. We've configured it to allow access only from whitelisted IP addresses, and we must often change the IPs in the whitelist to maintain access. Accessing NSQ through the registry will ensure that 1) we can access it from anywhere and 2) only valid APTrust admins can access it.
+
+* View current NSQ status for all topics, channels, and hosts.
+* Pause any topic or channel.
+* Unpause any topic or channel.
+* Empty any topic or channel.
+
+### Redis
+
+Admin UI will show interim processing data in Redis. This helps us understand what's being ingested and whether there are problems in specific workers. All data in these views is read-only.
+
+* View object list.
+* View files list (list of all files belonging to an object)
+* View file details (full report on individual file)
+
+### Logs
+
+Log viewing and searching will require an additional service in preservation services to tail and search logs. This feature gives admins access to worker logs and registry logs only, not to any other files.
+
+* Admin can tail any log for any worker on any host.
+* Admin can search specific log.
+* Admin can search all logs across all hosts.
+* Admin can dowload any worker or registry log from any host.
 
 # Member API
 
