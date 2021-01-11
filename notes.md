@@ -17,11 +17,13 @@ We had considered writing this replacement in Ruby on Rails, but decided to use 
 
 ### Performance
 
-After rewriting APTrust's [Preservation Services](https://github.com/APTrust/preservation-services) to increase throughput, load testing showed that Pharos always became unresponsive under loads we expect to encounter often in production. Rails memory and CPU usage was so high that we could not even SSH into our servers for days. The only way to ensure the stability of the system was to throttle the services' access to the Rails app, which defeats the point of rewriting those services in the first place. We have seen similar behavior from Pharos in production for more than two years, and we have dealt with it by throttling the clients that access it.
+After rewriting APTrust's [Preservation Services](https://github.com/APTrust/preservation-services) to increase throughput, load testing showed that Pharos always became unresponsive under loads we expect to encounter often in production. Rails memory and CPU usage was so high that we could not even SSH into our servers for days. The only way to ensure the stability of the system was to throttle the services' access to the Rails app, which defeats the point of rewriting those services in the first place. We have seen similar behavior from Pharos in production for more than two years, and we have dealt with it by 1) running expensive overpowered hardware (whose memory and CPU still gets maxed out) and 2) throttling our clients' access to the Rails app.
 
 ### Maintainability (Explicitness)
 
-While Rails is an excellent platform for rapidly developing database-driven web applications and APIs, the cost of changing code and adding features is often much higher than in a codebase built on the principle of explicitness over assumption. Rails' "magic" hides tremendous complexity from the developer, and developers must often dig into that complexity to make seemingly simple changes. In eleven years of Rails work, I have consistently run into unexpected behaviors that require hours of research to understand what Rails is doing under the hood.
+While Rails is an excellent platform for rapidly developing database-driven web applications and APIs, the cost of changing code and adding features is often much higher than in a codebase built on the principle of explicitness. Rails' "magic" initially hides tremendous complexity from the developer, but developers must often dig into that complexity to make seemingly simple changes. In eleven years of Rails work, I have consistently run into unexpected behaviors that require hours of research to understand what Rails is doing under the hood.
+
+It's common to spend four hours or even an entire day wading through documentation and source code to figure out the unexpected consequences of changing a single line of code. Choosing Rails means committing your developers to years of difficult debugging.
 
 These problems rarely occur in languages and frameworks that enforce explicitness. While explicit codebases require more up-front effort, their transparency and lack of assumptions make them far easier to maintain in the long run.
 
@@ -33,11 +35,13 @@ An empty Rails 6 project includes 18,688 files. Then yarn pulls in 770 node pack
 
 We know we don't need many of these files. We know we don't need ANY of 770 node modules. We can spend a few days now weeding them all out, or we can leave them in place and update them every week when Dependabot nags us.
 
-We estimate that the using Go's [Gin Framework](https://github.com/gin-gonic/gin), we can implement all of our required featured in about 100-150 code files. That takes about 21,000 items off our to-do list.
+(In practice, removing files from a default Rails installation causes problems later, as new gems added later in the development cycle, depend on the presence of those default files. We'd likely have to add back many of the files we remove.)
+
+We estimate that the using Go's [Gin Framework](https://github.com/gin-gonic/gin), we can implement all of our required featured in about 100-150 code files. That's 21,000 fewer files to maintain.
 
 ### Maintainability (Testing)
 
-Our Rails applications have traditially included hundreds or thousands of tests. Many of those simply test things a compiler will catch at build time, such as whether types and parameter lists are correct, whether values are (or even can be) nil, etc.
+Our Rails applications have traditially included thousands of tests. Many of those simply test things a compiler will catch at build time, such as whether types and parameter lists are correct, whether values are (or even can be) nil, etc. Maintaining tests requires work. If we can remove a few hundred tests, we'll have that much less to maintain.
 
 # Features
 
