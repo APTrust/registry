@@ -29,7 +29,7 @@ func ProjectRoot() string {
 //
 // Example:
 //
-// bytes, err := LoadRelativeFile("test/fixtures/work_items.sql")
+// bytes, err := LoadRelativeFile("db/fixtures/work_items.csv")
 //
 func LoadRelativeFile(relpath string) ([]byte, error) {
 	absPath := filepath.Join(ProjectRoot(), relpath)
