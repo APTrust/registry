@@ -15,7 +15,7 @@ func TestProjectRoot(t *testing.T) {
 }
 
 func TestLoadRelativeFile(t *testing.T) {
-	file := path.Join("app", "common", "config.go")
+	file := path.Join("common", "config.go")
 	data, err := common.LoadRelativeFile(file)
 	require.Nil(t, err)
 	assert.NotEmpty(t, data)

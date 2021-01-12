@@ -20,7 +20,7 @@ import (
 // ProjectRoot returns the project root.
 func ProjectRoot() string {
 	_, thisFile, _, _ := runtime.Caller(0)
-	absPath, _ := filepath.Abs(path.Join(thisFile, "..", "..", ".."))
+	absPath, _ := filepath.Abs(path.Join(thisFile, "..", ".."))
 	return absPath
 }
 
