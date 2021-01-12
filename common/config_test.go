@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/APTrust/registry/app/common"
+	"github.com/APTrust/registry/common"
 	"github.com/op/go-logging"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
