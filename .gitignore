@@ -16,3 +16,6 @@
 
 # Emacs detritus
 *~
+
+# Mac Junk
+*.DS_Store
