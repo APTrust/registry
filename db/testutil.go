@@ -1,7 +1,7 @@
 package db
 
 import (
-	"encoding/csv"
+	// "encoding/csv"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -9,9 +9,19 @@ import (
 
 	"github.com/APTrust/registry/common"
 	"github.com/go-pg/pg/v10"
+	"github.com/stretchr/stew/slice"
 )
 
 var fixturesLoaded = false
+
+// SafeEnvironments lists which APT_ENV environments are safe for data loading.
+// Since data loading DELETES THE ENTIRE DB before reloading fixtures, we want
+// this to run only on local dev machines and test/CI systems.
+var SafeEnvironments = []string{
+	"dev",
+	"integration",
+	"test",
+}
 
 // LoadOrder lists the names of tables for which we have fixture data
 // (csv files) in the order they should be loaded.
@@ -26,6 +36,12 @@ var LoadOrder = []string{
 	"storage_records",
 	"premis_events",
 	"work_items",
+}
+
+// HasNoIDColumn lists tables that have no identity column. Attempting
+// to reset the id sequences on these tables will cause an error.
+var HasNoIDColumn = []string{
+	"roles_users",
 }
 
 // DropOrder lists tables to be dropped, in the order they should be
@@ -91,7 +107,7 @@ func dropEverything(db *pg.DB) error {
 	panicOnWrongEnv()
 	// Drop all tables
 	for _, table := range DropOrder {
-		sql := fmt.Sprintf(`DROP TABLE IF EXISTS "%s" CASCADE`, table)
+		sql := fmt.Sprintf(`drop table if exists "%s" cascade`, table)
 		err := runTransaction(db, sql)
 		if err != nil {
 			return err
@@ -122,53 +138,20 @@ func loadCSVFiles(db *pg.DB) error {
 	return nil
 }
 
-// Load fixture data from a single CSV file.
+// Loads data from a CSV file into a table.
+// The CSV files were created with the Postgres COPY command.
 func loadCSVFile(db *pg.DB, table string) error {
 	panicOnWrongEnv()
-	file := filepath.Join("db", "fixtures", table+".csv")
-	data, err := common.LoadRelativeFile(file)
+	file := filepath.Join(common.ProjectRoot(), "db", "fixtures", table+".csv")
+	sql := fmt.Sprintf(`copy "%s" from '%s' csv header`, table, file)
+	fmt.Println(sql)
+	//_, err := db.Exec(sql)
+	err := runTransaction(db, sql)
 	if err != nil {
-		return fmt.Errorf("File read error in %s: %v", file, err)
+		fmt.Println(sql)
+		err = fmt.Errorf(`Error executing "%s": %v`, sql, err)
 	}
-	reader := csv.NewReader(strings.NewReader(string(data)))
-	records, err := reader.ReadAll()
-	if err != nil {
-		return fmt.Errorf("CSV parse error in %s: %v", file, err)
-	}
-
-	// BEGIN TRANSACTION
-	tx, err := db.Begin()
-	if err != nil {
-		return err
-	}
-	defer tx.Close()
-
-	// Insert rows one at a time. We'll commit them all below.
-	// This is much faster than committing on each insert.
-	placeholders := sqlPlaceholders(len(records[0]))
-	var cols []string
-	var colString string
-	for i, record := range records {
-		if i == 0 {
-			// First line of csv file has column names.
-			cols = record
-			colString = strings.Join(cols, ", ")
-			continue
-		}
-		// Insert a single row
-		sql := fmt.Sprintf(`insert into "%s" (%s) values (%s)`, table, colString, placeholders)
-		fmt.Println(sql, record)
-		values := interfaceSlice(record)
-		_, err = db.Exec(sql, values...)
-		if err != nil {
-			tx.Rollback()
-			return fmt.Errorf("SQL insert error, %s line %d: %v", file, i+1, err)
-		}
-	}
-
-	// COMMIT TRANSACTION
-	// and return any error to the caller
-	return tx.Commit()
+	return err
 }
 
 // Get the placeholders for a sql query.
@@ -180,25 +163,29 @@ func sqlPlaceholders(count int) string {
 	return strings.Join(placeholders, ", ")
 }
 
-func interfaceSlice(s []string) []interface{} {
-	iSlice := make([]interface{}, len(s))
-	for i, v := range s {
-		if v == "NULL" {
-			iSlice[i] = nil
-		} else {
-			iSlice[i] = v
-		}
-	}
-	return iSlice
-}
-
-// Our fixtures insert records with ids 1, 2, 3, etc.
-// This resets the Postgres ID sequences for the specified table
-// so we don't get conflicting IDs when our tests insert new records.
+// Our fixtures include explicit IDs because other fixtures must refer
+// to those IDs in foreign key columns. For example, the intellectual_objects
+// fixtures refer to institution ids 1, 2, 3, etc. They MUST do this for
+// tests to be reliable.
 //
-// See: https://stackoverflow.com/questions/244243/how-to-reset-postgres-primary-key-sequence-when-it-falls-out-of-sync
+// When we import explicit IDs, we are doing inserts without hitting the
+// serial auto-incrementer. The result is that when our tests insert new
+// records in tables we've imported, Postgres will start generating IDs
+// at 1. But ID 1 already exists, from the imported data.
+//
+// Here's a sample error:
+//
+// ERROR: duplicate key value violates unique constraint "<table>_pkey"
+// Detail: Key (id)=(1) already exists.
+//
+// To avoid this, the resetSequence code below tells Postgres to start the
+// ID sequence at the highest existing ID in the table, instead of at 1.
+//
 func resetSequences(db *pg.DB) error {
 	for _, table := range LoadOrder {
+		if slice.ContainsString(HasNoIDColumn, table) {
+			continue
+		}
 		if err := resetSequence(db, table); err != nil {
 			return err
 		}
@@ -221,16 +208,16 @@ func runTransaction(db *pg.DB, sql string, params ...interface{}) error {
 	})
 }
 
-// Blow up and die if this is run in any environment other than "test"
-// or "integration". We call this at every step of the way, in case some
-// clever developer ever tries to use or abuse any function in this file.
+// Blow up and die if this is run in any environment other than "test",
+// "integration", or "dev". We call this at every step of the way, in case
+// some clever developer ever tries to use or abuse any function in this file.
 // Our paranoid level of protection comes from us actually having deleted
 // a production database after mistyping a single character in a command.
 // Top-notch DevOps saved the day, but paranoid programming would have
 // prevented it in the first place.
 func panicOnWrongEnv() {
 	envName := os.Getenv("APT_ENV")
-	if envName != "test" && envName != "integration" {
-		panic("Cannot run destructive DB operations outside test and integration environments.")
+	if !slice.Contains(SafeEnvironments, envName) {
+		panic("Cannot run destructive DB operations outside dev, integration, test environments.")
 	}
 }

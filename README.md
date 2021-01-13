@@ -26,6 +26,10 @@ create user dev_user with password 'password';
 create database apt_registry_development owner dev_user;
 create database apt_registry_integration owner dev_user;
 create database apt_registry_test owner dev_user;
+
+-- This lets dev_user load data from csv files into tables.
+-- Required for running tests.
+grant pg_read_server_files to dev_user;
 ```
 
 Now load the schema into the dev database:
