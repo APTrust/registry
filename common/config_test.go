@@ -16,7 +16,7 @@ func TestNewConfig(t *testing.T) {
 	require.NotNil(t, config)
 	assert.Equal(t, "postgres", config.DB.Driver)
 	assert.Equal(t, "localhost", config.DB.Host)
-	assert.Equal(t, "registry_test", config.DB.Name)
+	assert.Equal(t, "apt_registry_test", config.DB.Name)
 	assert.Equal(t, "dev_user", config.DB.User)
 	assert.Equal(t, "password", config.DB.Password)
 	assert.Equal(t, 5432, config.DB.Port)
