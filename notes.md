@@ -81,6 +81,10 @@ Like Pharos, the registry will use a Postgres database and will likely sit behin
 * Two-factor text/sms
 * Two-factor Authy
 
+To ensure users won't have to change their passwords when moving from the Rails app, implement the same password encryption scheme as Devise. The scheme is described [here](https://www.freecodecamp.org/news/how-does-devise-keep-your-passwords-safe-d367f6e816eb/), and the [Go bcrypt library](https://pkg.go.dev/golang.org/x/crypto/bcrypt) should be able to support it.
+
+For two-factor auth, since we're already using Authy, try the [Go Client for Authy](https://github.com/dcu/go-authy).
+
 ### Edit
 
 * edit details (phone, etc.)
