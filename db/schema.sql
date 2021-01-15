@@ -523,7 +523,6 @@ CREATE TABLE public.users (
 	"name" varchar NULL,
 	email varchar NULL,
 	phone_number varchar NULL,
-	institution_pid varchar NULL,
 	created_at timestamp NOT NULL,
 	updated_at timestamp NOT NULL,
 	encrypted_password varchar NOT NULL DEFAULT ''::character varying,
