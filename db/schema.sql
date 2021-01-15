@@ -358,7 +358,7 @@ CREATE INDEX index_premis_events_on_outcome ON public.premis_events USING btree 
 
 CREATE TABLE public.roles (
 	id serial NOT NULL,
-	"name" varchar NULL,
+	"name" varchar NULL UNIQUE,
 	created_at timestamp NOT NULL,
 	updated_at timestamp NOT NULL,
 	CONSTRAINT roles_pkey PRIMARY KEY (id)
@@ -562,3 +562,22 @@ CREATE UNIQUE INDEX index_users_on_email ON public.users USING btree (email);
 CREATE INDEX index_users_on_institution_id ON public.users USING btree (institution_id);
 CREATE INDEX index_users_on_password_changed_at ON public.users USING btree (password_changed_at);
 CREATE UNIQUE INDEX index_users_on_reset_password_token ON public.users USING btree (reset_password_token);
+
+-------------------------------------------------------------------------------
+-- Functions
+-------------------------------------------------------------------------------
+
+CREATE OR REPLACE FUNCTION create_constraint_if_not_exists (t_name text, c_name text, constraint_sql text)
+  RETURNS void
+AS
+$BODY$
+  begin
+    -- Look for our constraint
+    if not exists (select constraint_name
+                   from information_schema.constraint_column_usage
+                   where table_name = t_name  and constraint_name = c_name) then
+        execute 'ALTER TABLE ' || t_name || ' ADD CONSTRAINT ' || c_name || ' ' || constraint_sql;
+    end if;
+end;
+$BODY$
+LANGUAGE plpgsql VOLATILE;

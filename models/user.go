@@ -2,6 +2,8 @@ package models
 
 import (
 	"time"
+
+	"github.com/APTrust/registry/common"
 )
 
 type User struct {
@@ -38,4 +40,80 @@ type User struct {
 	InitialPasswordUpdated bool      `json:"initial_password_updated" form:"-" pg:"initial_password_updatedd"`
 	ForcePasswordUpdate    bool      `json:"force_password_update" form:"-" pg:"force_password_update"`
 	GracePeriod            time.Time `json:"grace_period" form:"grace_period" pg:"grace_period"`
+	Roles                  Role      `json:"role" pg:"rel:has-one"`
+}
+
+func (user *User) GetID() int64 {
+	return user.ID
+}
+func (user *User) Authorize(*User, string) error {
+	// TODO: Implement policy
+	return nil
+}
+func (user *User) IsReadOnly() bool {
+	return false
+}
+
+func (user *User) SupportsSoftDelete() bool {
+	return true
+}
+
+func (user *User) SetSoftDeleteAttributes(*User) {
+	user.DeactivatedAt = time.Now().UTC()
+}
+
+func (user *User) ClearSoftDeleteAttributes() {
+	user.DeactivatedAt = time.Time{}
+}
+
+func (user *User) SetTimestamps() {
+	now := time.Now().UTC()
+	if user.CreatedAt.IsZero() {
+		user.CreatedAt = now
+	}
+	user.UpdatedAt = now
+}
+
+func (user *User) BeforeSave() error {
+	// TODO: Validate
+	return nil
+}
+
+func SignInUser(email, password, ipAddr string) (*User, error) {
+	ctx := common.Context()
+	user := &User{}
+	err := ctx.DB.Model(user).
+		Relation("Role").
+		Where("email = ? ", email).
+		Offset(0).
+		Limit(1).
+		Select()
+	if err != nil {
+		return nil, err
+	}
+	if user == nil {
+		return nil, common.ErrInvalidLogin
+	}
+	//user := users[0]
+
+	if !user.DeactivatedAt.IsZero() {
+		return nil, common.ErrAccountDeactivated
+	}
+
+	if !common.ComparePasswords(user.EncryptedPassword, password) {
+		return nil, common.ErrInvalidLogin
+	}
+
+	user.SignInCount = user.SignInCount + 1
+	if user.CurrentSignInIP != "" {
+		user.LastSignInIP = user.CurrentSignInIP
+	}
+	if user.CurrentSignInAt.IsZero() {
+		user.LastSignInAt = user.CurrentSignInAt
+	}
+	user.CurrentSignInIP = ipAddr
+	user.CurrentSignInAt = time.Now().UTC()
+	_, err = ctx.DB.Model(user).WherePK().Update()
+
+	return user, err
 }
