@@ -2,15 +2,11 @@ package models_test
 
 import (
 	"testing"
-	"time"
 
 	"github.com/APTrust/registry/models"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
-
-// Bloomsday
-var TestDate = time.Date(2016, 6, 16, 10, 24, 16, 0, time.UTC)
 
 func TestQueryWhere(t *testing.T) {
 

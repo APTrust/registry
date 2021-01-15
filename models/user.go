@@ -9,6 +9,7 @@ import (
 type User struct {
 	ID                     int64     `json:"id" form:"id" pg:"id"`
 	Name                   string    `json:"name" form:"name" pg:"name"`
+	Email                  string    `json:"email" form:"email" pg:"email"`
 	PhoneNumber            string    `json:"phone_number" form:"phone_number" pg:"phone_number"`
 	CreatedAt              time.Time `json:"created_at" form:"created_at" pg:"created_at"`
 	UpdatedAt              time.Time `json:"updated_at" form:"updated_at" pg:"updated_at"`
@@ -16,7 +17,7 @@ type User struct {
 	ResetPasswordToken     string    `json:"-" form:"-" pg:"reset_password_token"`
 	ResetPasswordSentAt    time.Time `json:"reset_password_sent_at" form:"-" pg:"reset_password_sent_at"`
 	RememberCreatedAt      time.Time `json:"-" form:"-" pg:"remember_created_at"`
-	SignInCount            int       `json:"sign_in_count" form:"-" pg:"sign_in_count"`
+	SignInCount            int       `json:"sign_in_count" form:"-" pg:"sign_in_count,use_zero"`
 	CurrentSignInAt        time.Time `json:"current_sign_in_at" form:"-" pg:"current_sign_in_at"`
 	LastSignInAt           time.Time `json:"last_sign_in_at" form:"-" pg:"last_sign_in_at"`
 	CurrentSignInIP        string    `json:"current_sign_in_ip" form:"-" pg:"current_sign_in_ip"`
@@ -27,7 +28,7 @@ type User struct {
 	EncryptedOTPSecret     string    `json:"-" form:"-" pg:"encrypted_otp_secret"`
 	EncryptedOTPSecretIV   string    `json:"-" form:"-" pg:"encrypted_otp_secret_iv"`
 	EncryptedOTPSecretSalt string    `json:"-" form:"-" pg:"encrypted_otp_secret_salt"`
-	ConsumedTimestamp      int       `json:"-" form:"-" pg:"consumed_timestamp"`
+	ConsumedTimestep       int       `json:"-" form:"-" pg:"consumed_timestep"`
 	OTPRequiredForLogin    bool      `json:"otp_required_for_login" form:"-" pg:"otp_required_for_login"`
 	DeactivatedAt          time.Time `json:"deactivated_at" form:"-" pg:"deactivated_at"`
 	EnabledTwoFactor       bool      `json:"enabled_two_factor" form:"-" pg:"enabled_two_factor"`
@@ -37,10 +38,10 @@ type User struct {
 	LastSignInWithAuthy    time.Time `json:"last_sign_in_with_authy" form:"-" pg:"last_sign_in_with_authy"`
 	AuthyStatus            string    `json:"authy_status" form:"-" pg:"authy_status"`
 	EmailVerified          bool      `json:"email_verified" form:"-" pg:"email_verified"`
-	InitialPasswordUpdated bool      `json:"initial_password_updated" form:"-" pg:"initial_password_updatedd"`
+	InitialPasswordUpdated bool      `json:"initial_password_updated" form:"-" pg:"initial_password_updated"`
 	ForcePasswordUpdate    bool      `json:"force_password_update" form:"-" pg:"force_password_update"`
 	GracePeriod            time.Time `json:"grace_period" form:"grace_period" pg:"grace_period"`
-	Roles                  Role      `json:"role" pg:"rel:has-one"`
+	Role                   string    `json:"role" form:"role" pg:"-"`
 }
 
 func (user *User) GetID() int64 {
@@ -83,18 +84,15 @@ func SignInUser(email, password, ipAddr string) (*User, error) {
 	ctx := common.Context()
 	user := &User{}
 	err := ctx.DB.Model(user).
-		Relation("Role").
 		Where("email = ? ", email).
 		Offset(0).
 		Limit(1).
 		Select()
-	if err != nil {
+	if IsNoRowError(err) {
+		return nil, common.ErrInvalidLogin
+	} else if err != nil {
 		return nil, err
 	}
-	if user == nil {
-		return nil, common.ErrInvalidLogin
-	}
-	//user := users[0]
 
 	if !user.DeactivatedAt.IsZero() {
 		return nil, common.ErrAccountDeactivated
@@ -103,6 +101,18 @@ func SignInUser(email, password, ipAddr string) (*User, error) {
 	if !common.ComparePasswords(user.EncryptedPassword, password) {
 		return nil, common.ErrInvalidLogin
 	}
+
+	// Since users effectively have only one role, role should
+	// go into the users table.
+	role := &Role{}
+	err = ctx.DB.Model(role).
+		Join("JOIN roles_users AS ru ON ru.role_id = role.id").
+		Where("ru.user_id = ? ", user.ID).
+		First()
+	if err != nil {
+		return nil, err
+	}
+	user.Role = role.Name
 
 	user.SignInCount = user.SignInCount + 1
 	if user.CurrentSignInIP != "" {

@@ -92,7 +92,7 @@ func update(model Model, user *User) error {
 
 	db := common.Context().DB
 	return db.RunInTransaction(db.Context(), func(*pg.Tx) error {
-		_, err := db.Model(model).Update()
+		_, err := db.Model(model).WherePK().Update()
 		return err
 	})
 }
@@ -116,7 +116,7 @@ func softDelete(model Model, user *User) error {
 	model.SetTimestamps()
 	db := common.Context().DB
 	return db.RunInTransaction(db.Context(), func(*pg.Tx) error {
-		_, err := db.Model(model).Update()
+		_, err := db.Model(model).WherePK().Update()
 		return err
 	})
 }
@@ -124,7 +124,7 @@ func softDelete(model Model, user *User) error {
 func hardDelete(model Model, user *User) error {
 	db := common.Context().DB
 	return db.RunInTransaction(db.Context(), func(*pg.Tx) error {
-		_, err := db.Model(model).Delete()
+		_, err := db.Model(model).WherePK().Delete()
 		return err
 	})
 }
@@ -141,12 +141,12 @@ func Undelete(model Model, user *User) error {
 	model.ClearSoftDeleteAttributes()
 	db := common.Context().DB
 	return db.RunInTransaction(db.Context(), func(*pg.Tx) error {
-		_, err := db.Model(model).Update()
+		_, err := db.Model(model).WherePK().Update()
 		return err
 	})
 }
 
-func Inv64Value(obj interface{}, fieldName string) int64 {
+func Int64Value(obj interface{}, fieldName string) int64 {
 	value := reflect.ValueOf(obj)
 	if value.Type().Kind() != reflect.Ptr {
 		value = reflect.New(reflect.TypeOf(obj))
@@ -156,4 +156,12 @@ func Inv64Value(obj interface{}, fieldName string) int64 {
 		return field.Int()
 	}
 	return int64(0)
+}
+
+// IsNoRowError returns true if err is pg.ErrNoRows. For some reason,
+// err doesn't compare correctly with pg.ErrNoRows, and errors.Is()
+// doesn't work either. Probably because pg.ErrNoRows is an alias of
+// an error in the pg/internal package, which we cannot access.
+func IsNoRowError(err error) bool {
+	return err != nil && err.Error() == pg.ErrNoRows.Error()
 }

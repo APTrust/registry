@@ -144,8 +144,6 @@ func loadCSVFile(db *pg.DB, table string) error {
 	panicOnWrongEnv()
 	file := filepath.Join(common.ProjectRoot(), "db", "fixtures", table+".csv")
 	sql := fmt.Sprintf(`copy "%s" from '%s' csv header`, table, file)
-	fmt.Println(sql)
-	//_, err := db.Exec(sql)
 	err := runTransaction(db, sql)
 	if err != nil {
 		fmt.Println(sql)
