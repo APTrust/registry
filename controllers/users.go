@@ -83,6 +83,7 @@ func SignInUser(c *gin.Context) (int, string, error) {
 	)
 	if err != nil {
 		fmt.Println(err)
+		helpers.DeleteSessionCookie(c)
 		return http.StatusBadRequest, redirectTo, err
 	}
 	err = helpers.SetSessionCookie(c, user)

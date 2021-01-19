@@ -14,6 +14,7 @@ func SetSessionCookie(c *gin.Context, user *models.User) error {
 	ctx := common.Context()
 	id := fmt.Sprintf("%d", user.ID)
 	if encoded, err := ctx.Config.Cookies.Secure.Encode(ctx.Config.Cookies.SessionCookie, id); err == nil {
+		fmt.Println("Setting session cookie")
 		c.SetCookie(
 			ctx.Config.Cookies.SessionCookie,
 			encoded,
@@ -29,6 +30,7 @@ func SetSessionCookie(c *gin.Context, user *models.User) error {
 
 func DeleteSessionCookie(c *gin.Context) {
 	ctx := common.Context()
+	fmt.Println("Deleting session cookie")
 	c.SetCookie(
 		ctx.Config.Cookies.SessionCookie,
 		"",

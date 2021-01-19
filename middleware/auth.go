@@ -12,7 +12,8 @@ func Auth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		user, err := GetUserFromSession(c)
 		if err != nil {
-			// TODO: Log error
+			// TODO: If this isn't the sign-in page and
+			// we don't have a user, redirect to sign-in.
 			c.Set("CurrentUser", &models.User{})
 		} else {
 			c.Set("CurrentUser", user)
