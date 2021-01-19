@@ -1,0 +1,33 @@
+{{ define "shared/header.html" }}
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>APTrust Registry</title>
+    <link rel="stylesheet" href="/static/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/css/mvp.css">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/img/favicon.png">
+    <script src="/static/js/registry.js" ></script>
+  </head>
+
+  <body>
+    <main>
+      {{ if .CurrentUser }}
+        <nav>
+            <ul>
+                <li><a href="/dashboard">Dashboard</li>
+                <li><a href="/objects">Objects</a></li>
+                <li><a href="/work_items">Work Items</a></li>
+                <li><a href="/reports">Reports</a></li>
+                <li><a href="/alerts">Alerts</a></li>
+                <li><a href="/users/sign_out">Sign Out</a></li>
+                <li><a href="#">Admin</a>
+                    <ul>
+                        <li><a href="/users">Users</a></li>
+                        <li><a href="/institutions">Institutions</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+      {{ end }}
+{{ end }}

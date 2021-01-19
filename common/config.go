@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/gorilla/securecookie"
 	"github.com/op/go-logging"
 	"github.com/spf13/viper"
 )
@@ -23,8 +24,9 @@ type DBConfig struct {
 }
 
 type CookieConfig struct {
+	Secure        *securecookie.SecureCookie
 	Domain        string
-	Secure        bool
+	HTTPSOnly     bool
 	MaxAge        int
 	SessionCookie string
 }
@@ -35,7 +37,6 @@ type LoggingConfig struct {
 }
 
 type Config struct {
-	AESKey  []byte
 	Cookies *CookieConfig
 	DB      *DBConfig
 	Logging *LoggingConfig
@@ -90,12 +91,15 @@ func loadConfig() *Config {
 	if err != nil {
 		PrintAndExit(fmt.Sprintf("Fatal error config file: %v \n", err))
 	}
-	aesKey := v.GetString("AES_KEY")
-	if len(aesKey) != 32 {
-		PrintAndExit(fmt.Sprintf("Invalid AES Key."))
+
+	hashKey := []byte(v.GetString("COOKIE_HASH_KEY"))
+	blockKey := []byte(v.GetString("COOKIE_BLOCK_KEY"))
+	if len(hashKey) < 32 || len(blockKey) < 32 {
+		PrintAndExit("COOKIE_HASH_KEY and COOKIE_BLOCK_KEY must each be >= 32 bytes")
 	}
+	var secureCookie = securecookie.New(hashKey, blockKey)
+
 	return &Config{
-		AESKey: []byte(aesKey),
 		Logging: &LoggingConfig{
 			File:  v.GetString("LOG_FILE"),
 			Level: getLogLevel(v.GetString("LOG_LEVEL")),
@@ -110,8 +114,9 @@ func loadConfig() *Config {
 			UseSSL:   v.GetBool("DB_USE_SSL"),
 		},
 		Cookies: &CookieConfig{
+			Secure:        secureCookie,
 			Domain:        v.GetString("COOKIE_DOMAIN"),
-			Secure:        v.GetBool("SECURE_COOKIES"),
+			HTTPSOnly:     v.GetBool("HTTPS_COOKIES"),
 			MaxAge:        v.GetInt("SESSION_MAX_AGE"),
 			SessionCookie: v.GetString("SESSION_COOKIE_NAME"),
 		},

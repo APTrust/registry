@@ -73,6 +73,8 @@ Like Pharos, the registry will use a Postgres database and will likely sit behin
 
 # Web UI
 
+During development, we'll create a barebones web UI that simply renders the required data without polish. Later, we'll work toward [the UI that Simple Thread mocked up](./docs/APTrust_Wireframes.pdf). During development, however, we only need to ensure that our pages get the data that Simple Thread's UI requires.
+
 ## Accounts
 
 ### Login

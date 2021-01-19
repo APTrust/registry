@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/APTrust/registry/common"
@@ -89,6 +90,7 @@ func SignInUser(email, password, ipAddr string) (*User, error) {
 		Limit(1).
 		Select()
 	if IsNoRowError(err) {
+		fmt.Println("No match for email", email)
 		return nil, common.ErrInvalidLogin
 	} else if err != nil {
 		return nil, err
@@ -99,20 +101,16 @@ func SignInUser(email, password, ipAddr string) (*User, error) {
 	}
 
 	if !common.ComparePasswords(user.EncryptedPassword, password) {
+		fmt.Println("Password mismatch for", email)
+		fmt.Println("Password:", password)
+		fmt.Println("Enc Pwd:", user.EncryptedPassword)
 		return nil, common.ErrInvalidLogin
 	}
 
-	// Since users effectively have only one role, role should
-	// go into the users table.
-	role := &Role{}
-	err = ctx.DB.Model(role).
-		Join("JOIN roles_users AS ru ON ru.role_id = role.id").
-		Where("ru.user_id = ? ", user.ID).
-		First()
+	err = user.loadRole()
 	if err != nil {
 		return nil, err
 	}
-	user.Role = role.Name
 
 	user.SignInCount = user.SignInCount + 1
 	if user.CurrentSignInIP != "" {
@@ -126,4 +124,45 @@ func SignInUser(email, password, ipAddr string) (*User, error) {
 	_, err = ctx.DB.Model(user).WherePK().Update()
 
 	return user, err
+}
+
+// SignOutUser -> copy current sign in time and ip to last, then clear
+func (user *User) SignOutUser() error {
+	ctx := common.Context()
+	if user.CurrentSignInIP != "" {
+		user.LastSignInIP = user.CurrentSignInIP
+	}
+	if !user.CurrentSignInAt.IsZero() {
+		user.LastSignInAt = user.CurrentSignInAt
+	}
+	user.CurrentSignInIP = ""
+	user.CurrentSignInAt = time.Time{}
+	_, err := ctx.DB.Model(user).WherePK().Update()
+	return err
+}
+
+func UserGet(id int64) (*User, error) {
+	ctx := common.Context()
+	user := &User{ID: id}
+	err := ctx.DB.Model(user).WherePK().Select()
+	if err == nil {
+		err = user.loadRole()
+	}
+	return user, err
+}
+
+func (user *User) loadRole() error {
+	// Since users effectively have only one role, role should
+	// go into the users table.
+	ctx := common.Context()
+	role := &Role{}
+	err := ctx.DB.Model(role).
+		Join("JOIN roles_users AS ru ON ru.role_id = role.id").
+		Where("ru.user_id = ? ", user.ID).
+		First()
+	if err != nil {
+		return err
+	}
+	user.Role = role.Name
+	return nil
 }

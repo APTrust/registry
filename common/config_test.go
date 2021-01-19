@@ -24,9 +24,8 @@ func TestNewConfig(t *testing.T) {
 	assert.True(t, strings.HasSuffix(config.Logging.File, "logs/registry_test.log"))
 	assert.Equal(t, logging.DEBUG, config.Logging.Level)
 
-	assert.Equal(t, 32, len(config.AESKey))
 	assert.Equal(t, "localhost", config.Cookies.Domain)
 	assert.Equal(t, 43200, config.Cookies.MaxAge)
 	assert.Equal(t, "aptrust_session", config.Cookies.SessionCookie)
-	assert.False(t, config.Cookies.Secure)
+	assert.False(t, config.Cookies.HTTPSOnly)
 }
