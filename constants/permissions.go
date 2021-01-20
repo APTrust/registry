@@ -1,56 +1,67 @@
 package constants
 
-// These constants represent permissions. They are indexes into the
-// boolean arrays defined below.
-const (
-	AlertCreate = iota
-	AlertRead
-	AlertUpdate
-	AlertDelete
-	ChecksumCreate
-	ChecksumRead
-	ChecksumUpdate
-	ChecksumDelete
-	EventCreate
-	EventRead
-	EventUpdate
-	EventDelete
-	FileCreate
-	FileRead
-	FileUpdate
-	FileDelete
-	FileRequestDelete
-	FileApproveDelete    // For institutional admin approval
-	FileFinishBulkDelete // Sys admin approval of bulk delete
-	FileRestore
-	InstitutionCreate
-	InstitutionRead
-	InstitutionUpdate
-	InstitutionDelete
-	ObjectCreate
-	ObjectRead
-	ObjectUpdate
-	ObjectDelete
-	ObjectRequestDelete
-	ObjectApproveDelete    // For institutional admin approval
-	ObjectFinishBulkDelete // Sys admin approval of bulk delete
-	ObjectRestore
-	StorageRecordCreate
-	StorageRecordRead
-	StorageRecordUpdate
-	StorageRecordDelete
-	UserCreate
-	UserRead
-	UserUpdate
-	UserDelete
-	UserReadSelf
-	UserUpdateSelf
-	WorkItemCreate
-	WorkItemRead
-	WorkItemUpdate
-	WorkItemDelete
+// Permission is a string that keys into permission maps for
+// different roles. We use string instead of bitmask or array index
+// for a few reasons:
+//
+// 1. We may wind up with more than 64 of these, which would be too
+//    many for a bitmask.
+// 2. Our models need to construct permission names from strings made
+//    up of model names and actions. E.g. "User" + "Create" or
+//    "Object" + "Read".
+// 3. We will likely insert permissions as the application grows, and
+//    adding bitmasks and array indices is order-dependent, while
+//    adding string keys is value-dependent, which means we can insert
+//    them anywhere in the list.
+type Permission string
 
-	// Future permissions for reports will go here.
+const (
+	AlertCreate            Permission = "AlertCreate"
+	AlertRead                         = "AlertRead"
+	AlertUpdate                       = "AlertUpdate"
+	AlertDelete                       = "AlertDelete"
+	ChecksumCreate                    = "ChecksumCreate"
+	ChecksumRead                      = "ChecksumRead"
+	ChecksumUpdate                    = "ChecksumUpdate"
+	ChecksumDelete                    = "ChecksumDelete"
+	EventCreate                       = "EventCreate"
+	EventRead                         = "EventRead"
+	EventUpdate                       = "EventUpdate"
+	EventDelete                       = "EventDelete"
+	FileCreate                        = "FileCreate"
+	FileRead                          = "FileRead"
+	FileUpdate                        = "FileUpdate"
+	FileDelete                        = "FileDelete"
+	FileRequestDelete                 = "FileRequestDelete"
+	FileApproveDelete                 = "FileApproveDelete"
+	FileFinishBulkDelete              = "FileFinishBulkDelete"
+	FileRestore                       = "FileRestore"
+	InstitutionCreate                 = "InstitutionCreate"
+	InstitutionRead                   = "InstitutionRead"
+	InstitutionUpdate                 = "InstitutionUpdate"
+	InstitutionDelete                 = "InstitutionDelete"
+	ObjectCreate                      = "ObectCreate"
+	ObjectRead                        = "ObjectRead"
+	ObjectUpdate                      = "ObjectUpdate"
+	ObjectDelete                      = "ObjectDelete"
+	ObjectRequestDelete               = "ObjectRequestDelete"
+	ObjectApproveDelete               = "ObjectApproveDelete"
+	ObjectFinishBulkDelete            = "ObjectFinishBulkDelete"
+	ObjectRestore                     = "ObjectRestore"
+	StorageRecordCreate               = "StorageRecordCreate"
+	StorageRecordRead                 = "StorageRecordRead"
+	StorageRecordUpdate               = "StorageRecordUpdate"
+	StorageRecordDelete               = "StorageRecordDelete"
+	UserCreate                        = "UserCreate"
+	UserRead                          = "UserRead"
+	UserUpdate                        = "UserUpdate"
+	UserDelete                        = "UserDelete"
+	UserReadSelf                      = "UserReadSelf"
+	UserUpdateSelf                    = "UserUpdateSelf"
+	WorkItemCreate                    = "WorkItemCreate"
+	WorkItemRead                      = "WorkItemRead"
+	WorkItemUpdate                    = "WorkItemUpdate"
+	WorkItemDelete                    = "WorkItemDelete"
 )
 
 var permissionsInitialized = false
@@ -58,10 +69,12 @@ var permissionCount = 46
 
 // Permission lists for different roles. Bools default to false in Go,
 // so roles will have only the permissions we explicitly grant below.
-var instUser = make([]bool, permissionCount)
-var instAdmin = make([]bool, permissionCount)
-var sysAdmin = make([]bool, permissionCount)
-var emptyList = make([]bool, permissionCount)
+// Note that emptyList gets zero permissions. This is the list we'll check
+// if we can't figure out a user's role, or if a user has been deactivated.
+var instUser = make(map[Permission]bool)
+var instAdmin = make(map[Permission]bool)
+var sysAdmin = make(map[Permission]bool)
+var emptyList = make(map[Permission]bool)
 
 func initPermissions() {
 	instUser[AlertRead] = true
@@ -147,20 +160,20 @@ func initPermissions() {
 	permissionsInitialized = true
 }
 
-func CheckPermission(role string, permission int) bool {
+func CheckPermission(role string, permission Permission) bool {
 	if !permissionsInitialized {
 		initPermissions()
 	}
-	var permissionList []bool
+	var permissions map[Permission]bool
 	switch role {
 	case RoleSysAdmin:
-		permissionList = sysAdmin
+		permissions = sysAdmin
 	case RoleInstAdmin:
-		permissionList = instAdmin
+		permissions = instAdmin
 	case RoleInstUser:
-		permissionList = instUser
+		permissions = instUser
 	default:
-		permissionList = emptyList
+		permissions = emptyList
 	}
-	return permissionList[permission]
+	return permissions[permission]
 }

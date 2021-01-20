@@ -5,17 +5,15 @@ const (
 	RoleInstAdmin = "institutional_admin"
 	RoleInstUser  = "institutional_user"
 	RoleNone      = "none"
-	ActionList    = "list"
-	ActionCreate  = "create"
-	ActionView    = "view"
-	ActionEdit    = "edit"
-	ActionDelete  = "delete"
+	ActionCreate  = "Create"
+	ActionRead    = "Read"
+	ActionUpdate  = "Update"
+	ActionDelete  = "Delete"
 )
 
 var Actions = []string{
-	ActionList,
 	ActionCreate,
-	ActionView,
-	ActionEdit,
+	ActionRead,
+	ActionUpdate,
 	ActionDelete,
 }

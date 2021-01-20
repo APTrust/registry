@@ -49,8 +49,16 @@ type User struct {
 func (user *User) GetID() int64 {
 	return user.ID
 }
-func (user *User) Authorize(*User, string) error {
-	// TODO: Implement policy
+func (user *User) Authorize(actingUser *User, action string) error {
+	perm := "User" + action
+	if actingUser.ID == user.ID && (action == constants.ActionRead || action == constants.ActionUpdate) {
+		perm += "Self"
+	}
+	if !actingUser.Can(constants.Permission(perm), user.InstitutionID) {
+		// TODO: Log this...
+		fmt.Printf("Permission denied: acting user %d can't %s on subject user %d\n", actingUser.ID, perm, user.ID)
+		return common.ErrPermissionDenied
+	}
 	return nil
 }
 func (user *User) IsReadOnly() bool {
@@ -156,8 +164,20 @@ func (user *User) loadRole() error {
 	// Since users effectively have only one role, role should
 	// go into the users table.
 
-	// Initialize to something safe...
+	// Initialize to something safe.
+	// RoleNone corresponds to the empty permissions list
+	// in constants/permissions.go
 	user.Role = constants.RoleNone
+
+	// If user is deactivated, code above should prevent them
+	// from signing in at all. Just in case, this failsafe leaves
+	// them with RoleNone and zero permissions. We do this instead
+	// of returning an error because an admin may be loading this
+	// user to review their info or to reactivate them.
+	if !user.DeactivatedAt.IsZero() {
+		return nil
+	}
+
 	ctx := common.Context()
 	role := &Role{}
 	err := ctx.DB.Model(role).
@@ -177,7 +197,7 @@ func (user *User) loadRole() error {
 // be the ID of the institution that owns the object upon which the user is
 // trying to act. In certain cases, such as when a user is editing him/herself,
 // this can be zero.
-func (user *User) Can(action int, institutionID int64) bool {
+func (user *User) Can(action constants.Permission, institutionID int64) bool {
 	// Sys admin's permissions apply across all institutional boundaries.
 	if user.Role == constants.RoleSysAdmin {
 		return constants.CheckPermission(user.Role, action)

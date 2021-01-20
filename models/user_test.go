@@ -67,31 +67,46 @@ func TestSignInUser_Deactivated(t *testing.T) {
 func TestUserDeleteUndelete(t *testing.T) {
 	db.LoadFixtures()
 
+	admin, err := getUser()
+	require.Nil(t, err)
+	require.NotNil(t, admin)
+	admin.Role = constants.RoleSysAdmin
+
+	regUser, err := getUser()
+	require.Nil(t, err)
+	require.NotNil(t, regUser)
+	regUser.Role = constants.RoleInstUser
+
 	user, err := getUser()
 	require.Nil(t, err)
-	err = models.Save(user, user)
+	err = models.Save(user, admin)
 	require.Nil(t, err)
 	assert.True(t, user.ID > int64(0))
 	assert.True(t, user.DeactivatedAt.IsZero())
 
+	// This should raise an error, since regular user cannot
+	// delete users.
+	err = models.Delete(user, regUser)
+	assert.Equal(t, common.ErrPermissionDenied, err)
+
 	// We don't hard-delete users. We set a timestamp on
 	// User.DeactivatedAt to indicate they're no longer active.
-	err = models.Delete(user, user)
+	err = models.Delete(user, admin)
 	require.Nil(t, err)
 
 	// Reload deleted user. They should exist with a
 	// DeactivatedAt timestamp.
-	err = models.Find(user, user.ID, user)
+	err = models.Find(user, user.ID, admin)
 	require.Nil(t, err)
 	require.NotNil(t, user)
 	assert.False(t, user.DeactivatedAt.IsZero())
 
 	// Undelete the bastard.
-	err = models.Undelete(user, user)
+	err = models.Undelete(user, admin)
 	require.Nil(t, err)
 
 	// His deactivation timestamp should be cleared.
-	err = models.Find(user, user.ID, user)
+	err = models.Find(user, user.ID, admin)
 	require.Nil(t, err)
 	require.NotNil(t, user)
 	assert.True(t, user.DeactivatedAt.IsZero())

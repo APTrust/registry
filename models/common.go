@@ -21,13 +21,13 @@ type Model interface {
 }
 
 // Find finds an object by ID
-func Find(obj Model, id int64, user *User) error {
+func Find(obj Model, id int64, actingUser *User) error {
 	ctx := common.Context()
 	err := ctx.DB.Model(obj).Where("id = ?", id).Select()
 	if err != nil {
 		return err
 	}
-	return obj.Authorize(user, constants.ActionView)
+	return obj.Authorize(actingUser, constants.ActionRead)
 }
 
 func Select(models interface{}, q *Query) error {
@@ -46,20 +46,20 @@ func Select(models interface{}, q *Query) error {
 	return orm.Select()
 }
 
-func Save(model Model, user *User) error {
+func Save(model Model, actingUser *User) error {
 	if model.IsReadOnly() {
 		return common.ErrNotSupported
 	}
 	if model.GetID() > 0 {
 		fmt.Println("Updating model")
-		return update(model, user)
+		return update(model, actingUser)
 	}
 	fmt.Println("Inserting model")
-	return insert(model, user)
+	return insert(model, actingUser)
 }
 
-func insert(model Model, user *User) error {
-	err := model.Authorize(user, constants.ActionCreate)
+func insert(model Model, actingUser *User) error {
+	err := model.Authorize(actingUser, constants.ActionCreate)
 	if err != nil {
 		return err
 	}
@@ -78,8 +78,8 @@ func insert(model Model, user *User) error {
 	})
 }
 
-func update(model Model, user *User) error {
-	err := model.Authorize(user, constants.ActionEdit)
+func update(model Model, actingUser *User) error {
+	err := model.Authorize(actingUser, constants.ActionUpdate)
 	if err != nil {
 		return err
 	}
@@ -97,22 +97,22 @@ func update(model Model, user *User) error {
 	})
 }
 
-func Delete(model Model, user *User) error {
+func Delete(model Model, actingUser *User) error {
 	if model.IsReadOnly() {
 		return common.ErrNotSupported
 	}
-	err := model.Authorize(user, constants.ActionDelete)
+	err := model.Authorize(actingUser, constants.ActionDelete)
 	if err != nil {
 		return err
 	}
 	if model.SupportsSoftDelete() {
-		return softDelete(model, user)
+		return softDelete(model, actingUser)
 	}
-	return hardDelete(model, user)
+	return hardDelete(model, actingUser)
 }
 
-func softDelete(model Model, user *User) error {
-	model.SetSoftDeleteAttributes(user)
+func softDelete(model Model, actingUser *User) error {
+	model.SetSoftDeleteAttributes(actingUser)
 	model.SetTimestamps()
 	db := common.Context().DB
 	return db.RunInTransaction(db.Context(), func(*pg.Tx) error {
@@ -121,7 +121,7 @@ func softDelete(model Model, user *User) error {
 	})
 }
 
-func hardDelete(model Model, user *User) error {
+func hardDelete(model Model, actingUser *User) error {
 	db := common.Context().DB
 	return db.RunInTransaction(db.Context(), func(*pg.Tx) error {
 		_, err := db.Model(model).WherePK().Delete()
@@ -129,11 +129,11 @@ func hardDelete(model Model, user *User) error {
 	})
 }
 
-func Undelete(model Model, user *User) error {
+func Undelete(model Model, actingUser *User) error {
 	if model.IsReadOnly() {
 		return common.ErrNotSupported
 	}
-	err := model.Authorize(user, constants.ActionEdit)
+	err := model.Authorize(actingUser, constants.ActionUpdate)
 	if err != nil {
 		return err
 	}
