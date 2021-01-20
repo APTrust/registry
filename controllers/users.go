@@ -1,12 +1,10 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/APTrust/registry/helpers"
 	"github.com/APTrust/registry/models"
-
 	"github.com/gin-gonic/gin"
 )
 
@@ -82,7 +80,7 @@ func SignInUser(c *gin.Context) (int, string, error) {
 		c.ClientIP(),
 	)
 	if err != nil {
-		fmt.Println(err)
+		c.Error(err)
 		helpers.DeleteSessionCookie(c)
 		return http.StatusBadRequest, redirectTo, err
 	}

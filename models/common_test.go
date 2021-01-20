@@ -2,11 +2,13 @@ package models_test
 
 import (
 	"fmt"
+	"testing"
 	"time"
 
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/models"
+	"github.com/stretchr/testify/assert"
 )
 
 // Bloomsday
@@ -46,4 +48,9 @@ func getUser() (*models.User, error) {
 		InstitutionID:     InstOne,
 		Role:              constants.RoleInstAdmin,
 	}, nil
+}
+
+func TestTypeOf(t *testing.T) {
+	user := &models.User{}
+	assert.Equal(t, "User", models.TypeOf(user))
 }

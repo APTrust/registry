@@ -1,7 +1,6 @@
 package models
 
 import (
-	"fmt"
 	"reflect"
 
 	"github.com/APTrust/registry/common"
@@ -31,9 +30,9 @@ func Find(obj Model, id int64, actingUser *User) error {
 }
 
 func Select(models interface{}, q *Query) error {
-	db := common.Context().DB
-	orm := db.Model(models).Where(q.WhereClause(), q.Params()...)
-	fmt.Println(q.WhereClause(), q.Params(), q.OrderBy, q.Offset, q.Limit)
+	ctx := common.Context()
+	orm := ctx.DB.Model(models).Where(q.WhereClause(), q.Params()...)
+	ctx.Log.Debug().Msgf("%s, %v, order by %s, offset %d, limit %d ", q.WhereClause(), q.Params(), q.OrderBy, q.Offset, q.Limit)
 	if q.OrderBy != "" {
 		orm.Order(q.OrderBy)
 	}
@@ -51,10 +50,8 @@ func Save(model Model, actingUser *User) error {
 		return common.ErrNotSupported
 	}
 	if model.GetID() > 0 {
-		fmt.Println("Updating model")
 		return update(model, actingUser)
 	}
-	fmt.Println("Inserting model")
 	return insert(model, actingUser)
 }
 
@@ -70,10 +67,11 @@ func insert(model Model, actingUser *User) error {
 		return err
 	}
 
-	db := common.Context().DB
-	return db.RunInTransaction(db.Context(), func(*pg.Tx) error {
-		_, err := db.Model(model).Insert()
-		fmt.Println("Transaction", err, "ID", model.GetID())
+	ctx := common.Context()
+	ctx.Log.Debug().Msgf("Insert %s %v", TypeOf(model), model)
+	return ctx.DB.RunInTransaction(ctx.DB.Context(), func(*pg.Tx) error {
+		_, err := ctx.DB.Model(model).Insert()
+		ctx.Log.Error().Msgf("Transaction on ID %d: %v", model.GetID(), err)
 		return err
 	})
 }
@@ -90,9 +88,10 @@ func update(model Model, actingUser *User) error {
 		return err
 	}
 
-	db := common.Context().DB
-	return db.RunInTransaction(db.Context(), func(*pg.Tx) error {
-		_, err := db.Model(model).WherePK().Update()
+	ctx := common.Context()
+	ctx.Log.Debug().Msgf("Insert %s %v", TypeOf(model), model)
+	return ctx.DB.RunInTransaction(ctx.DB.Context(), func(*pg.Tx) error {
+		_, err := ctx.DB.Model(model).WherePK().Update()
 		return err
 	})
 }
@@ -156,6 +155,14 @@ func Int64Value(obj interface{}, fieldName string) int64 {
 		return field.Int()
 	}
 	return int64(0)
+}
+
+func TypeOf(obj interface{}) string {
+	if t := reflect.TypeOf(obj); t.Kind() == reflect.Ptr {
+		return t.Elem().Name()
+	} else {
+		return t.Name()
+	}
 }
 
 // IsNoRowError returns true if err is pg.ErrNoRows. For some reason,

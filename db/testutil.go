@@ -1,7 +1,6 @@
 package db
 
 import (
-	// "encoding/csv"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -86,15 +85,19 @@ func LoadFixtures() error {
 	if !fixturesLoaded {
 		ctx := common.Context()
 		if err := dropEverything(ctx.DB); err != nil {
+			ctx.Log.Error().Stack().Err(err).Msg("")
 			return err
 		}
 		if err := loadSchema(ctx.DB); err != nil {
+			ctx.Log.Error().Stack().Err(err).Msg("")
 			return err
 		}
 		if err := loadCSVFiles(ctx.DB); err != nil {
+			ctx.Log.Error().Stack().Err(err).Msg("")
 			return err
 		}
 		if err := resetSequences(ctx.DB); err != nil {
+			ctx.Log.Error().Stack().Err(err).Msg("")
 			return err
 		}
 		fixturesLoaded = true
@@ -146,7 +149,6 @@ func loadCSVFile(db *pg.DB, table string) error {
 	sql := fmt.Sprintf(`copy "%s" from '%s' csv header`, table, file)
 	err := runTransaction(db, sql)
 	if err != nil {
-		fmt.Println(sql)
 		err = fmt.Errorf(`Error executing "%s": %v`, sql, err)
 	}
 	return err

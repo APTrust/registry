@@ -14,7 +14,7 @@ func SetSessionCookie(c *gin.Context, user *models.User) error {
 	ctx := common.Context()
 	id := fmt.Sprintf("%d", user.ID)
 	if encoded, err := ctx.Config.Cookies.Secure.Encode(ctx.Config.Cookies.SessionCookie, id); err == nil {
-		fmt.Println("Setting session cookie")
+		ctx.Log.Info().Msgf("Setting session cookie for %s", user.Email)
 		c.SetCookie(
 			ctx.Config.Cookies.SessionCookie,
 			encoded,
@@ -30,7 +30,12 @@ func SetSessionCookie(c *gin.Context, user *models.User) error {
 
 func DeleteSessionCookie(c *gin.Context) {
 	ctx := common.Context()
-	fmt.Println("Deleting session cookie")
+	user := CurrentUser(c)
+	email := "unknown@not-logged-in.edu"
+	if user != nil {
+		email = user.Email
+	}
+	ctx.Log.Info().Msgf("Deleting session cookie for %s", email)
 	c.SetCookie(
 		ctx.Config.Cookies.SessionCookie,
 		"",
@@ -40,4 +45,11 @@ func DeleteSessionCookie(c *gin.Context) {
 		ctx.Config.Cookies.HTTPSOnly, // set only via HTTPS?
 		true,                         // http-only: javascript can't access
 	)
+}
+
+func CurrentUser(c *gin.Context) *models.User {
+	if currentUser, ok := c.Get("CurrentUser"); ok && currentUser != nil {
+		return currentUser.(*models.User)
+	}
+	return nil
 }
