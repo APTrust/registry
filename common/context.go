@@ -2,8 +2,14 @@ package common
 
 import (
 	"fmt"
+	"os"
+	"time"
 
+	//"github.com/gin-contrib/logger"
+	//"github.com/gin-gonic/gin"
 	"github.com/go-pg/pg/v10"
+	"github.com/rs/zerolog"
+	//"github.com/rs/zerolog/log"
 )
 
 var ctx *APTContext
@@ -11,6 +17,7 @@ var ctx *APTContext
 type APTContext struct {
 	Config *Config
 	DB     *pg.DB
+	Log    zerolog.Logger
 }
 
 // Context returns an APTContext object, which includes
@@ -34,10 +41,49 @@ func Context() *APTContext {
 			Password: config.DB.Password,
 			Database: config.DB.Name,
 		})
+		logger := getLogger(config)
 		ctx = &APTContext{
 			Config: config,
 			DB:     db,
+			Log:    logger,
 		}
 	}
 	return ctx
+}
+
+// getLogger returns a logger based on our config settings.
+func getLogger(config *Config) zerolog.Logger {
+
+	// Start by setting the log level and timestamp format.
+	zerolog.SetGlobalLevel(config.Logging.Level)
+	zerolog.TimeFieldFormat = time.RFC3339
+
+	// Get a writer for the log file, or die if we can't.
+	fileWriter, err := os.OpenFile(config.Logging.File, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+	if err != nil {
+		PrintAndExit(fmt.Sprintf("Cannot open log file '%s': %v\n", config.Logging.File, err))
+	}
+
+	// Set up a multiwriter, because we might be logging to multiple outputs.
+	multiWriter := zerolog.MultiLevelWriter(fileWriter)
+
+	// If the config says log to console, add that output.
+	if config.Logging.LogToConsole {
+		consoleWriter := zerolog.ConsoleWriter{
+			Out:     os.Stderr,
+			NoColor: false,
+		}
+		multiWriter = zerolog.MultiLevelWriter(consoleWriter, fileWriter)
+	}
+
+	// If the config says to log the caller, we'll do that and timestamps.
+	// Otherwise, just timestamps.
+	var logger zerolog.Logger
+	if config.Logging.LogCaller {
+		logger = zerolog.New(multiWriter).With().Timestamp().Caller().Logger()
+	} else {
+		logger = zerolog.New(multiWriter).With().Timestamp().Logger()
+	}
+
+	return logger
 }

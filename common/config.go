@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/gorilla/securecookie"
-	"github.com/op/go-logging"
+	"github.com/rs/zerolog"
 	"github.com/spf13/viper"
 )
 
@@ -32,23 +32,16 @@ type CookieConfig struct {
 }
 
 type LoggingConfig struct {
-	File  string
-	Level logging.Level
+	File         string
+	Level        zerolog.Level
+	LogCaller    bool
+	LogToConsole bool
 }
 
 type Config struct {
 	Cookies *CookieConfig
 	DB      *DBConfig
 	Logging *LoggingConfig
-}
-
-var logLevels = map[string]logging.Level{
-	"CRITICAL": logging.CRITICAL,
-	"ERROR":    logging.ERROR,
-	"WARNING":  logging.WARNING,
-	"NOTICE":   logging.NOTICE,
-	"INFO":     logging.INFO,
-	"DEBUG":    logging.DEBUG,
 }
 
 // Returns a new config based on APT_ENV
@@ -101,8 +94,10 @@ func loadConfig() *Config {
 
 	return &Config{
 		Logging: &LoggingConfig{
-			File:  v.GetString("LOG_FILE"),
-			Level: getLogLevel(v.GetString("LOG_LEVEL")),
+			File:         v.GetString("LOG_FILE"),
+			Level:        getLogLevel(v.GetInt("LOG_LEVEL")),
+			LogCaller:    v.GetBool("LOG_CALLER"),
+			LogToConsole: v.GetBool("LOG_TO_CONSOLE"),
 		},
 		DB: &DBConfig{
 			Host:     v.GetString("DB_HOST"),
@@ -123,11 +118,8 @@ func loadConfig() *Config {
 	}
 }
 
-func getLogLevel(level string) logging.Level {
-	if level == "" {
-		level = "INFO"
-	}
-	return logLevels[level]
+func getLogLevel(level int) zerolog.Level {
+	return zerolog.Level(int8(level))
 }
 
 // Expand ~ to home dir in path settings.
@@ -152,7 +144,7 @@ func expandPath(dirName string) string {
 
 func (config *Config) makeDirs() error {
 	dirs := []string{
-		config.Logging.File,
+		path.Dir(config.Logging.File),
 	}
 	for _, dir := range dirs {
 		err := os.MkdirAll(dir, 0755)
