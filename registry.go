@@ -3,30 +3,46 @@ package main
 import (
 	"html/template"
 
+	"github.com/APTrust/registry/common"
 	c "github.com/APTrust/registry/controllers"
 	"github.com/APTrust/registry/helpers"
 	"github.com/APTrust/registry/middleware"
+	"github.com/gin-contrib/logger"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
 	r := gin.Default()
+	initTemplates(r)
+	initMiddleware(r)
+	initRoutes(r)
+	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
+}
 
-	// Set up our template helper functions.
-	// These have to be defined before views
-	// are loaded, or the view parser will
-	// error out.
-	r.SetFuncMap(template.FuncMap{
+// initTemplateHelpers sets up our template helper functions.
+// These have to be defined before views  are loaded, or the view
+// parser will error out.
+func initTemplates(router *gin.Engine) {
+	router.SetFuncMap(template.FuncMap{
 		"dateISO":  helpers.DateISO,
 		"dateUS":   helpers.DateUS,
 		"truncate": helpers.Truncate,
 	})
-
 	// Load the view templates
-	r.LoadHTMLGlob("views/**/*.html")
-	r.Use(middleware.Auth())
-	initRoutes(r)
-	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
+	router.LoadHTMLGlob("views/**/*.html")
+}
+
+// initMiddleware loads our custom middleware in the desired order.
+func initMiddleware(router *gin.Engine) {
+	// Logger first...
+	ctx := common.Context()
+	router.Use(logger.SetLogger(logger.Config{
+		Logger: &ctx.Log,
+		UTC:    true,
+	}))
+
+	// Then authentication middleware
+	router.Use(middleware.Auth())
 }
 
 // initRoutes maps URLs to handlers.

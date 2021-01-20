@@ -1,7 +1,6 @@
 package models
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/APTrust/registry/common"
@@ -55,8 +54,8 @@ func (user *User) Authorize(actingUser *User, action string) error {
 		perm += "Self"
 	}
 	if !actingUser.Can(constants.Permission(perm), user.InstitutionID) {
-		// TODO: Log this...
-		fmt.Printf("Permission denied: acting user %d can't %s on subject user %d\n", actingUser.ID, perm, user.ID)
+		ctx := common.Context()
+		ctx.Log.Error().Msgf("Permission denied: acting user %d can't %s on subject user %d\n", actingUser.ID, perm, user.ID)
 		return common.ErrPermissionDenied
 	}
 	return nil
@@ -99,7 +98,7 @@ func SignInUser(email, password, ipAddr string) (*User, error) {
 		Limit(1).
 		Select()
 	if IsNoRowError(err) {
-		fmt.Println("No match for email", email)
+		ctx.Log.Error().Msgf("No users matches email %s", email)
 		return nil, common.ErrInvalidLogin
 	} else if err != nil {
 		return nil, err
@@ -110,9 +109,7 @@ func SignInUser(email, password, ipAddr string) (*User, error) {
 	}
 
 	if !common.ComparePasswords(user.EncryptedPassword, password) {
-		fmt.Println("Password mismatch for", email)
-		fmt.Println("Password:", password)
-		fmt.Println("Enc Pwd:", user.EncryptedPassword)
+		ctx.Log.Warn().Msgf("Wrong password for user %s", email)
 		return nil, common.ErrInvalidLogin
 	}
 
