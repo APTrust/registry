@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/APTrust/registry/common"
+	"github.com/APTrust/registry/constants"
 )
 
 type User struct {
@@ -126,6 +127,16 @@ func SignInUser(email, password, ipAddr string) (*User, error) {
 	return user, err
 }
 
+func UserGet(id int64) (*User, error) {
+	ctx := common.Context()
+	user := &User{ID: id}
+	err := ctx.DB.Model(user).WherePK().Select()
+	if err == nil {
+		err = user.loadRole()
+	}
+	return user, err
+}
+
 // SignOutUser -> copy current sign in time and ip to last, then clear
 func (user *User) SignOutUser() error {
 	ctx := common.Context()
@@ -141,19 +152,12 @@ func (user *User) SignOutUser() error {
 	return err
 }
 
-func UserGet(id int64) (*User, error) {
-	ctx := common.Context()
-	user := &User{ID: id}
-	err := ctx.DB.Model(user).WherePK().Select()
-	if err == nil {
-		err = user.loadRole()
-	}
-	return user, err
-}
-
 func (user *User) loadRole() error {
 	// Since users effectively have only one role, role should
 	// go into the users table.
+
+	// Initialize to something safe...
+	user.Role = constants.RoleNone
 	ctx := common.Context()
 	role := &Role{}
 	err := ctx.DB.Model(role).
@@ -165,4 +169,20 @@ func (user *User) loadRole() error {
 	}
 	user.Role = role.Name
 	return nil
+}
+
+// Can returns true or false to indicate whether the user has sufficient
+// permissions to perform the requested action. Param action should be one
+// of the constants from constants/permissions.go. Param institutionID should
+// be the ID of the institution that owns the object upon which the user is
+// trying to act. In certain cases, such as when a user is editing him/herself,
+// this can be zero.
+func (user *User) Can(action int, institutionID int64) bool {
+	// Sys admin's permissions apply across all institutional boundaries.
+	if user.Role == constants.RoleSysAdmin {
+		return constants.CheckPermission(user.Role, action)
+	}
+	// Institutional user and admin permissions apply only within their
+	// own institutions.
+	return user.InstitutionID == institutionID && constants.CheckPermission(user.Role, action)
 }

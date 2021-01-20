@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/APTrust/registry/common"
+	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/db"
 	"github.com/APTrust/registry/models"
 	"github.com/stretchr/testify/assert"
@@ -94,4 +95,95 @@ func TestUserDeleteUndelete(t *testing.T) {
 	require.Nil(t, err)
 	require.NotNil(t, user)
 	assert.True(t, user.DeactivatedAt.IsZero())
+}
+
+func TestUserCan(t *testing.T) {
+	ownInst := int64(2)
+	otherInst := int64(3)
+	sysAdmin := &models.User{
+		Role:          constants.RoleSysAdmin,
+		InstitutionID: int64(1),
+	}
+	instAdmin := &models.User{
+		Role:          constants.RoleInstAdmin,
+		InstitutionID: ownInst,
+	}
+	instUser := &models.User{
+		Role:          constants.RoleInstUser,
+		InstitutionID: ownInst,
+	}
+	nobody := &models.User{
+		Role:          constants.RoleNone,
+		InstitutionID: ownInst,
+	}
+
+	// Sys Admin has privileges across all institutions
+	assert.True(t, sysAdmin.Can(constants.ObjectUpdate, 0))
+	assert.True(t, sysAdmin.Can(constants.ObjectUpdate, 1))
+	assert.True(t, sysAdmin.Can(constants.ObjectUpdate, 2))
+	assert.True(t, sysAdmin.Can(constants.UserUpdate, 1))
+	assert.True(t, sysAdmin.Can(constants.InstitutionUpdate, 1))
+
+	// Inst admin can read and update some things at their own institution.
+	assert.True(t, instAdmin.Can(constants.ObjectRead, ownInst))
+	assert.True(t, instAdmin.Can(constants.UserUpdate, ownInst))
+	assert.True(t, instAdmin.Can(constants.ObjectRequestDelete, ownInst))
+	assert.True(t, instAdmin.Can(constants.ObjectApproveDelete, ownInst))
+	assert.True(t, instAdmin.Can(constants.ObjectRestore, ownInst))
+	assert.True(t, instAdmin.Can(constants.FileRestore, ownInst))
+
+	// Inst admin cannot read and update items at their other institutions.
+	assert.False(t, instAdmin.Can(constants.ObjectRead, otherInst))
+	assert.False(t, instAdmin.Can(constants.UserUpdate, otherInst))
+	assert.False(t, instAdmin.Can(constants.ObjectRequestDelete, otherInst))
+	assert.False(t, instAdmin.Can(constants.ObjectApproveDelete, otherInst))
+	assert.False(t, instAdmin.Can(constants.ObjectRestore, otherInst))
+	assert.False(t, instAdmin.Can(constants.FileRestore, otherInst))
+
+	// Inst user can read records at their own institution...
+	assert.True(t, instUser.Can(constants.ObjectRead, ownInst))
+	assert.True(t, instUser.Can(constants.FileRead, ownInst))
+	assert.True(t, instUser.Can(constants.EventRead, ownInst))
+	assert.True(t, instUser.Can(constants.ChecksumRead, ownInst))
+	assert.True(t, instUser.Can(constants.StorageRecordRead, ownInst))
+
+	// Inst user cannot read records at other institutions.
+	assert.False(t, instUser.Can(constants.ObjectRead, otherInst))
+	assert.False(t, instUser.Can(constants.FileRead, otherInst))
+	assert.False(t, instUser.Can(constants.EventRead, otherInst))
+	assert.False(t, instUser.Can(constants.ChecksumRead, otherInst))
+	assert.False(t, instUser.Can(constants.StorageRecordRead, otherInst))
+
+	// Inst user can't edit much at any institution
+	assert.False(t, instUser.Can(constants.UserUpdate, ownInst))
+	assert.False(t, instUser.Can(constants.ObjectRequestDelete, ownInst))
+	assert.False(t, instUser.Can(constants.ObjectApproveDelete, ownInst))
+	assert.False(t, instUser.Can(constants.ObjectRestore, ownInst))
+	assert.False(t, instUser.Can(constants.FileRestore, ownInst))
+
+	assert.False(t, instUser.Can(constants.UserUpdate, otherInst))
+	assert.False(t, instUser.Can(constants.ObjectRequestDelete, otherInst))
+	assert.False(t, instUser.Can(constants.ObjectApproveDelete, otherInst))
+	assert.False(t, instUser.Can(constants.ObjectRestore, otherInst))
+	assert.False(t, instUser.Can(constants.FileRestore, otherInst))
+
+	// User with no role has no permissions.
+	// RoleNone is set by default until we can determine from the database
+	// what the user's actual role is. See User.loadRole().
+	assert.False(t, nobody.Can(constants.ObjectRead, otherInst))
+	assert.False(t, nobody.Can(constants.FileRead, otherInst))
+	assert.False(t, nobody.Can(constants.EventRead, otherInst))
+	assert.False(t, nobody.Can(constants.ChecksumRead, otherInst))
+	assert.False(t, nobody.Can(constants.StorageRecordRead, otherInst))
+	assert.False(t, nobody.Can(constants.UserUpdate, ownInst))
+	assert.False(t, nobody.Can(constants.ObjectRequestDelete, ownInst))
+	assert.False(t, nobody.Can(constants.ObjectApproveDelete, ownInst))
+	assert.False(t, nobody.Can(constants.ObjectRestore, ownInst))
+	assert.False(t, nobody.Can(constants.FileRestore, ownInst))
+	assert.False(t, nobody.Can(constants.UserUpdate, otherInst))
+	assert.False(t, nobody.Can(constants.ObjectRequestDelete, otherInst))
+	assert.False(t, nobody.Can(constants.ObjectApproveDelete, otherInst))
+	assert.False(t, nobody.Can(constants.ObjectRestore, otherInst))
+	assert.False(t, nobody.Can(constants.FileRestore, otherInst))
+
 }
