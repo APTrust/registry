@@ -11,6 +11,7 @@ import (
 type Model interface {
 	GetID() int64
 	Authorize(*User, string) error
+	DeleteIsForbidden() bool
 	IsReadOnly() bool
 	SupportsSoftDelete() bool
 	SetSoftDeleteAttributes(*User)
@@ -97,7 +98,7 @@ func update(model Model, actingUser *User) error {
 }
 
 func Delete(model Model, actingUser *User) error {
-	if model.IsReadOnly() {
+	if model.IsReadOnly() || model.DeleteIsForbidden() {
 		return common.ErrNotSupported
 	}
 	err := model.Authorize(actingUser, constants.ActionDelete)

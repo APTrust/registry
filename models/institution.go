@@ -36,6 +36,10 @@ func (inst *Institution) Authorize(actingUser *User, action string) error {
 	return nil
 }
 
+func (inst *Institution) DeleteIsForbidden() bool {
+	return false
+}
+
 func (inst *Institution) IsReadOnly() bool {
 	return false
 }

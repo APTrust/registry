@@ -18,6 +18,11 @@ func TestUserGetID(t *testing.T) {
 	assert.Equal(t, int64(1), sysAdmin.GetID())
 }
 
+func TestUserDeleteIsForbidden(t *testing.T) {
+	user := &models.User{}
+	assert.False(t, user.DeleteIsForbidden())
+}
+
 func TestUserIsReadOnly(t *testing.T) {
 	user := &models.User{}
 	assert.False(t, user.IsReadOnly())

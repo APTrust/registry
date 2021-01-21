@@ -21,6 +21,10 @@ func (role *Role) Authorize(*Role, string) error {
 	return nil
 }
 
+func (role *Role) DeleteIsForbidden() bool {
+	return true
+}
+
 // IsReadOnly is true. We don't want anyone editing roles.
 func (role *Role) IsReadOnly() bool {
 	return true

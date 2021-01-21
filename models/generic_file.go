@@ -37,6 +37,10 @@ func (gf *GenericFile) Authorize(actingUser *User, action string) error {
 	return nil
 }
 
+func (gf *GenericFile) DeleteIsForbidden() bool {
+	return false
+}
+
 func (gf *GenericFile) IsReadOnly() bool {
 	return false
 }

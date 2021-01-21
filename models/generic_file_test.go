@@ -98,6 +98,11 @@ func TestGenericFileAuthorize(t *testing.T) {
 
 }
 
+func TestGenericFileDeleteIsFobidden(t *testing.T) {
+	gf := &models.GenericFile{}
+	assert.False(t, gf.DeleteIsForbidden())
+}
+
 func TestGenericFileIsReadOnly(t *testing.T) {
 	gf := &models.GenericFile{}
 	assert.False(t, gf.IsReadOnly())

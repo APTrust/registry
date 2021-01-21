@@ -47,6 +47,11 @@ func TestInstitutionAuthorize(t *testing.T) {
 	}
 }
 
+func TestInstitutionDeleteIsFobidden(t *testing.T) {
+	inst := &models.Institution{}
+	assert.False(t, inst.DeleteIsForbidden())
+}
+
 func TestInstitutionIsReadOnly(t *testing.T) {
 	inst := &models.Institution{}
 	assert.False(t, inst.IsReadOnly())

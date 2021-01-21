@@ -43,6 +43,10 @@ func (obj *IntellectualObject) Authorize(actingUser *User, action string) error 
 	return nil
 }
 
+func (obj *IntellectualObject) DeleteIsForbidden() bool {
+	return false
+}
+
 func (obj *IntellectualObject) IsReadOnly() bool {
 	return false
 }
