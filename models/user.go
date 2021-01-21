@@ -66,6 +66,10 @@ func (user *User) DeleteIsForbidden() bool {
 	return false
 }
 
+func (user *User) UpdateIsForbidden() bool {
+	return false
+}
+
 func (user *User) IsReadOnly() bool {
 	return false
 }

@@ -83,6 +83,11 @@ func TestPremisEventDeleteIsFobidden(t *testing.T) {
 	assert.True(t, event.DeleteIsForbidden())
 }
 
+func TestPremisEventUpdateIsFobidden(t *testing.T) {
+	event := &models.PremisEvent{}
+	assert.True(t, event.UpdateIsForbidden())
+}
+
 func TestPremisEventSupportsSoftDelete(t *testing.T) {
 	event := &models.PremisEvent{}
 	assert.False(t, event.SupportsSoftDelete())

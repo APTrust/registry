@@ -47,6 +47,10 @@ func (obj *IntellectualObject) DeleteIsForbidden() bool {
 	return false
 }
 
+func (obj *IntellectualObject) UpdateIsForbidden() bool {
+	return false
+}
+
 func (obj *IntellectualObject) IsReadOnly() bool {
 	return false
 }

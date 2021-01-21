@@ -40,6 +40,10 @@ func (inst *Institution) DeleteIsForbidden() bool {
 	return false
 }
 
+func (inst *Institution) UpdateIsForbidden() bool {
+	return false
+}
+
 func (inst *Institution) IsReadOnly() bool {
 	return false
 }

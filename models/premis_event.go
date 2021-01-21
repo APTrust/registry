@@ -42,8 +42,14 @@ func (event *PremisEvent) Authorize(actingUser *User, action string) error {
 	return nil
 }
 
+// DeleteIsForbidden returns true because PremisEvents are our audit trail.
 func (event *PremisEvent) DeleteIsForbidden() bool {
-	return true // can't delete these!
+	return true
+}
+
+// UpdateIsForbidden returns true because PremisEvents are our audit trail.
+func (event *PremisEvent) UpdateIsForbidden() bool {
+	return true
 }
 
 func (event *PremisEvent) IsReadOnly() bool {

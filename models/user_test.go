@@ -23,6 +23,11 @@ func TestUserDeleteIsForbidden(t *testing.T) {
 	assert.False(t, user.DeleteIsForbidden())
 }
 
+func TestUserUpdateIsForbidden(t *testing.T) {
+	user := &models.User{}
+	assert.False(t, user.UpdateIsForbidden())
+}
+
 func TestUserIsReadOnly(t *testing.T) {
 	user := &models.User{}
 	assert.False(t, user.IsReadOnly())

@@ -103,6 +103,11 @@ func TestIntellectualObjectDeleteIsFobidden(t *testing.T) {
 	assert.False(t, obj.DeleteIsForbidden())
 }
 
+func TestIntellectualObjectUpdateIsFobidden(t *testing.T) {
+	obj := &models.IntellectualObject{}
+	assert.False(t, obj.UpdateIsForbidden())
+}
+
 func TestIntellectualObjectIsReadOnly(t *testing.T) {
 	obj := &models.IntellectualObject{}
 	assert.False(t, obj.IsReadOnly())

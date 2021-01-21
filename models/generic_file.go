@@ -41,6 +41,10 @@ func (gf *GenericFile) DeleteIsForbidden() bool {
 	return false
 }
 
+func (gf *GenericFile) UpdateIsForbidden() bool {
+	return false
+}
+
 func (gf *GenericFile) IsReadOnly() bool {
 	return false
 }

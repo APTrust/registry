@@ -25,6 +25,10 @@ func (role *Role) DeleteIsForbidden() bool {
 	return true
 }
 
+func (role *Role) UpdateIsForbidden() bool {
+	return true
+}
+
 // IsReadOnly is true. We don't want anyone editing roles.
 func (role *Role) IsReadOnly() bool {
 	return true
