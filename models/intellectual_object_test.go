@@ -38,6 +38,10 @@ func TestIntellectualObjectAuthorize(t *testing.T) {
 	assert.Nil(t, obj.Authorize(sysAdmin, constants.ActionRead))
 	assert.Nil(t, obj.Authorize(sysAdmin, constants.ActionUpdate))
 	assert.Nil(t, obj.Authorize(sysAdmin, constants.ActionDelete))
+	assert.Nil(t, obj.Authorize(sysAdmin, constants.ActionRequestDelete))
+	assert.Nil(t, obj.Authorize(sysAdmin, constants.ActionApproveDelete))
+	assert.Nil(t, obj.Authorize(sysAdmin, constants.ActionFinishBulkDelete))
+	assert.Nil(t, obj.Authorize(sysAdmin, constants.ActionRestore))
 
 	// Users other than SysAdmin cannot create or update
 	// intellectual objects, and cannot finish bulk delete.
