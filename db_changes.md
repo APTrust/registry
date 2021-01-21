@@ -2,6 +2,47 @@
 
 - [x] Add unique constraint on roles.name
 
+## Standardize IDs
+
+Some tables use serial (32-bit int) ids and some use bigserial (64-bit int). Foreign keys pointing back to primary ids are also a mix of int4 (32-bit) and int8 (64-bit).
+
+The system should use int8/bigserial/64-bit throughout. Note that the method for making this change in Postgres 10+ may involve two steps, [as described here](https://stackoverflow.com/questions/52195303/postgresql-primary-key-id-datatype-from-serial-to-bigserial). We have to alter both the sequence and the ID column. Most other answers say the sequence already returns bigint, and we only have to alter the column from int to bigint.
+
+## Fix Missing Constraints
+
+* institutions.identifier should be NOT NULL
+* institutions.identifier should be UNIQUE
+
+## Review Indexes
+
+* generic_files has way too many indexes, and most of them are probably not used
+* intellectual_objects has too many indexes, most are probably unused
+* work_items has quite a few indexes. Review and remove unnecessary ones.
+* review indexes on intellectual_objects
+
+## Normalize / Deduplicate Data
+
+### Premis Events
+
+* Remove premis_events.intellectual_object_identifier
+* Remove premis_events.generic_file_identifier
+* Use a view to join premis_events to objects and files tables to get identifiers
+
+### Work Items
+
+* Remove work_items.object_identifier
+* Remove work_items.generic_file_identifier
+* Use a view to pull in those two fields based on obj ID and gf ID.
+
+## Remove Unused Columns
+
+* generic_files.ingest_state
+* intellectual_object.ingest_state
+
+## Rename Ambiguous Columns
+
+* work_items.date should be something like "date\_processed"
+
 ## Multi-Step Involved Changes
 
 ### Move Role into Users Table
