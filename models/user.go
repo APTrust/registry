@@ -48,6 +48,7 @@ type User struct {
 func (user *User) GetID() int64 {
 	return user.ID
 }
+
 func (user *User) Authorize(actingUser *User, action string) error {
 	perm := "User" + action
 	if actingUser.ID == user.ID && (action == constants.ActionRead || action == constants.ActionUpdate || action == constants.ActionDelete) {
@@ -60,6 +61,7 @@ func (user *User) Authorize(actingUser *User, action string) error {
 	}
 	return nil
 }
+
 func (user *User) IsReadOnly() bool {
 	return false
 }
@@ -120,7 +122,7 @@ func SignInUser(email, password, ipAddr string) (*User, error) {
 	return user, err
 }
 
-func UserGet(id int64) (*User, error) {
+func UserFind(id int64) (*User, error) {
 	ctx := common.Context()
 	user := &User{ID: id}
 	err := ctx.DB.Model(user).WherePK().Select()

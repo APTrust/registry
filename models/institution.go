@@ -25,6 +25,7 @@ type Institution struct {
 func (inst *Institution) GetID() int64 {
 	return inst.ID
 }
+
 func (inst *Institution) Authorize(actingUser *User, action string) error {
 	perm := "Institution" + action
 	if !actingUser.HasPermission(constants.Permission(perm), inst.ID) {
@@ -34,6 +35,7 @@ func (inst *Institution) Authorize(actingUser *User, action string) error {
 	}
 	return nil
 }
+
 func (inst *Institution) IsReadOnly() bool {
 	return false
 }
@@ -61,4 +63,18 @@ func (inst *Institution) SetTimestamps() {
 func (inst *Institution) BeforeSave() error {
 	// TODO: Validate
 	return nil
+}
+
+func InstitutionFind(id int64) (*Institution, error) {
+	ctx := common.Context()
+	inst := &Institution{ID: id}
+	err := ctx.DB.Model(inst).WherePK().Select()
+	return inst, err
+}
+
+func InstitutionFindByIdentifier(identifier string) (*Institution, error) {
+	ctx := common.Context()
+	inst := &Institution{}
+	err := ctx.DB.Model(inst).Where(`"identifier" = ?`, identifier).First()
+	return inst, err
 }

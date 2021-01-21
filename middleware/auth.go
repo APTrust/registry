@@ -34,7 +34,7 @@ func GetUserFromSession(c *gin.Context) (user *models.User, err error) {
 		if err != nil {
 			return nil, common.ErrWrongDataType
 		}
-		user, err = models.UserGet(userID)
+		user, err = models.UserFind(userID)
 	}
 	return user, err
 }

@@ -12,6 +12,50 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestUserGetID(t *testing.T) {
+	sysAdmin, err := models.UserFindByEmail(SysAdmin)
+	require.Nil(t, err)
+	assert.Equal(t, int64(1), sysAdmin.GetID())
+}
+
+func TestUserIsReadOnly(t *testing.T) {
+	user := &models.User{}
+	assert.False(t, user.IsReadOnly())
+}
+
+func TestUserSupportsSoftDelete(t *testing.T) {
+	user := &models.User{}
+	assert.True(t, user.SupportsSoftDelete())
+}
+
+func TestUserSoftDeleteAttributes(t *testing.T) {
+	user := &models.User{}
+	assert.True(t, user.DeactivatedAt.IsZero())
+
+	user.SetSoftDeleteAttributes(&models.User{})
+	assert.False(t, user.DeactivatedAt.IsZero())
+
+	user.ClearSoftDeleteAttributes()
+	assert.True(t, user.DeactivatedAt.IsZero())
+}
+
+func TestUserSetTimestamps(t *testing.T) {
+	user := &models.User{}
+	assert.True(t, user.CreatedAt.IsZero())
+	assert.True(t, user.UpdatedAt.IsZero())
+
+	user.SetTimestamps()
+	assert.False(t, user.CreatedAt.IsZero())
+	assert.False(t, user.UpdatedAt.IsZero())
+}
+
+func TestUserFind(t *testing.T) {
+	user, err := models.UserFind(int64(1))
+	require.Nil(t, err)
+	require.NotNil(t, user)
+	assert.Equal(t, int64(1), user.ID)
+}
+
 func TestSignInUser_Valid(t *testing.T) {
 	db.LoadFixtures()
 	// Constants below are defined in models/common_test.go
