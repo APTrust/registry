@@ -50,12 +50,12 @@ func (user *User) GetID() int64 {
 }
 func (user *User) Authorize(actingUser *User, action string) error {
 	perm := "User" + action
-	if actingUser.ID == user.ID && (action == constants.ActionRead || action == constants.ActionUpdate) {
+	if actingUser.ID == user.ID && (action == constants.ActionRead || action == constants.ActionUpdate || action == constants.ActionDelete) {
 		perm += "Self"
 	}
-	if !actingUser.Can(constants.Permission(perm), user.InstitutionID) {
+	if !actingUser.HasPermission(constants.Permission(perm), user.InstitutionID) {
 		ctx := common.Context()
-		ctx.Log.Error().Msgf("Permission denied: acting user %d can't %s on subject user %d\n", actingUser.ID, perm, user.ID)
+		ctx.Log.Error().Msgf("Permission denied: acting user %s at inst %d can't %s on subject user %s at inst %d\n", actingUser.Email, actingUser.InstitutionID, perm, user.Email, user.InstitutionID)
 		return common.ErrPermissionDenied
 	}
 	return nil
@@ -91,16 +91,9 @@ func (user *User) BeforeSave() error {
 
 func SignInUser(email, password, ipAddr string) (*User, error) {
 	ctx := common.Context()
-	user := &User{}
-	err := ctx.DB.Model(user).
-		Where("email = ? ", email).
-		Offset(0).
-		Limit(1).
-		Select()
-	if IsNoRowError(err) {
-		ctx.Log.Error().Msgf("No users matches email %s", email)
-		return nil, common.ErrInvalidLogin
-	} else if err != nil {
+
+	user, err := UserFindByEmail(email)
+	if err != nil {
 		return nil, err
 	}
 
@@ -111,11 +104,6 @@ func SignInUser(email, password, ipAddr string) (*User, error) {
 	if !common.ComparePasswords(user.EncryptedPassword, password) {
 		ctx.Log.Warn().Msgf("Wrong password for user %s", email)
 		return nil, common.ErrInvalidLogin
-	}
-
-	err = user.loadRole()
-	if err != nil {
-		return nil, err
 	}
 
 	user.SignInCount = user.SignInCount + 1
@@ -140,6 +128,28 @@ func UserGet(id int64) (*User, error) {
 		err = user.loadRole()
 	}
 	return user, err
+}
+
+func UserFindByEmail(email string) (*User, error) {
+	ctx := common.Context()
+	user := &User{}
+	err := ctx.DB.Model(user).
+		Where("email = ? ", email).
+		Offset(0).
+		Limit(1).
+		Select()
+	if IsNoRowError(err) {
+		ctx.Log.Error().Msgf("No users matches email %s", email)
+		return nil, common.ErrInvalidLogin
+	}
+	if err != nil {
+		return nil, err
+	}
+	err = user.loadRole()
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
 }
 
 // SignOutUser -> copy current sign in time and ip to last, then clear
@@ -188,13 +198,13 @@ func (user *User) loadRole() error {
 	return nil
 }
 
-// Can returns true or false to indicate whether the user has sufficient
-// permissions to perform the requested action. Param action should be one
-// of the constants from constants/permissions.go. Param institutionID should
-// be the ID of the institution that owns the object upon which the user is
-// trying to act. In certain cases, such as when a user is editing him/herself,
-// this can be zero.
-func (user *User) Can(action constants.Permission, institutionID int64) bool {
+// HasPermission returns true or false to indicate whether the user has
+// sufficient permissions to perform the requested action. Param action
+// should be one of the constants from constants/permissions.go. Param
+// institutionID should be the ID of the institution that owns the object
+// upon which the user is trying to act. In certain cases, such as when a
+// user is editing him/herself, this can be zero.
+func (user *User) HasPermission(action constants.Permission, institutionID int64) bool {
 	// Sys admin's permissions apply across all institutional boundaries.
 	if user.Role == constants.RoleSysAdmin {
 		return constants.CheckPermission(user.Role, action)

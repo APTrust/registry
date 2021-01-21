@@ -58,6 +58,7 @@ const (
 	UserDelete                        = "UserDelete"
 	UserReadSelf                      = "UserReadSelf"
 	UserUpdateSelf                    = "UserUpdateSelf"
+	UserDeleteSelf                    = "UserDeleteSelf"
 	WorkItemCreate                    = "WorkItemCreate"
 	WorkItemRead                      = "WorkItemRead"
 	WorkItemUpdate                    = "WorkItemUpdate"
@@ -106,6 +107,7 @@ func initPermissions() {
 	instAdmin[UserCreate] = true
 	instAdmin[UserRead] = true
 	instAdmin[UserUpdate] = true
+	instAdmin[UserDelete] = true
 	instAdmin[UserReadSelf] = true
 	instAdmin[UserUpdateSelf] = true
 	instAdmin[WorkItemRead] = true
