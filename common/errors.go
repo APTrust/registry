@@ -11,3 +11,5 @@ var ErrNotSupported = errors.New("operation not supported")
 
 var ErrDecodeCookie = errors.New("error decoding cookie")
 var ErrWrongDataType = errors.New("wrong data type")
+
+var ErrParentRecordNotFound = errors.New("parent record not found")

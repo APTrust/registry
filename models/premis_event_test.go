@@ -52,23 +52,23 @@ func TestPremisEventAuthorize(t *testing.T) {
 		assert.Equal(t, common.ErrPermissionDenied, event.Authorize(user, constants.ActionDelete))
 	}
 
-	// Inst user and admin can read their own institution's files.
+	// Inst user and admin can read their own institution's events.
 	assert.Nil(t, event.Authorize(instUser, constants.ActionRead))
 	assert.Nil(t, event.Authorize(instAdmin, constants.ActionRead))
 
 	// Inactive User cannot read
 	assert.Equal(t, common.ErrPermissionDenied, event.Authorize(inactiveUser, constants.ActionRead))
 
-	// No users other than SysAdmin can events files from
+	// No users other than SysAdmin can read events from
 	// other institutions.
-	foreignFile := &models.PremisEvent{
+	foreignEvent := &models.PremisEvent{
 		InstitutionID: InstTwo,
 	}
 	for _, user := range otherUsers {
-		assert.Equal(t, common.ErrPermissionDenied, foreignFile.Authorize(user, constants.ActionCreate))
-		assert.Equal(t, common.ErrPermissionDenied, foreignFile.Authorize(user, constants.ActionUpdate))
-		assert.Equal(t, common.ErrPermissionDenied, foreignFile.Authorize(user, constants.ActionRead))
-		assert.Equal(t, common.ErrPermissionDenied, foreignFile.Authorize(user, constants.ActionDelete))
+		assert.Equal(t, common.ErrPermissionDenied, foreignEvent.Authorize(user, constants.ActionCreate))
+		assert.Equal(t, common.ErrPermissionDenied, foreignEvent.Authorize(user, constants.ActionUpdate))
+		assert.Equal(t, common.ErrPermissionDenied, foreignEvent.Authorize(user, constants.ActionRead))
+		assert.Equal(t, common.ErrPermissionDenied, foreignEvent.Authorize(user, constants.ActionDelete))
 	}
 
 }
