@@ -209,14 +209,12 @@ func TestUserDBPermissions(t *testing.T) {
 
 	instAdmin, err := models.UserFindByEmail(InstAdmin)
 	require.Nil(t, err)
-	// instUser := &models.User{
-	// 	Role:          constants.RoleInstUser,
-	// 	InstitutionID: InstOne,
-	// }
-	// nobody := &models.User{
-	// 	Role:          constants.RoleNone,
-	// 	InstitutionID: InstOne,
-	// }
+
+	instUser, err := models.UserFindByEmail(InstUser)
+	require.Nil(t, err)
+
+	inactiveUser, err := models.UserFindByEmail(InactiveUser)
+	require.Nil(t, err)
 
 	// These are the user record we will try to save/update/delete
 	inst1User, err := getUser()
@@ -229,6 +227,10 @@ func TestUserDBPermissions(t *testing.T) {
 	inst2User.InstitutionID = InstTwo
 	inst2User.Role = constants.RoleInstUser
 
+	// ---------------------------------------------------------------------
+	// Sys Admin
+	// ---------------------------------------------------------------------
+
 	// SysAdmin should be able to perform all actions on any user
 	require.Nil(t, models.Save(inst1User, sysAdmin))
 	require.Nil(t, models.Save(inst2User, sysAdmin))
@@ -237,12 +239,16 @@ func TestUserDBPermissions(t *testing.T) {
 	require.Nil(t, models.Undelete(inst1User, sysAdmin))
 	require.Nil(t, models.Undelete(inst2User, sysAdmin))
 
+	// ---------------------------------------------------------------------
+	// Institutional Admin
+	// ---------------------------------------------------------------------
+
 	// Inst Admin can create users at their own institution
 	anotherInst1User, err := getUser()
 	require.Nil(t, err)
 	anotherInst1User.InstitutionID = InstOne
 	anotherInst1User.Role = constants.RoleInstUser
-	assert.Nil(t, models.Save(inst1User, instAdmin))
+	assert.Nil(t, models.Save(anotherInst1User, instAdmin))
 
 	// Inst Admin can edit user at own institution
 	assert.Nil(t, models.Save(inst1User, instAdmin))
@@ -250,11 +256,56 @@ func TestUserDBPermissions(t *testing.T) {
 	assert.Nil(t, models.Undelete(inst1User, instAdmin))
 
 	// Inst Admin cannot edit user at other institition
-	assert.NotNil(t, models.Save(inst2User, instAdmin))
-	assert.NotNil(t, models.Delete(inst2User, instAdmin))
-	assert.NotNil(t, models.Undelete(inst2User, instAdmin))
+	assert.Equal(t, common.ErrPermissionDenied, models.Save(inst2User, instAdmin))
+	assert.Equal(t, common.ErrPermissionDenied, models.Delete(inst2User, instAdmin))
+	assert.Equal(t, common.ErrPermissionDenied, models.Undelete(inst2User, instAdmin))
 
 	// Inst Admin can edit self but cannot delete self
 	assert.Nil(t, models.Save(instAdmin, instAdmin))
-	assert.NotNil(t, models.Delete(instAdmin, instAdmin))
+	assert.Equal(t, common.ErrPermissionDenied, models.Delete(instAdmin, instAdmin))
+
+	// ---------------------------------------------------------------------
+	// Institutional User
+	// ---------------------------------------------------------------------
+
+	// Inst User cannot create users
+	oneMoreInst1User, err := getUser()
+	require.Nil(t, err)
+	oneMoreInst1User.InstitutionID = InstOne
+	oneMoreInst1User.Role = constants.RoleInstUser
+	assert.Equal(t, common.ErrPermissionDenied, models.Save(oneMoreInst1User, instUser))
+
+	// Inst User cannot edit any other users
+	assert.Equal(t, common.ErrPermissionDenied, models.Save(inst1User, instUser))
+	assert.Equal(t, common.ErrPermissionDenied, models.Delete(inst1User, instUser))
+	assert.Equal(t, common.ErrPermissionDenied, models.Undelete(inst1User, instUser))
+	assert.Equal(t, common.ErrPermissionDenied, models.Save(inst2User, instUser))
+	assert.Equal(t, common.ErrPermissionDenied, models.Delete(inst2User, instUser))
+	assert.Equal(t, common.ErrPermissionDenied, models.Undelete(inst2User, instUser))
+
+	// Inst User can edit self but cannot delete self
+	assert.Nil(t, models.Save(instUser, instUser))
+	assert.Equal(t, common.ErrPermissionDenied, models.Delete(instUser, instUser))
+
+	// ---------------------------------------------------------------------
+	// Inactive User
+	//
+	// This user should never be able to get past login.
+	// In case they do somehow, the system assigns them zero permissions.
+	// Let's test that here.
+	// ---------------------------------------------------------------------
+
+	// Inactive User cannot create or edit any users
+	assert.Equal(t, common.ErrPermissionDenied, models.Save(oneMoreInst1User, inactiveUser))
+	assert.Equal(t, common.ErrPermissionDenied, models.Save(inst1User, inactiveUser))
+	assert.Equal(t, common.ErrPermissionDenied, models.Delete(inst1User, inactiveUser))
+	assert.Equal(t, common.ErrPermissionDenied, models.Undelete(inst1User, inactiveUser))
+	assert.Equal(t, common.ErrPermissionDenied, models.Save(inst2User, inactiveUser))
+	assert.Equal(t, common.ErrPermissionDenied, models.Delete(inst2User, inactiveUser))
+	assert.Equal(t, common.ErrPermissionDenied, models.Undelete(inst2User, inactiveUser))
+
+	// Inactive User cannot event edit self
+	assert.Equal(t, common.ErrPermissionDenied, models.Save(inactiveUser, inactiveUser))
+	assert.Equal(t, common.ErrPermissionDenied, models.Delete(inactiveUser, inactiveUser))
+
 }
