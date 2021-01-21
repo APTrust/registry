@@ -2,11 +2,9 @@ package models_test
 
 import (
 	"testing"
-	//	"time"
 
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
-	//	"github.com/APTrust/registry/db"
 	"github.com/APTrust/registry/models"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

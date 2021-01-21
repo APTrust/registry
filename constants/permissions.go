@@ -40,7 +40,7 @@ const (
 	InstitutionRead                   = "InstitutionRead"
 	InstitutionUpdate                 = "InstitutionUpdate"
 	InstitutionDelete                 = "InstitutionDelete"
-	ObjectCreate                      = "ObectCreate"
+	ObjectCreate                      = "ObjectCreate"
 	ObjectRead                        = "ObjectRead"
 	ObjectUpdate                      = "ObjectUpdate"
 	ObjectDelete                      = "ObjectDelete"

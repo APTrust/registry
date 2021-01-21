@@ -22,7 +22,7 @@ func TestNewConfig(t *testing.T) {
 	assert.Equal(t, 5432, config.DB.Port)
 
 	assert.True(t, strings.HasSuffix(config.Logging.File, "logs/registry_test.log"))
-	assert.Equal(t, zerolog.DebugLevel, config.Logging.Level)
+	assert.Equal(t, zerolog.WarnLevel, config.Logging.Level)
 
 	assert.Equal(t, "localhost", config.Cookies.Domain)
 	assert.Equal(t, 43200, config.Cookies.MaxAge)
