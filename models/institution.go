@@ -20,6 +20,8 @@ type Institution struct {
 	OTPEnabled          bool      `json:"otp_enabled" form:"otp_enabled" pg:"otp_enabled"`
 	ReceivingBucket     string    `json:"receiving_bucket" form:"receiving_bucket" pg:"receiving_bucket"`
 	RestoreBucket       string    `json:"restore_bucket" form:"restore_bucket" pg:"restore_bucket"`
+
+	Users []*User `json:"users" pg:"rel:has-many"`
 }
 
 func (inst *Institution) GetID() int64 {

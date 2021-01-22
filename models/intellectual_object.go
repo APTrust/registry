@@ -27,6 +27,10 @@ type IntellectualObject struct {
 	SourceOrganization        string    `json:"source_organization" form:"source_organization" pg:"source_organization"`
 	InternalSenderIdentifier  string    `json:"internal_sender_identifier" form:"internal_sender_identifier" pg:"internal_sender_identifier"`
 	InternalSenderDescription string    `json:"internal_sender_description" form:"internal_sender_description" pg:"internal_sender_description"`
+
+	Institution  *Institution   `json:"institution" pg:"rel:has-one"`
+	GenericFiles []*GenericFile `json:"generic_files" pg:"rel:has-many"`
+	PremisEvents []*PremisEvent `json:"premis_events" pg:"rel:has-many"`
 }
 
 func (obj *IntellectualObject) GetID() int64 {

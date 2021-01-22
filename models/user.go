@@ -42,7 +42,9 @@ type User struct {
 	InitialPasswordUpdated bool      `json:"initial_password_updated" form:"-" pg:"initial_password_updated"`
 	ForcePasswordUpdate    bool      `json:"force_password_update" form:"-" pg:"force_password_update"`
 	GracePeriod            time.Time `json:"grace_period" form:"grace_period" pg:"grace_period"`
-	Role                   string    `json:"role" form:"role" pg:"-"`
+
+	Institution *Institution `json:"institution" pg:"rel:has-one"`
+	Role        *Role        `json:"institution" pg:"rel:has-one"`
 }
 
 func (user *User) GetID() int64 {
@@ -133,9 +135,9 @@ func SignInUser(email, password, ipAddr string) (*User, error) {
 func UserFind(id int64) (*User, error) {
 	ctx := common.Context()
 	user := &User{ID: id}
-	err := ctx.DB.Model(user).WherePK().Select()
+	err := ctx.DB.Model(user).Relation("Institution").Relation("Role").WherePK().Select()
 	if err == nil {
-		err = user.loadRole()
+		user.ensureRole()
 	}
 	return user, err
 }
@@ -144,6 +146,8 @@ func UserFindByEmail(email string) (*User, error) {
 	ctx := common.Context()
 	user := &User{}
 	err := ctx.DB.Model(user).
+		Relation("Institution").
+		Relation("Role").
 		Where("email = ? ", email).
 		Offset(0).
 		Limit(1).
@@ -155,10 +159,7 @@ func UserFindByEmail(email string) (*User, error) {
 	if err != nil {
 		return nil, err
 	}
-	err = user.loadRole()
-	if err != nil {
-		return nil, err
-	}
+	user.ensureRole()
 	return user, nil
 }
 
@@ -177,35 +178,15 @@ func (user *User) SignOutUser() error {
 	return err
 }
 
-func (user *User) loadRole() error {
-	// Since users effectively have only one role, role should
-	// go into the users table.
-
-	// Initialize to something safe.
-	// RoleNone corresponds to the empty permissions list
-	// in constants/permissions.go
-	user.Role = constants.RoleNone
-
-	// If user is deactivated, code above should prevent them
-	// from signing in at all. Just in case, this failsafe leaves
-	// them with RoleNone and zero permissions. We do this instead
-	// of returning an error because an admin may be loading this
-	// user to review their info or to reactivate them.
-	if !user.DeactivatedAt.IsZero() {
-		return nil
+// ensureRole ensures that this user has a Role. All users do, but
+// if we ever lose a Role relation, or if the user has been deactivated,
+// they will be assigned RoleNone, which has zero privileges.
+func (user *User) ensureRole() {
+	if user.Role == nil || !user.DeactivatedAt.IsZero() {
+		user.Role = &Role{
+			Name: constants.RoleNone,
+		}
 	}
-
-	ctx := common.Context()
-	role := &Role{}
-	err := ctx.DB.Model(role).
-		Join("JOIN roles_users AS ru ON ru.role_id = role.id").
-		Where("ru.user_id = ? ", user.ID).
-		First()
-	if err != nil {
-		return err
-	}
-	user.Role = role.Name
-	return nil
 }
 
 // HasPermission returns true or false to indicate whether the user has
@@ -216,10 +197,10 @@ func (user *User) loadRole() error {
 // user is editing him/herself, this can be zero.
 func (user *User) HasPermission(action constants.Permission, institutionID int64) bool {
 	// Sys admin's permissions apply across all institutional boundaries.
-	if user.Role == constants.RoleSysAdmin {
-		return constants.CheckPermission(user.Role, action)
+	if user.Role.Name == constants.RoleSysAdmin {
+		return constants.CheckPermission(user.Role.Name, action)
 	}
 	// Institutional user and admin permissions apply only within their
 	// own institutions.
-	return user.InstitutionID == institutionID && constants.CheckPermission(user.Role, action)
+	return user.InstitutionID == institutionID && constants.CheckPermission(user.Role.Name, action)
 }

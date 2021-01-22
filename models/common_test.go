@@ -46,7 +46,7 @@ func getUser() (*models.User, error) {
 		Email:             fmt.Sprintf("%d@example.com", nonce),
 		EncryptedPassword: pwd,
 		InstitutionID:     InstOne,
-		Role:              constants.RoleInstAdmin,
+		Role:              &models.Role{Name: constants.RoleInstAdmin},
 	}, nil
 }
 

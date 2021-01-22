@@ -21,6 +21,11 @@ type GenericFile struct {
 	InstitutionID        int64     `json:"institution_id" form:"institution_id" pg:"institution_id"`
 	StorageOption        string    `json:"storage_option" form:"storage_option" pg:"storage_option"`
 	UUID                 string    `json:"uuid" form:"uuid" pg:"uuid"`
+
+	GenericFiles   []*GenericFile   `json:"generic_files" pg:"rel:has-many"`
+	PremisEvents   []*PremisEvent   `json:"premis_events" pg:"rel:has-many"`
+	Checksums      []*Checksum      `json:"checksumss" pg:"rel:has-many"`
+	StorageRecords []*StorageRecord `json:"storage_records" pg:"rel:has-many"`
 }
 
 func (gf *GenericFile) GetID() int64 {

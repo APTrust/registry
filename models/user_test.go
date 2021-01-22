@@ -64,6 +64,8 @@ func TestUserFind(t *testing.T) {
 	require.Nil(t, err)
 	require.NotNil(t, user)
 	assert.Equal(t, int64(1), user.ID)
+	assert.NotNil(t, user.Role)
+	assert.NotNil(t, user.Institution)
 }
 
 func TestSignInUser_Valid(t *testing.T) {
@@ -82,7 +84,8 @@ func TestSignInUser_Valid(t *testing.T) {
 		assert.Equal(t, "1.1.1.1", user.CurrentSignInIP)
 		assert.True(t, user.SignInCount > 0)
 		assert.InDelta(t, time.Now().Unix(), user.CurrentSignInAt.Unix(), 10)
-		assert.NotEmpty(t, user.Role)
+		assert.NotNil(t, user.Role)
+		assert.NotNil(t, user.Institution)
 		oldSignInTime := user.CurrentSignInAt
 		oldSignInCount := user.SignInCount
 
@@ -124,12 +127,12 @@ func TestUserDeleteUndelete(t *testing.T) {
 	admin, err := getUser()
 	require.Nil(t, err)
 	require.NotNil(t, admin)
-	admin.Role = constants.RoleSysAdmin
+	admin.Role = &models.Role{Name: constants.RoleSysAdmin}
 
 	regUser, err := getUser()
 	require.Nil(t, err)
 	require.NotNil(t, regUser)
-	regUser.Role = constants.RoleInstUser
+	regUser.Role = &models.Role{Name: constants.RoleInstUser}
 
 	user, err := getUser()
 	require.Nil(t, err)
@@ -170,19 +173,19 @@ func TestUserHasPermission(t *testing.T) {
 	ownInst := int64(2)
 	otherInst := int64(3)
 	sysAdmin := &models.User{
-		Role:          constants.RoleSysAdmin,
+		Role:          &models.Role{Name: constants.RoleSysAdmin},
 		InstitutionID: int64(1),
 	}
 	instAdmin := &models.User{
-		Role:          constants.RoleInstAdmin,
+		Role:          &models.Role{Name: constants.RoleInstAdmin},
 		InstitutionID: ownInst,
 	}
 	instUser := &models.User{
-		Role:          constants.RoleInstUser,
+		Role:          &models.Role{Name: constants.RoleInstUser},
 		InstitutionID: ownInst,
 	}
 	nobody := &models.User{
-		Role:          constants.RoleNone,
+		Role:          &models.Role{Name: constants.RoleNone},
 		InstitutionID: ownInst,
 	}
 
@@ -265,12 +268,12 @@ func TestUserDBPerms_SysAdmin(t *testing.T) {
 	inst1User, err := getUser()
 	require.Nil(t, err)
 	inst1User.InstitutionID = InstOne
-	inst1User.Role = constants.RoleInstUser
+	inst1User.Role = &models.Role{Name: constants.RoleInstUser}
 
 	inst2User, err := getUser()
 	require.Nil(t, err)
 	inst2User.InstitutionID = InstTwo
-	inst2User.Role = constants.RoleInstUser
+	inst2User.Role = &models.Role{Name: constants.RoleInstUser}
 
 	// SysAdmin should be able to perform all actions on any user
 	require.Nil(t, models.Save(inst1User, sysAdmin))
@@ -289,18 +292,18 @@ func TestUserDBPerms_InstAdmin(t *testing.T) {
 	inst1User, err := getUser()
 	require.Nil(t, err)
 	inst1User.InstitutionID = InstOne
-	inst1User.Role = constants.RoleInstUser
+	inst1User.Role = &models.Role{Name: constants.RoleInstUser}
 
 	inst2User, err := getUser()
 	require.Nil(t, err)
 	inst2User.InstitutionID = InstTwo
-	inst2User.Role = constants.RoleInstUser
+	inst2User.Role = &models.Role{Name: constants.RoleInstUser}
 
 	// Inst Admin can create users at their own institution
 	anotherInst1User, err := getUser()
 	require.Nil(t, err)
 	anotherInst1User.InstitutionID = InstOne
-	anotherInst1User.Role = constants.RoleInstUser
+	anotherInst1User.Role = &models.Role{Name: constants.RoleInstUser}
 	assert.Nil(t, models.Save(anotherInst1User, instAdmin))
 
 	// Inst Admin can edit user at own institution
@@ -326,18 +329,18 @@ func TestUserDBPerms_InstUser(t *testing.T) {
 	inst1User, err := getUser()
 	require.Nil(t, err)
 	inst1User.InstitutionID = InstOne
-	inst1User.Role = constants.RoleInstUser
+	inst1User.Role = &models.Role{Name: constants.RoleInstUser}
 
 	inst2User, err := getUser()
 	require.Nil(t, err)
 	inst2User.InstitutionID = InstTwo
-	inst2User.Role = constants.RoleInstUser
+	inst2User.Role = &models.Role{Name: constants.RoleInstUser}
 
 	// Inst User cannot create users
 	oneMoreInst1User, err := getUser()
 	require.Nil(t, err)
 	oneMoreInst1User.InstitutionID = InstOne
-	oneMoreInst1User.Role = constants.RoleInstUser
+	oneMoreInst1User.Role = &models.Role{Name: constants.RoleInstUser}
 	assert.Equal(t, common.ErrPermissionDenied, models.Save(oneMoreInst1User, instUser))
 
 	// Inst User cannot edit any other users
@@ -361,17 +364,17 @@ func TestUserDBPerms_InactiveUser(t *testing.T) {
 	inst1User, err := getUser()
 	require.Nil(t, err)
 	inst1User.InstitutionID = InstOne
-	inst1User.Role = constants.RoleInstUser
+	inst1User.Role = &models.Role{Name: constants.RoleInstUser}
 
 	inst2User, err := getUser()
 	require.Nil(t, err)
 	inst2User.InstitutionID = InstTwo
-	inst2User.Role = constants.RoleInstUser
+	inst2User.Role = &models.Role{Name: constants.RoleInstUser}
 
 	oneMoreInst1User, err := getUser()
 	require.Nil(t, err)
 	oneMoreInst1User.InstitutionID = InstOne
-	oneMoreInst1User.Role = constants.RoleInstUser
+	oneMoreInst1User.Role = &models.Role{Name: constants.RoleInstUser}
 
 	// Inactive User cannot create or edit any users
 	assert.Equal(t, common.ErrPermissionDenied, models.Save(oneMoreInst1User, inactiveUser))
