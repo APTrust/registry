@@ -1,71 +1,82 @@
 {{ define "users/sign_in.html" }}
 
-{{ template "shared/header.html" .}}
+<!--
+     Note that this template duplicates most of what's in the shared/header.html
+     template. This page has a fundamentally different layout that all of the
+     interior pages, because it's a single column with no side nav. It's
+     easier to separate this template than to add lots of conditionals to
+     suppress main template elements for non-logged-in users.
+-->
 
-<style type="text/css">
- body > .grid {
-     height: 100%;
- }
- .column {
-     max-width: 450px;
- }
- .segment {
-     opacity: 0.94;
- }
- .credit {
-     margin-top: 20px;
-     color: #aaa;
- }
- .credit a, .credit a:hover, .credit a:visited {
-     color: #aaa;
- }
- body {
-     background-image: url("/static/img/covers/{{ .cover.Source }}");
-     height: 100%;
-     background-position: center;
-     background-repeat: no-repeat;
-     background-size: cover;
- }
-</style>
+<html>
+  <head>
+    <title>APTrust Registry</title>
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/img/favicon.png">
+    <script src="/static/js/jquery-3.3.1.min.js"></script>
+    <link rel="stylesheet" href="/static/css/semantic-2.8.7.min.css">
+    <script src="/static/js/semantic-2.8.7.min.js"></script>
+    <script src="/static/js/registry.js"></script>
+    <style>
+     body > .grid {
+         height: 100%;
+     }
+     .column {
+         max-width: 450px;
+     }
+     .segment {
+         opacity: 0.94;
+     }
+     .credit {
+         margin-top: 20px;
+         color: #aaa;
+     }
+     .credit a, .credit a:hover, .credit a:visited {
+         color: #aaa;
+     }
+     body {
+         background-image: url("/static/img/covers/{{ .cover.Source }}");
+         height: 100%;
+         background-position: center;
+         background-repeat: no-repeat;
+         background-size: cover;
+     }
+    </style>
+  </head>
 
-<div class="ui middle aligned center aligned grid">
-  <div class="column">
-    <div class="ui segment">
-      <img src="/static/img/APTrustLogo.gif">
-    </div>
-    <form class="ui large form" action="/users/sign_in/" method="post">
-      <div class="ui segment">
-        <div class="field">
-          <div class="ui left icon input">
-            <i class="user icon"></i>
-            <input type="text" name="email" placeholder="Email address">
+  <body>
+    <div class="ui middle aligned center aligned grid">
+      <div class="column">
+        <div class="ui segment">
+          <img src="/static/img/APTrustLogo.gif">
+        </div>
+        <form class="ui large form" action="/users/sign_in/" method="post">
+          <div class="ui segment">
+            <div class="field">
+              <div class="ui left icon input">
+                <i class="user icon"></i>
+                <input type="text" name="email" placeholder="Email address">
+              </div>
+            </div>
+            <div class="field">
+              <div class="ui left icon input">
+                <i class="lock icon"></i>
+                <input type="password" name="password" placeholder="Password">
+              </div>
+            </div>
+            <input type="submit" class="ui fluid large primary submit button" value="Sign In">
+          </div>
+          <div class="ui error message" {{ if .error }}style="display:block"{{ end }}>{{ .error }}</div>
+        </form>
+
+        <div class="ui segment message">
+          <a href="javascript:alert('Too bad!');">Forgot your password?</a>
+          <div class="credit">
+            <span class="ui small grey text">Photo by <a class="item" href="{{ .cover.CreditURL }}" target="_blank">{{ .cover.Photographer }}</a></span>
           </div>
         </div>
-        <div class="field">
-          <div class="ui left icon input">
-            <i class="lock icon"></i>
-            <input type="password" name="password" placeholder="Password">
-          </div>
-        </div>
-        <input type="submit" class="ui fluid large primary submit button" value="Sign In">
-      </div>
-
-      <div class="ui error message" {{ if .error }}style="display:block"{{ end }}>{{ .error }}</div>
-
-    </form>
-
-    <div class="ui segment message">
-      <a href="javascript:alert('Too bad!');">Forgot your password?</a>
-
-      <div class="credit">
-        <span class="ui small grey text">Photo by <a class="item" href="{{ .cover.CreditURL }}" target="_blank">{{ .cover.Photographer }}</a></span>
       </div>
     </div>
-
-  </div>
-</div>
-
-
-{{ template "shared/footer.html" .}}
+</body>
+</html>
 
 {{ end }}

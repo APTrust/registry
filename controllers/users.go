@@ -59,7 +59,6 @@ func UserSignIn(c *gin.Context) {
 func UserSignOut(c *gin.Context) {
 	helpers.DeleteSessionCookie(c)
 	c.HTML(http.StatusOK, "users/sign_in.html", gin.H{
-		"error": "You have successfully signed out.",
 		"cover": helpers.GetCover(),
 	})
 }

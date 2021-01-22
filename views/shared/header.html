@@ -5,32 +5,17 @@
   <head>
     <title>APTrust Registry</title>
     <link rel="icon" type="image/png" sizes="16x16" href="/static/img/favicon.png">
-    <!-- link rel="stylesheet" href="/static/css/font-awesome.min.css" -->
-    <!-- link rel="stylesheet" href="/static/css/mvp.css" -->
     <script src="/static/js/jquery-3.3.1.min.js"></script>
     <link rel="stylesheet" href="/static/css/semantic-2.8.7.min.css">
+    <link rel="stylesheet" href="/static/css/registry.css">
     <script src="/static/js/semantic-2.8.7.min.js"></script>
     <script src="/static/js/registry.js"></script>
   </head>
 
   <body>
 
-      {{ if .CurrentUser }}
-        <nav>
-            <ul>
-                <li><a href="/dashboard">Dashboard</li>
-                <li><a href="/objects">Objects</a></li>
-                <li><a href="/work_items">Work Items</a></li>
-                <li><a href="/reports">Reports</a></li>
-                <li><a href="/alerts">Alerts</a></li>
-                <li><a href="/users/sign_out">Sign Out</a></li>
-                <li><a href="#">Admin</a>
-                    <ul>
-                        <li><a href="/users">Users</a></li>
-                        <li><a href="/institutions">Institutions</a></li>
-                    </ul>
-                </li>
-            </ul>
-        </nav>
-      {{ end }}
+    {{ template "shared/nav.html" .}}
+
+    <div class="pusher registry-main">
+
 {{ end }}
