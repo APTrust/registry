@@ -12,8 +12,15 @@
  .segment {
      opacity: 0.94;
  }
+ .credit {
+     margin-top: 20px;
+     color: #aaa;
+ }
+ .credit a, .credit a:hover, .credit a:visited {
+     color: #aaa;
+ }
  body {
-     background-image: url("/static/img/covers/{{ .cover }}");
+     background-image: url("/static/img/covers/{{ .cover.Source }}");
      height: 100%;
      background-position: center;
      background-repeat: no-repeat;
@@ -49,40 +56,15 @@
 
     <div class="ui segment message">
       <a href="javascript:alert('Too bad!');">Forgot your password?</a>
+
+      <div class="credit">
+        <span class="ui small grey text">Photo by <a class="item" href="{{ .cover.CreditURL }}" target="_blank">{{ .cover.Photographer }}</a></span>
+      </div>
     </div>
 
   </div>
 </div>
 
-
-
-<!--
-<div class="ui container">
-  <form action="/users/sign_in/" method="post">
-    <header>
-      <h2>Sign In</h2>
-    </header>
-
-    {{ if .error }}
-    <div class="ui segment">{{ .error }}</div>
-    {{ end }}
-
-    <div class="ui segment">
-      <label for="email">Email:</label>
-      <input type="text" id="email" name="email" size="40" placeholder="you@example.com">
-    </div>
-    <div class="ui segment">
-      <label for="password">Password:</label>
-      <input type="password" id="password" name="password" size="40">
-    </div>
-
-    <div class="ui segment">
-      <button type="submit">Submit</button>
-    </div>
-
-  </form>
-</div>
--->
 
 {{ template "shared/footer.html" .}}
 

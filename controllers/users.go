@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"math/rand"
 	"net/http"
 
 	"github.com/APTrust/registry/helpers"
@@ -37,7 +36,7 @@ func UserNew(c *gin.Context) {
 // GET /users/sign_in
 func UserSignInShow(c *gin.Context) {
 	c.HTML(200, "users/sign_in.html", gin.H{
-		"cover": getCover(),
+		"cover": helpers.GetCover(),
 	})
 }
 
@@ -50,7 +49,7 @@ func UserSignIn(c *gin.Context) {
 	} else {
 		c.HTML(status, "users/sign_in.html", gin.H{
 			"error": err.Error(),
-			"cover": getCover(),
+			"cover": helpers.GetCover(),
 		})
 	}
 }
@@ -61,7 +60,7 @@ func UserSignOut(c *gin.Context) {
 	helpers.DeleteSessionCookie(c)
 	c.HTML(http.StatusOK, "users/sign_in.html", gin.H{
 		"error": "You have successfully signed out.",
-		"cover": getCover(),
+		"cover": helpers.GetCover(),
 	})
 }
 
@@ -95,16 +94,4 @@ func SignInUser(c *gin.Context) (int, string, error) {
 	}
 	c.Set("CurrentUser", user)
 	return http.StatusFound, "/dashboard", nil
-}
-
-func getCover() string {
-	images := []string{
-		"LibraryAmsterdam.jpg",
-		"LibraryKiev.jpg",
-		"LibraryLondon.jpg",
-		"LibrarySeattle.jpg",
-		"LibraryStuttgart.jpg",
-		"LibraryWhiteGold.jpg",
-	}
-	return images[rand.Intn(len(images))]
 }
