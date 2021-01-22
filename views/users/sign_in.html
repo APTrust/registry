@@ -50,7 +50,7 @@
         <input type="submit" class="ui fluid large primary submit button" value="Sign In">
       </div>
 
-      <div class="ui error message"></div>
+      <div class="ui error message" {{ if .error }}style="display:block"{{ end }}>{{ .error }}</div>
 
     </form>
 

@@ -38,9 +38,15 @@ Now load the schema into the dev database:
 psql -U dev_user -d apt_registry_development -a -f db/schema.sql
 ```
 
+If you want more data in your dev DB, we have a copy of the staging database in an undisclosed location.
+
 [DBeaver](https://dbeaver.io/download/) is an excellent free GUI tool for interacting with the database.
 
-__TODO__: Set up default admin account for dev environment, or create a setup script that will load the test fixtures into the default dev DB at startup.
+# Running
+
+`APT_ENV=dev go run registry.go`
+
+You can change APT_ENV to test if you want to run against the test database, but note that the test DB is regenerated every time we run the test suite.
 
 # Testing
 

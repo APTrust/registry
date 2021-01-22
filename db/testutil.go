@@ -17,7 +17,6 @@ var fixturesLoaded = false
 // Since data loading DELETES THE ENTIRE DB before reloading fixtures, we want
 // this to run only on local dev machines and test/CI systems.
 var SafeEnvironments = []string{
-	"dev",
 	"integration",
 	"test",
 }
