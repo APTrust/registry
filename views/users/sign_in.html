@@ -2,23 +2,87 @@
 
 {{ template "shared/header.html" .}}
 
-<section>
+<style type="text/css">
+ body > .grid {
+     height: 100%;
+ }
+ .column {
+     max-width: 450px;
+ }
+ .segment {
+     opacity: 0.94;
+ }
+ body {
+     background-image: url("/static/img/covers/{{ .cover }}");
+     height: 100%;
+     background-position: center;
+     background-repeat: no-repeat;
+     background-size: cover;
+ }
+</style>
+
+<div class="ui middle aligned center aligned grid">
+  <div class="column">
+    <div class="ui segment">
+      <img src="/static/img/APTrustLogo.gif">
+    </div>
+    <form class="ui large form" action="/users/sign_in/" method="post">
+      <div class="ui segment">
+        <div class="field">
+          <div class="ui left icon input">
+            <i class="user icon"></i>
+            <input type="text" name="email" placeholder="Email address">
+          </div>
+        </div>
+        <div class="field">
+          <div class="ui left icon input">
+            <i class="lock icon"></i>
+            <input type="password" name="password" placeholder="Password">
+          </div>
+        </div>
+        <input type="submit" class="ui fluid large primary submit button" value="Sign In">
+      </div>
+
+      <div class="ui error message"></div>
+
+    </form>
+
+    <div class="ui segment message">
+      <a href="javascript:alert('Too bad!');">Forgot your password?</a>
+    </div>
+
+  </div>
+</div>
+
+
+
+<!--
+<div class="ui container">
   <form action="/users/sign_in/" method="post">
     <header>
       <h2>Sign In</h2>
     </header>
 
     {{ if .error }}
-    <aside>{{ .error }}</aside>
+    <div class="ui segment">{{ .error }}</div>
     {{ end }}
 
-    <label for="email">Email:</label>
-    <input type="text" id="email" name="email" size="40" placeholder="you@example.com">
-    <label for="password">Password:</label>
-    <input type="password" id="password" name="password" size="40">
-    <button type="submit">Submit</button>
+    <div class="ui segment">
+      <label for="email">Email:</label>
+      <input type="text" id="email" name="email" size="40" placeholder="you@example.com">
+    </div>
+    <div class="ui segment">
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" size="40">
+    </div>
+
+    <div class="ui segment">
+      <button type="submit">Submit</button>
+    </div>
+
   </form>
-</section>
+</div>
+-->
 
 {{ template "shared/footer.html" .}}
 

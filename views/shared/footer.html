@@ -1,6 +1,6 @@
 {{ define "shared/footer.html" }}
 
-</main>
+{{ if .CurrentUser }}
 <footer>
   <hr>
   <p>
@@ -13,6 +13,8 @@
     <small>Build info</small>
   </p>
 </footer>
+{{ end }}
+
 </body>
 </html>
 {{ end }}

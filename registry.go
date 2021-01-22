@@ -72,8 +72,6 @@ func initRoutes(router *gin.Engine) {
 
 	}
 
-	router.GET("/", func(c *gin.Context) {
-		c.HTML(200, "users/sign_in.html", nil)
-	})
-
+	// Root goes to sign-in page
+	router.GET("/", c.UserSignInShow)
 }
