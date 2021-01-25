@@ -62,6 +62,7 @@ The registry will include three sets of routes, leading to three sets of endpoin
 - [Member API](#member-api)
 - [Admin API](#admin-api)
 - [Roles and Security](#roles-and-security)
+- [Reporting](#reporting)
 - [Testing](#testing)
 - [Database Changes](#database-changes)
 
@@ -336,6 +337,18 @@ The term "items" below refers to Intellectual Objects, Generic Files, Checksums,
 Testing should cover all major features of the Web UI, Member API and Admin API. That is, tests should make the same endpoint requests that users make and should ensure that results are complete and correct, and that side effects (e.g. generating an email alert) are complete and correct.
 
 In general, high-level testing should be more useful than huge suites of low-level tests.
+
+# Reporting
+
+Depositors and APTrust should be able to get reports on demand describing:
+
+* total current deposits
+* total deposits over time (i.e. end-of-month object, file and byte totals for each month of each year)
+* deposits by storage type (standard, glacier, glacier-deep, wasabi - this report can be use to calculate billing)
+* deposits by region and technology
+* show deleted objects/files/bytes and (ideally) when those items were deleted, and by whom
+
+The Web UI should show data and charts. The Admin API should provide reporting for all institutions, for APTrust's billing and reporting needs. The Member API should show information for the member's own institution, but not for other institutions.
 
 # Database Changes
 
