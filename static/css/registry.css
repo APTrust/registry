@@ -1,5 +1,12 @@
-.side-nav img {
+.top-nav img {
     max-width: 60%;
+}
+
+.top-nav input {
+    margin-top: 2rem;
+    margin-left: auto;
+    margin-right: auto;
+    width: 60%;
 }
 
 .side-nav ul {
