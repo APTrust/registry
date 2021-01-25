@@ -1,42 +1,18 @@
 {{ define "shared/nav.html" }}
 
-<div class="ui left vertical inverted thin sidebar labeled menu visible">
-  <img class="ui image tiny centered" src="/static/img/APTrustSquare.png">
-  <a class="item" href="/dashboard">
-    <i class="home icon"></i>
-    Dashboard
-  </a>
-  <a class="item" href="/objects">
-    <i class="box icon"></i>
-    Objects
-  </a>
-  <a class="item" href="/items">
-    <i class="cog icon"></i>
-    Work Items
-  </a>
-  <a class="item" href="/reports">
-    <i class="chart line icon"></i>
-    Reports
-  </a>
-  <a class="item" href="/alerts">
-    <i class="bell icon"></i>
-    Alerts
-  </a>
-  <a class="item" href="/institutions">
-    <i class="landmark icon"></i>
-    Institutions
-  </a>
-  <a class="item" href="/users">
-    <i class="users icon"></i>
-    Users
-  </a>
-  <a class="item" href="/users/sign_out">
-    <i class="poo icon"></i>
-    Sign Out
-  </a>
-</div>
+<img src="/static/img/APTrustSquare.png">
+<ul>
+  <li><a href="/dashboard"><i class="fa fa-home"></i> Dashboard</a></li>
+  <li><a href="/objects"><i class="fa fa-archive"></i> Objects</a></li>
+  <li><a href="/items"><i class="fa fa-cog"></i> Work Items</a></li>
+  <li><a href="/reports"><i class="fa fa-chart-line"></i> Reports</a></li>
+  <li><a href="/alerts"><i class="fa fa-bell"></i> Alerts</a></li>
+  <li><a href="/institutions"><i class="fa fa-landmark"></i> Institutions</a></li>
+  <li><a href="/users"><i class="fa fa-users"></i> Users</a></li>
+  <li><a href="/users/sign_out"><i class="fas sign-out-alt"></i> Sign Out</a></li>
+</ul>
 
-
+<!--
 <div id="topnav" class="ui top inverted fixed menu overlay">
   <div class="center menu">
     <div class="ui fluid category search">
@@ -51,5 +27,6 @@
     <a class="item"><i class="help icon"></i>Help</a>
  </div>
 </div>
+-->
 
 {{ end }}

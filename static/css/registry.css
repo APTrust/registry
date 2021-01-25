@@ -1,0 +1,13 @@
+.side-nav img {
+    max-width: 60%;
+}
+
+.side-nav ul {
+    list-style: none;
+}
+
+.side-nav ul li a i {
+    margin-left: 0px;
+    margin-right: 0px;
+    width: 20px;
+}
