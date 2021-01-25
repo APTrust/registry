@@ -13,9 +13,13 @@
 
   <body class="container">
 
+    <div class="row top-nav">
+      {{ template "shared/top_nav.html" .}}
+    </div>
+
     <div class="row">
       <div class="column column-20 side-nav">
-        {{ template "shared/nav.html" .}}
+        {{ template "shared/side_nav.html" .}}
       </div>
 
       <div class="column column-80">
