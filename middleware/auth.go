@@ -17,7 +17,13 @@ func Auth() gin.HandlerFunc {
 		if !ExemptFromAuth(c) {
 			user, err := GetUserFromSession(c)
 			if err != nil {
-				c.AbortWithStatus(http.StatusUnauthorized)
+				c.HTML(http.StatusUnauthorized, "errors/show.html", gin.H{
+					"suppressSideNav": true,
+					"suppressTopNav":  false,
+					"error":           "Please log in",
+					"redirectURL":     "/",
+				})
+				c.Abort()
 			} else {
 				c.Set("CurrentUser", user)
 			}

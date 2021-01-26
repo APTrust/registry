@@ -1,0 +1,18 @@
+{{ define "errors/show.html" }}
+
+{{ template "shared/header.html" .}}
+
+<h1>Oops!</h1>
+
+<p>{{ .error }}</p>
+
+{{ if .redirectURL }}
+<p>You will be redirected automatically in 3 seconds...</p>
+<script type="text/javascript">
+    setTimeout(function () { window.location = "{{ .redirectURL }}" }, 3000);
+</script>
+{{ end }}
+
+{{ template "shared/footer.html" .}}
+
+{{ end }}

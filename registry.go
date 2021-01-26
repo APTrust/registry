@@ -70,6 +70,9 @@ func initRoutes(router *gin.Engine) {
 		web.GET("/users/show/:id", c.UserShow)
 		web.PUT("/users/update/:id", c.UserUpdate)
 
+		// Error page
+		web.GET("/error", c.ErrorShow)
+
 	}
 
 	// Root goes to sign-in page

@@ -13,13 +13,17 @@
 
   <body class="container">
 
+    {{ if not .suppressTopNav }}
     <div class="row top-nav">
       {{ template "shared/top_nav.html" .}}
     </div>
+    {{ end }}
 
     <div class="row">
       <div class="column column-20 side-nav">
+        {{ if not .suppressSideNav }}
         {{ template "shared/side_nav.html" .}}
+        {{ end }}
       </div>
 
       <div class="column column-80">
