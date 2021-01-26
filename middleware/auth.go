@@ -1,22 +1,26 @@
 package middleware
 
 import (
+	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/models"
 	"github.com/gin-gonic/gin"
 )
 
+// Auth eusures the current user is logged in for all requests other
+// than those going to "/" or static resources.
 func Auth() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		user, err := GetUserFromSession(c)
-		if err != nil {
-			// TODO: If this isn't the sign-in page and
-			// we don't have a user, redirect to sign-in.
-			c.Set("CurrentUser", &models.User{})
-		} else {
-			c.Set("CurrentUser", user)
+		if !ExemptFromAuth(c) {
+			user, err := GetUserFromSession(c)
+			if err != nil {
+				c.AbortWithStatus(http.StatusUnauthorized)
+			} else {
+				c.Set("CurrentUser", user)
+			}
 		}
 		c.Next()
 	}
@@ -25,7 +29,8 @@ func Auth() gin.HandlerFunc {
 // GetUserFromSession returns the User for the current session.
 func GetUserFromSession(c *gin.Context) (user *models.User, err error) {
 	ctx := common.Context()
-	if cookie, err := c.Cookie(ctx.Config.Cookies.SessionCookie); err == nil {
+	cookie, err := c.Cookie(ctx.Config.Cookies.SessionCookie)
+	if err == nil {
 		value := ""
 		if err = ctx.Config.Cookies.Secure.Decode(ctx.Config.Cookies.SessionCookie, cookie, &value); err != nil {
 			return nil, common.ErrDecodeCookie
@@ -37,4 +42,9 @@ func GetUserFromSession(c *gin.Context) (user *models.User, err error) {
 		user, err = models.UserFind(userID)
 	}
 	return user, err
+}
+
+func ExemptFromAuth(c *gin.Context) bool {
+	p := c.FullPath()
+	return p == "/" || p == "/users/sign_in" || strings.HasPrefix(p, "/static") || strings.HasPrefix(p, "/favicon")
 }
