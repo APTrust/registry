@@ -24,10 +24,8 @@ var SafeEnvironments = []string{
 // LoadOrder lists the names of tables for which we have fixture data
 // (csv files) in the order they should be loaded.
 var LoadOrder = []string{
-	"roles",
 	"institutions",
 	"users",
-	"roles_users",
 	"intellectual_objects",
 	"generic_files",
 	"checksums",
@@ -118,7 +116,7 @@ func dropEverything(db *pg.DB) error {
 	return nil
 }
 
-// Reload the entire DB schema
+// Reload the entire DB schema.
 func loadSchema(db *pg.DB) error {
 	panicOnWrongEnv()
 	file := filepath.Join("db", "schema.sql")

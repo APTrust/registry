@@ -32,7 +32,6 @@ func UserIndex(c *gin.Context) {
 	ctx := common.Context()
 	err := ctx.DB.Model(&users).
 		Relation("Institution").
-		Relation("Role").
 		Order("name asc").
 		Select()
 	if err != nil && err != pg.ErrNoRows {

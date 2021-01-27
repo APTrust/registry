@@ -19,7 +19,7 @@
       <td>{{ $user.Name }}</td>
       <td>{{ $user.Email }}</td>
       <td>{{ $user.Institution.Name }}</td>
-      <td>{{ if $user.Role }}{{ $user.Role.Name }}{{ else }}None{{ end }}</td>
+      <td>{{ $user.Role }}</td>
     </tr>
     {{ end }}
   </tbody>

@@ -554,6 +554,7 @@ CREATE TABLE public.users (
 	force_password_update bool NULL DEFAULT false,
 	account_confirmed bool NULL DEFAULT true,
 	grace_period timestamp NULL,
+    "role" varchar(50) NOT NULL default 'none',
 	CONSTRAINT users_pkey PRIMARY KEY (id),
 	CONSTRAINT fk_rails_7fcf39ca13 FOREIGN KEY (institution_id) REFERENCES institutions(id)
 );

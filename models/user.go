@@ -16,43 +16,42 @@ import (
 
 // User is a person who can log in and do stuff.
 type User struct {
-	ID                     int64     `json:"id" form:"id" pg:"id"`
-	Name                   string    `json:"name" form:"name" pg:"name"`
-	Email                  string    `json:"email" form:"email" pg:"email"`
-	PhoneNumber            string    `json:"phone_number" form:"phone_number" pg:"phone_number"`
-	CreatedAt              time.Time `json:"created_at" form:"created_at" pg:"created_at"`
-	UpdatedAt              time.Time `json:"updated_at" form:"updated_at" pg:"updated_at"`
-	EncryptedPassword      string    `json:"-" form:"-" pg:"encrypted_password"`
-	ResetPasswordToken     string    `json:"-" form:"-" pg:"reset_password_token"`
-	ResetPasswordSentAt    time.Time `json:"reset_password_sent_at" form:"-" pg:"reset_password_sent_at"`
-	RememberCreatedAt      time.Time `json:"-" form:"-" pg:"remember_created_at"`
-	SignInCount            int       `json:"sign_in_count" form:"-" pg:"sign_in_count,use_zero"`
-	CurrentSignInAt        time.Time `json:"current_sign_in_at" form:"-" pg:"current_sign_in_at"`
-	LastSignInAt           time.Time `json:"last_sign_in_at" form:"-" pg:"last_sign_in_at"`
-	CurrentSignInIP        string    `json:"current_sign_in_ip" form:"-" pg:"current_sign_in_ip"`
-	LastSignInIP           string    `json:"last_sign_in_ip" form:"-" pg:"last_sign_in_ip"`
-	InstitutionID          int64     `json:"institution_id" form:"institution_id" pg:"institution_id"`
-	EncryptedAPISecretKey  string    `json:"-" form:"-" pg:"encrypted_api_secret_key"`
-	PasswordChangedAt      time.Time `json:"password_changed_at" form:"-" pg:"password_changed_at"`
-	EncryptedOTPSecret     string    `json:"-" form:"-" pg:"encrypted_otp_secret"`
-	EncryptedOTPSecretIV   string    `json:"-" form:"-" pg:"encrypted_otp_secret_iv"`
-	EncryptedOTPSecretSalt string    `json:"-" form:"-" pg:"encrypted_otp_secret_salt"`
-	ConsumedTimestep       int       `json:"-" form:"-" pg:"consumed_timestep"`
-	OTPRequiredForLogin    bool      `json:"otp_required_for_login" form:"-" pg:"otp_required_for_login"`
-	DeactivatedAt          time.Time `json:"deactivated_at" form:"-" pg:"deactivated_at"`
-	EnabledTwoFactor       bool      `json:"enabled_two_factor" form:"-" pg:"enabled_two_factor"`
-	ConfirmedTwoFactor     bool      `json:"confirmed_two_factor" form:"-" pg:"confirmed_two_factor"`
-	OTPBackupCodes         string    `json:"-" form:"-" pg:"otp_backup_codes"`
-	AuthyID                string    `json:"-" form:"-" pg:"authy_id"`
-	LastSignInWithAuthy    time.Time `json:"last_sign_in_with_authy" form:"-" pg:"last_sign_in_with_authy"`
-	AuthyStatus            string    `json:"authy_status" form:"-" pg:"authy_status"`
-	EmailVerified          bool      `json:"email_verified" form:"-" pg:"email_verified"`
-	InitialPasswordUpdated bool      `json:"initial_password_updated" form:"-" pg:"initial_password_updated"`
-	ForcePasswordUpdate    bool      `json:"force_password_update" form:"-" pg:"force_password_update"`
-	GracePeriod            time.Time `json:"grace_period" form:"grace_period" pg:"grace_period"`
-
-	Institution *Institution `json:"institution" pg:"rel:has-one"`
-	Role        *Role        `json:"institution" pg:"rel:has-one"`
+	ID                     int64        `json:"id" form:"id" pg:"id"`
+	Name                   string       `json:"name" form:"name" pg:"name"`
+	Email                  string       `json:"email" form:"email" pg:"email"`
+	PhoneNumber            string       `json:"phone_number" form:"phone_number" pg:"phone_number"`
+	CreatedAt              time.Time    `json:"created_at" form:"created_at" pg:"created_at"`
+	UpdatedAt              time.Time    `json:"updated_at" form:"updated_at" pg:"updated_at"`
+	EncryptedPassword      string       `json:"-" form:"-" pg:"encrypted_password"`
+	ResetPasswordToken     string       `json:"-" form:"-" pg:"reset_password_token"`
+	ResetPasswordSentAt    time.Time    `json:"reset_password_sent_at" form:"-" pg:"reset_password_sent_at"`
+	RememberCreatedAt      time.Time    `json:"-" form:"-" pg:"remember_created_at"`
+	SignInCount            int          `json:"sign_in_count" form:"-" pg:"sign_in_count,use_zero"`
+	CurrentSignInAt        time.Time    `json:"current_sign_in_at" form:"-" pg:"current_sign_in_at"`
+	LastSignInAt           time.Time    `json:"last_sign_in_at" form:"-" pg:"last_sign_in_at"`
+	CurrentSignInIP        string       `json:"current_sign_in_ip" form:"-" pg:"current_sign_in_ip"`
+	LastSignInIP           string       `json:"last_sign_in_ip" form:"-" pg:"last_sign_in_ip"`
+	InstitutionID          int64        `json:"institution_id" form:"institution_id" pg:"institution_id"`
+	EncryptedAPISecretKey  string       `json:"-" form:"-" pg:"encrypted_api_secret_key"`
+	PasswordChangedAt      time.Time    `json:"password_changed_at" form:"-" pg:"password_changed_at"`
+	EncryptedOTPSecret     string       `json:"-" form:"-" pg:"encrypted_otp_secret"`
+	EncryptedOTPSecretIV   string       `json:"-" form:"-" pg:"encrypted_otp_secret_iv"`
+	EncryptedOTPSecretSalt string       `json:"-" form:"-" pg:"encrypted_otp_secret_salt"`
+	ConsumedTimestep       int          `json:"-" form:"-" pg:"consumed_timestep"`
+	OTPRequiredForLogin    bool         `json:"otp_required_for_login" form:"-" pg:"otp_required_for_login"`
+	DeactivatedAt          time.Time    `json:"deactivated_at" form:"-" pg:"deactivated_at"`
+	EnabledTwoFactor       bool         `json:"enabled_two_factor" form:"-" pg:"enabled_two_factor"`
+	ConfirmedTwoFactor     bool         `json:"confirmed_two_factor" form:"-" pg:"confirmed_two_factor"`
+	OTPBackupCodes         string       `json:"-" form:"-" pg:"otp_backup_codes"`
+	AuthyID                string       `json:"-" form:"-" pg:"authy_id"`
+	LastSignInWithAuthy    time.Time    `json:"last_sign_in_with_authy" form:"-" pg:"last_sign_in_with_authy"`
+	AuthyStatus            string       `json:"authy_status" form:"-" pg:"authy_status"`
+	EmailVerified          bool         `json:"email_verified" form:"-" pg:"email_verified"`
+	InitialPasswordUpdated bool         `json:"initial_password_updated" form:"-" pg:"initial_password_updated"`
+	ForcePasswordUpdate    bool         `json:"force_password_update" form:"-" pg:"force_password_update"`
+	GracePeriod            time.Time    `json:"grace_period" form:"grace_period" pg:"grace_period"`
+	Role                   string       `json:"role" form:"role" pg:"role"`
+	Institution            *Institution `json:"institution" pg:"rel:has-one"`
 }
 
 func (user *User) GetID() int64 {
@@ -143,10 +142,7 @@ func SignInUser(email, password, ipAddr string) (*User, error) {
 func UserFind(id int64) (*User, error) {
 	ctx := common.Context()
 	user := &User{ID: id}
-	err := ctx.DB.Model(user).Relation("Institution").Relation("Role").WherePK().Select()
-	if err == nil {
-		user.ensureRole()
-	}
+	err := ctx.DB.Model(user).Relation("Institution").WherePK().Select()
 	return user, err
 }
 
@@ -155,7 +151,6 @@ func UserFindByEmail(email string) (*User, error) {
 	user := &User{}
 	err := ctx.DB.Model(user).
 		Relation("Institution").
-		Relation("Role").
 		Where("email = ? ", email).
 		Offset(0).
 		Limit(1).
@@ -167,7 +162,6 @@ func UserFindByEmail(email string) (*User, error) {
 	if err != nil {
 		return nil, err
 	}
-	user.ensureRole()
 	return user, nil
 }
 
@@ -186,17 +180,6 @@ func (user *User) SignOutUser() error {
 	return err
 }
 
-// ensureRole ensures that this user has a Role. All users do, but
-// if we ever lose a Role relation, or if the user has been deactivated,
-// they will be assigned RoleNone, which has zero privileges.
-func (user *User) ensureRole() {
-	if user.Role == nil || !user.DeactivatedAt.IsZero() {
-		user.Role = &Role{
-			Name: constants.RoleNone,
-		}
-	}
-}
-
 // HasPermission returns true or false to indicate whether the user has
 // sufficient permissions to perform the requested action. Param action
 // should be one of the constants from constants/permissions.go. Param
@@ -205,10 +188,10 @@ func (user *User) ensureRole() {
 // user is editing him/herself, this can be zero.
 func (user *User) HasPermission(action constants.Permission, institutionID int64) bool {
 	// Sys admin's permissions apply across all institutional boundaries.
-	if user.Role.Name == constants.RoleSysAdmin {
-		return constants.CheckPermission(user.Role.Name, action)
+	if user.Role == constants.RoleSysAdmin {
+		return constants.CheckPermission(user.Role, action)
 	}
 	// Institutional user and admin permissions apply only within their
 	// own institutions.
-	return user.InstitutionID == institutionID && constants.CheckPermission(user.Role.Name, action)
+	return user.InstitutionID == institutionID && constants.CheckPermission(user.Role, action)
 }
