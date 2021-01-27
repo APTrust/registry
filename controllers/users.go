@@ -10,12 +10,6 @@ import (
 	"github.com/go-pg/pg/v10"
 )
 
-// Possible issue with OTP columns in users table.
-// Embedded newlines cause error:
-// "invalid character '$' looking for beginning of object key string"
-// This may be related to:
-// https://github.com/go-pg/pg/issues/1776
-
 // UserCreate a new user. Handles submission of new user form.
 // POST /users/new
 func UserCreate(c *gin.Context) {
@@ -40,7 +34,6 @@ func UserIndex(c *gin.Context) {
 		Relation("Institution").
 		Relation("Role").
 		Order("name asc").
-		Limit(4).
 		Select()
 	if err != nil && err != pg.ErrNoRows {
 		c.Error(err)
