@@ -3,10 +3,18 @@ package controllers
 import (
 	"net/http"
 
+	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/helpers"
 	"github.com/APTrust/registry/models"
 	"github.com/gin-gonic/gin"
+	"github.com/go-pg/pg/v10"
 )
+
+// Possible issue with OTP columns in users table.
+// Embedded newlines cause error:
+// "invalid character '$' looking for beginning of object key string"
+// This may be related to:
+// https://github.com/go-pg/pg/issues/1776
 
 // UserCreate a new user. Handles submission of new user form.
 // POST /users/new
@@ -23,7 +31,27 @@ func UserDelete(c *gin.Context) {
 // UserIndex shows list of users.
 // GET /users
 func UserIndex(c *gin.Context) {
-	c.HTML(http.StatusOK, "users/index.html", gin.H{})
+	templateData := gin.H{}
+	template := "users/index.html"
+	status := http.StatusOK
+	users := []models.User{}
+	ctx := common.Context()
+	err := ctx.DB.Model(&users).
+		Relation("Institution").
+		Relation("Role").
+		Order("name asc").
+		Limit(4).
+		Select()
+	if err != nil && err != pg.ErrNoRows {
+		c.Error(err)
+		status = http.StatusBadRequest
+		templateData["error"] = err.Error()
+		template = "errors/show.html"
+	} else {
+		templateData = helpers.TemplateVars(c)
+		templateData["items"] = users
+	}
+	c.HTML(status, template, templateData)
 }
 
 // UserNew returns a blank form for the user to create a new user.

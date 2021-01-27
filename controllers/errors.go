@@ -6,5 +6,5 @@ import (
 )
 
 func ErrorShow(c *gin.Context) {
-	c.HTML(200, "error/show.html", helpers.TemplateVars(c))
+	c.HTML(200, "errors/show.html", helpers.TemplateVars(c))
 }

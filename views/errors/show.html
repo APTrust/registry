@@ -11,6 +11,8 @@
 <script type="text/javascript">
     setTimeout(function () { window.location = "{{ .redirectURL }}" }, 3000);
 </script>
+{{ else }}
+<button class="button button-outline" onclick="history.back()">&lt;&lt; Back</button>
 {{ end }}
 
 {{ template "shared/footer.html" .}}
