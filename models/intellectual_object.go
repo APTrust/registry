@@ -20,7 +20,6 @@ type IntellectualObject struct {
 	UpdatedAt                 time.Time `json:"updated_at" form:"updated_at" pg:"updated_at"`
 	State                     string    `json:"state" form:"state" pg:"state"`
 	ETag                      string    `json:"etag" form:"etag" pg:"etag"`
-	IngestState               string    `json:"ingest_state" form:"ingest_state" pg:"ingest_state"`
 	BagGroupIdentifier        string    `json:"bag_group_identifier" form:"bag_group_identifier" pg:"bag_group_identifier"`
 	StorageOption             string    `json:"storage_option" form:"storage_option" pg:"storage_option"`
 	BagItProfileIdentifier    string    `json:"bagit_profile_identifier" form:"bag_it_profile_identifier" pg:"bagit_profile_identifier"`

@@ -37,3 +37,8 @@ begin
   end if;
 end
 $$
+
+-- The ingest_state columns were part of a proposed architecture we never
+-- implemented. They have never been used, and we don't need them.
+alter table intellectual_objects drop column if exists ingest_state;
+alter table generic_files drop column if exists ingest_state;

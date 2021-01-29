@@ -16,7 +16,6 @@ type GenericFile struct {
 	CreatedAt            time.Time `json:"created_at" form:"created_at" pg:"created_at"`
 	UpdatedAt            time.Time `json:"updated_at" form:"updated_at" pg:"updated_at"`
 	State                string    `json:"state" form:"state" pg:"state"`
-	IngestState          string    `json:"ingest_state" form:"ingest_state" pg:"ingest_state"`
 	LastFixityCheck      time.Time `json:"last_fixity_check" form:"last_fixity_check" pg:"last_fixity_check"`
 	InstitutionID        int64     `json:"institution_id" form:"institution_id" pg:"institution_id"`
 	StorageOption        string    `json:"storage_option" form:"storage_option" pg:"storage_option"`
