@@ -70,3 +70,13 @@ drop index if exists index_work_items_on_institution_id_and_date;
 
 create index if not exists index_work_items_on_date_processed on work_items(date_processed);
 create index if not exists index_work_items_on_inst_id_and_date_processed on work_items(institution_id, date_processed);
+
+-- These columns are unnecessary in the premis_events table.
+-- We can get them by joining other tables in a view.
+-- This will have a large impact on storage space, since these
+-- two fields together average ~100 bytes per record, and as of
+-- Jan. 2021, we have around 120M records. Dropping these columns
+-- also drops the indexes on these two columns, which are huge and
+-- are rarely used.
+alter table premis_events drop column if exists intellectual_object_identifier;
+alter table premis_events drop column if exists generic_file_identifier;

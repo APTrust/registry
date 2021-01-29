@@ -329,8 +329,6 @@ CREATE TABLE public.premis_events (
 	updated_at timestamp NOT NULL,
 	outcome varchar NULL,
 	institution_id int4 NULL,
-	intellectual_object_identifier varchar NOT NULL DEFAULT ''::character varying,
-	generic_file_identifier varchar NOT NULL DEFAULT ''::character varying,
 	old_uuid varchar NULL,
 	CONSTRAINT premis_events_pkey PRIMARY KEY (id)
 );
@@ -339,12 +337,10 @@ CREATE INDEX index_premis_events_on_event_type ON public.premis_events USING btr
 CREATE INDEX index_premis_events_on_event_type_and_outcome ON public.premis_events USING btree (event_type, outcome);
 CREATE INDEX index_premis_events_on_generic_file_id ON public.premis_events USING btree (generic_file_id);
 CREATE INDEX index_premis_events_on_generic_file_id_and_event_type ON public.premis_events USING btree (generic_file_id, event_type);
-CREATE INDEX index_premis_events_on_generic_file_identifier ON public.premis_events USING btree (generic_file_identifier);
 CREATE UNIQUE INDEX index_premis_events_on_identifier ON public.premis_events USING btree (identifier);
 CREATE INDEX index_premis_events_on_identifier_and_institution_id ON public.premis_events USING btree (identifier, institution_id);
 CREATE INDEX index_premis_events_on_institution_id ON public.premis_events USING btree (institution_id);
 CREATE INDEX index_premis_events_on_intellectual_object_id ON public.premis_events USING btree (intellectual_object_id);
-CREATE INDEX index_premis_events_on_intellectual_object_identifier ON public.premis_events USING btree (intellectual_object_identifier);
 CREATE INDEX index_premis_events_on_outcome ON public.premis_events USING btree (outcome);
 
 
