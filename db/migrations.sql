@@ -8,6 +8,8 @@
 -- any number of times and always know that it will leave the DB in a
 -- consistent and known state that matches schema.sql.
 --
+-- NOTE: When migrating old Pharos DB, we will also need to create the
+--       views in the schema.sql file.
 -------------------------------------------------------------------------------
 
 -- We need to fix the user role structure. Pharos allows a user to have

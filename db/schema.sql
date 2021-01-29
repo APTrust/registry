@@ -528,6 +528,77 @@ CREATE INDEX index_users_on_password_changed_at ON public.users USING btree (pas
 CREATE UNIQUE INDEX index_users_on_reset_password_token ON public.users USING btree (reset_password_token);
 
 -------------------------------------------------------------------------------
+-- Views
+-------------------------------------------------------------------------------
+
+-- Create a view to pull in columns that used to be in the WorkItems table.
+-- These include intellectual_object_identifier and generic_file_identifier.
+create or replace view work_items_view as
+select
+	wi.id,
+	wi.institution_id,
+	i."name" as institution_name,
+	wi.intellectual_object_id,
+	io.identifier as "intellectual_object_identifier",
+	wi.generic_file_id,
+	gf.identifier as "generic_file_identifier",
+	wi."name",
+	wi.etag,
+	wi.bucket,
+	wi."user",
+	wi.note,
+	wi."action",
+	wi.stage,
+	wi.status,
+	wi.outcome,
+	wi.bag_date,
+	wi.date_processed,
+	wi.retry,
+	wi.node,
+	wi.pid,
+    wi.needs_admin_review,
+    wi."size",
+	wi.queued_at,
+	wi.stage_started_at,
+	wi.aptrust_approver,
+	wi.inst_approver,
+	wi.created_at,
+	wi.updated_at
+from work_items wi
+left join institutions i on wi.institution_id = i.id
+left join intellectual_objects io on wi.intellectual_object_id = io.id
+left join generic_files gf on wi.generic_file_id = gf.id;
+
+
+-- Create a view to pull in columns that used to be in the PremisEvents table.
+-- These include intellectual_object_identifier and generic_file_identifier.
+create or replace view premis_events_view as
+select
+	pe.id,
+	pe.identifier,
+	pe.institution_id,
+	i."name" as institution_name,
+	pe.intellectual_object_id,
+	io.identifier as intellectual_object_identifier,
+	pe.generic_file_id,
+	gf.identifier as generic_file_identifier,
+	pe.event_type,
+	pe.date_time,
+	pe.detail,
+	pe.outcome,
+	pe.outcome_detail,
+	pe.outcome_information,
+	pe."object",
+	pe.agent,
+	pe.created_at,
+	pe.updated_at,
+	pe.old_uuid
+from premis_events pe
+left join institutions i on pe.institution_id = i.id
+left join intellectual_objects io on pe.intellectual_object_id = io.id
+left join generic_files gf on pe.generic_file_id = gf.id;
+
+-------------------------------------------------------------------------------
 -- Functions
 -------------------------------------------------------------------------------
 
