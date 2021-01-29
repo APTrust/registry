@@ -344,35 +344,6 @@ CREATE INDEX index_premis_events_on_intellectual_object_id ON public.premis_even
 CREATE INDEX index_premis_events_on_outcome ON public.premis_events USING btree (outcome);
 
 
--- public.roles definition
-
--- Drop table
-
--- DROP TABLE public.roles;
-
-CREATE TABLE public.roles (
-	id serial NOT NULL,
-	"name" varchar NULL UNIQUE,
-	created_at timestamp NOT NULL,
-	updated_at timestamp NOT NULL,
-	CONSTRAINT roles_pkey PRIMARY KEY (id)
-);
-
-
--- public.roles_users definition
-
--- Drop table
-
--- DROP TABLE public.roles_users;
-
-CREATE TABLE public.roles_users (
-	role_id int4 NULL,
-	user_id int4 NULL
-);
-CREATE INDEX index_roles_users_on_role_id_and_user_id ON public.roles_users USING btree (role_id, user_id);
-CREATE INDEX index_roles_users_on_user_id_and_role_id ON public.roles_users USING btree (user_id, role_id);
-
-
 -- public.schema_migrations definition
 
 -- Drop table

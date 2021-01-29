@@ -10,13 +10,6 @@
 --
 -------------------------------------------------------------------------------
 
--- First off, make sure role names are unique.
--- I have no idea why this constraint did not exist in Pharos.
--- Note that the name of the constraint is created by postgres
--- as 'roles_names_key' when we define roles.name as varchar unique.
-select create_constraint_if_not_exists('roles', 'roles_name_key', 'unique("name");');
-
-
 -- We need to fix the user role structure. Pharos allows a user to have
 -- multiple roles at a single institution, though our business rules disallow
 -- that, and no user has ever had more than one role. To simplify the DB
