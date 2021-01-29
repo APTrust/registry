@@ -1,7 +1,8 @@
 -- migrations.sql
 --
 -- This file contains ALL alterations that should be applied to the
--- existing Pharos DB schema to make it match schema.sql.
+-- existing Pharos DB schema (as it exists in the feature/storage-option
+-- branch) to make it match schema.sql.
 --
 -- All operations in this file must be idempotent, so we can run it
 -- any number of times and always know that it will leave the DB in a
@@ -42,3 +43,30 @@ $$
 -- implemented. They have never been used, and we don't need them.
 alter table intellectual_objects drop column if exists ingest_state;
 alter table generic_files drop column if exists ingest_state;
+
+-- Remove object_identifier and generic_file_identifier from work_items.
+-- We can use a view to join the files & objects tables, avoiding the
+-- duplicate data.
+alter table work_items drop column if exists object_identifier;
+alter table work_items drop column if exists generic_file_identifier;
+
+-- The work_items.date column actually refers to the datetime on which
+-- the item was last processed by one of our Go workers. The name "date"
+-- is too vague and ambiguous, so let's call it what it is.
+do $$
+begin
+  if exists (select 1 from information_schema.columns
+    where table_schema='public' AND table_name='work_items' AND column_name='date') then
+    alter table work_items rename column "date" to "date_processed";
+  end if;
+end
+$$
+
+-- Update the indexes on work_items to reflect the change from date to
+-- date_processed.
+
+drop index if exists index_work_items_on_date;
+drop index if exists index_work_items_on_institution_id_and_date;
+
+create index if not exists index_work_items_on_date_processed on work_items(date_processed);
+create index if not exists index_work_items_on_inst_id_and_date_processed on work_items(institution_id, date_processed);

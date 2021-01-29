@@ -448,10 +448,8 @@ CREATE TABLE public.work_items (
 	status varchar NULL,
 	outcome text NULL,
 	bag_date timestamp NULL,
-	"date" timestamp NULL,
+	date_processed timestamp NULL,
 	retry bool NOT NULL DEFAULT false,
-	object_identifier varchar NULL,
-	generic_file_identifier varchar NULL,
 	node varchar(255) NULL,
 	pid int4 NULL DEFAULT 0,
 	needs_admin_review bool NOT NULL DEFAULT false,
@@ -464,11 +462,11 @@ CREATE TABLE public.work_items (
 	CONSTRAINT work_items_pkey PRIMARY KEY (id)
 );
 CREATE INDEX index_work_items_on_action ON public.work_items USING btree (action);
-CREATE INDEX index_work_items_on_date ON public.work_items USING btree (date);
+CREATE INDEX index_work_items_on_date ON public.work_items USING btree (date_processed);
 CREATE INDEX index_work_items_on_etag_and_name ON public.work_items USING btree (etag, name);
 CREATE INDEX index_work_items_on_generic_file_id ON public.work_items USING btree (generic_file_id);
 CREATE INDEX index_work_items_on_institution_id ON public.work_items USING btree (institution_id);
-CREATE INDEX index_work_items_on_institution_id_and_date ON public.work_items USING btree (institution_id, date);
+CREATE INDEX index_work_items_on_institution_id_and_date ON public.work_items USING btree (institution_id, date_processed);
 CREATE INDEX index_work_items_on_intellectual_object_id ON public.work_items USING btree (intellectual_object_id);
 CREATE INDEX index_work_items_on_stage ON public.work_items USING btree (stage);
 CREATE INDEX index_work_items_on_status ON public.work_items USING btree (status);
