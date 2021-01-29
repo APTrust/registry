@@ -366,6 +366,10 @@ The existing Pharos DB duplicates a number of fields (such as premis_events.inte
 
 Other tables with duplicate columns include work_items (object_identifier and generic_file_identifier).
 
+## Foreign Keys
+
+Many tables do not include properly-defined foreign key constraints. The premis_events table is an example. Its intel obj id and generic file id columns should be proper foreign keys to the related tables.
+
 ## Counts
 
 We require count queries in a number of places such as for API results and paged web results. Count queries are notoriously slow in Postgres because the MVCC implementation needs to run a table scan to check row visibility.
