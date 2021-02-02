@@ -8,7 +8,7 @@ services:
   - postgresql
 before_script:
   - psql -c 'create database apt_registry_travis;' -U postgres
-  - psql -U postgres -d apt_registry_test -a -f ./db/schema.sql
+  - psql -U postgres -d apt_registry_travis -a -f ./db/schema.sql
 script:
   - go test ./...
 notifications:
