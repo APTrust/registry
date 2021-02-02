@@ -19,6 +19,7 @@ var fixturesLoaded = false
 var SafeEnvironments = []string{
 	"integration",
 	"test",
+	"travis",
 }
 
 // LoadOrder lists the names of tables for which we have fixture data
@@ -215,6 +216,6 @@ func runTransaction(db *pg.DB, sql string, params ...interface{}) error {
 func panicOnWrongEnv() {
 	envName := os.Getenv("APT_ENV")
 	if !slice.Contains(SafeEnvironments, envName) {
-		panic("Cannot run destructive DB operations outside dev, integration, test environments.")
+		panic("Cannot run destructive DB operations outside dev, test, travis environments.")
 	}
 }
