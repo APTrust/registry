@@ -360,6 +360,15 @@ The existing Pharos DB includes a number of unnecessary indexes created in an at
 
 Remove unused columns, such as generic_files.ingest_state, as well as columns that can be shared using views, rather than being duplicated. See [Views](#views) below.
 
+As of Feb. 2021, migrations delete the following columns:
+
+- intellectual\_objects.ingest\_state - was never used
+- generic\_files.ingest\_state - was never used
+- work\_items.object\_identifier - replaced in work\_items\_view
+- work\_items.generic\_file\_identifier - replaced in work\_items\_view
+- premis\_events.object\_identifier - replaced in premis\_events\_view
+- premis\_events.generic\_file\_identifier - replaced in premis\_events\_view
+
 ## Views
 
 The existing Pharos DB duplicates a number of fields (such as premis_events.intellectual_object_identifier and premis_events.generic_file_identifier, which are duplicated from other tables. These columns exist to speed queries that return multiple records. We can delete the columns and create views instead that provide the same columns without duplicating data. This will likely reduce the size of the DB by several gigabytes and increase insert efficiency.
@@ -369,6 +378,54 @@ Other tables with duplicate columns include work_items (object_identifier and ge
 ## Foreign Keys
 
 Many tables do not include properly-defined foreign key constraints. The premis_events table is an example. Its intel obj id and generic file id columns should be proper foreign keys to the related tables.
+
+As we add foreign keys, we need to change datatypes as well. All of the 32-bit integer serial IDs and the foreign keys that refer to them will need to change to 64-bit integers.
+
+The Pharos DB already had the following formal foreign key definitions:
+
+- checksums.generic\_file\_id -> generic\_files.id
+- storage\_records.generic\_file\_id -> generic\_files.id
+- users.institution\_id -> institutions.id
+
+The migrations file will need to add the following, pointing to the obvious places. We also need to index these fields, if they're not already indexed, because Postgres doesn't automatically index foreign keys.
+
+- checksums.generic\_file\_id
+- generic\_files.institution\_id
+- generic\_files.intellectual\_object\_id
+- institutions.member\_institution\_id (to institution\_id)
+- intellectual\_objects.institution\_id
+- premis\_events.generic\_file\_id
+- premis\_events.institution\_id
+- premis\_events.intellectual\_object\_id
+- storage\_records.generic\_file\_id
+- work\_items.generic\_file\_id
+- work\_items.institution\_id
+- work\_items.intellectual\_object\_id
+
+Note that as of Feb. 2021, we're skipping changes to the bulk\_delete tables, email tables, confirmation\_tokens and some others. We'll decide later whether we keep these tables or rearchitect them.
+
+## Tables To Drop or Rearchitect
+
+- ar\_internal\_metadata - No longer required once we stop using ActiveRecord.
+- bulk\_delete\_jobs - Likely still required, but need review to ensure the structure still serves our needs.
+- bulk\_delete\_jobs\_emails - Consolidate all email tables into one.
+- bulk\_delete\_jobs\_generic\_files - Probably still required, since it lists which files should be deleted by a job.
+- bulk\_delete\_jobs\_institutions - Huh?
+- bulk\_delete\_jobs\_generic\_files - Probably still required, since it lists which objects should be deleted by a job.
+- confirmation\_tokens - WTF is this?
+- emails - I get why it's there, but the structure makes no sense.
+- emails\_generic\_files - Why?
+- emails\_intellectual\_objects - More why?
+- emails\_premis\_events - Seeing a pattern here.
+- emails\_work\_items - Sigh
+- old\_passwords - Like used chewing gum, probably best to discard. This is probably used to prevent users from reusing an old password. Need to discuss password policy before deciding what to do about this. If we keep it, we have to guarantee the new registry code can use it. Who knows what kind of voodoo Rails used when hashing these values?
+- schema\_migrations - Not necessary after we move away from Rails.
+- snapshots - Contains summary info about total deposits as of the first of each month, broken down by each depositor. God knows how this is calculated. Needs review.
+- usage_samples - No idea what this is. The table is empty in the demo DB. Check the production DB, and see if there's any code to populate it or display its contents.
+
+## Other Changes
+
+intellectual\_obects.bagit\_profile\_identifier should probably be an integer field, pointing to a lookup table containing profile identifiers. The actual identifiers are long URLs and we don't need to repeat them 100k times.
 
 ## Counts
 

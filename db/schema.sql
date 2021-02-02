@@ -206,23 +206,12 @@ CREATE TABLE public.generic_files (
 	uuid varchar NOT NULL,
 	CONSTRAINT generic_files_pkey PRIMARY KEY (id)
 );
-CREATE INDEX index_files_on_inst_state_and_format ON public.generic_files USING btree (institution_id, state, file_format);
-CREATE INDEX index_files_on_inst_state_and_updated ON public.generic_files USING btree (institution_id, state, updated_at);
 CREATE INDEX index_generic_files_on_created_at ON public.generic_files USING btree (created_at);
-CREATE INDEX index_generic_files_on_file_format ON public.generic_files USING btree (file_format);
-CREATE INDEX index_generic_files_on_file_format_and_state ON public.generic_files USING btree (file_format, state);
 CREATE UNIQUE INDEX index_generic_files_on_identifier ON public.generic_files USING btree (identifier);
 CREATE INDEX index_generic_files_on_institution_id ON public.generic_files USING btree (institution_id);
-CREATE INDEX index_generic_files_on_institution_id_and_size_and_state ON public.generic_files USING btree (institution_id, size, state);
 CREATE INDEX index_generic_files_on_institution_id_and_state ON public.generic_files USING btree (institution_id, state);
 CREATE INDEX index_generic_files_on_institution_id_and_updated_at ON public.generic_files USING btree (institution_id, updated_at);
 CREATE INDEX index_generic_files_on_intellectual_object_id ON public.generic_files USING btree (intellectual_object_id);
-CREATE INDEX index_generic_files_on_intellectual_object_id_and_file_format ON public.generic_files USING btree (intellectual_object_id, file_format);
-CREATE INDEX index_generic_files_on_intellectual_object_id_and_state ON public.generic_files USING btree (intellectual_object_id, state);
-CREATE INDEX index_generic_files_on_size ON public.generic_files USING btree (size);
-CREATE INDEX index_generic_files_on_size_and_state ON public.generic_files USING btree (size, state);
-CREATE INDEX index_generic_files_on_state ON public.generic_files USING btree (state);
-CREATE INDEX index_generic_files_on_state_and_updated_at ON public.generic_files USING btree (state, updated_at);
 CREATE INDEX index_generic_files_on_updated_at ON public.generic_files USING btree (updated_at);
 CREATE UNIQUE INDEX index_generic_files_on_uuid ON public.generic_files USING btree (uuid);
 CREATE INDEX ix_gf_last_fixity_check ON public.generic_files USING btree (last_fixity_check);
@@ -279,13 +268,10 @@ CREATE TABLE public.intellectual_objects (
 	internal_sender_description text NULL,
 	CONSTRAINT intellectual_objects_pkey PRIMARY KEY (id)
 );
-CREATE INDEX index_intellectual_objects_on_access ON public.intellectual_objects USING btree (access);
 CREATE INDEX index_intellectual_objects_on_bag_name ON public.intellectual_objects USING btree (bag_name);
 CREATE INDEX index_intellectual_objects_on_created_at ON public.intellectual_objects USING btree (created_at);
 CREATE UNIQUE INDEX index_intellectual_objects_on_identifier ON public.intellectual_objects USING btree (identifier);
 CREATE INDEX index_intellectual_objects_on_institution_id ON public.intellectual_objects USING btree (institution_id);
-CREATE INDEX index_intellectual_objects_on_institution_id_and_state ON public.intellectual_objects USING btree (institution_id, state);
-CREATE INDEX index_intellectual_objects_on_state ON public.intellectual_objects USING btree (state);
 CREATE INDEX index_intellectual_objects_on_updated_at ON public.intellectual_objects USING btree (updated_at);
 
 
@@ -336,9 +322,7 @@ CREATE INDEX index_premis_events_date_time_desc ON public.premis_events USING bt
 CREATE INDEX index_premis_events_on_event_type ON public.premis_events USING btree (event_type);
 CREATE INDEX index_premis_events_on_event_type_and_outcome ON public.premis_events USING btree (event_type, outcome);
 CREATE INDEX index_premis_events_on_generic_file_id ON public.premis_events USING btree (generic_file_id);
-CREATE INDEX index_premis_events_on_generic_file_id_and_event_type ON public.premis_events USING btree (generic_file_id, event_type);
 CREATE UNIQUE INDEX index_premis_events_on_identifier ON public.premis_events USING btree (identifier);
-CREATE INDEX index_premis_events_on_identifier_and_institution_id ON public.premis_events USING btree (identifier, institution_id);
 CREATE INDEX index_premis_events_on_institution_id ON public.premis_events USING btree (institution_id);
 CREATE INDEX index_premis_events_on_intellectual_object_id ON public.premis_events USING btree (intellectual_object_id);
 CREATE INDEX index_premis_events_on_outcome ON public.premis_events USING btree (outcome);

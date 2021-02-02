@@ -75,3 +75,28 @@ create index if not exists index_work_items_on_inst_id_and_date_processed on wor
 -- are rarely used.
 alter table premis_events drop column if exists intellectual_object_identifier;
 alter table premis_events drop column if exists generic_file_identifier;
+
+-- Get rid of useless indexes. We can add these back if they actually turn
+-- out to be useful.
+--
+-- generic_files
+drop index if exists index_files_on_inst_state_and_format;
+drop index if exists index_files_on_inst_state_and_updated;
+drop index if exists index_generic_files_on_file_format;
+drop index if exists index_generic_files_on_file_format_and_state;
+drop index if exists index_generic_files_on_institution_id_and_size_and_state;
+drop index if exists index_generic_files_on_intellectual_object_id_and_file_format;
+drop index if exists index_generic_files_on_intellectual_object_id_and_state;
+drop index if exists index_generic_files_on_size;
+drop index if exists index_generic_files_on_size_and_state;
+drop index if exists index_generic_files_on_state;
+drop index if exists index_generic_files_on_state_and_updated_at;
+
+-- intellectual_objects
+drop index if exists index_intellectual_objects_on_access;
+drop index if exists index_intellectual_objects_on_institution_id_and_state;
+drop index if exists index_intellectual_objects_on_state;
+
+-- premis_events
+drop index if exists index_premis_events_on_generic_file_id_and_event_type;
+drop index if exists index_premis_events_on_identifier_and_institution_id;
