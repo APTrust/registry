@@ -41,6 +41,7 @@ type LoggingConfig struct {
 type Config struct {
 	Cookies *CookieConfig
 	DB      *DBConfig
+	EnvName string
 	Logging *LoggingConfig
 }
 
@@ -108,6 +109,7 @@ func loadConfig() *Config {
 			Driver:   v.GetString("DB_DRIVER"),
 			UseSSL:   v.GetBool("DB_USE_SSL"),
 		},
+		EnvName: os.Getenv("APT_ENV"),
 		Cookies: &CookieConfig{
 			Secure:        secureCookie,
 			Domain:        v.GetString("COOKIE_DOMAIN"),

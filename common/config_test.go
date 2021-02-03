@@ -28,11 +28,14 @@ func TestNewConfig(t *testing.T) {
 		assert.Equal(t, "apt_registry_test", config.DB.Name)
 		assert.Equal(t, "dev_user", config.DB.User)
 		assert.Equal(t, "password", config.DB.Password)
+		assert.Equal(t, "test", config.EnvName)
 	} else if os.Getenv("APT_ENV") == "travis" {
 		assert.Equal(t, "apt_registry_travis", config.DB.Name)
 		assert.Equal(t, "postgres", config.DB.User)
 		assert.Equal(t, "", config.DB.Password)
+		assert.Equal(t, "travis", config.EnvName)
 	} else {
+		// TODO: Handle integration test env
 		require.False(t, true, "Wrong APT_ENV environment for testing")
 	}
 
