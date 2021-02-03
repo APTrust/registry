@@ -1,44 +1,43 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/APTrust/registry/helpers"
-	"github.com/APTrust/registry/models"
 	"github.com/gin-gonic/gin"
 	"github.com/go-pg/pg/v10"
 )
 
 type IndexRequest struct {
-	Context  *gin.Context
-	Items    interface{}
-	Query    *models.Query
-	Template string
+	Context      *gin.Context
+	Status       int
+	Template     string
+	TemplateData gin.H
 }
 
-func NewIndexRequest(c *gin.Context, items interface{}, query *models.Query, template string) *IndexRequest {
+func NewIndexRequest(c *gin.Context, template string) *IndexRequest {
 	return &IndexRequest{
-		Context:  c,
-		Items:    items,
-		Query:    query,
-		Template: template,
+		Context:      c,
+		Status:       http.StatusOK,
+		Template:     template,
+		TemplateData: helpers.TemplateVars(c),
 	}
 }
 
-func (r *IndexRequest) Process() {
-	templateData := gin.H{}
-	template := r.Template
-	status := http.StatusOK
-	err := models.Select(r.Items, r.Query)
+func (r *IndexRequest) Respond(items interface{}, err error) {
+	// ErrNoRows is acceptable in an index request, e.g.
+	// when user filters restuls and there are no matches.
+	// For other errors, we need to display an error page.
 	if err != nil && err != pg.ErrNoRows {
-		status = http.StatusBadRequest
-		templateData["error"] = err.Error()
-		template = "errors/show.html"
+		r.setError(err)
 	} else {
-		templateData = helpers.TemplateVars(r.Context)
-		templateData["items"] = r.Items
-		fmt.Println(r.Items)
+		r.TemplateData["items"] = items
 	}
-	r.Context.HTML(status, template, templateData)
+	r.Context.HTML(r.Status, r.Template, r.TemplateData)
+}
+
+func (r *IndexRequest) setError(err error) {
+	r.Status = StatusCodeForError(err)
+	r.TemplateData["error"] = err.Error()
+	r.Template = "errors/show.html"
 }
