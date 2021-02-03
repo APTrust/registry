@@ -6,8 +6,6 @@ env:
   - APT_ENV=travis
 services:
   - postgresql
-before_install:
-  - sudo apt-get -y install postgresql-client
 before_script:
   - psql -c 'create database apt_registry_travis;' -U postgres
   - psql -U postgres -d apt_registry_travis -a -f ./db/schema.sql

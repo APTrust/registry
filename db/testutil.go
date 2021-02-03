@@ -3,7 +3,7 @@ package db
 import (
 	"fmt"
 	"os"
-	"os/exec"
+	"path"
 	"path/filepath"
 	"strings"
 
@@ -133,15 +133,7 @@ func loadSchema(db *pg.DB) error {
 func loadCSVFiles(db *pg.DB) error {
 	panicOnWrongEnv()
 	for _, table := range LoadOrder {
-		var err error
-		ctx := common.Context()
-		if ctx.Config.EnvName == "test" || ctx.Config.EnvName == "integration" {
-			err = loadCSVFile(db, table)
-		} else if ctx.Config.EnvName == "travis" {
-			err = loadCSVFileOnTravis(db, table)
-		} else {
-			return fmt.Errorf("Don't know how to load data in env %s", ctx.Config.EnvName)
-		}
+		err := loadCSVFile(db, table)
 		if err != nil {
 			return err
 		}
@@ -153,20 +145,27 @@ func loadCSVFiles(db *pg.DB) error {
 // The CSV files were created with the Postgres COPY command.
 func loadCSVFile(db *pg.DB, table string) error {
 	panicOnWrongEnv()
+	ctx := common.Context()
 	file := filepath.Join(common.ProjectRoot(), "db", "fixtures", table+".csv")
+
+	// On Travis, posgres user can't read from Travis' home dir,
+	// so we have to copy our csv file to a readable temp dir.
+	if ctx.Config.EnvName == "travis" {
+		tmpFile := path.Join(os.TempDir(), table+".csv")
+		err := common.CopyFile(file, tmpFile, 0666)
+		if err != nil {
+			return err
+		}
+		defer os.Remove(tmpFile)
+		file = tmpFile
+	}
+
 	sql := fmt.Sprintf(`copy "%s" from '%s' csv header`, table, file)
 	err := runTransaction(db, sql)
 	if err != nil {
 		err = fmt.Errorf(`Error executing "%s": %v`, sql, err)
 	}
 	return err
-}
-
-// Travis/Postgres has different permissions and requires the \copy command
-func loadCSVFileOnTravis(db *pg.DB, table string) error {
-	file := filepath.Join(common.ProjectRoot(), "db", "fixtures", table+".csv")
-	cmd := exec.Command(fmt.Sprintf(`psql \copy "public"."%s" from '%s' with csv`, table, file))
-	return cmd.Wait()
 }
 
 // Get the placeholders for a sql query.

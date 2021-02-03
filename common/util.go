@@ -118,3 +118,23 @@ func DecryptAES(key []byte, hexCipher string) (string, error) {
 	}
 	return string(plaintext), nil
 }
+
+// CopyFile copies the file at src path to dst path. It applies
+// the permissions specified in mode to the destination file.
+// Mode values are 0644, 0755, etc.
+func CopyFile(src string, dst string, mode os.FileMode) error {
+	data, err := ioutil.ReadFile(src)
+	if err != nil {
+		return err
+	}
+	return ioutil.WriteFile(dst, data, mode)
+}
+
+// Returns true if the file at path exists, false if not.
+func FileExists(path string) bool {
+	_, err := os.Stat(path)
+	if err != nil && os.IsNotExist(err) {
+		return false
+	}
+	return true
+}

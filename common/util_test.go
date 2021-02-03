@@ -1,9 +1,12 @@
 package common_test
 
 import (
+	"fmt"
+	"os"
 	"path"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/APTrust/registry/common"
 	"github.com/stretchr/testify/assert"
@@ -37,4 +40,25 @@ func TestExpandTilde(t *testing.T) {
 func TestHash(t *testing.T) {
 	p := "be4296045a168d1c2a484b625bf67477dcf748c86de3f2a94a14ba9eefb53669"
 	assert.Equal(t, p, common.Hash("password"))
+}
+
+func TestFileExists(t *testing.T) {
+	thisFile := path.Join(common.ProjectRoot(), "common", "util_test.go")
+	assert.True(t, common.FileExists(thisFile))
+
+	doesNotExist := path.Join(common.ProjectRoot(), "common", "nope.xyz")
+	assert.False(t, common.FileExists(doesNotExist))
+}
+
+func TestCopyFile(t *testing.T) {
+	src := path.Join(common.ProjectRoot(), "common", "util_test.go")
+	dst := path.Join(os.TempDir(), fmt.Sprintf("%d", time.Now().Unix()))
+	defer os.Remove(dst)
+
+	err := common.CopyFile(src, dst, 0644)
+	require.Nil(t, err)
+
+	finfo, err := os.Stat(dst)
+	require.Nil(t, err)
+	assert.Equal(t, os.FileMode(0644), finfo.Mode())
 }
