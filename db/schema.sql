@@ -582,6 +582,56 @@ left join institutions i on pe.institution_id = i.id
 left join intellectual_objects io on pe.intellectual_object_id = io.id
 left join generic_files gf on pe.generic_file_id = gf.id;
 
+
+-- users_view makes it easier to list and search on institution-related
+-- attributes for users.
+create or replace view users_view as
+select
+	u.id,
+	u."name",
+	u.email,
+	u.phone_number,
+	u.created_at,
+	u.updated_at,
+	u.reset_password_sent_at,
+	u.remember_created_at,
+	u.sign_in_count,
+	u.current_sign_in_at,
+	u.last_sign_in_at,
+	u.current_sign_in_ip,
+	u.last_sign_in_ip,
+	u.institution_id,
+	u.password_changed_at,
+	u.consumed_timestep,
+	u.otp_required_for_login,
+	u.deactivated_at,
+	u.enabled_two_factor,
+	u.confirmed_two_factor,
+	u.authy_id,
+	u.last_sign_in_with_authy,
+	u.authy_status,
+	u.email_verified,
+	u.initial_password_updated,
+	u.force_password_update,
+	u.account_confirmed,
+	u.grace_period,
+	u."role",
+	i."name" as institution_name,
+	i.identifier as institution_identifier,
+	i.state as institution_state,
+	i."type" as institution_type,
+	i.member_institution_id,
+	i2."name" as member_institution_name,
+	i2.identifier as member_institution_identifier,
+	i2.state as member_institution_state,
+	i.otp_enabled,
+	i.receiving_bucket,
+	i.restore_bucket
+from users u
+left join institutions i on u.institution_id = i.id
+left join institutions i2 on i.member_institution_id = i2.id;
+
+
 -------------------------------------------------------------------------------
 -- Functions
 -------------------------------------------------------------------------------
