@@ -3,7 +3,7 @@ package controllers
 import (
 	"net/http"
 
-	"github.com/APTrust/registry/common"
+	//"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/helpers"
 	"github.com/APTrust/registry/models"
 	"github.com/gin-gonic/gin"
@@ -30,12 +30,19 @@ func UserDelete(c *gin.Context) {
 // GET /users
 func UserIndex(c *gin.Context) {
 	resp := NewIndexRequest(c, "users/index.html")
-	users := []models.User{}
-	ctx := common.Context()
-	err := ctx.DB.Model(&users).
-		Relation("Institution").
-		Order("name asc").
-		Select()
+	users := &models.User{}
+	// ctx := common.Context()
+	// err := ctx.DB.Model(&users).
+	// 	Relation("Institution").
+	// 	Order("name asc").
+	// 	Select()
+	//
+	// TODO: We're generating an invalid query here.
+	//       Need to debug and fix.
+	//
+	query := models.NewQuery()
+	query.OrderBy = "name asc"
+	err := models.Select(users, query)
 	resp.Respond(users, err)
 }
 
