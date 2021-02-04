@@ -7,7 +7,6 @@ import (
 	"github.com/APTrust/registry/helpers"
 	"github.com/APTrust/registry/models"
 	"github.com/gin-gonic/gin"
-	"github.com/go-pg/pg/v10"
 )
 
 // UserCreate a new user. Handles submission of new user form.
@@ -22,28 +21,22 @@ func UserDelete(c *gin.Context) {
 
 }
 
+// TODO: Query users_view instead.
+// Allow filtering on name, email, institution, role, deactivated.
+// Allow sorting on name, email, institution, created,
+// updated, current sign in, last sign in,
+
 // UserIndex shows list of users.
 // GET /users
 func UserIndex(c *gin.Context) {
-	templateData := gin.H{}
-	template := "users/index.html"
-	status := http.StatusOK
+	resp := NewIndexRequest(c, "users/index.html")
 	users := []models.User{}
 	ctx := common.Context()
 	err := ctx.DB.Model(&users).
 		Relation("Institution").
 		Order("name asc").
 		Select()
-	if err != nil && err != pg.ErrNoRows {
-		c.Error(err)
-		status = http.StatusBadRequest
-		templateData["error"] = err.Error()
-		template = "errors/show.html"
-	} else {
-		templateData = helpers.TemplateVars(c)
-		templateData["items"] = users
-	}
-	c.HTML(status, template, templateData)
+	resp.Respond(users, err)
 }
 
 // UserNew returns a blank form for the user to create a new user.
