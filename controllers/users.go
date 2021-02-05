@@ -44,7 +44,7 @@ func UserIndex(c *gin.Context) {
 	users := make([]*models.UsersView, 0)
 	userQuery := ctx.DB.Model(&users).Column("name", "email", "institution_name", "role", "enabled_two_factor", "deactivated_at").Order("name asc")
 	if userFilter.InstitutionID > 0 {
-		userQuery = userQuery.Where("institution_id = ?", c.Query("institution_id"))
+		userQuery = userQuery.Where("institution_id = ?", userFilter.InstitutionID)
 		resp.TemplateData["selectedID"] = userFilter.InstitutionID
 	} else {
 		resp.TemplateData["selectedID"] = 0
