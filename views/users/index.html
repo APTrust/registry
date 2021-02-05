@@ -14,11 +14,12 @@
     </tr>
   </thead>
   <tbody>
+    <!-- Obj type is UsersView, not User -->
     {{ range $index, $user := .items }}
     <tr>
       <td>{{ $user.Name }}</td>
       <td>{{ $user.Email }}</td>
-      <td>{{ $user.Institution.Name }}</td>
+      <td>{{ $user.InstitutionName }}</td>
       <td>{{ $user.Role }}</td>
     </tr>
     {{ end }}

@@ -8,6 +8,7 @@ import (
 )
 
 type WorkItemsView struct {
+	tableName                    struct{}  `pg:"work_items_view"`
 	ID                           int64     `json:"id" form:"id" pg:"id"`
 	InstitutionID                int64     `json:"institution_id" form:"institution_id" pg:"institution_id"`
 	InstitutionName              int64     `json:"institution_name" form:"institution_name" pg:"institution_name"`

@@ -33,8 +33,13 @@ func Find(obj Model, id int64, actingUser *User) error {
 
 func Select(models interface{}, q *Query) error {
 	ctx := common.Context()
-	orm := ctx.DB.Model(models).Where(q.WhereClause(), q.Params()...)
-	ctx.Log.Debug().Msgf("%s, %v, order by %s, offset %d, limit %d ", q.WhereClause(), q.Params(), q.OrderBy, q.Offset, q.Limit)
+	orm := ctx.DB.Model(models)
+	// Empty where clause causes orm to generate empty parens -> ()
+	// which causes a SQL error. Include where only if non-empty.
+	if q.WhereClause() != "" {
+		orm = orm.Where(q.WhereClause(), q.Params()...)
+	}
+	ctx.Log.Debug().Msgf("SELECT PARAMS: %s, %v, order by %s, offset %d, limit %d ", q.WhereClause(), q.Params(), q.OrderBy, q.Offset, q.Limit)
 	if q.OrderBy != "" {
 		orm.Order(q.OrderBy)
 	}

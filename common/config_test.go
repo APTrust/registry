@@ -19,7 +19,7 @@ func TestNewConfig(t *testing.T) {
 	assert.Equal(t, "localhost", config.DB.Host)
 	assert.Equal(t, 5432, config.DB.Port)
 	assert.True(t, strings.HasSuffix(config.Logging.File, "registry_test.log"))
-	assert.Equal(t, zerolog.WarnLevel, config.Logging.Level)
+	assert.Equal(t, zerolog.DebugLevel, config.Logging.Level)
 
 	// Local tests vs. Travis-CI tests.
 	// Travis requires DB user 'postgres', which we don't do locally

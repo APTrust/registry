@@ -30,19 +30,10 @@ func UserDelete(c *gin.Context) {
 // GET /users
 func UserIndex(c *gin.Context) {
 	resp := NewIndexRequest(c, "users/index.html")
-	users := &models.User{}
-	// ctx := common.Context()
-	// err := ctx.DB.Model(&users).
-	// 	Relation("Institution").
-	// 	Order("name asc").
-	// 	Select()
-	//
-	// TODO: We're generating an invalid query here.
-	//       Need to debug and fix.
-	//
+	users := make([]*models.UsersView, 0)
 	query := models.NewQuery()
 	query.OrderBy = "name asc"
-	err := models.Select(users, query)
+	err := models.Select(&users, query)
 	resp.Respond(users, err)
 }
 

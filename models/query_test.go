@@ -10,8 +10,13 @@ import (
 
 func TestQueryWhere(t *testing.T) {
 
-	// Int
+	// Empty where clause
 	q := models.NewQuery()
+	assert.Equal(t, "", q.WhereClause())
+	require.Equal(t, 0, len(q.Params()))
+
+	// Int
+	q = models.NewQuery()
 	q.Where("id", "=", 100)
 	assert.Equal(t, `("id" = ?)`, q.WhereClause())
 	require.Equal(t, 1, len(q.Params()))

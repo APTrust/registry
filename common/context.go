@@ -5,11 +5,8 @@ import (
 	"os"
 	"time"
 
-	//"github.com/gin-contrib/logger"
-	//"github.com/gin-gonic/gin"
 	"github.com/go-pg/pg/v10"
 	"github.com/rs/zerolog"
-	//"github.com/rs/zerolog/log"
 )
 
 var ctx *APTContext
@@ -42,6 +39,8 @@ func Context() *APTContext {
 			Database: config.DB.Name,
 		})
 		logger := getLogger(config)
+		queryLogger := NewQueryLogger(logger)
+		db.AddQueryHook(queryLogger)
 		ctx = &APTContext{
 			Config: config,
 			DB:     db,

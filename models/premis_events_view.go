@@ -8,6 +8,7 @@ import (
 )
 
 type PremisEventsView struct {
+	tableName                    struct{}  `pg:"premis_events_view"`
 	ID                           int64     `json:"id" pg:"id"`
 	Identifier                   string    `json:"identifier" pg:"identifier"`
 	InstitutionID                int64     `json:"institution_id" pg:"institution_id"`

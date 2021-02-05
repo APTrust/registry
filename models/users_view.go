@@ -8,6 +8,7 @@ import (
 )
 
 type UsersView struct {
+	tableName              struct{}  `pg:"users_view"`
 	ID                     int64     `json:"id" pg:"id"`
 	Name                   string    `json:"name" pg:"name"`
 	Email                  string    `json:"email" pg:"email"`
