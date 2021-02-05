@@ -44,3 +44,17 @@ func DateUS(date time.Time) string {
 func DateISO(date time.Time) string {
 	return date.Format("2006-01-02")
 }
+
+// RoleName transforms ugly DB role names into more readable ones.
+func RoleName(role string) string {
+	switch role {
+	case "admin":
+		return "SysAdmin"
+	case "institutional_admin":
+		return "Admin"
+	case "institutional_user":
+		return "User"
+	default:
+		return role
+	}
+}

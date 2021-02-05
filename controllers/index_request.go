@@ -24,20 +24,17 @@ func NewIndexRequest(c *gin.Context, template string) *IndexRequest {
 	}
 }
 
-func (r *IndexRequest) Respond(items interface{}, err error) {
+func (r *IndexRequest) Respond() {
+	r.Context.HTML(r.Status, r.Template, r.TemplateData)
+}
+
+func (r *IndexRequest) SetError(err error) {
 	// ErrNoRows is acceptable in an index request, e.g.
 	// when user filters restuls and there are no matches.
 	// For other errors, we need to display an error page.
 	if err != nil && err != pg.ErrNoRows {
-		r.setError(err)
-	} else {
-		r.TemplateData["items"] = items
+		r.Status = StatusCodeForError(err)
+		r.TemplateData["error"] = err.Error()
+		r.Template = "errors/show.html"
 	}
-	r.Context.HTML(r.Status, r.Template, r.TemplateData)
-}
-
-func (r *IndexRequest) setError(err error) {
-	r.Status = StatusCodeForError(err)
-	r.TemplateData["error"] = err.Error()
-	r.Template = "errors/show.html"
 }

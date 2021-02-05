@@ -4,6 +4,23 @@
 
 <h1>Users</h1>
 
+<form method="get">
+  <div class="row">
+    <div class="column-50">
+      <select id="institution_id" name="institution_id">
+        <option value="">All Institutions</option>
+        {{ $selectedID := .selectedID }}
+        {{ range $index, $inst := .institutions }}
+        <option value="{{ $inst.ID }}" {{ if eq $selectedID $inst.ID }}selected{{ end}}>{{ $inst.Name }}</option>
+        {{ end }}
+      </select>
+    </div>
+    <div class="column-25">
+      <input class="button-primary" type="submit" value="Filter">
+    </div>
+  </div>
+</form>
+
 <table>
   <thead>
     <tr>
@@ -15,12 +32,12 @@
   </thead>
   <tbody>
     <!-- Obj type is UsersView, not User -->
-    {{ range $index, $user := .items }}
+    {{ range $index, $user := .users }}
     <tr>
       <td>{{ $user.Name }}</td>
       <td>{{ $user.Email }}</td>
       <td>{{ $user.InstitutionName }}</td>
-      <td>{{ $user.Role }}</td>
+      <td>{{ roleName $user.Role }}</td>
     </tr>
     {{ end }}
   </tbody>

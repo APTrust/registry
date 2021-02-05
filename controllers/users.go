@@ -2,8 +2,9 @@ package controllers
 
 import (
 	"net/http"
+	"strconv"
 
-	//"github.com/APTrust/registry/common"
+	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/helpers"
 	"github.com/APTrust/registry/models"
 	"github.com/gin-gonic/gin"
@@ -29,12 +30,27 @@ func UserDelete(c *gin.Context) {
 // UserIndex shows list of users.
 // GET /users
 func UserIndex(c *gin.Context) {
+	ctx := common.Context()
 	resp := NewIndexRequest(c, "users/index.html")
+
+	// Get users
 	users := make([]*models.UsersView, 0)
-	query := models.NewQuery()
-	query.OrderBy = "name asc"
-	err := models.Select(&users, query)
-	resp.Respond(users, err)
+	userQuery := ctx.DB.Model(&users).Column("name", "email", "institution_name", "role").Order("name asc")
+	if c.Query("institution_id") != "" {
+		userQuery = userQuery.Where("institution_id = ?", c.Query("institution_id"))
+		instID, _ := strconv.ParseInt(c.Query("institution_id"), 10, 64)
+		resp.TemplateData["selectedID"] = instID
+	}
+	resp.SetError(userQuery.Select())
+	resp.TemplateData["users"] = users
+
+	// Get institutions
+	institutions := make([]*models.Institution, 0)
+	instQuery := ctx.DB.Model(&institutions).Column("id", "name").Order("name asc")
+	resp.SetError(instQuery.Select())
+	resp.TemplateData["institutions"] = institutions
+
+	resp.Respond()
 }
 
 // UserNew returns a blank form for the user to create a new user.

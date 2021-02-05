@@ -27,6 +27,7 @@ func initTemplates(router *gin.Engine) {
 		"dateISO":  helpers.DateISO,
 		"dateUS":   helpers.DateUS,
 		"truncate": helpers.Truncate,
+		"roleName": helpers.RoleName,
 	})
 	// Load the view templates
 	router.LoadHTMLGlob("views/**/*.html")
