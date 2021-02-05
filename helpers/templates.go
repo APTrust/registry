@@ -37,11 +37,17 @@ func Truncate(value string, length int) string {
 
 // DateUS returns a date in format "Jan 2, 2006"
 func DateUS(date time.Time) string {
+	if date.IsZero() {
+		return ""
+	}
 	return date.Format("Jan _2, 2006")
 }
 
 // DateISO returns a date in format "2006-01-02"
 func DateISO(date time.Time) string {
+	if date.IsZero() {
+		return ""
+	}
 	return date.Format("2006-01-02")
 }
 
@@ -57,4 +63,11 @@ func RoleName(role string) string {
 	default:
 		return role
 	}
+}
+
+func YesNo(value bool) string {
+	if value {
+		return "Yes"
+	}
+	return "No"
 }

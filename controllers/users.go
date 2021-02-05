@@ -35,11 +35,13 @@ func UserIndex(c *gin.Context) {
 
 	// Get users
 	users := make([]*models.UsersView, 0)
-	userQuery := ctx.DB.Model(&users).Column("name", "email", "institution_name", "role").Order("name asc")
+	userQuery := ctx.DB.Model(&users).Column("name", "email", "institution_name", "role", "enabled_two_factor", "deactivated_at").Order("name asc")
 	if c.Query("institution_id") != "" {
 		userQuery = userQuery.Where("institution_id = ?", c.Query("institution_id"))
 		instID, _ := strconv.ParseInt(c.Query("institution_id"), 10, 64)
 		resp.TemplateData["selectedID"] = instID
+	} else {
+		resp.TemplateData["selectedID"] = 0
 	}
 	resp.SetError(userQuery.Select())
 	resp.TemplateData["users"] = users
