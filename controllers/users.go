@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/helpers"
@@ -33,13 +32,20 @@ func UserIndex(c *gin.Context) {
 	ctx := common.Context()
 	resp := NewIndexRequest(c, "users/index.html")
 
+	userFilter := &models.User{}
+	err := c.ShouldBindQuery(userFilter)
+	if err != nil {
+		resp.SetError(err)
+		resp.Respond()
+		return
+	}
+
 	// Get users
 	users := make([]*models.UsersView, 0)
 	userQuery := ctx.DB.Model(&users).Column("name", "email", "institution_name", "role", "enabled_two_factor", "deactivated_at").Order("name asc")
-	if c.Query("institution_id") != "" {
+	if userFilter.InstitutionID > 0 {
 		userQuery = userQuery.Where("institution_id = ?", c.Query("institution_id"))
-		instID, _ := strconv.ParseInt(c.Query("institution_id"), 10, 64)
-		resp.TemplateData["selectedID"] = instID
+		resp.TemplateData["selectedID"] = userFilter.InstitutionID
 	} else {
 		resp.TemplateData["selectedID"] = 0
 	}

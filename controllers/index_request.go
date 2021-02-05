@@ -33,6 +33,7 @@ func (r *IndexRequest) SetError(err error) {
 	// when user filters restuls and there are no matches.
 	// For other errors, we need to display an error page.
 	if err != nil && err != pg.ErrNoRows {
+		r.Context.Error(err)
 		r.Status = StatusCodeForError(err)
 		r.TemplateData["error"] = err.Error()
 		r.Template = "errors/show.html"
