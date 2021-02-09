@@ -389,3 +389,16 @@ func TestUserDBPerms_InactiveUser(t *testing.T) {
 	assert.Equal(t, common.ErrPermissionDenied, models.Save(inactiveUser, inactiveUser))
 	assert.Equal(t, common.ErrPermissionDenied, models.Delete(inactiveUser, inactiveUser))
 }
+
+func TestUserIsAdmin(t *testing.T) {
+	user := models.User{
+		Role: constants.RoleInstAdmin,
+	}
+	assert.False(t, user.IsAdmin())
+
+	user.Role = constants.RoleInstUser
+	assert.False(t, user.IsAdmin())
+
+	user.Role = constants.RoleSysAdmin
+	assert.True(t, user.IsAdmin())
+}

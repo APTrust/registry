@@ -39,10 +39,16 @@ func UserIndex(c *gin.Context) {
 		resp.Respond()
 		return
 	}
+	currentUser := helpers.CurrentUser(c)
+	if currentUser == nil {
+		resp.SetError(common.ErrPermissionDenied)
+	} else if currentUser.IsAdmin() == false {
+		userFilter.InstitutionID = currentUser.InstitutionID
+	}
 
 	// Get users
 	users := make([]*models.UsersView, 0)
-	userQuery := ctx.DB.Model(&users).Column("name", "email", "institution_name", "role", "enabled_two_factor", "deactivated_at").Order("name asc")
+	userQuery := ctx.DB.Model(&users).Column("name", "email", "institution_name", "institution_id", "role", "enabled_two_factor", "deactivated_at").Order("name asc")
 	if userFilter.InstitutionID > 0 {
 		userQuery = userQuery.Where("institution_id = ?", userFilter.InstitutionID)
 		resp.TemplateData["selectedID"] = userFilter.InstitutionID

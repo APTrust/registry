@@ -188,10 +188,16 @@ func (user *User) SignOutUser() error {
 // user is editing him/herself, this can be zero.
 func (user *User) HasPermission(action constants.Permission, institutionID int64) bool {
 	// Sys admin's permissions apply across all institutional boundaries.
-	if user.Role == constants.RoleSysAdmin {
+	if user.IsAdmin() {
 		return constants.CheckPermission(user.Role, action)
 	}
 	// Institutional user and admin permissions apply only within their
 	// own institutions.
 	return user.InstitutionID == institutionID && constants.CheckPermission(user.Role, action)
+}
+
+// IsAdmin returns true if user is a Sys Admin. Returns false for all other
+// roles (including institutional admin, which is not a super user).
+func (user *User) IsAdmin() bool {
+	return user.Role == constants.RoleSysAdmin
 }
