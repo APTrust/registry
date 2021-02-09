@@ -4,6 +4,9 @@ import (
 	"errors"
 )
 
+// ErrNotSignedIn means user has not signed in.
+var ErrNotSignedIn = errors.New("user is not signed in")
+
 // ErrInvalidLogin means the user supplied the wrong login name
 // or password while trying to sign in.
 var ErrInvalidLogin = errors.New("invalid login or password")

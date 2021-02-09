@@ -29,8 +29,11 @@ func UserDelete(c *gin.Context) {
 // UserIndex shows list of users.
 // GET /users
 func UserIndex(c *gin.Context) {
+	allowedFilters := []string{
+		"institution_id",
+	}
 	ctx := common.Context()
-	resp := NewIndexRequest(c, "users/index.html")
+	resp := NewIndexRequest(c, allowedFilters, true, "users/index.html")
 
 	userFilter := &models.User{}
 	err := c.ShouldBindQuery(userFilter)
