@@ -28,6 +28,10 @@ var ErrNotSupported = errors.New("operation not supported")
 // We consider it a 400/Bad Request because we don't set bad cookies.
 var ErrDecodeCookie = errors.New("error decoding cookie")
 
+// ErrInvalidParam means the HTTP request contained an invalid
+// parameter.
+var ErrInvalidParam = errors.New("invalid parameter")
+
 // ErrWrongDataType occurs when the user submits data of the wrong type,
 // such string data that cannot be converted to a number, bool, date,
 // or whatever type the application is expecting.

@@ -62,3 +62,13 @@ func TestCopyFile(t *testing.T) {
 	require.Nil(t, err)
 	assert.Equal(t, os.FileMode(0644), finfo.Mode())
 }
+
+func TestListIsEmpty(t *testing.T) {
+	empty1 := []string{}
+	empty2 := []string{"", "", ""}
+	notEmpty := []string{"", "yes", ""}
+
+	assert.True(t, common.ListIsEmpty(empty1))
+	assert.True(t, common.ListIsEmpty(empty2))
+	assert.False(t, common.ListIsEmpty(notEmpty))
+}

@@ -138,3 +138,19 @@ func FileExists(path string) bool {
 	}
 	return true
 }
+
+// ListIsEmpty returns true if the slice contains no
+// elements, or if all the elements are empty strings.
+func ListIsEmpty(list []string) bool {
+	isEmpty := true
+	if len(list) == 0 {
+		return isEmpty
+	}
+	for _, item := range list {
+		if item != "" {
+			isEmpty = false
+			break
+		}
+	}
+	return isEmpty
+}

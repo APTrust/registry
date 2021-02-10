@@ -5,6 +5,20 @@ import (
 	"strings"
 )
 
+var QueryOp = map[string]string{
+	"eq":          "=",
+	"ne":          "!=",
+	"gt":          ">",
+	"gteq":        ">=",
+	"lt":          "<",
+	"lteq":        "<=",
+	"starts_with": "LIKE",
+	"contains":    "LIKE",
+	"in":          "IN",
+	"is_null":     "IS NULL",
+	"not_null":    "IS NOT NULL",
+}
+
 type Query struct {
 	conditions []string
 	params     []interface{}

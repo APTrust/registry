@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/APTrust/registry/common"
@@ -13,6 +12,7 @@ import (
 )
 
 type IndexRequest struct {
+	AppCtx         *common.APTContext
 	GinCtx         *gin.Context
 	AllowedFilters []string
 	FilterInstID   bool
@@ -24,6 +24,7 @@ type IndexRequest struct {
 
 func NewIndexRequest(c *gin.Context, allowedFilters []string, filterInstID bool, template string) *IndexRequest {
 	return &IndexRequest{
+		AppCtx:         common.Context(),
 		GinCtx:         c,
 		AllowedFilters: allowedFilters,
 		FilterInstID:   filterInstID,
@@ -50,22 +51,36 @@ func (r *IndexRequest) SetError(err error) {
 	}
 }
 
-// TODO: return filters as where clause + params
-func (r *IndexRequest) GetFilters() (map[string]string, error) {
-	filters := make(map[string]string)
+func (r *IndexRequest) GetQuery() (*models.Query, error) {
+	q := models.NewQuery()
 	if r.currentUser == nil {
 		return nil, common.ErrNotSignedIn
 	}
 	if r.FilterInstID && !r.currentUser.IsAdmin() {
-		filters["institution_id"] = fmt.Sprintf("%d", r.currentUser.InstitutionID)
+		q.Where("institution_id", "=", r.currentUser.InstitutionID)
 	}
 	for _, key := range r.AllowedFilters {
-		value := r.GinCtx.Query(key)
-		if value != "" {
-			filters[key] = value
-		}
+		r.AddFilter(q, key)
 	}
-	return filters, nil
+	return q, nil
+}
+
+func (r *IndexRequest) AddFilter(q *models.Query, key string) error {
+	values := r.GinCtx.QueryArray(key)
+	if common.ListIsEmpty(values) {
+		return nil
+	}
+	paramFilter, err := NewParamFilter(key, values)
+	if err != nil {
+		r.AppCtx.Log.Error().Msgf(err.Error())
+		return common.ErrInvalidParam
+	}
+	err = paramFilter.AddToQuery(q)
+	if err != nil {
+		r.AppCtx.Log.Error().Msgf(err.Error())
+		return common.ErrInvalidParam
+	}
+	return nil
 }
 
 // Call this after gathering results

@@ -30,7 +30,7 @@ func UserDelete(c *gin.Context) {
 // GET /users
 func UserIndex(c *gin.Context) {
 	allowedFilters := []string{
-		"institution_id",
+		"institution_id__eq",
 	}
 	ctx := common.Context()
 	resp := NewIndexRequest(c, allowedFilters, true, "users/index.html")
