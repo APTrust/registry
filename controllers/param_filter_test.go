@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/APTrust/registry/controllers"
+	"github.com/APTrust/registry/models"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -55,14 +56,14 @@ var valid = []*controllers.ParamFilter{
 		Key:    "name__starts_with",
 		Column: "name",
 		RawOp:  "starts_with",
-		SqlOp:  "LIKE",
+		SqlOp:  "ILIKE",
 		Values: []string{"Simpson"},
 	},
 	&controllers.ParamFilter{
 		Key:    "name__contains",
 		Column: "name",
 		RawOp:  "contains",
-		SqlOp:  "LIKE",
+		SqlOp:  "ILIKE",
 		Values: []string{"Simpson"},
 	},
 	&controllers.ParamFilter{
@@ -98,8 +99,38 @@ var invalid = []*controllers.ParamFilter{
 	},
 }
 
+func expectedQuery(index int) *models.Query {
+	q := models.NewQuery()
+	switch index {
+	case 0:
+		q.Where("name", "=", "Homer")
+	case 1:
+		q.Where("name", "!=", "Homer")
+	case 2:
+		q.Where("age", ">", "38")
+	case 3:
+		q.Where("age", ">=", "38")
+	case 4:
+		q.Where("age", "<", "38")
+	case 5:
+		q.Where("age", "<=", "38")
+	case 6:
+		q.Where("name", "ILIKE", "Simpson%")
+	case 7:
+		q.Where("name", "ILIKE", "%Simpson%")
+	case 8:
+		q.IsNull("name")
+	case 9:
+		q.IsNotNull("name")
+	case 10:
+		q.WithAny("name", []interface{}{"Bart", "Lisa", "Maggie"}...)
+	}
+	return q
+}
+
+// TestNewParamFilter checks that Constructor sets all properties correctly
+// based on input params.
 func TestNewParamFilter(t *testing.T) {
-	// Constructor should set all properties correctly based on input params.
 	for _, obj := range valid {
 		filter, err := controllers.NewParamFilter(obj.Key, obj.Values)
 		assert.Nil(t, err)
@@ -117,23 +148,38 @@ func TestNewParamFilter(t *testing.T) {
 	}
 }
 
-func TestAddToQuery_Basic(t *testing.T) {
-	//q := models.NewQuery()
-	//filter, err := controllers.NewParamFilter()
+// TestAddToQuery ensures that ParamFilter correctly translates something
+// like this:
+//
+// name__eq=Homer
+//
+// into something like this:
+//
+// WhereClause: "name" = ?
+// Params: ["Homer"]
+func TestAddToQuery(t *testing.T) {
+	for i, obj := range valid {
+		q := models.NewQuery()
+		filter, err := controllers.NewParamFilter(obj.Key, obj.Values)
+		assert.Nil(t, err)
+		err = filter.AddToQuery(q)
+		require.Nil(t, err)
+
+		expected := expectedQuery(i)
+		assert.Equal(t, expected.WhereClause(), q.WhereClause(), "Index = %d", i)
+		assert.Equal(t, expected.Params(), q.Params(), "Index = %d", i)
+	}
 }
 
-func TestAddToQuery_Like(t *testing.T) {
-
-}
-
-func TestAddToQuery_Null(t *testing.T) {
-
-}
-
-func TestAddToQuery_In(t *testing.T) {
-
-}
-
+// TestInterfaceValues ensures that we can get the filter's string values
+// as a slice of []interface{}.
 func TestInterfaceValues(t *testing.T) {
-
+	values := []string{
+		"val1",
+		"val2",
+		"val3",
+	}
+	filter, err := controllers.NewParamFilter("col1__in", values)
+	require.Nil(t, err)
+	assert.Equal(t, []interface{}{"val1", "val2", "val3"}, filter.InterfaceValues())
 }

@@ -54,10 +54,15 @@ func NewParamFilter(key string, values []string) (*ParamFilter, error) {
 func (pf *ParamFilter) AddToQuery(q *models.Query) error {
 	switch pf.RawOp {
 	case "eq":
+		q.Where(pf.Column, pf.SqlOp, pf.Values[0])
 	case "ne":
+		q.Where(pf.Column, pf.SqlOp, pf.Values[0])
 	case "gt":
+		q.Where(pf.Column, pf.SqlOp, pf.Values[0])
 	case "gteq":
+		q.Where(pf.Column, pf.SqlOp, pf.Values[0])
 	case "lt":
+		q.Where(pf.Column, pf.SqlOp, pf.Values[0])
 	case "lteq":
 		q.Where(pf.Column, pf.SqlOp, pf.Values[0])
 	case "starts_with":
@@ -77,6 +82,8 @@ func (pf *ParamFilter) AddToQuery(q *models.Query) error {
 }
 
 // InterfaceValues converts []string Values to []interface{} values.
+// We get string values from the HTTP query string, but we need to provide
+// interface{} values to the pg library that will query the database.
 // Golang type suckage.
 func (pf *ParamFilter) InterfaceValues() []interface{} {
 	iValues := make([]interface{}, len(pf.Values))
