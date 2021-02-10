@@ -99,13 +99,8 @@ func (r *IndexRequest) AssertPermissions(models []models.Model) error {
 
 // TODO:
 //
-// Obj can have both Gin context and App context.
-//
-// Filter parser should allow for complex queries,
-// e.g.
-//     created_at__gt=2021-02-09
-//     user_id__in=[10,11,12]
-//     name__starts_with="thom"
+// --> Separate filter/query from the other housekeeping
+//     involved in rendering. These are separate concerns.
 //
 // Set results list object as []models.Model
 // Build query.

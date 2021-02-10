@@ -7,6 +7,9 @@ import (
 	"github.com/APTrust/registry/models"
 )
 
+// TODO: Pass in all param filters at once and generate a query object
+//       from that.
+
 // ParamFilter parses query string params into filters that can be added
 // to a SQL where clause.
 type ParamFilter struct {

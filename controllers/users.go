@@ -29,6 +29,17 @@ func UserDelete(c *gin.Context) {
 // UserIndex shows list of users.
 // GET /users
 func UserIndex(c *gin.Context) {
+
+	// TODO: Replace with ParamFilter and slimmed-down IndexRequest.
+	//
+	// TODO: Create common convenience methods to get select list
+	//       data. For example, this controller uses an Institutions
+	//       list, so models.InstitutionsAll?
+	//
+	// TODO: Allow rich filter set in addition to default. E.g. filter
+	//       down to all inst admins with 2FA enabled whose accounts
+	//       were disabled after 2020-01-01.
+
 	allowedFilters := []string{
 		"institution_id__eq",
 	}
