@@ -42,7 +42,6 @@ func Select(models interface{}, columns []string, q *Query) error {
 	if q.WhereClause() != "" {
 		orm.Where(q.WhereClause(), q.Params()...)
 	}
-	// ctx.Log.Debug().Msgf("SELECT PARAMS: %s, %v, order by %s, offset %d, limit %d ", q.WhereClause(), q.Params(), q.OrderBy, q.Offset, q.Limit)
 	if q.OrderBy != "" {
 		orm.Order(q.OrderBy)
 	}
@@ -52,6 +51,11 @@ func Select(models interface{}, columns []string, q *Query) error {
 	if q.Offset >= 0 {
 		orm.Offset(q.Offset)
 	}
+
+	// TODO: Want to authorize every object here, but we can't convert
+	// models interface{} to slice of []Model, nor can we conver
+	// each item individually
+
 	return orm.Select()
 }
 
