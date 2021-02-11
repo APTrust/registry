@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/helpers"
@@ -40,45 +41,57 @@ func UserIndex(c *gin.Context) {
 	//       down to all inst admins with 2FA enabled whose accounts
 	//       were disabled after 2020-01-01.
 
-	allowedFilters := []string{
-		"institution_id__eq",
-	}
-	ctx := common.Context()
-	resp := NewIndexRequest(c, allowedFilters, true, "users/index.html")
+	// OK if instID doesn't parse. It will often be zero.
+	instID, _ := strconv.ParseInt(c.Query("institution_id__eq"), 10, 64)
 
-	userFilter := &models.User{}
-	err := c.ShouldBindQuery(userFilter)
+	template := "users/index.html"
+	templateData := helpers.TemplateVars(c)
+	query, err := getIndexQuery(c)
 	if err != nil {
-		resp.SetError(err)
-		resp.Respond()
-		return
+		c.AbortWithError(StatusCodeForError(err), err)
 	}
 	currentUser := helpers.CurrentUser(c)
 	if currentUser == nil {
-		resp.SetError(common.ErrPermissionDenied)
+		err = common.ErrPermissionDenied
+		c.AbortWithError(StatusCodeForError(err), err)
 	} else if currentUser.IsAdmin() == false {
-		userFilter.InstitutionID = currentUser.InstitutionID
+		query.Where("institution_id", "=", currentUser.InstitutionID)
 	}
-
-	// Get users
+	// Get user list
 	users := make([]*models.UsersView, 0)
-	userQuery := ctx.DB.Model(&users).Column("name", "email", "institution_name", "institution_id", "role", "enabled_two_factor", "deactivated_at").Order("name asc")
-	if userFilter.InstitutionID > 0 {
-		userQuery = userQuery.Where("institution_id = ?", userFilter.InstitutionID)
-		resp.TemplateData["selectedID"] = userFilter.InstitutionID
-	} else {
-		resp.TemplateData["selectedID"] = 0
+	cols := []string{
+		"name",
+		"email",
+		"institution_name",
+		"institution_id",
+		"role",
+		"enabled_two_factor",
+		"deactivated_at",
 	}
-	resp.SetError(userQuery.Select())
-	resp.TemplateData["users"] = users
+	templateData["selectedID"] = instID
+
+	err = models.Select(&users, cols, query)
+	if err != nil {
+		c.AbortWithError(StatusCodeForError(err), err)
+	}
+	templateData["users"] = users
 
 	// Get institutions
 	institutions := make([]*models.Institution, 0)
-	instQuery := ctx.DB.Model(&institutions).Column("id", "name").Order("name asc")
-	resp.SetError(instQuery.Select())
-	resp.TemplateData["institutions"] = institutions
+	instCols := []string{"id", "name"}
+	instQuery := models.NewQuery()
+	instQuery.OrderBy = "name asc"
+	instQuery.Limit = 100
+	instQuery.Offset = 0
+	err = models.Select(&institutions, instCols, instQuery)
+	//instQuery := ctx.DB.Model(&institutions).Column("id", "name").Order("name asc")
+	//err = instQuery.Select()
+	if err != nil {
+		c.AbortWithError(StatusCodeForError(err), err)
+	}
+	templateData["institutions"] = institutions
 
-	resp.Respond()
+	c.HTML(http.StatusOK, template, templateData)
 }
 
 // UserNew returns a blank form for the user to create a new user.
@@ -148,4 +161,15 @@ func SignInUser(c *gin.Context) (int, string, error) {
 	}
 	c.Set("CurrentUser", user)
 	return http.StatusFound, "/dashboard", nil
+}
+
+func getIndexQuery(c *gin.Context) (*models.Query, error) {
+	allowedFilters := []string{
+		"institution_id__eq",
+	}
+	fc := NewFilterCollection()
+	for _, key := range allowedFilters {
+		fc.Add(key, c.QueryArray(key))
+	}
+	return fc.ToQuery()
 }

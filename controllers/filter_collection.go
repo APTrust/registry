@@ -4,11 +4,57 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/models"
 )
 
-// TODO: Pass in all param filters at once and generate a query object
-//       from that.
+// ParamsToQuery converts query string params such as name__eq=Homer to
+// a models.Query object that allows us to build a SQL where clause as
+// we go.
+type FilterCollection struct {
+	filters []*ParamFilter
+}
+
+// NewFilterCollection returns a ParamFileters object.
+func NewFilterCollection() *FilterCollection {
+	return &FilterCollection{
+		filters: make([]*ParamFilter, 0),
+	}
+}
+
+// Add adds an item to the filter collection. Param key is a filter
+// key from the query string. Param values are the values associated
+// with that key. For example:
+//
+// Key: name__in
+// Values: ["Bart", "Lisa", "Maggie"]
+//
+func (fc *FilterCollection) Add(key string, values []string) error {
+	filter, err := NewParamFilter(key, values)
+	if err != nil {
+		return err
+	}
+	fc.filters = append(fc.filters, filter)
+	return nil
+}
+
+// ToQuery returns a query object based on the keys and values passed in.
+// The Query's WhereClause() will return the where conditions for the filters
+// passed in through Add(), and the Query's Params() method will return the
+// params. Conditions and params come back in the order they were added.
+func (fc *FilterCollection) ToQuery() (*models.Query, error) {
+	query := models.NewQuery()
+	for _, filter := range fc.filters {
+		if common.ListIsEmpty(filter.Values) {
+			continue // no need to apply filter
+		}
+		err := filter.AddToQuery(query)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return query, nil
+}
 
 // ParamFilter parses query string params into filters that can be added
 // to a SQL where clause.

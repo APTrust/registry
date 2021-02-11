@@ -183,3 +183,16 @@ func TestInterfaceValues(t *testing.T) {
 	require.Nil(t, err)
 	assert.Equal(t, []interface{}{"val1", "val2", "val3"}, filter.InterfaceValues())
 }
+
+func TestFilterCollection(t *testing.T) {
+	fc := controllers.NewFilterCollection()
+	for _, obj := range valid {
+		err := fc.Add(obj.Key, obj.Values)
+		require.Nil(t, err)
+	}
+	query, err := fc.ToQuery()
+	require.Nil(t, err)
+	require.NotNil(t, query)
+	assert.Equal(t, `("name" = ?) AND ("name" != ?) AND ("age" > ?) AND ("age" >= ?) AND ("age" < ?) AND ("age" <= ?) AND ("name" ILIKE ?) AND ("name" ILIKE ?) AND ("name" is null) AND ("name" is not null) AND ("name" IN (?, ?, ?))`, query.WhereClause())
+	assert.Equal(t, []interface{}{"Homer", "Homer", "38", "38", "38", "38", "Simpson%", "%Simpson%", "Bart", "Lisa", "Maggie"}, query.Params())
+}

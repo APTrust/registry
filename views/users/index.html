@@ -7,7 +7,7 @@
 <form method="get">
   <div class="row">
     <div class="column-50">
-      <select id="institution_id" name="institution_id">
+      <select id="institution_id__eq" name="institution_id__eq">
         <option value="">All Institutions</option>
         {{ $selectedID := .selectedID }}
         {{ range $index, $inst := .institutions }}

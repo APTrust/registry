@@ -31,29 +31,29 @@ func Find(obj Model, id int64, actingUser *User) error {
 	return obj.Authorize(actingUser, constants.ActionRead)
 }
 
-//
-// Consider removing this and sticking with pg's query mechanism.
-//
-// func Select(models interface{}, q *Query) error {
-// 	ctx := common.Context()
-// 	orm := ctx.DB.Model(models)
-// 	// Empty where clause causes orm to generate empty parens -> ()
-// 	// which causes a SQL error. Include where only if non-empty.
-// 	if q.WhereClause() != "" {
-// 		orm = orm.Where(q.WhereClause(), q.Params()...)
-// 	}
-// 	ctx.Log.Debug().Msgf("SELECT PARAMS: %s, %v, order by %s, offset %d, limit %d ", q.WhereClause(), q.Params(), q.OrderBy, q.Offset, q.Limit)
-// 	if q.OrderBy != "" {
-// 		orm.Order(q.OrderBy)
-// 	}
-// 	if q.Limit > 0 {
-// 		orm.Limit(q.Limit)
-// 	}
-// 	if q.Offset >= 0 {
-// 		orm.Offset(q.Offset)
-// 	}
-// 	return orm.Select()
-// }
+func Select(models interface{}, columns []string, q *Query) error {
+	ctx := common.Context()
+	orm := ctx.DB.Model(models)
+	if !common.ListIsEmpty(columns) {
+		orm.Column(columns...)
+	}
+	// Empty where clause causes orm to generate empty parens -> ()
+	// which causes a SQL error. Include where only if non-empty.
+	if q.WhereClause() != "" {
+		orm.Where(q.WhereClause(), q.Params()...)
+	}
+	// ctx.Log.Debug().Msgf("SELECT PARAMS: %s, %v, order by %s, offset %d, limit %d ", q.WhereClause(), q.Params(), q.OrderBy, q.Offset, q.Limit)
+	if q.OrderBy != "" {
+		orm.Order(q.OrderBy)
+	}
+	if q.Limit > 0 {
+		orm.Limit(q.Limit)
+	}
+	if q.Offset >= 0 {
+		orm.Offset(q.Offset)
+	}
+	return orm.Select()
+}
 
 func Save(model Model, actingUser *User) error {
 	if model.IsReadOnly() {
