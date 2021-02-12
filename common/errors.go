@@ -43,3 +43,7 @@ var ErrWrongDataType = errors.New("wrong data type")
 // is allowed to access the Checksum's parent, which is a Generic
 // File. If that record is missing, we get this error.
 var ErrParentRecordNotFound = errors.New("parent record not found")
+
+// ErrInternal is a runtime error that is not the user's fault, hence
+// probably the programmer's fault.
+var ErrInternal = errors.New("internal server error")

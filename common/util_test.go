@@ -71,4 +71,5 @@ func TestListIsEmpty(t *testing.T) {
 	assert.True(t, common.ListIsEmpty(empty1))
 	assert.True(t, common.ListIsEmpty(empty2))
 	assert.False(t, common.ListIsEmpty(notEmpty))
+	assert.True(t, common.ListIsEmpty(nil))
 }

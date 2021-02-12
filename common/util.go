@@ -143,7 +143,7 @@ func FileExists(path string) bool {
 // elements, or if all the elements are empty strings.
 func ListIsEmpty(list []string) bool {
 	isEmpty := true
-	if len(list) == 0 {
+	if list == nil || len(list) == 0 {
 		return isEmpty
 	}
 	for _, item := range list {

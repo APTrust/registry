@@ -20,15 +20,19 @@ func StatusCodeForError(err error) (status int) {
 	case common.ErrInvalidLogin:
 		status = http.StatusUnauthorized
 	case common.ErrAccountDeactivated:
+		status = http.StatusForbidden
 	case common.ErrPermissionDenied:
 		status = http.StatusForbidden
 	case common.ErrParentRecordNotFound:
 		status = http.StatusNotFound
 	case common.ErrWrongDataType:
+		status = http.StatusBadRequest
 	case common.ErrDecodeCookie:
 		status = http.StatusBadRequest
 	case common.ErrNotSupported:
 		status = http.StatusMethodNotAllowed
+	case common.ErrInternal:
+		status = http.StatusInternalServerError
 	default:
 		status = http.StatusInternalServerError
 	}
