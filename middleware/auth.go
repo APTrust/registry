@@ -47,8 +47,10 @@ func GetUserFromSession(c *gin.Context) (user *models.User, err error) {
 			return nil, common.ErrWrongDataType
 		}
 		// We need admin privilege to ensure we can retrieve
-		// an arbitrary user. This is the only query in the
-		// system we don't run as actual logged-in user.
+		// an arbitrary user. This is one of two instances where
+		// DataStore doesn't run as actual logged-in user.
+		// The other instance is in the SignIn method of the
+		// Users controller.
 		ds := models.NewDataStore(&models.User{Role: constants.RoleSysAdmin})
 		user, err = ds.UserFind(userID)
 	}

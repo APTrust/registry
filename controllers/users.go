@@ -138,6 +138,8 @@ func UserUpdate(c *gin.Context) {
 }
 
 func SignInUser(c *gin.Context) (int, string, error) {
+	// Second of two DataStore instances with automatic
+	// admin privileges.
 	ds := models.NewDataStore(&models.User{Role: constants.RoleSysAdmin})
 	redirectTo := "/users/sign_in"
 	user, err := ds.UserSignIn(
