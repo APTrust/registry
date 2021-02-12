@@ -22,6 +22,7 @@ var QueryOp = map[string]string{
 type Query struct {
 	conditions []string
 	params     []interface{}
+	Columns    []string
 	OrderBy    string
 	Offset     int
 	Limit      int
@@ -31,6 +32,7 @@ func NewQuery() *Query {
 	return &Query{
 		conditions: make([]string, 0),
 		params:     make([]interface{}, 0),
+		Columns:    make([]string, 0),
 		Offset:     -1,
 		Limit:      -1,
 	}

@@ -49,17 +49,19 @@ func UserIndex(c *gin.Context) {
 	query, err := getIndexQuery(c)
 	if err != nil {
 		c.AbortWithError(StatusCodeForError(err), err)
+		return
 	}
 	currentUser := helpers.CurrentUser(c)
 	if currentUser == nil {
 		err = common.ErrPermissionDenied
 		c.AbortWithError(StatusCodeForError(err), err)
+		return
 	} else if currentUser.IsAdmin() == false {
 		query.Where("institution_id", "=", currentUser.InstitutionID)
 	}
 	// Get user list
 	users := make([]*models.UsersView, 0)
-	cols := []string{
+	query.Columns = []string{
 		"name",
 		"email",
 		"institution_name",
@@ -70,24 +72,26 @@ func UserIndex(c *gin.Context) {
 	}
 	templateData["selectedID"] = instID
 
-	err = models.Select(&users, cols, query)
+	err = models.Select(&users, query)
 	if err != nil {
 		c.AbortWithError(StatusCodeForError(err), err)
+		return
 	}
 	templateData["users"] = users
 
 	// Get institutions
 	institutions := make([]*models.Institution, 0)
-	instCols := []string{"id", "name"}
 	instQuery := models.NewQuery()
+	instQuery.Columns = []string{"id", "name"}
 	instQuery.OrderBy = "name asc"
 	instQuery.Limit = 100
 	instQuery.Offset = 0
-	err = models.Select(&institutions, instCols, instQuery)
+	err = models.Select(&institutions, instQuery)
 	//instQuery := ctx.DB.Model(&institutions).Column("id", "name").Order("name asc")
 	//err = instQuery.Select()
 	if err != nil {
 		c.AbortWithError(StatusCodeForError(err), err)
+		return
 	}
 	templateData["institutions"] = institutions
 

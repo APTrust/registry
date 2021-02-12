@@ -31,11 +31,11 @@ func Find(obj Model, id int64, actingUser *User) error {
 	return obj.Authorize(actingUser, constants.ActionRead)
 }
 
-func Select(models interface{}, columns []string, q *Query) error {
+func Select(models interface{}, q *Query) error {
 	ctx := common.Context()
 	orm := ctx.DB.Model(models)
-	if !common.ListIsEmpty(columns) {
-		orm.Column(columns...)
+	if !common.ListIsEmpty(q.Columns) {
+		orm.Column(q.Columns...)
 	}
 	// Empty where clause causes orm to generate empty parens -> ()
 	// which causes a SQL error. Include where only if non-empty.
@@ -51,11 +51,6 @@ func Select(models interface{}, columns []string, q *Query) error {
 	if q.Offset >= 0 {
 		orm.Offset(q.Offset)
 	}
-
-	// TODO: Want to authorize every object here, but we can't convert
-	// models interface{} to slice of []Model, nor can we conver
-	// each item individually
-
 	return orm.Select()
 }
 
