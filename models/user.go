@@ -108,77 +108,77 @@ func (user *User) BeforeSave() error {
 	return nil
 }
 
-func SignInUser(email, password, ipAddr string) (*User, error) {
-	ctx := common.Context()
+// func SignInUser(email, password, ipAddr string) (*User, error) {
+// 	ctx := common.Context()
 
-	user, err := UserFindByEmail(email)
-	if err != nil {
-		return nil, err
-	}
+// 	user, err := UserFindByEmail(email)
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	if !user.DeactivatedAt.IsZero() {
-		return nil, common.ErrAccountDeactivated
-	}
+// 	if !user.DeactivatedAt.IsZero() {
+// 		return nil, common.ErrAccountDeactivated
+// 	}
 
-	if !common.ComparePasswords(user.EncryptedPassword, password) {
-		ctx.Log.Warn().Msgf("Wrong password for user %s", email)
-		return nil, common.ErrInvalidLogin
-	}
+// 	if !common.ComparePasswords(user.EncryptedPassword, password) {
+// 		ctx.Log.Warn().Msgf("Wrong password for user %s", email)
+// 		return nil, common.ErrInvalidLogin
+// 	}
 
-	user.SignInCount = user.SignInCount + 1
-	if user.CurrentSignInIP != "" {
-		user.LastSignInIP = user.CurrentSignInIP
-	}
-	if user.CurrentSignInAt.IsZero() {
-		user.LastSignInAt = user.CurrentSignInAt
-	}
-	user.CurrentSignInIP = ipAddr
-	user.CurrentSignInAt = time.Now().UTC()
-	_, err = ctx.DB.Model(user).WherePK().Update()
+// 	user.SignInCount = user.SignInCount + 1
+// 	if user.CurrentSignInIP != "" {
+// 		user.LastSignInIP = user.CurrentSignInIP
+// 	}
+// 	if user.CurrentSignInAt.IsZero() {
+// 		user.LastSignInAt = user.CurrentSignInAt
+// 	}
+// 	user.CurrentSignInIP = ipAddr
+// 	user.CurrentSignInAt = time.Now().UTC()
+// 	_, err = ctx.DB.Model(user).WherePK().Update()
 
-	return user, err
-}
+// 	return user, err
+// }
 
-func UserFind(id int64) (*User, error) {
-	ctx := common.Context()
-	user := &User{ID: id}
-	err := ctx.DB.Model(user).Relation("Institution").WherePK().Select()
-	return user, err
-}
+// func UserFind(id int64) (*User, error) {
+// 	ctx := common.Context()
+// 	user := &User{ID: id}
+// 	err := ctx.DB.Model(user).Relation("Institution").WherePK().Select()
+// 	return user, err
+// }
 
-func UserFindByEmail(email string) (*User, error) {
-	ctx := common.Context()
-	user := &User{}
-	err := ctx.DB.Model(user).
-		Relation("Institution").
-		Where("email = ? ", email).
-		Offset(0).
-		Limit(1).
-		Select()
-	if IsNoRowError(err) {
-		ctx.Log.Error().Msgf("No users matches email %s", email)
-		return nil, common.ErrInvalidLogin
-	}
-	if err != nil {
-		return nil, err
-	}
-	return user, nil
-}
+// func UserFindByEmail(email string) (*User, error) {
+// 	ctx := common.Context()
+// 	user := &User{}
+// 	err := ctx.DB.Model(user).
+// 		Relation("Institution").
+// 		Where("email = ? ", email).
+// 		Offset(0).
+// 		Limit(1).
+// 		Select()
+// 	if IsNoRowError(err) {
+// 		ctx.Log.Error().Msgf("No users matches email %s", email)
+// 		return nil, common.ErrInvalidLogin
+// 	}
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	return user, nil
+// }
 
 // SignOutUser -> copy current sign in time and ip to last, then clear
-func (user *User) SignOutUser() error {
-	ctx := common.Context()
-	if user.CurrentSignInIP != "" {
-		user.LastSignInIP = user.CurrentSignInIP
-	}
-	if !user.CurrentSignInAt.IsZero() {
-		user.LastSignInAt = user.CurrentSignInAt
-	}
-	user.CurrentSignInIP = ""
-	user.CurrentSignInAt = time.Time{}
-	_, err := ctx.DB.Model(user).WherePK().Update()
-	return err
-}
+// func (user *User) SignOutUser() error {
+// 	ctx := common.Context()
+// 	if user.CurrentSignInIP != "" {
+// 		user.LastSignInIP = user.CurrentSignInIP
+// 	}
+// 	if !user.CurrentSignInAt.IsZero() {
+// 		user.LastSignInAt = user.CurrentSignInAt
+// 	}
+// 	user.CurrentSignInIP = ""
+// 	user.CurrentSignInAt = time.Time{}
+// 	_, err := ctx.DB.Model(user).WherePK().Update()
+// 	return err
+// }
 
 // HasPermission returns true or false to indicate whether the user has
 // sufficient permissions to perform the requested action. Param action

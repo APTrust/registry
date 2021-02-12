@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/APTrust/registry/common"
+	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/models"
 	"github.com/gin-gonic/gin"
 )
@@ -45,7 +46,11 @@ func GetUserFromSession(c *gin.Context) (user *models.User, err error) {
 		if err != nil {
 			return nil, common.ErrWrongDataType
 		}
-		user, err = models.UserFind(userID)
+		// We need admin privilege to ensure we can retrieve
+		// an arbitrary user. This is the only query in the
+		// system we don't run as actual logged-in user.
+		ds := models.NewDataStore(&models.User{Role: constants.RoleSysAdmin})
+		user, err = ds.UserFind(userID)
 	}
 	return user, err
 }

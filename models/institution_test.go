@@ -18,13 +18,13 @@ func TestInstitutionGetID(t *testing.T) {
 }
 
 func TestInstitutionAuthorize(t *testing.T) {
-	sysAdmin, err := models.UserFindByEmail(SysAdmin)
+	sysAdmin, err := ds.UserFindByEmail(SysAdmin)
 	require.Nil(t, err)
-	instAdmin, err := models.UserFindByEmail(InstAdmin)
+	instAdmin, err := ds.UserFindByEmail(InstAdmin)
 	require.Nil(t, err)
-	instUser, err := models.UserFindByEmail(InstUser)
+	instUser, err := ds.UserFindByEmail(InstUser)
 	require.Nil(t, err)
-	inactiveUser, err := models.UserFindByEmail(InactiveUser)
+	inactiveUser, err := ds.UserFindByEmail(InactiveUser)
 	require.Nil(t, err)
 
 	inst := &models.Institution{}

@@ -14,6 +14,9 @@ import (
 // Bloomsday
 var TestDate = time.Date(2021, 6, 16, 10, 24, 16, 0, time.UTC)
 
+// ds is a DataStore with admin privileges we can use in tests.
+var ds = models.NewDataStore(&models.User{Role: constants.RoleSysAdmin})
+
 const (
 
 	// Test constants for users (from fixture data)

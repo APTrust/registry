@@ -432,3 +432,15 @@ intellectual\_obects.bagit\_profile\_identifier should probably be an integer fi
 We require count queries in a number of places such as for API results and paged web results. Count queries are notoriously slow in Postgres because the MVCC implementation needs to run a table scan to check row visibility.
 
 Many developers and DBAs recommend using triggers on insert and delete to update a "counts" table. We'll look into how feasible that is in our case. The difficulty lies in count queries that include where clauses. We can't store counts for every possible where clause, but we can store counts by institution, which is often what we need.
+
+---
+
+# Working Notes
+
+Delete these notes when implementation is complete.
+
+## models.DataStore
+
+Due to lack of Go generics, we have to implement list methods individually for each type. The hard part of doing this generically is that the underlying pg library wants an interface{} type to bind results to. That interface is actually a pointer to a slice of specific model types. After binding results, we need to check permissions on every object, which is done through the Authorize method of the Model interface. Since Go will not let us cast interface{} to []*<Type> to []<ModelInterface> as needed, for each conversion, we would have to copy and rebuild every element in each slice using reflection.  That process is slow, complex, cumbersome and generally unsafe. So we bite the bullet and implement our list method individually for each type.
+
+This class may also return select lists for different types. For example, we need lists of institutions, event types, etc. so users can filter. All we need for these lists is an id and label, not the entire object. Items should be in alpha order.

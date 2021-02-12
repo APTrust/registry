@@ -7,7 +7,7 @@ import (
 	"github.com/APTrust/registry/constants"
 )
 
-type UsersView struct {
+type UserView struct {
 	tableName              struct{}  `pg:"users_view"`
 	ID                     int64     `json:"id" pg:"id"`
 	Name                   string    `json:"name" pg:"name"`
@@ -52,11 +52,11 @@ type UsersView struct {
 	RestoreBucket   string `json:"restore_bucket" pg:"restore_bucket"`
 }
 
-func (user *UsersView) GetID() int64 {
+func (user *UserView) GetID() int64 {
 	return user.ID
 }
 
-func (user *UsersView) Authorize(actingUser *User, action string) error {
+func (user *UserView) Authorize(actingUser *User, action string) error {
 	perm := "User" + action
 	if actingUser.ID == user.ID && (action == constants.ActionRead || action == constants.ActionUpdate || action == constants.ActionDelete) {
 		perm += "Self"
@@ -69,42 +69,42 @@ func (user *UsersView) Authorize(actingUser *User, action string) error {
 	return nil
 }
 
-func (user *UsersView) DeleteIsForbidden() bool {
+func (user *UserView) DeleteIsForbidden() bool {
 	return true
 }
 
-func (user *UsersView) UpdateIsForbidden() bool {
+func (user *UserView) UpdateIsForbidden() bool {
 	return true
 }
 
-func (user *UsersView) IsReadOnly() bool {
+func (user *UserView) IsReadOnly() bool {
 	return true
 }
 
-func (user *UsersView) SupportsSoftDelete() bool {
+func (user *UserView) SupportsSoftDelete() bool {
 	return false
 }
 
-func (user *UsersView) SetSoftDeleteAttributes(actingUser *User) {
+func (user *UserView) SetSoftDeleteAttributes(actingUser *User) {
 	// No-op
 }
 
-func (user *UsersView) ClearSoftDeleteAttributes() {
+func (user *UserView) ClearSoftDeleteAttributes() {
 	// No-op
 }
 
-func (user *UsersView) SetTimestamps() {
+func (user *UserView) SetTimestamps() {
 	// No-op, since view is read-only
 }
 
-func (user *UsersView) BeforeSave() error {
+func (user *UserView) BeforeSave() error {
 	// No-op
 	return nil
 }
 
-func UsersViewFind(id int64) (*UsersView, error) {
+func UserViewFind(id int64) (*UserView, error) {
 	ctx := common.Context()
-	user := &UsersView{ID: id}
+	user := &UserView{ID: id}
 	err := ctx.DB.Model(user).WherePK().Select()
 	return user, err
 }
