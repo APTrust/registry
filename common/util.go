@@ -6,7 +6,7 @@ import (
 	"crypto/md5"
 	"crypto/sha256"
 	"encoding/hex"
-	"flag"
+	//"flag"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -38,7 +38,12 @@ func LoadRelativeFile(relpath string) ([]byte, error) {
 
 // TestsAreRunning returns true when code is running under "go test"
 func TestsAreRunning() bool {
-	return flag.Lookup("test.v") != nil
+	for _, arg := range os.Args {
+		if strings.HasPrefix(arg, "-test.") {
+			return true
+		}
+	}
+	return false
 }
 
 // PrintAndExit prints a message to STDERR and exits
