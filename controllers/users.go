@@ -2,9 +2,9 @@ package controllers
 
 import (
 	"net/http"
-	//"strconv"
+	"strconv"
 
-	//"github.com/APTrust/registry/common"
+	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/helpers"
 	"github.com/APTrust/registry/models"
@@ -32,72 +32,60 @@ func UserDelete(c *gin.Context) {
 // GET /users
 func UserIndex(c *gin.Context) {
 
-	// TODO: Replace with ParamFilter and slimmed-down IndexRequest.
-	//
 	// TODO: Create common convenience methods to get select list
 	//       data. For example, this controller uses an Institutions
 	//       list, so models.InstitutionsAll?
 	//
-	// TODO: Allow rich filter set in addition to default. E.g. filter
-	//       down to all inst admins with 2FA enabled whose accounts
-	//       were disabled after 2020-01-01.
 
 	// OK if instID doesn't parse. It will often be zero.
 
-	// instID, _ := strconv.ParseInt(c.Query("institution_id__eq"), 10, 64)
+	instID, _ := strconv.ParseInt(c.Query("institution_id__eq"), 10, 64)
 
-	// template := "users/index.html"
-	// templateData := helpers.TemplateVars(c)
-	// query, err := getIndexQuery(c)
-	// if err != nil {
-	// 	c.AbortWithError(StatusCodeForError(err), err)
-	// 	return
-	// }
-	// currentUser := helpers.CurrentUser(c)
-	// if currentUser == nil {
-	// 	err = common.ErrPermissionDenied
-	// 	c.AbortWithError(StatusCodeForError(err), err)
-	// 	return
-	// } else if currentUser.IsAdmin() == false {
-	// 	query.Where("institution_id", "=", currentUser.InstitutionID)
-	// }
-	// // Get user list
-	// users := make([]*models.UsersView, 0)
-	// query.Columns = []string{
-	// 	"name",
-	// 	"email",
-	// 	"institution_name",
-	// 	"institution_id",
-	// 	"role",
-	// 	"enabled_two_factor",
-	// 	"deactivated_at",
-	// }
-	// templateData["selectedID"] = instID
+	template := "users/index.html"
+	templateData := helpers.TemplateVars(c)
+	query, err := getIndexQuery(c)
+	if err != nil {
+		c.AbortWithError(StatusCodeForError(err), err)
+		return
+	}
+	currentUser := helpers.CurrentUser(c)
+	if currentUser == nil {
+		err = common.ErrPermissionDenied
+		c.AbortWithError(StatusCodeForError(err), err)
+		return
+	} else if currentUser.IsAdmin() == false {
+		query.Where("institution_id", "=", currentUser.InstitutionID)
+	}
+	// Get user list
+	query.Columns(
+		"name",
+		"email",
+		"institution_name",
+		"institution_id",
+		"role",
+		"enabled_two_factor",
+		"deactivated_at",
+	)
+	templateData["selectedID"] = instID
 
-	// err = models.Select(&users, query)
-	// if err != nil {
-	// 	c.AbortWithError(StatusCodeForError(err), err)
-	// 	return
-	// }
-	// templateData["users"] = users
+	ds := models.NewDataStore(currentUser)
+	users, err := ds.UserViewList(query)
+	if err != nil {
+		c.AbortWithError(StatusCodeForError(err), err)
+		return
+	}
+	templateData["users"] = users
 
-	// // Get institutions
-	// institutions := make([]*models.Institution, 0)
-	// instQuery := models.NewQuery()
-	// instQuery.Columns = []string{"id", "name"}
-	// instQuery.OrderBy = "name asc"
-	// instQuery.Limit = 100
-	// instQuery.Offset = 0
-	// err = models.Select(&institutions, instQuery)
-	// //instQuery := ctx.DB.Model(&institutions).Column("id", "name").Order("name asc")
-	// //err = instQuery.Select()
-	// if err != nil {
-	// 	c.AbortWithError(StatusCodeForError(err), err)
-	// 	return
-	// }
-	// templateData["institutions"] = institutions
+	// Get institutions
+	instQuery := models.NewQuery().Columns("id", "name").OrderBy("name asc").Limit(100).Offset(0)
+	institutions, err := ds.InstitutionList(instQuery)
+	if err != nil {
+		c.AbortWithError(StatusCodeForError(err), err)
+		return
+	}
+	templateData["institutions"] = institutions
 
-	// c.HTML(http.StatusOK, template, templateData)
+	c.HTML(http.StatusOK, template, templateData)
 }
 
 // UserNew returns a blank form for the user to create a new user.

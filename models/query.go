@@ -126,8 +126,11 @@ func (q *Query) GetColumns() []string {
 	return q.columns
 }
 
-func (q *Query) Columns(cols []string) *Query {
-	q.columns = cols
+func (q *Query) Columns(cols ...string) *Query {
+	q.columns = make([]string, len(cols))
+	for i, col := range cols {
+		q.columns[i] = col
+	}
 	return q
 }
 

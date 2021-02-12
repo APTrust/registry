@@ -21,6 +21,12 @@ func NewDataStore(actingUser *User) *DataStore {
 	}
 }
 
+func (ds *DataStore) InstitutionList(q *Query) ([]*Institution, error) {
+	institutions := make([]*Institution, 0)
+	err := ds._select(&institutions, q)
+	return institutions, err
+}
+
 func (ds *DataStore) UserDelete(user *User) error {
 	return ds.delete(user)
 }
@@ -99,25 +105,10 @@ func (ds *DataStore) UserUndelete(user *User) error {
 }
 
 func (ds *DataStore) UserViewList(q *Query) ([]*UserView, error) {
-	users := make([]*UserView, 0)
-	err := ds._select(&users, q)
-	return users, err
+	records := make([]*UserView, 0)
+	err := ds._select(&records, q)
+	return records, err
 }
-
-// func ChecksumList(q *Query) ([]*Checksum, error) {
-// 	checksums := make([]*Checksum, 0)
-// 	err := _select(checksums, listQuery.Query)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	for _, obj := range checksums {
-// 		err = obj.Authorize(listQuery.ActingUser, constants.ActionRead)
-// 		if err != nil {
-// 			return nil, err
-// 		}
-// 	}
-// 	return checksums, nil
-// }
 
 // Private
 
