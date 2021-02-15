@@ -56,10 +56,12 @@ func (inst *Institution) SupportsSoftDelete() bool {
 
 func (inst *Institution) SetSoftDeleteAttributes(actingUser *User) {
 	inst.DeactivatedAt = time.Now().UTC()
+	inst.State = "D"
 }
 
 func (inst *Institution) ClearSoftDeleteAttributes() {
 	inst.DeactivatedAt = time.Time{}
+	inst.State = "A"
 }
 
 func (inst *Institution) SetTimestamps() {
@@ -73,18 +75,4 @@ func (inst *Institution) SetTimestamps() {
 func (inst *Institution) BeforeSave() error {
 	// TODO: Validate
 	return nil
-}
-
-func InstitutionFind(id int64) (*Institution, error) {
-	ctx := common.Context()
-	inst := &Institution{ID: id}
-	err := ctx.DB.Model(inst).WherePK().Select()
-	return inst, err
-}
-
-func InstitutionFindByIdentifier(identifier string) (*Institution, error) {
-	ctx := common.Context()
-	inst := &Institution{}
-	err := ctx.DB.Model(inst).Where(`"identifier" = ?`, identifier).First()
-	return inst, err
 }

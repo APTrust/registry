@@ -13,6 +13,8 @@ const (
 	AlgSha1                    = "sha1"
 	AlgSha256                  = "sha256"
 	AlgSha512                  = "sha512"
+	InstTypeMember             = "MemberInstitution"
+	InstTybeSubscriber         = "SubscriptionInstitution"
 	RoleInstAdmin              = "institutional_admin"
 	RoleInstUser               = "institutional_user"
 	RoleNone                   = "none"

@@ -11,9 +11,7 @@ import (
 )
 
 func TestInstitutionGetID(t *testing.T) {
-	inst, err := models.InstitutionFind(int64(1))
-	require.Nil(t, err)
-	require.NotNil(t, inst)
+	inst := &models.Institution{ID: int64(1)}
 	assert.Equal(t, int64(1), inst.GetID())
 }
 
@@ -86,20 +84,4 @@ func TestInstitutionSetTimestamps(t *testing.T) {
 	inst.SetTimestamps()
 	assert.False(t, inst.CreatedAt.IsZero())
 	assert.False(t, inst.UpdatedAt.IsZero())
-}
-
-func TestInstitutionFind(t *testing.T) {
-	inst, err := models.InstitutionFind(int64(1))
-	require.Nil(t, err)
-	require.NotNil(t, inst)
-	assert.Equal(t, int64(1), inst.ID)
-	assert.Equal(t, "aptrust.org", inst.Identifier)
-}
-
-func TestInstitutionFindByIdentifier(t *testing.T) {
-	inst, err := models.InstitutionFindByIdentifier("aptrust.org")
-	require.Nil(t, err)
-	require.NotNil(t, inst)
-	assert.Equal(t, int64(1), inst.ID)
-	assert.Equal(t, "aptrust.org", inst.Identifier)
 }

@@ -99,8 +99,9 @@ func (ds *DataStore) GenericFileUndelete(gf *GenericFile) error {
 	return ds.undelete(gf)
 }
 
-// InstitutionDelete sets the DeactivatedAt timestamp on an Institution,
-// marking it as no longer active. This is a soft delete.
+// InstitutionDelete sets State = "D" and sets the DeactivatedAt
+// timestamp on an Institution, marking it as no longer active.
+// This is a soft delete.
 func (ds *DataStore) InstitutionDelete(inst *Institution) error {
 	return ds.delete(inst)
 }
@@ -134,7 +135,8 @@ func (ds *DataStore) InstitutionSave(inst *Institution) error {
 }
 
 // InstitutionUnelete clears the DeactivatedAt timestamp on an Institution,
-// marking it as once again active. This undoes soft delete.
+// and sets its State to "A", marking it as once again active. This undoes
+// soft delete.
 func (ds *DataStore) InstitutionUndelete(inst *Institution) error {
 	return ds.undelete(inst)
 }
