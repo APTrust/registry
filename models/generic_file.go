@@ -21,7 +21,6 @@ type GenericFile struct {
 	StorageOption        string    `json:"storage_option" form:"storage_option" pg:"storage_option"`
 	UUID                 string    `json:"uuid" form:"uuid" pg:"uuid"`
 
-	GenericFiles   []*GenericFile   `json:"generic_files" pg:"rel:has-many"`
 	PremisEvents   []*PremisEvent   `json:"premis_events" pg:"rel:has-many"`
 	Checksums      []*Checksum      `json:"checksumss" pg:"rel:has-many"`
 	StorageRecords []*StorageRecord `json:"storage_records" pg:"rel:has-many"`
@@ -76,18 +75,4 @@ func (gf *GenericFile) SetTimestamps() {
 func (gf *GenericFile) BeforeSave() error {
 	// TODO: Validate
 	return nil
-}
-
-func GenericFileFind(id int64) (*GenericFile, error) {
-	ctx := common.Context()
-	gf := &GenericFile{ID: id}
-	err := ctx.DB.Model(gf).WherePK().Select()
-	return gf, err
-}
-
-func GenericFileFindByIdentifier(identifier string) (*GenericFile, error) {
-	ctx := common.Context()
-	gf := &GenericFile{}
-	err := ctx.DB.Model(gf).Where(`"identifier" = ?`, identifier).First()
-	return gf, err
 }

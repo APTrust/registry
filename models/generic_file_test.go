@@ -11,9 +11,7 @@ import (
 )
 
 func TestGenericFileGetID(t *testing.T) {
-	gf, err := models.GenericFileFind(int64(1))
-	require.Nil(t, err)
-	require.NotNil(t, gf)
+	gf := &models.GenericFile{ID: int64(1)}
 	assert.Equal(t, int64(1), gf.GetID())
 }
 
@@ -139,22 +137,4 @@ func TestGenericFileSetTimestamps(t *testing.T) {
 	gf.SetTimestamps()
 	assert.False(t, gf.CreatedAt.IsZero())
 	assert.False(t, gf.UpdatedAt.IsZero())
-}
-
-func TestGenericFileFind(t *testing.T) {
-	gf, err := models.GenericFileFind(int64(1))
-	require.Nil(t, err)
-	require.NotNil(t, gf)
-	assert.Equal(t, int64(1), gf.ID)
-	assert.Equal(t, "institution1.edu/photos/picture1", gf.Identifier)
-	assert.Equal(t, int64(48771), gf.Size)
-}
-
-func TestGenericFileFindByIdentifier(t *testing.T) {
-	gf, err := models.GenericFileFindByIdentifier("institution1.edu/photos/picture1")
-	require.Nil(t, err)
-	require.NotNil(t, gf)
-	assert.Equal(t, int64(1), gf.ID)
-	assert.Equal(t, "institution1.edu/photos/picture1", gf.Identifier)
-	assert.Equal(t, int64(48771), gf.Size)
 }

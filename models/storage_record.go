@@ -17,10 +17,10 @@ func (sr *StorageRecord) GetID() int64 {
 
 func (sr *StorageRecord) Authorize(actingUser *User, action string) error {
 	ctx := common.Context()
-	gf, err := GenericFileFind(sr.GenericFileID)
+	gf, err := NewDataStore(actingUser).GenericFileFind(sr.GenericFileID)
 	if err != nil {
-		ctx.Log.Error().Msgf("While checking permissions for StorageRecord %d, could not find parent GenericFile %d", sr.ID, sr.GenericFileID)
-		return common.ErrParentRecordNotFound
+		ctx.Log.Error().Msgf("While checking permissions for StorageRecord %d, user %s, error on GenericFile %d: %v", sr.ID, actingUser.Email, sr.GenericFileID, err)
+		return err
 	}
 	perm := "StorageRecord" + action
 	if !actingUser.HasPermission(constants.Permission(perm), gf.InstitutionID) {

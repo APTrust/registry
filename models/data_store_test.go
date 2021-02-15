@@ -63,3 +63,54 @@ func TestChecksumSave(t *testing.T) {
 	require.NotNil(t, err)
 	assert.Equal(t, common.ErrNotSupported, err)
 }
+
+func TestGenericFileSaveDeleteUndelete(t *testing.T) {
+	gf := &models.GenericFile{
+		FileFormat:           "text/plain",
+		Size:                 int64(400),
+		Identifier:           "institution2.edu/toads/test-file.txt",
+		IntellectualObjectID: int64(6),
+		State:                "A",
+		LastFixityCheck:      TestDate,
+		InstitutionID:        int64(3),
+		StorageOption:        constants.StorageOptionStandard,
+		UUID:                 "811b9a46-f91f-4379-a2f7-7b1bc8125a7c",
+	}
+
+	err := ds.GenericFileSave(gf)
+	require.Nil(t, err)
+	assert.True(t, gf.ID > int64(0))
+	assert.Equal(t, "A", gf.State)
+	assert.False(t, gf.CreatedAt.IsZero())
+	assert.False(t, gf.UpdatedAt.IsZero())
+
+	err = ds.GenericFileDelete(gf)
+	require.Nil(t, err)
+	assert.Equal(t, "D", gf.State)
+
+	err = ds.GenericFileUndelete(gf)
+	require.Nil(t, err)
+	assert.Equal(t, "A", gf.State)
+}
+
+func TestGenericFileFind(t *testing.T) {
+	gf, err := ds.GenericFileFind(int64(1))
+	require.Nil(t, err)
+	require.NotNil(t, gf)
+	assert.Equal(t, int64(1), gf.ID)
+	assert.Equal(t, "institution1.edu/photos/picture1", gf.Identifier)
+	assert.Equal(t, int64(48771), gf.Size)
+}
+
+func TestGenericFileFindByIdentifier(t *testing.T) {
+	gf, err := ds.GenericFileFindByIdentifier("institution1.edu/photos/picture1")
+	require.Nil(t, err)
+	require.NotNil(t, gf)
+	assert.Equal(t, int64(1), gf.ID)
+	assert.Equal(t, "institution1.edu/photos/picture1", gf.Identifier)
+	assert.Equal(t, int64(48771), gf.Size)
+}
+
+func TestGenericFileList(t *testing.T) {
+
+}

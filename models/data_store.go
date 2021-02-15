@@ -95,7 +95,7 @@ func (ds *DataStore) GenericFileSave(gf *GenericFile) error {
 
 // GenericFileUndelete sets the State attribute of the GenericFile to "A".
 // This undoes the soft delete.
-func (ds *DataStore) GenericFileUnelete(gf *GenericFile) error {
+func (ds *DataStore) GenericFileUndelete(gf *GenericFile) error {
 	return ds.undelete(gf)
 }
 

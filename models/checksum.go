@@ -23,10 +23,10 @@ func (cs *Checksum) GetID() int64 {
 
 func (cs *Checksum) Authorize(actingUser *User, action string) error {
 	ctx := common.Context()
-	gf, err := GenericFileFind(cs.GenericFileID)
+	gf, err := NewDataStore(actingUser).GenericFileFind(cs.GenericFileID)
 	if err != nil {
-		ctx.Log.Error().Msgf("While checking permissions for Checksum %d, could not find parent GenericFile %d", cs.ID, cs.GenericFileID)
-		return common.ErrParentRecordNotFound
+		ctx.Log.Error().Msgf("While checking permissions for Checksum %d, user %s, error on GenericFile %d: %v", cs.ID, actingUser.Email, cs.GenericFileID, err)
+		return err
 	}
 	perm := "Checksum" + action
 	if !actingUser.HasPermission(constants.Permission(perm), gf.InstitutionID) {
