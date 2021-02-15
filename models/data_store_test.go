@@ -200,3 +200,123 @@ func TestInstitutionList(t *testing.T) {
 		assert.Equal(t, expected[i], inst.Name)
 	}
 }
+
+func TestIntellectualObjectFind(t *testing.T) {
+	db.LoadFixtures()
+	obj, err := ds.IntellectualObjectFind(int64(1))
+	require.Nil(t, err)
+	require.NotNil(t, obj)
+	assert.Equal(t, int64(1), obj.ID)
+	assert.Equal(t, "institution1.edu/photos", obj.Identifier)
+	assert.Equal(t, "First Object for Institution One", obj.Title)
+}
+
+func TestIntellectualObjectFindByIdentifier(t *testing.T) {
+	db.LoadFixtures()
+	obj, err := ds.IntellectualObjectFindByIdentifier("institution1.edu/photos")
+	require.Nil(t, err)
+	require.NotNil(t, obj)
+	assert.Equal(t, int64(1), obj.ID)
+	assert.Equal(t, "institution1.edu/photos", obj.Identifier)
+	assert.Equal(t, "First Object for Institution One", obj.Title)
+}
+
+func TestIntellectualObjectSaveDeleteUndelete(t *testing.T) {
+	obj := &models.IntellectualObject{
+		Title:                     "Unit Test Bag #100",
+		Description:               "Bag created during unit tests",
+		Identifier:                "institution1.edu/UnitTestBag100",
+		AltIdentifier:             "Alt Identifier 100",
+		Access:                    constants.AccessInstitution,
+		BagName:                   "UnitTestBag.tar",
+		InstitutionID:             2,
+		State:                     "A",
+		ETag:                      "etag-phone-home",
+		BagGroupIdentifier:        "unit-test-group",
+		StorageOption:             constants.StorageOptionWasabiVA,
+		BagItProfileIdentifier:    constants.DefaultProfileIdentifier,
+		SourceOrganization:        "UVA",
+		InternalSenderIdentifier:  "test-internal-id",
+		InternalSenderDescription: "test-internal-desc",
+	}
+	err := ds.IntellectualObjectSave(obj)
+	require.Nil(t, err)
+	assert.True(t, obj.ID > int64(0))
+	assert.Equal(t, "UnitTestBag.tar", obj.BagName)
+	assert.Equal(t, "A", obj.State)
+	assert.False(t, obj.CreatedAt.IsZero())
+	assert.False(t, obj.UpdatedAt.IsZero())
+
+	err = ds.IntellectualObjectDelete(obj)
+	assert.Equal(t, "D", obj.State)
+
+	err = ds.IntellectualObjectUndelete(obj)
+	assert.Equal(t, "A", obj.State)
+}
+
+func TestIntellectualObjectList(t *testing.T) {
+	db.LoadFixtures()
+}
+
+func TestPremisEventFind(t *testing.T) {
+	event, err := ds.PremisEventFind(int64(1))
+	require.Nil(t, err)
+	require.NotNil(t, event)
+	assert.Equal(t, int64(1), event.ID)
+	assert.EqualValues(t, 14, event.GenericFileID)
+	assert.EqualValues(t, 3, event.InstitutionID)
+	assert.Equal(t, "a966ca54-ee5b-4606-81bd-7653dd5f3a63", event.Identifier)
+}
+
+func TestPremisEventFindByIdentifier(t *testing.T) {
+	event, err := ds.PremisEventFindByIdentifier("a966ca54-ee5b-4606-81bd-7653dd5f3a63")
+	require.Nil(t, err)
+	require.NotNil(t, event)
+	assert.Equal(t, int64(1), event.ID)
+	assert.EqualValues(t, 14, event.GenericFileID)
+	assert.EqualValues(t, 3, event.InstitutionID)
+	assert.Equal(t, "a966ca54-ee5b-4606-81bd-7653dd5f3a63", event.Identifier)
+}
+
+func TestPremisEventList(t *testing.T) {
+	query := models.NewQuery().Where("generic_file_id", "=", int64(3)).OrderBy("event_type asc", "date_time asc")
+	events, err := ds.PremisEventList(query)
+	require.Nil(t, err)
+	require.NotNil(t, events)
+	expected := []string{
+		"d1dd9047-d25c-4ba3-adc4-e17914eda1e9", // ingestion
+		"6e9e665a-4f7e-41f4-9594-d511f9fc1edf", // ingestion
+		"549a9b7f-3a61-42b3-8af4-13d01ef13f41", // message digest calculation
+		"3bd67ede-0fca-430a-9bb3-652c0a95b471", // message digest calculation
+	}
+	assert.Equal(t, len(expected), len(events))
+	for i, event := range events {
+		assert.Equal(t, expected[i], event.Identifier)
+	}
+}
+
+func TestPremisEventSave(t *testing.T) {
+	event := &models.PremisEvent{
+		Identifier:           "",
+		EventType:            constants.EventDecryption,
+		DateTime:             TestDate,
+		OutcomeDetail:        "Pistol whip? I don't like the sound of that!",
+		Detail:               "Mmm! Pistol whip!",
+		Object:               "Duff",
+		Agent:                "Moe",
+		IntellectualObjectID: int64(1),
+		GenericFileID:        int64(20),
+		Outcome:              "Doh!",
+		InstitutionID:        int64(4),
+	}
+	err := ds.PremisEventSave(event)
+	require.Nil(t, err)
+	assert.True(t, event.ID > int64(0))
+
+	// This should cause an error because updating events
+	// is not allowed.
+	event.Outcome = "Ooh!"
+	err = ds.PremisEventSave(event)
+	require.NotNil(t, err)
+	assert.Equal(t, common.ErrNotSupported, err)
+}

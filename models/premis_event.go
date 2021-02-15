@@ -78,17 +78,3 @@ func (event *PremisEvent) BeforeSave() error {
 	// TODO: Validate
 	return nil
 }
-
-func PremisEventFind(id int64) (*PremisEvent, error) {
-	ctx := common.Context()
-	event := &PremisEvent{ID: id}
-	err := ctx.DB.Model(event).WherePK().Select()
-	return event, err
-}
-
-func PremisEventFindByIdentifier(identifier string) (*PremisEvent, error) {
-	ctx := common.Context()
-	event := &PremisEvent{}
-	err := ctx.DB.Model(event).Where(`"identifier" = ?`, identifier).First()
-	return event, err
-}

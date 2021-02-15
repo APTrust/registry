@@ -11,9 +11,7 @@ import (
 )
 
 func TestIntellectualObjectGetID(t *testing.T) {
-	obj, err := models.IntellectualObjectFind(int64(1))
-	require.Nil(t, err)
-	require.NotNil(t, obj)
+	obj := &models.IntellectualObject{ID: int64(1)}
 	assert.Equal(t, int64(1), obj.GetID())
 }
 
@@ -139,22 +137,4 @@ func TestIntellectualObjectSetTimestamps(t *testing.T) {
 	obj.SetTimestamps()
 	assert.False(t, obj.CreatedAt.IsZero())
 	assert.False(t, obj.UpdatedAt.IsZero())
-}
-
-func TestIntellectualObjectFind(t *testing.T) {
-	obj, err := models.IntellectualObjectFind(int64(1))
-	require.Nil(t, err)
-	require.NotNil(t, obj)
-	assert.Equal(t, int64(1), obj.ID)
-	assert.Equal(t, "institution1.edu/photos", obj.Identifier)
-	assert.Equal(t, "First Object for Institution One", obj.Title)
-}
-
-func TestIntellectualObjectFindByIdentifier(t *testing.T) {
-	obj, err := models.IntellectualObjectFindByIdentifier("institution1.edu/photos")
-	require.Nil(t, err)
-	require.NotNil(t, obj)
-	assert.Equal(t, int64(1), obj.ID)
-	assert.Equal(t, "institution1.edu/photos", obj.Identifier)
-	assert.Equal(t, "First Object for Institution One", obj.Title)
 }

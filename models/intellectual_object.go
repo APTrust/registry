@@ -82,17 +82,3 @@ func (obj *IntellectualObject) BeforeSave() error {
 	// TODO: Validate
 	return nil
 }
-
-func IntellectualObjectFind(id int64) (*IntellectualObject, error) {
-	ctx := common.Context()
-	obj := &IntellectualObject{ID: id}
-	err := ctx.DB.Model(obj).WherePK().Select()
-	return obj, err
-}
-
-func IntellectualObjectFindByIdentifier(identifier string) (*IntellectualObject, error) {
-	ctx := common.Context()
-	obj := &IntellectualObject{}
-	err := ctx.DB.Model(obj).Where(`"identifier" = ?`, identifier).First()
-	return obj, err
-}

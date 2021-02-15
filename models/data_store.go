@@ -378,8 +378,8 @@ func (ds *DataStore) _select(models interface{}, q *Query) error {
 	if q.WhereClause() != "" {
 		orm.Where(q.WhereClause(), q.Params()...)
 	}
-	if q.GetOrderBy() != "" {
-		orm.Order(q.GetOrderBy())
+	for _, orderBy := range q.GetOrderBy() {
+		orm.Order(orderBy)
 	}
 	if q.GetLimit() > 0 {
 		orm.Limit(q.GetLimit())

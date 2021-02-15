@@ -11,9 +11,7 @@ import (
 )
 
 func TestPremisEventGetID(t *testing.T) {
-	event, err := models.PremisEventFind(int64(1))
-	require.Nil(t, err)
-	require.NotNil(t, event)
+	event := &models.PremisEvent{ID: int64(1)}
 	assert.Equal(t, int64(1), event.GetID())
 }
 
@@ -105,24 +103,4 @@ func TestPremisEventSetTimestamps(t *testing.T) {
 	event.SetTimestamps()
 	assert.False(t, event.CreatedAt.IsZero())
 	assert.False(t, event.UpdatedAt.IsZero())
-}
-
-func TestPremisEventFind(t *testing.T) {
-	event, err := models.PremisEventFind(int64(1))
-	require.Nil(t, err)
-	require.NotNil(t, event)
-	assert.Equal(t, int64(1), event.ID)
-	assert.EqualValues(t, 14, event.GenericFileID)
-	assert.EqualValues(t, 3, event.InstitutionID)
-	assert.Equal(t, "a966ca54-ee5b-4606-81bd-7653dd5f3a63", event.Identifier)
-}
-
-func TestPremisEventFindByIdentifier(t *testing.T) {
-	event, err := models.PremisEventFindByIdentifier("a966ca54-ee5b-4606-81bd-7653dd5f3a63")
-	require.Nil(t, err)
-	require.NotNil(t, event)
-	assert.Equal(t, int64(1), event.ID)
-	assert.EqualValues(t, 14, event.GenericFileID)
-	assert.EqualValues(t, 3, event.InstitutionID)
-	assert.Equal(t, "a966ca54-ee5b-4606-81bd-7653dd5f3a63", event.Identifier)
 }

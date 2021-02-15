@@ -167,8 +167,8 @@ func (q *Query) Limit(limit int) *Query {
 	return q
 }
 
-func (q *Query) GetOrderBy() string {
-	return strings.Join(q.orderBy, ",")
+func (q *Query) GetOrderBy() []string {
+	return q.orderBy
 }
 
 func (q *Query) OrderBy(orderBy ...string) *Query {
