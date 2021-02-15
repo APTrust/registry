@@ -11,9 +11,7 @@ import (
 )
 
 func TestChecksumGetID(t *testing.T) {
-	cs, err := models.ChecksumFind(int64(1))
-	require.Nil(t, err)
-	require.NotNil(t, cs)
+	cs := &models.Checksum{ID: int64(1)}
 	assert.Equal(t, int64(1), cs.GetID())
 }
 
@@ -106,30 +104,4 @@ func TestChecksumSetTimestamps(t *testing.T) {
 	cs.SetTimestamps()
 	assert.False(t, cs.CreatedAt.IsZero())
 	assert.False(t, cs.UpdatedAt.IsZero())
-}
-
-func TestChecksumFind(t *testing.T) {
-	cs, err := models.ChecksumFind(int64(1))
-	require.Nil(t, err)
-	require.NotNil(t, cs)
-	assert.Equal(t, int64(1), cs.ID)
-	assert.EqualValues(t, 1, cs.GenericFileID)
-	assert.EqualValues(t, "md5", cs.Algorithm)
-	assert.Equal(t, "12345678", cs.Digest)
-}
-
-func TestChecksumsForFile(t *testing.T) {
-	checksums, err := models.ChecksumsForFile(int64(21))
-	require.Nil(t, err)
-	require.NotEmpty(t, checksums)
-	algs := []string{
-		"md5",
-		"sha1",
-		"sha256",
-		"sha512",
-	}
-	for i, cs := range checksums {
-		assert.Equal(t, int64(21), cs.GenericFileID)
-		assert.Equal(t, algs[i], checksums[i].Algorithm)
-	}
 }

@@ -365,6 +365,9 @@ func (ds *DataStore) find(obj Model, id int64) error {
 
 func (ds *DataStore) _select(models interface{}, q *Query) error {
 	orm := ds.ctx.DB.Model(models)
+	for _, rel := range q.GetRelations() {
+		orm.Relation(rel)
+	}
 	if !common.ListIsEmpty(q.GetColumns()) {
 		orm.Column(q.GetColumns()...)
 	}
@@ -409,7 +412,9 @@ func (ds *DataStore) insert(model Model) error {
 	db := ds.ctx.DB
 	return db.RunInTransaction(db.Context(), func(*pg.Tx) error {
 		_, err := db.Model(model).Insert()
-		ds.ctx.Log.Error().Msgf("Transaction on ID %d: %v", model.GetID(), err)
+		if err != nil {
+			ds.ctx.Log.Error().Msgf("Transaction on ID %d: %v", model.GetID(), err)
+		}
 		return err
 	})
 }

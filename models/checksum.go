@@ -74,17 +74,3 @@ func (cs *Checksum) BeforeSave() error {
 	// TODO: Validate
 	return nil
 }
-
-func ChecksumFind(id int64) (*Checksum, error) {
-	ctx := common.Context()
-	cs := &Checksum{ID: id}
-	err := ctx.DB.Model(cs).WherePK().Select()
-	return cs, err
-}
-
-func ChecksumsForFile(genericFileID int64) ([]*Checksum, error) {
-	ctx := common.Context()
-	var checksums []*Checksum
-	err := ctx.DB.Model(&checksums).Where(`"generic_file_id" = ?`, genericFileID).Order(`created_at desc`).Order(`algorithm asc`).Select()
-	return checksums, err
-}

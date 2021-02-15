@@ -23,7 +23,8 @@ type Query struct {
 	conditions []string
 	params     []interface{}
 	columns    []string
-	orderBy    string
+	relations  []string
+	orderBy    []string
 	offset     int
 	limit      int
 }
@@ -33,6 +34,8 @@ func NewQuery() *Query {
 		conditions: make([]string, 0),
 		params:     make([]interface{}, 0),
 		columns:    make([]string, 0),
+		relations:  make([]string, 0),
+		orderBy:    make([]string, 0),
 		offset:     -1,
 		limit:      -1,
 	}
@@ -134,6 +137,18 @@ func (q *Query) Columns(cols ...string) *Query {
 	return q
 }
 
+func (q *Query) GetRelations() []string {
+	return q.relations
+}
+
+func (q *Query) Relations(relations ...string) *Query {
+	q.relations = make([]string, len(relations))
+	for i, rel := range relations {
+		q.relations[i] = rel
+	}
+	return q
+}
+
 func (q *Query) GetOffset() int {
 	return q.offset
 }
@@ -153,10 +168,13 @@ func (q *Query) Limit(limit int) *Query {
 }
 
 func (q *Query) GetOrderBy() string {
-	return q.orderBy
+	return strings.Join(q.orderBy, ",")
 }
 
-func (q *Query) OrderBy(orderBy string) *Query {
-	q.orderBy = orderBy
+func (q *Query) OrderBy(orderBy ...string) *Query {
+	q.orderBy = make([]string, len(orderBy))
+	for i, order := range orderBy {
+		q.orderBy[i] = order
+	}
 	return q
 }
