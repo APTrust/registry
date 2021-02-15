@@ -7,6 +7,7 @@ import (
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/db"
 	"github.com/APTrust/registry/models"
+	"github.com/go-pg/pg/v10"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -256,9 +257,25 @@ func TestIntellectualObjectSaveDeleteUndelete(t *testing.T) {
 
 func TestIntellectualObjectList(t *testing.T) {
 	db.LoadFixtures()
+	query := models.NewQuery().Where("institution_id", "=", 2).OrderBy("identifier asc")
+	objects, err := ds.IntellectualObjectList(query)
+	require.Nil(t, err)
+	require.NotNil(t, objects)
+
+	expected := []string{
+		"institution1.edu/UnitTestBag100",
+		"institution1.edu/glass",
+		"institution1.edu/pdfs",
+		"institution1.edu/photos",
+	}
+	assert.Equal(t, len(expected), len(objects))
+	for i, obj := range objects {
+		assert.Equal(t, expected[i], obj.Identifier)
+	}
 }
 
 func TestPremisEventFind(t *testing.T) {
+	db.LoadFixtures()
 	event, err := ds.PremisEventFind(int64(1))
 	require.Nil(t, err)
 	require.NotNil(t, event)
@@ -269,6 +286,7 @@ func TestPremisEventFind(t *testing.T) {
 }
 
 func TestPremisEventFindByIdentifier(t *testing.T) {
+	db.LoadFixtures()
 	event, err := ds.PremisEventFindByIdentifier("a966ca54-ee5b-4606-81bd-7653dd5f3a63")
 	require.Nil(t, err)
 	require.NotNil(t, event)
@@ -279,6 +297,7 @@ func TestPremisEventFindByIdentifier(t *testing.T) {
 }
 
 func TestPremisEventList(t *testing.T) {
+	db.LoadFixtures()
 	query := models.NewQuery().Where("generic_file_id", "=", int64(3)).OrderBy("event_type asc", "date_time asc")
 	events, err := ds.PremisEventList(query)
 	require.Nil(t, err)
@@ -319,4 +338,62 @@ func TestPremisEventSave(t *testing.T) {
 	err = ds.PremisEventSave(event)
 	require.NotNil(t, err)
 	assert.Equal(t, common.ErrNotSupported, err)
+}
+
+func TestStorageRecordFind(t *testing.T) {
+	db.LoadFixtures()
+	sr, err := ds.StorageRecordFind(int64(1))
+	require.Nil(t, err)
+	require.NotNil(t, sr)
+	assert.Equal(t, int64(1), sr.ID)
+	assert.EqualValues(t, 1, sr.GenericFileID)
+	assert.EqualValues(t, "https://localhost:9899/preservation-va/25452f41-1b18-47b7-b334-751dfd5d011e", sr.URL)
+}
+
+func TestStorageRecordsForFile(t *testing.T) {
+	records, err := ds.StorageRecordsForFile(int64(1))
+	require.Nil(t, err)
+	require.NotEmpty(t, records)
+	urls := []string{
+		"https://localhost:9899/preservation-or/25452f41-1b18-47b7-b334-751dfd5d011e",
+		"https://localhost:9899/preservation-va/25452f41-1b18-47b7-b334-751dfd5d011e",
+	}
+	for i, sr := range records {
+		assert.Equal(t, int64(1), sr.GenericFileID)
+		assert.Equal(t, urls[i], records[i].URL)
+	}
+}
+
+func TestStorageRecordSaveDelete(t *testing.T) {
+	sr := &models.StorageRecord{
+		GenericFileID: int64(3),
+		URL:           "https://example.edu/test.url",
+	}
+	err := ds.StorageRecordSave(sr)
+	require.Nil(t, err)
+	assert.True(t, sr.ID > int64(0))
+
+	err = ds.StorageRecordDelete(sr)
+	require.Nil(t, err)
+
+	record, err := ds.StorageRecordFind(sr.ID)
+	require.NotNil(t, err)
+	assert.Equal(t, pg.ErrNoRows, err)
+	require.Nil(t, record)
+}
+
+func TestStorageRecordList(t *testing.T) {
+	db.LoadFixtures()
+	query := models.NewQuery().Where("generic_file_id", "=", 1).OrderBy("url asc")
+	records, err := ds.StorageRecordList(query)
+	require.Nil(t, err)
+	require.NotNil(t, records)
+	urls := []string{
+		"https://localhost:9899/preservation-or/25452f41-1b18-47b7-b334-751dfd5d011e",
+		"https://localhost:9899/preservation-va/25452f41-1b18-47b7-b334-751dfd5d011e",
+	}
+	for i, sr := range records {
+		assert.Equal(t, int64(1), sr.GenericFileID)
+		assert.Equal(t, urls[i], records[i].URL)
+	}
 }

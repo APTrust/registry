@@ -42,6 +42,9 @@ func NewDataStore(actingUser *User) *DataStore {
 func (ds *DataStore) ChecksumFind(id int64) (*Checksum, error) {
 	checksum := &Checksum{}
 	err := ds.find(checksum, id)
+	if err != nil {
+		checksum = nil
+	}
 	return checksum, err
 }
 
@@ -69,6 +72,9 @@ func (ds *DataStore) GenericFileDelete(gf *GenericFile) error {
 func (ds *DataStore) GenericFileFind(id int64) (*GenericFile, error) {
 	gf := &GenericFile{}
 	err := ds.find(gf, id)
+	if err != nil {
+		gf = nil
+	}
 	return gf, err
 }
 
@@ -110,6 +116,9 @@ func (ds *DataStore) InstitutionDelete(inst *Institution) error {
 func (ds *DataStore) InstitutionFind(id int64) (*Institution, error) {
 	inst := &Institution{}
 	err := ds.find(inst, id)
+	if err != nil {
+		inst = nil
+	}
 	return inst, err
 }
 
@@ -152,6 +161,9 @@ func (ds *DataStore) IntellectualObjectDelete(obj *IntellectualObject) error {
 func (ds *DataStore) IntellectualObjectFind(id int64) (*IntellectualObject, error) {
 	obj := &IntellectualObject{}
 	err := ds.find(obj, id)
+	if err != nil {
+		obj = nil
+	}
 	return obj, err
 }
 
@@ -186,6 +198,9 @@ func (ds *DataStore) IntellectualObjectUndelete(obj *IntellectualObject) error {
 func (ds *DataStore) PremisEventFind(id int64) (*PremisEvent, error) {
 	event := &PremisEvent{}
 	err := ds.find(event, id)
+	if err != nil {
+		event = nil
+	}
 	return event, err
 }
 
@@ -215,7 +230,17 @@ func (ds *DataStore) PremisEventSave(event *PremisEvent) error {
 func (ds *DataStore) StorageRecordFind(id int64) (*StorageRecord, error) {
 	sr := &StorageRecord{}
 	err := ds.find(sr, id)
+	if err != nil {
+		sr = nil
+	}
 	return sr, err
+}
+
+func (ds *DataStore) StorageRecordsForFile(genericFileID int64) ([]*StorageRecord, error) {
+	var records []*StorageRecord
+	query := NewQuery().Where("generic_file_id", "=", genericFileID).OrderBy("url asc")
+	err := ds._select(&records, query)
+	return records, err
 }
 
 // StorageRecordList returns a list of StorageRecords matching the query.
@@ -251,6 +276,9 @@ func (ds *DataStore) UserFind(id int64) (*User, error) {
 		return nil, err
 	}
 	err = user.Authorize(ds.actingUser, constants.ActionRead)
+	if err != nil {
+		user = nil
+	}
 	return user, err
 }
 
@@ -338,6 +366,9 @@ func (ds *DataStore) UserViewList(q *Query) ([]*UserView, error) {
 func (ds *DataStore) WorkItemFind(id int64) (*WorkItem, error) {
 	item := &WorkItem{}
 	err := ds.find(item, id)
+	if err != nil {
+		item = nil
+	}
 	return item, err
 }
 

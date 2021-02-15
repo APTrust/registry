@@ -62,17 +62,3 @@ func (sr *StorageRecord) BeforeSave() error {
 	// TODO: Validate
 	return nil
 }
-
-func StorageRecordFind(id int64) (*StorageRecord, error) {
-	ctx := common.Context()
-	sr := &StorageRecord{ID: id}
-	err := ctx.DB.Model(sr).WherePK().Select()
-	return sr, err
-}
-
-func StorageRecordsForFile(genericFileID int64) ([]*StorageRecord, error) {
-	ctx := common.Context()
-	var records []*StorageRecord
-	err := ctx.DB.Model(&records).Where(`"generic_file_id" = ?`, genericFileID).Order("url").Select()
-	return records, err
-}

@@ -14,9 +14,7 @@ import (
 // which belongs to InstOne.
 
 func TestStorageRecordGetID(t *testing.T) {
-	sr, err := models.StorageRecordFind(int64(1))
-	require.Nil(t, err)
-	require.NotNil(t, sr)
+	sr := models.StorageRecord{ID: int64(1)}
 	assert.Equal(t, int64(1), sr.GetID())
 }
 
@@ -102,27 +100,4 @@ func TestStorageRecordSoftDeleteAttributes(t *testing.T) {
 
 func TestStorageRecordSetTimestamps(t *testing.T) {
 	// No-op
-}
-
-func TestStorageRecordFind(t *testing.T) {
-	sr, err := models.StorageRecordFind(int64(1))
-	require.Nil(t, err)
-	require.NotNil(t, sr)
-	assert.Equal(t, int64(1), sr.ID)
-	assert.EqualValues(t, 1, sr.GenericFileID)
-	assert.EqualValues(t, "https://localhost:9899/preservation-va/25452f41-1b18-47b7-b334-751dfd5d011e", sr.URL)
-}
-
-func TestStorageRecordsForFile(t *testing.T) {
-	records, err := models.StorageRecordsForFile(int64(1))
-	require.Nil(t, err)
-	require.NotEmpty(t, records)
-	urls := []string{
-		"https://localhost:9899/preservation-or/25452f41-1b18-47b7-b334-751dfd5d011e",
-		"https://localhost:9899/preservation-va/25452f41-1b18-47b7-b334-751dfd5d011e",
-	}
-	for i, sr := range records {
-		assert.Equal(t, int64(1), sr.GenericFileID)
-		assert.Equal(t, urls[i], records[i].URL)
-	}
 }
