@@ -1,6 +1,8 @@
 package models_test
 
 import (
+	"runtime"
+	"strings"
 	"testing"
 
 	"github.com/APTrust/registry/common"
@@ -262,12 +264,31 @@ func TestIntellectualObjectList(t *testing.T) {
 	require.Nil(t, err)
 	require.NotNil(t, objects)
 
+	// Ooh, now here's a problem.
+	// Our sorts will not come back the same on Unix vs. Linux
+	//
+	// > Collations don't work on any BSD-ish OS (incl. OSX) for UTF8 encoding.
+	// > Postgres uses the collation implementation from the OS. There is
+	// > no way to get the same result on both operating systems.
+	//
+	// https://dba.stackexchange.com/questions/106964/why-is-my-postgresql-order-by-case-insensitive
 	expected := []string{
-		"institution1.edu/UnitTestBag100",
 		"institution1.edu/glass",
 		"institution1.edu/pdfs",
 		"institution1.edu/photos",
+		"institution1.edu/UnitTestBag100",
 	}
+
+	// So here's the fix for Travis
+	if strings.Contains(runtime.GOOS, "darwin") || strings.Contains(runtime.GOOS, "bsd") {
+		expected = []string{
+			"institution1.edu/UnitTestBag100",
+			"institution1.edu/glass",
+			"institution1.edu/pdfs",
+			"institution1.edu/photos",
+		}
+	}
+
 	assert.Equal(t, len(expected), len(objects))
 	for i, obj := range objects {
 		assert.Equal(t, expected[i], obj.Identifier)
