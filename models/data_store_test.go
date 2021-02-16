@@ -1,6 +1,7 @@
 package models_test
 
 import (
+	"fmt"
 	"runtime"
 	"strings"
 	"testing"
@@ -594,4 +595,46 @@ func TestUserViewList(t *testing.T) {
 		}
 		assert.True(t, found, "%s missing from results", email)
 	}
+}
+
+func TestWorkItemFind(t *testing.T) {
+	db.LoadFixtures()
+	item, err := ds.WorkItemFind(int64(1))
+	require.Nil(t, err)
+	require.NotNil(t, item)
+	assert.Equal(t, int64(1), item.ID)
+	assert.Equal(t, "fake_bag_01.tar", item.Name)
+}
+
+func TestWorkItemList(t *testing.T) {
+	db.LoadFixtures()
+	query := models.NewQuery().Where("institution_id", "=", int64(2)).OrderBy("name asc").Limit(5).Offset(2)
+	items, err := ds.WorkItemList(query)
+	require.Nil(t, err)
+	require.NotEmpty(t, items)
+	assert.Equal(t, 5, len(items))
+	for i, item := range items {
+		bagName := fmt.Sprintf("fake_bag_0%d.tar", i+3)
+		assert.Equal(t, bagName, item.Name)
+	}
+}
+
+func TestWorkItemSave(t *testing.T) {
+	item := &models.WorkItem{
+		Name:          "unit-test-bag-000.tar",
+		ETag:          "898989000000",
+		InstitutionID: 4,
+		Bucket:        "unit-test-bucket",
+		Note:          "Item is was created by unit test.",
+		Action:        constants.ActionIngest,
+		Stage:         constants.StageReceive,
+		Status:        constants.StatusPending,
+		Outcome:       "Ain't no outcome yet. Thang ain't even started.",
+		BagDate:       TestDate,
+		DateProcessed: TestDate,
+		Size:          int64(12345678),
+	}
+	err := ds.WorkItemSave(item)
+	require.Nil(t, err)
+	assert.True(t, item.ID > int64(0))
 }
