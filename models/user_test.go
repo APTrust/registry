@@ -2,11 +2,8 @@ package models_test
 
 import (
 	"testing"
-	"time"
 
-	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
-	"github.com/APTrust/registry/db"
 	"github.com/APTrust/registry/models"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -57,118 +54,6 @@ func TestUserSetTimestamps(t *testing.T) {
 	user.SetTimestamps()
 	assert.False(t, user.CreatedAt.IsZero())
 	assert.False(t, user.UpdatedAt.IsZero())
-}
-
-func TestUserFind(t *testing.T) {
-	user, err := ds.UserFind(int64(1))
-	require.Nil(t, err)
-	require.NotNil(t, user)
-	assert.Equal(t, int64(1), user.ID)
-	assert.NotNil(t, user.Role)
-	assert.NotNil(t, user.Institution)
-}
-
-func TestUserSignIn_Valid(t *testing.T) {
-	db.LoadFixtures()
-	// Constants below are defined in models/common_test.go
-	users := []string{
-		SysAdmin,
-		InstAdmin,
-		InstUser,
-	}
-	for _, email := range users {
-		user, err := ds.UserSignIn(email, Password, "1.1.1.1")
-		require.Nil(t, err)
-		require.NotNil(t, user)
-		assert.Equal(t, email, user.Email)
-		assert.Equal(t, "1.1.1.1", user.CurrentSignInIP)
-		assert.True(t, user.SignInCount > 0)
-		assert.InDelta(t, time.Now().Unix(), user.CurrentSignInAt.Unix(), 10)
-		assert.NotNil(t, user.Role)
-		assert.NotNil(t, user.Institution)
-		oldSignInTime := user.CurrentSignInAt
-		oldSignInCount := user.SignInCount
-
-		user, err = ds.UserSignIn(email, Password, "2.2.2.2")
-		require.Nil(t, err)
-		require.NotNil(t, user)
-		assert.Equal(t, "2.2.2.2", user.CurrentSignInIP)
-		assert.True(t, user.SignInCount > oldSignInCount)
-		assert.True(t, user.CurrentSignInAt.After(oldSignInTime))
-	}
-}
-
-func TestUserSignIn_Invalid(t *testing.T) {
-	db.LoadFixtures()
-
-	// User does not exist
-	user, err := ds.UserSignIn("noone@example.com", "xyz", "1.1.1.1")
-	require.NotNil(t, err)
-	require.Nil(t, user)
-	assert.Equal(t, common.ErrInvalidLogin, err)
-
-	// User exists, wrong password
-	user, err = ds.UserSignIn(SysAdmin, "xyz", "1.1.1.1")
-	require.NotNil(t, err)
-	require.Nil(t, user)
-	assert.Equal(t, common.ErrInvalidLogin, err)
-}
-
-func TestUserSignIn_Deactivated(t *testing.T) {
-	db.LoadFixtures()
-	user, err := ds.UserSignIn(InactiveUser, Password, "1.1.1.1")
-	require.NotNil(t, err)
-	require.Nil(t, user)
-	assert.Equal(t, common.ErrAccountDeactivated, err)
-}
-
-func TestUserDeleteUndelete(t *testing.T) {
-	db.LoadFixtures()
-
-	admin, err := getUser()
-	require.Nil(t, err)
-	require.NotNil(t, admin)
-	admin.Role = constants.RoleSysAdmin
-
-	regUser, err := getUser()
-	require.Nil(t, err)
-	require.NotNil(t, regUser)
-	regUser.Role = constants.RoleInstUser
-
-	user, err := getUser()
-	require.Nil(t, err)
-	err = ds.UserSave(user)
-	require.Nil(t, err)
-	assert.True(t, user.ID > int64(0))
-	assert.True(t, user.DeactivatedAt.IsZero())
-
-	// This should raise an error, since regular user cannot
-	// delete users.
-	dsRegUser := models.NewDataStore(regUser)
-	err = dsRegUser.UserDelete(user)
-	assert.Equal(t, common.ErrPermissionDenied, err)
-
-	// We don't hard-delete users. We set a timestamp on
-	// User.DeactivatedAt to indicate they're no longer active.
-	err = ds.UserDelete(user)
-	require.Nil(t, err)
-
-	// Reload deleted user. They should exist with a
-	// DeactivatedAt timestamp.
-	user, err = ds.UserFind(user.ID)
-	require.Nil(t, err)
-	require.NotNil(t, user)
-	assert.False(t, user.DeactivatedAt.IsZero())
-
-	// Undelete the bastard.
-	err = ds.UserUndelete(user)
-	require.Nil(t, err)
-
-	// His deactivation timestamp should be cleared.
-	user, err = ds.UserFind(user.ID)
-	require.Nil(t, err)
-	require.NotNil(t, user)
-	assert.True(t, user.DeactivatedAt.IsZero())
 }
 
 func TestUserHasPermission(t *testing.T) {

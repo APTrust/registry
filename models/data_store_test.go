@@ -4,6 +4,7 @@ import (
 	"runtime"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
@@ -416,5 +417,181 @@ func TestStorageRecordList(t *testing.T) {
 	for i, sr := range records {
 		assert.Equal(t, int64(1), sr.GenericFileID)
 		assert.Equal(t, urls[i], records[i].URL)
+	}
+}
+
+func TestUserFind(t *testing.T) {
+	user, err := ds.UserFind(int64(1))
+	require.Nil(t, err)
+	require.NotNil(t, user)
+	assert.Equal(t, int64(1), user.ID)
+	assert.NotNil(t, user.Role)
+	assert.NotNil(t, user.Institution)
+}
+
+func TestUserFindByEmail(t *testing.T) {
+	user, err := ds.UserFindByEmail(SysAdmin)
+	require.Nil(t, err)
+	require.NotNil(t, user)
+	assert.Equal(t, int64(1), user.ID)
+	assert.Equal(t, constants.RoleSysAdmin, user.Role)
+	assert.Equal(t, "aptrust.org", user.Institution.Identifier)
+}
+
+func TestUserSignIn_Valid(t *testing.T) {
+	db.LoadFixtures()
+	// Constants below are defined in models/common_test.go
+	users := []string{
+		SysAdmin,
+		InstAdmin,
+		InstUser,
+	}
+	for _, email := range users {
+		user, err := ds.UserSignIn(email, Password, "1.1.1.1")
+		require.Nil(t, err)
+		require.NotNil(t, user)
+		assert.Equal(t, email, user.Email)
+		assert.Equal(t, "1.1.1.1", user.CurrentSignInIP)
+		assert.True(t, user.SignInCount > 0)
+		assert.InDelta(t, time.Now().Unix(), user.CurrentSignInAt.Unix(), 10)
+		assert.NotNil(t, user.Role)
+		assert.NotNil(t, user.Institution)
+		oldSignInTime := user.CurrentSignInAt
+		oldSignInCount := user.SignInCount
+
+		user, err = ds.UserSignIn(email, Password, "2.2.2.2")
+		require.Nil(t, err)
+		require.NotNil(t, user)
+		assert.Equal(t, "2.2.2.2", user.CurrentSignInIP)
+		assert.True(t, user.SignInCount > oldSignInCount)
+		assert.True(t, user.CurrentSignInAt.After(oldSignInTime))
+	}
+}
+
+func TestUserSignIn_Invalid(t *testing.T) {
+	db.LoadFixtures()
+
+	// User does not exist
+	user, err := ds.UserSignIn("noone@example.com", "xyz", "1.1.1.1")
+	require.NotNil(t, err)
+	require.Nil(t, user)
+	assert.Equal(t, common.ErrInvalidLogin, err)
+
+	// User exists, wrong password
+	user, err = ds.UserSignIn(SysAdmin, "xyz", "1.1.1.1")
+	require.NotNil(t, err)
+	require.Nil(t, user)
+	assert.Equal(t, common.ErrInvalidLogin, err)
+}
+
+func TestUserSignIn_Deactivated(t *testing.T) {
+	db.LoadFixtures()
+	user, err := ds.UserSignIn(InactiveUser, Password, "1.1.1.1")
+	require.NotNil(t, err)
+	require.Nil(t, user)
+	assert.Equal(t, common.ErrAccountDeactivated, err)
+}
+
+func TestUserSaveDeleteUndelete(t *testing.T) {
+	db.LoadFixtures()
+
+	admin, err := getUser()
+	require.Nil(t, err)
+	require.NotNil(t, admin)
+	admin.Role = constants.RoleSysAdmin
+
+	regUser, err := getUser()
+	require.Nil(t, err)
+	require.NotNil(t, regUser)
+	regUser.Role = constants.RoleInstUser
+
+	user, err := getUser()
+	require.Nil(t, err)
+	err = ds.UserSave(user)
+	require.Nil(t, err)
+	assert.True(t, user.ID > int64(0))
+	assert.True(t, user.DeactivatedAt.IsZero())
+
+	// This should raise an error, since regular user cannot
+	// delete users.
+	dsRegUser := models.NewDataStore(regUser)
+	err = dsRegUser.UserDelete(user)
+	assert.Equal(t, common.ErrPermissionDenied, err)
+
+	// We don't hard-delete users. We set a timestamp on
+	// User.DeactivatedAt to indicate they're no longer active.
+	err = ds.UserDelete(user)
+	require.Nil(t, err)
+
+	// Reload deleted user. They should exist with a
+	// DeactivatedAt timestamp.
+	user, err = ds.UserFind(user.ID)
+	require.Nil(t, err)
+	require.NotNil(t, user)
+	assert.False(t, user.DeactivatedAt.IsZero())
+
+	// Undelete the bastard.
+	err = ds.UserUndelete(user)
+	require.Nil(t, err)
+
+	// His deactivation timestamp should be cleared.
+	user, err = ds.UserFind(user.ID)
+	require.Nil(t, err)
+	require.NotNil(t, user)
+	assert.True(t, user.DeactivatedAt.IsZero())
+}
+
+func TestUserList(t *testing.T) {
+	db.LoadFixtures()
+	query := models.NewQuery().Where("institution_id", "=", int64(2)).OrderBy("email asc")
+	users, err := ds.UserList(query)
+	require.Nil(t, err)
+	require.NotEmpty(t, users)
+
+	// These three users are part of the fixture data.
+	// There may be more, created by other tests.
+	expected := []string{
+		"admin@inst1.edu",
+		"inactive@inst1.edu",
+		"user@inst1.edu",
+	}
+	assert.True(t, len(users) >= len(expected))
+	for _, email := range expected {
+		found := false
+		for _, user := range users {
+			if user.Email == email {
+				found = true
+			}
+		}
+		assert.True(t, found, "%s missing from results", email)
+	}
+}
+
+// This is essentially the same test as above, but we're getting data
+// from users_view instead of from the users table.
+func TestUserViewList(t *testing.T) {
+	db.LoadFixtures()
+	query := models.NewQuery().Where("institution_id", "=", int64(2)).OrderBy("email asc")
+	userViews, err := ds.UserViewList(query)
+	require.Nil(t, err)
+	require.NotEmpty(t, userViews)
+
+	// These three users are part of the fixture data.
+	// There may be more, created by other tests.
+	expected := []string{
+		"admin@inst1.edu",
+		"inactive@inst1.edu",
+		"user@inst1.edu",
+	}
+	assert.True(t, len(userViews) >= len(expected))
+	for _, email := range expected {
+		found := false
+		for _, userView := range userViews {
+			assert.Equal(t, "institution1.edu", userView.InstitutionIdentifier)
+			if userView.Email == email {
+				found = true
+			}
+		}
+		assert.True(t, found, "%s missing from results", email)
 	}
 }
