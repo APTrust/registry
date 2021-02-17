@@ -2,9 +2,9 @@ package controllers
 
 import (
 	"net/http"
-	"strconv"
+	//	"strconv"
 
-	"github.com/APTrust/registry/common"
+	//	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/helpers"
 	"github.com/APTrust/registry/models"
@@ -37,10 +37,6 @@ func UserIndex(c *gin.Context) {
 	//       list, so models.InstitutionsAll?
 	//
 
-	// OK if instID doesn't parse. It will often be zero.
-
-	instID, _ := strconv.ParseInt(c.Query("institution_id__eq"), 10, 64)
-
 	template := "users/index.html"
 	templateData := helpers.TemplateVars(c)
 	query, err := getIndexQuery(c)
@@ -48,25 +44,9 @@ func UserIndex(c *gin.Context) {
 		c.AbortWithError(StatusCodeForError(err), err)
 		return
 	}
+	query.OrderBy("name asc")
 	currentUser := helpers.CurrentUser(c)
-	if currentUser == nil {
-		err = common.ErrPermissionDenied
-		c.AbortWithError(StatusCodeForError(err), err)
-		return
-	} else if currentUser.IsAdmin() == false {
-		query.Where("institution_id", "=", currentUser.InstitutionID)
-	}
-	// Get user list
-	query.Columns(
-		"name",
-		"email",
-		"institution_name",
-		"institution_id",
-		"role",
-		"enabled_two_factor",
-		"deactivated_at",
-	)
-	templateData["selectedID"] = instID
+	templateData["selectedID"] = c.Query("institution_id__eq")
 
 	ds := models.NewDataStore(currentUser)
 	users, err := ds.UserViewList(query)
@@ -77,13 +57,12 @@ func UserIndex(c *gin.Context) {
 	templateData["users"] = users
 
 	// Get institutions
-	instQuery := models.NewQuery().Columns("id", "name").OrderBy("name asc").Limit(100).Offset(0)
-	institutions, err := ds.InstitutionList(instQuery)
+	institutionOptions, err := ListInstitutions(ds)
 	if err != nil {
 		c.AbortWithError(StatusCodeForError(err), err)
 		return
 	}
-	templateData["institutions"] = institutions
+	templateData["institutionOptions"] = institutionOptions
 
 	c.HTML(http.StatusOK, template, templateData)
 }

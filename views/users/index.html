@@ -10,8 +10,8 @@
       <select id="institution_id__eq" name="institution_id__eq">
         <option value="">All Institutions</option>
         {{ $selectedID := .selectedID }}
-        {{ range $index, $inst := .institutions }}
-        <option value="{{ $inst.ID }}" {{ if eq $selectedID $inst.ID }}selected{{ end}}>{{ $inst.Name }}</option>
+        {{ range $index, $option := .institutionOptions }}
+        <option value="{{ $option.Value }}" {{ if eq $selectedID $option.Value }}selected{{ end}}>{{ $option.Text }}</option>
         {{ end }}
       </select>
     </div>

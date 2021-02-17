@@ -49,6 +49,10 @@ func (ds *DataStore) ChecksumFind(id int64) (*Checksum, error) {
 }
 
 // ChecksumList returns a list of checksums matching the query.
+// We can't apply institution filter here, because Checksum has no
+// InstitutionID. Instead, we check the results before returning
+// them and throw an error if the user tries to access a checksum
+// whose parent GenericFile belongs to another institution.
 func (ds *DataStore) ChecksumList(q *Query) ([]*Checksum, error) {
 	checksums := make([]*Checksum, 0)
 	err := ds._select(&checksums, q)
@@ -89,6 +93,7 @@ func (ds *DataStore) GenericFileFindByIdentifier(identifier string) (*GenericFil
 
 // GenericFileList returns the GenericFiles matching the specified query.
 func (ds *DataStore) GenericFileList(q *Query) ([]*GenericFile, error) {
+	ds.applyInstFilter(q, "institution_id")
 	gfs := make([]*GenericFile, 0)
 	err := ds._select(&gfs, q)
 	return gfs, err
@@ -133,6 +138,7 @@ func (ds *DataStore) InstitutionFindByIdentifier(identifier string) (*Institutio
 
 // InstitutionList returns the Institutions matching the query.
 func (ds *DataStore) InstitutionList(q *Query) ([]*Institution, error) {
+	ds.applyInstFilter(q, "id")
 	institutions := make([]*Institution, 0)
 	err := ds._select(&institutions, q)
 	return institutions, err
@@ -178,6 +184,7 @@ func (ds *DataStore) IntellectualObjectFindByIdentifier(identifier string) (*Int
 
 // IntellectualObjectList returns IntellectualObjects that match the query.
 func (ds *DataStore) IntellectualObjectList(q *Query) ([]*IntellectualObject, error) {
+	ds.applyInstFilter(q, "institution_id")
 	objitutions := make([]*IntellectualObject, 0)
 	err := ds._select(&objitutions, q)
 	return objitutions, err
@@ -215,6 +222,7 @@ func (ds *DataStore) PremisEventFindByIdentifier(identifier string) (*PremisEven
 
 // PremisEventList returns the PremisEvents that match the query.
 func (ds *DataStore) PremisEventList(q *Query) ([]*PremisEvent, error) {
+	ds.applyInstFilter(q, "institution_id")
 	events := make([]*PremisEvent, 0)
 	err := ds._select(&events, q)
 	return events, err
@@ -244,6 +252,10 @@ func (ds *DataStore) StorageRecordsForFile(genericFileID int64) ([]*StorageRecor
 }
 
 // StorageRecordList returns a list of StorageRecords matching the query.
+// We can't apply institution filter here, because StorageRecord has no
+// InstitutionID. Instead, we check the results before returning
+// them and throw an error if the user tries to access a record
+// whose parent GenericFile belongs to another institution.
 func (ds *DataStore) StorageRecordList(q *Query) ([]*StorageRecord, error) {
 	records := make([]*StorageRecord, 0)
 	err := ds._select(&records, q)
@@ -296,6 +308,7 @@ func (ds *DataStore) UserFindByEmail(email string) (*User, error) {
 
 // UserList returns a list of Users matching the specified query.
 func (ds *DataStore) UserList(q *Query) ([]*User, error) {
+	ds.applyInstFilter(q, "institution_id")
 	users := make([]*User, 0)
 	err := ds._select(&users, q)
 	return users, err
@@ -357,6 +370,7 @@ func (ds *DataStore) UserUndelete(user *User) error {
 
 // UserViewList returns a list of UserView objects.
 func (ds *DataStore) UserViewList(q *Query) ([]*UserView, error) {
+	ds.applyInstFilter(q, "institution_id")
 	records := make([]*UserView, 0)
 	err := ds._select(&records, q)
 	return records, err
@@ -374,6 +388,7 @@ func (ds *DataStore) WorkItemFind(id int64) (*WorkItem, error) {
 
 // WorkItemList returns a list of WorkItems matching the query.
 func (ds *DataStore) WorkItemList(q *Query) ([]*WorkItem, error) {
+	ds.applyInstFilter(q, "institution_id")
 	items := make([]*WorkItem, 0)
 	err := ds._select(&items, q)
 	return items, err
@@ -532,17 +547,15 @@ func (ds *DataStore) undelete(model Model) error {
 	})
 }
 
-// func Int64Value(obj interface{}, fieldName string) int64 {
-// 	value := reflect.ValueOf(obj)
-// 	if value.Type().Kind() != reflect.Ptr {
-// 		value = reflect.New(reflect.TypeOf(obj))
-// 	}
-// 	field := value.Elem().FieldByName(fieldName)
-// 	if field.IsValid() {
-// 		return field.Int()
-// 	}
-// 	return int64(0)
-// }
+// applyInstFilter filters results on institution id if the
+// acting user is not a sys admin. For most records, that means
+// adding "where institution_id = ?", though for Institution it
+// means filtering on ID.
+func (ds *DataStore) applyInstFilter(q *Query, column string) {
+	if !ds.actingUser.IsAdmin() {
+		q.Where(column, "=", ds.actingUser.InstitutionID)
+	}
+}
 
 func TypeOf(obj interface{}) string {
 	if t := reflect.TypeOf(obj); t.Kind() == reflect.Ptr {
