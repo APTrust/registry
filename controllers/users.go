@@ -41,7 +41,10 @@ func UserIndex(c *gin.Context) {
 	templateData := helpers.TemplateVars(c)
 	query, err := getIndexQuery(c)
 	if err != nil {
-		c.AbortWithError(StatusCodeForError(err), err)
+		c.Error(err)
+		c.Set("err", err)
+		ErrorShow(c)
+		c.Abort()
 		return
 	}
 	query.OrderBy("name asc")
@@ -51,7 +54,10 @@ func UserIndex(c *gin.Context) {
 	ds := models.NewDataStore(currentUser)
 	users, err := ds.UserViewList(query)
 	if err != nil {
-		c.AbortWithError(StatusCodeForError(err), err)
+		c.Error(err)
+		c.Set("err", err)
+		ErrorShow(c)
+		c.Abort()
 		return
 	}
 	templateData["users"] = users
@@ -59,7 +65,10 @@ func UserIndex(c *gin.Context) {
 	// Get institutions
 	institutionOptions, err := ListInstitutions(ds)
 	if err != nil {
-		c.AbortWithError(StatusCodeForError(err), err)
+		c.Error(err)
+		c.Set("err", err)
+		ErrorShow(c)
+		c.Abort()
 		return
 	}
 	templateData["institutionOptions"] = institutionOptions

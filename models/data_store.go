@@ -54,6 +54,9 @@ func (ds *DataStore) ChecksumFind(id int64) (*Checksum, error) {
 // them and throw an error if the user tries to access a checksum
 // whose parent GenericFile belongs to another institution.
 func (ds *DataStore) ChecksumList(q *Query) ([]*Checksum, error) {
+	if err := ds.assertListPermission(constants.ChecksumRead); err != nil {
+		return nil, err
+	}
 	checksums := make([]*Checksum, 0)
 	err := ds._select(&checksums, q)
 	return checksums, err
@@ -94,6 +97,9 @@ func (ds *DataStore) GenericFileFindByIdentifier(identifier string) (*GenericFil
 // GenericFileList returns the GenericFiles matching the specified query.
 func (ds *DataStore) GenericFileList(q *Query) ([]*GenericFile, error) {
 	ds.applyInstFilter(q, "institution_id")
+	if err := ds.assertListPermission(constants.FileRead); err != nil {
+		return nil, err
+	}
 	gfs := make([]*GenericFile, 0)
 	err := ds._select(&gfs, q)
 	return gfs, err
@@ -139,6 +145,9 @@ func (ds *DataStore) InstitutionFindByIdentifier(identifier string) (*Institutio
 // InstitutionList returns the Institutions matching the query.
 func (ds *DataStore) InstitutionList(q *Query) ([]*Institution, error) {
 	ds.applyInstFilter(q, "id")
+	if err := ds.assertListPermission(constants.InstitutionRead); err != nil {
+		return nil, err
+	}
 	institutions := make([]*Institution, 0)
 	err := ds._select(&institutions, q)
 	return institutions, err
@@ -185,9 +194,12 @@ func (ds *DataStore) IntellectualObjectFindByIdentifier(identifier string) (*Int
 // IntellectualObjectList returns IntellectualObjects that match the query.
 func (ds *DataStore) IntellectualObjectList(q *Query) ([]*IntellectualObject, error) {
 	ds.applyInstFilter(q, "institution_id")
-	objitutions := make([]*IntellectualObject, 0)
-	err := ds._select(&objitutions, q)
-	return objitutions, err
+	if err := ds.assertListPermission(constants.ObjectRead); err != nil {
+		return nil, err
+	}
+	objs := make([]*IntellectualObject, 0)
+	err := ds._select(&objs, q)
+	return objs, err
 }
 
 // IntellectualObjectSave inserts or updates an IntellectualObject.
@@ -223,6 +235,9 @@ func (ds *DataStore) PremisEventFindByIdentifier(identifier string) (*PremisEven
 // PremisEventList returns the PremisEvents that match the query.
 func (ds *DataStore) PremisEventList(q *Query) ([]*PremisEvent, error) {
 	ds.applyInstFilter(q, "institution_id")
+	if err := ds.assertListPermission(constants.EventRead); err != nil {
+		return nil, err
+	}
 	events := make([]*PremisEvent, 0)
 	err := ds._select(&events, q)
 	return events, err
@@ -257,6 +272,9 @@ func (ds *DataStore) StorageRecordsForFile(genericFileID int64) ([]*StorageRecor
 // them and throw an error if the user tries to access a record
 // whose parent GenericFile belongs to another institution.
 func (ds *DataStore) StorageRecordList(q *Query) ([]*StorageRecord, error) {
+	if err := ds.assertListPermission(constants.StorageRecordRead); err != nil {
+		return nil, err
+	}
 	records := make([]*StorageRecord, 0)
 	err := ds._select(&records, q)
 	return records, err
@@ -309,6 +327,9 @@ func (ds *DataStore) UserFindByEmail(email string) (*User, error) {
 // UserList returns a list of Users matching the specified query.
 func (ds *DataStore) UserList(q *Query) ([]*User, error) {
 	ds.applyInstFilter(q, "institution_id")
+	if err := ds.assertListPermission(constants.UserRead); err != nil {
+		return nil, err
+	}
 	users := make([]*User, 0)
 	err := ds._select(&users, q)
 	return users, err
@@ -371,6 +392,9 @@ func (ds *DataStore) UserUndelete(user *User) error {
 // UserViewList returns a list of UserView objects.
 func (ds *DataStore) UserViewList(q *Query) ([]*UserView, error) {
 	ds.applyInstFilter(q, "institution_id")
+	if err := ds.assertListPermission(constants.UserRead); err != nil {
+		return nil, err
+	}
 	records := make([]*UserView, 0)
 	err := ds._select(&records, q)
 	return records, err
@@ -389,6 +413,9 @@ func (ds *DataStore) WorkItemFind(id int64) (*WorkItem, error) {
 // WorkItemList returns a list of WorkItems matching the query.
 func (ds *DataStore) WorkItemList(q *Query) ([]*WorkItem, error) {
 	ds.applyInstFilter(q, "institution_id")
+	if err := ds.assertListPermission(constants.WorkItemRead); err != nil {
+		return nil, err
+	}
 	items := make([]*WorkItem, 0)
 	err := ds._select(&items, q)
 	return items, err
@@ -555,6 +582,28 @@ func (ds *DataStore) applyInstFilter(q *Query, column string) {
 	if !ds.actingUser.IsAdmin() {
 		q.Where(column, "=", ds.actingUser.InstitutionID)
 	}
+}
+
+// assertListPermission checks to see if a user's role allows them
+// to run a list/index query on a type of resource (IntellectualObject,
+// GenericFile, etc.). This is a basic check to see if they can even
+// run a query. It will return an error if they can't.
+//
+// This is not a full check, just a short-circuit for certain common
+// cases. The caller is responsible for the full security implementation,
+// which must do the following:
+//
+// 1. Forcibly apply an institution ID filter for all applicable queries
+// when the acting user is not a SysAdmin.
+//
+// 2. Check the institution ID of the returned data (in cases where it
+// can't be filtered by institution ID) to ensure that the user is allowed
+// to perform a given action on item(s) belonging to the institution.
+func (ds *DataStore) assertListPermission(perm constants.Permission) error {
+	if ok := ds.actingUser.HasPermission(perm, ds.actingUser.InstitutionID); !ok {
+		return common.ErrPermissionDenied
+	}
+	return nil
 }
 
 func TypeOf(obj interface{}) string {

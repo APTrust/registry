@@ -9,7 +9,14 @@ import (
 )
 
 func ErrorShow(c *gin.Context) {
-	c.HTML(200, "errors/show.html", helpers.TemplateVars(c))
+	templateData := helpers.TemplateVars(c)
+	status := http.StatusInternalServerError
+	err, _ := c.Get("err")
+	if err != nil {
+		templateData["error"] = err.(error).Error()
+		status = StatusCodeForError(err.(error))
+	}
+	c.HTML(status, "errors/show.html", templateData)
 }
 
 // StatusCodeForError returns the http.StatusCode for the specified

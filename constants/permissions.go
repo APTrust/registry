@@ -83,6 +83,7 @@ func initPermissions() {
 	instUser[ChecksumRead] = true
 	instUser[EventRead] = true
 	instUser[FileRead] = true
+	instUser[InstitutionRead] = true
 	instUser[ObjectRead] = true
 	instUser[StorageRecordRead] = true
 	instUser[UserReadSelf] = true
@@ -98,6 +99,7 @@ func initPermissions() {
 	instAdmin[FileRequestDelete] = true
 	instAdmin[FileApproveDelete] = true
 	instAdmin[FileRestore] = true
+	instAdmin[InstitutionRead] = true
 	instAdmin[ObjectRead] = true
 	instAdmin[ObjectDelete] = true
 	instAdmin[ObjectRequestDelete] = true
