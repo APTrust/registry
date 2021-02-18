@@ -8,6 +8,23 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// AbortIfError stops request processing and displays an
+// error page if param err is not nil. This returns true
+// if it actually did have to abort. When it returns true,
+// the caller should return to ensure that no further processing
+// of the request occurs. If this returns false, there was no error,
+// and the caller can continue processing.
+func AbortIfError(c *gin.Context, err error) bool {
+	if err != nil {
+		c.Error(err)
+		c.Set("err", err)
+		ErrorShow(c)
+		c.Abort()
+		return true
+	}
+	return false
+}
+
 func ErrorShow(c *gin.Context) {
 	templateData := helpers.TemplateVars(c)
 	status := http.StatusInternalServerError

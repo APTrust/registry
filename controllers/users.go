@@ -31,44 +31,27 @@ func UserDelete(c *gin.Context) {
 // UserIndex shows list of users.
 // GET /users
 func UserIndex(c *gin.Context) {
-
-	// TODO: Create common convenience methods to get select list
-	//       data. For example, this controller uses an Institutions
-	//       list, so models.InstitutionsAll?
-	//
-
 	template := "users/index.html"
 	templateData := helpers.TemplateVars(c)
 	query, err := getIndexQuery(c)
-	if err != nil {
-		c.Error(err)
-		c.Set("err", err)
-		ErrorShow(c)
-		c.Abort()
+	if AbortIfError(c, err) {
 		return
 	}
+
 	query.OrderBy("name asc")
 	currentUser := helpers.CurrentUser(c)
 	templateData["selectedID"] = c.Query("institution_id__eq")
 
 	ds := models.NewDataStore(currentUser)
 	users, err := ds.UserViewList(query)
-	if err != nil {
-		c.Error(err)
-		c.Set("err", err)
-		ErrorShow(c)
-		c.Abort()
+	if AbortIfError(c, err) {
 		return
 	}
 	templateData["users"] = users
 
-	// Get institutions
+	// Get institutions for filter list
 	institutionOptions, err := ListInstitutions(ds)
-	if err != nil {
-		c.Error(err)
-		c.Set("err", err)
-		ErrorShow(c)
-		c.Abort()
+	if AbortIfError(c, err) {
 		return
 	}
 	templateData["institutionOptions"] = institutionOptions

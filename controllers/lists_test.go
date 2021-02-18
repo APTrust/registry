@@ -33,7 +33,7 @@ func TestListInstitutions(t *testing.T) {
 	}
 }
 
-func TestOptionsFromStringList(t *testing.T) {
+func TestOptions(t *testing.T) {
 	options := controllers.Options(constants.AccessSettings)
 	require.NotEmpty(t, options)
 	for i, option := range options {
