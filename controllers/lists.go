@@ -23,3 +23,22 @@ func ListInstitutions(ds *models.DataStore) ([]ListOption, error) {
 	}
 	return options, nil
 }
+
+// Options returns a list of options for the given string list.
+// This is intended mainly to provide select list filters
+// for the web ui for constants such as:
+//
+// AccessSettings
+// DigestAlgs
+// EventTypes
+// Stages
+// Statuses
+// StorageOptions
+// WorkItemActions
+func Options(items []string) []ListOption {
+	options := make([]ListOption, len(items))
+	for i, item := range items {
+		options[i] = ListOption{item, item}
+	}
+	return options
+}

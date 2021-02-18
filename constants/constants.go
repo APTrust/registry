@@ -84,7 +84,7 @@ const (
 	TopicObjectRestore         = "restore_object"
 )
 
-var Actions = []string{
+var UserActions = []string{
 	ActionCreate,
 	ActionRead,
 	ActionUpdate,
@@ -93,6 +93,19 @@ var Actions = []string{
 	ActionApproveDelete,
 	ActionFinishBulkDelete,
 	ActionRestore,
+}
+
+var WorkItemActions = []string{
+	ActionDelete,
+	ActionGlacierRestore,
+	ActionIngest,
+	ActionRestore,
+}
+
+var AccessSettings = []string{
+	AccessConsortia,
+	AccessInstitution,
+	AccessRestricted,
 }
 
 var DigestAlgs = []string{
