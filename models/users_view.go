@@ -108,3 +108,10 @@ func UserViewFind(id int64) (*UserView, error) {
 	err := ctx.DB.Model(user).WherePK().Select()
 	return user, err
 }
+
+func (uv *UserView) LastLogin() time.Time {
+	if !uv.CurrentSignInAt.IsZero() {
+		return uv.CurrentSignInAt
+	}
+	return uv.LastSignInAt
+}
