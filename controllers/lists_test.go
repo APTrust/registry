@@ -5,12 +5,14 @@ import (
 
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/controllers"
+	"github.com/APTrust/registry/db"
 	"github.com/APTrust/registry/models"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestListInstitutions(t *testing.T) {
+	db.LoadFixtures()
 	adminUser := &models.User{
 		Role: constants.RoleSysAdmin,
 	}
