@@ -36,7 +36,7 @@
   <tbody>
     <!-- Obj type is UsersView, not User -->
     {{ range $index, $user := .users }}
-    <tr>
+    <tr class="clickable" onclick="window.location.href='/users/show/{{ $user.ID }}'">
       <td>{{ $user.Name }}</td>
       <td>{{ $user.Email }}</td>
       <td>{{ $user.InstitutionName }}</td>

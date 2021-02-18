@@ -18,3 +18,7 @@
     margin-right: 0px;
     width: 20px;
 }
+
+.clickable {
+    cursor: pointer;
+}

@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"net/http"
-	//	"strconv"
+	"strconv"
 
 	//	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
@@ -99,7 +99,17 @@ func UserSignOut(c *gin.Context) {
 // UserShow returns the user with the specified id.
 // GET /users/show/:id
 func UserShow(c *gin.Context) {
-	c.HTML(http.StatusOK, "users/show.html", gin.H{})
+	templateData := helpers.TemplateVars(c)
+	currentUser := helpers.CurrentUser(c)
+	ds := models.NewDataStore(currentUser)
+	id := c.Param("id")
+	userID, _ := strconv.ParseInt(id, 10, 64)
+	user, err := ds.UserFind(userID)
+	if AbortIfError(c, err) {
+		return
+	}
+	templateData["user"] = user
+	c.HTML(http.StatusOK, "users/show.html", templateData)
 }
 
 // UserUpdate saves changes to an exiting user.

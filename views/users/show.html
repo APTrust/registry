@@ -1,0 +1,51 @@
+{{ define "users/show.html" }}
+
+{{ template "shared/header.html" .}}
+
+<h1>{{ .user.Name }}</h1>
+<h2>{{ roleName .user.Role }} at {{ .user.Institution.Name }}</h2>
+
+<h3>Contact Info</h3>
+<div class="row">
+  <div class="column">Email: {{ .user.Email }}</div>
+  <div class="column">Verified: {{ yesNo .user.EmailVerified }}</div>
+  <div class="column">Phone: {{ .user.PhoneNumber }}</div>
+  <div class="column">Last Updated: {{ dateUS .user.UpdatedAt }}</div>
+</div>
+
+<h3>Activity</h3>
+<div class="row">
+  <div class="column">Signed In At: {{ dateUS .user.CurrentSignInAt }}</div>
+  <div class="column">From: {{ .user.CurrentSignInIP }}</div>
+  <div class="column">Last SignIn: {{ dateUS .user.LastSignInAt }}</div>
+  <div class="column">From: {{ .user.LastSignInIP }}</div>
+</div>
+
+<div class="row">
+  <div class="column">Sign In Count: {{ .user.SignInCount }}</div>
+  <div class="column">Initial Password Updated: {{ yesNo .user.InitialPasswordUpdated }}</div>
+  <div class="column">ForcePasswordUpdate: {{ yesNo .user.ForcePasswordUpdate }}</div>
+  <div class="column">Deactivated: {{ dateUS .user.DeactivatedAt }}</div>
+</div>
+
+<h3>Two Factor Authentication</h3>
+<div class="row">
+  <div class="column">Required: {{ yesNo .user.Institution.OTPEnabled }}</div>
+  <div class="column">Enabled: {{ yesNo .user.EnabledTwoFactor }}</div>
+  <div class="column">Confirmed: {{ yesNo .user.ConfirmedTwoFactor }}</div>
+  <div class="column">Required By: {{ dateUS .user.GracePeriod }}</div>
+</div>
+
+<h3>Authy</h3>
+<div class="row">
+  <div class="column">Status: {{ .user.AuthyStatus }}</div>
+  <div class="column">ID: {{ .user.AuthyID }}</div>
+  <div class="column">Last SignIn: {{ dateUS .user.LastSignInWithAuthy }}</div>
+  <div class="column"></div>
+</div>
+
+
+{{ template "shared/footer.html" .}}
+
+
+{{ end }}
