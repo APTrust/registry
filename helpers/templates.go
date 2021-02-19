@@ -2,6 +2,7 @@ package helpers
 
 import (
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -65,9 +66,22 @@ func RoleName(role string) string {
 	}
 }
 
+// YesNo returns "Yes" if value is true, "No" if value is false.
 func YesNo(value bool) string {
 	if value {
 		return "Yes"
 	}
 	return "No"
+}
+
+// EqStrInt compares a string to an int and returns true if the int's
+// string value matches str.
+func EqStrInt(strValue string, intValue int) bool {
+	return strValue == strconv.Itoa(intValue)
+}
+
+// EqStrInt64 compares a string to an int and returns true if the int's
+// string value matches str.
+func EqStrInt64(strValue string, int64Value int64) bool {
+	return strValue == strconv.FormatInt(int64Value, 10)
 }

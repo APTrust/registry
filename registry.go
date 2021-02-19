@@ -24,11 +24,13 @@ func main() {
 // parser will error out.
 func initTemplates(router *gin.Engine) {
 	router.SetFuncMap(template.FuncMap{
-		"dateISO":  helpers.DateISO,
-		"dateUS":   helpers.DateUS,
-		"truncate": helpers.Truncate,
-		"roleName": helpers.RoleName,
-		"yesNo":    helpers.YesNo,
+		"dateISO":    helpers.DateISO,
+		"dateUS":     helpers.DateUS,
+		"eqStrInt":   helpers.EqStrInt,
+		"eqStrInt64": helpers.EqStrInt64,
+		"truncate":   helpers.Truncate,
+		"roleName":   helpers.RoleName,
+		"yesNo":      helpers.YesNo,
 	})
 	// Load the view templates
 	router.LoadHTMLGlob("views/**/*.html")

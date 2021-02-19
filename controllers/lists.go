@@ -3,12 +3,22 @@ package controllers
 import (
 	"strconv"
 
+	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/models"
 )
 
 type ListOption struct {
 	Value string
 	Text  string
+}
+
+// RolesList is a list of assignable user roles. Hard-coded instead
+// of using Options() function for formatting reasons and because we
+// don't want to include the "none" role.
+var RolesList = []ListOption{
+	ListOption{constants.RoleInstAdmin, "Institutional Admin"},
+	ListOption{constants.RoleInstUser, "Institutional User"},
+	ListOption{constants.RoleSysAdmin, "APTrust System Administrator"},
 }
 
 func ListInstitutions(ds *models.DataStore) ([]ListOption, error) {

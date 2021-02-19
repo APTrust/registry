@@ -1,0 +1,34 @@
+{{ define "users/form.html" }}
+
+{{ template "shared/header.html" .}}
+
+{{ $user := .user }}
+
+<form action="{{ .formAction }}" method="post">
+  <input type="text" name="name" value="{{ .user.Name }}" placeholder="Name">
+  <input type="email" name="email" value="{{ .user.Email }}" placeholder="Email address">
+  <input type="tel" name="phone_number" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" value="{{ .user.PhoneNumber }}" placeholder="Phone in format 212-555-1212">
+  <input type="checkbox" name="otp_required_for_login" id="otp_required_for_login" value="true" {{ if .user.OTPRequiredForLogin }}checked{{ end }}><label for="otp_required_for_login">Require two-factor authentication</label>
+  Role <select id="role" name="role">
+    <option value="">Choose One</option>
+    {{ range $index, $option := .roles }}
+    <option value="{{ $option.Value }}" {{ if eq $user.Role $option.Value }}selected{{ end }}>{{ $option.Text }}</option>
+    {{ end }}
+  </select>
+  Institution <select id="institution_id" name="institution_id">
+    <option value="">Choose One</option>
+    {{ $selectedID := .selectedID }}
+    {{ range $index, $option := .institutionOptions }}
+    <option value="{{ $option.Value }}" {{ if eqStrInt64 $option.Value $user.InstitutionID }}selected{{ end }}>{{ $option.Text }}</option>
+    {{ end }}
+  </select>
+
+  <div class="sign-in-submit">
+    <input type="submit" value="Submit">
+  </div>
+  <div class="form-error" {{ if .error }}style="display:block"{{ end }}>{{ .error }}</div>
+</form>
+
+{{ template "shared/footer.html" .}}
+
+{{ end }}

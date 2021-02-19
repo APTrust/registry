@@ -62,7 +62,18 @@ func UserIndex(c *gin.Context) {
 // UserNew returns a blank form for the user to create a new user.
 // GET /users/new
 func UserNew(c *gin.Context) {
-
+	currentUser := helpers.CurrentUser(c)
+	ds := models.NewDataStore(currentUser)
+	template := "users/form.html"
+	templateData := helpers.TemplateVars(c)
+	templateData["user"] = &models.User{}
+	templateData["roles"] = RolesList
+	institutionOptions, err := ListInstitutions(ds)
+	if AbortIfError(c, err) {
+		return
+	}
+	templateData["institutionOptions"] = institutionOptions
+	c.HTML(http.StatusOK, template, templateData)
 }
 
 // UserSignIn shows the user sign-in form.
