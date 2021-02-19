@@ -9,6 +9,9 @@
   <input type="email" name="email" value="{{ .user.Email }}" placeholder="Email address">
   <input type="tel" name="phone_number" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" value="{{ .user.PhoneNumber }}" placeholder="Phone in format 212-555-1212">
   <input type="checkbox" name="otp_required_for_login" id="otp_required_for_login" value="true" {{ if .user.OTPRequiredForLogin }}checked{{ end }}><label for="otp_required_for_login">Require two-factor authentication</label>
+  Must enable 2FA by <input type="date" id="grace_period" name="grace_period"
+         value="{{ .user.GracePeriod }}"
+         min="2021-01-01" max="2099-12-31">
   Role <select id="role" name="role">
     <option value="">Choose One</option>
     {{ range $index, $option := .roles }}

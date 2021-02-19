@@ -20,8 +20,8 @@ type User struct {
 	Name                   string       `json:"name" form:"name" pg:"name"`
 	Email                  string       `json:"email" form:"email" pg:"email"`
 	PhoneNumber            string       `json:"phone_number" form:"phone_number" pg:"phone_number"`
-	CreatedAt              time.Time    `json:"created_at" form:"created_at" pg:"created_at"`
-	UpdatedAt              time.Time    `json:"updated_at" form:"updated_at" pg:"updated_at"`
+	CreatedAt              time.Time    `json:"created_at" form:"-" pg:"created_at"`
+	UpdatedAt              time.Time    `json:"updated_at" form:"-" pg:"updated_at"`
 	EncryptedPassword      string       `json:"-" form:"-" pg:"encrypted_password"`
 	ResetPasswordToken     string       `json:"-" form:"-" pg:"reset_password_token"`
 	ResetPasswordSentAt    time.Time    `json:"reset_password_sent_at" form:"-" pg:"reset_password_sent_at"`
@@ -38,7 +38,7 @@ type User struct {
 	EncryptedOTPSecretIV   string       `json:"-" form:"-" pg:"encrypted_otp_secret_iv"`
 	EncryptedOTPSecretSalt string       `json:"-" form:"-" pg:"encrypted_otp_secret_salt"`
 	ConsumedTimestep       int          `json:"-" form:"-" pg:"consumed_timestep"`
-	OTPRequiredForLogin    bool         `json:"otp_required_for_login" form:"-" pg:"otp_required_for_login"`
+	OTPRequiredForLogin    bool         `json:"otp_required_for_login" form:"otp_required_for_login" pg:"otp_required_for_login"`
 	DeactivatedAt          time.Time    `json:"deactivated_at" form:"-" pg:"deactivated_at"`
 	EnabledTwoFactor       bool         `json:"enabled_two_factor" form:"-" pg:"enabled_two_factor"`
 	ConfirmedTwoFactor     bool         `json:"confirmed_two_factor" form:"-" pg:"confirmed_two_factor"`
