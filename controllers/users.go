@@ -1,10 +1,10 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
-	//	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/helpers"
 	"github.com/APTrust/registry/models"
@@ -14,7 +14,29 @@ import (
 // UserCreate a new user. Handles submission of new user form.
 // POST /users/new
 func UserCreate(c *gin.Context) {
-
+	// Bind form to user
+	// Validate
+	// If OK, save and redirect to index with flash message.
+	// If invalid, redisplay form.
+	// For other errors (permissions, etc), show error page.
+	currentUser := helpers.CurrentUser(c)
+	ds := models.NewDataStore(currentUser)
+	template := "users/form.html"
+	templateData := helpers.TemplateVars(c)
+	user := &models.User{}
+	templateData["user"] = user
+	if err := c.ShouldBind(&user); err != nil {
+		templateData["error"] = err.Error()
+		c.HTML(http.StatusBadRequest, template, templateData)
+		return
+	}
+	// Validate??
+	err := ds.UserSave(user)
+	if AbortIfError(c, err) {
+		return
+	}
+	location := fmt.Sprintf("/users/show/%d?flash=User+created", user.ID)
+	c.Redirect(http.StatusSeeOther, location)
 }
 
 // UserDelete deletes a user.

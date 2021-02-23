@@ -22,3 +22,11 @@
 .clickable {
     cursor: pointer;
 }
+
+div.flash {
+    display: block;
+    border: 1px solid #9b4dca;
+    border-radius: 5px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}

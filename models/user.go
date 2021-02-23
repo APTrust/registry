@@ -49,7 +49,7 @@ type User struct {
 	EmailVerified          bool         `json:"email_verified" form:"-" pg:"email_verified"`
 	InitialPasswordUpdated bool         `json:"initial_password_updated" form:"-" pg:"initial_password_updated"`
 	ForcePasswordUpdate    bool         `json:"force_password_update" form:"-" pg:"force_password_update"`
-	GracePeriod            time.Time    `json:"grace_period" form:"grace_period" pg:"grace_period"`
+	GracePeriod            time.Time    `json:"grace_period" form:"grace_period" time_format:"2006-01-02" pg:"grace_period"`
 	Role                   string       `json:"role" form:"role" pg:"role"`
 	Institution            *Institution `json:"institution" pg:"rel:has-one"`
 }
