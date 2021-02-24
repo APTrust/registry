@@ -25,6 +25,12 @@ func UserCreate(c *gin.Context) {
 	templateData := helpers.TemplateVars(c)
 	user := &models.User{}
 	templateData["user"] = user
+	templateData["roles"] = RolesList
+	institutionOptions, err := ListInstitutions(ds)
+	if AbortIfError(c, err) {
+		return
+	}
+	templateData["institutionOptions"] = institutionOptions
 	if err := c.ShouldBind(user); err != nil {
 		errMessages := ValidationErrors(err, user)
 		if errMessages != nil {
@@ -34,8 +40,7 @@ func UserCreate(c *gin.Context) {
 		c.HTML(http.StatusBadRequest, template, templateData)
 		return
 	}
-	// Validate??
-	err := ds.UserSave(user)
+	err = ds.UserSave(user)
 	if AbortIfError(c, err) {
 		return
 	}

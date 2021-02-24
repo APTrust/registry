@@ -30,3 +30,10 @@ div.flash {
     padding: 1.5rem;
     margin-bottom: 1.5rem;
 }
+
+.validation-error {
+    color: red;
+    margin: -0.5rem 1rem 1rem 1rem;
+    font-size: 1.4rem;
+    font-style: italic;
+}

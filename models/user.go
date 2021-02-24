@@ -108,17 +108,21 @@ func (user *User) BeforeSave() error {
 	return nil
 }
 
-func (user *User) GetValidationErrors(map[string]interface{}) map[string]string {
-	// errs := map[string]string{
-	// 	"Name":          "Name must contain at least two letters.",
-	// 	"Email":         "Valid email address required.",
-	// 	"PhoneNumber":   "Please enter a phone number in format 000-000-0000.",
-	// 	"InstitutionID": "Please select an institution.",
-	// 	"Role":          "Please choose a role for this user.",
-	// }
-	// messages := make(map[string]string)
-
-	return nil
+func (user *User) GetValidationErrors(errors map[string]interface{}) map[string]string {
+	msgs := map[string]string{
+		"Name":          "Name must contain at least two letters.",
+		"Email":         "Valid email address required.",
+		"PhoneNumber":   "Please enter a phone number in format 000-000-0000.",
+		"InstitutionID": "Please select an institution.",
+		"Role":          "Please choose a role for this user.",
+	}
+	messages := make(map[string]string)
+	for key, _ := range errors {
+		if _, ok := msgs[key]; ok {
+			messages[key] = msgs[key]
+		}
+	}
+	return messages
 }
 
 // HasPermission returns true or false to indicate whether the user has
