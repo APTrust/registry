@@ -19,7 +19,7 @@ type User struct {
 	ID                     int64        `json:"id" form:"id" pg:"id"`
 	Name                   string       `json:"name" form:"name" pg:"name" binding:"required,min=2,max=10"`
 	Email                  string       `json:"email" form:"email" pg:"email" binding:"required,email"`
-	PhoneNumber            string       `json:"phone_number" form:"phone_number" pg:"phone_number" binding:"regexp=^[0-9]{3}-[0-9]{3}-[0-9]{4}$"`
+	PhoneNumber            string       `json:"phone_number" form:"phone_number" pg:"phone_number"`
 	CreatedAt              time.Time    `json:"created_at" form:"-" pg:"created_at"`
 	UpdatedAt              time.Time    `json:"updated_at" form:"-" pg:"updated_at"`
 	EncryptedPassword      string       `json:"-" form:"-" pg:"encrypted_password"`
@@ -31,7 +31,7 @@ type User struct {
 	LastSignInAt           time.Time    `json:"last_sign_in_at" form:"-" pg:"last_sign_in_at"`
 	CurrentSignInIP        string       `json:"current_sign_in_ip" form:"-" pg:"current_sign_in_ip"`
 	LastSignInIP           string       `json:"last_sign_in_ip" form:"-" pg:"last_sign_in_ip"`
-	InstitutionID          int64        `json:"institution_id" form:"institution_id" pg:"institution_id"`
+	InstitutionID          int64        `json:"institution_id" form:"institution_id" pg:"institution_id" binding:"required"`
 	EncryptedAPISecretKey  string       `json:"-" form:"-" pg:"encrypted_api_secret_key"`
 	PasswordChangedAt      time.Time    `json:"password_changed_at" form:"-" pg:"password_changed_at"`
 	EncryptedOTPSecret     string       `json:"-" form:"-" pg:"encrypted_otp_secret"`
@@ -50,7 +50,7 @@ type User struct {
 	InitialPasswordUpdated bool         `json:"initial_password_updated" form:"-" pg:"initial_password_updated"`
 	ForcePasswordUpdate    bool         `json:"force_password_update" form:"-" pg:"force_password_update"`
 	GracePeriod            time.Time    `json:"grace_period" form:"grace_period" time_format:"2006-01-02" pg:"grace_period"`
-	Role                   string       `json:"role" form:"role" pg:"role"`
+	Role                   string       `json:"role" form:"role" pg:"role" binding:"required"`
 	Institution            *Institution `json:"institution" pg:"rel:has-one"`
 }
 

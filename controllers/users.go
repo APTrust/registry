@@ -25,7 +25,7 @@ func UserCreate(c *gin.Context) {
 	templateData := helpers.TemplateVars(c)
 	user := &models.User{}
 	templateData["user"] = user
-	if err := c.ShouldBind(&user); err != nil {
+	if err := c.ShouldBind(user); err != nil {
 		templateData["error"] = err.Error()
 		c.HTML(http.StatusBadRequest, template, templateData)
 		return
@@ -98,7 +98,7 @@ func UserNew(c *gin.Context) {
 	c.HTML(http.StatusOK, template, templateData)
 }
 
-// UserSignIn shows the user sign-in form.
+// UserSignInShow shows the user sign-in form.
 // GET /users/sign_in
 func UserSignInShow(c *gin.Context) {
 	c.HTML(200, "users/sign_in.html", gin.H{
