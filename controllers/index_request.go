@@ -83,7 +83,8 @@ func (r *IndexRequest) AddFilter(q *models.Query, key string) error {
 	return nil
 }
 
-// Call this after gathering results
+// AssertPermissions returns an error if user doesn't have permission
+// to perform the specified operation. Call this after gathering results
 func (r *IndexRequest) AssertPermissions(models []models.Model) error {
 	if r.currentUser == nil {
 		return common.ErrNotSignedIn

@@ -8,7 +8,7 @@ import (
 	"github.com/APTrust/registry/models"
 )
 
-// ParamsToQuery converts query string params such as name__eq=Homer to
+// FilterCollection converts query string params such as name__eq=Homer to
 // a models.Query object that allows us to build a SQL where clause as
 // we go.
 type FilterCollection struct {
@@ -65,9 +65,9 @@ type ParamFilter struct {
 	Column string
 	// RawOp is the operator in Key. For example, "eq" or "gt".
 	RawOp string
-	// SqlOp is the SQL operator that corresponds to RawOp. For example,
+	// SQLOp is the SQL operator that corresponds to RawOp. For example,
 	// "=" or ">".
-	SqlOp string
+	SQLOp string
 	// Values are the values attached to Key in the query string.
 	Values []string
 }
@@ -92,7 +92,7 @@ func NewParamFilter(key string, values []string) (*ParamFilter, error) {
 		Key:    key,
 		Column: col,
 		RawOp:  rawOp,
-		SqlOp:  sqlOp,
+		SQLOp:  sqlOp,
 		Values: values,
 	}, nil
 }
@@ -103,21 +103,21 @@ func NewParamFilter(key string, values []string) (*ParamFilter, error) {
 func (pf *ParamFilter) AddToQuery(q *models.Query) error {
 	switch pf.RawOp {
 	case "eq":
-		q.Where(pf.Column, pf.SqlOp, pf.Values[0])
+		q.Where(pf.Column, pf.SQLOp, pf.Values[0])
 	case "ne":
-		q.Where(pf.Column, pf.SqlOp, pf.Values[0])
+		q.Where(pf.Column, pf.SQLOp, pf.Values[0])
 	case "gt":
-		q.Where(pf.Column, pf.SqlOp, pf.Values[0])
+		q.Where(pf.Column, pf.SQLOp, pf.Values[0])
 	case "gteq":
-		q.Where(pf.Column, pf.SqlOp, pf.Values[0])
+		q.Where(pf.Column, pf.SQLOp, pf.Values[0])
 	case "lt":
-		q.Where(pf.Column, pf.SqlOp, pf.Values[0])
+		q.Where(pf.Column, pf.SQLOp, pf.Values[0])
 	case "lteq":
-		q.Where(pf.Column, pf.SqlOp, pf.Values[0])
+		q.Where(pf.Column, pf.SQLOp, pf.Values[0])
 	case "starts_with":
-		q.Where(pf.Column, pf.SqlOp, fmt.Sprintf("%s%%", pf.Values[0]))
+		q.Where(pf.Column, pf.SQLOp, fmt.Sprintf("%s%%", pf.Values[0]))
 	case "contains":
-		q.Where(pf.Column, pf.SqlOp, fmt.Sprintf("%%%s%%", pf.Values[0]))
+		q.Where(pf.Column, pf.SQLOp, fmt.Sprintf("%%%s%%", pf.Values[0]))
 	case "is_null":
 		q.IsNull(pf.Column)
 	case "not_null":

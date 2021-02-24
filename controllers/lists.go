@@ -16,9 +16,9 @@ type ListOption struct {
 // of using Options() function for formatting reasons and because we
 // don't want to include the "none" role.
 var RolesList = []ListOption{
-	ListOption{constants.RoleInstAdmin, "Institutional Admin"},
-	ListOption{constants.RoleInstUser, "Institutional User"},
-	ListOption{constants.RoleSysAdmin, "APTrust System Administrator"},
+	{constants.RoleInstAdmin, "Institutional Admin"},
+	{constants.RoleInstUser, "Institutional User"},
+	{constants.RoleSysAdmin, "APTrust System Administrator"},
 }
 
 func ListInstitutions(ds *models.DataStore) ([]ListOption, error) {

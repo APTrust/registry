@@ -14,77 +14,77 @@ var valid = []*controllers.ParamFilter{
 		Key:    "name__eq",
 		Column: "name",
 		RawOp:  "eq",
-		SqlOp:  "=",
+		SQLOp:  "=",
 		Values: []string{"Homer"},
 	},
 	&controllers.ParamFilter{
 		Key:    "name__ne",
 		Column: "name",
 		RawOp:  "ne",
-		SqlOp:  "!=",
+		SQLOp:  "!=",
 		Values: []string{"Homer"},
 	},
 	&controllers.ParamFilter{
 		Key:    "age__gt",
 		Column: "age",
 		RawOp:  "gt",
-		SqlOp:  ">",
+		SQLOp:  ">",
 		Values: []string{"38"},
 	},
 	&controllers.ParamFilter{
 		Key:    "age__gteq",
 		Column: "age",
 		RawOp:  "gteq",
-		SqlOp:  ">=",
+		SQLOp:  ">=",
 		Values: []string{"38"},
 	},
 	&controllers.ParamFilter{
 		Key:    "age__lt",
 		Column: "age",
 		RawOp:  "lt",
-		SqlOp:  "<",
+		SQLOp:  "<",
 		Values: []string{"38"},
 	},
 	&controllers.ParamFilter{
 		Key:    "age__lteq",
 		Column: "age",
 		RawOp:  "lteq",
-		SqlOp:  "<=",
+		SQLOp:  "<=",
 		Values: []string{"38"},
 	},
 	&controllers.ParamFilter{
 		Key:    "name__starts_with",
 		Column: "name",
 		RawOp:  "starts_with",
-		SqlOp:  "ILIKE",
+		SQLOp:  "ILIKE",
 		Values: []string{"Simpson"},
 	},
 	&controllers.ParamFilter{
 		Key:    "name__contains",
 		Column: "name",
 		RawOp:  "contains",
-		SqlOp:  "ILIKE",
+		SQLOp:  "ILIKE",
 		Values: []string{"Simpson"},
 	},
 	&controllers.ParamFilter{
 		Key:    "name__is_null",
 		Column: "name",
 		RawOp:  "is_null",
-		SqlOp:  "IS NULL",
+		SQLOp:  "IS NULL",
 		Values: []string{"true"},
 	},
 	&controllers.ParamFilter{
 		Key:    "name__not_null",
 		Column: "name",
 		RawOp:  "not_null",
-		SqlOp:  "IS NOT NULL",
+		SQLOp:  "IS NOT NULL",
 		Values: []string{"true"},
 	},
 	&controllers.ParamFilter{
 		Key:    "name__in",
 		Column: "name",
 		RawOp:  "in",
-		SqlOp:  "IN",
+		SQLOp:  "IN",
 		Values: []string{"Bart", "Lisa", "Maggie"},
 	},
 }
@@ -94,7 +94,7 @@ var invalid = []*controllers.ParamFilter{
 		Key:    "name__xyz",
 		Column: "name",
 		RawOp:  "xyz",
-		SqlOp:  "",
+		SQLOp:  "",
 		Values: []string{},
 	},
 }
@@ -138,7 +138,7 @@ func TestNewParamFilter(t *testing.T) {
 		assert.Equal(t, obj.Key, filter.Key)
 		assert.Equal(t, obj.Column, filter.Column)
 		assert.Equal(t, obj.RawOp, filter.RawOp)
-		assert.Equal(t, obj.SqlOp, filter.SqlOp)
+		assert.Equal(t, obj.SQLOp, filter.SQLOp)
 		assert.Equal(t, obj.Values, filter.Values)
 	}
 	for _, obj := range invalid {
