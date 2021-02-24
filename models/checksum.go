@@ -5,6 +5,7 @@ import (
 
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
+	"github.com/go-playground/validator/v10"
 )
 
 type Checksum struct {
@@ -72,5 +73,9 @@ func (cs *Checksum) SetTimestamps() {
 
 func (cs *Checksum) BeforeSave() error {
 	// TODO: Validate
+	return nil
+}
+
+func (cs *Checksum) GetValidationErrors(validator.ValidationErrors) map[string]string {
 	return nil
 }

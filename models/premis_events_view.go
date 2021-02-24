@@ -5,6 +5,7 @@ import (
 
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
+	"github.com/go-playground/validator/v10"
 )
 
 type PremisEventsView struct {
@@ -77,6 +78,10 @@ func (event *PremisEventsView) SetTimestamps() {
 
 func (event *PremisEventsView) BeforeSave() error {
 	// No-op
+	return nil
+}
+
+func (event *PremisEventsView) GetValidationErrors(validator.ValidationErrors) map[string]string {
 	return nil
 }
 

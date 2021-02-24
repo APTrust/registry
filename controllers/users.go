@@ -26,6 +26,7 @@ func UserCreate(c *gin.Context) {
 	user := &models.User{}
 	templateData["user"] = user
 	if err := c.ShouldBind(user); err != nil {
+		PrintValidationErrors(err)
 		templateData["error"] = err.Error()
 		c.HTML(http.StatusBadRequest, template, templateData)
 		return

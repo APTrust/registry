@@ -5,6 +5,7 @@ import (
 
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
+	"github.com/go-playground/validator/v10"
 )
 
 /*
@@ -105,6 +106,10 @@ func (user *User) SetTimestamps() {
 
 func (user *User) BeforeSave() error {
 	// TODO: Validate
+	return nil
+}
+
+func (user *User) GetValidationErrors(validator.ValidationErrors) map[string]string {
 	return nil
 }
 

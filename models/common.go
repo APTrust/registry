@@ -1,5 +1,9 @@
 package models
 
+import (
+	"github.com/go-playground/validator/v10"
+)
+
 type Model interface {
 	GetID() int64
 	Authorize(*User, string) error
@@ -11,4 +15,5 @@ type Model interface {
 	ClearSoftDeleteAttributes()
 	SetTimestamps()
 	BeforeSave() error
+	GetValidationErrors(validator.ValidationErrors) map[string]string
 }

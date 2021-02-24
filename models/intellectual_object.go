@@ -5,6 +5,7 @@ import (
 
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
+	"github.com/go-playground/validator/v10"
 )
 
 type IntellectualObject struct {
@@ -80,5 +81,9 @@ func (obj *IntellectualObject) SetTimestamps() {
 
 func (obj *IntellectualObject) BeforeSave() error {
 	// TODO: Validate
+	return nil
+}
+
+func (obj *IntellectualObject) GetValidationErrors(validator.ValidationErrors) map[string]string {
 	return nil
 }

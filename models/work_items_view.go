@@ -5,6 +5,7 @@ import (
 
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
+	"github.com/go-playground/validator/v10"
 )
 
 type WorkItemsView struct {
@@ -84,6 +85,10 @@ func (item *WorkItemsView) SetTimestamps() {
 
 func (item *WorkItemsView) BeforeSave() error {
 	// No-op
+	return nil
+}
+
+func (item *WorkItemsView) GetValidationErrors(validator.ValidationErrors) map[string]string {
 	return nil
 }
 

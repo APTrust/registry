@@ -3,6 +3,7 @@ package models
 import (
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
+	"github.com/go-playground/validator/v10"
 )
 
 type StorageRecord struct {
@@ -60,5 +61,9 @@ func (sr *StorageRecord) SetTimestamps() {
 
 func (sr *StorageRecord) BeforeSave() error {
 	// TODO: Validate
+	return nil
+}
+
+func (sr *StorageRecord) GetValidationErrors(validator.ValidationErrors) map[string]string {
 	return nil
 }

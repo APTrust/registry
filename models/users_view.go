@@ -5,6 +5,7 @@ import (
 
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
+	"github.com/go-playground/validator/v10"
 )
 
 type UserView struct {
@@ -99,6 +100,10 @@ func (user *UserView) SetTimestamps() {
 
 func (user *UserView) BeforeSave() error {
 	// No-op
+	return nil
+}
+
+func (user *UserView) GetValidationErrors(validator.ValidationErrors) map[string]string {
 	return nil
 }
 
