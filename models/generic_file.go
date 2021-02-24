@@ -5,7 +5,6 @@ import (
 
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
-	"github.com/go-playground/validator/v10"
 )
 
 type GenericFile struct {
@@ -78,6 +77,6 @@ func (gf *GenericFile) BeforeSave() error {
 	return nil
 }
 
-func (gf *GenericFile) GetValidationErrors(validator.ValidationErrors) map[string]string {
+func (gf *GenericFile) GetValidationErrors(map[string]interface{}) map[string]string {
 	return nil
 }

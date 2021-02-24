@@ -5,7 +5,6 @@ import (
 
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
-	"github.com/go-playground/validator/v10"
 )
 
 type UserView struct {
@@ -103,7 +102,7 @@ func (user *UserView) BeforeSave() error {
 	return nil
 }
 
-func (user *UserView) GetValidationErrors(validator.ValidationErrors) map[string]string {
+func (user *UserView) GetValidationErrors(map[string]interface{}) map[string]string {
 	return nil
 }
 

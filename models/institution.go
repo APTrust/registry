@@ -5,7 +5,6 @@ import (
 
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
-	"github.com/go-playground/validator/v10"
 )
 
 type Institution struct {
@@ -78,6 +77,6 @@ func (inst *Institution) BeforeSave() error {
 	return nil
 }
 
-func (inst *Institution) GetValidationErrors(validator.ValidationErrors) map[string]string {
+func (inst *Institution) GetValidationErrors(map[string]interface{}) map[string]string {
 	return nil
 }

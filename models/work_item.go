@@ -5,7 +5,6 @@ import (
 
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
-	"github.com/go-playground/validator/v10"
 )
 
 type WorkItem struct {
@@ -89,7 +88,7 @@ func (item *WorkItem) BeforeSave() error {
 	return nil
 }
 
-func (item *WorkItem) GetValidationErrors(validator.ValidationErrors) map[string]string {
+func (item *WorkItem) GetValidationErrors(map[string]interface{}) map[string]string {
 	return nil
 }
 

@@ -5,7 +5,6 @@ import (
 
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
-	"github.com/go-playground/validator/v10"
 )
 
 type PremisEvent struct {
@@ -80,6 +79,6 @@ func (event *PremisEvent) BeforeSave() error {
 	return nil
 }
 
-func (event *PremisEvent) GetValidationErrors(validator.ValidationErrors) map[string]string {
+func (event *PremisEvent) GetValidationErrors(map[string]interface{}) map[string]string {
 	return nil
 }
