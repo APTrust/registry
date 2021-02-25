@@ -6,24 +6,24 @@
 
 <form action="{{ .formAction }}" method="post">
 
-  <input type="text" name="name" value="{{ .user.Name }}" placeholder="Name" minlength="2" required>
+  <input type="text" name="Name" value="{{ .user.Name }}" placeholder="Name" minlength="2" required>
   {{ template "forms/error.html" .validationErrors.Name }}
 
-  <input type="email" name="email" value="{{ .user.Email }}" placeholder="Email address" required>
+  <input type="email" name="Email" value="{{ .user.Email }}" placeholder="Email address" required>
   {{ template "forms/error.html" .validationErrors.Email }}
 
-  {{ template "forms/tel.html" dict "name" "phone_number" "value" .user.PhoneNumber }}
+  {{ template "forms/tel.html" dict "name" "PhoneNumber" "value" .user.PhoneNumber }}
   {{ template "forms/error.html" .validationErrors.PhoneNumber }}
 
 
-  <input type="checkbox" name="otp_required_for_login" id="otp_required_for_login" value="true" {{ if .user.OTPRequiredForLogin }}checked{{ end }}><label for="otp_required_for_login">Require two-factor authentication</label>
+  <input type="checkbox" name="OTPRequiredForLogin" value="true" {{ if .user.OTPRequiredForLogin }}checked{{ end }}><label for="OTPRequiredForLogin">Require two-factor authentication</label>
 
-  Must enable 2FA by <input type="date" id="grace_period" name="grace_period"
+  Must enable 2FA by <input type="date" name="GracePeriod"
          value="{{ .user.GracePeriod }}"
          min="2021-01-01" max="2099-12-31" placeholder="yyyy-mm-dd">
   {{ template "forms/error.html" .validationErrors.GracePeriod }}
 
-  Institution <select id="institution_id" name="institution_id" required>
+  Institution <select name="InstitutionID" required>
     <option value="">Choose One</option>
     {{ $selectedID := .selectedID }}
     {{ range $index, $option := .institutionOptions }}
@@ -32,7 +32,7 @@
   </select>
   {{ template "forms/error.html" .validationErrors.InstitutionID }}
 
-  Role <select id="role" name="role" required>
+  Role <select name="Role" required>
     <option value="">Choose One</option>
     {{ range $index, $option := .roles }}
     <option value="{{ $option.Value }}" {{ if eq $user.Role $option.Value }}selected{{ end }}>{{ $option.Text }}</option>

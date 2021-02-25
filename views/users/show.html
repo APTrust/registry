@@ -30,7 +30,7 @@
 
 <h3>Two Factor Authentication</h3>
 <div class="row">
-  <div class="column">Required: {{ yesNo .user.Institution.OTPEnabled }}</div>
+  <div class="column">Required: {{ yesNo .user.OTPRequiredForLogin }}</div>
   <div class="column">Enabled: {{ yesNo .user.EnabledTwoFactor }}</div>
   <div class="column">Confirmed: {{ yesNo .user.ConfirmedTwoFactor }}</div>
   <div class="column">Required By: {{ dateUS .user.GracePeriod }}</div>
