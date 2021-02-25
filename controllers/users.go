@@ -14,11 +14,6 @@ import (
 // UserCreate a new user. Handles submission of new user form.
 // POST /users/new
 func UserCreate(c *gin.Context) {
-	// Bind form to user
-	// Validate
-	// If OK, save and redirect to index with flash message.
-	// If invalid, redisplay form.
-	// For other errors (permissions, etc), show error page.
 	currentUser := helpers.CurrentUser(c)
 	ds := models.NewDataStore(currentUser)
 	template := "users/form.html"
@@ -53,11 +48,6 @@ func UserCreate(c *gin.Context) {
 func UserDelete(c *gin.Context) {
 
 }
-
-// TODO: Query users_view instead.
-// Allow filtering on name, email, institution, role, deactivated.
-// Allow sorting on name, email, institution, created,
-// updated, current sign in, last sign in,
 
 // UserIndex shows list of users.
 // GET /users
@@ -151,6 +141,7 @@ func UserShow(c *gin.Context) {
 		return
 	}
 	templateData["user"] = user
+	templateData["flash"] = c.Query("flash")
 	c.HTML(http.StatusOK, "users/show.html", templateData)
 }
 
