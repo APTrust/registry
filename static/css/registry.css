@@ -31,7 +31,7 @@ div.flash {
     margin-bottom: 1.5rem;
 }
 
-.validation-error {
+.form-error {
     color: red;
     margin: -0.5rem 1rem 1rem 1rem;
     font-size: 1.4rem;

@@ -17,7 +17,7 @@ import (
 // User is a person who can log in and do stuff.
 type User struct {
 	ID                     int64        `json:"id" form:"id" pg:"id"`
-	Name                   string       `json:"name" form:"name" pg:"name" binding:"required,min=2,max=10"`
+	Name                   string       `json:"name" form:"name" pg:"name" binding:"required,min=2,max=100"`
 	Email                  string       `json:"email" form:"email" pg:"email" binding:"required,email"`
 	PhoneNumber            string       `json:"phone_number" form:"phone_number" pg:"phone_number"`
 	CreatedAt              time.Time    `json:"created_at" form:"-" pg:"created_at"`
