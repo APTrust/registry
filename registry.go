@@ -26,6 +26,7 @@ func initTemplates(router *gin.Engine) {
 	router.SetFuncMap(template.FuncMap{
 		"dateISO":    helpers.DateISO,
 		"dateUS":     helpers.DateUS,
+		"dict":       helpers.Dict,
 		"eqStrInt":   helpers.EqStrInt,
 		"eqStrInt64": helpers.EqStrInt64,
 		"truncate":   helpers.Truncate,

@@ -12,7 +12,7 @@
   <input type="email" name="email" value="{{ .user.Email }}" placeholder="Email address" required>
   {{ template "forms/error.html" .validationErrors.Email }}
 
-  <input type="tel" name="phone_number" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" value="{{ .user.PhoneNumber }}" placeholder="Phone in format 212-555-1212" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}">
+  {{ template "forms/tel.html" dict "name" "phone_number" "value" .user.PhoneNumber }}
   {{ template "forms/error.html" .validationErrors.PhoneNumber }}
 
 
