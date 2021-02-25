@@ -1,0 +1,87 @@
+package forms
+
+import (
+	"github.com/APTrust/registry/models"
+	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
+)
+
+type UserForm struct {
+	Form
+	User        *models.User
+	instOptions []ListOption
+}
+
+var UserFormErrors = map[string]string{
+	"Name":          "Name must contain at least two letters.",
+	"Email":         "Valid email address required.",
+	"PhoneNumber":   "Please enter a phone number in format 000-000-0000.",
+	"InstitutionID": "Please select an institution.",
+	"Role":          "Please choose a role for this user.",
+}
+
+func NewUserForm(ds *models.DataStore, user *models.User) (*UserForm, error) {
+	var err error
+	userForm := &UserForm{
+		Form: NewForm(ds),
+		User: user,
+	}
+	userForm.instOptions, err = ListInstitutions(ds)
+	if err != nil {
+		return nil, err
+	}
+	userForm.init()
+	return userForm, err
+}
+
+func (f *UserForm) init() {
+	f.Fields["Name"] = &Field{
+		Name:  "Name",
+		Label: "Name",
+		Value: f.User.Name,
+	}
+	f.Fields["Email"] = &Field{
+		Name:  "Email",
+		Label: "Email",
+		Value: f.User.Email,
+	}
+	f.Fields["PhoneNumber"] = &Field{
+		Name:  "PhoneNumber",
+		Label: "PhoneNumber",
+		Value: f.User.PhoneNumber,
+	}
+	f.Fields["OTPRequiredForLogin"] = &Field{
+		Name:  "OTPRequiredForLogin",
+		Label: "OTP Required For Login",
+		Value: f.User.OTPRequiredForLogin,
+	}
+	f.Fields["GracePeriod"] = &Field{
+		Name:  "GracePeriod",
+		Label: "Grace Period",
+		Value: f.User.GracePeriod,
+	}
+	f.Fields["InstitutionID"] = &Field{
+		Name:    "InstitutionID",
+		Label:   "Institution",
+		Value:   f.User.InstitutionID,
+		Options: f.instOptions,
+	}
+	f.Fields["Role"] = &Field{
+		Name:  "Role",
+		Label: "Role",
+		Value: f.User.Role,
+	}
+}
+
+func (f *UserForm) Bind(c *gin.Context) error {
+	err := c.ShouldBind(f.User)
+	if err != nil {
+		if _, ok := err.(validator.ValidationErrors); ok {
+			for _, fieldErr := range err.(validator.ValidationErrors) {
+				f.Fields[fieldErr.Field()].Error = UserFormErrors[fieldErr.Field()]
+			}
+		}
+	}
+	f.init() // set field values to parsed User values
+	return err
+}

@@ -1,4 +1,4 @@
-package controllers
+package forms
 
 import (
 	"strconv"
@@ -6,11 +6,6 @@ import (
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/models"
 )
-
-type ListOption struct {
-	Value string
-	Text  string
-}
 
 // RolesList is a list of assignable user roles. Hard-coded instead
 // of using Options() function for formatting reasons and because we

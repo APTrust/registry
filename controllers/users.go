@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/APTrust/registry/constants"
+	"github.com/APTrust/registry/forms"
 	"github.com/APTrust/registry/helpers"
 	"github.com/APTrust/registry/models"
 	"github.com/gin-gonic/gin"
@@ -20,8 +21,8 @@ func UserCreate(c *gin.Context) {
 	templateData := helpers.TemplateVars(c)
 	user := &models.User{}
 	templateData["user"] = user
-	templateData["roles"] = RolesList
-	institutionOptions, err := ListInstitutions(ds)
+	templateData["roles"] = forms.RolesList
+	institutionOptions, err := forms.ListInstitutions(ds)
 	if AbortIfError(c, err) {
 		return
 	}
@@ -71,7 +72,7 @@ func UserIndex(c *gin.Context) {
 	templateData["users"] = users
 
 	// Get institutions for filter list
-	institutionOptions, err := ListInstitutions(ds)
+	institutionOptions, err := forms.ListInstitutions(ds)
 	if AbortIfError(c, err) {
 		return
 	}
@@ -88,8 +89,8 @@ func UserNew(c *gin.Context) {
 	template := "users/form.html"
 	templateData := helpers.TemplateVars(c)
 	templateData["user"] = &models.User{}
-	templateData["roles"] = RolesList
-	institutionOptions, err := ListInstitutions(ds)
+	templateData["roles"] = forms.RolesList
+	institutionOptions, err := forms.ListInstitutions(ds)
 	if AbortIfError(c, err) {
 		return
 	}
