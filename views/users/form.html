@@ -7,28 +7,21 @@
 <form action="{{ .formAction }}" method="post">
 
   <input type="text" name="name" value="{{ .user.Name }}" placeholder="Name" minlength="2" required>
-  {{ if .validationErrors.Name }}<div class="row form-error">{{ .validationErrors.Name }}</div>{{ end }}
+  {{ template "forms/error.html" .validationErrors.Name }}
 
   <input type="email" name="email" value="{{ .user.Email }}" placeholder="Email address" required>
-  {{ if .validationErrors.Email }}<div class="row form-error">{{ .validationErrors.Email }}</div>{{ end }}
+  {{ template "forms/error.html" .validationErrors.Email }}
 
   <input type="tel" name="phone_number" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" value="{{ .user.PhoneNumber }}" placeholder="Phone in format 212-555-1212" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}">
-  {{ if .validationErrors.PhoneNumber }}<div class="row form-error">{{ .validationErrors.PhoneNumber }}</div>{{ end }}
+  {{ template "forms/error.html" .validationErrors.PhoneNumber }}
+
 
   <input type="checkbox" name="otp_required_for_login" id="otp_required_for_login" value="true" {{ if .user.OTPRequiredForLogin }}checked{{ end }}><label for="otp_required_for_login">Require two-factor authentication</label>
 
   Must enable 2FA by <input type="date" id="grace_period" name="grace_period"
          value="{{ .user.GracePeriod }}"
          min="2021-01-01" max="2099-12-31" placeholder="yyyy-mm-dd">
-  {{ if .validationErrors.GracePeriod }}<div class="row form-error">{{ .validationErrors.GracePeriod }}</div>{{ end }}
-
-  Role <select id="role" name="role" required>
-    <option value="">Choose One</option>
-    {{ range $index, $option := .roles }}
-    <option value="{{ $option.Value }}" {{ if eq $user.Role $option.Value }}selected{{ end }}>{{ $option.Text }}</option>
-    {{ end }}
-  </select>
-  {{ if .validationErrors.Role }}<div class="row form-error">{{ .validationErrors.Role }}</div>{{ end }}
+  {{ template "forms/error.html" .validationErrors.GracePeriod }}
 
   Institution <select id="institution_id" name="institution_id" required>
     <option value="">Choose One</option>
@@ -37,7 +30,15 @@
     <option value="{{ $option.Value }}" {{ if eqStrInt64 $option.Value $user.InstitutionID }}selected{{ end }}>{{ $option.Text }}</option>
     {{ end }}
   </select>
-  {{ if .validationErrors.InstitutionID }}<div class="row form-error">{{ .validationErrors.InstitutionID }}</div>{{ end }}
+  {{ template "forms/error.html" .validationErrors.InstitutionID }}
+
+  Role <select id="role" name="role" required>
+    <option value="">Choose One</option>
+    {{ range $index, $option := .roles }}
+    <option value="{{ $option.Value }}" {{ if eq $user.Role $option.Value }}selected{{ end }}>{{ $option.Text }}</option>
+    {{ end }}
+  </select>
+  {{ template "forms/error.html" .validationErrors.Role }}
 
   <div class="sign-in-submit">
     <input type="submit" value="Submit">
