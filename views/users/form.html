@@ -2,43 +2,21 @@
 
 {{ template "shared/header.html" .}}
 
-{{ $user := .user }}
-
 <form action="{{ .formAction }}" method="post">
 
-  <input type="text" name="Name" value="{{ .user.Name }}" placeholder="Name" minlength="2" required>
-  {{ template "forms/error.html" .validationErrors.Name }}
+  {{ template "forms/text_input.html" .form.Fields.Name }}
 
-  <input type="email" name="Email" value="{{ .user.Email }}" placeholder="Email address" required>
-  {{ template "forms/error.html" .validationErrors.Email }}
+  {{ template "forms/email.html" .form.Fields.Email }}
 
-  {{ template "forms/tel.html" dict "name" "PhoneNumber" "value" .user.PhoneNumber }}
-  {{ template "forms/error.html" .validationErrors.PhoneNumber }}
+  {{ template "forms/tel.html" .form.Fields.PhoneNumber }}
 
+  {{ template "forms/checkbox.html" .form.Fields.OTPRequiredForLogin }}
 
-  <input type="checkbox" name="OTPRequiredForLogin" value="true" {{ if .user.OTPRequiredForLogin }}checked{{ end }}><label for="OTPRequiredForLogin">Require two-factor authentication</label>
+  {{ template "forms/date.html" .form.Fields.GracePeriod }}
 
-  Must enable 2FA by <input type="date" name="GracePeriod"
-         value="{{ .user.GracePeriod }}"
-         min="2021-01-01" max="2099-12-31" placeholder="yyyy-mm-dd">
-  {{ template "forms/error.html" .validationErrors.GracePeriod }}
+  {{ template "forms/select.html" .form.Fields.InstitutionID }}
 
-  Institution <select name="InstitutionID" required>
-    <option value="">Choose One</option>
-    {{ $selectedID := .selectedID }}
-    {{ range $index, $option := .institutionOptions }}
-    <option value="{{ $option.Value }}" {{ if eqStrInt64 $option.Value $user.InstitutionID }}selected{{ end }}>{{ $option.Text }}</option>
-    {{ end }}
-  </select>
-  {{ template "forms/error.html" .validationErrors.InstitutionID }}
-
-  Role <select name="Role" required>
-    <option value="">Choose One</option>
-    {{ range $index, $option := .roles }}
-    <option value="{{ $option.Value }}" {{ if eq $user.Role $option.Value }}selected{{ end }}>{{ $option.Text }}</option>
-    {{ end }}
-  </select>
-  {{ template "forms/error.html" .validationErrors.Role }}
+  {{ template "forms/select.html" .form.Fields.Role }}
 
   <div class="sign-in-submit">
     <input type="submit" value="Submit">

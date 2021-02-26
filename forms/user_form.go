@@ -45,7 +45,7 @@ func (f *UserForm) init() {
 	}
 	f.Fields["Email"] = &Field{
 		Name:        "Email",
-		Placeholder: "Email",
+		Placeholder: "Email Address",
 		Value:       f.User.Email,
 		Attrs: map[string]string{
 			"required": "",
@@ -68,7 +68,7 @@ func (f *UserForm) init() {
 		Name:        "GracePeriod",
 		Label:       "Must enable two-factor auth by",
 		Placeholder: "mm/dd/yyyy",
-		Value:       f.User.GracePeriod,
+		Value:       f.User.GracePeriod.Format("2006-01-02"),
 		Attrs: map[string]string{
 			"min": "2021-01-01",
 			"max": "2099-12-31",
@@ -103,6 +103,22 @@ func (f *UserForm) Bind(c *gin.Context) error {
 			}
 		}
 	}
-	f.init() // set field values to parsed User values
+	f.setValues()
 	return err
+}
+
+// setValues sets the form values to match the User values.
+// This is done in init(), when we first create the form, but it needs
+// to be done again when we parse the user-submitted form. If some of
+// the user-supplied values are invalid, we need to present the form
+// to them again, with validation error messages. The form should have
+// all of their saved inputs. Hence this function.
+func (f *UserForm) setValues() {
+	f.Fields["Name"].Value = f.User.Name
+	f.Fields["Email"].Value = f.User.Email
+	f.Fields["PhoneNumber"].Value = f.User.PhoneNumber
+	f.Fields["OTPRequiredForLogin"].Value = f.User.OTPRequiredForLogin
+	f.Fields["GracePeriod"].Value = f.User.GracePeriod.Format("2006-01-02")
+	f.Fields["InstitutionID"].Value = f.User.InstitutionID
+	f.Fields["Role"].Value = f.User.Role
 }

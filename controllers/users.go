@@ -19,28 +19,26 @@ func UserCreate(c *gin.Context) {
 	ds := models.NewDataStore(currentUser)
 	template := "users/form.html"
 	templateData := helpers.TemplateVars(c)
-	user := &models.User{}
-	templateData["user"] = user
-	templateData["roles"] = forms.RolesList
-	institutionOptions, err := forms.ListInstitutions(ds)
+
+	form, err := forms.NewUserForm(ds, &models.User{})
 	if AbortIfError(c, err) {
 		return
 	}
-	templateData["institutionOptions"] = institutionOptions
-	if err := c.ShouldBind(user); err != nil {
-		errMessages := ValidationErrors(err, user)
-		if errMessages != nil {
-			templateData["validationErrors"] = errMessages
-		}
-		templateData["error"] = err.Error()
+	err = form.Bind(c)
+	templateData["form"] = form
+
+	// If validation error, re-display the form with error messages.
+	if err != nil {
 		c.HTML(http.StatusBadRequest, template, templateData)
 		return
 	}
-	err = ds.UserSave(user)
+
+	// If no validation error, save the user and redirect.
+	err = ds.UserSave(form.User)
 	if AbortIfError(c, err) {
 		return
 	}
-	location := fmt.Sprintf("/users/show/%d?flash=User+created", user.ID)
+	location := fmt.Sprintf("/users/show/%d?flash=User+created", form.User.ID)
 	c.Redirect(http.StatusSeeOther, location)
 }
 
@@ -88,13 +86,11 @@ func UserNew(c *gin.Context) {
 	ds := models.NewDataStore(currentUser)
 	template := "users/form.html"
 	templateData := helpers.TemplateVars(c)
-	templateData["user"] = &models.User{}
-	templateData["roles"] = forms.RolesList
-	institutionOptions, err := forms.ListInstitutions(ds)
+	form, err := forms.NewUserForm(ds, &models.User{})
 	if AbortIfError(c, err) {
 		return
 	}
-	templateData["institutionOptions"] = institutionOptions
+	templateData["form"] = form
 	c.HTML(http.StatusOK, template, templateData)
 }
 

@@ -2,7 +2,6 @@ package helpers
 
 import (
 	"fmt"
-	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -74,32 +73,10 @@ func YesNo(value bool) string {
 	return "No"
 }
 
-// EqStrInt compares a string to an int and returns true if the int's
-// string value matches str.
-func EqStrInt(strValue string, intValue int) bool {
-	return strValue == strconv.Itoa(intValue)
-}
-
-// EqStrInt64 compares a string to an int and returns true if the int's
-// string value matches str.
-func EqStrInt64(strValue string, int64Value int64) bool {
-	return strValue == strconv.FormatInt(int64Value, 10)
-}
-
-// Dict takes a list of pairs in the form string, interface{},
-// string, interface{}... and returns a map of [string]interface.
-// This allows us to pass custom maps as params to nested templates.
-func Dict(values ...interface{}) (map[string]interface{}, error) {
-	if len(values)%2 != 0 {
-		return nil, fmt.Errorf("wrong number of params, expected pairs")
-	}
-	dict := make(map[string]interface{}, len(values)/2)
-	for i := 0; i < len(values); i += 2 {
-		key, ok := values[i].(string)
-		if !ok {
-			return nil, fmt.Errorf("dict keys must be strings")
-		}
-		dict[key] = values[i+1]
-	}
-	return dict, nil
+// StrEq compares the string representation of two values and returns
+// true if they are equal.
+func StrEq(val1, val2 interface{}) bool {
+	str1 := fmt.Sprintf("%v", val1)
+	str2 := fmt.Sprintf("%v", val2)
+	return str1 == str2
 }

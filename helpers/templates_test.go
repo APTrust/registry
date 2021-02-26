@@ -36,12 +36,18 @@ func TestDateISO(t *testing.T) {
 	assert.Equal(t, "2021-04-16", helpers.DateISO(testDate))
 }
 
-func TestEqStrInt(t *testing.T) {
-	assert.True(t, helpers.EqStrInt64("200", 200))
-	assert.False(t, helpers.EqStrInt64("200", 909))
-}
+func TestStrEq(t *testing.T) {
+	assert.True(t, helpers.StrEq("4", int8(4)))
+	assert.True(t, helpers.StrEq("200", int16(200)))
+	assert.True(t, helpers.StrEq("200", int32(200)))
+	assert.True(t, helpers.StrEq("200", int64(200)))
 
-func TestEqStrInt64(t *testing.T) {
-	assert.True(t, helpers.EqStrInt64("200", int64(200)))
-	assert.False(t, helpers.EqStrInt64("200", int64(909)))
+	assert.True(t, helpers.StrEq("true", true))
+	assert.True(t, helpers.StrEq("true", "true"))
+	assert.True(t, helpers.StrEq(true, true))
+	assert.True(t, helpers.StrEq(true, "true"))
+	assert.True(t, helpers.StrEq(false, "false"))
+
+	assert.False(t, helpers.StrEq("true", false))
+	assert.False(t, helpers.StrEq("200", 909))
 }
