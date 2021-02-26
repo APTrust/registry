@@ -1,0 +1,3 @@
+{{ define "forms/attrs.html" }}
+{{ range $key, $value := .Attrs }}{{ $key }}{{ if $value }}="{{ $value }}"{{ end }} {{ end }}
+{{ end }}

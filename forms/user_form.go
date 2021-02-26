@@ -36,19 +36,28 @@ func NewUserForm(ds *models.DataStore, user *models.User) (*UserForm, error) {
 
 func (f *UserForm) init() {
 	f.Fields["Name"] = &Field{
-		Name:  "Name",
-		Label: "Name",
-		Value: f.User.Name,
+		Name:        "Name",
+		Placeholder: "Name",
+		Value:       f.User.Name,
+		Attrs: map[string]string{
+			"required": "",
+		},
 	}
 	f.Fields["Email"] = &Field{
-		Name:  "Email",
-		Label: "Email",
-		Value: f.User.Email,
+		Name:        "Email",
+		Placeholder: "Email",
+		Value:       f.User.Email,
+		Attrs: map[string]string{
+			"required": "",
+		},
 	}
 	f.Fields["PhoneNumber"] = &Field{
-		Name:  "PhoneNumber",
-		Label: "PhoneNumber",
-		Value: f.User.PhoneNumber,
+		Name:        "PhoneNumber",
+		Placeholder: "Phone in format 212-555-1212",
+		Value:       f.User.PhoneNumber,
+		Attrs: map[string]string{
+			"pattern": "[0-9]{3}-[0-9]{3}-[0-9]{4}",
+		},
 	}
 	f.Fields["OTPRequiredForLogin"] = &Field{
 		Name:  "OTPRequiredForLogin",
@@ -56,20 +65,32 @@ func (f *UserForm) init() {
 		Value: f.User.OTPRequiredForLogin,
 	}
 	f.Fields["GracePeriod"] = &Field{
-		Name:  "GracePeriod",
-		Label: "Grace Period",
-		Value: f.User.GracePeriod,
+		Name:        "GracePeriod",
+		Label:       "Must enable two-factor auth by",
+		Placeholder: "mm/dd/yyyy",
+		Value:       f.User.GracePeriod,
+		Attrs: map[string]string{
+			"min": "2021-01-01",
+			"max": "2099-12-31",
+		},
 	}
 	f.Fields["InstitutionID"] = &Field{
 		Name:    "InstitutionID",
 		Label:   "Institution",
 		Value:   f.User.InstitutionID,
 		Options: f.instOptions,
+		Attrs: map[string]string{
+			"required": "",
+		},
 	}
 	f.Fields["Role"] = &Field{
-		Name:  "Role",
-		Label: "Role",
-		Value: f.User.Role,
+		Name:    "Role",
+		Label:   "Role",
+		Value:   f.User.Role,
+		Options: RolesList,
+		Attrs: map[string]string{
+			"required": "",
+		},
 	}
 }
 

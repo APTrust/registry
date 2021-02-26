@@ -1,3 +1,7 @@
 {{ define "forms/tel.html" }}
-  <input type="tel" name="{{ .name }}" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" value="{{ .value }}" placeholder="Phone in format 212-555-1212" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}">
+
+<input type="tel" name="{{ .Name }}" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" value="{{ .Value }}" placeholder="{{ .Placeholder }}" {{ template "forms/attrs.html" . }}>
+
+{{ if .Error }}<div class="row form-error">{{ .Error }}</div>{{ end }}
+
 {{ end }}

@@ -1,0 +1,7 @@
+{{ define "forms/email.html" }}
+
+<input type="email" name="Email" value="{{ .user.Email }}" placeholder="Email address" {{ template "forms/attrs.html" . }}>
+
+{{ if .Error }}<div class="row form-error">{{ .Error }}</div>{{ end }}
+
+{{ end }}

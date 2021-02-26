@@ -1,0 +1,14 @@
+{{ define "forms/select.html" }}
+
+{{ $value := .Value }}
+
+<select name="{{ .Name }}" {{ template "forms/attrs.html" . }}>
+    <option value="">Choose One</option>
+    {{ range $index, $option := .Options }}
+    <option value="{{ $option.Value }}" {{ if eq $value $option.Value }}selected{{ end }}>{{ $option.Text }}</option>
+    {{ end }}
+</select>
+
+{{ if .Error }}<div class="row form-error">{{ .Error }}</div>{{ end }}
+
+{{ end }}

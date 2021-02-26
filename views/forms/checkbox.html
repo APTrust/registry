@@ -1,0 +1,7 @@
+{{ define "forms/checkbox.html" }}
+
+<input type="checkbox" name="{{ .Name }}" value="true" {{ if .Value }}checked{{ end }}  {{ template "forms/attrs.html" . }}><label for="{{ .Name }}" >{{ .Label }}</label>
+
+{{ if .Error }}<div class="row form-error">{{ .Error }}</div>{{ end }}
+
+{{ end }}
