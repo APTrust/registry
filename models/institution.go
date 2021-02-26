@@ -76,7 +76,3 @@ func (inst *Institution) BeforeSave() error {
 	// TODO: Validate
 	return nil
 }
-
-func (inst *Institution) GetValidationErrors(map[string]interface{}) map[string]string {
-	return nil
-}

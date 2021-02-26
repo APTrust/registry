@@ -62,7 +62,3 @@ func (sr *StorageRecord) BeforeSave() error {
 	// TODO: Validate
 	return nil
 }
-
-func (sr *StorageRecord) GetValidationErrors(map[string]interface{}) map[string]string {
-	return nil
-}

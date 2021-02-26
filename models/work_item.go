@@ -88,10 +88,6 @@ func (item *WorkItem) BeforeSave() error {
 	return nil
 }
 
-func (item *WorkItem) GetValidationErrors(map[string]interface{}) map[string]string {
-	return nil
-}
-
 func WorkItemFind(id int64) (*WorkItem, error) {
 	ctx := common.Context()
 	item := &WorkItem{ID: id}

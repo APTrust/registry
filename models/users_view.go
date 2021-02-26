@@ -102,10 +102,6 @@ func (user *UserView) BeforeSave() error {
 	return nil
 }
 
-func (user *UserView) GetValidationErrors(map[string]interface{}) map[string]string {
-	return nil
-}
-
 func UserViewFind(id int64) (*UserView, error) {
 	ctx := common.Context()
 	user := &UserView{ID: id}

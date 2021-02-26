@@ -11,5 +11,4 @@ type Model interface {
 	ClearSoftDeleteAttributes()
 	SetTimestamps()
 	BeforeSave() error
-	GetValidationErrors(map[string]interface{}) map[string]string
 }

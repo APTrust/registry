@@ -80,10 +80,6 @@ func (event *PremisEventsView) BeforeSave() error {
 	return nil
 }
 
-func (event *PremisEventsView) GetValidationErrors(map[string]interface{}) map[string]string {
-	return nil
-}
-
 func PremisEventsViewFind(id int64) (*PremisEventsView, error) {
 	ctx := common.Context()
 	event := &PremisEventsView{ID: id}

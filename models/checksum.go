@@ -74,7 +74,3 @@ func (cs *Checksum) BeforeSave() error {
 	// TODO: Validate
 	return nil
 }
-
-func (cs *Checksum) GetValidationErrors(map[string]interface{}) map[string]string {
-	return nil
-}
