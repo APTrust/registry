@@ -5,9 +5,7 @@ import (
 	"time"
 
 	"github.com/APTrust/registry/helpers"
-	"github.com/APTrust/registry/models"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 var testDate, _ = time.Parse(time.RFC3339, "2021-04-16T15:04:05Z")

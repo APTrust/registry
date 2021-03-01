@@ -4,39 +4,19 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/forms"
 	"github.com/APTrust/registry/helpers"
 	"github.com/APTrust/registry/models"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 // UserCreate a new user. Handles submission of new user form.
 // POST /users/new
 func UserCreate(c *gin.Context) {
-	r := NewRequest(c)
-	template := "users/form.html"
-
-	form, err := forms.NewUserForm(r.DataStore, &models.User{})
-	if AbortIfError(c, err) {
-		return
-	}
-	form.Action = "/users/new"
-	r.TemplateData["form"] = form
-	err = form.Bind(c)
-	// If validation error, re-display the form with error messages.
-	if err != nil {
-		c.HTML(http.StatusBadRequest, template, r.TemplateData)
-		return
-	}
-
-	// If no validation error, save the user and redirect.
-	err = r.DataStore.UserSave(form.User)
-	if AbortIfError(c, err) {
-		return
-	}
-	location := fmt.Sprintf("/users/show/%d?flash=User+created", form.User.ID)
-	c.Redirect(http.StatusSeeOther, location)
+	saveUserFromForm(c, &models.User{})
 }
 
 // UserDelete deletes a user.
@@ -104,7 +84,12 @@ func UserShow(c *gin.Context) {
 // UserUpdate saves changes to an exiting user.
 // PUT /users/edit/:id
 func UserUpdate(c *gin.Context) {
-
+	r := NewRequest(c)
+	user, err := r.DataStore.UserFind(r.ID)
+	if AbortIfError(c, err) {
+		return
+	}
+	saveUserFromForm(c, user)
 }
 
 // UserEdit shows a form to edit an exiting user.
@@ -187,4 +172,45 @@ func getIndexQuery(c *gin.Context) (*models.Query, error) {
 		fc.Add(key, c.QueryArray(key))
 	}
 	return fc.ToQuery()
+}
+
+func saveUserFromForm(c *gin.Context, userToEdit *models.User) {
+	r := NewRequest(c)
+	form, err := forms.NewUserForm(r.DataStore, userToEdit)
+	if AbortIfError(c, err) {
+		return
+	}
+
+	template := "users/form.html"
+	form.Action = "/users/new"
+	if userToEdit.ID > 0 {
+		form.Action = fmt.Sprintf("/users/edit/%d", userToEdit.ID)
+	} else {
+		// Assign random password to new user. They'll get an email
+		// asking them to reset their password.
+		encPwd, err := common.EncryptPassword(uuid.New().String())
+		if AbortIfError(c, err) {
+			return
+		}
+		userToEdit.EncryptedPassword = encPwd
+	}
+
+	r.TemplateData["form"] = form
+	err = form.Bind(c)
+	// If validation error, re-display the form with error messages.
+	if err != nil {
+		c.HTML(http.StatusBadRequest, template, r.TemplateData)
+		return
+	}
+
+	fmt.Println("Form User:", form.User)
+	fmt.Println("DB User:  ", userToEdit)
+
+	// If no validation error, save the user and redirect.
+	err = r.DataStore.UserSave(form.User)
+	if AbortIfError(c, err) {
+		return
+	}
+	location := fmt.Sprintf("/users/show/%d?flash=User+saved", form.User.ID)
+	c.Redirect(http.StatusSeeOther, location)
 }
