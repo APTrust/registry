@@ -2,7 +2,7 @@
 
 {{ template "shared/header.html" .}}
 
-<form action="{{ .formAction }}" method="post">
+<form action="{{ .form.Action }}" method="post">
 
   {{ template "forms/text_input.html" .form.Fields.Name }}
 

@@ -24,9 +24,9 @@ func UserCreate(c *gin.Context) {
 	if AbortIfError(c, err) {
 		return
 	}
-	err = form.Bind(c)
+	form.Action = "/users/new"
 	templateData["form"] = form
-
+	err = form.Bind(c)
 	// If validation error, re-display the form with error messages.
 	if err != nil {
 		c.HTML(http.StatusBadRequest, template, templateData)
@@ -90,8 +90,49 @@ func UserNew(c *gin.Context) {
 	if AbortIfError(c, err) {
 		return
 	}
+	form.Action = "/users/new"
 	templateData["form"] = form
 	c.HTML(http.StatusOK, template, templateData)
+}
+
+// UserShow returns the user with the specified id.
+// GET /users/show/:id
+func UserShow(c *gin.Context) {
+	templateData := helpers.TemplateVars(c)
+	currentUser := helpers.CurrentUser(c)
+	ds := models.NewDataStore(currentUser)
+	user, err := findUser(ds, c.Param("id"))
+	if AbortIfError(c, err) {
+		return
+	}
+	templateData["user"] = user
+	templateData["flash"] = c.Query("flash")
+	c.HTML(http.StatusOK, "users/show.html", templateData)
+}
+
+// UserUpdate saves changes to an exiting user.
+// PUT /users/edit/:id
+func UserUpdate(c *gin.Context) {
+
+}
+
+// UserEdit shows a form to edit an exiting user.
+// GET /users/edit/:id
+func UserEdit(c *gin.Context) {
+	templateData := helpers.TemplateVars(c)
+	currentUser := helpers.CurrentUser(c)
+	ds := models.NewDataStore(currentUser)
+	userToEdit, err := findUser(ds, c.Param("id"))
+	if AbortIfError(c, err) {
+		return
+	}
+	form, err := forms.NewUserForm(ds, userToEdit)
+	if AbortIfError(c, err) {
+		return
+	}
+	form.Action = fmt.Sprintf("/users/edit/%d", userToEdit.ID)
+	templateData["form"] = form
+	c.HTML(http.StatusOK, "users/form.html", templateData)
 }
 
 // UserSignInShow shows the user sign-in form.
@@ -125,29 +166,6 @@ func UserSignOut(c *gin.Context) {
 	})
 }
 
-// UserShow returns the user with the specified id.
-// GET /users/show/:id
-func UserShow(c *gin.Context) {
-	templateData := helpers.TemplateVars(c)
-	currentUser := helpers.CurrentUser(c)
-	ds := models.NewDataStore(currentUser)
-	id := c.Param("id")
-	userID, _ := strconv.ParseInt(id, 10, 64)
-	user, err := ds.UserFind(userID)
-	if AbortIfError(c, err) {
-		return
-	}
-	templateData["user"] = user
-	templateData["flash"] = c.Query("flash")
-	c.HTML(http.StatusOK, "users/show.html", templateData)
-}
-
-// UserUpdate saves changes to an exiting user.
-// PUT /users/:id
-func UserUpdate(c *gin.Context) {
-
-}
-
 func SignInUser(c *gin.Context) (int, string, error) {
 	// Second of two DataStore instances with automatic
 	// admin privileges.
@@ -169,6 +187,11 @@ func SignInUser(c *gin.Context) (int, string, error) {
 	}
 	c.Set("CurrentUser", user)
 	return http.StatusFound, "/dashboard", nil
+}
+
+func findUser(ds *models.DataStore, id string) (*models.User, error) {
+	userID, _ := strconv.ParseInt(id, 10, 64)
+	return ds.UserFind(userID)
 }
 
 func getIndexQuery(c *gin.Context) (*models.Query, error) {

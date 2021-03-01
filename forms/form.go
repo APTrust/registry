@@ -5,6 +5,7 @@ import (
 )
 
 type Form struct {
+	Action string
 	ds     *models.DataStore
 	Fields map[string]*Field
 }

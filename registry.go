@@ -49,6 +49,20 @@ func initMiddleware(router *gin.Engine) {
 }
 
 // initRoutes maps URLs to handlers.
+// Note that for PUT requests, we also have to support POST,
+// and for DELETE, we need to support GET. This is in the web
+// routes only, because browsers don't support PUT and DELETE,
+// only POST and GET. Most other frameworks will rewrite the
+// request verb based on a _method param in the form or query
+// string, but gin won't because the router gets its hands on the
+// request before any other middleware. This issue is documented
+// in a few GitHub issues, including
+// https://github.com/gin-gonic/gin/issues/450
+//
+// The maintainers' solution is to use r.Any(), meaning any HTTP
+// verb would map to a given route. We'll use the pairs PUT/POST
+// and GET/DELETE, which is a little more restrictive that "match
+// anything".
 func initRoutes(router *gin.Engine) {
 
 	// This ensures that routes match with or without trailing slash.
@@ -65,13 +79,18 @@ func initRoutes(router *gin.Engine) {
 		// Users
 		web.POST("/users/new", c.UserCreate)
 		web.DELETE("/users/delete/:id", c.UserDelete)
+		web.GET("/users/delete/:id", c.UserDelete)
 		web.GET("/users", c.UserIndex)
 		web.GET("/users/new", c.UserNew)
+		web.GET("/users/show/:id", c.UserShow)
+		web.GET("/users/edit/:id", c.UserEdit)
+		web.PUT("/users/edit/:id", c.UserUpdate)
+		web.POST("/users/edit/:id", c.UserUpdate)
+
+		// User Sign In
 		web.GET("/users/sign_in", c.UserSignInShow)
 		web.POST("/users/sign_in", c.UserSignIn)
 		web.GET("/users/sign_out", c.UserSignOut) // should be delete?
-		web.GET("/users/show/:id", c.UserShow)
-		web.PUT("/users/update/:id", c.UserUpdate)
 
 		// Error page
 		web.GET("/error", c.ErrorShow)
