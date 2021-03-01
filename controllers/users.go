@@ -3,7 +3,6 @@ package controllers
 import (
 	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/forms"
@@ -15,26 +14,24 @@ import (
 // UserCreate a new user. Handles submission of new user form.
 // POST /users/new
 func UserCreate(c *gin.Context) {
-	currentUser := helpers.CurrentUser(c)
-	ds := models.NewDataStore(currentUser)
+	r := NewRequest(c)
 	template := "users/form.html"
-	templateData := helpers.TemplateVars(c)
 
-	form, err := forms.NewUserForm(ds, &models.User{})
+	form, err := forms.NewUserForm(r.DataStore, &models.User{})
 	if AbortIfError(c, err) {
 		return
 	}
 	form.Action = "/users/new"
-	templateData["form"] = form
+	r.TemplateData["form"] = form
 	err = form.Bind(c)
 	// If validation error, re-display the form with error messages.
 	if err != nil {
-		c.HTML(http.StatusBadRequest, template, templateData)
+		c.HTML(http.StatusBadRequest, template, r.TemplateData)
 		return
 	}
 
 	// If no validation error, save the user and redirect.
-	err = ds.UserSave(form.User)
+	err = r.DataStore.UserSave(form.User)
 	if AbortIfError(c, err) {
 		return
 	}
@@ -51,63 +48,57 @@ func UserDelete(c *gin.Context) {
 // UserIndex shows list of users.
 // GET /users
 func UserIndex(c *gin.Context) {
+	r := NewRequest(c)
 	template := "users/index.html"
-	templateData := helpers.TemplateVars(c)
 	query, err := getIndexQuery(c)
 	if AbortIfError(c, err) {
 		return
 	}
 
 	query.OrderBy("name asc")
-	currentUser := helpers.CurrentUser(c)
-	templateData["selectedID"] = c.Query("institution_id__eq")
+	r.TemplateData["selectedID"] = c.Query("institution_id__eq")
 
-	ds := models.NewDataStore(currentUser)
-	users, err := ds.UserViewList(query)
+	users, err := r.DataStore.UserViewList(query)
 	if AbortIfError(c, err) {
 		return
 	}
-	templateData["users"] = users
+	r.TemplateData["users"] = users
 
 	// Get institutions for filter list
-	institutionOptions, err := forms.ListInstitutions(ds)
+	institutionOptions, err := forms.ListInstitutions(r.DataStore)
 	if AbortIfError(c, err) {
 		return
 	}
-	templateData["institutionOptions"] = institutionOptions
+	r.TemplateData["institutionOptions"] = institutionOptions
 
-	c.HTML(http.StatusOK, template, templateData)
+	c.HTML(http.StatusOK, template, r.TemplateData)
 }
 
 // UserNew returns a blank form for the user to create a new user.
 // GET /users/new
 func UserNew(c *gin.Context) {
-	currentUser := helpers.CurrentUser(c)
-	ds := models.NewDataStore(currentUser)
+	r := NewRequest(c)
 	template := "users/form.html"
-	templateData := helpers.TemplateVars(c)
-	form, err := forms.NewUserForm(ds, &models.User{})
+	form, err := forms.NewUserForm(r.DataStore, &models.User{})
 	if AbortIfError(c, err) {
 		return
 	}
 	form.Action = "/users/new"
-	templateData["form"] = form
-	c.HTML(http.StatusOK, template, templateData)
+	r.TemplateData["form"] = form
+	c.HTML(http.StatusOK, template, r.TemplateData)
 }
 
 // UserShow returns the user with the specified id.
 // GET /users/show/:id
 func UserShow(c *gin.Context) {
-	templateData := helpers.TemplateVars(c)
-	currentUser := helpers.CurrentUser(c)
-	ds := models.NewDataStore(currentUser)
-	user, err := findUser(ds, c.Param("id"))
+	r := NewRequest(c)
+	user, err := r.DataStore.UserFind(r.ID)
 	if AbortIfError(c, err) {
 		return
 	}
-	templateData["user"] = user
-	templateData["flash"] = c.Query("flash")
-	c.HTML(http.StatusOK, "users/show.html", templateData)
+	r.TemplateData["user"] = user
+	r.TemplateData["flash"] = c.Query("flash")
+	c.HTML(http.StatusOK, "users/show.html", r.TemplateData)
 }
 
 // UserUpdate saves changes to an exiting user.
@@ -119,20 +110,18 @@ func UserUpdate(c *gin.Context) {
 // UserEdit shows a form to edit an exiting user.
 // GET /users/edit/:id
 func UserEdit(c *gin.Context) {
-	templateData := helpers.TemplateVars(c)
-	currentUser := helpers.CurrentUser(c)
-	ds := models.NewDataStore(currentUser)
-	userToEdit, err := findUser(ds, c.Param("id"))
+	r := NewRequest(c)
+	userToEdit, err := r.DataStore.UserFind(r.ID)
 	if AbortIfError(c, err) {
 		return
 	}
-	form, err := forms.NewUserForm(ds, userToEdit)
+	form, err := forms.NewUserForm(r.DataStore, userToEdit)
 	if AbortIfError(c, err) {
 		return
 	}
 	form.Action = fmt.Sprintf("/users/edit/%d", userToEdit.ID)
-	templateData["form"] = form
-	c.HTML(http.StatusOK, "users/form.html", templateData)
+	r.TemplateData["form"] = form
+	c.HTML(http.StatusOK, "users/form.html", r.TemplateData)
 }
 
 // UserSignInShow shows the user sign-in form.
@@ -187,11 +176,6 @@ func SignInUser(c *gin.Context) (int, string, error) {
 	}
 	c.Set("CurrentUser", user)
 	return http.StatusFound, "/dashboard", nil
-}
-
-func findUser(ds *models.DataStore, id string) (*models.User, error) {
-	userID, _ := strconv.ParseInt(id, 10, 64)
-	return ds.UserFind(userID)
 }
 
 func getIndexQuery(c *gin.Context) (*models.Query, error) {

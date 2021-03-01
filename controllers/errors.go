@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/APTrust/registry/common"
-	"github.com/APTrust/registry/helpers"
 	"github.com/gin-gonic/gin"
 )
 
@@ -26,7 +25,7 @@ func AbortIfError(c *gin.Context, err error) bool {
 }
 
 func ErrorShow(c *gin.Context) {
-	templateData := helpers.TemplateVars(c)
+	templateData := gin.H{}
 	status := http.StatusInternalServerError
 	err, _ := c.Get("err")
 	if err != nil {

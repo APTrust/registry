@@ -6,7 +6,6 @@ import (
 
 	"github.com/APTrust/registry/helpers"
 	"github.com/APTrust/registry/models"
-	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -14,15 +13,6 @@ import (
 var testDate, _ = time.Parse(time.RFC3339, "2021-04-16T15:04:05Z")
 var textString = "The Academic Preservation Trust (APTrust) is committed to the creation and management of a sustainable environment for digital preservation."
 var truncatedString = "The Academic Preservation Trust..."
-
-func TestTemplateVars(t *testing.T) {
-	c := &gin.Context{}
-	c.Set("CurrentUser", &models.User{Name: "John von Neumann"})
-	vars := helpers.TemplateVars(c)
-	require.NotNil(t, vars)
-	require.NotNil(t, vars["CurrentUser"])
-	assert.Equal(t, "John von Neumann", vars["CurrentUser"].(*models.User).Name)
-}
 
 func TestTruncate(t *testing.T) {
 	assert.Equal(t, truncatedString, helpers.Truncate(textString, 31))

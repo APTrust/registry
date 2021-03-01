@@ -3,22 +3,9 @@ package helpers
 import (
 	"fmt"
 	"time"
-
-	"github.com/gin-gonic/gin"
 )
 
 // https://curtisvermeeren.github.io/2017/09/14/Golang-Templates-Cheatsheet
-
-// TemplateVars returns a map to pass into templates.
-// The map contains a number of params that are expected to be
-// present within most or all templates. We will likely add to
-// this as development proceeds.
-func TemplateVars(c *gin.Context) gin.H {
-	currentUser, _ := c.Get("CurrentUser")
-	return gin.H{
-		"CurrentUser": currentUser,
-	}
-}
 
 // -------------------------------------------------------------------------
 // Helper functions to be used inside of templates
