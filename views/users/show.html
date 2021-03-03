@@ -3,47 +3,64 @@
 {{ template "shared/header.html" .}}
 
 <h1>{{ .user.Name }}</h1>
-<h2>{{ roleName .user.Role }} at {{ .user.Institution.Name }}</h2>
+<h3>{{ roleName .user.Role }} at {{ .user.Institution.Name }}</h3>
 
-<h3>Contact Info</h3>
-<div class="row">
-  <div class="column">Email: {{ .user.Email }}</div>
-  <div class="column">Verified: {{ yesNo .user.EmailVerified }}</div>
-  <div class="column">Phone: {{ .user.PhoneNumber }}</div>
-  <div class="column">Last Updated: {{ dateUS .user.UpdatedAt }}</div>
-</div>
-
-<h3>Activity</h3>
-<div class="row">
-  <div class="column">Signed In At: {{ dateUS .user.CurrentSignInAt }}</div>
-  <div class="column">From: {{ .user.CurrentSignInIP }}</div>
-  <div class="column">Last SignIn: {{ dateUS .user.LastSignInAt }}</div>
-  <div class="column">From: {{ .user.LastSignInIP }}</div>
-</div>
-
-<div class="row">
-  <div class="column">Sign In Count: {{ .user.SignInCount }}</div>
-  <div class="column">Initial Password Updated: {{ yesNo .user.InitialPasswordUpdated }}</div>
-  <div class="column">ForcePasswordUpdate: {{ yesNo .user.ForcePasswordUpdate }}</div>
-  <div class="column">Deactivated: {{ dateUS .user.DeactivatedAt }}</div>
-</div>
-
-<h3>Two Factor Authentication</h3>
-<div class="row">
-  <div class="column">Required: {{ yesNo .user.OTPRequiredForLogin }}</div>
-  <div class="column">Enabled: {{ yesNo .user.EnabledTwoFactor }}</div>
-  <div class="column">Confirmed: {{ yesNo .user.ConfirmedTwoFactor }}</div>
-  <div class="column">Required By: {{ dateUS .user.GracePeriod }}</div>
-</div>
-
-<h3>Authy</h3>
-<div class="row">
-  <div class="column">Status: {{ .user.AuthyStatus }}</div>
-  <div class="column">ID: {{ .user.AuthyID }}</div>
-  <div class="column">Last SignIn: {{ dateUS .user.LastSignInWithAuthy }}</div>
-  <div class="column"></div>
-</div>
-
+<table>
+<tbody>
+<tr>
+  <th>Email</th><td>{{ .user.Email }}</td>
+</tr>
+<tr>
+  <th>Verified</th><td>{{ yesNo .user.EmailVerified }}</td>
+</tr>
+<tr>
+  <th>Phone</th><td>{{ .user.PhoneNumber }}</td>
+</tr>
+<tr>
+  <th>Last Updated</th><td>{{ dateUS .user.UpdatedAt }}</td>
+</tr>
+<tr>
+  <th>Sign In Count</th><td>{{ .user.SignInCount }}</td>
+</tr>
+<tr>
+  <th>Current Sign In</th><td>{{ dateUS .user.CurrentSignInAt }} from {{ .user.CurrentSignInIP }}</td>
+</tr>
+<tr>
+  <th>Last Sign In</th><td>{{ dateUS .user.LastSignInAt }} from {{ .user.LastSignInIP }}</td>
+</tr>
+<tr>
+  <th>Initial Password Updated</th><td>{{ yesNo .user.InitialPasswordUpdated }}</td>
+</tr>
+<tr>
+  <th>Force Password Update?</th><td>{{ yesNo .user.ForcePasswordUpdate }}</td>
+</tr>
+<tr>
+  <th>Deactivated</th><td>{{ dateUS .user.DeactivatedAt }}</td>
+</tr>
+<tr>
+  <th>2FA Required</th><td>{{ yesNo .user.OTPRequiredForLogin }}</td>
+</tr>
+<tr>
+  <th>2FA Enabled</th><td>{{ yesNo .user.EnabledTwoFactor }}</td>
+</tr>
+<tr>
+  <th>2FA Confirmed</th><td>{{ yesNo .user.ConfirmedTwoFactor }}</td>
+</tr>
+<tr>
+  <th>2FA Required By</th><td>{{ dateUS .user.GracePeriod }}</td>
+</tr>
+<tr>
+  <th>Authy Status</th><td>{{ .user.AuthyStatus }}</td>
+</tr>
+<tr>
+  <th>Authy ID</th><td>{{ .user.AuthyID }}</td>
+</tr>
+<tr>
+  <th>Last Authy SignIn</th><td>{{ dateUS .user.LastSignInWithAuthy }}</td>
+</tr>
+<tr>
+</tbody>
+</table>
 
 {{ template "shared/footer.html" .}}
 
