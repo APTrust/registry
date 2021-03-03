@@ -76,6 +76,17 @@ func initRoutes(router *gin.Engine) {
 		// Dashboard
 		web.GET("/dashboard", c.DashboardShow)
 
+		// Institutions
+		web.POST("/institutions/new", c.InstitutionCreate)
+		web.DELETE("/institutions/delete/:id", c.InstitutionDelete)
+		web.GET("/institutions/delete/:id", c.InstitutionDelete)
+		web.GET("/institutions", c.InstitutionIndex)
+		web.GET("/institutions/new", c.InstitutionNew)
+		web.GET("/institutions/show/:id", c.InstitutionShow)
+		web.GET("/institutions/edit/:id", c.InstitutionEdit)
+		web.PUT("/institutions/edit/:id", c.InstitutionUpdate)
+		web.POST("/institutions/edit/:id", c.InstitutionUpdate)
+
 		// Users
 		web.POST("/users/new", c.UserCreate)
 		web.DELETE("/users/delete/:id", c.UserDelete)

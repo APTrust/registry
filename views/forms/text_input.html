@@ -1,6 +1,6 @@
 {{ define "forms/text_input.html" }}
 
-<input type="text" name="{{ .Name }}" value="{{ .Value }}" placeholder="{{ .Placeholder }}" minlength="2" required>
+<input type="text" name="{{ .Name }}" value="{{ .Value }}" placeholder="{{ .Placeholder }}" minlength="2" {{ template "forms/attrs.html" . }}>
 
 {{ if .Error }}<div class="row form-error">{{ .Error }}</div>{{ end }}
 

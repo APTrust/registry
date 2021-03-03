@@ -1,0 +1,20 @@
+{{ define "institutions/form.html" }}
+
+{{ template "shared/header.html" .}}
+
+<form action="{{ .form.Action }}" method="post">
+
+  {{ template "forms/text_input.html" .form.Fields.Name }}
+
+  {{ template "forms/text_input.html" .form.Fields.Identifier }}
+
+
+  <div class="sign-in-submit">
+    <input type="submit" value="Submit">
+  </div>
+
+</form>
+
+{{ template "shared/footer.html" .}}
+
+{{ end }}

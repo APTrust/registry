@@ -1,0 +1,27 @@
+{{ define "institutions/index.html" }}
+
+{{ template "shared/header.html" .}}
+
+<h1>Institutions</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Identifier</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{ range $index, $inst := .institutions }}
+    <tr class="clickable" onclick="window.location.href='/institutions/show/{{ $inst.ID }}'">
+      <td>{{ $inst.Name }}</td>
+      <td>{{ $inst.Identifier }}</td>
+    </tr>
+    {{ end }}
+  </tbody>
+</table>
+
+{{ template "shared/footer.html" .}}
+
+
+{{ end }}
