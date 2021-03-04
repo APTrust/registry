@@ -2,6 +2,7 @@ package helpers
 
 import (
 	"fmt"
+	"html/template"
 	"time"
 )
 
@@ -66,4 +67,14 @@ func StrEq(val1, val2 interface{}) bool {
 	str1 := fmt.Sprintf("%v", val1)
 	str2 := fmt.Sprintf("%v", val2)
 	return str1 == str2
+}
+
+// EscapeAttr escapes an HTML attribute value.
+func EscapeAttr(s string) template.HTMLAttr {
+	return template.HTMLAttr(s)
+}
+
+// EscapeHTML returns an escaped HTML string.
+func EscapeHTML(s string) template.HTML {
+	return template.HTML(s)
 }

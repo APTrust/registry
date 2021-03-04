@@ -1,6 +1,7 @@
 package helpers_test
 
 import (
+	"html/template"
 	"testing"
 	"time"
 
@@ -38,4 +39,12 @@ func TestStrEq(t *testing.T) {
 
 	assert.False(t, helpers.StrEq("true", false))
 	assert.False(t, helpers.StrEq("200", 909))
+}
+
+func TestEscapeAttr(t *testing.T) {
+	assert.Equal(t, template.HTMLAttr("O'Blivion's"), helpers.EscapeAttr("O'Blivion's"))
+}
+
+func TestEscapeHTML(t *testing.T) {
+	assert.Equal(t, template.HTML("<em>escape!</em>"), helpers.EscapeHTML("<em>escape!</em>"))
 }
