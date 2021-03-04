@@ -632,6 +632,31 @@ left join institutions i on u.institution_id = i.id
 left join institutions i2 on i.member_institution_id = i2.id;
 
 
+-- institutions_view shows an institution along with essential
+-- information about its parent, if it has a parent.
+
+create or replace view institutions_view as
+select
+	i.id,
+	i."name",
+	i.identifier,
+	i.state,
+	i."type",
+	i.deactivated_at,
+	i.otp_enabled,
+	i.receiving_bucket,
+	i.restore_bucket,
+	i.created_at,
+	i.updated_at,
+	i.member_institution_id as "parent_id",
+	parent."name" as "parent_name",
+	parent.identifier as "parent_identifier",
+	parent.state as "parent_state",
+	parent.deactivated_at as "parent_deactivated_at"
+from institutions i
+left join institutions parent on i.member_institution_id = parent.id;
+
+
 -------------------------------------------------------------------------------
 -- Functions
 -------------------------------------------------------------------------------

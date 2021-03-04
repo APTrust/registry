@@ -22,6 +22,8 @@ type Institution struct {
 	RestoreBucket       string    `json:"restore_bucket" form:"restore_bucket" pg:"restore_bucket"`
 
 	Users []*User `json:"users" pg:"rel:has-many"`
+
+	// TODO: Add child institutions as an official relation
 }
 
 func (inst *Institution) GetID() int64 {

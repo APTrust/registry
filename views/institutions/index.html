@@ -9,6 +9,7 @@
     <tr>
       <th>Name</th>
       <th>Identifier</th>
+      <th>Type</th>
     </tr>
   </thead>
   <tbody>
@@ -16,6 +17,7 @@
     <tr class="clickable" onclick="window.location.href='/institutions/show/{{ $inst.ID }}'">
       <td>{{ $inst.Name }}</td>
       <td>{{ $inst.Identifier }}</td>
+      <td>{{ $inst.Type }}</td>
     </tr>
     {{ end }}
   </tbody>
