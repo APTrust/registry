@@ -12,14 +12,6 @@ type UserForm struct {
 	instOptions []ListOption
 }
 
-var UserFormErrors = map[string]string{
-	"Name":          "Name must contain at least two letters.",
-	"Email":         "Valid email address required.",
-	"PhoneNumber":   "Please enter a phone number in format 000-000-0000.",
-	"InstitutionID": "Please select an institution.",
-	"Role":          "Please choose a role for this user.",
-}
-
 func NewUserForm(ds *models.DataStore, user *models.User) (*UserForm, error) {
 	var err error
 	userForm := &UserForm{
@@ -38,6 +30,7 @@ func NewUserForm(ds *models.DataStore, user *models.User) (*UserForm, error) {
 func (f *UserForm) init() {
 	f.Fields["Name"] = &Field{
 		Name:        "Name",
+		ErrMsg:      "Name must contain at least two letters.",
 		Placeholder: "Name",
 		Attrs: map[string]string{
 			"required": "",
@@ -45,6 +38,7 @@ func (f *UserForm) init() {
 	}
 	f.Fields["Email"] = &Field{
 		Name:        "Email",
+		ErrMsg:      "Valid email address required.",
 		Placeholder: "Email Address",
 		Attrs: map[string]string{
 			"required": "",
@@ -52,6 +46,7 @@ func (f *UserForm) init() {
 	}
 	f.Fields["PhoneNumber"] = &Field{
 		Name:        "PhoneNumber",
+		ErrMsg:      "Please enter a phone number in format 000-000-0000.",
 		Placeholder: "Phone in format 212-555-1212",
 		Attrs: map[string]string{
 			"pattern": "[0-9]{3}-[0-9]{3}-[0-9]{4}",
@@ -80,6 +75,7 @@ func (f *UserForm) init() {
 	}
 	f.Fields["Role"] = &Field{
 		Name:    "Role",
+		ErrMsg:  "Please choose a role for this user.",
 		Label:   "Role",
 		Options: RolesList,
 		Attrs: map[string]string{
@@ -93,7 +89,7 @@ func (f *UserForm) Bind(c *gin.Context) error {
 	if err != nil {
 		if _, ok := err.(validator.ValidationErrors); ok {
 			for _, fieldErr := range err.(validator.ValidationErrors) {
-				f.Fields[fieldErr.Field()].Error = UserFormErrors[fieldErr.Field()]
+				f.Fields[fieldErr.Field()].DisplayError = true
 			}
 		}
 	}

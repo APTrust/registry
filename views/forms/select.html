@@ -9,6 +9,6 @@
     {{ end }}
 </select>
 
-{{ if .Error }}<div class="row form-error">{{ .Error }}</div>{{ end }}
+{{ if .DisplayError }}<div class="row form-error">{{ .ErrMsg }}</div>{{ end }}
 
 {{ end }}

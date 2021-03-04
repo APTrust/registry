@@ -18,13 +18,14 @@ func NewForm(ds *models.DataStore) Form {
 }
 
 type Field struct {
-	Name        string
-	Label       string
-	Placeholder string
-	Value       interface{}
-	Error       string
-	Options     []ListOption
-	Attrs       map[string]string
+	Name         string
+	Label        string
+	Placeholder  string
+	Value        interface{}
+	ErrMsg       string
+	DisplayError bool
+	Options      []ListOption
+	Attrs        map[string]string
 }
 
 type ListOption struct {

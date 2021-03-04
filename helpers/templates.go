@@ -70,11 +70,13 @@ func StrEq(val1, val2 interface{}) bool {
 }
 
 // EscapeAttr escapes an HTML attribute value.
+// This helps avoid the ZgotmplZ problem.
 func EscapeAttr(s string) template.HTMLAttr {
 	return template.HTMLAttr(s)
 }
 
 // EscapeHTML returns an escaped HTML string.
+// This helps avoid the ZgotmplZ problem.
 func EscapeHTML(s string) template.HTML {
 	return template.HTML(s)
 }

@@ -2,6 +2,6 @@
 
 <input type="date" name="{{ .Name }}" value="{{ .Value }}" placeholder="{{ .Placeholder }}" {{ template "forms/attrs.html" . }}>
 
-{{ if .Error }}<div class="row form-error">{{ .Error }}</div>{{ end }}
+{{ if .DisplayError }}<div class="row form-error">{{ .ErrMsg }}</div>{{ end }}
 
 {{ end }}

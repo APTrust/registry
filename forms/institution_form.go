@@ -12,17 +12,14 @@ type InstitutionForm struct {
 	instOptions []ListOption
 }
 
-var InstitutionFormErrors = map[string]string{
-	"Name":       "Name must contain at least two letters.",
-	"Identifier": "Identifier must be a domain name.",
-}
-
 func NewInstitutionForm(ds *models.DataStore, institution *models.Institution) (*InstitutionForm, error) {
 	var err error
 	institutionForm := &InstitutionForm{
 		Form:        NewForm(ds),
 		Institution: institution,
 	}
+
+	// This should list parent institutions only.
 	institutionForm.instOptions, err = ListInstitutions(ds)
 	if err != nil {
 		return nil, err
@@ -36,13 +33,16 @@ func (f *InstitutionForm) init() {
 	f.Fields["Name"] = &Field{
 		Name:        "Name",
 		Placeholder: "Name",
+		ErrMsg:      "Name must have at least two letters.",
 		Attrs: map[string]string{
 			"required": "",
+			"min":      "2",
 		},
 	}
 	f.Fields["Identifier"] = &Field{
 		Name:        "Identifier",
 		Placeholder: "Identifier",
+		ErrMsg:      "Identifier must be a domain name.",
 		Attrs: map[string]string{
 			"required": "",
 			"pattern":  "[A-Za-z0-9]{2,}\\.[A-Za-z0-9]{2,}",
@@ -55,7 +55,7 @@ func (f *InstitutionForm) Bind(c *gin.Context) error {
 	if err != nil {
 		if _, ok := err.(validator.ValidationErrors); ok {
 			for _, fieldErr := range err.(validator.ValidationErrors) {
-				f.Fields[fieldErr.Field()].Error = InstitutionFormErrors[fieldErr.Field()]
+				f.Fields[fieldErr.Field()].DisplayError = true
 			}
 		}
 	}
