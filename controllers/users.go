@@ -45,7 +45,7 @@ func UserIndex(c *gin.Context) {
 	r.TemplateData["users"] = users
 
 	// Get institutions for filter list
-	institutionOptions, err := forms.ListInstitutions(r.DataStore)
+	institutionOptions, err := forms.ListInstitutions(r.DataStore, false)
 	if AbortIfError(c, err) {
 		return
 	}

@@ -15,7 +15,7 @@ type Institution struct {
 	UpdatedAt           time.Time `json:"updated_at" pg:"updated_at"`
 	State               string    `json:"state" form:"state" pg:"state"`
 	Type                string    `json:"type" form:"type" pg:"type"`
-	MemberInstitutionId int64     `json:"member_institution_id" form:"member_institution_id" pg:"member_institution_id"`
+	MemberInstitutionID int64     `json:"member_institution_id" form:"member_institution_id" pg:"member_institution_id"`
 	DeactivatedAt       time.Time `json:"deactivated_at" form:"deactivated_at" pg:"deactivated_at"`
 	OTPEnabled          bool      `json:"otp_enabled" form:"otp_enabled" pg:"otp_enabled"`
 	ReceivingBucket     string    `json:"receiving_bucket" form:"receiving_bucket" pg:"receiving_bucket"`

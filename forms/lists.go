@@ -16,8 +16,21 @@ var RolesList = []ListOption{
 	{constants.RoleSysAdmin, "APTrust System Administrator"},
 }
 
-func ListInstitutions(ds *models.DataStore) ([]ListOption, error) {
+var InstTypeList = []ListOption{
+	{constants.InstTypeMember, "Member"},
+	{constants.InstTypeSubscriber, "Subscriber (Sub-Account)"},
+}
+
+var YesNoList = []ListOption{
+	{"true", "Yes"},
+	{"false", "No"},
+}
+
+func ListInstitutions(ds *models.DataStore, membersOnly bool) ([]ListOption, error) {
 	instQuery := models.NewQuery().Columns("id", "name").OrderBy("name asc").Limit(100).Offset(0)
+	if membersOnly {
+		instQuery.Where("type", "=", constants.InstTypeMember)
+	}
 	institutions, err := ds.InstitutionList(instQuery)
 	if err != nil {
 		return nil, err

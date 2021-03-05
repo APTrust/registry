@@ -18,7 +18,7 @@ func NewUserForm(ds *models.DataStore, user *models.User) (*UserForm, error) {
 		Form: NewForm(ds),
 		User: user,
 	}
-	userForm.instOptions, err = ListInstitutions(ds)
+	userForm.instOptions, err = ListInstitutions(ds, false)
 	if err != nil {
 		return nil, err
 	}
@@ -31,6 +31,7 @@ func (f *UserForm) init() {
 	f.Fields["Name"] = &Field{
 		Name:        "Name",
 		ErrMsg:      "Name must contain at least two letters.",
+		Label:       "Name",
 		Placeholder: "Name",
 		Attrs: map[string]string{
 			"required": "",
@@ -39,6 +40,7 @@ func (f *UserForm) init() {
 	f.Fields["Email"] = &Field{
 		Name:        "Email",
 		ErrMsg:      "Valid email address required.",
+		Label:       "Email Address",
 		Placeholder: "Email Address",
 		Attrs: map[string]string{
 			"required": "",
@@ -46,15 +48,21 @@ func (f *UserForm) init() {
 	}
 	f.Fields["PhoneNumber"] = &Field{
 		Name:        "PhoneNumber",
-		ErrMsg:      "Please enter a phone number in format 000-000-0000.",
-		Placeholder: "Phone in format 212-555-1212",
+		ErrMsg:      "Please enter a phone number in format +2125551212.",
+		Label:       "Phone",
+		Placeholder: "Phone in format +2125551212",
 		Attrs: map[string]string{
-			"pattern": "[0-9]{3}-[0-9]{3}-[0-9]{4}",
+			"pattern": "\\+[0-9]{10}",
 		},
 	}
 	f.Fields["OTPRequiredForLogin"] = &Field{
-		Name:  "OTPRequiredForLogin",
-		Label: "OTP Required For Login",
+		Name:    "OTPRequiredForLogin",
+		Label:   "Require Two-Factor Auth",
+		ErrMsg:  "Please choose yes or no.",
+		Options: YesNoList,
+		Attrs: map[string]string{
+			"required": "",
+		},
 	}
 	f.Fields["GracePeriod"] = &Field{
 		Name:        "GracePeriod",

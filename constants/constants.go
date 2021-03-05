@@ -38,7 +38,7 @@ const (
 	EventSignatureValidation   = "digital signature validation"
 	EventValidation            = "validation"
 	EventVirusCheck            = "virus check"
-	InstTybeSubscriber         = "SubscriptionInstitution"
+	InstTypeSubscriber         = "SubscriptionInstitution"
 	InstTypeMember             = "MemberInstitution"
 	RoleInstAdmin              = "institutional_admin"
 	RoleInstUser               = "institutional_user"

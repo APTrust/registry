@@ -37,3 +37,8 @@ div.flash {
     font-size: 1.4rem;
     font-style: italic;
 }
+
+/* Milligram default weight 700 is too strong for form labels & legends. */
+label, legend {
+    font-weight: 300;
+}

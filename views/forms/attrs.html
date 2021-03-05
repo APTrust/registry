@@ -1,6 +1,6 @@
 {{ define "forms/attrs.html" }}
 {{ range $key, $value := .Attrs -}}
-{{- $key | escapeAttr }}{{ if $value }}="{{ $value | escapeAttr }}"{{ end }}
+{{ $key | escapeAttr }}{{ if $value }}="{{ $value | escapeAttr }}" {{ else }} {{ end }}
 {{- end }}
 {{ if .ErrMsg -}}
 oninvalid="this.setCustomValidity('{{ .ErrMsg | escapeAttr }}')" oninput="this.setCustomValidity('')"

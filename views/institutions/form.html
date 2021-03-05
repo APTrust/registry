@@ -8,9 +8,21 @@
 
   {{ template "forms/text_input.html" .form.Fields.Identifier }}
 
+  {{ template "forms/select.html" .form.Fields.Type }}
 
-  <div class="sign-in-submit">
+  {{ template "forms/select.html" .form.Fields.MemberInstitutionID }}
+
+  {{ template "forms/select.html" .form.Fields.OTPEnabled }}
+
+  {{ template "forms/text_input.html" .form.Fields.ReceivingBucket }}
+
+  {{ template "forms/text_input.html" .form.Fields.RestoreBucket }}
+
+  <div class="float-right">
     <input type="submit" value="Submit">
+  </div>
+  <div class="float-left">
+    <a class="button button-outline" href="javascript:history.back()">Cancel</a>
   </div>
 
 </form>

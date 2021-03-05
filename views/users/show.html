@@ -2,6 +2,7 @@
 
 {{ template "shared/header.html" .}}
 
+<div class="float-right"><a class="button" href="/users/edit/{{ .user.ID }}">Edit</a></div>
 <h1>{{ .user.Name }}</h1>
 <h3>{{ roleName .user.Role }} at {{ .user.Institution.Name }}</h3>
 
