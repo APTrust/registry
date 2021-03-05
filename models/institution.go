@@ -9,17 +9,17 @@ import (
 
 type Institution struct {
 	ID                  int64     `json:"id" form:"id" pg:"id"`
-	Name                string    `json:"name" form:"name" pg:"name"`
+	Name                string    `json:"name" form:"name" pg:"name" binding:"required,min=2,max=100"`
 	Identifier          string    `json:"identifier" form:"identifier" pg:"identifier"`
+	State               string    `json:"state" pg:"state" binding:"oneof=A D"`
+	Type                string    `json:"type" pg:"type"`
+	MemberInstitutionID int64     `json:"member_institution_id" pg:"member_institution_id"`
+	DeactivatedAt       time.Time `json:"deactivated_at" pg:"deactivated_at"`
+	OTPEnabled          bool      `json:"otp_enabled" form:"otp_enabled" pg:"otp_enabled"`
+	ReceivingBucket     string    `json:"receiving_bucket" pg:"receiving_bucket"`
+	RestoreBucket       string    `json:"restore_bucket" pg:"restore_bucket"`
 	CreatedAt           time.Time `json:"created_at" pg:"created_at"`
 	UpdatedAt           time.Time `json:"updated_at" pg:"updated_at"`
-	State               string    `json:"state" form:"state" pg:"state"`
-	Type                string    `json:"type" form:"type" pg:"type"`
-	MemberInstitutionID int64     `json:"member_institution_id" form:"member_institution_id" pg:"member_institution_id"`
-	DeactivatedAt       time.Time `json:"deactivated_at" form:"deactivated_at" pg:"deactivated_at"`
-	OTPEnabled          bool      `json:"otp_enabled" form:"otp_enabled" pg:"otp_enabled"`
-	ReceivingBucket     string    `json:"receiving_bucket" form:"receiving_bucket" pg:"receiving_bucket"`
-	RestoreBucket       string    `json:"restore_bucket" form:"restore_bucket" pg:"restore_bucket"`
 
 	Users []*User `json:"users" pg:"rel:has-many"`
 

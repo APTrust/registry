@@ -42,3 +42,11 @@ div.flash {
 label, legend {
     font-weight: 300;
 }
+
+footer {
+    border-top: 0.1rem solid #f4f5f6;
+    font-size: 1.2rem;
+    margin: 2.0rem 0;
+    padding: 2.0rem;
+    text-align: center;
+}

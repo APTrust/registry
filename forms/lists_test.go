@@ -17,7 +17,7 @@ func TestListInstitutions(t *testing.T) {
 		Role: constants.RoleSysAdmin,
 	}
 	ds := models.NewDataStore(adminUser)
-	options, err := forms.ListInstitutions(ds)
+	options, err := forms.ListInstitutions(ds, false)
 	require.Nil(t, err)
 	require.NotEmpty(t, options)
 	assert.True(t, len(options) >= 4)
