@@ -7,9 +7,19 @@
 <p>{{ .error }}</p>
 
 {{ if .redirectURL }}
-<p>You will be redirected automatically in 3 seconds...</p>
+<p>You will be redirected automatically in <span id="time"></span> seconds...</p>
 <script type="text/javascript">
-    setTimeout(function () { window.location = "{{ .redirectURL }}" }, 3000);
+ let redirTime = 4;
+ function showSeconds(s) {
+     document.getElementById("time").innerHTML = s.toString()
+ }
+ setInterval(function () {
+     showSeconds(--redirTime);
+     if (redirTime == 0) {
+         window.location = "{{ .redirectURL }}"
+     }
+ }, 1000);
+ showSeconds(redirTime)
 </script>
 {{ else }}
 <button class="button button-outline" onclick="history.back()">&lt;&lt; Back</button>

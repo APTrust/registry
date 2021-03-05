@@ -11,7 +11,7 @@ import (
 // parent (if it has one). This view simplifies both search and display
 // for institution management.
 type InstitutionView struct {
-	tableName           struct{}  `pg:"users_view"`
+	tableName           struct{}  `pg:"institutions_view"`
 	ID                  int64     `json:"id" pg:"id"`
 	Name                string    `json:"name" pg:"name"`
 	Identifier          string    `json:"identifier" pg:"identifier"`

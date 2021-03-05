@@ -165,6 +165,30 @@ func (ds *DataStore) InstitutionUndelete(inst *Institution) error {
 	return ds.undelete(inst)
 }
 
+// InstitutionViewFind returns the instituions_view record with the
+// specified ID.
+func (ds *DataStore) InstitutionViewFind(id int64) (*InstitutionView, error) {
+	inst := &InstitutionView{}
+	err := ds.find(inst, id)
+	if err != nil {
+		inst = nil
+	}
+	return inst, err
+}
+
+// InstitutionViewList returns institutions from the institutions_view.
+// These records contain all the same fields as the normal instituion
+// model, plus info about the institution's parent.
+func (ds *DataStore) InstitutionViewList(q *Query) ([]*InstitutionView, error) {
+	ds.applyInstFilter(q, "id")
+	if err := ds.assertListPermission(constants.InstitutionRead); err != nil {
+		return nil, err
+	}
+	institutions := make([]*InstitutionView, 0)
+	err := ds._select(&institutions, q)
+	return institutions, err
+}
+
 // IntellectualObjectDelete marks an object as deleted by setting its
 // State to "D". This is a soft delete.
 func (ds *DataStore) IntellectualObjectDelete(obj *IntellectualObject) error {

@@ -28,7 +28,7 @@ func InstitutionIndex(c *gin.Context) {
 	r := NewRequest(c)
 	template := "institutions/index.html"
 	query := models.NewQuery().OrderBy("name")
-	institutions, err := r.DataStore.InstitutionList(query)
+	institutions, err := r.DataStore.InstitutionViewList(query)
 	if AbortIfError(c, err) {
 		return
 	}
@@ -55,11 +55,26 @@ func InstitutionNew(c *gin.Context) {
 // GET /institutions/show/:id
 func InstitutionShow(c *gin.Context) {
 	r := NewRequest(c)
-	institution, err := r.DataStore.InstitutionFind(r.ID)
+	institution, err := r.DataStore.InstitutionViewFind(r.ID)
 	if AbortIfError(c, err) {
 		return
 	}
 	r.TemplateData["institution"] = institution
+
+	query := models.NewQuery().Where("parent_id", "=", institution.ID).OrderBy("name")
+	subscribers, err := r.DataStore.InstitutionViewList(query)
+	if AbortIfError(c, err) {
+		return
+	}
+	r.TemplateData["subscribers"] = subscribers
+
+	query = models.NewQuery().Where("institution_id", "=", institution.ID).IsNull("deactivated_at").OrderBy("name")
+	users, err := r.DataStore.UserViewList(query)
+	if AbortIfError(c, err) {
+		return
+	}
+	r.TemplateData["users"] = users
+
 	r.TemplateData["flash"] = c.Query("flash")
 	c.HTML(http.StatusOK, "institutions/show.html", r.TemplateData)
 }

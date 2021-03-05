@@ -3,9 +3,55 @@
 {{ template "shared/header.html" .}}
 
 <h1>{{ .institution.Name }}</h1>
-<h3>{{ .institution.Identifier }}</h3>
 
-<p>More to come...</p>
+<table>
+  <tbody>
+    <tr>
+      <th>Identifier</th>
+      <td>{{ .institution.Identifier }}</td>
+    </tr>
+    <tr>
+      <th>Type</th>
+      <td>{{ replace .institution.Type "Institution" "" 1 }}</td>
+    </tr>
+    <tr>
+      <th>Parent</th>
+      <td>{{ if .institution.ParentName }}{{ .institution.ParentName }}{{ else }}None{{end}}</td>
+    </tr>
+    <tr>
+      <th>Two-Factor Enabled</th>
+      <td>{{ yesNo .institution.OTPEnabled }}</td>
+    </tr>
+    <tr>
+      <th>Active?</th>
+      <td>{{ if eq .institution.State "A" }} Yes {{ else }} No - deactivated {{ dateUS .institution.DeactivatedAt }} {{ end }}</td>
+    </tr>
+    <tr>
+      <th>Receiving Bucket</th>
+      <td>{{ .institution.ReceivingBucket }}</td>
+    </tr>
+    <tr>
+      <th>Restore Bucket</th>
+      <td>{{ .institution.RestoreBucket }}</td>
+    </tr>
+    <tr>
+      <th>Subscribers</th>
+      <td>
+        {{ range $index, $inst := .subscribers }}
+        <a href="/institutions/show/{{ $inst.ID }}">{{ $inst.Name }}</a><br/>
+        {{ end }}
+      </td>
+    </tr>
+    <tr>
+      <th>Users</th>
+      <td>
+        {{ range $index, $user := .users }}
+        <a href="/users/show/{{ $user.ID }}">{{ $user.Name }} ({{ roleName $user.Role }})</a><br/>
+        {{ end }}
+      </td>
+    </tr>
+  </tbody>
+</table>
 
 {{ template "shared/footer.html" .}}
 

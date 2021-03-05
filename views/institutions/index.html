@@ -10,6 +10,8 @@
       <th>Name</th>
       <th>Identifier</th>
       <th>Type</th>
+      <th>Parent</th>
+      <th>Deactivated</th>
     </tr>
   </thead>
   <tbody>
@@ -17,7 +19,9 @@
     <tr class="clickable" onclick="window.location.href='/institutions/show/{{ $inst.ID }}'">
       <td>{{ $inst.Name }}</td>
       <td>{{ $inst.Identifier }}</td>
-      <td>{{ $inst.Type }}</td>
+      <td>{{ replace $inst.Type "Institution" "" 1 }}</td>
+      <td>{{ $inst.ParentIdentifier }}</td>
+      <td>{{ dateUS $inst.DeactivatedAt }}</td>
     </tr>
     {{ end }}
   </tbody>

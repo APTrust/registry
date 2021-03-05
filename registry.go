@@ -2,6 +2,7 @@ package main
 
 import (
 	"html/template"
+	"strings"
 
 	"github.com/APTrust/registry/common"
 	c "github.com/APTrust/registry/controllers"
@@ -28,6 +29,7 @@ func initTemplates(router *gin.Engine) {
 		"dateUS":     helpers.DateUS,
 		"escapeAttr": helpers.EscapeAttr,
 		"escapeHTML": helpers.EscapeHTML,
+		"replace":    strings.Replace,
 		"strEq":      helpers.StrEq,
 		"truncate":   helpers.Truncate,
 		"roleName":   helpers.RoleName,
