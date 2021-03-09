@@ -97,6 +97,8 @@ func (f *InstitutionForm) init() {
 	}
 }
 
+// TODO: Can this be part of the underlying Form class, and not
+// repeated in each form?
 func (f *InstitutionForm) Bind(c *gin.Context) error {
 	err := c.ShouldBind(f.Institution)
 	if err != nil {

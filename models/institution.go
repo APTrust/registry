@@ -85,3 +85,29 @@ func (inst *Institution) BeforeSave() error {
 	}
 	return nil
 }
+
+// TODO: Struct level validation to ensure a subscribing institution
+// has a parent, and to validate bucket names. For example, see:
+// https://github.com/go-playground/validator/blob/v9/_examples/struct-level/main.go
+
+// Should we move binding, validation, and error messages from the form
+// class to the model? Prolly.
+
+// Should we provide an option to save the model without validating? Hmm.
+
+// Also, it may be a good idea to take advantage of Go Pg's hooks, instead
+// of writing our own BeforeSave, etc. See:
+// https://pkg.go.dev/github.com/go-pg/pg/v10#AfterDeleteHook (useless)
+// https://pg.uptrace.dev/hooks/ (even uselesser)
+//
+// This helps a little:
+// https://github.com/go-pg/pg/issues/1275
+//
+// Looks like hooks are defined directly on the model, with the
+// underscore trick used to force a compiler check.
+//
+// Consider replacing EVERYTHING in the Model interface with the hooks
+// defined at https://pkg.go.dev/github.com/go-pg/pg/v10#AfterDeleteHook
+//
+// Consider centralizing permission checks, so they're not reimplemented
+// in each model.
