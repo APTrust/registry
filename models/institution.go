@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/APTrust/registry/common"
@@ -9,13 +10,13 @@ import (
 
 type Institution struct {
 	ID                  int64     `json:"id" form:"id" pg:"id"`
-	Name                string    `json:"name" form:"name" pg:"name" binding:"required,min=2,max=100"`
-	Identifier          string    `json:"identifier" form:"identifier" pg:"identifier"`
-	State               string    `json:"state" pg:"state" binding:"oneof=A D"`
-	Type                string    `json:"type" pg:"type"`
+	Name                string    `json:"name" pg:"name" binding:"required,min=2,max=100"`
+	Identifier          string    `json:"identifier" pg:"identifier"`
+	State               string    `json:"state" pg:"state"`
+	Type                string    `json:"type" pg:"type" binding:"oneof=MemberInstitution SubscriptionInstitution"`
 	MemberInstitutionID int64     `json:"member_institution_id" pg:"member_institution_id"`
 	DeactivatedAt       time.Time `json:"deactivated_at" pg:"deactivated_at"`
-	OTPEnabled          bool      `json:"otp_enabled" form:"otp_enabled" pg:"otp_enabled"`
+	OTPEnabled          bool      `json:"otp_enabled" pg:"otp_enabled"`
 	ReceivingBucket     string    `json:"receiving_bucket" pg:"receiving_bucket"`
 	RestoreBucket       string    `json:"restore_bucket" pg:"restore_bucket"`
 	CreatedAt           time.Time `json:"created_at" pg:"created_at"`
@@ -75,6 +76,12 @@ func (inst *Institution) SetTimestamps() {
 }
 
 func (inst *Institution) BeforeSave() error {
-	// TODO: Validate
+	if inst.ID == int64(0) {
+		ctx := common.Context()
+		inst.State = "A"
+		inst.ReceivingBucket = fmt.Sprintf("aptrust.receiving%s%s", ctx.Config.BucketQualifier(), inst.Identifier)
+		inst.RestoreBucket = fmt.Sprintf("aptrust.restore%s%s", ctx.Config.BucketQualifier(), inst.Identifier)
+		ctx.Log.Info().Msgf("Set buckets for new institution '%s' to %s and %s", inst.Name, inst.ReceivingBucket, inst.RestoreBucket)
+	}
 	return nil
 }

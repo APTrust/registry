@@ -11,7 +11,16 @@ import (
 	"github.com/gorilla/securecookie"
 	"github.com/rs/zerolog"
 	"github.com/spf13/viper"
+	"github.com/stretchr/stew/slice"
 )
+
+var allowedConfigs = []string{
+	"ci",
+	"dev",
+	"production",
+	"staging",
+	"test",
+}
 
 type DBConfig struct {
 	Host     string
@@ -62,8 +71,8 @@ func NewConfig() *Config {
 func configDirAndFile() (configDir string, configFile string) {
 	configDir, _ = os.Getwd()
 	envName := os.Getenv("APT_ENV")
-	if envName == "" {
-		PrintAndExit("Set APT_ENV: dev, test, or production")
+	if !slice.Contains(allowedConfigs, envName) {
+		PrintAndExit(fmt.Sprintf("Set APT_ENV to one of %s", strings.Join(allowedConfigs, ",")))
 	}
 	configFile = ".env"
 	if envName != "" {
@@ -157,6 +166,24 @@ func (config *Config) makeDirs() error {
 		}
 	}
 	return nil
+}
+
+// BucketQualifier returns the S3 bucket qualifier for the current
+// config. We could set this in the .env file, but we want to avoid
+// the possibility of a config pointing to the wrong buckets. (For
+// example, by someone carelessly copying and pasting config settings.)
+// Our restrictive IAM permissions prevent the wrong environments
+// from accessing the wrong buckets, but this is an extra layer of
+// protection. This defaults to ".test.", so if anything is misconfigured,
+// we'll be reading from and writing to buckets in which we explicitly
+// guarantee no permanance.
+func (config *Config) BucketQualifier() string {
+	if config.EnvName == "production" {
+		return ""
+	} else if config.EnvName == "staging" {
+		return ".staging."
+	}
+	return ".test."
 }
 
 // ToJSON serializes the config to JSON for logging purposes.

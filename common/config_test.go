@@ -44,3 +44,23 @@ func TestNewConfig(t *testing.T) {
 	assert.Equal(t, "aptrust_session", config.Cookies.SessionCookie)
 	assert.False(t, config.Cookies.HTTPSOnly)
 }
+
+func TestConfigBucketQualifier(t *testing.T) {
+	config := common.NewConfig()
+	assert.Equal(t, ".test.", config.BucketQualifier())
+
+	config.EnvName = "test"
+	assert.Equal(t, ".test.", config.BucketQualifier())
+
+	config.EnvName = "ci"
+	assert.Equal(t, ".test.", config.BucketQualifier())
+
+	config.EnvName = "production"
+	assert.Equal(t, "", config.BucketQualifier())
+
+	config.EnvName = "staging"
+	assert.Equal(t, ".staging.", config.BucketQualifier())
+
+	config.EnvName = "invalid-name"
+	assert.Equal(t, ".test.", config.BucketQualifier())
+}
