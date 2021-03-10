@@ -3,6 +3,7 @@ package models_test
 import (
 	"testing"
 
+	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/models"
 	"github.com/stretchr/testify/assert"
@@ -288,4 +289,22 @@ func TestUserIsAdmin(t *testing.T) {
 
 	user.Role = constants.RoleSysAdmin
 	assert.True(t, user.IsAdmin())
+}
+
+func TestOTPBackupCodes(t *testing.T) {
+	ctx := common.Context()
+	user := &models.User{}
+
+	// In fixtures, Inactive User with id #4 has some OTP
+	// backup codes. We want to make sure these are bound
+	// correctly.
+	err := ctx.DB.Model(user).Where("id = 4").Select()
+	require.Nil(t, err)
+
+	codes := []string{
+		"code1",
+		"code2",
+		"code3",
+	}
+	assert.Equal(t, codes, user.OTPBackupCodes)
 }

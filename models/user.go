@@ -7,13 +7,6 @@ import (
 	"github.com/APTrust/registry/constants"
 )
 
-/*
-   The OTPBackupCodes column in this table is of type _varchar,
-   which is a delimited array. The pg driver seems to have a problem
-   deserializing the array, so in the User model below, the type
-   is set to string instead of []string.
-*/
-
 // User is a person who can log in and do stuff.
 type User struct {
 	ID                     int64        `json:"id" form:"id" pg:"id"`
@@ -42,7 +35,7 @@ type User struct {
 	DeactivatedAt          time.Time    `json:"deactivated_at" form:"-" pg:"deactivated_at"`
 	EnabledTwoFactor       bool         `json:"enabled_two_factor" form:"-" pg:"enabled_two_factor"`
 	ConfirmedTwoFactor     bool         `json:"confirmed_two_factor" form:"-" pg:"confirmed_two_factor"`
-	OTPBackupCodes         string       `json:"-" form:"-" pg:"otp_backup_codes"`
+	OTPBackupCodes         []string     `json:"-" form:"-" pg:"otp_backup_codes,array"`
 	AuthyID                string       `json:"-" form:"-" pg:"authy_id"`
 	LastSignInWithAuthy    time.Time    `json:"last_sign_in_with_authy" form:"-" pg:"last_sign_in_with_authy"`
 	AuthyStatus            string       `json:"authy_status" form:"-" pg:"authy_status"`
