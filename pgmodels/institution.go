@@ -1,11 +1,11 @@
 package pgmodels
 
 import (
-	"fmt"
+	"context"
+	//"fmt"
 	"time"
-
-	"github.com/APTrust/registry/common"
-	"github.com/APTrust/registry/constants"
+	//"github.com/APTrust/registry/common"
+	//"github.com/APTrust/registry/constants"
 )
 
 type Institution struct {
@@ -22,8 +22,8 @@ type Institution struct {
 	CreatedAt           time.Time `json:"created_at" pg:"created_at"`
 	UpdatedAt           time.Time `json:"updated_at" pg:"updated_at"`
 
-	Users                   []*User        `json:"users" pg:"rel:has-many"`
-	SubscribingInstitutions []*Institution `json:"subscribing_institutions" pg:"rel:has-many"`
+	//Users                   []*User        `json:"users" pg:"rel:has-many"`
+	//SubscribingInstitutions []*Institution `json:"subscribing_institutions" pg:"rel:has-many"`
 	// TODO: Add child institutions as an official relation
 }
 
