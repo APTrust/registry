@@ -4,8 +4,10 @@ import (
 	"context"
 	//"fmt"
 	"time"
+
 	//"github.com/APTrust/registry/common"
 	//"github.com/APTrust/registry/constants"
+	"github.com/go-pg/pg/v10"
 )
 
 type Institution struct {
@@ -26,6 +28,13 @@ type Institution struct {
 	//SubscribingInstitutions []*Institution `json:"subscribing_institutions" pg:"rel:has-many"`
 	// TODO: Add child institutions as an official relation
 }
+
+// The following statements have no effect other than to force a compile-time
+// check that ensures our Institution model properly implements these hook
+// interfaces.
+var _ pg.BeforeDeleteHook = (*Institution)(nil)
+var _ pg.BeforeInsertHook = (*Institution)(nil)
+var _ pg.BeforeUpdateHook = (*Institution)(nil)
 
 // BeforeDelete sets Institution.State to "D" before we perform a
 // soft delete. Note that DeactivatedAt is the soft delete field,
@@ -54,9 +63,31 @@ func (inst *Institution) BeforeUpdate(c context.Context) (context.Context, error
 // has a parent, and to validate bucket names. For example, see:
 // https://github.com/go-playground/validator/blob/v9/_examples/struct-level/main.go
 
-// Compile-time check to ensure we implement hooks correctly.
-// https://pg.uptrace.dev/hooks/
-// https://medium.com/@matryer/golang-tip-compile-time-checks-to-ensure-your-type-satisfies-an-interface-c167afed3aae
+// TODO: Check out https://github.com/go-ozzo/ozzo-validation
+// as an alternative to gin's baked-in validation package.
+// The problems with the baked in are:
+//
+// 1. Custom field validators are clumsy.
+// 2. Custom struct validators are even more clumsy.
+// 3. Custom error messages are even worse.
+//
+//
+// Consider validators as separate structs, or consider wrappers
+// around the ozzo validators that simplify usage.
+//
+// Or roll your own...
+//
+// min, max, regex, datemin, datemax, inList
+//
+// Also see https://github.com/asaskevich/govalidator,
+// which ozzo uses under the hood.
+
+// func InstitutionValidator(sl validator.StructLevel) {
+// 	inst := sl.Current().Interface().(Institution)
+// 	if inst.Type == constants.InstTypeSubscriber && inst.MemberInstitutionID == int64(0) {
+// 		sl.ReportError(inst.MemberInstitutionID, "MemberInstitutionID", "MemberInstitutionID", "fnameorlname", "")
+// 	}
+// }
 
 // InstitutionGet(db, query) (*Institution, error)
 // InstitutionSelect(db, query) ([]*Institution, error)
