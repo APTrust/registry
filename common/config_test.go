@@ -47,20 +47,20 @@ func TestNewConfig(t *testing.T) {
 
 func TestConfigBucketQualifier(t *testing.T) {
 	config := common.NewConfig()
-	assert.Equal(t, ".test.", config.BucketQualifier())
+	assert.Equal(t, ".test", config.BucketQualifier())
 
 	config.EnvName = "test"
-	assert.Equal(t, ".test.", config.BucketQualifier())
+	assert.Equal(t, ".test", config.BucketQualifier())
 
 	config.EnvName = "ci"
-	assert.Equal(t, ".test.", config.BucketQualifier())
+	assert.Equal(t, ".test", config.BucketQualifier())
 
 	config.EnvName = "production"
 	assert.Equal(t, "", config.BucketQualifier())
 
 	config.EnvName = "staging"
-	assert.Equal(t, ".staging.", config.BucketQualifier())
+	assert.Equal(t, ".staging", config.BucketQualifier())
 
 	config.EnvName = "invalid-name"
-	assert.Equal(t, ".test.", config.BucketQualifier())
+	assert.Equal(t, ".test", config.BucketQualifier())
 }

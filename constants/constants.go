@@ -38,8 +38,8 @@ const (
 	EventSignatureValidation   = "digital signature validation"
 	EventValidation            = "validation"
 	EventVirusCheck            = "virus check"
-	InstTypeSubscriber         = "SubscriptionInstitution"
 	InstTypeMember             = "MemberInstitution"
+	InstTypeSubscriber         = "SubscriptionInstitution"
 	RoleInstAdmin              = "institutional_admin"
 	RoleInstUser               = "institutional_user"
 	RoleNone                   = "none"
@@ -115,6 +115,11 @@ var DigestAlgs = []string{
 	AlgSha512,
 }
 
+var InstTypes = []string{
+	InstTypeMember,
+	InstTypeSubscriber,
+}
+
 var Stages = []string{
 	StageAvailableInS3,
 	StageCleanup,
@@ -132,6 +137,11 @@ var Stages = []string{
 	StageStore,
 	StageUnpack,
 	StageValidate,
+}
+
+var States = []string{
+	StateActive,
+	StateDeleted,
 }
 
 var Statuses = []string{

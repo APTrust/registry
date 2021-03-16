@@ -175,16 +175,16 @@ func (config *Config) makeDirs() error {
 // example, by someone carelessly copying and pasting config settings.)
 // Our restrictive IAM permissions prevent the wrong environments
 // from accessing the wrong buckets, but this is an extra layer of
-// protection. This defaults to ".test.", so if anything is misconfigured,
+// protection. This defaults to ".test", so if anything is misconfigured,
 // we'll be reading from and writing to buckets in which we explicitly
 // guarantee no permanance.
 func (config *Config) BucketQualifier() string {
 	if config.EnvName == "production" {
 		return ""
 	} else if config.EnvName == "staging" {
-		return ".staging."
+		return ".staging"
 	}
-	return ".test."
+	return ".test"
 }
 
 // ToJSON serializes the config to JSON for logging purposes.

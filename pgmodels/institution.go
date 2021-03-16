@@ -2,13 +2,28 @@ package pgmodels
 
 import (
 	"context"
-	//"fmt"
+	"fmt"
 	"time"
 
-	//"github.com/APTrust/registry/common"
-	//"github.com/APTrust/registry/constants"
+	"github.com/APTrust/registry/common"
+	"github.com/APTrust/registry/constants"
+	v "github.com/go-ozzo/ozzo-validation/v4"
+	"github.com/go-ozzo/ozzo-validation/v4/is"
 	"github.com/go-pg/pg/v10"
 )
+
+const (
+	ErrInstName       = "Name must contain 5-100 characters."
+	ErrInstIdentifier = "Identifier must be a domain name."
+	ErrInstState      = "State must be 'A' or 'D'."
+	ErrInstType       = "Please choose an institution type."
+	ErrInstReceiving  = "Receiving bucket name is not valid."
+	ErrInstRestore    = "Restoration bucket name is not valid."
+	ErrInstMemberID   = "Please choose a parent institution."
+)
+
+var ValidStates = common.InterfaceList(constants.States)
+var ValidInstTypes = common.InterfaceList(constants.InstTypes)
 
 type Institution struct {
 	ID                  int64     `json:"id" form:"id" pg:"id"`
@@ -42,52 +57,39 @@ var _ pg.BeforeUpdateHook = (*Institution)(nil)
 // expunging the record from the DB.
 func (inst *Institution) BeforeDelete(c context.Context) (context.Context, error) {
 	inst.State = "D"
-	return c, nil
+	return c, inst.Validate()
 }
 
 // BeforeInsert sets the CreatedAt and UpdatedAt timestamps on creation.
 func (inst *Institution) BeforeInsert(c context.Context) (context.Context, error) {
+	ctx := common.Context()
 	now := time.Now().UTC()
 	inst.CreatedAt = now
 	inst.UpdatedAt = now
-	return c, nil
+	inst.ReceivingBucket = fmt.Sprintf("aptrust.receiving%s.%s", ctx.Config.BucketQualifier(), inst.Identifier)
+	inst.RestoreBucket = fmt.Sprintf("aptrust.restore%s.%s", ctx.Config.BucketQualifier(), inst.Identifier)
+	inst.State = constants.StateActive
+	return c, inst.Validate()
 }
 
 // BeforeUpdate sets the UpdatedAt timestamp.
 func (inst *Institution) BeforeUpdate(c context.Context) (context.Context, error) {
 	inst.UpdatedAt = time.Now().UTC()
-	return c, nil
+	return c, inst.Validate()
 }
 
-// TODO: Struct level validation to ensure a subscribing institution
-// has a parent, and to validate bucket names. For example, see:
-// https://github.com/go-playground/validator/blob/v9/_examples/struct-level/main.go
-
-// TODO: Check out https://github.com/go-ozzo/ozzo-validation
-// as an alternative to gin's baked-in validation package.
-// The problems with the baked in are:
-//
-// 1. Custom field validators are clumsy.
-// 2. Custom struct validators are even more clumsy.
-// 3. Custom error messages are even worse.
-//
-//
-// Consider validators as separate structs, or consider wrappers
-// around the ozzo validators that simplify usage.
-//
-// Or roll your own...
-//
-// min, max, regex, datemin, datemax, inList
-//
-// Also see https://github.com/asaskevich/govalidator,
-// which ozzo uses under the hood.
-
-// func InstitutionValidator(sl validator.StructLevel) {
-// 	inst := sl.Current().Interface().(Institution)
-// 	if inst.Type == constants.InstTypeSubscriber && inst.MemberInstitutionID == int64(0) {
-// 		sl.ReportError(inst.MemberInstitutionID, "MemberInstitutionID", "MemberInstitutionID", "fnameorlname", "")
-// 	}
-// }
+func (inst *Institution) Validate() error {
+	return v.ValidateStruct(
+		inst,
+		v.Field(&inst.Name, v.Required.Error(ErrInstName), v.Length(5, 100).Error(ErrInstName)),
+		v.Field(&inst.Identifier, v.Required.Error(ErrInstIdentifier), is.Domain.Error(ErrInstIdentifier)),
+		v.Field(&inst.State, v.Required.Error(ErrInstState), v.In(ValidStates...).Error(ErrInstState)),
+		v.Field(&inst.Type, v.Required.Error(ErrInstType), v.In(ValidInstTypes...).Error(ErrInstType)),
+		v.Field(&inst.ReceivingBucket, v.Required.Error(ErrInstReceiving), v.Length(20, 100).Error(ErrInstReceiving)),
+		v.Field(&inst.RestoreBucket, v.Required.Error(ErrInstRestore), v.Length(20, 100).Error(ErrInstRestore)),
+		v.Field(&inst.MemberInstitutionID, v.When(inst.Type == constants.InstTypeSubscriber, v.Required.Error(ErrInstMemberID))),
+	)
+}
 
 // InstitutionGet(db, query) (*Institution, error)
 // InstitutionSelect(db, query) ([]*Institution, error)
@@ -95,3 +97,11 @@ func (inst *Institution) BeforeUpdate(c context.Context) (context.Context, error
 // func (inst *Institution) Delete() error
 // func InstitutionBind(c *gin.Context) (*Institution, bool)
 //      - this sets map[string]string of error messages
+
+// Common module:
+//
+// - error messages
+// - valid states, valid inst types, etc.
+// - function to convert validation errors to map[string]string
+//   - this function should return ["ValidationError"] for internal validation
+//     errors

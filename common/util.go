@@ -159,3 +159,12 @@ func ListIsEmpty(list []string) bool {
 	}
 	return isEmpty
 }
+
+// InterfaceList converts a list of strings to a list of interfaces.
+func InterfaceList(items []string) []interface{} {
+	list := make([]interface{}, len(items))
+	for i, item := range items {
+		list[i] = item
+	}
+	return list
+}

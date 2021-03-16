@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/APTrust/registry/common"
+	"github.com/APTrust/registry/constants"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -72,4 +73,11 @@ func TestListIsEmpty(t *testing.T) {
 	assert.True(t, common.ListIsEmpty(empty2))
 	assert.False(t, common.ListIsEmpty(notEmpty))
 	assert.True(t, common.ListIsEmpty(nil))
+}
+
+func TestInterfaceList(t *testing.T) {
+	list := common.InterfaceList(constants.States)
+	require.Equal(t, 2, len(list))
+	assert.Equal(t, "A", list[0].(string))
+	assert.Equal(t, "D", list[1].(string))
 }
