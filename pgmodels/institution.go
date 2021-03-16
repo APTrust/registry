@@ -113,17 +113,29 @@ func (inst *Institution) Validate() *common.ValidationError {
 	return nil
 }
 
-// InstitutionGet(db, query) (*Institution, error)
-// InstitutionSelect(db, query) ([]*Institution, error)
-// func (inst *Institution) Save() error [insert, update]
+// InstitutionFind(query) (*Institution, error)
+// InstitutionSelect(query) ([]*Institution, error)
+// func (inst *Institution) Save() error
 // func (inst *Institution) Delete() error
-// func InstitutionBind(c *gin.Context) (*Institution, bool)
-//      - this sets map[string]string of error messages
 
-// Common module:
-//
-// - error messages
-// - valid states, valid inst types, etc.
-// - function to convert validation errors to map[string]string
-//   - this function should return ["ValidationError"] for internal validation
-//     errors
+// Do binding in controller, not as method on model.
+// After binding, we can validate, or we can simply Save() and get
+// the validation errors from there.
+
+// Param query should be a QueryBuilder based on models.Query, but
+// consider simplifying it. Instead of Where(col, op, vals),
+// And(cols, ops, vals), just do Where(sql, params)... but check
+// the existing params to query to see if the new methods would
+// work with that.
+
+// See the DataStore._select method for an example of how to translate
+// our simple query builder to an orm query. Maybe we build that into
+// the pgmodel base.
+
+// pgmodel interface should implement an Authorize method, which can be
+// similar to the existing authorize methods, only the controllers will
+// be responsible for calling them. That de-couples the web-context-specific
+// User from the data access layer, and permits us to run the app in a
+// console, if need be, like Rails console, which has no notion of user.
+// The current mixing of data access with web user with permissions checking
+// makes things too complex.
