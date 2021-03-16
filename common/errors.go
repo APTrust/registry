@@ -2,6 +2,8 @@ package common
 
 import (
 	"errors"
+	"fmt"
+	"strings"
 )
 
 // ErrNotSignedIn means user has not signed in.
@@ -47,3 +49,26 @@ var ErrParentRecordNotFound = errors.New("parent record not found")
 // ErrInternal is a runtime error that is not the user's fault, hence
 // probably the programmer's fault.
 var ErrInternal = errors.New("internal server error")
+
+type ValidationError struct {
+	Errors map[string]string
+}
+
+func NewValidationError() *ValidationError {
+	return &ValidationError{
+		Errors: make(map[string]string),
+	}
+}
+
+func (v *ValidationError) Error() string {
+	if v.Errors == nil {
+		return ""
+	}
+	errs := make([]string, len(v.Errors))
+	i := 0
+	for field, errMsg := range v.Errors {
+		errs[i] = fmt.Sprintf("%s: %s", field, errMsg)
+		i++
+	}
+	return strings.Join(errs, "\n")
+}

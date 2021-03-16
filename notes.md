@@ -72,11 +72,13 @@ The primary technology stack for the new application will consist of a web appli
 
 Like Pharos, the registry will use a Postgres database and will likely sit behind a Nginx or a similar reverse proxy.
 
-We're also using [ozzo-validation](https://github.com/go-ozzo/ozzo-validation) instead of Gin's built-in [go-playground validator](https://github.com/go-playground/validator) for the following reasons:
+We're also using the dead-simple and utra-flexible [govalidator](https://github.com/asaskevich/govalidator) instead of Gin's built-in [go-playground validator](https://github.com/go-playground/validator) for the following reasons:
 
-1. The specific cross-field validation our app needs is much easier to do in ozzo than in the go-playground validator.
-2. Custom error messages are easier to set in ozzo.
-3. Gin's uses the go-playground validator only in the web handler context, when user data is bound to models. Ozzo lets us attach validators to the models themselves, so we can call them whenever we want, in any context.
+1. The specific cross-field validation our app needs is much easier to do with govalidator than with the go-playground validator.
+2. Custom error messages are easier to set with govalidator.
+3. Gin's uses the go-playground validator only in the web handler context, when user data is bound to models. Govalidator lets us attach validators to the models themselves, so we can call them whenever we want, in any context.
+
+We also evaluated [ozzo-validation](https://github.com/go-ozzo/ozzo-validation) which is built on top of govalidator, but in the end, govalidator was the simplest, richest, and most flexible. It also led to the most readable and maintainable code.
 
 # Web UI
 

@@ -84,24 +84,6 @@ const (
 	TopicObjectRestore         = "restore_object"
 )
 
-var UserActions = []string{
-	ActionCreate,
-	ActionRead,
-	ActionUpdate,
-	ActionDelete,
-	ActionRequestDelete,
-	ActionApproveDelete,
-	ActionFinishBulkDelete,
-	ActionRestore,
-}
-
-var WorkItemActions = []string{
-	ActionDelete,
-	ActionGlacierRestore,
-	ActionIngest,
-	ActionRestore,
-}
-
 var AccessSettings = []string{
 	AccessConsortia,
 	AccessInstitution,
@@ -163,4 +145,22 @@ var StorageOptions = []string{
 	StorageOptionStandard,
 	StorageOptionWasabiOR,
 	StorageOptionWasabiVA,
+}
+
+var UserActions = []string{
+	ActionCreate,
+	ActionRead,
+	ActionUpdate,
+	ActionDelete,
+	ActionRequestDelete,
+	ActionApproveDelete,
+	ActionFinishBulkDelete,
+	ActionRestore,
+}
+
+var WorkItemActions = []string{
+	ActionDelete,
+	ActionGlacierRestore,
+	ActionIngest,
+	ActionRestore,
 }

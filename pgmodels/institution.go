@@ -3,12 +3,12 @@ package pgmodels
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
-	v "github.com/go-ozzo/ozzo-validation/v4"
-	"github.com/go-ozzo/ozzo-validation/v4/is"
+	v "github.com/asaskevich/govalidator"
 	"github.com/go-pg/pg/v10"
 )
 
@@ -62,12 +62,11 @@ func (inst *Institution) BeforeDelete(c context.Context) (context.Context, error
 
 // BeforeInsert sets the CreatedAt and UpdatedAt timestamps on creation.
 func (inst *Institution) BeforeInsert(c context.Context) (context.Context, error) {
-	ctx := common.Context()
 	now := time.Now().UTC()
 	inst.CreatedAt = now
 	inst.UpdatedAt = now
-	inst.ReceivingBucket = fmt.Sprintf("aptrust.receiving%s.%s", ctx.Config.BucketQualifier(), inst.Identifier)
-	inst.RestoreBucket = fmt.Sprintf("aptrust.restore%s.%s", ctx.Config.BucketQualifier(), inst.Identifier)
+	inst.ReceivingBucket = inst.bucket("receiving")
+	inst.RestoreBucket = inst.bucket("restore")
 	inst.State = constants.StateActive
 	return c, inst.Validate()
 }
@@ -78,17 +77,40 @@ func (inst *Institution) BeforeUpdate(c context.Context) (context.Context, error
 	return c, inst.Validate()
 }
 
-func (inst *Institution) Validate() error {
-	return v.ValidateStruct(
-		inst,
-		v.Field(&inst.Name, v.Required.Error(ErrInstName), v.Length(5, 100).Error(ErrInstName)),
-		v.Field(&inst.Identifier, v.Required.Error(ErrInstIdentifier), is.Domain.Error(ErrInstIdentifier)),
-		v.Field(&inst.State, v.Required.Error(ErrInstState), v.In(ValidStates...).Error(ErrInstState)),
-		v.Field(&inst.Type, v.Required.Error(ErrInstType), v.In(ValidInstTypes...).Error(ErrInstType)),
-		v.Field(&inst.ReceivingBucket, v.Required.Error(ErrInstReceiving), v.Length(20, 100).Error(ErrInstReceiving)),
-		v.Field(&inst.RestoreBucket, v.Required.Error(ErrInstRestore), v.Length(20, 100).Error(ErrInstRestore)),
-		v.Field(&inst.MemberInstitutionID, v.When(inst.Type == constants.InstTypeSubscriber, v.Required.Error(ErrInstMemberID))),
-	)
+func (inst *Institution) bucket(name string) string {
+	ctx := common.Context()
+	return fmt.Sprintf("aptrust.%s%s.%s", name, ctx.Config.BucketQualifier(), inst.Identifier)
+}
+
+func (inst *Institution) Validate() *common.ValidationError {
+	errors := make(map[string]string)
+	if !v.IsByteLength(inst.Name, 5, 200) {
+		errors["Name"] = ErrInstName
+	}
+	// DNS names without dots, such as "localhost" are valid,
+	// but we require a DNS name with at least one dot.
+	if !v.IsDNSName(inst.Identifier) || !strings.Contains(inst.Identifier, ".") {
+		errors["Identifier"] = ErrInstIdentifier
+	}
+	if !v.IsIn(inst.State, constants.States...) {
+		errors["State"] = ErrInstState
+	}
+	if !v.IsIn(inst.Type, constants.InstTypes...) {
+		errors["Type"] = ErrInstType
+	}
+	if inst.ReceivingBucket != inst.bucket("receiving") {
+		errors["ReceivingBucket"] = ErrInstReceiving
+	}
+	if inst.RestoreBucket != inst.bucket("restore") {
+		errors["RestoreBucket"] = ErrInstRestore
+	}
+	if inst.Type == constants.InstTypeSubscriber && inst.MemberInstitutionID < int64(1) {
+		errors["MemberInstitutionID"] = ErrInstMemberID
+	}
+	if len(errors) > 0 {
+		return &common.ValidationError{errors}
+	}
+	return nil
 }
 
 // InstitutionGet(db, query) (*Institution, error)
