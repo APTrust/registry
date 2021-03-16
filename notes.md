@@ -72,6 +72,12 @@ The primary technology stack for the new application will consist of a web appli
 
 Like Pharos, the registry will use a Postgres database and will likely sit behind a Nginx or a similar reverse proxy.
 
+We're also using [ozzo-validation](https://github.com/go-ozzo/ozzo-validation) instead of Gin's built-in [go-playground validator](https://github.com/go-playground/validator) for the following reasons:
+
+1. The specific cross-field validation our app needs is much easier to do in ozzo than in the go-playground validator.
+2. Custom error messages are easier to set in ozzo.
+3. Gin's uses the go-playground validator only in the web handler context, when user data is bound to models. Ozzo lets us attach validators to the models themselves, so we can call them whenever we want, in any context.
+
 # Web UI
 
 During development, we'll create a barebones web UI that simply renders the required data without polish. Later, we'll work toward [the UI that Simple Thread mocked up](./docs/APTrust_Wireframes.pdf). During development, however, we only need to ensure that our pages get the data that Simple Thread's UI requires.
