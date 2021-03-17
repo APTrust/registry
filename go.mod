@@ -13,8 +13,7 @@ require (
 	github.com/rs/zerolog v1.20.0
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/stew v0.0.0-20130812190256-80ef0842b48b
-	github.com/stretchr/testify v1.6.1
-	golang.org/x/crypto v0.0.0-20201117144127-c1f2f97bffc9
-	golang.org/x/sys v0.0.0-20210119212857-b64e53b001e4 // indirect
+	github.com/stretchr/testify v1.7.0
+	golang.org/x/crypto v0.0.0-20210220033148-5ea612d1eb83
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 )

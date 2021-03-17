@@ -1,10 +1,11 @@
 package pgmodels_test
 
 import (
-	//"fmt"
+	"fmt"
 	"testing"
 
 	"github.com/APTrust/registry/constants"
+	"github.com/APTrust/registry/db"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -53,4 +54,66 @@ func TestInstitutionValidation(t *testing.T) {
 
 	err = inst.Validate()
 	require.Nil(t, err)
+}
+
+func TestInstitutionByID(t *testing.T) {
+	db.LoadFixtures()
+	inst, err := pgmodels.InstitutionByID(int64(1))
+	require.Nil(t, err)
+	require.NotNil(t, inst)
+	assert.Equal(t, int64(1), inst.ID)
+}
+
+func TestInstitutionByIdentifier(t *testing.T) {
+	db.LoadFixtures()
+	inst, err := pgmodels.InstitutionByIdentifier("test.edu")
+	require.Nil(t, err)
+	require.NotNil(t, inst)
+	assert.Equal(t, "test.edu", inst.Identifier)
+}
+
+func TestInstitutionGet(t *testing.T) {
+	db.LoadFixtures()
+	query := pgmodels.NewQuery().Where("name", "=", "Institution One")
+	inst, err := pgmodels.InstitutionGet(query)
+	require.Nil(t, err)
+	require.NotNil(t, inst)
+	assert.Equal(t, "Institution One", inst.Name)
+}
+
+func TestInstitutionSelect(t *testing.T) {
+	db.LoadFixtures()
+	query := pgmodels.NewQuery()
+	query.Where("name", "!=", "Institution One")
+	query.Where("name", "!=", "Institution Two")
+	query.OrderBy("name asc")
+	institutions, err := pgmodels.InstitutionSelect(query)
+	require.Nil(t, err)
+	require.NotEmpty(t, institutions)
+	assert.True(t, (len(institutions) > 0 && len(institutions) < 10))
+	for _, inst := range institutions {
+		assert.NotEqual(t, "Institution One", inst)
+		assert.NotEqual(t, "Institution Two", inst)
+	}
+}
+
+func TestInstitutionSave(t *testing.T) {
+	db.LoadFixtures()
+	inst := &pgmodels.Institution{
+		Name:       "Unit Test Inst #1",
+		Identifier: "test1.kom",
+		Type:       constants.InstTypeMember,
+	}
+	fmt.Println(inst)
+	err := inst.Save()
+	require.Nil(t, err)
+
+	// pg library should set ID, BeforeInsert hook should set other values
+	assert.True(t, inst.ID > int64(0))
+	fmt.Println(inst)
+	assert.Equal(t, constants.StateActive, inst.State)
+	assert.Equal(t, "aptrust.receiving.test.test1.kom", inst.ReceivingBucket)
+	assert.Equal(t, "aptrust.restore.test.test1.kom", inst.RestoreBucket)
+	assert.NotEmpty(t, inst.CreatedAt)
+	assert.NotEmpty(t, inst.UpdatedAt)
 }

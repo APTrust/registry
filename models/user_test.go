@@ -5,6 +5,7 @@ import (
 
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
+	"github.com/APTrust/registry/db"
 	"github.com/APTrust/registry/models"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -292,6 +293,7 @@ func TestUserIsAdmin(t *testing.T) {
 }
 
 func TestOTPBackupCodes(t *testing.T) {
+	db.LoadFixtures()
 	ctx := common.Context()
 	user := &models.User{}
 

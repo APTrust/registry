@@ -37,9 +37,9 @@ type Institution struct {
 	UpdatedAt           time.Time `json:"updated_at" pg:"updated_at"`
 }
 
-// InstitutionById returns the institution with the specified id.
+// InstitutionByID returns the institution with the specified id.
 // Returns pg.ErrNoRows if there is no match.
-func InstitutionById(id int64) (*Institution, error) {
+func InstitutionByID(id int64) (*Institution, error) {
 	query := NewQuery().Where("id", "=", id)
 	return InstitutionGet(query)
 }
@@ -69,6 +69,12 @@ func InstitutionSelect(query *Query) ([]*Institution, error) {
 // if Institution.ID is zero. Otherwise, it updates.
 func (inst *Institution) Save() error {
 	if inst.ID == int64(0) {
+		now := time.Now().UTC()
+		inst.CreatedAt = now
+		inst.UpdatedAt = now
+		inst.ReceivingBucket = inst.bucket("receiving")
+		inst.RestoreBucket = inst.bucket("restore")
+		inst.State = constants.StateActive
 		return insert(inst)
 	}
 	return update(inst)
@@ -95,7 +101,7 @@ func (inst *Institution) Undelete() error {
 // interfaces.
 var (
 	_ pg.BeforeDeleteHook = (*Institution)(nil)
-	_ pg.BeforeInsertHook = (*Institution)(nil)
+	//	_ pg.BeforeInsertHook = (*Institution)(nil)
 	_ pg.BeforeUpdateHook = (*Institution)(nil)
 )
 
@@ -108,16 +114,21 @@ func (inst *Institution) BeforeDelete(c context.Context) (context.Context, error
 	return c, inst.Validate()
 }
 
+//
+// BeforeInsert hook causes transaction to fail
+//
+
 // BeforeInsert sets timestamps and bucket names on creation.
-func (inst *Institution) BeforeInsert(c context.Context) (context.Context, error) {
-	now := time.Now().UTC()
-	inst.CreatedAt = now
-	inst.UpdatedAt = now
-	inst.ReceivingBucket = inst.bucket("receiving")
-	inst.RestoreBucket = inst.bucket("restore")
-	inst.State = constants.StateActive
-	return c, inst.Validate()
-}
+// func (inst *Institution) BeforeInsert(c context.Context) (context.Context, error) {
+// 	fmt.Println("BEFORE INSERT HOOK CALLED")
+// 	now := time.Now().UTC()
+// 	inst.CreatedAt = now
+// 	inst.UpdatedAt = now
+// 	inst.ReceivingBucket = inst.bucket("receiving")
+// 	inst.RestoreBucket = inst.bucket("restore")
+// 	inst.State = constants.StateActive
+// 	return c, inst.Validate()
+// }
 
 // BeforeUpdate sets the UpdatedAt timestamp.
 func (inst *Institution) BeforeUpdate(c context.Context) (context.Context, error) {

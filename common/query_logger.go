@@ -18,11 +18,13 @@ func NewQueryLogger(logger zerolog.Logger) *QueryLogger {
 }
 
 func (l *QueryLogger) BeforeQuery(c context.Context, qe *pg.QueryEvent) (context.Context, error) {
+	sql, _ := qe.FormattedQuery()
+	l.log.Debug().Msgf("Starting SQL: %s", string(sql))
 	return c, nil
 }
 
 func (l *QueryLogger) AfterQuery(c context.Context, qe *pg.QueryEvent) error {
-	sql, _ := qe.FormattedQuery()
-	l.log.Debug().Msgf("SQL: %s", string(sql))
+	//sql, _ := qe.FormattedQuery()
+	//l.log.Debug().Msgf("Finished SQL: %s", string(sql))
 	return nil
 }
