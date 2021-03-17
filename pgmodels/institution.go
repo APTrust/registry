@@ -37,6 +37,59 @@ type Institution struct {
 	UpdatedAt           time.Time `json:"updated_at" pg:"updated_at"`
 }
 
+// InstitutionById returns the institution with the specified id.
+// Returns pg.ErrNoRows if there is no match.
+func InstitutionById(id int64) (*Institution, error) {
+	query := NewQuery().Where("id", "=", id)
+	return InstitutionGet(query)
+}
+
+// InstitutionById returns the institution with the specified identifier.
+// Returns pg.ErrNoRows if there is no match.
+func InstitutionByIdentifier(identifier string) (*Institution, error) {
+	query := NewQuery().Where("identifier", "=", identifier)
+	return InstitutionGet(query)
+}
+
+// InstitutionGet returns the first institution matching the query.
+func InstitutionGet(query *Query) (*Institution, error) {
+	var institution Institution
+	err := query.Select(&institution)
+	return &institution, err
+}
+
+// InstitutionSelect returns all institutions matching the query.
+func InstitutionSelect(query *Query) ([]*Institution, error) {
+	var institutions []*Institution
+	err := query.Select(&institutions)
+	return institutions, err
+}
+
+// Save saves this institution to the database. This will peform an insert
+// if Institution.ID is zero. Otherwise, it updates.
+func (inst *Institution) Save() error {
+	if inst.ID == int64(0) {
+		return insert(inst)
+	}
+	return update(inst)
+}
+
+// Delete soft-deletes this institution by setting State to 'D' and
+// the DeletedAt timestamp to now. You can undo this with Undelete.
+func (inst *Institution) Delete() error {
+	inst.State = constants.StateDeleted
+	inst.DeactivatedAt = time.Now().UTC()
+	return update(inst)
+}
+
+// Undelete reactivates this institution by setting State to 'A' and
+// clearing the DeletedAt timestamp.
+func (inst *Institution) Undelete() error {
+	inst.State = constants.StateActive
+	inst.DeactivatedAt = time.Time{}
+	return update(inst)
+}
+
 // The following statements have no effect other than to force a compile-time
 // check that ensures our Institution model properly implements these hook
 // interfaces.
@@ -107,30 +160,3 @@ func (inst *Institution) Validate() *common.ValidationError {
 	}
 	return nil
 }
-
-// InstitutionFind(query) (*Institution, error)
-// InstitutionSelect(query) ([]*Institution, error)
-// func (inst *Institution) Save() error
-// func (inst *Institution) Delete() error
-
-// Do binding in controller, not as method on model.
-// After binding, we can validate, or we can simply Save() and get
-// the validation errors from there.
-
-// Param query should be a QueryBuilder based on models.Query, but
-// consider simplifying it. Instead of Where(col, op, vals),
-// And(cols, ops, vals), just do Where(sql, params)... but check
-// the existing params to query to see if the new methods would
-// work with that.
-
-// See the DataStore._select method for an example of how to translate
-// our simple query builder to an orm query. Maybe we build that into
-// the pgmodel base.
-
-// pgmodel interface should implement an Authorize method, which can be
-// similar to the existing authorize methods, only the controllers will
-// be responsible for calling them. That de-couples the web-context-specific
-// User from the data access layer, and permits us to run the app in a
-// console, if need be, like Rails console, which has no notion of user.
-// The current mixing of data access with web user with permissions checking
-// makes things too complex.

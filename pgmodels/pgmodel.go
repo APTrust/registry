@@ -1,17 +1,38 @@
 package pgmodels
 
 import (
-	"context"
+	"github.com/APTrust/registry/common"
+	"github.com/go-pg/pg/v10"
 )
 
-type PGModel interface {
-	AfterDelete(context.Context) error
-	AfterInsert(context.Context) error
-	AfterScan(context.Context) error
-	AfterSelect(context.Context) error
-	AfterUpdate(context.Context) error
-	BeforeDelete(context.Context) (context.Context, error)
-	BeforeInsert(context.Context) (context.Context, error)
-	BeforeScan(context.Context) error
-	BeforeUpdate(context.Context) (context.Context, error)
+type xactType int
+
+const (
+	TypeInsert xactType = iota
+	TypeUpdate
+)
+
+func insert(model interface{}) error {
+	return transact(model, TypeInsert)
+}
+
+func update(model interface{}) error {
+	return transact(model, TypeUpdate)
+}
+
+func transact(model interface{}, action xactType) error {
+	registryContext := common.Context()
+	db := registryContext.DB
+	return db.RunInTransaction(db.Context(), func(*pg.Tx) error {
+		var err error
+		if action == TypeInsert {
+			_, err = db.Model(model).Insert()
+		} else {
+			_, err = db.Model(model).WherePK().Update()
+		}
+		if err != nil {
+			registryContext.Log.Error().Msgf("Transaction failed: %v", err)
+		}
+		return err
+	})
 }
