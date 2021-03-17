@@ -50,4 +50,4 @@ You can change APT_ENV to test if you want to run against the test database, but
 
 # Testing
 
-`APT_ENV=test go test ./...`
+`APT_ENV=test go test -p 1 ./...`
