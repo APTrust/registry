@@ -22,15 +22,12 @@ const (
 	ErrInstMemberID   = "Please choose a parent institution."
 )
 
-var ValidStates = common.InterfaceList(constants.States)
-var ValidInstTypes = common.InterfaceList(constants.InstTypes)
-
 type Institution struct {
 	ID                  int64     `json:"id" form:"id" pg:"id"`
-	Name                string    `json:"name" pg:"name" binding:"required,min=2,max=100"`
+	Name                string    `json:"name" pg:"name"`
 	Identifier          string    `json:"identifier" pg:"identifier"`
 	State               string    `json:"state" pg:"state"`
-	Type                string    `json:"type" pg:"type" binding:"oneof=MemberInstitution SubscriptionInstitution"`
+	Type                string    `json:"type" pg:"type"`
 	MemberInstitutionID int64     `json:"member_institution_id" pg:"member_institution_id"`
 	DeactivatedAt       time.Time `json:"deactivated_at" pg:"deactivated_at,soft_delete"`
 	OTPEnabled          bool      `json:"otp_enabled" pg:"otp_enabled"`
@@ -38,29 +35,27 @@ type Institution struct {
 	RestoreBucket       string    `json:"restore_bucket" pg:"restore_bucket"`
 	CreatedAt           time.Time `json:"created_at" pg:"created_at"`
 	UpdatedAt           time.Time `json:"updated_at" pg:"updated_at"`
-
-	//Users                   []*User        `json:"users" pg:"rel:has-many"`
-	//SubscribingInstitutions []*Institution `json:"subscribing_institutions" pg:"rel:has-many"`
-	// TODO: Add child institutions as an official relation
 }
 
 // The following statements have no effect other than to force a compile-time
 // check that ensures our Institution model properly implements these hook
 // interfaces.
-var _ pg.BeforeDeleteHook = (*Institution)(nil)
-var _ pg.BeforeInsertHook = (*Institution)(nil)
-var _ pg.BeforeUpdateHook = (*Institution)(nil)
+var (
+	_ pg.BeforeDeleteHook = (*Institution)(nil)
+	_ pg.BeforeInsertHook = (*Institution)(nil)
+	_ pg.BeforeUpdateHook = (*Institution)(nil)
+)
 
 // BeforeDelete sets Institution.State to "D" before we perform a
 // soft delete. Note that DeactivatedAt is the soft delete field,
 // which means the pg library sets its timestamp instead of actually
 // expunging the record from the DB.
 func (inst *Institution) BeforeDelete(c context.Context) (context.Context, error) {
-	inst.State = "D"
+	inst.State = constants.StateDeleted
 	return c, inst.Validate()
 }
 
-// BeforeInsert sets the CreatedAt and UpdatedAt timestamps on creation.
+// BeforeInsert sets timestamps and bucket names on creation.
 func (inst *Institution) BeforeInsert(c context.Context) (context.Context, error) {
 	now := time.Now().UTC()
 	inst.CreatedAt = now
