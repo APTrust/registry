@@ -69,12 +69,6 @@ func InstitutionSelect(query *Query) ([]*Institution, error) {
 // if Institution.ID is zero. Otherwise, it updates.
 func (inst *Institution) Save() error {
 	if inst.ID == int64(0) {
-		now := time.Now().UTC()
-		inst.CreatedAt = now
-		inst.UpdatedAt = now
-		inst.ReceivingBucket = inst.bucket("receiving")
-		inst.RestoreBucket = inst.bucket("restore")
-		inst.State = constants.StateActive
 		return insert(inst)
 	}
 	return update(inst)
@@ -101,7 +95,7 @@ func (inst *Institution) Undelete() error {
 // interfaces.
 var (
 	_ pg.BeforeDeleteHook = (*Institution)(nil)
-	//	_ pg.BeforeInsertHook = (*Institution)(nil)
+	_ pg.BeforeInsertHook = (*Institution)(nil)
 	_ pg.BeforeUpdateHook = (*Institution)(nil)
 )
 
@@ -114,33 +108,47 @@ func (inst *Institution) BeforeDelete(c context.Context) (context.Context, error
 	return c, inst.Validate()
 }
 
-//
-// BeforeInsert hook causes transaction to fail
-//
-
 // BeforeInsert sets timestamps and bucket names on creation.
-// func (inst *Institution) BeforeInsert(c context.Context) (context.Context, error) {
-// 	fmt.Println("BEFORE INSERT HOOK CALLED")
-// 	now := time.Now().UTC()
-// 	inst.CreatedAt = now
-// 	inst.UpdatedAt = now
-// 	inst.ReceivingBucket = inst.bucket("receiving")
-// 	inst.RestoreBucket = inst.bucket("restore")
-// 	inst.State = constants.StateActive
-// 	return c, inst.Validate()
-// }
+func (inst *Institution) BeforeInsert(c context.Context) (context.Context, error) {
+	now := time.Now().UTC()
+	inst.CreatedAt = now
+	inst.UpdatedAt = now
+	inst.ReceivingBucket = inst.bucket("receiving")
+	inst.RestoreBucket = inst.bucket("restore")
+	inst.State = constants.StateActive
+
+	// WTF? The following:
+	//
+	// return c, inst.Validate()
+	//
+	// causes transaction to fail, even when inst.Validate() returns nil.
+	// So we have to do this BS.
+	err := inst.Validate()
+	if err == nil {
+		return c, nil
+	}
+	return c, err
+}
 
 // BeforeUpdate sets the UpdatedAt timestamp.
 func (inst *Institution) BeforeUpdate(c context.Context) (context.Context, error) {
 	inst.UpdatedAt = time.Now().UTC()
-	return c, inst.Validate()
+	err := inst.Validate()
+	if err == nil {
+		return c, nil
+	}
+	return c, err
 }
 
+// bucket returns a valid bucket name for this institution.
+// Param name should be "receiving" or "restore"
 func (inst *Institution) bucket(name string) string {
 	ctx := common.Context()
 	return fmt.Sprintf("aptrust.%s%s.%s", name, ctx.Config.BucketQualifier(), inst.Identifier)
 }
 
+// Validate validates the model. This is called automatically on insert
+// and update.
 func (inst *Institution) Validate() *common.ValidationError {
 	errors := make(map[string]string)
 	if !v.IsByteLength(inst.Name, 5, 200) {
