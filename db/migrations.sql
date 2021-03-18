@@ -32,7 +32,7 @@ begin
     drop table if exists roles;
   end if;
 end
-$$
+$$;
 
 -- The ingest_state columns were part of a proposed architecture we never
 -- implemented. They have never been used, and we don't need them.
@@ -55,7 +55,7 @@ begin
     alter table work_items rename column "date" to "date_processed";
   end if;
 end
-$$
+$$;
 
 -- Update the indexes on work_items to reflect the change from date to
 -- date_processed.
@@ -100,3 +100,8 @@ drop index if exists index_intellectual_objects_on_state;
 -- premis_events
 drop index if exists index_premis_events_on_generic_file_id_and_event_type;
 drop index if exists index_premis_events_on_identifier_and_institution_id;
+
+-- institutions
+create unique index if not exists index_institutions_identifier on public.institutions using btree(identifier);
+create unique index if not exists index_institutions_receiving_bucket on public.institutions using btree(receiving_bucket);
+create unique index if not exists index_institutions_restore_bucket on public.institutions using btree(restore_bucket);
