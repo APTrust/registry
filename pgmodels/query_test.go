@@ -22,35 +22,35 @@ func TestQueryWhere(t *testing.T) {
 	// Int
 	q = pgmodels.NewQuery()
 	q.Where("id", "=", 100)
-	assert.Equal(t, `("id" = ?)`, q.WhereClause())
+	assert.Equal(t, `(id = ?)`, q.WhereClause())
 	require.Equal(t, 1, len(q.Params()))
 	assert.Equal(t, 100, q.Params()[0])
 
 	// Int64
 	q = pgmodels.NewQuery()
 	q.Where("id", "=", int64(100))
-	assert.Equal(t, `("id" = ?)`, q.WhereClause())
+	assert.Equal(t, `(id = ?)`, q.WhereClause())
 	require.Equal(t, 1, len(q.Params()))
 	assert.Equal(t, int64(100), q.Params()[0])
 
 	// String
 	q = pgmodels.NewQuery()
 	q.Where("name", "=", "Homer Simpson")
-	assert.Equal(t, `("name" = ?)`, q.WhereClause())
+	assert.Equal(t, `(name = ?)`, q.WhereClause())
 	require.Equal(t, 1, len(q.Params()))
 	assert.Equal(t, "Homer Simpson", q.Params()[0])
 
 	// Bool
 	q = pgmodels.NewQuery()
 	q.Where("active", "=", true)
-	assert.Equal(t, `("active" = ?)`, q.WhereClause())
+	assert.Equal(t, `(active = ?)`, q.WhereClause())
 	require.Equal(t, 1, len(q.Params()))
 	assert.Equal(t, true, q.Params()[0])
 
 	// Time
 	q = pgmodels.NewQuery()
 	q.Where("created_at", ">=", TestDate)
-	assert.Equal(t, `("created_at" >= ?)`, q.WhereClause())
+	assert.Equal(t, `(created_at >= ?)`, q.WhereClause())
 	require.Equal(t, 1, len(q.Params()))
 	assert.Equal(t, TestDate, q.Params()[0])
 }
@@ -58,14 +58,14 @@ func TestQueryWhere(t *testing.T) {
 func TestWithIsNull(t *testing.T) {
 	q := pgmodels.NewQuery()
 	q.IsNull("email")
-	assert.Equal(t, `("email" is null)`, q.WhereClause())
+	assert.Equal(t, `(email is null)`, q.WhereClause())
 	assert.Equal(t, 0, len(q.Params()))
 }
 
 func TestWithIsNotNull(t *testing.T) {
 	q := pgmodels.NewQuery()
 	q.IsNotNull("email")
-	assert.Equal(t, `("email" is not null)`, q.WhereClause())
+	assert.Equal(t, `(email is not null)`, q.WhereClause())
 	assert.Equal(t, 0, len(q.Params()))
 }
 
@@ -76,7 +76,7 @@ func TestOr(t *testing.T) {
 	vals := []interface{}{"val1", "val2", "val3"}
 	q.Or(cols, ops, vals)
 
-	assert.Equal(t, `("col1" = ? OR "col2" < ? OR "col3" > ?)`, q.WhereClause())
+	assert.Equal(t, `(col1 = ? OR col2 < ? OR col3 > ?)`, q.WhereClause())
 	assert.Equal(t, 3, len(q.Params()))
 }
 
@@ -87,21 +87,21 @@ func TestAnd(t *testing.T) {
 	vals := []interface{}{"val1", "val2", "val3"}
 	q.And(cols, ops, vals)
 
-	assert.Equal(t, `("col1" = ? AND "col2" < ? AND "col3" > ?)`, q.WhereClause())
+	assert.Equal(t, `(col1 = ? AND col2 < ? AND col3 > ?)`, q.WhereClause())
 	assert.Equal(t, 3, len(q.Params()))
 }
 
 func TestBetweenInclusive(t *testing.T) {
 	q := pgmodels.NewQuery()
 	q.BetweenInclusive("col1", 28, 42)
-	assert.Equal(t, `("col1" >= ? AND "col1" <= ?)`, q.WhereClause())
+	assert.Equal(t, `(col1 >= ? AND col1 <= ?)`, q.WhereClause())
 	assert.Equal(t, 2, len(q.Params()))
 }
 
 func TestBetweenExclusive(t *testing.T) {
 	q := pgmodels.NewQuery()
 	q.BetweenExclusive("col1", 28, 42)
-	assert.Equal(t, `("col1" > ? AND "col1" < ?)`, q.WhereClause())
+	assert.Equal(t, `(col1 > ? AND col1 < ?)`, q.WhereClause())
 	assert.Equal(t, 2, len(q.Params()))
 }
 
@@ -114,7 +114,7 @@ func TestMakePlaceholders(t *testing.T) {
 func TestWithAny(t *testing.T) {
 	q := pgmodels.NewQuery()
 	q.WithAny("col12", []interface{}{1, 2, 3, 4}...)
-	assert.Equal(t, `("col12" IN (?, ?, ?, ?))`, q.WhereClause())
+	assert.Equal(t, `(col12 IN (?, ?, ?, ?))`, q.WhereClause())
 	assert.Equal(t, 4, len(q.Params()))
 }
 
@@ -135,7 +135,7 @@ func TestWithMultipleConditions(t *testing.T) {
 	q.WithAny("col12", []interface{}{1, 2, 3, 4}...)
 	q.IsNull("col99")
 
-	assert.Equal(t, `("org_id" = ?) AND ("name" = ?) AND ("active" = ?) AND ("created_at" >= ?) AND ("age" >= ? AND "age" <= ?) AND ("col1" = ? OR "col2" < ? OR "col3" > ?) AND ("col12" IN (?, ?, ?, ?)) AND ("col99" is null)`, q.WhereClause())
+	assert.Equal(t, `(org_id = ?) AND (name = ?) AND (active = ?) AND (created_at >= ?) AND (age >= ? AND age <= ?) AND (col1 = ? OR col2 < ? OR col3 > ?) AND (col12 IN (?, ?, ?, ?)) AND (col99 is null)`, q.WhereClause())
 	require.Equal(t, 13, len(q.Params()))
 	assert.Equal(t, int64(100), q.Params()[0])
 	assert.Equal(t, "Ned Flanders", q.Params()[1])

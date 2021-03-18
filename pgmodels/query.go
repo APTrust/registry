@@ -44,20 +44,20 @@ func NewQuery() *Query {
 }
 
 func (q *Query) Where(col, op string, val interface{}) *Query {
-	cond := fmt.Sprintf(`("%s" %s ?)`, col, op)
+	cond := fmt.Sprintf(`(%s %s ?)`, col, op)
 	q.conditions = append(q.conditions, cond)
 	q.params = append(q.params, val)
 	return q
 }
 
 func (q *Query) IsNull(col string) *Query {
-	cond := fmt.Sprintf(`("%s" is null)`, col)
+	cond := fmt.Sprintf(`(%s is null)`, col)
 	q.conditions = append(q.conditions, cond)
 	return q
 }
 
 func (q *Query) IsNotNull(col string) *Query {
-	cond := fmt.Sprintf(`("%s" is not null)`, col)
+	cond := fmt.Sprintf(`(%s is not null)`, col)
 	q.conditions = append(q.conditions, cond)
 	return q
 }
@@ -76,7 +76,7 @@ func (q *Query) multi(cols, ops []string, vals []interface{}, logicOp string) {
 	if len(vals) > 0 && len(cols) == len(vals) {
 		conditions := make([]string, len(cols))
 		for i, col := range cols {
-			conditions[i] = fmt.Sprintf(`"%s" %s ?`, col, ops[i])
+			conditions[i] = fmt.Sprintf(`%s %s ?`, col, ops[i])
 			q.params = append(q.params, vals[i])
 		}
 		cond := fmt.Sprintf("(%s)", strings.Join(conditions, logicOp))
@@ -85,14 +85,14 @@ func (q *Query) multi(cols, ops []string, vals []interface{}, logicOp string) {
 }
 
 func (q *Query) BetweenInclusive(col string, low, high interface{}) *Query {
-	cond := fmt.Sprintf(`("%s" >= ? AND "%s" <= ?)`, col, col)
+	cond := fmt.Sprintf(`(%s >= ? AND %s <= ?)`, col, col)
 	q.conditions = append(q.conditions, cond)
 	q.params = append(q.params, low, high)
 	return q
 }
 
 func (q *Query) BetweenExclusive(col string, low, high interface{}) *Query {
-	cond := fmt.Sprintf(`("%s" > ? AND "%s" < ?)`, col, col)
+	cond := fmt.Sprintf(`(%s > ? AND %s < ?)`, col, col)
 	q.conditions = append(q.conditions, cond)
 	q.params = append(q.params, low, high)
 	return q
@@ -101,7 +101,7 @@ func (q *Query) BetweenExclusive(col string, low, high interface{}) *Query {
 func (q *Query) WithAny(col string, vals ...interface{}) *Query {
 	if len(vals) > 0 {
 		paramStr := q.MakePlaceholders(len(q.params), len(vals))
-		cond := fmt.Sprintf(`("%s" IN (%s))`, col, paramStr)
+		cond := fmt.Sprintf(`(%s IN (%s))`, col, paramStr)
 		q.conditions = append(q.conditions, cond)
 		q.params = append(q.params, vals...)
 	}
