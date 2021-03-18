@@ -11,9 +11,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Auth eusures the current user is logged in for all requests other
+// Authenticate eusures the current user is logged in for all requests other
 // than those going to "/" or static resources.
-func Auth() gin.HandlerFunc {
+func Authenticate() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if !ExemptFromAuth(c) {
 			user, err := GetUserFromSession(c)
@@ -59,21 +59,5 @@ func GetUserFromSession(c *gin.Context) (user *models.User, err error) {
 
 func ExemptFromAuth(c *gin.Context) bool {
 	p := c.FullPath()
-	return p == "/" || p == "/users/sign_in" || strings.HasPrefix(p, "/static") || strings.HasPrefix(p, "/favicon")
+	return p == "/" || p == "/users/sign_in" || strings.HasPrefix(p, "/static") || strings.HasPrefix(p, "/favicon") || strings.HasPrefix(p, "/error")
 }
-
-// TODO: Check permission based on user, resource, and institution id.
-//
-// - Get resource type from route (requires route to resource map -
-//   consider wrapping route.Register to do that).
-// - Get resource id from route (if available).
-// - Ask DB for institution id of resource.
-// - Check permission and set context vars saying permission was checked
-//   and whether check passed.
-// - If permission was not checked, or if error occurred, return status 500
-//   with missing check error.
-// - If not authorized, return 403.
-// - If authorized, proceed to handler.
-// - Index methods should still force user's institution ID into query.
-// - Some resources, like checksums and storage records, will have to
-//   get the InstitutionID from the parent object.

@@ -48,8 +48,9 @@ func initMiddleware(router *gin.Engine) {
 		UTC:    true,
 	}))
 
-	// Then authentication middleware
-	router.Use(middleware.Auth())
+	// Then authentication and authorization middleware
+	router.Use(middleware.Authenticate())
+	router.Use(middleware.Authorize())
 }
 
 // initRoutes maps URLs to handlers.
