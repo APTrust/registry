@@ -2,6 +2,7 @@ package forms
 
 import (
 	"github.com/APTrust/registry/models"
+	"github.com/APTrust/registry/pgmodels"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 )
@@ -30,7 +31,7 @@ func NewUserForm(ds *models.DataStore, user *models.User) (*UserForm, error) {
 func (f *UserForm) init() {
 	f.Fields["Name"] = &Field{
 		Name:        "Name",
-		ErrMsg:      "Name must contain at least two letters.",
+		ErrMsg:      pgmodels.ErrUserName,
 		Label:       "Name",
 		Placeholder: "Name",
 		Attrs: map[string]string{
@@ -39,7 +40,7 @@ func (f *UserForm) init() {
 	}
 	f.Fields["Email"] = &Field{
 		Name:        "Email",
-		ErrMsg:      "Valid email address required.",
+		ErrMsg:      pgmodels.ErrUserEmail,
 		Label:       "Email Address",
 		Placeholder: "Email Address",
 		Attrs: map[string]string{
@@ -48,7 +49,7 @@ func (f *UserForm) init() {
 	}
 	f.Fields["PhoneNumber"] = &Field{
 		Name:        "PhoneNumber",
-		ErrMsg:      "Please enter a phone number in format +2125551212.",
+		ErrMsg:      pgmodels.ErrUserPhone,
 		Label:       "Phone",
 		Placeholder: "Phone in format +2125551212",
 		Attrs: map[string]string{
@@ -58,7 +59,7 @@ func (f *UserForm) init() {
 	f.Fields["OTPRequiredForLogin"] = &Field{
 		Name:    "OTPRequiredForLogin",
 		Label:   "Require Two-Factor Auth",
-		ErrMsg:  "Please choose yes or no.",
+		ErrMsg:  pgmodels.ErrUser2Factor,
 		Options: YesNoList,
 		Attrs: map[string]string{
 			"required": "",
@@ -68,6 +69,7 @@ func (f *UserForm) init() {
 		Name:        "GracePeriod",
 		Label:       "Must enable two-factor auth by",
 		Placeholder: "mm/dd/yyyy",
+		ErrMsg:      pgmodels.ErrUserGracePeriod,
 		Attrs: map[string]string{
 			"min": "2021-01-01",
 			"max": "2099-12-31",
@@ -76,6 +78,7 @@ func (f *UserForm) init() {
 	f.Fields["InstitutionID"] = &Field{
 		Name:    "InstitutionID",
 		Label:   "Institution",
+		ErrMsg:  pgmodels.ErrUserInst,
 		Options: f.instOptions,
 		Attrs: map[string]string{
 			"required": "",
@@ -83,7 +86,7 @@ func (f *UserForm) init() {
 	}
 	f.Fields["Role"] = &Field{
 		Name:    "Role",
-		ErrMsg:  "Please choose a role for this user.",
+		ErrMsg:  pgmodels.ErrUserRole,
 		Label:   "Role",
 		Options: RolesList,
 		Attrs: map[string]string{

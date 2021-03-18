@@ -36,3 +36,11 @@ func transact(model interface{}, action xactType) error {
 		return err
 	})
 }
+
+// IsNoRowError returns true if err is pg.ErrNoRows. For some reason,
+// err doesn't compare correctly with pg.ErrNoRows, and errors.Is()
+// doesn't work either. Probably because pg.ErrNoRows is an alias of
+// an error in the pg/internal package, which we cannot access.
+func IsNoRowError(err error) bool {
+	return err != nil && err.Error() == pg.ErrNoRows.Error()
+}

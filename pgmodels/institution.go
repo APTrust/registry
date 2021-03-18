@@ -44,8 +44,8 @@ func InstitutionByID(id int64) (*Institution, error) {
 	return InstitutionGet(query)
 }
 
-// InstitutionById returns the institution with the specified identifier.
-// Returns pg.ErrNoRows if there is no match.
+// InstitutionByIdentifier returns the institution with the specified
+// identifier. Returns pg.ErrNoRows if there is no match.
 func InstitutionByIdentifier(identifier string) (*Institution, error) {
 	query := NewQuery().Where("identifier", "=", identifier)
 	return InstitutionGet(query)
@@ -94,19 +94,9 @@ func (inst *Institution) Undelete() error {
 // check that ensures our Institution model properly implements these hook
 // interfaces.
 var (
-	_ pg.BeforeDeleteHook = (*Institution)(nil)
 	_ pg.BeforeInsertHook = (*Institution)(nil)
 	_ pg.BeforeUpdateHook = (*Institution)(nil)
 )
-
-// BeforeDelete sets Institution.State to "D" before we perform a
-// soft delete. Note that DeactivatedAt is the soft delete field,
-// which means the pg library sets its timestamp instead of actually
-// expunging the record from the DB.
-func (inst *Institution) BeforeDelete(c context.Context) (context.Context, error) {
-	inst.State = constants.StateDeleted
-	return c, inst.Validate()
-}
 
 // BeforeInsert sets timestamps and bucket names on creation.
 func (inst *Institution) BeforeInsert(c context.Context) (context.Context, error) {

@@ -102,6 +102,13 @@ var InstTypes = []string{
 	InstTypeSubscriber,
 }
 
+var Roles = []string{
+	RoleInstAdmin,
+	RoleInstUser,
+	RoleNone,
+	RoleSysAdmin,
+}
+
 var Stages = []string{
 	StageAvailableInS3,
 	StageCleanup,
