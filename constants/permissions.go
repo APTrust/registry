@@ -65,8 +65,65 @@ const (
 	WorkItemDelete                    = "WorkItemDelete"
 )
 
+var Permissions = []Permission{
+	AlertCreate,
+	AlertRead,
+	AlertUpdate,
+	AlertDelete,
+	ChecksumCreate,
+	ChecksumRead,
+	ChecksumUpdate,
+	ChecksumDelete,
+	EventCreate,
+	EventRead,
+	EventUpdate,
+	EventDelete,
+	FileCreate,
+	FileRead,
+	FileUpdate,
+	FileDelete,
+	FileRequestDelete,
+	FileApproveDelete,
+	FileFinishBulkDelete,
+	FileRestore,
+	InstitutionCreate,
+	InstitutionRead,
+	InstitutionUpdate,
+	InstitutionDelete,
+	ObjectCreate,
+	ObjectRead,
+	ObjectUpdate,
+	ObjectDelete,
+	ObjectRequestDelete,
+	ObjectApproveDelete,
+	ObjectFinishBulkDelete,
+	ObjectRestore,
+	StorageRecordCreate,
+	StorageRecordRead,
+	StorageRecordUpdate,
+	StorageRecordDelete,
+	UserCreate,
+	UserRead,
+	UserUpdate,
+	UserDelete,
+	UserReadSelf,
+	UserUpdateSelf,
+	UserDeleteSelf,
+	WorkItemCreate,
+	WorkItemRead,
+	WorkItemUpdate,
+	WorkItemDelete,
+}
+
+var ForbiddenToAll = []Permission{
+	ChecksumUpdate,
+	ChecksumDelete,
+	EventUpdate,
+	EventDelete,
+}
+
 var permissionsInitialized = false
-var permissionCount = 46
+var permissionCount = len(Permissions)
 
 // Permission lists for different roles. Bools default to false in Go,
 // so roles will have only the permissions we explicitly grant below.
@@ -154,6 +211,7 @@ func initPermissions() {
 	sysAdmin[UserRead] = true
 	sysAdmin[UserUpdate] = true
 	sysAdmin[UserDelete] = true
+	sysAdmin[UserDeleteSelf] = true
 	sysAdmin[UserReadSelf] = true
 	sysAdmin[UserUpdateSelf] = true
 	sysAdmin[WorkItemCreate] = true

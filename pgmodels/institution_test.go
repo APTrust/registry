@@ -1,7 +1,6 @@
 package pgmodels_test
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/APTrust/registry/constants"
@@ -104,13 +103,11 @@ func TestInstitutionSave(t *testing.T) {
 		Identifier: "test1.kom",
 		Type:       constants.InstTypeMember,
 	}
-	fmt.Println(inst)
 	err := inst.Save()
 	require.Nil(t, err)
 
 	// pg library should set ID, BeforeInsert hook should set other values
 	assert.True(t, inst.ID > int64(0))
-	fmt.Println(inst)
 	assert.Equal(t, constants.StateActive, inst.State)
 	assert.Equal(t, "aptrust.receiving.test.test1.kom", inst.ReceivingBucket)
 	assert.Equal(t, "aptrust.restore.test.test1.kom", inst.RestoreBucket)
