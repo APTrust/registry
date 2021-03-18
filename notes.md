@@ -80,6 +80,10 @@ We're also using the dead-simple and utra-flexible [govalidator](https://github.
 
 We also evaluated [ozzo-validation](https://github.com/go-ozzo/ozzo-validation) which is built on top of govalidator, but in the end, govalidator was the simplest, richest, and most flexible. It also led to the most readable and maintainable code.
 
+Model validation takes place on the model itself before insert and update, triggered by go-pg's built-in hooks. Validation is explicit and clear, using no reflection or hard-to-debug abstraction, so we can easily follow the logic when debugging.
+
+Clarity is a guiding principle for this entire code base. When choosing between writing five lines of explicit, unambiguous code and using a clever one-liner from a third-party reflection library, we write the five lines. That spares future developers hours of painful debugging.
+
 # Web UI
 
 During development, we'll create a barebones web UI that simply renders the required data without polish. Later, we'll work toward [the UI that Simple Thread mocked up](./docs/APTrust_Wireframes.pdf). During development, however, we only need to ensure that our pages get the data that Simple Thread's UI requires.

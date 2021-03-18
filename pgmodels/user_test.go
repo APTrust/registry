@@ -2,14 +2,32 @@ package pgmodels_test
 
 import (
 	"testing"
+	"time"
 
-	//"github.com/APTrust/registry/common"
+	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/db"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/stretchr/stew/slice"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+)
+
+const (
+
+	// Test constants for users (from fixture data)
+	SysAdmin     = "system@aptrust.org"
+	InstAdmin    = "admin@inst1.edu"
+	InstUser     = "user@inst1.edu"
+	InactiveUser = "inactive@inst1.edu"
+	Password     = "password"
+
+	// Institution IDs (from fixture data)
+	InstAPTrust = int64(1)
+	InstOne     = int64(2)
+	InstTwo     = int64(3)
+	InstTest    = int64(4)
+	InstExample = int64(5)
 )
 
 func TestUserHasPermission(t *testing.T) {
@@ -100,4 +118,198 @@ func TestOTPBackupCodes(t *testing.T) {
 		"code3",
 	}
 	assert.Equal(t, codes, user.OTPBackupCodes)
+}
+
+func TestUserByID(t *testing.T) {
+	db.LoadFixtures()
+	user, err := pgmodels.UserByID(int64(1))
+	require.Nil(t, err)
+	require.NotNil(t, user)
+	assert.Equal(t, int64(1), user.ID)
+	assert.NotNil(t, user.Role)
+	assert.NotNil(t, user.Institution)
+}
+
+func TestUserByEmail(t *testing.T) {
+	db.LoadFixtures()
+	user, err := pgmodels.UserByEmail(SysAdmin)
+	require.Nil(t, err)
+	require.NotNil(t, user)
+	assert.Equal(t, int64(1), user.ID)
+	assert.Equal(t, constants.RoleSysAdmin, user.Role)
+	assert.Equal(t, "aptrust.org", user.Institution.Identifier)
+}
+
+func TestUserByGet(t *testing.T) {
+	db.LoadFixtures()
+	query := pgmodels.NewQuery().Where(`"user"."name"`, "=", "Inst One Admin")
+	user, err := pgmodels.UserGet(query)
+	require.Nil(t, err)
+	require.NotNil(t, user)
+	assert.Equal(t, "Inst One Admin", user.Name)
+	assert.NotNil(t, user.Role)
+	assert.NotNil(t, user.Institution)
+}
+
+func TestUserSignIn_Valid(t *testing.T) {
+	db.LoadFixtures()
+	// Constants below are defined in models/common_test.go
+	users := []string{
+		SysAdmin,
+		InstAdmin,
+		InstUser,
+	}
+	for _, email := range users {
+		user, err := pgmodels.UserSignIn(email, Password, "1.1.1.1")
+		require.Nil(t, err, email)
+		require.NotNil(t, user)
+		assert.Equal(t, email, user.Email)
+		assert.Equal(t, "1.1.1.1", user.CurrentSignInIP)
+		assert.True(t, user.SignInCount > 0)
+		assert.InDelta(t, time.Now().Unix(), user.CurrentSignInAt.Unix(), 10)
+		assert.NotNil(t, user.Role)
+		assert.NotNil(t, user.Institution)
+		oldSignInTime := user.CurrentSignInAt
+		oldSignInCount := user.SignInCount
+
+		user, err = pgmodels.UserSignIn(email, Password, "2.2.2.2")
+		require.Nil(t, err)
+		require.NotNil(t, user)
+		assert.Equal(t, "2.2.2.2", user.CurrentSignInIP)
+		assert.True(t, user.SignInCount > oldSignInCount)
+		assert.True(t, user.CurrentSignInAt.After(oldSignInTime))
+	}
+}
+
+func TestUserSignIn_Invalid(t *testing.T) {
+	db.LoadFixtures()
+
+	// User does not exist
+	user, err := pgmodels.UserSignIn("noone@example.com", "xyz", "1.1.1.1")
+	require.NotNil(t, err)
+	require.Nil(t, user)
+	assert.Equal(t, common.ErrInvalidLogin, err)
+
+	// User exists, wrong password
+	user, err = pgmodels.UserSignIn(SysAdmin, "xyz", "1.1.1.1")
+	require.NotNil(t, err)
+	require.Nil(t, user)
+	assert.Equal(t, common.ErrInvalidLogin, err)
+}
+
+func TestUserSignIn_Deactivated(t *testing.T) {
+	db.LoadFixtures()
+	user, err := pgmodels.UserSignIn(InactiveUser, Password, "1.1.1.1")
+	require.NotNil(t, err)
+	require.Nil(t, user)
+	assert.Equal(t, common.ErrAccountDeactivated, err)
+}
+
+func TestUserSaveDeleteUndelete(t *testing.T) {
+	db.LoadFixtures()
+	pwd, err := common.EncryptPassword("Duff Beer")
+	require.Nil(t, err)
+	user := pgmodels.User{
+		Name:              "Barney Gumble",
+		Email:             "barney@simpsons.kom",
+		InstitutionID:     InstTest,
+		Role:              constants.RoleInstUser,
+		EncryptedPassword: pwd,
+	}
+	err = user.Save()
+	require.Nil(t, err)
+	require.True(t, user.ID > int64(0))
+	assert.Empty(t, user.DeactivatedAt)
+
+	err = user.Delete()
+	require.Nil(t, err)
+	assert.NotEmpty(t, user.DeactivatedAt)
+
+	err = user.Undelete()
+	require.Nil(t, err)
+	assert.Empty(t, user.DeactivatedAt)
+}
+
+func TestUserSelect(t *testing.T) {
+	db.LoadFixtures()
+	query := pgmodels.NewQuery().Where("institution_id", "=", int64(2)).OrderBy("email asc")
+	users, err := pgmodels.UserSelect(query)
+	require.Nil(t, err)
+	require.NotEmpty(t, users)
+
+	// These three users are part of the fixture data.
+	// There may be more, created by other tests.
+	expected := []string{
+		"admin@inst1.edu",
+		"inactive@inst1.edu",
+		"user@inst1.edu",
+	}
+	assert.True(t, len(users) >= len(expected))
+	for _, email := range expected {
+		found := false
+		for _, user := range users {
+			if user.Email == email {
+				found = true
+			}
+		}
+		assert.True(t, found, "%s missing from results", email)
+	}
+}
+
+func TestUserValidate(t *testing.T) {
+	user := pgmodels.User{}
+	err := user.Validate()
+	require.NotNil(t, err)
+
+	assert.Equal(t, pgmodels.ErrUserName, err.Errors["Name"])
+	assert.Equal(t, pgmodels.ErrUserEmail, err.Errors["Email"])
+	assert.Equal(t, pgmodels.ErrUserInst, err.Errors["InstitutionID"])
+	assert.Equal(t, pgmodels.ErrUserRole, err.Errors["Role"])
+
+	// PhoneNumber can be empty, so no error here
+	assert.Empty(t, err.Errors["PhoneNumber"])
+
+	// GracePeriod not required if OTPRequiredForLogin is false
+	assert.Empty(t, err.Errors["GracePeriod"])
+
+	// Check Phone and Grace Period
+	user.PhoneNumber = "4321-22"
+	user.OTPRequiredForLogin = true
+	err = user.Validate()
+	require.NotNil(t, err)
+	assert.Equal(t, pgmodels.ErrUserPhone, err.Errors["PhoneNumber"])
+	assert.Equal(t, pgmodels.ErrUserGracePeriod, err.Errors["GracePeriod"])
+
+	user.Email = "not@valid"
+	err = user.Validate()
+	require.NotNil(t, err)
+	assert.Equal(t, pgmodels.ErrUserEmail, err.Errors["Email"])
+
+	user.Role = "Invalid Role"
+	err = user.Validate()
+	require.NotNil(t, err)
+	assert.Equal(t, pgmodels.ErrUserRole, err.Errors["Role"])
+
+	user.InstitutionID = InstTwo
+	user.Role = constants.RoleSysAdmin
+	err = user.Validate()
+	require.NotNil(t, err)
+	assert.Equal(t, pgmodels.ErrUserInvalidAdmin, err.Errors["Role"])
+
+	// Now let's make a fully legit user and make sure
+	// he passed validation.
+	pwd, encErr := common.EncryptPassword("Okaly Dokaly, Homer!")
+	require.Nil(t, encErr)
+
+	user.Name = "Ned Flanders"
+	user.Email = "flanders@simpson.kom"
+	user.PhoneNumber = "+12028089999"
+	user.OTPRequiredForLogin = true
+	user.GracePeriod = time.Now().UTC().Add(time.Hour * 24)
+	user.Role = constants.RoleInstUser
+	user.InstitutionID = InstTest
+	user.EncryptedPassword = pwd
+
+	err = user.Validate()
+	require.Nil(t, err)
 }

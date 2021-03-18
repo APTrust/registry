@@ -12,17 +12,20 @@ import (
 )
 
 // Phone: +1234567890 (10 digits)
-var rePhone = regexp.MustCompile("^\\+{d}10$")
+var rePhone = regexp.MustCompile("^\\+[0-9]{11}$")
 var reNumeric = regexp.MustCompile("[^0-9]+")
 
 const (
-	ErrUserName        = "Name must contain at least 2 characters."
-	ErrUserEmail       = "Email address is required."
-	ErrUserPhone       = "Please enter a phone number in format +2125551212."
-	ErrUser2Factor     = "Please choose yes or no."
-	ErrUserGracePeriod = "Enter a date specifying when this user must enable two-factor authentication."
-	ErrUserInst        = "Please choose an institution."
-	ErrUserRole        = "Please choose a role for this user."
+	ErrUserName         = "Name must contain at least 2 characters."
+	ErrUserEmail        = "Email address is required."
+	ErrUserPhone        = "Please enter a phone number in format +2125551212."
+	ErrUser2Factor      = "Please choose yes or no."
+	ErrUserGracePeriod  = "Enter a date specifying when this user must enable two-factor authentication."
+	ErrUserInst         = "Please choose an institution."
+	ErrUserRole         = "Please choose a role for this user."
+	ErrUserInstNotFound = "Internal error: cannot find institution."
+	ErrUserInvalidAdmin = "Admin role is not valid for this institution."
+	ErrUserPwdMissing   = "Encrypted password is missing."
 )
 
 // User is a person who can log in and do stuff.
@@ -68,21 +71,21 @@ type User struct {
 // UserByID returns the institution with the specified id.
 // Returns pg.ErrNoRows if there is no match.
 func UserByID(id int64) (*User, error) {
-	query := NewQuery().Where("id", "=", id)
+	query := NewQuery().Where(`"user"."id"`, "=", id)
 	return UserGet(query)
 }
 
 // UserByEmail returns the user with the specified email address.
 // Returns pg.ErrNoRows if there is no match.
 func UserByEmail(email string) (*User, error) {
-	query := NewQuery().Where("email", "=", email)
+	query := NewQuery().Where(`"user"."email"`, "=", email)
 	return UserGet(query)
 }
 
 // UserGet returns the first user matching the query.
 func UserGet(query *Query) (*User, error) {
 	var user User
-	err := query.Select(&user)
+	err := query.Relations("Institution").Select(&user)
 	return &user, err
 }
 
@@ -153,14 +156,6 @@ func (user *User) Undelete() error {
 	return update(user)
 }
 
-func (user *User) SetTimestamps() {
-	now := time.Now().UTC()
-	if user.CreatedAt.IsZero() {
-		user.CreatedAt = now
-	}
-	user.UpdatedAt = now
-}
-
 func (user *User) Validate() *common.ValidationError {
 	errors := make(map[string]string)
 	if !v.IsByteLength(user.Name, 2, 200) {
@@ -169,7 +164,7 @@ func (user *User) Validate() *common.ValidationError {
 	if !v.IsEmail(user.Email) {
 		errors["Email"] = ErrUserEmail
 	}
-	if !rePhone.MatchString(user.PhoneNumber) {
+	if user.PhoneNumber != "" && !rePhone.MatchString(user.PhoneNumber) {
 		errors["PhoneNumber"] = ErrUserPhone
 	}
 	if user.OTPRequiredForLogin && user.GracePeriod.IsZero() {
@@ -184,10 +179,13 @@ func (user *User) Validate() *common.ValidationError {
 	if user.Role == constants.RoleSysAdmin {
 		aptrust, err := InstitutionByIdentifier("aptrust.org")
 		if err != nil {
-			errors["Role"] = "Internal error: cannot find institution."
+			errors["Role"] = ErrUserInstNotFound
 		} else if user.InstitutionID != aptrust.ID {
-			errors["Role"] = "Admin role is not valid for this institution."
+			errors["Role"] = ErrUserInvalidAdmin
 		}
+	}
+	if user.EncryptedPassword == "" {
+		errors["EncryptedPassword"] = ErrUserPwdMissing
 	}
 	if len(errors) > 0 {
 		return &common.ValidationError{errors}
@@ -225,7 +223,11 @@ func (user *User) BeforeUpdate(c context.Context) (context.Context, error) {
 
 func (user *User) reformatPhone() {
 	digitsOnly := reNumeric.ReplaceAllString(user.PhoneNumber, "")
-	user.PhoneNumber = "+" + digitsOnly
+	if len(digitsOnly) > 0 {
+		user.PhoneNumber = "+" + digitsOnly
+	} else {
+		user.PhoneNumber = digitsOnly // may be blank string
+	}
 }
 
 // HasPermission returns true or false to indicate whether the user has
