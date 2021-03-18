@@ -114,3 +114,27 @@ func TestInstitutionSave(t *testing.T) {
 	assert.NotEmpty(t, inst.CreatedAt)
 	assert.NotEmpty(t, inst.UpdatedAt)
 }
+
+func TestInstitutionDeleteUndelete(t *testing.T) {
+	inst := &pgmodels.Institution{
+		Name:       "Unit Test Inst #2",
+		Identifier: "test2.kom",
+		Type:       constants.InstTypeMember,
+	}
+	err := inst.Save()
+	require.Nil(t, err)
+
+	assert.True(t, inst.ID > int64(0))
+	assert.Equal(t, constants.StateActive, inst.State)
+	assert.Empty(t, inst.DeactivatedAt)
+
+	err = inst.Delete()
+	require.Nil(t, err)
+	assert.Equal(t, constants.StateDeleted, inst.State)
+	assert.NotEmpty(t, inst.DeactivatedAt)
+
+	err = inst.Undelete()
+	require.Nil(t, err)
+	assert.Equal(t, constants.StateActive, inst.State)
+	assert.Empty(t, inst.DeactivatedAt)
+}
