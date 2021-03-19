@@ -1,6 +1,7 @@
 package common
 
 import (
+	"bytes"
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/md5"
@@ -15,6 +16,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"unicode"
 )
 
 // ProjectRoot returns the project root.
@@ -167,4 +169,25 @@ func InterfaceList(items []string) []interface{} {
 		list[i] = item
 	}
 	return list
+}
+
+// SplitCamelCase splits camel-case identifiers into multiple words.
+// Note that it does not split on multiple consecutive caps, so
+// param CurrencyUSD would return ["Currency", "USD"].
+//
+// If max is less than zero, this will split into all words. If max
+// is > 0, this will split into max words.
+func SplitCamelCase(str string, max int) []string {
+	var b bytes.Buffer
+	partsCount := 0
+	priorLower := false
+	for _, v := range str {
+		if priorLower && unicode.IsUpper(v) && (max < 0 || partsCount < max-1) {
+			b.WriteByte(' ')
+			partsCount++
+		}
+		b.WriteRune(v)
+		priorLower = unicode.IsLower(v)
+	}
+	return strings.Split(b.String(), " ")
 }

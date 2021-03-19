@@ -81,3 +81,15 @@ func TestInterfaceList(t *testing.T) {
 	assert.Equal(t, "A", list[0].(string))
 	assert.Equal(t, "D", list[1].(string))
 }
+
+func TestSplitCamelCase(t *testing.T) {
+	assert.Equal(t, []string{"Institution", "Index"}, common.SplitCamelCase("InstitutionIndex", -1))
+	assert.Equal(t, []string{"Currency", "USD"}, common.SplitCamelCase("CurrencyUSD", -1))
+
+	// Split into all words
+	assert.Equal(t, []string{"User", "Sign", "In"}, common.SplitCamelCase("UserSignIn", -1))
+
+	// Split into 2 words max (first two)
+	assert.Equal(t, []string{"User", "SignIn"}, common.SplitCamelCase("UserSignIn", 2))
+
+}

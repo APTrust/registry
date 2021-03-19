@@ -24,6 +24,7 @@ const (
 	ChecksumRead                      = "ChecksumRead"
 	ChecksumUpdate                    = "ChecksumUpdate"
 	ChecksumDelete                    = "ChecksumDelete"
+	DashboardShow                     = "DashboardShow"
 	EventCreate                       = "EventCreate"
 	EventRead                         = "EventRead"
 	EventUpdate                       = "EventUpdate"
@@ -54,6 +55,8 @@ const (
 	StorageRecordDelete               = "StorageRecordDelete"
 	UserCreate                        = "UserCreate"
 	UserRead                          = "UserRead"
+	UserSignIn                        = "UserSignIn"
+	UserSignOut                       = "UserSignOut"
 	UserUpdate                        = "UserUpdate"
 	UserDelete                        = "UserDelete"
 	UserReadSelf                      = "UserReadSelf"
@@ -74,6 +77,7 @@ var Permissions = []Permission{
 	ChecksumRead,
 	ChecksumUpdate,
 	ChecksumDelete,
+	DashboardShow,
 	EventCreate,
 	EventRead,
 	EventUpdate,
@@ -104,6 +108,8 @@ var Permissions = []Permission{
 	StorageRecordDelete,
 	UserCreate,
 	UserRead,
+	UserSignIn,
+	UserSignOut,
 	UserUpdate,
 	UserDelete,
 	UserReadSelf,
@@ -138,11 +144,14 @@ func initPermissions() {
 	instUser[AlertRead] = true
 	instUser[AlertUpdate] = true
 	instUser[ChecksumRead] = true
+	instUser[DashboardShow] = true
 	instUser[EventRead] = true
 	instUser[FileRead] = true
 	instUser[InstitutionRead] = true
 	instUser[ObjectRead] = true
 	instUser[StorageRecordRead] = true
+	instUser[UserSignIn] = true
+	instUser[UserSignOut] = true
 	instUser[UserReadSelf] = true
 	instUser[UserUpdateSelf] = true
 	instUser[WorkItemRead] = true
@@ -150,6 +159,7 @@ func initPermissions() {
 	instAdmin[AlertRead] = true
 	instAdmin[AlertUpdate] = true
 	instAdmin[ChecksumRead] = true
+	instAdmin[DashboardShow] = true
 	instAdmin[EventRead] = true
 	instAdmin[FileRead] = true
 	instAdmin[FileDelete] = true
@@ -165,6 +175,8 @@ func initPermissions() {
 	instAdmin[StorageRecordRead] = true
 	instAdmin[UserCreate] = true
 	instAdmin[UserRead] = true
+	instAdmin[UserSignIn] = true
+	instAdmin[UserSignOut] = true
 	instAdmin[UserUpdate] = true
 	instAdmin[UserDelete] = true
 	instAdmin[UserReadSelf] = true
@@ -179,6 +191,7 @@ func initPermissions() {
 	sysAdmin[ChecksumRead] = true
 	sysAdmin[ChecksumUpdate] = false // no one can do this
 	sysAdmin[ChecksumDelete] = false // no one can do this
+	sysAdmin[DashboardShow] = true
 	sysAdmin[EventCreate] = true
 	sysAdmin[EventRead] = true
 	sysAdmin[EventUpdate] = false // no one can do this
@@ -209,6 +222,8 @@ func initPermissions() {
 	sysAdmin[StorageRecordDelete] = true
 	sysAdmin[UserCreate] = true
 	sysAdmin[UserRead] = true
+	sysAdmin[UserSignIn] = true
+	sysAdmin[UserSignOut] = true
 	sysAdmin[UserUpdate] = true
 	sysAdmin[UserDelete] = true
 	sysAdmin[UserDeleteSelf] = true
@@ -238,4 +253,75 @@ func CheckPermission(role string, permission Permission) bool {
 		permissions = emptyList
 	}
 	return permissions[permission]
+}
+
+// PermissionForHandler maps HTTP handler names to the permissions
+// required to access that handler.
+var PermissionForHandler = map[string]Permission{
+	"AlertCreate":            AlertCreate,
+	"AlertNew":               AlertCreate,
+	"AlertIndex":             AlertRead,
+	"AlertShow":              AlertRead,
+	"AlertUpdate":            AlertUpdate,
+	"AlertDelete":            AlertDelete,
+	"ChecksumNew":            ChecksumCreate,
+	"ChecksumCreate":         ChecksumCreate,
+	"ChecksumShow":           ChecksumRead,
+	"ChecksumIndex":          ChecksumRead,
+	"ChecksumUpdate":         ChecksumUpdate,
+	"ChecksumDelete":         ChecksumDelete,
+	"DashboardShow":          DashboardShow,
+	"EventCreate":            EventCreate,
+	"EventNew":               EventCreate,
+	"EventShow":              EventRead,
+	"EventIndex":             EventRead,
+	"EventUpdate":            EventUpdate,
+	"EventDelete":            EventDelete,
+	"FileNew":                FileCreate,
+	"FileCreate":             FileCreate,
+	"FileShow":               FileRead,
+	"FileIndex":              FileRead,
+	"FileUpdate":             FileUpdate,
+	"FileDelete":             FileDelete,
+	"FileRequestDelete":      FileRequestDelete,
+	"FileApproveDelete":      FileApproveDelete,
+	"FileFinishBulkDelete":   FileFinishBulkDelete,
+	"FileRestore":            FileRestore,
+	"InstitutionNew":         InstitutionCreate,
+	"InstitutionCreate":      InstitutionCreate,
+	"InstitutionIndex":       InstitutionRead,
+	"InstitutionShow":        InstitutionRead,
+	"InstitutionUpdate":      InstitutionUpdate,
+	"InstitutionDelete":      InstitutionDelete,
+	"ObjectNew":              ObjectCreate,
+	"ObjectCreate":           ObjectCreate,
+	"ObjectIndex":            ObjectRead,
+	"ObjectShow":             ObjectRead,
+	"ObjectUpdate":           ObjectUpdate,
+	"ObjectDelete":           ObjectDelete,
+	"ObjectRequestDelete":    ObjectRequestDelete,
+	"ObjectApproveDelete":    ObjectApproveDelete,
+	"ObjectFinishBulkDelete": ObjectFinishBulkDelete,
+	"ObjectRestore":          ObjectRestore,
+	"StorageRecordNew":       StorageRecordCreate,
+	"StorageRecordCreate":    StorageRecordCreate,
+	"StorageRecordIndex":     StorageRecordRead,
+	"StorageRecordShow":      StorageRecordRead,
+	"StorageRecordUpdate":    StorageRecordUpdate,
+	"StorageRecordDelete":    StorageRecordDelete,
+	"UserNew":                UserCreate,
+	"UserCreate":             UserCreate,
+	"UserIndex":              UserRead,
+	"UserShow":               UserRead,
+	"UserUpdate":             UserUpdate,
+	"UserDelete":             UserDelete,
+	"UserReadSelf":           UserReadSelf,
+	"UserUpdateSelf":         UserUpdateSelf,
+	"UserDeleteSelf":         UserDeleteSelf,
+	"WorkItemNew":            WorkItemCreate,
+	"WorkItemCreate":         WorkItemCreate,
+	"WorkItemIndex":          WorkItemRead,
+	"WorkItemShow":           WorkItemRead,
+	"WorkItemUpdate":         WorkItemUpdate,
+	"WorkItemDelete":         WorkItemDelete,
 }

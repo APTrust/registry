@@ -1,13 +1,19 @@
 package middleware
 
 import (
+	"fmt"
+	"strconv"
+	"strings"
+
+	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
+	"github.com/APTrust/registry/models"
 	"github.com/gin-gonic/gin"
 )
 
 type ResourceAuthorization struct {
 	c              *gin.Context
-	ResourceType   string
+	Handler        string
 	ResourceID     int64
 	ResourceInstID int64
 	Permission     constants.Permission
@@ -23,7 +29,8 @@ func NewResourceAuthorization(c *gin.Context) *ResourceAuthorization {
 }
 
 func (r *ResourceAuthorization) run() {
-	r.parseURL()
+	r.getPermissionType()
+	r.readRequestIds()
 	if r.Error == nil {
 		r.getInstitutionID()
 	}
@@ -32,10 +39,15 @@ func (r *ResourceAuthorization) run() {
 	}
 }
 
-func (r *ResourceAuthorization) parseURL() {
-	// Get resource type from route.
-	// Get resource id from route (if available).
-	// Set ResourceType, ResourceID, Error
+func (r *ResourceAuthorization) getPermissionType() {
+	nameParts := strings.Split(r.c.HandlerName(), ".")
+	if len(nameParts) > 1 {
+		r.Handler = nameParts[len(nameParts)-1]
+		r.Permission = constants.PermissionForHandler[r.Handler]
+	}
+	if r.Permission == "" {
+		r.Error = common.ErrResourcePermission
+	}
 }
 
 func (r *ResourceAuthorization) getInstitutionID() {
@@ -46,4 +58,32 @@ func (r *ResourceAuthorization) getInstitutionID() {
 func (r *ResourceAuthorization) checkPermission() {
 	// Use User.HasPermission()
 	// Set Checked, Approved, Error
+}
+
+func (r *ResourceAuthorization) readRequestIds() {
+	r.ResourceID = r.idFromRequest("id")
+	r.ResourceInstID = r.idFromRequest("institution_id")
+}
+
+func (r *ResourceAuthorization) idFromRequest(name string) int64 {
+	id := r.c.Param(name)
+	if id == "" {
+		id = r.c.Query(name)
+	}
+	if id == "" {
+		id = r.c.PostForm(name)
+	}
+	idAsInt, _ := strconv.ParseInt(id, 10, 64)
+	return idAsInt
+}
+
+// GetError returns an error message with detailed information.
+// This is primarily for logging.
+func (r *ResourceAuthorization) GetError() string {
+	user, exists := r.c.Get("CurrentUser")
+	email := "<user not signed in>"
+	if exists && user != nil {
+		email = user.(*models.User).Email
+	}
+	return fmt.Sprintf("ResourceAuth: User %s, Remote IP: %s, Handler: %s, ResourceID: %d, InstID: %d, Path: %s, Permission: %s, Error: %s", email, r.c.Request.RemoteAddr, r.c.HandlerName(), r.ResourceID, r.ResourceInstID, r.c.FullPath(), r.Permission, r.Error.Error())
 }

@@ -46,6 +46,10 @@ var ErrWrongDataType = errors.New("wrong data type")
 // File. If that record is missing, we get this error.
 var ErrParentRecordNotFound = errors.New("parent record not found")
 
+// ErrResourcePermission occurs when Authorization middleware cannot
+// determine which permission is required to access the specified resoruce.
+var ErrResourcePermission = errors.New("cannot determine permission type for requested requested resource")
+
 // ErrInternal is a runtime error that is not the user's fault, hence
 // probably the programmer's fault.
 var ErrInternal = errors.New("internal server error")

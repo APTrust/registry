@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"fmt"
 	// "net/http"
 	// "strconv"
 	// "strings"
@@ -13,7 +14,7 @@ import (
 
 func Authorize() gin.HandlerFunc {
 	return func(c *gin.Context) {
-
+		fmt.Println(c.HandlerName(), c.FullPath())
 		c.Next()
 	}
 }
