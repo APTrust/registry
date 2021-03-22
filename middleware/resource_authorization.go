@@ -29,6 +29,7 @@ func NewResourceAuthorization(c *gin.Context) *ResourceAuthorization {
 }
 
 func (r *ResourceAuthorization) run() {
+	// TODO: Move permission name, resource type to map.
 	r.getPermissionType()
 	r.readRequestIds()
 	if r.Error == nil {
@@ -53,6 +54,16 @@ func (r *ResourceAuthorization) getPermissionType() {
 func (r *ResourceAuthorization) getInstitutionID() {
 	// Ask DB for institution id of resource.
 	// Set ResourceInstID, Error
+
+	// Index: Need inst ID in URL
+	//     but - may be no inst ID for Admin index requests
+	//     inst id in query string?
+	// Show & Update: Get inst ID from resource.
+	// Create: Need inst ID in URL
+
+	if r.ResourceInstID == int64(0) {
+		// id, err := pgmodels.InstIDFor()
+	}
 }
 
 func (r *ResourceAuthorization) checkPermission() {
@@ -63,6 +74,9 @@ func (r *ResourceAuthorization) checkPermission() {
 func (r *ResourceAuthorization) readRequestIds() {
 	r.ResourceID = r.idFromRequest("id")
 	r.ResourceInstID = r.idFromRequest("institution_id")
+	if strings.HasPrefix(r.Handler, "Institution") {
+		r.ResourceInstID = r.ResourceID
+	}
 }
 
 func (r *ResourceAuthorization) idFromRequest(name string) int64 {

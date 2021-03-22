@@ -44,3 +44,48 @@ func transact(model interface{}, action xactType) error {
 func IsNoRowError(err error) bool {
 	return err != nil && err.Error() == pg.ErrNoRows.Error()
 }
+
+func InstIDFor(resourceType string, resourceID int64) (id int64, err error) {
+	ctx := common.Context()
+	db := ctx.DB
+	switch resourceType {
+	case "Checksum":
+		cs := &Checksum{}
+		err = db.Model(cs).Column("_").Relation("GenericFile.institution_id").Where(`"checksum"."id" = ?`, resourceID).Select()
+		if cs != nil && cs.GenericFile != nil {
+			id = cs.GenericFile.InstitutionID
+		}
+	case "GenericFile":
+		gf := &GenericFile{}
+		err = db.Model(gf).Column("institution_id").Where("id = ?", resourceID).Select()
+		id = gf.InstitutionID
+	case "Institution":
+		id = resourceID
+	case "IntellectualObject":
+		obj := &IntellectualObject{}
+		err = db.Model(obj).Column("institution_id").Where("id = ?", resourceID).Select()
+		id = obj.InstitutionID
+	case "PremisEvent":
+		pe := &PremisEvent{}
+		err = db.Model(pe).Column("institution_id").Where("id = ?", resourceID).Select()
+		id = pe.InstitutionID
+	case "StorageRecord":
+		sr := &StorageRecord{}
+		err = db.Model(sr).Column("_").Relation("GenericFile.institution_id").Where(`"storage_record"."id" = ?`, resourceID).Select()
+		if sr != nil && sr.GenericFile != nil {
+			id = sr.GenericFile.InstitutionID
+		}
+	case "User":
+		user := &User{}
+		err = db.Model(user).Column("institution_id").Where("id = ?", resourceID).Select()
+		id = user.InstitutionID
+	case "WorkItem":
+		item := &WorkItem{}
+		err = db.Model(item).Column("institution_id").Where("id = ?", resourceID).Select()
+		id = item.InstitutionID
+	default:
+		ctx.Log.Error().Msgf("pgmodels.InstIDFor got unknown type '%s'", resourceType)
+		err = common.ErrInvalidParam
+	}
+	return id, err
+}
