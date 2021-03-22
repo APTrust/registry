@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/APTrust/registry/forms"
-	"github.com/APTrust/registry/models"
+	"github.com/APTrust/registry/pgmodels"
 	"github.com/gin-gonic/gin"
 )
 
@@ -13,7 +13,7 @@ import (
 // institution form.
 // POST /institutions/new
 func InstitutionCreate(c *gin.Context) {
-	saveInstitutionFromForm(c, &models.Institution{})
+	saveInstitutionFromForm(c, &pgmodels.Institution{})
 }
 
 // InstitutionDelete deletes a institution.
@@ -27,8 +27,8 @@ func InstitutionDelete(c *gin.Context) {
 func InstitutionIndex(c *gin.Context) {
 	r := NewRequest(c)
 	template := "institutions/index.html"
-	query := models.NewQuery().OrderBy("name")
-	institutions, err := r.DataStore.InstitutionViewList(query)
+	query := pgmodels.NewQuery().OrderBy("name")
+	institutions, err := pgmodels.InstitutionViewSelect(query)
 	if AbortIfError(c, err) {
 		return
 	}
@@ -42,7 +42,7 @@ func InstitutionIndex(c *gin.Context) {
 func InstitutionNew(c *gin.Context) {
 	r := NewRequest(c)
 	template := "institutions/form.html"
-	form, err := forms.NewInstitutionForm(r.DataStore, &models.Institution{})
+	form, err := forms.NewInstitutionForm(&pgmodels.Institution{})
 	if AbortIfError(c, err) {
 		return
 	}
@@ -55,21 +55,21 @@ func InstitutionNew(c *gin.Context) {
 // GET /institutions/show/:id
 func InstitutionShow(c *gin.Context) {
 	r := NewRequest(c)
-	institution, err := r.DataStore.InstitutionViewFind(r.ID)
+	institution, err := pgmodels.InstitutionViewByID(r.ID)
 	if AbortIfError(c, err) {
 		return
 	}
 	r.TemplateData["institution"] = institution
 
-	query := models.NewQuery().Where("parent_id", "=", institution.ID).OrderBy("name")
-	subscribers, err := r.DataStore.InstitutionViewList(query)
+	query := pgmodels.NewQuery().Where("parent_id", "=", institution.ID).OrderBy("name")
+	subscribers, err := pgmodels.InstitutionViewSelect(query)
 	if AbortIfError(c, err) {
 		return
 	}
 	r.TemplateData["subscribers"] = subscribers
 
-	query = models.NewQuery().Where("institution_id", "=", institution.ID).IsNull("deactivated_at").OrderBy("name")
-	users, err := r.DataStore.UserViewList(query)
+	query = pgmodels.NewQuery().Where("institution_id", "=", institution.ID).IsNull("deactivated_at").OrderBy("name")
+	users, err := pgmodels.UserViewSelect(query)
 	if AbortIfError(c, err) {
 		return
 	}
@@ -83,7 +83,7 @@ func InstitutionShow(c *gin.Context) {
 // PUT /institutions/edit/:id
 func InstitutionUpdate(c *gin.Context) {
 	r := NewRequest(c)
-	institution, err := r.DataStore.InstitutionFind(r.ID)
+	institution, err := pgmodels.InstitutionByID(r.ID)
 	if AbortIfError(c, err) {
 		return
 	}
@@ -94,11 +94,11 @@ func InstitutionUpdate(c *gin.Context) {
 // GET /institutions/edit/:id
 func InstitutionEdit(c *gin.Context) {
 	r := NewRequest(c)
-	institution, err := r.DataStore.InstitutionFind(r.ID)
+	institution, err := pgmodels.InstitutionByID(r.ID)
 	if AbortIfError(c, err) {
 		return
 	}
-	form, err := forms.NewInstitutionForm(r.DataStore, institution)
+	form, err := forms.NewInstitutionForm(institution)
 	if AbortIfError(c, err) {
 		return
 	}
@@ -107,9 +107,9 @@ func InstitutionEdit(c *gin.Context) {
 	c.HTML(http.StatusOK, "institutions/form.html", r.TemplateData)
 }
 
-func saveInstitutionFromForm(c *gin.Context, institution *models.Institution) {
+func saveInstitutionFromForm(c *gin.Context, institution *pgmodels.Institution) {
 	r := NewRequest(c)
-	form, err := forms.NewInstitutionForm(r.DataStore, institution)
+	form, err := forms.NewInstitutionForm(institution)
 	if AbortIfError(c, err) {
 		return
 	}
@@ -131,7 +131,7 @@ func saveInstitutionFromForm(c *gin.Context, institution *models.Institution) {
 	fmt.Println("DB Institution:  ", institution)
 
 	// If no validation error, save the institution and redirect.
-	err = r.DataStore.InstitutionSave(form.Institution)
+	err = form.Institution.Save()
 	if AbortIfError(c, err) {
 		return
 	}

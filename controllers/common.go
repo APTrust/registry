@@ -4,13 +4,12 @@ import (
 	"strconv"
 
 	"github.com/APTrust/registry/helpers"
-	"github.com/APTrust/registry/models"
+	"github.com/APTrust/registry/pgmodels"
 	"github.com/gin-gonic/gin"
 )
 
 type Req struct {
-	CurrentUser  *models.User
-	DataStore    *models.DataStore
+	CurrentUser  *pgmodels.User
 	ID           int64
 	TemplateData gin.H
 }
@@ -20,7 +19,6 @@ func NewRequest(c *gin.Context) *Req {
 	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
 	return &Req{
 		CurrentUser:  currentUser,
-		DataStore:    models.NewDataStore(currentUser),
 		ID:           id,
 		TemplateData: gin.H{"CurrentUser": currentUser},
 	}

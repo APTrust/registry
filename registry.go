@@ -79,7 +79,7 @@ func initRoutes(router *gin.Engine) {
 	web := router.Group("/")
 	{
 		// Dashboard
-		web.GET("/dashboard", c.DashboardShow)
+		web.GET("/dashboard/:institution_id", c.DashboardShow)
 
 		// Institutions
 		web.POST("/institutions/new", c.InstitutionCreate)

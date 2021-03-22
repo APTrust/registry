@@ -1,7 +1,6 @@
 package forms
 
 import (
-	"github.com/APTrust/registry/models"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -9,17 +8,17 @@ import (
 
 type UserForm struct {
 	Form
-	User        *models.User
+	User        *pgmodels.User
 	instOptions []ListOption
 }
 
-func NewUserForm(ds *models.DataStore, user *models.User) (*UserForm, error) {
+func NewUserForm(user *pgmodels.User) (*UserForm, error) {
 	var err error
 	userForm := &UserForm{
-		Form: NewForm(ds),
+		Form: NewForm(),
 		User: user,
 	}
-	userForm.instOptions, err = ListInstitutions(ds, false)
+	userForm.instOptions, err = ListInstitutions(false)
 	if err != nil {
 		return nil, err
 	}

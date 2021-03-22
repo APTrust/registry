@@ -5,11 +5,11 @@ import (
 	"net/http"
 
 	"github.com/APTrust/registry/common"
-	"github.com/APTrust/registry/models"
+	"github.com/APTrust/registry/pgmodels"
 	"github.com/gin-gonic/gin"
 )
 
-func SetSessionCookie(c *gin.Context, user *models.User) error {
+func SetSessionCookie(c *gin.Context, user *pgmodels.User) error {
 	c.SetSameSite(http.SameSiteStrictMode)
 	ctx := common.Context()
 	id := fmt.Sprintf("%d", user.ID)
@@ -47,9 +47,9 @@ func DeleteSessionCookie(c *gin.Context) {
 	)
 }
 
-func CurrentUser(c *gin.Context) *models.User {
+func CurrentUser(c *gin.Context) *pgmodels.User {
 	if currentUser, ok := c.Get("CurrentUser"); ok && currentUser != nil {
-		return currentUser.(*models.User)
+		return currentUser.(*pgmodels.User)
 	}
 	return nil
 }

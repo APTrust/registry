@@ -50,3 +50,33 @@ type UserView struct {
 	ReceivingBucket string `json:"receiving_bucket" pg:"receiving_bucket"`
 	RestoreBucket   string `json:"restore_bucket" pg:"restore_bucket"`
 }
+
+// UserViewByID returns the UserView record with the specified id.
+// Returns pg.ErrNoRows if there is no match.
+func UserViewByID(id int64) (*UserView, error) {
+	query := NewQuery().Where("id", "=", id)
+	return UserViewGet(query)
+}
+
+// UserViewByEmail returns the UserView record with the specified
+// email address. Returns pg.ErrNoRows if there is no match.
+func UserViewByEmail(email string) (*UserView, error) {
+	query := NewQuery().Where("email", "=", email)
+	return UserViewGet(query)
+}
+
+// UserViewSelect returns all UserView records matching the query.
+// This read-only view is for listing users. It includes a number
+// of insitition fields to simplify the search process.
+func UserViewSelect(query *Query) ([]*UserView, error) {
+	var users []*UserView
+	err := query.Select(&users)
+	return users, err
+}
+
+// UserViewGet returns the first user view record matching the query.
+func UserViewGet(query *Query) (*UserView, error) {
+	var user UserView
+	err := query.Select(&user)
+	return &user, err
+}

@@ -5,8 +5,12 @@ import (
 )
 
 type AuthMetadata struct {
+	// ResourceType is the type of resource the user is requesting.
+	// E.g. "IntellectualObject", "GenericFile", etc.
 	ResourceType string
-	Permission   constants.Permission
+	// Permission is the name of the permission required to access
+	// the requested resources. E.g. "PremisEventCreate".
+	Permission constants.Permission
 }
 
 // PermissionForHandler maps HTTP handler names to the permissions
@@ -43,6 +47,7 @@ var AuthMap = map[string]AuthMetadata{
 	"FileRestore":            AuthMetadata{"GenericFile", constants.FileRestore},
 	"InstitutionNew":         AuthMetadata{"Institution", constants.InstitutionCreate},
 	"InstitutionCreate":      AuthMetadata{"Institution", constants.InstitutionCreate},
+	"InstitutionEdit":        AuthMetadata{"Institution", constants.InstitutionUpdate},
 	"InstitutionIndex":       AuthMetadata{"Institution", constants.InstitutionRead},
 	"InstitutionShow":        AuthMetadata{"Institution", constants.InstitutionRead},
 	"InstitutionUpdate":      AuthMetadata{"Institution", constants.InstitutionUpdate},
@@ -65,6 +70,7 @@ var AuthMap = map[string]AuthMetadata{
 	"StorageRecordDelete":    AuthMetadata{"StorageRecord", constants.StorageRecordDelete},
 	"UserNew":                AuthMetadata{"User", constants.UserCreate},
 	"UserCreate":             AuthMetadata{"User", constants.UserCreate},
+	"UserEdit":               AuthMetadata{"User", constants.UserUpdate},
 	"UserIndex":              AuthMetadata{"User", constants.UserRead},
 	"UserShow":               AuthMetadata{"User", constants.UserRead},
 	"UserUpdate":             AuthMetadata{"User", constants.UserUpdate},

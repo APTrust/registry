@@ -1,18 +1,12 @@
 package forms
 
-import (
-	"github.com/APTrust/registry/models"
-)
-
 type Form struct {
 	Action string
-	ds     *models.DataStore
 	Fields map[string]*Field
 }
 
-func NewForm(ds *models.DataStore) Form {
+func NewForm() Form {
 	return Form{
-		ds:     ds,
 		Fields: make(map[string]*Field),
 	}
 }

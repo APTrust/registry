@@ -1,26 +1,26 @@
 package forms
 
 import (
-	"github.com/APTrust/registry/models"
+	"github.com/APTrust/registry/pgmodels"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 )
 
 type InstitutionForm struct {
 	Form
-	Institution *models.Institution
+	Institution *pgmodels.Institution
 	instOptions []ListOption
 }
 
-func NewInstitutionForm(ds *models.DataStore, institution *models.Institution) (*InstitutionForm, error) {
+func NewInstitutionForm(institution *pgmodels.Institution) (*InstitutionForm, error) {
 	var err error
 	institutionForm := &InstitutionForm{
-		Form:        NewForm(ds),
+		Form:        NewForm(),
 		Institution: institution,
 	}
 
 	// List parent (member) institutions only.
-	institutionForm.instOptions, err = ListInstitutions(ds, true)
+	institutionForm.instOptions, err = ListInstitutions(true)
 	if err != nil {
 		return nil, err
 	}

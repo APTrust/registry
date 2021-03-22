@@ -6,18 +6,13 @@ import (
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/db"
 	"github.com/APTrust/registry/forms"
-	"github.com/APTrust/registry/models"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestListInstitutions(t *testing.T) {
 	db.LoadFixtures()
-	adminUser := &models.User{
-		Role: constants.RoleSysAdmin,
-	}
-	ds := models.NewDataStore(adminUser)
-	options, err := forms.ListInstitutions(ds, false)
+	options, err := forms.ListInstitutions(false)
 	require.Nil(t, err)
 	require.NotEmpty(t, options)
 	assert.True(t, len(options) >= 4)

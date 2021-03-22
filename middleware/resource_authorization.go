@@ -12,7 +12,7 @@ import (
 )
 
 type ResourceAuthorization struct {
-	c              *gin.Context
+	ginCtx         *gin.Context
 	Handler        string
 	ResourceID     int64
 	ResourceInstID int64
@@ -24,12 +24,19 @@ type ResourceAuthorization struct {
 }
 
 func AuthorizeResource(c *gin.Context) *ResourceAuthorization {
-	r := &ResourceAuthorization{c: c}
-	r.run()
+	r := &ResourceAuthorization{ginCtx: c}
+	r.init()
 	return r
 }
 
-func (r *ResourceAuthorization) run() {
+func (r *ResourceAuthorization) init() {
+	if ExemptFromAuth(r.ginCtx) {
+		r.Handler = "ExemptHandler"
+		r.ResourceType = "Exempt"
+		r.Checked = true
+		r.Approved = true
+		return
+	}
 	r.getPermissionType()
 	r.readRequestIds()
 	if r.Error == nil {
@@ -38,7 +45,7 @@ func (r *ResourceAuthorization) run() {
 }
 
 func (r *ResourceAuthorization) getPermissionType() {
-	nameParts := strings.Split(r.c.HandlerName(), ".")
+	nameParts := strings.Split(r.ginCtx.HandlerName(), ".")
 	if len(nameParts) > 1 {
 		r.Handler = nameParts[len(nameParts)-1]
 		if authMeta, ok := AuthMap[r.Handler]; ok {
@@ -66,25 +73,25 @@ func (r *ResourceAuthorization) readRequestIds() {
 	// TODO: Consider forcing institution_id = User.InstitutionID
 	// on requests where user is not admin: New, Create, Index.
 
-	if r.ResourceID == int64(0) {
+	if r.ResourceID != 0 {
 		r.ResourceInstID, r.Error = pgmodels.InstIDFor(r.ResourceType, r.ResourceID)
 	}
 }
 
 func (r *ResourceAuthorization) idFromRequest(name string) int64 {
-	id := r.c.Param(name)
+	id := r.ginCtx.Param(name)
 	if id == "" {
-		id = r.c.Query(name)
+		id = r.ginCtx.Query(name)
 	}
 	if id == "" {
-		id = r.c.PostForm(name)
+		id = r.ginCtx.PostForm(name)
 	}
 	idAsInt, _ := strconv.ParseInt(id, 10, 64)
 	return idAsInt
 }
 
 func (r *ResourceAuthorization) CurrentUser() *pgmodels.User {
-	if currentUser, ok := r.c.Get("CurrentUser"); ok && currentUser != nil {
+	if currentUser, ok := r.ginCtx.Get("CurrentUser"); ok && currentUser != nil {
 		return currentUser.(*pgmodels.User)
 	}
 	return nil
@@ -93,10 +100,24 @@ func (r *ResourceAuthorization) CurrentUser() *pgmodels.User {
 // GetError returns an error message with detailed information.
 // This is primarily for logging.
 func (r *ResourceAuthorization) GetError() string {
-	user, exists := r.c.Get("CurrentUser")
+	return fmt.Sprintf("ResourceAuth Error: %s", r.String())
+}
+
+// GetNotAuthorizedMessage returns a message describing what was not
+// authorized, and for whom.
+func (r *ResourceAuthorization) GetNotAuthorizedMessage() string {
+	return fmt.Sprintf("Not Authorized: %s", r.String())
+}
+
+func (r *ResourceAuthorization) String() string {
+	user, exists := r.ginCtx.Get("CurrentUser")
 	email := "<user not signed in>"
 	if exists && user != nil {
 		email = user.(*pgmodels.User).Email
 	}
-	return fmt.Sprintf("ResourceAuth: User %s, Remote IP: %s, Handler: %s, ResourceID: %d, InstID: %d, Path: %s, Permission: %s, Error: %s", email, r.c.Request.RemoteAddr, r.c.HandlerName(), r.ResourceID, r.ResourceInstID, r.c.FullPath(), r.Permission, r.Error.Error())
+	errMsg := ""
+	if r.Error != nil {
+		errMsg = r.Error.Error()
+	}
+	return fmt.Sprintf("User %s, Remote IP: %s, Handler: %s, ResourceType: %s, ResourceID: %d, InstID: %d, Path: %s, Permission: %s, Error: %s", email, r.ginCtx.Request.RemoteAddr, r.ginCtx.HandlerName(), r.ResourceType, r.ResourceID, r.ResourceInstID, r.ginCtx.FullPath(), r.Permission, errMsg)
 }

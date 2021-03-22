@@ -5,10 +5,9 @@ import (
 	"net/http"
 
 	"github.com/APTrust/registry/common"
-	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/forms"
 	"github.com/APTrust/registry/helpers"
-	"github.com/APTrust/registry/models"
+	"github.com/APTrust/registry/pgmodels"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
@@ -16,7 +15,7 @@ import (
 // UserCreate a new user. Handles submission of new user form.
 // POST /users/new
 func UserCreate(c *gin.Context) {
-	saveUserFromForm(c, &models.User{})
+	saveUserFromForm(c, &pgmodels.User{})
 }
 
 // UserDelete deletes a user.
@@ -38,14 +37,14 @@ func UserIndex(c *gin.Context) {
 	query.OrderBy("name asc")
 	r.TemplateData["selectedID"] = c.Query("institution_id__eq")
 
-	users, err := r.DataStore.UserViewList(query)
+	users, err := pgmodels.UserViewSelect(query)
 	if AbortIfError(c, err) {
 		return
 	}
 	r.TemplateData["users"] = users
 
 	// Get institutions for filter list
-	institutionOptions, err := forms.ListInstitutions(r.DataStore, false)
+	institutionOptions, err := forms.ListInstitutions(false)
 	if AbortIfError(c, err) {
 		return
 	}
@@ -59,7 +58,7 @@ func UserIndex(c *gin.Context) {
 func UserNew(c *gin.Context) {
 	r := NewRequest(c)
 	template := "users/form.html"
-	form, err := forms.NewUserForm(r.DataStore, &models.User{})
+	form, err := forms.NewUserForm(&pgmodels.User{})
 	if AbortIfError(c, err) {
 		return
 	}
@@ -72,7 +71,7 @@ func UserNew(c *gin.Context) {
 // GET /users/show/:id
 func UserShow(c *gin.Context) {
 	r := NewRequest(c)
-	user, err := r.DataStore.UserFind(r.ID)
+	user, err := pgmodels.UserByID(r.ID)
 	if AbortIfError(c, err) {
 		return
 	}
@@ -85,7 +84,7 @@ func UserShow(c *gin.Context) {
 // PUT /users/edit/:id
 func UserUpdate(c *gin.Context) {
 	r := NewRequest(c)
-	user, err := r.DataStore.UserFind(r.ID)
+	user, err := pgmodels.UserByID(r.ID)
 	if AbortIfError(c, err) {
 		return
 	}
@@ -96,11 +95,11 @@ func UserUpdate(c *gin.Context) {
 // GET /users/edit/:id
 func UserEdit(c *gin.Context) {
 	r := NewRequest(c)
-	userToEdit, err := r.DataStore.UserFind(r.ID)
+	userToEdit, err := pgmodels.UserByID(r.ID)
 	if AbortIfError(c, err) {
 		return
 	}
-	form, err := forms.NewUserForm(r.DataStore, userToEdit)
+	form, err := forms.NewUserForm(userToEdit)
 	if AbortIfError(c, err) {
 		return
 	}
@@ -134,6 +133,10 @@ func UserSignIn(c *gin.Context) {
 // UserSignOut signs the user out.
 // GET /users/sign_out
 func UserSignOut(c *gin.Context) {
+	user := helpers.CurrentUser(c)
+	if user != nil {
+		user.SignOut()
+	}
 	helpers.DeleteSessionCookie(c)
 	c.HTML(http.StatusOK, "users/sign_in.html", gin.H{
 		"cover": helpers.GetCover(),
@@ -141,11 +144,8 @@ func UserSignOut(c *gin.Context) {
 }
 
 func SignInUser(c *gin.Context) (int, string, error) {
-	// Second of two DataStore instances with automatic
-	// admin privileges.
-	ds := models.NewDataStore(&models.User{Role: constants.RoleSysAdmin})
 	redirectTo := "/users/sign_in"
-	user, err := ds.UserSignIn(
+	user, err := pgmodels.UserSignIn(
 		c.PostForm("email"),
 		c.PostForm("password"),
 		c.ClientIP(),
@@ -160,10 +160,11 @@ func SignInUser(c *gin.Context) (int, string, error) {
 		return http.StatusInternalServerError, redirectTo, err
 	}
 	c.Set("CurrentUser", user)
-	return http.StatusFound, "/dashboard", nil
+	location := fmt.Sprintf("/dashboard/%d", user.InstitutionID)
+	return http.StatusFound, location, nil
 }
 
-func getIndexQuery(c *gin.Context) (*models.Query, error) {
+func getIndexQuery(c *gin.Context) (*pgmodels.Query, error) {
 	allowedFilters := []string{
 		"institution_id__eq",
 	}
@@ -174,9 +175,9 @@ func getIndexQuery(c *gin.Context) (*models.Query, error) {
 	return fc.ToQuery()
 }
 
-func saveUserFromForm(c *gin.Context, userToEdit *models.User) {
+func saveUserFromForm(c *gin.Context, userToEdit *pgmodels.User) {
 	r := NewRequest(c)
-	form, err := forms.NewUserForm(r.DataStore, userToEdit)
+	form, err := forms.NewUserForm(userToEdit)
 	if AbortIfError(c, err) {
 		return
 	}
@@ -207,7 +208,7 @@ func saveUserFromForm(c *gin.Context, userToEdit *models.User) {
 	fmt.Println("DB User:  ", userToEdit)
 
 	// If no validation error, save the user and redirect.
-	err = r.DataStore.UserSave(form.User)
+	err = form.User.Save()
 	if AbortIfError(c, err) {
 		return
 	}

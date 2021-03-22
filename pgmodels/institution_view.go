@@ -28,3 +28,32 @@ type InstitutionView struct {
 	ParentState         string    `json:"parent_state" pg:"parent_state"`
 	ParentDeactivatedAt time.Time `json:"parent_deactivated_at" pg:"parent_deactivated_at"`
 }
+
+// InstitutionViewByID returns the InstitutionView record
+// with the specified id.  Returns pg.ErrNoRows if there is no match.
+func InstitutionViewByID(id int64) (*InstitutionView, error) {
+	query := NewQuery().Where("id", "=", id)
+	return InstitutionViewGet(query)
+}
+
+// InstitutionViewByEmail returns the InstitutionView record with the
+// specified email address. Returns pg.ErrNoRows if there is no match.
+func InstitutionViewByEmail(email string) (*InstitutionView, error) {
+	query := NewQuery().Where("email", "=", email)
+	return InstitutionViewGet(query)
+}
+
+// InstitutionViewSelect returns all InstitutionView records matching
+// the query.
+func InstitutionViewSelect(query *Query) ([]*InstitutionView, error) {
+	var users []*InstitutionView
+	err := query.Select(&users)
+	return users, err
+}
+
+// InstitutionViewGet returns the first user view record matching the query.
+func InstitutionViewGet(query *Query) (*InstitutionView, error) {
+	var user InstitutionView
+	err := query.Select(&user)
+	return &user, err
+}

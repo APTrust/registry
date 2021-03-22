@@ -6,8 +6,7 @@ import (
 	"strings"
 
 	"github.com/APTrust/registry/common"
-	"github.com/APTrust/registry/constants"
-	"github.com/APTrust/registry/models"
+	"github.com/APTrust/registry/pgmodels"
 	"github.com/gin-gonic/gin"
 )
 
@@ -34,7 +33,7 @@ func Authenticate() gin.HandlerFunc {
 }
 
 // GetUserFromSession returns the User for the current session.
-func GetUserFromSession(c *gin.Context) (user *models.User, err error) {
+func GetUserFromSession(c *gin.Context) (user *pgmodels.User, err error) {
 	ctx := common.Context()
 	cookie, err := c.Cookie(ctx.Config.Cookies.SessionCookie)
 	if err == nil {
@@ -46,13 +45,7 @@ func GetUserFromSession(c *gin.Context) (user *models.User, err error) {
 		if err != nil {
 			return nil, common.ErrWrongDataType
 		}
-		// We need admin privilege to ensure we can retrieve
-		// an arbitrary user. This is one of two instances where
-		// DataStore doesn't run as actual logged-in user.
-		// The other instance is in the SignIn method of the
-		// Users controller.
-		ds := models.NewDataStore(&models.User{Role: constants.RoleSysAdmin})
-		user, err = ds.UserFind(userID)
+		user, err = pgmodels.UserByID(userID)
 	}
 	return user, err
 }

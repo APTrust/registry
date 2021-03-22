@@ -28,7 +28,7 @@
       <th>Email</th>
       <th>Institution</th>
       <th>Role</th>
-      <th>Last Login</th>
+      <th>Last Sign In</th>
       <th>2FA</th>
       <th>Disabled</th>
     </tr>
@@ -41,7 +41,7 @@
       <td>{{ $user.Email }}</td>
       <td>{{ $user.InstitutionName }}</td>
       <td>{{ roleName $user.Role }}</td>
-      <td>{{ dateUS $user.LastLogin }}</td>
+      <td>{{ dateUS $user.LastSignInAt }}</td>
       <td>{{ yesNo $user.EnabledTwoFactor }}</td>
       <td>{{ dateUS $user.DeactivatedAt }}</td>
     </tr>

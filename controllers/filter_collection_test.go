@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/APTrust/registry/controllers"
-	"github.com/APTrust/registry/models"
+	"github.com/APTrust/registry/pgmodels"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -99,8 +99,8 @@ var invalid = []*controllers.ParamFilter{
 	},
 }
 
-func expectedQuery(index int) *models.Query {
-	q := models.NewQuery()
+func expectedQuery(index int) *pgmodels.Query {
+	q := pgmodels.NewQuery()
 	switch index {
 	case 0:
 		q.Where("name", "=", "Homer")
@@ -159,7 +159,7 @@ func TestNewParamFilter(t *testing.T) {
 // Params: ["Homer"]
 func TestAddToQuery(t *testing.T) {
 	for i, obj := range valid {
-		q := models.NewQuery()
+		q := pgmodels.NewQuery()
 		filter, err := controllers.NewParamFilter(obj.Key, obj.Values)
 		assert.Nil(t, err)
 		err = filter.AddToQuery(q)
@@ -193,6 +193,6 @@ func TestFilterCollection(t *testing.T) {
 	query, err := fc.ToQuery()
 	require.Nil(t, err)
 	require.NotNil(t, query)
-	assert.Equal(t, `("name" = ?) AND ("name" != ?) AND ("age" > ?) AND ("age" >= ?) AND ("age" < ?) AND ("age" <= ?) AND ("name" ILIKE ?) AND ("name" ILIKE ?) AND ("name" is null) AND ("name" is not null) AND ("name" IN (?, ?, ?))`, query.WhereClause())
+	assert.Equal(t, `(name = ?) AND (name != ?) AND (age > ?) AND (age >= ?) AND (age < ?) AND (age <= ?) AND (name ILIKE ?) AND (name ILIKE ?) AND (name is null) AND (name is not null) AND (name IN (?, ?, ?))`, query.WhereClause())
 	assert.Equal(t, []interface{}{"Homer", "Homer", "38", "38", "38", "38", "Simpson%", "%Simpson%", "Bart", "Lisa", "Maggie"}, query.Params())
 }

@@ -4,7 +4,7 @@ import (
 	"strconv"
 
 	"github.com/APTrust/registry/constants"
-	"github.com/APTrust/registry/models"
+	"github.com/APTrust/registry/pgmodels"
 )
 
 // RolesList is a list of assignable user roles. Hard-coded instead
@@ -26,12 +26,12 @@ var YesNoList = []ListOption{
 	{"false", "No"},
 }
 
-func ListInstitutions(ds *models.DataStore, membersOnly bool) ([]ListOption, error) {
-	instQuery := models.NewQuery().Columns("id", "name").OrderBy("name asc").Limit(100).Offset(0)
+func ListInstitutions(membersOnly bool) ([]ListOption, error) {
+	instQuery := pgmodels.NewQuery().Columns("id", "name").OrderBy("name asc").Limit(100).Offset(0)
 	if membersOnly {
 		instQuery.Where("type", "=", constants.InstTypeMember)
 	}
-	institutions, err := ds.InstitutionList(instQuery)
+	institutions, err := pgmodels.InstitutionSelect(instQuery)
 	if err != nil {
 		return nil, err
 	}

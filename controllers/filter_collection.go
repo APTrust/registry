@@ -5,11 +5,11 @@ import (
 	"strings"
 
 	"github.com/APTrust/registry/common"
-	"github.com/APTrust/registry/models"
+	"github.com/APTrust/registry/pgmodels"
 )
 
 // FilterCollection converts query string params such as name__eq=Homer to
-// a models.Query object that allows us to build a SQL where clause as
+// a pgmodels.Query object that allows us to build a SQL where clause as
 // we go.
 type FilterCollection struct {
 	filters []*ParamFilter
@@ -42,8 +42,8 @@ func (fc *FilterCollection) Add(key string, values []string) error {
 // The Query's WhereClause() will return the where conditions for the filters
 // passed in through Add(), and the Query's Params() method will return the
 // params. Conditions and params come back in the order they were added.
-func (fc *FilterCollection) ToQuery() (*models.Query, error) {
-	query := models.NewQuery()
+func (fc *FilterCollection) ToQuery() (*pgmodels.Query, error) {
+	query := pgmodels.NewQuery()
 	for _, filter := range fc.filters {
 		if common.ListIsEmpty(filter.Values) {
 			continue // no need to apply filter
@@ -84,7 +84,7 @@ func NewParamFilter(key string, values []string) (*ParamFilter, error) {
 	}
 	col := colAndOp[0]
 	rawOp := colAndOp[1]
-	sqlOp, ok := models.QueryOp[rawOp]
+	sqlOp, ok := pgmodels.QueryOp[rawOp]
 	if !ok {
 		return nil, fmt.Errorf("Invalid query string param '%s': unknown operator '%s'", key, rawOp)
 	}
@@ -100,7 +100,7 @@ func NewParamFilter(key string, values []string) (*ParamFilter, error) {
 // AddToQuery adds this ParamFilter to SQL query q. If it can't map the
 // RawOp to a known Query method, it returns a custom error. The caller
 // should log the error and then return a basic common.ErrInvalidParam.
-func (pf *ParamFilter) AddToQuery(q *models.Query) error {
+func (pf *ParamFilter) AddToQuery(q *pgmodels.Query) error {
 	switch pf.RawOp {
 	case "eq":
 		q.Where(pf.Column, pf.SQLOp, pf.Values[0])
