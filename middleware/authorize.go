@@ -8,6 +8,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Authorize ensures that a user is authorized to commit a specific
+// action on a specific resource. This function uses a
+// ResourceAuthorization struct to figure out what's being requested,
+// what action the user wants to take on the resource, and whether
+// the user has sufficient permissions.
+//
+// With the exception of the login page and static resources such as
+// images, scripts, and stylesheets, all endpoints require an authorization
+// check. Failure to perform the check is itself an error.
 func Authorize() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		auth := AuthorizeResource(c)

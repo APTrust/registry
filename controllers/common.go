@@ -23,3 +23,5 @@ func NewRequest(c *gin.Context) *Req {
 		TemplateData: gin.H{"CurrentUser": currentUser},
 	}
 }
+
+// TODO: Load resource or resource list here.

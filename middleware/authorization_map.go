@@ -4,6 +4,8 @@ import (
 	"github.com/APTrust/registry/constants"
 )
 
+// AuthMetadata contains information about what type of resource is being
+// requested, and what action the user wants to take on that resource.
 type AuthMetadata struct {
 	// ResourceType is the type of resource the user is requesting.
 	// E.g. "IntellectualObject", "GenericFile", etc.
@@ -14,7 +16,20 @@ type AuthMetadata struct {
 }
 
 // PermissionForHandler maps HTTP handler names to the permissions
-// required to access that handler.
+// required to access that handler. We want to be explicit about permissions
+// because explicitness is much easier to debug than assumptions and
+// magic methods.
+//
+// When permissions are explicitly defined, we can check them in middleware
+// instead of polluting request handler code with lots of security logic.
+// We know that middleware always runs and cannot be accidentally omitted
+// by the developer.
+//
+// We also have a failsafe built in to our Authorize middleware that
+// raises an error if permissions are not checked and explicitly granted.
+// If we forget to map a controller action to permission metadata below,
+// requests that hit an unguarded route will return  an internal server
+// error.
 var AuthMap = map[string]AuthMetadata{
 	"AlertCreate":            AuthMetadata{"Alert", constants.AlertCreate},
 	"AlertNew":               AuthMetadata{"Alert", constants.AlertCreate},

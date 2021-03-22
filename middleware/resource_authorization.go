@@ -11,6 +11,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// ResourceAuthorization contains information about the current request
+// handler, the resource and action being requested, and whether the
+// current user is authorized to do what they're trying to do.
 type ResourceAuthorization struct {
 	ginCtx         *gin.Context
 	Handler        string
@@ -23,6 +26,9 @@ type ResourceAuthorization struct {
 	Error          error
 }
 
+// AuthorizeResource returns a ResourceAuthorization struct
+// describing what is being authorized and whether the current
+// user is allowed to do what they're trying to do.
 func AuthorizeResource(c *gin.Context) *ResourceAuthorization {
 	r := &ResourceAuthorization{ginCtx: c}
 	r.init()
