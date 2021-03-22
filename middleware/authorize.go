@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"fmt"
+	// "fmt"
 	// "net/http"
 	// "strconv"
 	// "strings"
@@ -14,19 +14,16 @@ import (
 
 func Authorize() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		fmt.Println(c.HandlerName(), c.FullPath())
+		auth := AuthorizeResource(c)
+		if !auth.Checked {
+			// return 500 / Internal Server Error
+			// auth MUST be checked
+			// c.Abort()
+		}
+		if !auth.Approved {
+			// return 403 / Forbidden
+			// c.Abort()
+		}
 		c.Next()
 	}
 }
-
-// TODO: Check permission based on user, resource, and institution id.
-//
-// - Check permission and set context vars saying permission was checked
-//   and whether check passed.
-// - If permission was not checked, or if error occurred, return status 500
-//   with missing check error.
-// - If not authorized, return 403.
-// - If authorized, proceed to handler.
-// - Index methods should still force user's institution ID into query.
-// - Some resources, like checksums and storage records, will have to
-//   get the InstitutionID from the parent object.

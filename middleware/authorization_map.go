@@ -1,0 +1,81 @@
+package middleware
+
+import (
+	"github.com/APTrust/registry/constants"
+)
+
+type AuthMetadata struct {
+	ResourceType string
+	Permission   constants.Permission
+}
+
+// PermissionForHandler maps HTTP handler names to the permissions
+// required to access that handler.
+var AuthMap = map[string]AuthMetadata{
+	"AlertCreate":            AuthMetadata{"Alert", constants.AlertCreate},
+	"AlertNew":               AuthMetadata{"Alert", constants.AlertCreate},
+	"AlertIndex":             AuthMetadata{"Alert", constants.AlertRead},
+	"AlertShow":              AuthMetadata{"Alert", constants.AlertRead},
+	"AlertUpdate":            AuthMetadata{"Alert", constants.AlertUpdate},
+	"AlertDelete":            AuthMetadata{"Alert", constants.AlertDelete},
+	"ChecksumNew":            AuthMetadata{"Checksum", constants.ChecksumCreate},
+	"ChecksumCreate":         AuthMetadata{"Checksum", constants.ChecksumCreate},
+	"ChecksumShow":           AuthMetadata{"Checksum", constants.ChecksumRead},
+	"ChecksumIndex":          AuthMetadata{"Checksum", constants.ChecksumRead},
+	"ChecksumUpdate":         AuthMetadata{"Checksum", constants.ChecksumUpdate},
+	"ChecksumDelete":         AuthMetadata{"Checksum", constants.ChecksumDelete},
+	"DashboardShow":          AuthMetadata{"Dashboard", constants.DashboardShow},
+	"EventCreate":            AuthMetadata{"Event", constants.EventCreate},
+	"EventNew":               AuthMetadata{"Event", constants.EventCreate},
+	"EventShow":              AuthMetadata{"Event", constants.EventRead},
+	"EventIndex":             AuthMetadata{"Event", constants.EventRead},
+	"EventUpdate":            AuthMetadata{"Event", constants.EventUpdate},
+	"EventDelete":            AuthMetadata{"Event", constants.EventDelete},
+	"FileNew":                AuthMetadata{"GenericFile", constants.FileCreate},
+	"FileCreate":             AuthMetadata{"GenericFile", constants.FileCreate},
+	"FileShow":               AuthMetadata{"GenericFile", constants.FileRead},
+	"FileIndex":              AuthMetadata{"GenericFile", constants.FileRead},
+	"FileUpdate":             AuthMetadata{"GenericFile", constants.FileUpdate},
+	"FileDelete":             AuthMetadata{"GenericFile", constants.FileDelete},
+	"FileRequestDelete":      AuthMetadata{"GenericFile", constants.FileRequestDelete},
+	"FileApproveDelete":      AuthMetadata{"GenericFile", constants.FileApproveDelete},
+	"FileFinishBulkDelete":   AuthMetadata{"GenericFile", constants.FileFinishBulkDelete},
+	"FileRestore":            AuthMetadata{"GenericFile", constants.FileRestore},
+	"InstitutionNew":         AuthMetadata{"Institution", constants.InstitutionCreate},
+	"InstitutionCreate":      AuthMetadata{"Institution", constants.InstitutionCreate},
+	"InstitutionIndex":       AuthMetadata{"Institution", constants.InstitutionRead},
+	"InstitutionShow":        AuthMetadata{"Institution", constants.InstitutionRead},
+	"InstitutionUpdate":      AuthMetadata{"Institution", constants.InstitutionUpdate},
+	"InstitutionDelete":      AuthMetadata{"Institution", constants.InstitutionDelete},
+	"ObjectNew":              AuthMetadata{"IntellectualObject", constants.ObjectCreate},
+	"ObjectCreate":           AuthMetadata{"IntellectualObject", constants.ObjectCreate},
+	"ObjectIndex":            AuthMetadata{"IntellectualObject", constants.ObjectRead},
+	"ObjectShow":             AuthMetadata{"IntellectualObject", constants.ObjectRead},
+	"ObjectUpdate":           AuthMetadata{"IntellectualObject", constants.ObjectUpdate},
+	"ObjectDelete":           AuthMetadata{"IntellectualObject", constants.ObjectDelete},
+	"ObjectRequestDelete":    AuthMetadata{"IntellectualObject", constants.ObjectRequestDelete},
+	"ObjectApproveDelete":    AuthMetadata{"IntellectualObject", constants.ObjectApproveDelete},
+	"ObjectFinishBulkDelete": AuthMetadata{"IntellectualObject", constants.ObjectFinishBulkDelete},
+	"ObjectRestore":          AuthMetadata{"IntellectualObject", constants.ObjectRestore},
+	"StorageRecordNew":       AuthMetadata{"StorageRecord", constants.StorageRecordCreate},
+	"StorageRecordCreate":    AuthMetadata{"StorageRecord", constants.StorageRecordCreate},
+	"StorageRecordIndex":     AuthMetadata{"StorageRecord", constants.StorageRecordRead},
+	"StorageRecordShow":      AuthMetadata{"StorageRecord", constants.StorageRecordRead},
+	"StorageRecordUpdate":    AuthMetadata{"StorageRecord", constants.StorageRecordUpdate},
+	"StorageRecordDelete":    AuthMetadata{"StorageRecord", constants.StorageRecordDelete},
+	"UserNew":                AuthMetadata{"User", constants.UserCreate},
+	"UserCreate":             AuthMetadata{"User", constants.UserCreate},
+	"UserIndex":              AuthMetadata{"User", constants.UserRead},
+	"UserShow":               AuthMetadata{"User", constants.UserRead},
+	"UserUpdate":             AuthMetadata{"User", constants.UserUpdate},
+	"UserDelete":             AuthMetadata{"User", constants.UserDelete},
+	"UserReadSelf":           AuthMetadata{"User", constants.UserReadSelf},
+	"UserUpdateSelf":         AuthMetadata{"User", constants.UserUpdateSelf},
+	"UserDeleteSelf":         AuthMetadata{"User", constants.UserDeleteSelf},
+	"WorkItemNew":            AuthMetadata{"WorkItem", constants.WorkItemCreate},
+	"WorkItemCreate":         AuthMetadata{"WorkItem", constants.WorkItemCreate},
+	"WorkItemIndex":          AuthMetadata{"WorkItem", constants.WorkItemRead},
+	"WorkItemShow":           AuthMetadata{"WorkItem", constants.WorkItemRead},
+	"WorkItemUpdate":         AuthMetadata{"WorkItem", constants.WorkItemUpdate},
+	"WorkItemDelete":         AuthMetadata{"WorkItem", constants.WorkItemDelete},
+}
