@@ -3,6 +3,7 @@ package pgmodels
 import (
 	"context"
 	"regexp"
+	"strings"
 	"time"
 
 	"github.com/APTrust/registry/common"
@@ -31,8 +32,8 @@ const (
 // User is a person who can log in and do stuff.
 type User struct {
 	ID                     int64        `json:"id" form:"id" pg:"id"`
-	Name                   string       `json:"name" pg:"name" binding:"required,min=2,max=100"`
-	Email                  string       `json:"email" pg:"email" binding:"required,email"`
+	Name                   string       `json:"name" pg:"name"`
+	Email                  string       `json:"email" pg:"email"`
 	PhoneNumber            string       `json:"phone_number" pg:"phone_number"`
 	CreatedAt              time.Time    `json:"created_at" form:"-" pg:"created_at"`
 	UpdatedAt              time.Time    `json:"updated_at" form:"-" pg:"updated_at"`
@@ -45,7 +46,7 @@ type User struct {
 	LastSignInAt           time.Time    `json:"last_sign_in_at" form:"-" pg:"last_sign_in_at"`
 	CurrentSignInIP        string       `json:"current_sign_in_ip" form:"-" pg:"current_sign_in_ip"`
 	LastSignInIP           string       `json:"last_sign_in_ip" form:"-" pg:"last_sign_in_ip"`
-	InstitutionID          int64        `json:"institution_id" pg:"institution_id" binding:"required"`
+	InstitutionID          int64        `json:"institution_id" pg:"institution_id"`
 	EncryptedAPISecretKey  string       `json:"-" form:"-" pg:"encrypted_api_secret_key"`
 	PasswordChangedAt      time.Time    `json:"password_changed_at" form:"-" pg:"password_changed_at"`
 	EncryptedOTPSecret     string       `json:"-" form:"-" pg:"encrypted_otp_secret"`
@@ -64,7 +65,7 @@ type User struct {
 	InitialPasswordUpdated bool         `json:"initial_password_updated" form:"-" pg:"initial_password_updated"`
 	ForcePasswordUpdate    bool         `json:"force_password_update" form:"-" pg:"force_password_update"`
 	GracePeriod            time.Time    `json:"grace_period" time_format:"2006-01-02" pg:"grace_period"`
-	Role                   string       `json:"role" pg:"role" binding:"required"`
+	Role                   string       `json:"role" pg:"role"`
 	Institution            *Institution `json:"institution" pg:"rel:has-one"`
 }
 
@@ -224,6 +225,9 @@ func (user *User) BeforeUpdate(c context.Context) (context.Context, error) {
 func (user *User) reformatPhone() {
 	digitsOnly := reNumeric.ReplaceAllString(user.PhoneNumber, "")
 	if len(digitsOnly) > 0 {
+		if !strings.HasPrefix(digitsOnly, "1") {
+			digitsOnly = "1" + digitsOnly
+		}
 		user.PhoneNumber = "+" + digitsOnly
 	} else {
 		user.PhoneNumber = digitsOnly // may be blank string

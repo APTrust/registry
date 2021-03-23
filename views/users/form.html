@@ -4,6 +4,12 @@
 
 <form action="{{ .form.Action }}" method="post">
 
+  {{ if .FormError }}
+  <div class="row form-error">
+    {{ .FormError }}
+  </div>
+  {{ end }}
+
   {{ template "forms/text_input.html" .form.Fields.Name }}
 
   {{ template "forms/email.html" .form.Fields.Email }}

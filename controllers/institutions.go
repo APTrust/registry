@@ -127,9 +127,6 @@ func saveInstitutionFromForm(c *gin.Context, institution *pgmodels.Institution) 
 		return
 	}
 
-	fmt.Println("Form Institution:", form.Institution)
-	fmt.Println("DB Institution:  ", institution)
-
 	// If no validation error, save the institution and redirect.
 	err = form.Institution.Save()
 	if AbortIfError(c, err) {

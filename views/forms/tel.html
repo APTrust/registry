@@ -1,7 +1,7 @@
 {{ define "forms/tel.html" }}
 
 <label>{{ .Label }}
-  <input type="tel" name="{{ .Name }}" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" value="{{ .Value }}" placeholder="{{ .Placeholder }}" {{ template "forms/attrs.html" . }}>
+  <input type="tel" name="{{ .Name }}" value="{{ .Value }}" placeholder="{{ .Placeholder }}" {{ template "forms/attrs.html" . }}>
 </label>
 
 {{ if .DisplayError }}<div class="row form-error">{{ .ErrMsg }}</div>{{ end }}

@@ -1,9 +1,11 @@
 package forms
 
 import (
+	"net/http"
+
+	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
 )
 
 type UserForm struct {
@@ -50,9 +52,9 @@ func (f *UserForm) init() {
 		Name:        "PhoneNumber",
 		ErrMsg:      pgmodels.ErrUserPhone,
 		Label:       "Phone",
-		Placeholder: "Phone in format +2125551212",
-		Attrs: map[string]string{
-			"pattern": "\\+[0-9]{10}",
+		Placeholder: "Phone in format 212-555-1212",
+		Attrs:       map[string]string{
+			//"pattern": "[0-9]{10,11}",
 		},
 	}
 	f.Fields["OTPRequiredForLogin"] = &Field{
@@ -94,17 +96,31 @@ func (f *UserForm) init() {
 	}
 }
 
-func (f *UserForm) Bind(c *gin.Context) error {
-	err := c.ShouldBind(f.User)
+func (f *UserForm) Save(c *gin.Context, templateData gin.H) (int, error) {
+	status := http.StatusCreated
+	if f.User.ID > 0 {
+		status = http.StatusOK
+	}
+	_ = c.ShouldBind(f.User)
+	err := f.User.Save()
 	if err != nil {
-		if _, ok := err.(validator.ValidationErrors); ok {
-			for _, fieldErr := range err.(validator.ValidationErrors) {
-				f.Fields[fieldErr.Field()].DisplayError = true
-			}
-		}
+		status = f.handleError(err, templateData)
 	}
 	f.setValues()
-	return err
+	return status, err
+}
+
+func (f *UserForm) handleError(err error, templateData gin.H) int {
+	status := http.StatusBadRequest
+	if valErr, ok := err.(*common.ValidationError); ok {
+		for fieldName, _ := range valErr.Errors {
+			f.Fields[fieldName].DisplayError = true
+		}
+	} else {
+		templateData["FormError"] = err.Error()
+		status = http.StatusInternalServerError
+	}
+	return status
 }
 
 // setValues sets the form values to match the User values.

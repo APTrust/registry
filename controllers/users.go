@@ -197,18 +197,11 @@ func saveUserFromForm(c *gin.Context, userToEdit *pgmodels.User) {
 	}
 
 	r.TemplateData["form"] = form
-	err = form.Bind(c)
-	// If validation error, re-display the form with error messages.
+	status, err := form.Save(c, r.TemplateData)
 	if err != nil {
-		c.HTML(http.StatusBadRequest, template, r.TemplateData)
+		c.HTML(status, template, r.TemplateData)
 		return
 	}
-
-	fmt.Println("Form User:", form.User)
-	fmt.Println("DB User:  ", userToEdit)
-
-	// If no validation error, save the user and redirect.
-	err = form.User.Save()
 	if AbortIfError(c, err) {
 		return
 	}
