@@ -52,5 +52,10 @@ func GetUserFromSession(c *gin.Context) (user *pgmodels.User, err error) {
 
 func ExemptFromAuth(c *gin.Context) bool {
 	p := c.FullPath()
-	return p == "/" || p == "/users/sign_in" || strings.HasPrefix(p, "/static") || strings.HasPrefix(p, "/favicon") || strings.HasPrefix(p, "/error")
+	return p == "/" ||
+		p == "/users/sign_in" ||
+		p == "/users/sign_out" ||
+		strings.HasPrefix(p, "/static") ||
+		strings.HasPrefix(p, "/favicon") ||
+		strings.HasPrefix(p, "/error")
 }
