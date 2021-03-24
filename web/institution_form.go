@@ -1,10 +1,6 @@
 package web
 
 import (
-	"fmt"
-	//"net/http"
-
-	//"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/pgmodels"
 )
 
@@ -104,36 +100,8 @@ func (f *InstitutionForm) init() {
 	}
 }
 
-// func (f *InstitutionForm) Save(c *gin.Context, templateData gin.H) (int, error) {
-// 	status := http.StatusCreated
-// 	if f.Institution.ID > 0 {
-// 		status = http.StatusOK
-// 	}
-// 	_ = c.ShouldBind(f.Institution)
-// 	err := f.Institution.Save()
-// 	if err != nil {
-// 		status = f.handleError(err, templateData)
-// 	}
-// 	f.setValues()
-// 	return status, err
-// }
-
-// func (f *InstitutionForm) handleError(err error, templateData gin.H) int {
-// 	status := http.StatusBadRequest
-// 	if valErr, ok := err.(*common.ValidationError); ok {
-// 		for fieldName, _ := range valErr.Errors {
-// 			f.Fields[fieldName].DisplayError = true
-// 		}
-// 	} else {
-// 		templateData["FormError"] = err.Error()
-// 		status = http.StatusInternalServerError
-// 	}
-// 	return status
-// }
-
 // setValues sets the form values to match the Institution values.
 func (f *InstitutionForm) setValues() {
-	fmt.Println("------ CALLED INST setValues() ------")
 	institution := f.Model.(*pgmodels.Institution)
 	f.Fields["Name"].Value = institution.Name
 	f.Fields["Identifier"].Value = institution.Identifier
