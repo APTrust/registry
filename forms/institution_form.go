@@ -1,9 +1,11 @@
 package forms
 
 import (
+	"net/http"
+
+	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
 )
 
 type InstitutionForm struct {
@@ -97,19 +99,31 @@ func (f *InstitutionForm) init() {
 	}
 }
 
-// TODO: Can this be part of the underlying Form class, and not
-// repeated in each form?
-func (f *InstitutionForm) Bind(c *gin.Context) error {
-	err := c.ShouldBind(f.Institution)
+func (f *InstitutionForm) Save(c *gin.Context, templateData gin.H) (int, error) {
+	status := http.StatusCreated
+	if f.Institution.ID > 0 {
+		status = http.StatusOK
+	}
+	_ = c.ShouldBind(f.Institution)
+	err := f.Institution.Save()
 	if err != nil {
-		if _, ok := err.(validator.ValidationErrors); ok {
-			for _, fieldErr := range err.(validator.ValidationErrors) {
-				f.Fields[fieldErr.Field()].DisplayError = true
-			}
-		}
+		status = f.handleError(err, templateData)
 	}
 	f.setValues()
-	return err
+	return status, err
+}
+
+func (f *InstitutionForm) handleError(err error, templateData gin.H) int {
+	status := http.StatusBadRequest
+	if valErr, ok := err.(*common.ValidationError); ok {
+		for fieldName, _ := range valErr.Errors {
+			f.Fields[fieldName].DisplayError = true
+		}
+	} else {
+		templateData["FormError"] = err.Error()
+		status = http.StatusInternalServerError
+	}
+	return status
 }
 
 // setValues sets the form values to match the Institution values.

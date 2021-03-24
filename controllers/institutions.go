@@ -13,7 +13,7 @@ import (
 // institution form.
 // POST /institutions/new
 func InstitutionCreate(c *gin.Context) {
-	saveInstitutionFromForm(c, &pgmodels.Institution{})
+	saveInstitutionForm(c, &pgmodels.Institution{})
 }
 
 // InstitutionDelete deletes a institution.
@@ -87,7 +87,7 @@ func InstitutionUpdate(c *gin.Context) {
 	if AbortIfError(c, err) {
 		return
 	}
-	saveInstitutionFromForm(c, institution)
+	saveInstitutionForm(c, institution)
 }
 
 // InstitutionEdit shows a form to edit an exiting institution.
@@ -107,7 +107,7 @@ func InstitutionEdit(c *gin.Context) {
 	c.HTML(http.StatusOK, "institutions/form.html", r.TemplateData)
 }
 
-func saveInstitutionFromForm(c *gin.Context, institution *pgmodels.Institution) {
+func saveInstitutionForm(c *gin.Context, institution *pgmodels.Institution) {
 	r := NewRequest(c)
 	form, err := forms.NewInstitutionForm(institution)
 	if AbortIfError(c, err) {
@@ -121,15 +121,9 @@ func saveInstitutionFromForm(c *gin.Context, institution *pgmodels.Institution) 
 	}
 
 	r.TemplateData["form"] = form
-	err = form.Bind(c)
+	status, err := form.Save(c, r.TemplateData)
 	if err != nil {
-		c.HTML(http.StatusBadRequest, template, r.TemplateData)
-		return
-	}
-
-	// If no validation error, save the institution and redirect.
-	err = form.Institution.Save()
-	if AbortIfError(c, err) {
+		c.HTML(status, template, r.TemplateData)
 		return
 	}
 	location := fmt.Sprintf("/institutions/show/%d?flash=Institution+saved", form.Institution.ID)

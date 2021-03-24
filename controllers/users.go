@@ -15,7 +15,7 @@ import (
 // UserCreate a new user. Handles submission of new user form.
 // POST /users/new
 func UserCreate(c *gin.Context) {
-	saveUserFromForm(c, &pgmodels.User{})
+	saveUserForm(c, &pgmodels.User{})
 }
 
 // UserDelete deletes a user.
@@ -88,7 +88,7 @@ func UserUpdate(c *gin.Context) {
 	if AbortIfError(c, err) {
 		return
 	}
-	saveUserFromForm(c, user)
+	saveUserForm(c, user)
 }
 
 // UserEdit shows a form to edit an exiting user.
@@ -175,7 +175,7 @@ func getIndexQuery(c *gin.Context) (*pgmodels.Query, error) {
 	return fc.ToQuery()
 }
 
-func saveUserFromForm(c *gin.Context, userToEdit *pgmodels.User) {
+func saveUserForm(c *gin.Context, userToEdit *pgmodels.User) {
 	r := NewRequest(c)
 	form, err := forms.NewUserForm(userToEdit)
 	if AbortIfError(c, err) {
@@ -200,9 +200,6 @@ func saveUserFromForm(c *gin.Context, userToEdit *pgmodels.User) {
 	status, err := form.Save(c, r.TemplateData)
 	if err != nil {
 		c.HTML(status, template, r.TemplateData)
-		return
-	}
-	if AbortIfError(c, err) {
 		return
 	}
 	location := fmt.Sprintf("/users/show/%d?flash=User+saved", form.User.ID)
