@@ -97,6 +97,7 @@ func InstitutionEdit(c *gin.Context) {
 	c.HTML(http.StatusOK, "institutions/form.html", req.TemplateData)
 }
 
+// TODO: Move common code into Form.
 func saveInstitutionForm(c *gin.Context) {
 	req := NewRequest(c)
 	form, err := NewInstitutionForm(req)

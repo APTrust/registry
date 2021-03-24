@@ -165,6 +165,7 @@ func getIndexQuery(c *gin.Context) (*pgmodels.Query, error) {
 	return fc.ToQuery()
 }
 
+// TODO: Move common code into Form.
 func saveUserForm(c *gin.Context) {
 	req := NewRequest(c)
 	form, err := NewUserForm(req)
