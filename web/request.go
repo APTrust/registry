@@ -8,18 +8,20 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type Req struct {
+type Request struct {
 	CurrentUser  *pgmodels.User
-	ID           int64
+	GinContext   *gin.Context
+	ResourceID   int64
 	TemplateData gin.H
 }
 
-func NewRequest(c *gin.Context) *Req {
+func NewRequest(c *gin.Context) *Request {
 	currentUser := helpers.CurrentUser(c)
 	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
-	return &Req{
+	return &Request{
 		CurrentUser:  currentUser,
-		ID:           id,
+		GinContext:   c,
+		ResourceID:   id,
 		TemplateData: gin.H{"CurrentUser": currentUser},
 	}
 }

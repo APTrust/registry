@@ -70,7 +70,7 @@ func UserNew(c *gin.Context) {
 // GET /users/show/:id
 func UserShow(c *gin.Context) {
 	r := NewRequest(c)
-	user, err := pgmodels.UserByID(r.ID)
+	user, err := pgmodels.UserByID(r.ResourceID)
 	if AbortIfError(c, err) {
 		return
 	}
@@ -83,7 +83,7 @@ func UserShow(c *gin.Context) {
 // PUT /users/edit/:id
 func UserUpdate(c *gin.Context) {
 	r := NewRequest(c)
-	user, err := pgmodels.UserByID(r.ID)
+	user, err := pgmodels.UserByID(r.ResourceID)
 	if AbortIfError(c, err) {
 		return
 	}

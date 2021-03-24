@@ -6,7 +6,6 @@ import (
 
 	//"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/pgmodels"
-	"github.com/gin-gonic/gin"
 )
 
 type InstitutionForm struct {
@@ -14,17 +13,17 @@ type InstitutionForm struct {
 	instOptions []ListOption
 }
 
-func NewInstitutionForm(c *gin.Context, t gin.H, instID int64) (*InstitutionForm, error) {
+func NewInstitutionForm(request *Request) (*InstitutionForm, error) {
 	var err error
 	institution := &pgmodels.Institution{}
-	if instID > 0 {
-		institution, err = pgmodels.InstitutionByID(instID)
+	if request.ResourceID > 0 {
+		institution, err = pgmodels.InstitutionByID(request.ResourceID)
 		if err != nil {
 			return nil, err
 		}
 	}
 	institutionForm := &InstitutionForm{
-		Form: NewForm(c, t, institution),
+		Form: NewForm(request, institution),
 	}
 
 	// List parent (member) institutions only.
