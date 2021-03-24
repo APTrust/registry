@@ -1,11 +1,10 @@
-package controllers
+package web
 
 import (
 	"fmt"
 	"net/http"
 
 	//"github.com/APTrust/registry/common"
-	"github.com/APTrust/registry/forms"
 	"github.com/APTrust/registry/helpers"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/gin-gonic/gin"
@@ -44,7 +43,7 @@ func UserIndex(c *gin.Context) {
 	r.TemplateData["users"] = users
 
 	// Get institutions for filter list
-	institutionOptions, err := forms.ListInstitutions(false)
+	institutionOptions, err := ListInstitutions(false)
 	if AbortIfError(c, err) {
 		return
 	}
@@ -58,7 +57,7 @@ func UserIndex(c *gin.Context) {
 func UserNew(c *gin.Context) {
 	// r := NewRequest(c)
 	// template := "users/form.html"
-	// form, err := forms.NewUserForm(&pgmodels.User{})
+	// form, err := NewUserForm(&pgmodels.User{})
 	// if AbortIfError(c, err) {
 	// 	return
 	// }
@@ -99,7 +98,7 @@ func UserEdit(c *gin.Context) {
 	// if AbortIfError(c, err) {
 	// 	return
 	// }
-	// form, err := forms.NewUserForm(userToEdit)
+	// form, err := NewUserForm(userToEdit)
 	// if AbortIfError(c, err) {
 	// 	return
 	// }
@@ -177,7 +176,7 @@ func getIndexQuery(c *gin.Context) (*pgmodels.Query, error) {
 
 func saveUserForm(c *gin.Context, userToEdit *pgmodels.User) {
 	// r := NewRequest(c)
-	// form, err := forms.NewUserForm(userToEdit)
+	// form, err := NewUserForm(userToEdit)
 	// if AbortIfError(c, err) {
 	// 	return
 	// }

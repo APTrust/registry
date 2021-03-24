@@ -5,9 +5,9 @@ import (
 	"strings"
 
 	"github.com/APTrust/registry/common"
-	c "github.com/APTrust/registry/controllers"
 	"github.com/APTrust/registry/helpers"
 	"github.com/APTrust/registry/middleware"
+	"github.com/APTrust/registry/web"
 	"github.com/gin-contrib/logger"
 	"github.com/gin-gonic/gin"
 )
@@ -76,43 +76,43 @@ func initRoutes(router *gin.Engine) {
 	router.Static("/static", "./static")
 	router.Static("/favicon.ico", "./static/img/favicon.png")
 
-	web := router.Group("/")
+	webRoutes := router.Group("/")
 	{
 		// Dashboard
-		web.GET("/dashboard/:institution_id", c.DashboardShow)
+		webRoutes.GET("/dashboard/:institution_id", web.DashboardShow)
 
 		// Institutions
-		web.POST("/institutions/new", c.InstitutionCreate)
-		web.DELETE("/institutions/delete/:id", c.InstitutionDelete)
-		web.GET("/institutions/delete/:id", c.InstitutionDelete)
-		web.GET("/institutions", c.InstitutionIndex)
-		web.GET("/institutions/new", c.InstitutionNew)
-		web.GET("/institutions/show/:id", c.InstitutionShow)
-		web.GET("/institutions/edit/:id", c.InstitutionEdit)
-		web.PUT("/institutions/edit/:id", c.InstitutionUpdate)
-		web.POST("/institutions/edit/:id", c.InstitutionUpdate)
+		webRoutes.POST("/institutions/new", web.InstitutionCreate)
+		webRoutes.DELETE("/institutions/delete/:id", web.InstitutionDelete)
+		webRoutes.GET("/institutions/delete/:id", web.InstitutionDelete)
+		webRoutes.GET("/institutions", web.InstitutionIndex)
+		webRoutes.GET("/institutions/new", web.InstitutionNew)
+		webRoutes.GET("/institutions/show/:id", web.InstitutionShow)
+		webRoutes.GET("/institutions/edit/:id", web.InstitutionEdit)
+		webRoutes.PUT("/institutions/edit/:id", web.InstitutionUpdate)
+		webRoutes.POST("/institutions/edit/:id", web.InstitutionUpdate)
 
 		// Users
-		web.POST("/users/new", c.UserCreate)
-		web.DELETE("/users/delete/:id", c.UserDelete)
-		web.GET("/users/delete/:id", c.UserDelete)
-		web.GET("/users", c.UserIndex)
-		web.GET("/users/new", c.UserNew)
-		web.GET("/users/show/:id", c.UserShow)
-		web.GET("/users/edit/:id", c.UserEdit)
-		web.PUT("/users/edit/:id", c.UserUpdate)
-		web.POST("/users/edit/:id", c.UserUpdate)
+		webRoutes.POST("/users/new", web.UserCreate)
+		webRoutes.DELETE("/users/delete/:id", web.UserDelete)
+		webRoutes.GET("/users/delete/:id", web.UserDelete)
+		webRoutes.GET("/users", web.UserIndex)
+		webRoutes.GET("/users/new", web.UserNew)
+		webRoutes.GET("/users/show/:id", web.UserShow)
+		webRoutes.GET("/users/edit/:id", web.UserEdit)
+		webRoutes.PUT("/users/edit/:id", web.UserUpdate)
+		webRoutes.POST("/users/edit/:id", web.UserUpdate)
 
 		// User Sign In
-		web.GET("/users/sign_in", c.UserSignInShow)
-		web.POST("/users/sign_in", c.UserSignIn)
-		web.GET("/users/sign_out", c.UserSignOut) // should be delete?
+		webRoutes.GET("/users/sign_in", web.UserSignInShow)
+		webRoutes.POST("/users/sign_in", web.UserSignIn)
+		webRoutes.GET("/users/sign_out", web.UserSignOut) // should be delete?
 
 		// Error page
-		web.GET("/error", c.ErrorShow)
+		webRoutes.GET("/error", web.ErrorShow)
 
 	}
 
 	// Root goes to sign-in page
-	router.GET("/", c.UserSignInShow)
+	router.GET("/", web.UserSignInShow)
 }

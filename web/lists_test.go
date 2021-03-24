@@ -1,22 +1,22 @@
-package forms_test
+package web_test
 
 import (
 	"testing"
 
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/db"
-	"github.com/APTrust/registry/forms"
+	"github.com/APTrust/registry/web"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestListInstitutions(t *testing.T) {
 	db.LoadFixtures()
-	options, err := forms.ListInstitutions(false)
+	options, err := web.ListInstitutions(false)
 	require.Nil(t, err)
 	require.NotEmpty(t, options)
 	assert.True(t, len(options) >= 4)
-	expected := []forms.ListOption{
+	expected := []web.ListOption{
 		{"1", "APTrust"},
 		{"5", "Example Institution (for integration tests)"},
 		{"2", "Institution One"},
@@ -31,7 +31,7 @@ func TestListInstitutions(t *testing.T) {
 }
 
 func TestOptions(t *testing.T) {
-	options := forms.Options(constants.AccessSettings)
+	options := web.Options(constants.AccessSettings)
 	require.NotEmpty(t, options)
 	for i, option := range options {
 		assert.Equal(t, constants.AccessSettings[i], option.Value)

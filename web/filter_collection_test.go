@@ -1,86 +1,86 @@
-package controllers_test
+package web_test
 
 import (
 	"testing"
 
-	"github.com/APTrust/registry/controllers"
 	"github.com/APTrust/registry/pgmodels"
+	"github.com/APTrust/registry/web"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-var valid = []*controllers.ParamFilter{
-	&controllers.ParamFilter{
+var valid = []*web.ParamFilter{
+	&web.ParamFilter{
 		Key:    "name__eq",
 		Column: "name",
 		RawOp:  "eq",
 		SQLOp:  "=",
 		Values: []string{"Homer"},
 	},
-	&controllers.ParamFilter{
+	&web.ParamFilter{
 		Key:    "name__ne",
 		Column: "name",
 		RawOp:  "ne",
 		SQLOp:  "!=",
 		Values: []string{"Homer"},
 	},
-	&controllers.ParamFilter{
+	&web.ParamFilter{
 		Key:    "age__gt",
 		Column: "age",
 		RawOp:  "gt",
 		SQLOp:  ">",
 		Values: []string{"38"},
 	},
-	&controllers.ParamFilter{
+	&web.ParamFilter{
 		Key:    "age__gteq",
 		Column: "age",
 		RawOp:  "gteq",
 		SQLOp:  ">=",
 		Values: []string{"38"},
 	},
-	&controllers.ParamFilter{
+	&web.ParamFilter{
 		Key:    "age__lt",
 		Column: "age",
 		RawOp:  "lt",
 		SQLOp:  "<",
 		Values: []string{"38"},
 	},
-	&controllers.ParamFilter{
+	&web.ParamFilter{
 		Key:    "age__lteq",
 		Column: "age",
 		RawOp:  "lteq",
 		SQLOp:  "<=",
 		Values: []string{"38"},
 	},
-	&controllers.ParamFilter{
+	&web.ParamFilter{
 		Key:    "name__starts_with",
 		Column: "name",
 		RawOp:  "starts_with",
 		SQLOp:  "ILIKE",
 		Values: []string{"Simpson"},
 	},
-	&controllers.ParamFilter{
+	&web.ParamFilter{
 		Key:    "name__contains",
 		Column: "name",
 		RawOp:  "contains",
 		SQLOp:  "ILIKE",
 		Values: []string{"Simpson"},
 	},
-	&controllers.ParamFilter{
+	&web.ParamFilter{
 		Key:    "name__is_null",
 		Column: "name",
 		RawOp:  "is_null",
 		SQLOp:  "IS NULL",
 		Values: []string{"true"},
 	},
-	&controllers.ParamFilter{
+	&web.ParamFilter{
 		Key:    "name__not_null",
 		Column: "name",
 		RawOp:  "not_null",
 		SQLOp:  "IS NOT NULL",
 		Values: []string{"true"},
 	},
-	&controllers.ParamFilter{
+	&web.ParamFilter{
 		Key:    "name__in",
 		Column: "name",
 		RawOp:  "in",
@@ -89,8 +89,8 @@ var valid = []*controllers.ParamFilter{
 	},
 }
 
-var invalid = []*controllers.ParamFilter{
-	&controllers.ParamFilter{
+var invalid = []*web.ParamFilter{
+	&web.ParamFilter{
 		Key:    "name__xyz",
 		Column: "name",
 		RawOp:  "xyz",
@@ -132,7 +132,7 @@ func expectedQuery(index int) *pgmodels.Query {
 // based on input params.
 func TestNewParamFilter(t *testing.T) {
 	for _, obj := range valid {
-		filter, err := controllers.NewParamFilter(obj.Key, obj.Values)
+		filter, err := web.NewParamFilter(obj.Key, obj.Values)
 		assert.Nil(t, err)
 		require.NotNil(t, filter)
 		assert.Equal(t, obj.Key, filter.Key)
@@ -142,7 +142,7 @@ func TestNewParamFilter(t *testing.T) {
 		assert.Equal(t, obj.Values, filter.Values)
 	}
 	for _, obj := range invalid {
-		filter, err := controllers.NewParamFilter(obj.Key, obj.Values)
+		filter, err := web.NewParamFilter(obj.Key, obj.Values)
 		assert.NotNil(t, err)
 		require.Nil(t, filter)
 	}
@@ -160,7 +160,7 @@ func TestNewParamFilter(t *testing.T) {
 func TestAddToQuery(t *testing.T) {
 	for i, obj := range valid {
 		q := pgmodels.NewQuery()
-		filter, err := controllers.NewParamFilter(obj.Key, obj.Values)
+		filter, err := web.NewParamFilter(obj.Key, obj.Values)
 		assert.Nil(t, err)
 		err = filter.AddToQuery(q)
 		require.Nil(t, err)
@@ -179,13 +179,13 @@ func TestInterfaceValues(t *testing.T) {
 		"val2",
 		"val3",
 	}
-	filter, err := controllers.NewParamFilter("col1__in", values)
+	filter, err := web.NewParamFilter("col1__in", values)
 	require.Nil(t, err)
 	assert.Equal(t, []interface{}{"val1", "val2", "val3"}, filter.InterfaceValues())
 }
 
 func TestFilterCollection(t *testing.T) {
-	fc := controllers.NewFilterCollection()
+	fc := web.NewFilterCollection()
 	for _, obj := range valid {
 		err := fc.Add(obj.Key, obj.Values)
 		require.Nil(t, err)

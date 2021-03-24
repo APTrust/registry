@@ -1,10 +1,9 @@
-package controllers
+package web
 
 import (
 	"fmt"
 	"net/http"
 
-	"github.com/APTrust/registry/forms"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/gin-gonic/gin"
 )
@@ -42,7 +41,7 @@ func InstitutionIndex(c *gin.Context) {
 func InstitutionNew(c *gin.Context) {
 	r := NewRequest(c)
 	template := "institutions/form.html"
-	form, err := forms.NewInstitutionForm(c, r.TemplateData, 0)
+	form, err := NewInstitutionForm(c, r.TemplateData, 0)
 	if AbortIfError(c, err) {
 		return
 	}
@@ -98,7 +97,7 @@ func InstitutionEdit(c *gin.Context) {
 	// if AbortIfError(c, err) {
 	// 	return
 	// }
-	form, err := forms.NewInstitutionForm(c, r.TemplateData, r.ID)
+	form, err := NewInstitutionForm(c, r.TemplateData, r.ID)
 	if AbortIfError(c, err) {
 		return
 	}
@@ -109,7 +108,7 @@ func InstitutionEdit(c *gin.Context) {
 
 func saveInstitutionForm(c *gin.Context, instID int64) {
 	r := NewRequest(c)
-	form, err := forms.NewInstitutionForm(c, r.TemplateData, instID)
+	form, err := NewInstitutionForm(c, r.TemplateData, instID)
 	if AbortIfError(c, err) {
 		return
 	}
