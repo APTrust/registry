@@ -127,6 +127,10 @@ func UserSignIn(email, password, ipAddr string) (*User, error) {
 	return user, err
 }
 
+func (user *User) GetID() int64 {
+	return user.ID
+}
+
 // UserSignOut signs a user out.
 func (user *User) SignOut() error {
 	if user.CurrentSignInIP != "" {

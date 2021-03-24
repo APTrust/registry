@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/APTrust/registry/common"
+	//"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/forms"
 	"github.com/APTrust/registry/helpers"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
+	//"github.com/google/uuid"
 )
 
 // UserCreate a new user. Handles submission of new user form.
@@ -56,15 +56,15 @@ func UserIndex(c *gin.Context) {
 // UserNew returns a blank form for the user to create a new user.
 // GET /users/new
 func UserNew(c *gin.Context) {
-	r := NewRequest(c)
-	template := "users/form.html"
-	form, err := forms.NewUserForm(&pgmodels.User{})
-	if AbortIfError(c, err) {
-		return
-	}
-	form.Action = "/users/new"
-	r.TemplateData["form"] = form
-	c.HTML(http.StatusOK, template, r.TemplateData)
+	// r := NewRequest(c)
+	// template := "users/form.html"
+	// form, err := forms.NewUserForm(&pgmodels.User{})
+	// if AbortIfError(c, err) {
+	// 	return
+	// }
+	// form.Action = "/users/new"
+	// r.TemplateData["form"] = form
+	// c.HTML(http.StatusOK, template, r.TemplateData)
 }
 
 // UserShow returns the user with the specified id.
@@ -94,18 +94,18 @@ func UserUpdate(c *gin.Context) {
 // UserEdit shows a form to edit an exiting user.
 // GET /users/edit/:id
 func UserEdit(c *gin.Context) {
-	r := NewRequest(c)
-	userToEdit, err := pgmodels.UserByID(r.ID)
-	if AbortIfError(c, err) {
-		return
-	}
-	form, err := forms.NewUserForm(userToEdit)
-	if AbortIfError(c, err) {
-		return
-	}
-	form.Action = fmt.Sprintf("/users/edit/%d", userToEdit.ID)
-	r.TemplateData["form"] = form
-	c.HTML(http.StatusOK, "users/form.html", r.TemplateData)
+	// r := NewRequest(c)
+	// userToEdit, err := pgmodels.UserByID(r.ID)
+	// if AbortIfError(c, err) {
+	// 	return
+	// }
+	// form, err := forms.NewUserForm(userToEdit)
+	// if AbortIfError(c, err) {
+	// 	return
+	// }
+	// form.Action = fmt.Sprintf("/users/edit/%d", userToEdit.ID)
+	// r.TemplateData["form"] = form
+	// c.HTML(http.StatusOK, "users/form.html", r.TemplateData)
 }
 
 // UserSignInShow shows the user sign-in form.
@@ -176,32 +176,32 @@ func getIndexQuery(c *gin.Context) (*pgmodels.Query, error) {
 }
 
 func saveUserForm(c *gin.Context, userToEdit *pgmodels.User) {
-	r := NewRequest(c)
-	form, err := forms.NewUserForm(userToEdit)
-	if AbortIfError(c, err) {
-		return
-	}
+	// r := NewRequest(c)
+	// form, err := forms.NewUserForm(userToEdit)
+	// if AbortIfError(c, err) {
+	// 	return
+	// }
 
-	template := "users/form.html"
-	form.Action = "/users/new"
-	if userToEdit.ID > 0 {
-		form.Action = fmt.Sprintf("/users/edit/%d", userToEdit.ID)
-	} else {
-		// Assign random password to new user. They'll get an email
-		// asking them to reset their password.
-		encPwd, err := common.EncryptPassword(uuid.New().String())
-		if AbortIfError(c, err) {
-			return
-		}
-		userToEdit.EncryptedPassword = encPwd
-	}
+	// template := "users/form.html"
+	// form.Action = "/users/new"
+	// if userToEdit.ID > 0 {
+	// 	form.Action = fmt.Sprintf("/users/edit/%d", userToEdit.ID)
+	// } else {
+	// 	// Assign random password to new user. They'll get an email
+	// 	// asking them to reset their password.
+	// 	encPwd, err := common.EncryptPassword(uuid.New().String())
+	// 	if AbortIfError(c, err) {
+	// 		return
+	// 	}
+	// 	userToEdit.EncryptedPassword = encPwd
+	// }
 
-	r.TemplateData["form"] = form
-	status, err := form.Save(c, r.TemplateData)
-	if err != nil {
-		c.HTML(status, template, r.TemplateData)
-		return
-	}
-	location := fmt.Sprintf("/users/show/%d?flash=User+saved", form.User.ID)
-	c.Redirect(http.StatusSeeOther, location)
+	// r.TemplateData["form"] = form
+	// status, err := form.Save(c, r.TemplateData)
+	// if err != nil {
+	// 	c.HTML(status, template, r.TemplateData)
+	// 	return
+	// }
+	// location := fmt.Sprintf("/users/show/%d?flash=User+saved", form.User.ID)
+	// c.Redirect(http.StatusSeeOther, location)
 }

@@ -13,7 +13,7 @@ import (
 // institution form.
 // POST /institutions/new
 func InstitutionCreate(c *gin.Context) {
-	saveInstitutionForm(c, &pgmodels.Institution{})
+	saveInstitutionForm(c, 0)
 }
 
 // InstitutionDelete deletes a institution.
@@ -42,7 +42,7 @@ func InstitutionIndex(c *gin.Context) {
 func InstitutionNew(c *gin.Context) {
 	r := NewRequest(c)
 	template := "institutions/form.html"
-	form, err := forms.NewInstitutionForm(&pgmodels.Institution{})
+	form, err := forms.NewInstitutionForm(c, r.TemplateData, 0)
 	if AbortIfError(c, err) {
 		return
 	}
@@ -83,49 +83,49 @@ func InstitutionShow(c *gin.Context) {
 // PUT /institutions/edit/:id
 func InstitutionUpdate(c *gin.Context) {
 	r := NewRequest(c)
-	institution, err := pgmodels.InstitutionByID(r.ID)
-	if AbortIfError(c, err) {
-		return
-	}
-	saveInstitutionForm(c, institution)
+	// institution, err := pgmodels.InstitutionByID(r.ID)
+	// if AbortIfError(c, err) {
+	// 	return
+	// }
+	saveInstitutionForm(c, r.ID)
 }
 
 // InstitutionEdit shows a form to edit an exiting institution.
 // GET /institutions/edit/:id
 func InstitutionEdit(c *gin.Context) {
 	r := NewRequest(c)
-	institution, err := pgmodels.InstitutionByID(r.ID)
+	// institution, err := pgmodels.InstitutionByID(r.ID)
+	// if AbortIfError(c, err) {
+	// 	return
+	// }
+	form, err := forms.NewInstitutionForm(c, r.TemplateData, r.ID)
 	if AbortIfError(c, err) {
 		return
 	}
-	form, err := forms.NewInstitutionForm(institution)
-	if AbortIfError(c, err) {
-		return
-	}
-	form.Action = fmt.Sprintf("/institutions/edit/%d", institution.ID)
+	form.Action = fmt.Sprintf("/institutions/edit/%d", form.Model.GetID())
 	r.TemplateData["form"] = form
 	c.HTML(http.StatusOK, "institutions/form.html", r.TemplateData)
 }
 
-func saveInstitutionForm(c *gin.Context, institution *pgmodels.Institution) {
+func saveInstitutionForm(c *gin.Context, instID int64) {
 	r := NewRequest(c)
-	form, err := forms.NewInstitutionForm(institution)
+	form, err := forms.NewInstitutionForm(c, r.TemplateData, instID)
 	if AbortIfError(c, err) {
 		return
 	}
 
 	template := "institutions/form.html"
 	form.Action = "/institutions/new"
-	if institution.ID > 0 {
-		form.Action = fmt.Sprintf("/institutions/edit/%d", institution.ID)
+	if instID > 0 {
+		form.Action = fmt.Sprintf("/institutions/edit/%d", instID)
 	}
 
 	r.TemplateData["form"] = form
-	status, err := form.Save(c, r.TemplateData)
+	status, err := form.Save()
 	if err != nil {
 		c.HTML(status, template, r.TemplateData)
 		return
 	}
-	location := fmt.Sprintf("/institutions/show/%d?flash=Institution+saved", form.Institution.ID)
+	location := fmt.Sprintf("/institutions/show/%d?flash=Institution+saved", form.Model.GetID())
 	c.Redirect(http.StatusSeeOther, location)
 }

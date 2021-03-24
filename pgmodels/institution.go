@@ -65,6 +65,10 @@ func InstitutionSelect(query *Query) ([]*Institution, error) {
 	return institutions, err
 }
 
+func (inst *Institution) GetID() int64 {
+	return inst.ID
+}
+
 // Save saves this institution to the database. This will peform an insert
 // if Institution.ID is zero. Otherwise, it updates.
 func (inst *Institution) Save() error {

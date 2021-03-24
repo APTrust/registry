@@ -5,6 +5,11 @@ import (
 	"github.com/go-pg/pg/v10"
 )
 
+type Model interface {
+	GetID() int64
+	Save() error
+}
+
 type xactType int
 
 const (

@@ -1,24 +1,30 @@
 package forms
 
 import (
-	"net/http"
+	"fmt"
+	//"net/http"
 
-	"github.com/APTrust/registry/common"
+	//"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/gin-gonic/gin"
 )
 
 type InstitutionForm struct {
 	Form
-	Institution *pgmodels.Institution
 	instOptions []ListOption
 }
 
-func NewInstitutionForm(institution *pgmodels.Institution) (*InstitutionForm, error) {
+func NewInstitutionForm(c *gin.Context, t gin.H, instID int64) (*InstitutionForm, error) {
 	var err error
+	institution := &pgmodels.Institution{}
+	if instID > 0 {
+		institution, err = pgmodels.InstitutionByID(instID)
+		if err != nil {
+			return nil, err
+		}
+	}
 	institutionForm := &InstitutionForm{
-		Form:        NewForm(),
-		Institution: institution,
+		Form: NewForm(c, t, institution),
 	}
 
 	// List parent (member) institutions only.
@@ -99,40 +105,42 @@ func (f *InstitutionForm) init() {
 	}
 }
 
-func (f *InstitutionForm) Save(c *gin.Context, templateData gin.H) (int, error) {
-	status := http.StatusCreated
-	if f.Institution.ID > 0 {
-		status = http.StatusOK
-	}
-	_ = c.ShouldBind(f.Institution)
-	err := f.Institution.Save()
-	if err != nil {
-		status = f.handleError(err, templateData)
-	}
-	f.setValues()
-	return status, err
-}
+// func (f *InstitutionForm) Save(c *gin.Context, templateData gin.H) (int, error) {
+// 	status := http.StatusCreated
+// 	if f.Institution.ID > 0 {
+// 		status = http.StatusOK
+// 	}
+// 	_ = c.ShouldBind(f.Institution)
+// 	err := f.Institution.Save()
+// 	if err != nil {
+// 		status = f.handleError(err, templateData)
+// 	}
+// 	f.setValues()
+// 	return status, err
+// }
 
-func (f *InstitutionForm) handleError(err error, templateData gin.H) int {
-	status := http.StatusBadRequest
-	if valErr, ok := err.(*common.ValidationError); ok {
-		for fieldName, _ := range valErr.Errors {
-			f.Fields[fieldName].DisplayError = true
-		}
-	} else {
-		templateData["FormError"] = err.Error()
-		status = http.StatusInternalServerError
-	}
-	return status
-}
+// func (f *InstitutionForm) handleError(err error, templateData gin.H) int {
+// 	status := http.StatusBadRequest
+// 	if valErr, ok := err.(*common.ValidationError); ok {
+// 		for fieldName, _ := range valErr.Errors {
+// 			f.Fields[fieldName].DisplayError = true
+// 		}
+// 	} else {
+// 		templateData["FormError"] = err.Error()
+// 		status = http.StatusInternalServerError
+// 	}
+// 	return status
+// }
 
 // setValues sets the form values to match the Institution values.
 func (f *InstitutionForm) setValues() {
-	f.Fields["Name"].Value = f.Institution.Name
-	f.Fields["Identifier"].Value = f.Institution.Identifier
-	f.Fields["Type"].Value = f.Institution.Type
-	f.Fields["MemberInstitutionID"].Value = f.Institution.MemberInstitutionID
-	f.Fields["OTPEnabled"].Value = f.Institution.OTPEnabled
-	f.Fields["ReceivingBucket"].Value = f.Institution.ReceivingBucket
-	f.Fields["RestoreBucket"].Value = f.Institution.RestoreBucket
+	fmt.Println("------ CALLED INST setValues() ------")
+	institution := f.Model.(*pgmodels.Institution)
+	f.Fields["Name"].Value = institution.Name
+	f.Fields["Identifier"].Value = institution.Identifier
+	f.Fields["Type"].Value = institution.Type
+	f.Fields["MemberInstitutionID"].Value = institution.MemberInstitutionID
+	f.Fields["OTPEnabled"].Value = institution.OTPEnabled
+	f.Fields["ReceivingBucket"].Value = institution.ReceivingBucket
+	f.Fields["RestoreBucket"].Value = institution.RestoreBucket
 }
