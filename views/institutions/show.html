@@ -2,8 +2,10 @@
 
 {{ template "shared/header.html" .}}
 
+{{ if .CurrentUser.IsAdmin }}
 <div class="float-right"><a class="button" href="/institutions/edit/{{ .institution.ID }}">Edit</a></div>
 <h1>{{ .institution.Name }}</h1>
+{{ end }}
 
 <table>
   <tbody>

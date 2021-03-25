@@ -80,7 +80,7 @@ func NewParamFilter(key string, values []string) (*ParamFilter, error) {
 	// Parse the column and operator from the key name
 	colAndOp := strings.Split(key, "__")
 	if len(colAndOp) != 2 {
-		return nil, fmt.Errorf("Invalid query string param '%s': missing '__'", key)
+		colAndOp = append(colAndOp, "eq") // Assume equals if op not supplied.
 	}
 	col := colAndOp[0]
 	rawOp := colAndOp[1]

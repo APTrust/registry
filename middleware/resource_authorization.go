@@ -32,6 +32,7 @@ type ResourceAuthorization struct {
 func AuthorizeResource(c *gin.Context) *ResourceAuthorization {
 	r := &ResourceAuthorization{ginCtx: c}
 	r.init()
+	fmt.Println(r)
 	return r
 }
 

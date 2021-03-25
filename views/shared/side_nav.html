@@ -1,13 +1,26 @@
 {{ define "shared/side_nav.html" }}
 
 <ul>
-  <li><a href="/dashboard/{{ .CurrentUser.InstitutionID }}"><i class="fa fa-home"></i> Dashboard</a></li>
+
+  {{ if .CurrentUser.IsAdmin }}
+  <li><a href="/dashboard"><i class="fa fa-home"></i> Dashboard</a></li>
   <li><a href="/objects"><i class="fa fa-archive"></i> Objects</a></li>
   <li><a href="/items"><i class="fa fa-cog"></i> Work Items</a></li>
   <li><a href="/reports"><i class="fa fa-chart-line"></i> Reports</a></li>
   <li><a href="/alerts"><i class="fa fa-bell"></i> Alerts</a></li>
   <li><a href="/institutions"><i class="fa fa-landmark"></i> Institutions</a></li>
+  <li><a href="/users"><i class="fa fa-users"></i> Users</a></li>
+
+  {{ else }}
+
+  <li><a href="/dashboard?institution_id={{ .CurrentUser.InstitutionID }}"><i class="fa fa-home"></i> Dashboard</a></li>
+  <li><a href="/objects?institution_id={{ .CurrentUser.InstitutionID }}"><i class="fa fa-archive"></i> Objects</a></li>
+  <li><a href="/items?institution_id={{ .CurrentUser.InstitutionID }}"><i class="fa fa-cog"></i> Work Items</a></li>
+  <li><a href="/reports?institution_id={{ .CurrentUser.InstitutionID }}"><i class="fa fa-chart-line"></i> Reports</a></li>
+  <li><a href="/alerts"><i class="fa fa-bell"></i> Alerts</a></li>
+  <li><a href="/institutions/show/{{ .CurrentUser.InstitutionID }}"><i class="fa fa-landmark"></i> Institution</a></li>
   <li><a href="/users?institution_id={{ .CurrentUser.InstitutionID }}"><i class="fa fa-users"></i> Users</a></li>
+  {{ end }}
   <li><a href="/users/sign_out"><i class="fas fa-sign-out-alt"></i> Sign Out</a></li>
 </ul>
 

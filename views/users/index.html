@@ -4,10 +4,11 @@
 
 <h1>Users</h1>
 
+{{ if .CurrentUser.IsAdmin }}
 <form method="get">
   <div class="row">
     <div class="column-50">
-      <select id="institution_id__eq" name="institution_id__eq">
+      <select id="institution_id" name="institution_id">
         <option value="">All Institutions</option>
         {{ $selectedID := .selectedID }}
         {{ range $index, $option := .institutionOptions }}
@@ -20,6 +21,7 @@
     </div>
   </div>
 </form>
+{{ end }}
 
 <table>
   <thead>

@@ -34,7 +34,7 @@ func UserIndex(c *gin.Context) {
 	}
 
 	query.OrderBy("name asc")
-	req.TemplateData["selectedID"] = c.Query("institution_id__eq")
+	req.TemplateData["selectedID"] = c.Query("institution_id")
 
 	users, err := pgmodels.UserViewSelect(query)
 	if AbortIfError(c, err) {
@@ -150,13 +150,16 @@ func SignInUser(c *gin.Context) (int, string, error) {
 		return http.StatusInternalServerError, redirectTo, err
 	}
 	c.Set("CurrentUser", user)
-	location := fmt.Sprintf("/dashboard/%d", user.InstitutionID)
-	return http.StatusFound, location, nil
+	startPage := "/dashboard"
+	if !user.IsAdmin() {
+		startPage += fmt.Sprintf("?institution_id=%d", user.InstitutionID)
+	}
+	return http.StatusFound, startPage, nil
 }
 
 func getIndexQuery(c *gin.Context) (*pgmodels.Query, error) {
 	allowedFilters := []string{
-		"institution_id__eq",
+		"institution_id",
 	}
 	fc := NewFilterCollection()
 	for _, key := range allowedFilters {

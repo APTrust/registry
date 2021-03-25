@@ -48,6 +48,6 @@ func showAuthFailedError(c *gin.Context, auth *ResourceAuthorization) {
 	c.HTML(http.StatusForbidden, "errors/show.html", gin.H{
 		"suppressSideNav": true,
 		"suppressTopNav":  false,
-		"error":           fmt.Sprintf("Permission denied for %s", c.FullPath()),
+		"error":           fmt.Sprintf("Permission denied for %s (institution %d).", c.FullPath(), auth.ResourceInstID),
 	})
 }
