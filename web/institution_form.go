@@ -1,6 +1,7 @@
 package web
 
 import (
+	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/pgmodels"
 )
 
@@ -69,6 +70,7 @@ func (f *InstitutionForm) init() {
 		Placeholder: "Parent Institution",
 		ErrMsg:      "You must choose a parent instition if this is a sub-account.",
 		Options:     f.instOptions,
+		Attrs:       map[string]string{},
 	}
 	f.Fields["OTPEnabled"] = &Field{
 		Name:        "OTPEnabled",
@@ -110,4 +112,8 @@ func (f *InstitutionForm) setValues() {
 	f.Fields["OTPEnabled"].Value = institution.OTPEnabled
 	f.Fields["ReceivingBucket"].Value = institution.ReceivingBucket
 	f.Fields["RestoreBucket"].Value = institution.RestoreBucket
+
+	if f.Fields["Type"].Value == constants.InstTypeMember {
+		f.Fields["MemberInstitutionID"].Attrs["disabled"] = "true"
+	}
 }
