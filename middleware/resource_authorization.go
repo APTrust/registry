@@ -73,6 +73,9 @@ func (r *ResourceAuthorization) checkPermission() {
 func (r *ResourceAuthorization) readRequestIds() {
 	r.ResourceID = r.idFromRequest("id")
 	r.ResourceInstID = r.idFromRequest("institution_id")
+	if r.ResourceInstID == 0 {
+		r.ResourceInstID = r.idFromRequest("InstitutionID")
+	}
 	if strings.HasPrefix(r.Handler, "Institution") {
 		r.ResourceInstID = r.ResourceID
 	}

@@ -33,6 +33,7 @@ func initTemplates(router *gin.Engine) {
 		"strEq":      helpers.StrEq,
 		"truncate":   helpers.Truncate,
 		"roleName":   helpers.RoleName,
+		"userCan":    helpers.UserCan,
 		"yesNo":      helpers.YesNo,
 	})
 	// Load the view templates

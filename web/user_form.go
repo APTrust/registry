@@ -1,6 +1,8 @@
 package web
 
 import (
+	"strconv"
+
 	"github.com/APTrust/registry/pgmodels"
 )
 
@@ -21,9 +23,17 @@ func NewUserForm(request *Request) (*UserForm, error) {
 	userForm := &UserForm{
 		Form: NewForm(request, user),
 	}
-	userForm.instOptions, err = ListInstitutions(false)
-	if err != nil {
-		return nil, err
+
+	if request.CurrentUser.IsAdmin() {
+		userForm.instOptions, err = ListInstitutions(false)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		instID := strconv.Itoa(int(request.CurrentUser.InstitutionID))
+		userForm.instOptions = []ListOption{
+			{instID, request.CurrentUser.Institution.Name},
+		}
 	}
 	userForm.init()
 	userForm.setValues()
@@ -86,11 +96,15 @@ func (f *UserForm) init() {
 			"required": "",
 		},
 	}
+	rolesList := InstRolesList
+	if f.Request.CurrentUser.IsAdmin() {
+		rolesList = AllRolesList
+	}
 	f.Fields["Role"] = &Field{
 		Name:    "Role",
 		ErrMsg:  pgmodels.ErrUserRole,
 		Label:   "Role",
-		Options: RolesList,
+		Options: rolesList,
 		Attrs: map[string]string{
 			"required": "",
 		},

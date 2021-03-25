@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"html/template"
 	"time"
+
+	"github.com/APTrust/registry/constants"
+	"github.com/APTrust/registry/pgmodels"
 )
 
 // https://curtisvermeeren.github.io/2017/09/14/Golang-Templates-Cheatsheet
@@ -79,4 +82,9 @@ func EscapeAttr(s string) template.HTMLAttr {
 // This helps avoid the ZgotmplZ problem.
 func EscapeHTML(s string) template.HTML {
 	return template.HTML(s)
+}
+
+// UserCan returns true if the user has the specified permission.
+func UserCan(user *pgmodels.User, permission constants.Permission, instID int64) bool {
+	return user.HasPermission(permission, instID)
 }

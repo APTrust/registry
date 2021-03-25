@@ -5,7 +5,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/helpers"
+	"github.com/APTrust/registry/pgmodels"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -47,4 +49,31 @@ func TestEscapeAttr(t *testing.T) {
 
 func TestEscapeHTML(t *testing.T) {
 	assert.Equal(t, template.HTML("<em>escape!</em>"), helpers.EscapeHTML("<em>escape!</em>"))
+}
+
+func TestUserCan(t *testing.T) {
+	admin := &pgmodels.User{
+		Role:          constants.RoleSysAdmin,
+		InstitutionID: 1,
+	}
+	assert.True(t, helpers.UserCan(admin, constants.UserCreate, 1))
+	assert.True(t, helpers.UserCan(admin, constants.UserCreate, 2))
+	assert.True(t, helpers.UserCan(admin, constants.UserCreate, 100))
+
+	instAdmin := &pgmodels.User{
+		Role:          constants.RoleInstAdmin,
+		InstitutionID: 1,
+	}
+	assert.True(t, helpers.UserCan(instAdmin, constants.UserCreate, 1))
+	assert.False(t, helpers.UserCan(instAdmin, constants.UserCreate, 2))
+	assert.False(t, helpers.UserCan(instAdmin, constants.UserCreate, 100))
+
+	instUser := &pgmodels.User{
+		Role:          constants.RoleInstUser,
+		InstitutionID: 1,
+	}
+	assert.False(t, helpers.UserCan(instUser, constants.UserCreate, 1))
+	assert.False(t, helpers.UserCan(instUser, constants.UserCreate, 2))
+	assert.False(t, helpers.UserCan(instUser, constants.UserCreate, 100))
+
 }

@@ -7,13 +7,19 @@ import (
 	"github.com/APTrust/registry/pgmodels"
 )
 
-// RolesList is a list of assignable user roles. Hard-coded instead
+// AllRolesList is a list of assignable user roles. Hard-coded instead
 // of using Options() function for formatting reasons and because we
 // don't want to include the "none" role.
-var RolesList = []ListOption{
+var AllRolesList = []ListOption{
 	{constants.RoleInstAdmin, "Institutional Admin"},
 	{constants.RoleInstUser, "Institutional User"},
 	{constants.RoleSysAdmin, "APTrust System Administrator"},
+}
+
+// InstRolesList is a list of user roles for institutions.
+var InstRolesList = []ListOption{
+	{constants.RoleInstAdmin, "Institutional Admin"},
+	{constants.RoleInstUser, "Institutional User"},
 }
 
 var InstTypeList = []ListOption{
