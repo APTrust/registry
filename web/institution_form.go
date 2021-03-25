@@ -64,15 +64,15 @@ func (f *InstitutionForm) init() {
 		},
 	}
 	f.Fields["MemberInstitutionID"] = &Field{
-		Name:        "Parent Institution",
+		Name:        "MemberInstitutionID",
 		Label:       "Parent Institution",
 		Placeholder: "Parent Institution",
 		ErrMsg:      "You must choose a parent instition if this is a sub-account.",
 		Options:     f.instOptions,
 	}
 	f.Fields["OTPEnabled"] = &Field{
-		Name:        "Two-Factor Auth Required?",
-		Label:       "Two-Factor Auth Required?",
+		Name:        "OTPEnabled",
+		Label:       "Enable two-factor authentication?",
 		Placeholder: "Two-Factor Auth Required?",
 		ErrMsg:      "Please choose yes or no.",
 		Options:     YesNoList,

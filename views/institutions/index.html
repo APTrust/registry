@@ -2,6 +2,10 @@
 
 {{ template "shared/header.html" .}}
 
+{{ if .CurrentUser.IsAdmin }}
+<div class="float-right"><a class="button" href="/institutions/new">New</a></div>
+{{ end }}
+
 <h1>Institutions</h1>
 
 <table>
