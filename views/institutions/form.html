@@ -28,7 +28,7 @@
 </form>
 
 <script>
-// Enable/disable parent institution select list based on institution type. 
+// Enable/disable parent institution select list based on institution type.
 window.addEventListener('load', (event) => {
   let typeList = document.forms[0].elements.Type
   let parentList = document.forms[0].elements.MemberInstitutionID
@@ -41,7 +41,6 @@ window.addEventListener('load', (event) => {
       }
   })
 });
-  
 </script>
 
 {{ template "shared/footer.html" .}}

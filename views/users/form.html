@@ -2,7 +2,7 @@
 
 {{ template "shared/header.html" .}}
 
-<form action="{{ .form.Action }}" method="post">
+<form action="{{ .form.Action }}" id="userForm" method="post">
 
   {{ if .FormError }}
   <div class="row form-error">
@@ -35,6 +35,24 @@
     <a class="button button-outline" href="javascript:history.back()">Cancel</a>
   </div>
 </form>
+
+<script>
+// Set 2FA date if 2FA is mandatory and no date is set
+window.addEventListener('load', (event) => {
+     let otpList = document.forms['userForm'].elements.OTPRequiredForLogin
+     let graceDate = document.forms['userForm'].elements.GracePeriod
+     otpList.addEventListener('change', (e) => {
+         if (otpList.value == "true") {
+             let today = new Date()
+             let deadline = new Date(today.setDate(today.getDate() + 60))
+             graceDate.value = deadline.toISOString().substring(0,10)
+         } else if (otpList.value == "false") {
+             graceDate.value = ''
+         }
+     })
+});
+</script>
+
 
 {{ template "shared/footer.html" .}}
 
