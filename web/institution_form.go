@@ -18,6 +18,10 @@ func NewInstitutionForm(request *Request) (*InstitutionForm, error) {
 		if err != nil {
 			return nil, err
 		}
+	} else {
+		// Bind submitted form values in case we have to
+		// re-display the form with an error message.
+		request.GinContext.ShouldBind(institution)
 	}
 	institutionForm := &InstitutionForm{
 		Form: NewForm(request, institution),

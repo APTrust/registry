@@ -20,7 +20,11 @@
 
   {{ template "forms/date.html" .form.Fields.GracePeriod }}
 
-  {{ template "forms/select.html" .form.Fields.InstitutionID }}
+  {{ if .CurrentUser.IsAdmin }}
+    {{ template "forms/select.html" .form.Fields.InstitutionID }}
+  {{ else }}
+    {{ template "forms/hidden.html" .form.Fields.InstitutionID }}
+  {{ end }}
 
   {{ template "forms/select.html" .form.Fields.Role }}
 

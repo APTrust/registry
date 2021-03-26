@@ -19,6 +19,10 @@ func NewUserForm(request *Request) (*UserForm, error) {
 		if err != nil {
 			return nil, err
 		}
+	} else {
+		// Bind submitted form values in case we have to
+		// re-display the form with an error message.
+		request.GinContext.ShouldBind(user)
 	}
 	userForm := &UserForm{
 		Form: NewForm(request, user),
@@ -34,6 +38,7 @@ func NewUserForm(request *Request) (*UserForm, error) {
 		userForm.instOptions = []ListOption{
 			{instID, request.CurrentUser.Institution.Name},
 		}
+		user.InstitutionID = request.CurrentUser.InstitutionID
 	}
 	userForm.init()
 	userForm.setValues()

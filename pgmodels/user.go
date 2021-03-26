@@ -25,7 +25,7 @@ const (
 	ErrUserInst         = "Please choose an institution."
 	ErrUserRole         = "Please choose a role for this user."
 	ErrUserInstNotFound = "Internal error: cannot find institution."
-	ErrUserInvalidAdmin = "Admin role is not valid for this institution."
+	ErrUserInvalidAdmin = "Sys Admin role is not valid for this institution."
 	ErrUserPwdMissing   = "Encrypted password is missing."
 )
 

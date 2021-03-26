@@ -1,0 +1,7 @@
+{{ define "forms/hidden.html" }}
+
+<input type="hidden" name="{{ .Name }}" value="{{ .Value }}" {{ template "forms/attrs.html" . }}>
+
+{{ if .DisplayError }}<div class="row form-error">{{ .ErrMsg }}</div>{{ end }}
+
+{{ end }}
