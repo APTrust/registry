@@ -15,10 +15,35 @@ func InstitutionCreate(c *gin.Context) {
 	saveInstitutionForm(c)
 }
 
-// InstitutionDelete deletes a institution.
-// DELETE /institutions/:id
+// InstitutionDelete deletes a user.
+// DELETE /institutions/delete/:id
 func InstitutionDelete(c *gin.Context) {
+	req := NewRequest(c)
+	inst, err := pgmodels.InstitutionByID(req.ResourceID)
+	if AbortIfError(c, err) {
+		return
+	}
+	err = inst.Delete()
+	if AbortIfError(c, err) {
+		return
+	}
+	c.Redirect(http.StatusFound, "/institutions")
+}
 
+// InstitutionUndelete reactivates an institution.
+// GET /institutions/undelete/:id
+func InstitutionUndelete(c *gin.Context) {
+	req := NewRequest(c)
+	inst, err := pgmodels.InstitutionByID(req.ResourceID)
+	if AbortIfError(c, err) {
+		return
+	}
+	err = inst.Undelete()
+	if AbortIfError(c, err) {
+		return
+	}
+	location := fmt.Sprintf("/institutions/show/%d", inst.ID)
+	c.Redirect(http.StatusFound, location)
 }
 
 // InstitutionIndex shows list of institutions.

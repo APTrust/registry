@@ -20,7 +20,11 @@
   </thead>
   <tbody>
     {{ range $index, $inst := .institutions }}
-    <tr class="clickable" onclick="window.location.href='/institutions/show/{{ $inst.ID }}'">
+      {{ $cssClass := "clickable" }}
+      {{ if not $inst.DeactivatedAt.IsZero }}
+        {{ $cssClass = "clickable row-disabled" }}
+      {{ end }}
+    <tr class="{{ $cssClass }}" onclick="window.location.href='/institutions/show/{{ $inst.ID }}'">
       <td>{{ $inst.Name }}</td>
       <td>{{ $inst.Identifier }}</td>
       <td>{{ replace $inst.Type "Institution" "" 1 }}</td>

@@ -89,6 +89,7 @@ func initRoutes(router *gin.Engine) {
 		webRoutes.POST("/institutions/new", web.InstitutionCreate)
 		webRoutes.DELETE("/institutions/delete/:id", web.InstitutionDelete)
 		webRoutes.GET("/institutions/delete/:id", web.InstitutionDelete)
+		webRoutes.GET("/institutions/undelete/:id", web.InstitutionUndelete)
 		webRoutes.GET("/institutions", web.InstitutionIndex)
 		webRoutes.GET("/institutions/new", web.InstitutionNew)
 		webRoutes.GET("/institutions/show/:id", web.InstitutionShow)

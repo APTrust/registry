@@ -45,7 +45,7 @@ func UserUndelete(c *gin.Context) {
 	if AbortIfError(c, err) {
 		return
 	}
-	location := fmt.Sprintf("/users?institution_id=%d", user.ID)
+	location := fmt.Sprintf("/users/show/%d", user.ID)
 	c.Redirect(http.StatusFound, location)
 }
 

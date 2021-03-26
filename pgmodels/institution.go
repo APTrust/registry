@@ -29,7 +29,7 @@ type Institution struct {
 	State               string    `json:"state" pg:"state"`
 	Type                string    `json:"type" pg:"type"`
 	MemberInstitutionID int64     `json:"member_institution_id" pg:"member_institution_id"`
-	DeactivatedAt       time.Time `json:"deactivated_at" pg:"deactivated_at,soft_delete"`
+	DeactivatedAt       time.Time `json:"deactivated_at" pg:"deactivated_at"`
 	OTPEnabled          bool      `json:"otp_enabled" pg:"otp_enabled"`
 	ReceivingBucket     string    `json:"receiving_bucket" pg:"receiving_bucket"`
 	RestoreBucket       string    `json:"restore_bucket" pg:"restore_bucket"`

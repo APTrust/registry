@@ -2,8 +2,17 @@
 
 {{ template "shared/header.html" .}}
 
-{{ if .CurrentUser.IsAdmin }}
-<div class="float-right"><a class="button" href="/institutions/edit/{{ .institution.ID }}">Edit</a></div>
+{{ if .institution.DeactivatedAt.IsZero }}
+  {{ if userCan .CurrentUser "InstitutionUpdate" .institution.ID }}
+  <div class="float-right"><a class="button" href="/institutions/edit/{{ .institution.ID }}">Edit</a></div>
+  {{ end }}
+  {{ if userCan .CurrentUser "InstitutionDelete" .institution.ID }}
+  <div class="float-right"><a class="button" href="/institutions/delete/{{ .institution.ID }}">Deactivate</a></div>
+  {{ end }}
+{{ else }}
+  {{ if userCan .CurrentUser "InstitutionUpdate" .institution.ID }}
+  <div class="float-right"><a class="button" href="/institutions/undelete/{{ .institution.ID }}">Reactivate</a></div>
+  {{ end }}
 {{ end }}
 
 <h1>{{ .institution.Name }}</h1>
