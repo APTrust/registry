@@ -6,6 +6,7 @@ import (
 
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/pgmodels"
+	"github.com/go-pg/pg/v10"
 )
 
 type Form struct {
@@ -44,8 +45,17 @@ func (f *Form) handleError(err error) int {
 			f.Fields[fieldName].DisplayError = true
 		}
 	} else {
+		// Integrity violation is usually someone entering
+		// an identifier or email address that is already
+		// in use.
+		isIntegrityViolation := false
 		f.Request.TemplateData["FormError"] = err.Error()
-		status = http.StatusInternalServerError
+		if pgErr, ok := err.(pg.Error); ok {
+			isIntegrityViolation = pgErr.IntegrityViolation()
+		}
+		if !isIntegrityViolation {
+			status = http.StatusInternalServerError
+		}
 	}
 	return status
 }

@@ -19,11 +19,11 @@ func NewUserForm(request *Request) (*UserForm, error) {
 		if err != nil {
 			return nil, err
 		}
-	} else {
-		// Bind submitted form values in case we have to
-		// re-display the form with an error message.
-		request.GinContext.ShouldBind(user)
 	}
+	// Bind submitted form values in case we have to
+	// re-display the form with an error message.
+	request.GinContext.ShouldBind(user)
+
 	userForm := &UserForm{
 		Form: NewForm(request, user),
 	}

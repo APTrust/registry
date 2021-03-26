@@ -91,6 +91,10 @@ func LoadFixtures() error {
 			ctx.Log.Error().Stack().Err(err).Msg("")
 			return err
 		}
+		if err := runMigrations(ctx.DB); err != nil {
+			ctx.Log.Error().Stack().Err(err).Msg("")
+			return err
+		}
 		if err := loadCSVFiles(ctx.DB); err != nil {
 			ctx.Log.Error().Stack().Err(err).Msg("")
 			return err
@@ -122,6 +126,17 @@ func dropEverything(db *pg.DB) error {
 func loadSchema(db *pg.DB) error {
 	panicOnWrongEnv()
 	file := filepath.Join("db", "schema.sql")
+	ddl, err := common.LoadRelativeFile(file)
+	if err != nil {
+		return fmt.Errorf("File %s: %v", file, err)
+	}
+	return runTransaction(db, string(ddl))
+}
+
+// Run all db migrations
+func runMigrations(db *pg.DB) error {
+	panicOnWrongEnv()
+	file := filepath.Join("db", "migrations.sql")
 	ddl, err := common.LoadRelativeFile(file)
 	if err != nil {
 		return fmt.Errorf("File %s: %v", file, err)

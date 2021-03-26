@@ -2,7 +2,13 @@
 
 {{ template "shared/header.html" .}}
 
-<form action="{{ .form.Action }}" method="post">
+<form action="{{ .form.Action }}" id="instForm" method="post">
+
+  {{ if .FormError }}
+  <div class="row form-error">
+    {{ .FormError }}
+  </div>
+  {{ end }}
 
   {{ template "forms/text_input.html" .form.Fields.Name }}
 
@@ -30,8 +36,8 @@
 <script>
 // Enable/disable parent institution select list based on institution type.
 window.addEventListener('load', (event) => {
-  let typeList = document.forms[0].elements.Type
-  let parentList = document.forms[0].elements.MemberInstitutionID
+  let typeList = document.forms['instForm'].elements.Type
+  let parentList = document.forms['instForm'].elements.MemberInstitutionID
   typeList.addEventListener('change', (e) => {
       if (typeList.value == "MemberInstitution") {
         parentList.value = ''

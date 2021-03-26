@@ -18,11 +18,11 @@ func NewInstitutionForm(request *Request) (*InstitutionForm, error) {
 		if err != nil {
 			return nil, err
 		}
-	} else {
-		// Bind submitted form values in case we have to
-		// re-display the form with an error message.
-		request.GinContext.ShouldBind(institution)
 	}
+	// Bind submitted form values in case we have to
+	// re-display the form with an error message.
+	request.GinContext.ShouldBind(institution)
+
 	institutionForm := &InstitutionForm{
 		Form: NewForm(request, institution),
 	}
@@ -119,5 +119,8 @@ func (f *InstitutionForm) setValues() {
 
 	if f.Fields["Type"].Value == constants.InstTypeMember {
 		f.Fields["MemberInstitutionID"].Attrs["disabled"] = "true"
+	}
+	if institution.ID > 0 {
+		f.Fields["Identifier"].Attrs["readonly"] = "true"
 	}
 }
