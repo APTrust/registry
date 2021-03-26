@@ -49,6 +49,7 @@ const (
 	ObjectApproveDelete               = "ObjectApproveDelete"
 	ObjectFinishBulkDelete            = "ObjectFinishBulkDelete"
 	ObjectRestore                     = "ObjectRestore"
+	ReportRead                        = "ReportRead"
 	StorageRecordCreate               = "StorageRecordCreate"
 	StorageRecordRead                 = "StorageRecordRead"
 	StorageRecordUpdate               = "StorageRecordUpdate"
@@ -102,6 +103,7 @@ var Permissions = []Permission{
 	ObjectApproveDelete,
 	ObjectFinishBulkDelete,
 	ObjectRestore,
+	ReportRead,
 	StorageRecordCreate,
 	StorageRecordRead,
 	StorageRecordUpdate,
@@ -149,6 +151,7 @@ func initPermissions() {
 	instUser[FileRead] = true
 	instUser[InstitutionRead] = true
 	instUser[ObjectRead] = true
+	instUser[ReportRead] = true
 	instUser[StorageRecordRead] = true
 	instUser[UserSignIn] = true
 	instUser[UserSignOut] = true
@@ -172,6 +175,7 @@ func initPermissions() {
 	instAdmin[ObjectRequestDelete] = true
 	instAdmin[ObjectApproveDelete] = true
 	instAdmin[ObjectRestore] = true
+	instAdmin[ReportRead] = true
 	instAdmin[StorageRecordRead] = true
 	instAdmin[UserCreate] = true
 	instAdmin[UserRead] = true
@@ -216,6 +220,7 @@ func initPermissions() {
 	sysAdmin[ObjectApproveDelete] = true
 	sysAdmin[ObjectFinishBulkDelete] = true
 	sysAdmin[ObjectRestore] = true
+	sysAdmin[ReportRead] = true
 	sysAdmin[StorageRecordCreate] = true
 	sysAdmin[StorageRecordRead] = true
 	sysAdmin[StorageRecordUpdate] = true

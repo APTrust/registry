@@ -4,8 +4,9 @@
 
 {{ if .CurrentUser.IsAdmin }}
 <div class="float-right"><a class="button" href="/institutions/edit/{{ .institution.ID }}">Edit</a></div>
-<h1>{{ .institution.Name }}</h1>
 {{ end }}
+
+<h1>{{ .institution.Name }}</h1>
 
 <table>
   <tbody>
@@ -40,16 +41,28 @@
     <tr>
       <th>Subscribers</th>
       <td>
-        {{ range $index, $inst := .subscribers }}
-        <a href="/institutions/show/{{ $inst.ID }}">{{ $inst.Name }}</a><br/>
+        {{ if .CurrentUser.IsAdmin }}
+          {{ range $index, $inst := .subscribers }}
+          <a href="/institutions/show/{{ $inst.ID }}">{{ $inst.Name }}</a><br/>
+          {{ end }}
+        {{ else }}
+          {{ range $index, $inst := .subscribers }}
+            {{ $inst.Name }}<br/>
+          {{ end }}
         {{ end }}
       </td>
     </tr>
     <tr>
       <th>Users</th>
       <td>
-        {{ range $index, $user := .users }}
-        <a href="/users/show/{{ $user.ID }}">{{ $user.Name }} ({{ roleName $user.Role }})</a><br/>
+        {{ if userCan .CurrentUser "UserUpdate" .institution.ID }}
+          {{ range $index, $user := .users }}
+          <a href="/users/show/{{ $user.ID }}">{{ $user.Name }} ({{ roleName $user.Role }})</a><br/>
+          {{ end }}
+        {{ else }}
+          {{ range $index, $user := .users }}
+          {{ $user.Name }} ({{ roleName $user.Role }})<br/>
+          {{ end }}
         {{ end }}
       </td>
     </tr>
