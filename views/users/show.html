@@ -2,7 +2,19 @@
 
 {{ template "shared/header.html" .}}
 
-<div class="float-right"><a class="button" href="/users/edit/{{ .user.ID }}">Edit</a></div>
+{{ if .user.DeactivatedAt.IsZero }}
+  {{ if userCan .CurrentUser "UserCreate" .user.InstitutionID }}
+  <div class="float-right"><a class="button" href="/users/edit/{{ .user.ID }}">Edit</a></div>
+  {{ end }}
+  {{ if userCan .CurrentUser "UserDelete" .user.InstitutionID }}
+  <div class="float-right"><a class="button" href="/users/delete/{{ .user.ID }}">Deactivate</a></div>
+  {{ end }}
+{{ else }}
+  {{ if userCan .CurrentUser "UserUpdate" .user.InstitutionID }}
+  <div class="float-right"><a class="button" href="/users/undelete/{{ .user.ID }}">Reactivate</a></div>
+  {{ end }}
+{{ end }}
+
 <h1>{{ .user.Name }}</h1>
 <h3>{{ roleName .user.Role }} at {{ .user.Institution.Name }}</h3>
 

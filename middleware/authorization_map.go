@@ -89,6 +89,7 @@ var AuthMap = map[string]AuthMetadata{
 	"UserIndex":              AuthMetadata{"User", constants.UserRead},
 	"UserShow":               AuthMetadata{"User", constants.UserRead},
 	"UserUpdate":             AuthMetadata{"User", constants.UserUpdate},
+	"UserUndelete":           AuthMetadata{"User", constants.UserUpdate},
 	"UserDelete":             AuthMetadata{"User", constants.UserDelete},
 	"UserReadSelf":           AuthMetadata{"User", constants.UserReadSelf},
 	"UserUpdateSelf":         AuthMetadata{"User", constants.UserUpdateSelf},

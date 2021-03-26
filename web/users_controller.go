@@ -18,9 +18,35 @@ func UserCreate(c *gin.Context) {
 }
 
 // UserDelete deletes a user.
-// DELETE /users/:id
+// DELETE /users/delete/:id
 func UserDelete(c *gin.Context) {
+	req := NewRequest(c)
+	user, err := pgmodels.UserByID(req.ResourceID)
+	if AbortIfError(c, err) {
+		return
+	}
+	err = user.Delete()
+	if AbortIfError(c, err) {
+		return
+	}
+	location := fmt.Sprintf("/users?institution_id=%d", user.InstitutionID)
+	c.Redirect(http.StatusFound, location)
+}
 
+// UserUndelete reactivates a user.
+// GET /users/undelete/:id
+func UserUndelete(c *gin.Context) {
+	req := NewRequest(c)
+	user, err := pgmodels.UserByID(req.ResourceID)
+	if AbortIfError(c, err) {
+		return
+	}
+	err = user.Undelete()
+	if AbortIfError(c, err) {
+		return
+	}
+	location := fmt.Sprintf("/users?institution_id=%d", user.ID)
+	c.Redirect(http.StatusFound, location)
 }
 
 // UserIndex shows list of users.

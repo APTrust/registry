@@ -65,6 +65,9 @@ func initMiddleware(router *gin.Engine) {
 // in a few GitHub issues, including
 // https://github.com/gin-gonic/gin/issues/450
 //
+// TODO: Implement the hidden _method hack described here, if possible.
+// https://stackoverflow.com/questions/16805956/why-dont-browsers-support-put-and-delete-requests-and-when-will-they
+//
 // The maintainers' solution is to use r.Any(), meaning any HTTP
 // verb would map to a given route. We'll use the pairs PUT/POST
 // and GET/DELETE, which is a little more restrictive that "match
@@ -97,6 +100,7 @@ func initRoutes(router *gin.Engine) {
 		webRoutes.POST("/users/new", web.UserCreate)
 		webRoutes.DELETE("/users/delete/:id", web.UserDelete)
 		webRoutes.GET("/users/delete/:id", web.UserDelete)
+		webRoutes.GET("/users/undelete/:id", web.UserUndelete)
 		webRoutes.GET("/users", web.UserIndex)
 		webRoutes.GET("/users/new", web.UserNew)
 		webRoutes.GET("/users/show/:id", web.UserShow)

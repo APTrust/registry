@@ -45,7 +45,11 @@
   <tbody>
     <!-- Obj type is UsersView, not User -->
     {{ range $index, $user := .users }}
-    <tr class="clickable" onclick="window.location.href='/users/show/{{ $user.ID }}'">
+      {{ if $user.DeactivatedAt.IsZero }}
+      <tr class="clickable" onclick="window.location.href='/users/show/{{ $user.ID }}'">
+      {{ else }}
+        <tr class="clickable row-disabled" onclick="window.location.href='/users/show/{{ $user.ID }}'">
+      {{ end }}
       <td>{{ $user.Name }}</td>
       <td>{{ $user.Email }}</td>
       <td>{{ $user.InstitutionName }}</td>
