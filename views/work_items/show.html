@@ -1,0 +1,108 @@
+{{ define "work_items/show.html" }}
+
+{{ template "shared/header.html" .}}
+
+
+{{ if userCan .CurrentUser "WorkItemUpdate" .item.InstitutionID }}
+  <div class="float-right"><a class="button" href="/work_items/edit/{{ .item.ID }}">Edit</a></div>
+{{ end }}
+
+<h1>{{ .item.Name }}</h1>
+
+<table>
+  <tbody>
+    <tr>
+      <th>ETag</th>
+      <td>{{ .item.ETag }}</td>
+    </tr>
+    <tr>
+      <th>Intellectual Object</th>
+      <td>{{ item.ObjectIdentifier }}</td>
+    </tr>
+    <tr>
+      <th>Generic File</th>
+      <td>{{ if .item.GenericFileIdentifier }}</td>
+    </tr>
+    <tr>
+      <th>Bucket</th>
+      <td>{{ .item.Bucket }}</td>
+    </tr>
+    <tr>
+      <th>User</th>
+      <td>{{ .item.User }}</td>
+    </tr>
+    <tr>
+      <th>Action</th>
+      <td>{{ .item.Action }}</td>
+    </tr>
+    <tr>
+      <th>Stage</th>
+      <td>{{ .item.Stage }}</td>
+    </tr>
+    <tr>
+      <th>Statue</th>
+      <td>{{ .item.Status }}</td>
+    </tr>
+    <tr>
+      <th>Outcome</th>
+      <td>{{ .item.Outcome }}</td>
+    </tr>
+    <tr>
+      <th>Bag Date</th>
+      <td>{{ .item.BagDate }}</td>
+    </tr>
+    <tr>
+      <th>Date Processed</th>
+      <td>{{ .item.DateProcessed }}</td>
+    </tr>
+    <tr>
+      <th>Retry</th>
+      <td>{{ .item.Retry }}</td>
+    </tr>
+    <tr>
+      <th>Node</th>
+      <td>{{ .item.Node }}</td>
+    </tr>
+    <tr>
+      <th>Pid</th>
+      <td>{{ .item.Pid }}</td>
+    </tr>
+    <tr>
+      <th>Needs Admin Review</th>
+      <td>{{ .item.NeedsAdminReview }}</td>
+    </tr>
+    <tr>
+      <th>Queued At</th>
+      <td>{{ .item.QueuedAt }}</td>
+    </tr>
+    <tr>
+      <th>Size</th>
+      <td>{{ .item.Size }}</td>
+    </tr>
+    <tr>
+      <th>Stage Started At</th>
+      <td>{{ .item.StageStartedAt }}</td>
+    </tr>
+    <tr>
+      <th>APTrust Approver</th>
+      <td>{{ .item.APTrustApprover }}</td>
+    </tr>
+    <tr>
+      <th>Intitutional Approver</th>
+      <td>{{ .item.InstApprover }}</td>
+    </tr>
+    <tr>
+      <th>Created At</th>
+      <td>{{ .item.CreatedAt }}</td>
+    </tr>
+    <tr>
+      <th>Updated At</th>
+      <td>{{ .item.UpdatedAt }}</td>
+    </tr>
+  </tbody>
+</table>
+
+{{ template "shared/footer.html" .}}
+
+
+{{ end }}

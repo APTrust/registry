@@ -1,0 +1,33 @@
+{{ define "work_items/index.html" }}
+
+{{ template "shared/header.html" .}}
+
+<h1>Work Items</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Institution</th>
+      <th>Action</th>
+      <th>Stage</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{ range $index, $item := .workItems }}
+    <tr class="clickable" onclick="window.location.href='/work_items/show/{{ $item.ID }}'">
+      <td>{{ $item.Name }}</td>
+      <td>{{ $item.InstitutionName }}</td>
+      <td>{{ $item.Action }}</td>
+      <td>{{ $item.Stage }}</td>
+      <td>{{ $item.Status }}</td>
+    </tr>
+    {{ end }}
+  </tbody>
+</table>
+
+{{ template "shared/footer.html" .}}
+
+
+{{ end }}
