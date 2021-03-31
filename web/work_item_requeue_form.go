@@ -1,11 +1,10 @@
 package web
 
 import (
-	//"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/pgmodels"
 )
 
-type WorkItemForm struct {
+type WorkItemRequeueForm struct {
 	Form
 	stageOptions []ListOption
 }
