@@ -2,10 +2,12 @@ package pgmodels
 
 import (
 	"time"
-	//"github.com/APTrust/registry/common"
-	//"github.com/APTrust/registry/constants"
+
+	"github.com/APTrust/registry/common"
 )
 
+// WorkItemView is a read-only model for querying. It flattens out
+// WorkItem and some of its one-to-one relations for easy querying.
 type WorkItemView struct {
 	tableName                struct{}  `pg:"work_items_view"`
 	ID                       int64     `json:"id" pg:"id"`
@@ -43,4 +45,36 @@ type WorkItemView struct {
 	InstApprover             string    `json:"inst_approver" pg:"inst_approver"`
 	CreatedAt                time.Time `json:"created_at" pg:"created_at"`
 	UpdatedAt                time.Time `json:"updated_at" pg:"updated_at"`
+}
+
+// WorkItemViewByID returns the work item with the specified id.
+// Returns pg.ErrNoRows if there is no match.
+func WorkItemViewByID(id int64) (*WorkItemView, error) {
+	query := NewQuery().Where("id", "=", id)
+	return WorkItemViewGet(query)
+}
+
+// WorkItemViewGet returns the first work item matching the query.
+func WorkItemViewGet(query *Query) (*WorkItemView, error) {
+	var item WorkItemView
+	err := query.Select(&item)
+	return &item, err
+}
+
+// WorkItemViewSelect returns all work items matching the query.
+func WorkItemViewSelect(query *Query) ([]*WorkItemView, error) {
+	var items []*WorkItemView
+	err := query.Select(&items)
+	return items, err
+}
+
+// GetID returns the ID of this WorkItem.
+func (item *WorkItemView) GetID() int64 {
+	return item.ID
+}
+
+// Validate is a no-op. This view is not writable, so we can't save to it.
+// This method is here to satisfy the Model interface.
+func (item *WorkItemView) Validate() *common.ValidationError {
+	return nil
 }
