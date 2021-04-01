@@ -5,7 +5,24 @@ import (
 	"time"
 
 	"github.com/APTrust/registry/common"
+	"github.com/APTrust/registry/constants"
+	v "github.com/asaskevich/govalidator"
 	"github.com/go-pg/pg/v10"
+)
+
+const (
+	ErrItemName          = "Name is required."
+	ErrItemETag          = "ETag is required."
+	ErrItemBagDate       = "BagDate is required."
+	ErrItemBucket        = "Bucket is required."
+	ErrItemUser          = "User must be a valid email address."
+	ErrItemInstID        = "InstitutionID is required."
+	ErrItemDateProcessed = "DateProcessed is required."
+	ErrItemNote          = "Note cannot be empty."
+	ErrItemAction        = "Action is missing or invalid."
+	ErrItemStage         = "Stage is missing or invalid."
+	ErrItemStatus        = "Status is missing or invalid."
+	ErrItemOutcome       = "Outcome cannot be empty."
 )
 
 type WorkItem struct {
@@ -81,6 +98,9 @@ var (
 
 // BeforeInsert validates the record and does additional prep work.
 func (item *WorkItem) BeforeInsert(c context.Context) (context.Context, error) {
+	now := time.Now().UTC()
+	item.CreatedAt = now
+	item.UpdatedAt = now
 	err := item.Validate()
 	if err == nil {
 		return c, nil
@@ -90,10 +110,47 @@ func (item *WorkItem) BeforeInsert(c context.Context) (context.Context, error) {
 
 // BeforeUpdate sets the UpdatedAt timestamp.
 func (item *WorkItem) BeforeUpdate(c context.Context) (context.Context, error) {
+	item.UpdatedAt = time.Now().UTC()
 	return c, nil
 }
 
 func (item *WorkItem) Validate() *common.ValidationError {
-	// TODO: Validate required. Validate biz rules.
+	errors := make(map[string]string)
+	if !v.IsByteLength(item.Name, 1, 1000) {
+		errors["Name"] = ErrItemName
+	}
+	if !v.IsByteLength(item.ETag, 32, 40) {
+		errors["ETag"] = ErrItemETag
+	}
+	if item.BagDate.IsZero() {
+		errors["BagDate"] = ErrItemBagDate
+	}
+	if !v.IsByteLength(item.Bucket, 1, 1000) {
+		errors["Bucket"] = ErrItemBucket
+	}
+	if !v.IsEmail(item.User) {
+		errors["User"] = ErrItemUser
+	}
+	if item.InstitutionID < 1 {
+		errors["InstitutionID"] = ErrItemInstID
+	}
+	if item.DateProcessed.IsZero() {
+		errors["DateProcessed"] = ErrItemDateProcessed
+	}
+	if !v.IsByteLength(item.Name, 1, 10000) {
+		errors["Note"] = ErrItemNote
+	}
+	if !v.IsIn(item.Action, constants.WorkItemActions...) {
+		errors["Action"] = ErrItemAction
+	}
+	if !v.IsIn(item.Stage, constants.Stages...) {
+		errors["Stage"] = ErrItemStage
+	}
+	if !v.IsIn(item.Status, constants.Statuses...) {
+		errors["Status"] = ErrItemStatus
+	}
+	if !v.IsByteLength(item.Name, 1, 1000) {
+		errors["Outcome"] = ErrItemOutcome
+	}
 	return nil
 }
