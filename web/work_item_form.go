@@ -7,7 +7,6 @@ import (
 
 type WorkItemForm struct {
 	Form
-	instOptions []ListOption
 }
 
 func NewWorkItemForm(request *Request) (*WorkItemForm, error) {
@@ -27,16 +26,81 @@ func NewWorkItemForm(request *Request) (*WorkItemForm, error) {
 		Form: NewForm(request, item),
 	}
 	itemForm.init()
+	itemForm.setValues()
 	return itemForm, err
 }
 
 func (f *WorkItemForm) init() {
-	// Editable fields:
-	//
-	// Stage, Status, Retry, NeedsAdminReview, Retry, Node, Pid
+	f.Fields["Stage"] = &Field{
+		Name:        "Stage",
+		Label:       "Stage",
+		Placeholder: "Stage",
+		ErrMsg:      pgmodels.ErrItemStage,
+		Attrs: map[string]string{
+			"required": "",
+		},
+	}
+	f.Fields["Status"] = &Field{
+		Name:        "Status",
+		Label:       "Status",
+		Placeholder: "Status",
+		ErrMsg:      pgmodels.ErrItemStatus,
+		Attrs: map[string]string{
+			"required": "",
+		},
+	}
+	f.Fields["Retry"] = &Field{
+		Name:        "Retry",
+		Label:       "Retry",
+		Placeholder: "Retry",
+		ErrMsg:      "Please choose yes or no.",
+		Attrs: map[string]string{
+			"required": "",
+		},
+	}
+	f.Fields["NeedsAdminReview"] = &Field{
+		Name:        "NeedsAdminReview",
+		Label:       "NeedsAdminReview",
+		Placeholder: "NeedsAdminReview",
+		ErrMsg:      "Please choose yes or no.",
+		Attrs: map[string]string{
+			"required": "",
+		},
+	}
+	f.Fields["Note"] = &Field{
+		Name:        "Note",
+		Label:       "Note",
+		Placeholder: "Note",
+		ErrMsg:      pgmodels.ErrItemNote,
+		Attrs: map[string]string{
+			"required": "",
+		},
+	}
+	f.Fields["Node"] = &Field{
+		Name:        "Node",
+		Label:       "Node",
+		Placeholder: "Node",
+		Attrs: map[string]string{
+			"required": "",
+		},
+	}
+	f.Fields["PID"] = &Field{
+		Name:        "PID",
+		Label:       "PID",
+		Placeholder: "PID",
+		Attrs: map[string]string{
+			"required": "",
+		},
+	}
 }
 
-// setValues sets the form values to match the WorkItem values.
 func (f *WorkItemForm) setValues() {
-
+	item := f.Model.(*pgmodels.WorkItem)
+	f.Fields["Stage"].Value = item.Stage
+	f.Fields["Status"].Value = item.Status
+	f.Fields["Retry"].Value = item.Retry
+	f.Fields["NeedsAdminReview"].Value = item.NeedsAdminReview
+	f.Fields["Note"].Value = item.Note
+	f.Fields["Node"].Value = item.Node
+	f.Fields["PID"].Value = item.PID
 }

@@ -1,0 +1,9 @@
+{{ define "forms/number.html" }}
+
+<label>{{ .Label }}
+  <input type="number" name="{{ .Name }}" value="{{ .Value }}" placeholder="{{ .Placeholder }}" {{ template "forms/attrs.html" . }}>
+</label>
+
+{{ if .DisplayError }}<div class="row form-error">{{ .ErrMsg }}</div>{{ end }}
+
+{{ end }}

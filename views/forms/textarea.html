@@ -1,0 +1,9 @@
+{{ define "forms/textarea.html" }}
+
+<label>{{ .Label }}
+<textarea name="{{ .Name }}" placeholder="{{ .Placeholder }}" {{ template "forms/attrs.html" . }}>{{ .Value }}</textarea>
+</label>
+
+{{ if .DisplayError }}<div class="row form-error">{{ .ErrMsg }}</div>{{ end }}
+
+{{ end }}

@@ -1,7 +1,7 @@
 {{ define "forms/text_input.html" }}
 
 <label>{{ .Label }}
-<input type="text" name="{{ .Name }}" value="{{ .Value }}" placeholder="{{ .Placeholder }}" minlength="2" {{ template "forms/attrs.html" . }}>
+<input type="text" name="{{ .Name }}" value="{{ .Value }}" placeholder="{{ .Placeholder }}" {{ template "forms/attrs.html" . }}>
 </label>
 
 {{ if .DisplayError }}<div class="row form-error">{{ .ErrMsg }}</div>{{ end }}

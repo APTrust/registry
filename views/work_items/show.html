@@ -1,6 +1,6 @@
 {{ define "work_items/show.html" }}
 
-{{ template "shared/header.html" .}}
+{{ template "shared/header.html" . }}
 
 
 {{ if userCan .CurrentUser "WorkItemUpdate" .item.InstitutionID }}
@@ -17,11 +17,11 @@
     </tr>
     <tr>
       <th>Intellectual Object</th>
-      <td>{{ item.ObjectIdentifier }}</td>
+      <td>{{ .item.ObjectIdentifier }}</td>
     </tr>
     <tr>
       <th>Generic File</th>
-      <td>{{ if .item.GenericFileIdentifier }}</td>
+      <td>{{ .item.GenericFileIdentifier }}</td>
     </tr>
     <tr>
       <th>Bucket</th>
@@ -40,7 +40,7 @@
       <td>{{ .item.Stage }}</td>
     </tr>
     <tr>
-      <th>Statue</th>
+      <th>Status</th>
       <td>{{ .item.Status }}</td>
     </tr>
     <tr>
@@ -102,7 +102,7 @@
   </tbody>
 </table>
 
-{{ template "shared/footer.html" .}}
+{{ template "shared/footer.html" . }}
 
 
 {{ end }}

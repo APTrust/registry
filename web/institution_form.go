@@ -42,7 +42,7 @@ func (f *InstitutionForm) init() {
 		Name:        "Name",
 		Label:       "Name",
 		Placeholder: "Name",
-		ErrMsg:      "Name must have at least two letters.",
+		ErrMsg:      pgmodels.ErrInstName,
 		Attrs: map[string]string{
 			"required": "",
 			"min":      "2",
@@ -52,7 +52,7 @@ func (f *InstitutionForm) init() {
 		Name:        "Identifier",
 		Label:       "Identifier",
 		Placeholder: "Identifier",
-		ErrMsg:      "Identifier must be a domain name.",
+		ErrMsg:      pgmodels.ErrInstIdentifier,
 		Attrs: map[string]string{
 			"required": "",
 			"pattern":  "[A-Za-z0-9]{2,}\\.[A-Za-z0-9]{2,}",
@@ -62,7 +62,7 @@ func (f *InstitutionForm) init() {
 		Name:        "Type",
 		Label:       "Institution Type",
 		Placeholder: "Institution Type",
-		ErrMsg:      "Please choose a type.",
+		ErrMsg:      pgmodels.ErrInstType,
 		Options:     InstTypeList,
 		Attrs: map[string]string{
 			"required": "",
@@ -72,7 +72,7 @@ func (f *InstitutionForm) init() {
 		Name:        "MemberInstitutionID",
 		Label:       "Parent Institution",
 		Placeholder: "Parent Institution",
-		ErrMsg:      "You must choose a parent instition if this is a sub-account.",
+		ErrMsg:      pgmodels.ErrInstMemberID,
 		Options:     f.instOptions,
 		Attrs:       map[string]string{},
 	}

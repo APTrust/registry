@@ -1,0 +1,38 @@
+{{ define "work_items/form.html" }}
+
+{{ template "shared/header.html" .}}
+
+<form action="{{ .form.Action }}" id="workItemForm" method="post">
+
+  {{ if .FormError }}
+  <div class="row form-error">
+    {{ .FormError }}
+  </div>
+  {{ end }}
+
+  {{ template "forms/select.html" .form.Fields.Status }}
+
+  {{ template "forms/select.html" .form.Fields.Status }}
+
+  {{ template "forms/select.html" .form.Fields.Retry }}
+
+  {{ template "forms/select.html" .form.Fields.NeedsAdminReview }}
+
+  {{ template "forms/textarea.html" .form.Fields.Note }}
+
+  {{ template "forms/text_input.html" .form.Fields.Node }}
+
+  {{ template "forms/number.html" .form.Fields.PID }}
+
+  <div class="float-right">
+    <input type="submit" value="Submit">
+  </div>
+  <div class="float-left">
+    <a class="button button-outline" href="javascript:history.back()">Cancel</a>
+  </div>
+
+</form>
+
+{{ template "shared/footer.html" .}}
+
+{{ end }}
