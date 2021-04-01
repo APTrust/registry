@@ -152,5 +152,8 @@ func (item *WorkItem) Validate() *common.ValidationError {
 	if !v.IsByteLength(item.Name, 1, 1000) {
 		errors["Outcome"] = ErrItemOutcome
 	}
+	if len(errors) > 0 {
+		return &common.ValidationError{errors}
+	}
 	return nil
 }

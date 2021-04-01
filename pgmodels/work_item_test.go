@@ -11,7 +11,29 @@ import (
 )
 
 func TestWorkItemValidation(t *testing.T) {
+	item := &pgmodels.WorkItem{}
+	err := item.Validate()
+	require.NotNil(t, err)
 
+	assert.Equal(t, pgmodels.ErrItemName, err.Errors["Name"])
+	assert.Equal(t, pgmodels.ErrItemETag, err.Errors["ETag"])
+	assert.Equal(t, pgmodels.ErrItemBagDate, err.Errors["BagDate"])
+	assert.Equal(t, pgmodels.ErrItemBucket, err.Errors["Bucket"])
+	assert.Equal(t, pgmodels.ErrItemUser, err.Errors["User"])
+	assert.Equal(t, pgmodels.ErrItemInstID, err.Errors["InstitutionID"])
+	assert.Equal(t, pgmodels.ErrItemDateProcessed, err.Errors["DateProcessed"])
+	assert.Equal(t, pgmodels.ErrItemNote, err.Errors["Note"])
+	assert.Equal(t, pgmodels.ErrItemAction, err.Errors["Action"])
+	assert.Equal(t, pgmodels.ErrItemStage, err.Errors["Stage"])
+	assert.Equal(t, pgmodels.ErrItemStatus, err.Errors["Status"])
+	assert.Equal(t, pgmodels.ErrItemOutcome, err.Errors["Outcome"])
+}
+
+func TestWorkItemGetID(t *testing.T) {
+	item := &pgmodels.WorkItem{
+		ID: 199,
+	}
+	assert.Equal(t, int64(199), item.GetID())
 }
 
 func TestWorkItemByID(t *testing.T) {
@@ -40,7 +62,7 @@ func TestWorkItemSelect(t *testing.T) {
 	items, err := pgmodels.WorkItemSelect(query)
 	require.Nil(t, err)
 	require.NotEmpty(t, items)
-	assert.True(t, (len(items) > 20 && len(items) < 25))
+	assert.True(t, (len(items) > 20 && len(items) < 30))
 	for _, item := range items {
 		assert.NotEqual(t, "pdfs.tar", item)
 		assert.NotEqual(t, "coal.tar", item)

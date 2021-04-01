@@ -14,7 +14,8 @@ type WorkItemView struct {
 	Name                     string    `json:"name" pg:"name"`
 	ETag                     string    `json:"etag" pg:"etag"`
 	InstitutionID            int64     `json:"institution_id" pg:"institution_id"`
-	InstitutionName          string    `json:"institution_name" pg:"institution_id"`
+	InstitutionName          string    `json:"institution_name" pg:"institution_name"`
+	InstitutionIdentifier    string    `json:"institution_identifier" pg:"institution_identifier"`
 	IntellectualObjectID     int64     `json:"intellectual_object_id" pg:"intellectual_object_id"`
 	ObjectIdentifier         string    `json:"object_identifier" pg:"object_identifier"`
 	AltIdentifier            string    `json:"alt_identifier" pg:"alt_identifier"`
