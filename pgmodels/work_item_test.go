@@ -97,3 +97,15 @@ func TestWorkItemSave(t *testing.T) {
 	assert.NotEmpty(t, item.CreatedAt)
 	assert.NotEmpty(t, item.UpdatedAt)
 }
+
+func TestWorkItemHasCompleted(t *testing.T) {
+	item := &pgmodels.WorkItem{}
+	for _, status := range constants.IncompleteStatusValues {
+		item.Status = status
+		assert.False(t, item.HasCompleted())
+	}
+	for _, status := range constants.CompletedStatusValues {
+		item.Status = status
+		assert.True(t, item.HasCompleted())
+	}
+}

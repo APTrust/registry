@@ -90,11 +90,22 @@ var AccessSettings = []string{
 	AccessRestricted,
 }
 
+var CompletedStatusValues = []string{
+	StatusCancelled,
+	StatusFailed,
+	StatusSuccess,
+}
+
 var DigestAlgs = []string{
 	AlgMd5,
 	AlgSha1,
 	AlgSha256,
 	AlgSha512,
+}
+
+var IncompleteStatusValues = []string{
+	StatusPending,
+	StatusStarted,
 }
 
 var InstTypes = []string{

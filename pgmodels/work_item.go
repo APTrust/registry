@@ -8,6 +8,7 @@ import (
 	"github.com/APTrust/registry/constants"
 	v "github.com/asaskevich/govalidator"
 	"github.com/go-pg/pg/v10"
+	"github.com/stretchr/stew/slice"
 )
 
 const (
@@ -75,8 +76,14 @@ func WorkItemSelect(query *Query) ([]*WorkItem, error) {
 	return items, err
 }
 
+// GetID returns this item's ID.
 func (item *WorkItem) GetID() int64 {
 	return item.ID
+}
+
+// HasCompleted returns true if this item has completed processing.
+func (item *WorkItem) HasCompleted() bool {
+	return slice.Contains(constants.CompletedStatusValues, item.Status)
 }
 
 // Save saves this work item to the database. This will peform an insert
