@@ -54,7 +54,7 @@ func WorkItemUpdate(c *gin.Context) {
 		return
 	}
 	location := fmt.Sprintf("/work_items/show/%d?flash=WorkItem+saved", form.Model.GetID())
-	c.Redirect(http.StatusOK, location)
+	c.Redirect(http.StatusSeeOther, location)
 }
 
 // WorkItemEdit shows a form to edit an exiting work item.

@@ -1,7 +1,7 @@
 package web
 
 import (
-	//"github.com/APTrust/registry/constants"
+	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/pgmodels"
 )
 
@@ -36,6 +36,7 @@ func (f *WorkItemForm) init() {
 		Label:       "Stage",
 		Placeholder: "Stage",
 		ErrMsg:      pgmodels.ErrItemStage,
+		Options:     Options(constants.Stages),
 		Attrs: map[string]string{
 			"required": "",
 		},
@@ -45,6 +46,7 @@ func (f *WorkItemForm) init() {
 		Label:       "Status",
 		Placeholder: "Status",
 		ErrMsg:      pgmodels.ErrItemStatus,
+		Options:     Options(constants.Statuses),
 		Attrs: map[string]string{
 			"required": "",
 		},
@@ -54,6 +56,7 @@ func (f *WorkItemForm) init() {
 		Label:       "Retry",
 		Placeholder: "Retry",
 		ErrMsg:      "Please choose yes or no.",
+		Options:     YesNoList,
 		Attrs: map[string]string{
 			"required": "",
 		},
@@ -63,6 +66,7 @@ func (f *WorkItemForm) init() {
 		Label:       "NeedsAdminReview",
 		Placeholder: "NeedsAdminReview",
 		ErrMsg:      "Please choose yes or no.",
+		Options:     YesNoList,
 		Attrs: map[string]string{
 			"required": "",
 		},
@@ -80,9 +84,7 @@ func (f *WorkItemForm) init() {
 		Name:        "Node",
 		Label:       "Node",
 		Placeholder: "Node",
-		Attrs: map[string]string{
-			"required": "",
-		},
+		Attrs:       map[string]string{},
 	}
 	f.Fields["PID"] = &Field{
 		Name:        "PID",

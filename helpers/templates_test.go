@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var testDate, _ = time.Parse(time.RFC3339, "2021-04-16T15:04:05Z")
+var testDate, _ = time.Parse(time.RFC3339, "2021-04-16T12:24:16Z")
 var textString = "The Academic Preservation Trust (APTrust) is committed to the creation and management of a sustainable environment for digital preservation."
 var truncatedString = "The Academic Preservation Trust..."
 
@@ -25,6 +25,10 @@ func TestDateUS(t *testing.T) {
 
 func TestDateISO(t *testing.T) {
 	assert.Equal(t, "2021-04-16", helpers.DateISO(testDate))
+}
+
+func TestDateTimeISO(t *testing.T) {
+	assert.Equal(t, "2021-04-16T12:24:16Z", helpers.DateTimeISO(testDate))
 }
 
 func TestStrEq(t *testing.T) {

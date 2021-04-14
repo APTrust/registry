@@ -42,6 +42,14 @@ func DateISO(date time.Time) string {
 	return date.Format("2006-01-02")
 }
 
+// DateTimeISO returns a date in format "2006-01-02T15:04:05Z"
+func DateTimeISO(date time.Time) string {
+	if date.IsZero() {
+		return ""
+	}
+	return date.Format(time.RFC3339)
+}
+
 // RoleName transforms ugly DB role names into more readable ones.
 func RoleName(role string) string {
 	switch role {
