@@ -12,7 +12,7 @@ import (
 // GET /work_items
 func WorkItemIndex(c *gin.Context) {
 	req := NewRequest(c)
-	template := "work items/index.html"
+	template := "work_items/index.html"
 	query := pgmodels.NewQuery().OrderBy("name")
 	items, err := pgmodels.WorkItemViewSelect(query)
 	if AbortIfError(c, err) {

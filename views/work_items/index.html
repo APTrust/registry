@@ -15,7 +15,7 @@
     </tr>
   </thead>
   <tbody>
-    {{ range $index, $item := .workItems }}
+    {{ range $index, $item := .items }}
     <tr class="clickable" onclick="window.location.href='/work_items/show/{{ $item.ID }}'">
       <td>{{ $item.Name }}</td>
       <td>{{ $item.InstitutionName }}</td>

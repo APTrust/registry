@@ -99,6 +99,6 @@ var AuthMap = map[string]AuthMetadata{
 	"WorkItemCreate":         AuthMetadata{"WorkItem", constants.WorkItemCreate},
 	"WorkItemIndex":          AuthMetadata{"WorkItem", constants.WorkItemRead},
 	"WorkItemShow":           AuthMetadata{"WorkItem", constants.WorkItemRead},
-	"WorkItemUpdate":         AuthMetadata{"WorkItem", constants.WorkItemUpdate},
+	"WorkItemEdit":           AuthMetadata{"WorkItem", constants.WorkItemUpdate},
 	"WorkItemDelete":         AuthMetadata{"WorkItem", constants.WorkItemDelete},
 }

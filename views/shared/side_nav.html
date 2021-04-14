@@ -5,7 +5,7 @@
   {{ if .CurrentUser.IsAdmin }}
   <li><a href="/dashboard"><i class="fa fa-home"></i> Dashboard</a></li>
   <li><a href="/objects"><i class="fa fa-archive"></i> Objects</a></li>
-  <li><a href="/items"><i class="fa fa-cog"></i> Work Items</a></li>
+  <li><a href="/work_items"><i class="fa fa-cog"></i> Work Items</a></li>
   <li><a href="/reports"><i class="fa fa-chart-line"></i> Reports</a></li>
   <li><a href="/alerts"><i class="fa fa-bell"></i> Alerts</a></li>
   <li><a href="/institutions"><i class="fa fa-landmark"></i> Institutions</a></li>
@@ -22,7 +22,7 @@
   {{ end }}
 
   {{ if userCan .CurrentUser "WorkItemRead" .CurrentUser.InstitutionID }}
-  <li><a href="/items?institution_id={{ .CurrentUser.InstitutionID }}"><i class="fa fa-cog"></i> Work Items</a></li>
+  <li><a href="/work_items?institution_id={{ .CurrentUser.InstitutionID }}"><i class="fa fa-cog"></i> Work Items</a></li>
   {{ end }}
 
   {{ if userCan .CurrentUser "ReportRead" .CurrentUser.InstitutionID }}

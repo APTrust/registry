@@ -97,6 +97,13 @@ func initRoutes(router *gin.Engine) {
 		webRoutes.PUT("/institutions/edit/:id", web.InstitutionUpdate)
 		webRoutes.POST("/institutions/edit/:id", web.InstitutionUpdate)
 
+		// WorkItems - Web UI allows only list, show, and limited editing for admin only
+		webRoutes.GET("/work_items", web.WorkItemIndex)
+		webRoutes.GET("/work_items/show/:id", web.WorkItemShow)
+		webRoutes.GET("/work_items/edit/:id", web.WorkItemEdit)
+		webRoutes.PUT("/work_items/edit/:id", web.WorkItemUpdate)
+		webRoutes.POST("/work_items/edit/:id", web.WorkItemUpdate)
+
 		// Users
 		webRoutes.POST("/users/new", web.UserCreate)
 		webRoutes.DELETE("/users/delete/:id", web.UserDelete)
