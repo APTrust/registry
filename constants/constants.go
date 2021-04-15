@@ -9,11 +9,13 @@ const (
 	ActionDelete               = "Delete"
 	ActionFinishBulkDelete     = "FinishBulkDelete"
 	ActionFixityCheck          = "Fixity Check"
+	ActionRestoreFile          = "Restore File"
 	ActionGlacierRestore       = "Glacier Restore"
 	ActionIngest               = "Ingest"
 	ActionRead                 = "Read"
 	ActionRequestDelete        = "RequestDelete"
 	ActionRestore              = "Restore"
+	ActionRestoreObject        = "Restore Object"
 	ActionUpdate               = "Update"
 	AlgMd5                     = "md5"
 	AlgSha1                    = "sha1"
@@ -38,6 +40,15 @@ const (
 	EventSignatureValidation   = "digital signature validation"
 	EventValidation            = "validation"
 	EventVirusCheck            = "virus check"
+	IngestPreFetch             = "ingest01_prefetch"
+	IngestValidation           = "ingest02_bag_validation"
+	IngestReingestCheck        = "ingest03_reingest_check"
+	IngestStaging              = "ingest04_staging"
+	IngestFormatIdentification = "ingest05_format_identification"
+	IngestStorage              = "ingest06_storage"
+	IngestStorageValidation    = "ingest07_storage_validation"
+	IngestRecord               = "ingest08_record"
+	IngestCleanup              = "ingest09_cleanup"
 	InstTypeMember             = "MemberInstitution"
 	InstTypeSubscriber         = "SubscriptionInstitution"
 	RoleInstAdmin              = "institutional_admin"
@@ -78,6 +89,11 @@ const (
 	StorageOptionWasabiOR      = "Wasabi-OR"
 	StorageOptionWasabiVA      = "Wasabi-VA"
 	TopicDelete                = "delete_item"
+	TopicE2EDelete             = "e2e_deletion_post_test"
+	TopicE2EFixity             = "e2e_fixity_post_test"
+	TopicE2EIngest             = "e2e_ingest_post_test"
+	TopicE2EReingest           = "e2e_reingest_post_test"
+	TopicE2ERestore            = "e2e_restoration_post_test"
 	TopicFileRestore           = "restore_file"
 	TopicFixity                = "fixity_check"
 	TopicGlacierRestore        = "restore_glacier"
@@ -106,6 +122,18 @@ var DigestAlgs = []string{
 var IncompleteStatusValues = []string{
 	StatusPending,
 	StatusStarted,
+}
+
+var IngestStagesInOrder = []string{
+	StageReceive,
+	StageValidate,
+	StageReingestCheck,
+	StageCopyToStaging,
+	StageFormatIdentification,
+	StageStore,
+	StageStorageValidation,
+	StageRecord,
+	StageCleanup,
 }
 
 var InstTypes = []string{
@@ -178,7 +206,21 @@ var UserActions = []string{
 
 var WorkItemActions = []string{
 	ActionDelete,
+	ActionRestore,
 	ActionGlacierRestore,
 	ActionIngest,
 	ActionRestore,
+}
+
+// NSQIngestTopicFor maps ingest stage names to NSQ topics.
+var NSQIngestTopicFor = map[string]string{
+	StageReceive:              IngestPreFetch,
+	StageValidate:             IngestValidation,
+	StageReingestCheck:        IngestReingestCheck,
+	StageCopyToStaging:        IngestStaging,
+	StageFormatIdentification: IngestFormatIdentification,
+	StageStore:                IngestStorage,
+	StageStorageValidation:    IngestStorageValidation,
+	StageRecord:               IngestRecord,
+	StageCleanup:              IngestCleanup,
 }
