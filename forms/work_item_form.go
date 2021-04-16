@@ -1,4 +1,4 @@
-package web
+package forms
 
 import (
 	"github.com/APTrust/registry/constants"

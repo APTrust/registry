@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/APTrust/registry/common"
+	"github.com/APTrust/registry/forms"
 	"github.com/APTrust/registry/helpers"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/gin-gonic/gin"
@@ -69,7 +70,7 @@ func UserIndex(c *gin.Context) {
 	req.TemplateData["users"] = users
 
 	// Get institutions for filter list
-	institutionOptions, err := ListInstitutions(false)
+	institutionOptions, err := forms.ListInstitutions(false)
 	if AbortIfError(c, err) {
 		return
 	}
@@ -82,7 +83,7 @@ func UserIndex(c *gin.Context) {
 // GET /users/new
 func UserNew(c *gin.Context) {
 	req := NewRequest(c)
-	form, err := NewUserForm(&pgmodels.User{}, req.CurrentUser)
+	form, err := forms.NewUserForm(&pgmodels.User{}, req.CurrentUser)
 	if AbortIfError(c, err) {
 		return
 	}
@@ -117,7 +118,7 @@ func UserEdit(c *gin.Context) {
 	if AbortIfError(c, err) {
 		return
 	}
-	form, err := NewUserForm(userToEdit, req.CurrentUser)
+	form, err := forms.NewUserForm(userToEdit, req.CurrentUser)
 	if AbortIfError(c, err) {
 		return
 	}
@@ -218,7 +219,7 @@ func saveUserForm(c *gin.Context) {
 	// Bind submitted form values in case we have to
 	// re-display the form with an error message.
 	c.ShouldBind(userToEdit)
-	form, err := NewUserForm(userToEdit, req.CurrentUser)
+	form, err := forms.NewUserForm(userToEdit, req.CurrentUser)
 	if AbortIfError(c, err) {
 		return
 	}

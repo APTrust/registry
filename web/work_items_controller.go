@@ -3,6 +3,7 @@ package web
 import (
 	"net/http"
 
+	"github.com/APTrust/registry/forms"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/gin-gonic/gin"
 )
@@ -66,14 +67,14 @@ func WorkItemRequeue(c *gin.Context) {
 	// See preservation services code for queueing via HTTPS
 }
 
-func getFormAndRequest(c *gin.Context) (*WorkItemForm, *Request, error) {
+func getFormAndRequest(c *gin.Context) (*forms.WorkItemForm, *Request, error) {
 	req := NewRequest(c)
 	workItem, err := pgmodels.WorkItemByID(req.ResourceID)
 	if err != nil {
 		return nil, nil, err
 	}
 	c.ShouldBind(workItem)
-	form := NewWorkItemForm(workItem)
+	form := forms.NewWorkItemForm(workItem)
 	req.TemplateData["form"] = form
 	return form, req, nil
 }

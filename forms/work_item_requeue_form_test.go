@@ -1,4 +1,4 @@
-package web_test
+package forms_test
 
 import (
 	//	"fmt"
@@ -8,8 +8,8 @@ import (
 
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
+	"github.com/APTrust/registry/forms"
 	"github.com/APTrust/registry/pgmodels"
-	"github.com/APTrust/registry/web"
 	//	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -21,7 +21,7 @@ func TestWorkItemRequeueFormCompleted(t *testing.T) {
 	require.Nil(t, err)
 	require.Equal(t, 1, len(items))
 	item := items[0]
-	_, err = web.NewWorkItemRequeueForm(item)
+	_, err = forms.NewWorkItemRequeueForm(item)
 	require.NotNil(t, err)
 	assert.Equal(t, common.ErrNotSupported, err)
 }
@@ -52,7 +52,7 @@ func TestWorkItemRequeueFormCompleted(t *testing.T) {
 // 		TemplateData: gin.H{"CurrentUser": &pgmodels.User{}},
 // 	}
 // 	fmt.Println(item)
-// 	form, err := web.NewWorkItemRequeueForm(req)
+// 	form, err := forms.NewWorkItemRequeueForm(req)
 // 	require.Nil(t, err)
 // 	require.NotNil(t, form)
 // 	require.NotNil(t, form.Fields["Stage"])
@@ -71,7 +71,7 @@ func TestWorkItemRequeueFormCompleted(t *testing.T) {
 // 		GinContext:   c,
 // 		TemplateData: gin.H{"CurrentUser": &pgmodels.User{}},
 // 	}
-// 	form, err = web.NewWorkItemRequeueForm(req)
+// 	form, err = forms.NewWorkItemRequeueForm(req)
 // 	require.Nil(t, err)
 // 	require.NotNil(t, form)
 // 	require.NotNil(t, form.Fields["Stage"])
@@ -96,7 +96,7 @@ func TestWorkItemRequeueFormCompleted(t *testing.T) {
 // 		GinContext:   c,
 // 		TemplateData: gin.H{"CurrentUser": &pgmodels.User{}},
 // 	}
-// 	form, err = web.NewWorkItemRequeueForm(req)
+// 	form, err = forms.NewWorkItemRequeueForm(req)
 // 	require.Nil(t, err)
 // 	require.NotNil(t, form)
 // 	require.NotNil(t, form.Fields["Stage"])
