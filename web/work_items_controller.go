@@ -41,14 +41,28 @@ func WorkItemShow(c *gin.Context) {
 // PUT /work_items/edit/:id
 func WorkItemUpdate(c *gin.Context) {
 	req := NewRequest(c)
-	form, err := NewWorkItemForm(req)
+	workItem, err := pgmodels.WorkItemByID(req.ResourceID)
+	if AbortIfError(c, err) {
+		return
+	}
+
+	c.ShouldBind(workItem)
+	form, err := NewWorkItemForm(workItem)
 	if AbortIfError(c, err) {
 		return
 	}
 	template := "work_items/form.html"
 	form.Action = fmt.Sprintf("/work_items/edit/%d", req.ResourceID)
 	req.TemplateData["form"] = form
-	status, err := form.Save()
+
+	status := http.StatusOK
+	err = workItem.Save()
+	if err != nil {
+		status = form.HandleError(err)
+		if form.Error != nil {
+			req.TemplateData["FormError"] = form.Error
+		}
+	}
 	if err != nil {
 		c.HTML(status, template, req.TemplateData)
 		return
@@ -61,11 +75,15 @@ func WorkItemUpdate(c *gin.Context) {
 // GET /work_items/edit/:id
 func WorkItemEdit(c *gin.Context) {
 	req := NewRequest(c)
-	form, err := NewWorkItemForm(req)
+	item, err := pgmodels.WorkItemByID(req.ResourceID)
 	if AbortIfError(c, err) {
 		return
 	}
-	form.Action = fmt.Sprintf("/work_items/edit/%d", form.Model.GetID())
+	form, err := NewWorkItemForm(item)
+	if AbortIfError(c, err) {
+		return
+	}
+	form.Action = fmt.Sprintf("/work_items/edit/%d", item.ID)
 	req.TemplateData["form"] = form
 	c.HTML(http.StatusOK, "work_items/form.html", req.TemplateData)
 }

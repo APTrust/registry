@@ -21,10 +21,7 @@ func TestWorkItemRequeueFormCompleted(t *testing.T) {
 	require.Nil(t, err)
 	require.Equal(t, 1, len(items))
 	item := items[0]
-	req := &web.Request{
-		ResourceID: item.ID,
-	}
-	_, err = web.NewWorkItemRequeueForm(req)
+	_, err = web.NewWorkItemRequeueForm(item)
 	require.NotNil(t, err)
 	assert.Equal(t, common.ErrNotSupported, err)
 }

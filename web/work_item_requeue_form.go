@@ -11,29 +11,17 @@ type WorkItemRequeueForm struct {
 	stageOptions []ListOption
 }
 
-func NewWorkItemRequeueForm(request *Request) (*WorkItemRequeueForm, error) {
-	var err error
-	item := &pgmodels.WorkItem{}
-	if request.ResourceID > 0 {
-		item, err = pgmodels.WorkItemByID(request.ResourceID)
-		if err != nil {
-			return nil, err
-		}
-		// We cannot requeue items after processing has completed.
-		if item.HasCompleted() {
-			common.Context().Log.Error().Msgf("Invalid request for requeue form. WorkItem %d (%s) has completed %s and cannot be requeued.", item.ID, item.Name, item.Action)
-			return nil, common.ErrNotSupported
-		}
+func NewWorkItemRequeueForm(workItem *pgmodels.WorkItem) (*WorkItemRequeueForm, error) {
+	if workItem.HasCompleted() {
+		common.Context().Log.Error().Msgf("Invalid request for requeue form. WorkItem %d (%s) has completed %s and cannot be requeued.", workItem.ID, workItem.Name, workItem.Action)
+		return nil, common.ErrNotSupported
 	}
-	// Bind submitted form values in case we have to
-	// re-display the form with an error message.
-	request.GinContext.ShouldBind(item)
 
 	itemForm := &WorkItemRequeueForm{
-		Form: NewForm(request, item),
+		Form: NewForm(workItem),
 	}
 	itemForm.init()
-	return itemForm, err
+	return itemForm, nil
 }
 
 func (f *WorkItemRequeueForm) init() {
@@ -74,6 +62,6 @@ func (f *WorkItemRequeueForm) setIngestStages() {
 }
 
 // setValues sets the form values to match the WorkItem values.
-func (f *WorkItemRequeueForm) setValues() {
+func (f *WorkItemRequeueForm) SetValues() {
 
 }

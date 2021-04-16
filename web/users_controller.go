@@ -83,7 +83,7 @@ func UserIndex(c *gin.Context) {
 func UserNew(c *gin.Context) {
 	req := NewRequest(c)
 	template := "users/form.html"
-	form, err := NewUserForm(req)
+	form, err := NewUserForm(&pgmodels.User{}, req.CurrentUser)
 	if AbortIfError(c, err) {
 		return
 	}
@@ -115,7 +115,11 @@ func UserUpdate(c *gin.Context) {
 // GET /users/edit/:id
 func UserEdit(c *gin.Context) {
 	req := NewRequest(c)
-	form, err := NewUserForm(req)
+	userToEdit, err := pgmodels.UserByID(req.ResourceID)
+	if AbortIfError(c, err) {
+		return
+	}
+	form, err := NewUserForm(userToEdit, req.CurrentUser)
 	if AbortIfError(c, err) {
 		return
 	}
@@ -197,7 +201,19 @@ func getIndexQuery(c *gin.Context) (*pgmodels.Query, error) {
 // TODO: Move common code into Form.
 func saveUserForm(c *gin.Context) {
 	req := NewRequest(c)
-	form, err := NewUserForm(req)
+	user := &pgmodels.User{}
+	var err error
+	if req.ResourceID > 0 {
+		user, err = pgmodels.UserByID(req.ResourceID)
+		if AbortIfError(c, err) {
+			return
+		}
+	}
+
+	// Bind submitted form values in case we have to
+	// re-display the form with an error message.
+	c.ShouldBind(user)
+	form, err := NewUserForm(user, req.CurrentUser)
 	if AbortIfError(c, err) {
 		return
 	}
@@ -217,11 +233,24 @@ func saveUserForm(c *gin.Context) {
 	}
 
 	req.TemplateData["form"] = form
-	status, err := form.Save()
+	status := http.StatusCreated
+	if user.ID > 0 {
+		status = http.StatusOK
+	}
+
+	err = user.Save()
+	if err != nil {
+		status = form.HandleError(err)
+		if form.Error != nil {
+			req.TemplateData["FormError"] = form.Error
+		}
+		//form.SetValues()
+	}
 	if err != nil {
 		c.HTML(status, template, req.TemplateData)
 		return
 	}
+
 	location := fmt.Sprintf("/users/show/%d?flash=User+saved", form.Model.GetID())
 	c.Redirect(http.StatusSeeOther, location)
 }

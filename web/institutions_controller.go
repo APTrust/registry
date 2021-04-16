@@ -66,7 +66,7 @@ func InstitutionIndex(c *gin.Context) {
 func InstitutionNew(c *gin.Context) {
 	req := NewRequest(c)
 	template := "institutions/form.html"
-	form, err := NewInstitutionForm(req)
+	form, err := NewInstitutionForm(&pgmodels.Institution{})
 	if AbortIfError(c, err) {
 		return
 	}
@@ -113,7 +113,11 @@ func InstitutionUpdate(c *gin.Context) {
 // GET /institutions/edit/:id
 func InstitutionEdit(c *gin.Context) {
 	req := NewRequest(c)
-	form, err := NewInstitutionForm(req)
+	institution, err := pgmodels.InstitutionByID(req.ResourceID)
+	if AbortIfError(c, err) {
+		return
+	}
+	form, err := NewInstitutionForm(institution)
 	if AbortIfError(c, err) {
 		return
 	}
@@ -125,7 +129,18 @@ func InstitutionEdit(c *gin.Context) {
 // TODO: Move common code into Form.
 func saveInstitutionForm(c *gin.Context) {
 	req := NewRequest(c)
-	form, err := NewInstitutionForm(req)
+	var err error
+	institution := &pgmodels.Institution{}
+	if req.ResourceID > 0 {
+		institution, err = pgmodels.InstitutionByID(req.ResourceID)
+		if AbortIfError(c, err) {
+			return
+		}
+	}
+	// Bind submitted form values in case we have to
+	// re-display the form with an error message.
+	c.ShouldBind(institution)
+	form, err := NewInstitutionForm(institution)
 	if AbortIfError(c, err) {
 		return
 	}
@@ -137,7 +152,19 @@ func saveInstitutionForm(c *gin.Context) {
 	}
 
 	req.TemplateData["form"] = form
-	status, err := form.Save()
+	status := http.StatusCreated
+	if institution.ID > 0 {
+		status = http.StatusOK
+	}
+
+	err = institution.Save()
+	if err != nil {
+		status = form.HandleError(err)
+		if form.Error != nil {
+			req.TemplateData["FormError"] = form.Error
+		}
+		//form.SetValues()
+	}
 	if err != nil {
 		c.HTML(status, template, req.TemplateData)
 		return

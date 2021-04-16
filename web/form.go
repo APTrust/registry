@@ -10,35 +10,20 @@ import (
 )
 
 type Form struct {
-	Action  string
-	Fields  map[string]*Field
-	Model   pgmodels.Model
-	Request *Request
+	Action string
+	Fields map[string]*Field
+	Model  pgmodels.Model
+	Error  error
 }
 
-func NewForm(request *Request, model pgmodels.Model) Form {
+func NewForm(model pgmodels.Model) Form {
 	return Form{
-		Fields:  make(map[string]*Field),
-		Model:   model,
-		Request: request,
+		Fields: make(map[string]*Field),
+		Model:  model,
 	}
 }
 
-func (f *Form) Save() (int, error) {
-	status := http.StatusCreated
-	if f.Model.GetID() > 0 {
-		status = http.StatusOK
-	}
-	_ = f.Request.GinContext.ShouldBind(f.Model)
-	err := f.Model.Save()
-	if err != nil {
-		status = f.handleError(err)
-	}
-	f.setValues()
-	return status, err
-}
-
-func (f *Form) handleError(err error) int {
+func (f *Form) HandleError(err error) int {
 	status := http.StatusBadRequest
 	if valErr, ok := err.(*common.ValidationError); ok {
 		for fieldName, _ := range valErr.Errors {
@@ -49,7 +34,7 @@ func (f *Form) handleError(err error) int {
 		// an identifier or email address that is already
 		// in use.
 		isIntegrityViolation := false
-		f.Request.TemplateData["FormError"] = err.Error()
+		f.Error = err
 		if pgErr, ok := err.(pg.Error); ok {
 			isIntegrityViolation = pgErr.IntegrityViolation()
 		}
@@ -60,7 +45,7 @@ func (f *Form) handleError(err error) int {
 	return status
 }
 
-func (f *Form) setValues() {
+func (f *Form) SetValues() {
 	// no-op
 	fmt.Println("***** Called base.setValues() *****")
 }

@@ -9,40 +9,32 @@ import (
 type UserForm struct {
 	Form
 	instOptions []ListOption
+	userIsAdmin bool
 }
 
-func NewUserForm(request *Request) (*UserForm, error) {
-	var err error
-	user := &pgmodels.User{}
-	if request.ResourceID > 0 {
-		user, err = pgmodels.UserByID(request.ResourceID)
-		if err != nil {
-			return nil, err
-		}
-	}
-	// Bind submitted form values in case we have to
-	// re-display the form with an error message.
-	request.GinContext.ShouldBind(user)
-
+func NewUserForm(userToEdit *pgmodels.User, actingUser *pgmodels.User) (*UserForm, error) {
 	userForm := &UserForm{
-		Form: NewForm(request, user),
+		Form:        NewForm(userToEdit),
+		userIsAdmin: actingUser.IsAdmin(),
 	}
 
-	if request.CurrentUser.IsAdmin() {
+	var err error
+	if actingUser.IsAdmin() {
+		// SysAdmin can create/edit users at any institutions.
 		userForm.instOptions, err = ListInstitutions(false)
 		if err != nil {
 			return nil, err
 		}
 	} else {
-		instID := strconv.Itoa(int(request.CurrentUser.InstitutionID))
+		// Non-sysadmin (inst admin) can add/edit local users only.
 		userForm.instOptions = []ListOption{
-			{instID, request.CurrentUser.Institution.Name},
+			{strconv.FormatInt(actingUser.InstitutionID, 10), actingUser.Institution.Name},
 		}
-		user.InstitutionID = request.CurrentUser.InstitutionID
+		userToEdit.InstitutionID = actingUser.InstitutionID
 	}
 	userForm.init()
-	userForm.setValues()
-	return userForm, err
+	userForm.SetValues()
+	return userForm, nil
 }
 
 func (f *UserForm) init() {
@@ -102,7 +94,7 @@ func (f *UserForm) init() {
 		},
 	}
 	rolesList := InstRolesList
-	if f.Request.CurrentUser.IsAdmin() {
+	if f.userIsAdmin {
 		rolesList = AllRolesList
 	}
 	f.Fields["Role"] = &Field{
@@ -117,7 +109,7 @@ func (f *UserForm) init() {
 }
 
 // setValues sets the form values to match the User values.
-func (f *UserForm) setValues() {
+func (f *UserForm) SetValues() {
 	user := f.Model.(*pgmodels.User)
 	f.Fields["Name"].Value = user.Name
 	f.Fields["Email"].Value = user.Email

@@ -9,25 +9,13 @@ type WorkItemForm struct {
 	Form
 }
 
-func NewWorkItemForm(request *Request) (*WorkItemForm, error) {
-	var err error
-	item := &pgmodels.WorkItem{}
-	if request.ResourceID > 0 {
-		item, err = pgmodels.WorkItemByID(request.ResourceID)
-		if err != nil {
-			return nil, err
-		}
-	}
-	// Bind submitted form values in case we have to
-	// re-display the form with an error message.
-	request.GinContext.ShouldBind(item)
-
+func NewWorkItemForm(workItem *pgmodels.WorkItem) (*WorkItemForm, error) {
 	itemForm := &WorkItemForm{
-		Form: NewForm(request, item),
+		Form: NewForm(workItem),
 	}
 	itemForm.init()
-	itemForm.setValues()
-	return itemForm, err
+	itemForm.SetValues()
+	return itemForm, nil
 }
 
 func (f *WorkItemForm) init() {
@@ -96,7 +84,7 @@ func (f *WorkItemForm) init() {
 	}
 }
 
-func (f *WorkItemForm) setValues() {
+func (f *WorkItemForm) SetValues() {
 	item := f.Model.(*pgmodels.WorkItem)
 	f.Fields["Stage"].Value = item.Stage
 	f.Fields["Status"].Value = item.Status

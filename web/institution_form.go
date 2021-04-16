@@ -10,30 +10,18 @@ type InstitutionForm struct {
 	instOptions []ListOption
 }
 
-func NewInstitutionForm(request *Request) (*InstitutionForm, error) {
-	var err error
-	institution := &pgmodels.Institution{}
-	if request.ResourceID > 0 {
-		institution, err = pgmodels.InstitutionByID(request.ResourceID)
-		if err != nil {
-			return nil, err
-		}
-	}
-	// Bind submitted form values in case we have to
-	// re-display the form with an error message.
-	request.GinContext.ShouldBind(institution)
-
+func NewInstitutionForm(institution *pgmodels.Institution) (*InstitutionForm, error) {
 	institutionForm := &InstitutionForm{
-		Form: NewForm(request, institution),
+		Form: NewForm(institution),
 	}
-
 	// List parent (member) institutions only.
+	var err error
 	institutionForm.instOptions, err = ListInstitutions(true)
 	if err != nil {
 		return nil, err
 	}
 	institutionForm.init()
-	institutionForm.setValues()
+	institutionForm.SetValues()
 	return institutionForm, err
 }
 
@@ -107,7 +95,7 @@ func (f *InstitutionForm) init() {
 }
 
 // setValues sets the form values to match the Institution values.
-func (f *InstitutionForm) setValues() {
+func (f *InstitutionForm) SetValues() {
 	institution := f.Model.(*pgmodels.Institution)
 	f.Fields["Name"].Value = institution.Name
 	f.Fields["Identifier"].Value = institution.Identifier
