@@ -7,14 +7,12 @@ import (
 
 type InstitutionForm struct {
 	Form
-	Institution *pgmodels.Institution
 	instOptions []ListOption
 }
 
 func NewInstitutionForm(institution *pgmodels.Institution) (*InstitutionForm, error) {
 	institutionForm := &InstitutionForm{
-		Form:        NewForm(),
-		Institution: institution,
+		Form: NewForm(institution, "institutions/form.html", "/institutions"),
 	}
 	// List parent (member) institutions only.
 	var err error
@@ -98,18 +96,19 @@ func (f *InstitutionForm) init() {
 
 // setValues sets the form values to match the Institution values.
 func (f *InstitutionForm) SetValues() {
-	f.Fields["Name"].Value = f.Institution.Name
-	f.Fields["Identifier"].Value = f.Institution.Identifier
-	f.Fields["Type"].Value = f.Institution.Type
-	f.Fields["MemberInstitutionID"].Value = f.Institution.MemberInstitutionID
-	f.Fields["OTPEnabled"].Value = f.Institution.OTPEnabled
-	f.Fields["ReceivingBucket"].Value = f.Institution.ReceivingBucket
-	f.Fields["RestoreBucket"].Value = f.Institution.RestoreBucket
+	institution := f.Model.(*pgmodels.Institution)
+	f.Fields["Name"].Value = institution.Name
+	f.Fields["Identifier"].Value = institution.Identifier
+	f.Fields["Type"].Value = institution.Type
+	f.Fields["MemberInstitutionID"].Value = institution.MemberInstitutionID
+	f.Fields["OTPEnabled"].Value = institution.OTPEnabled
+	f.Fields["ReceivingBucket"].Value = institution.ReceivingBucket
+	f.Fields["RestoreBucket"].Value = institution.RestoreBucket
 
 	if f.Fields["Type"].Value == constants.InstTypeMember {
 		f.Fields["MemberInstitutionID"].Attrs["disabled"] = "true"
 	}
-	if f.Institution.ID > 0 {
+	if institution.ID > 0 {
 		f.Fields["Identifier"].Attrs["readonly"] = "true"
 	}
 }

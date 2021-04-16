@@ -82,14 +82,12 @@ func UserIndex(c *gin.Context) {
 // GET /users/new
 func UserNew(c *gin.Context) {
 	req := NewRequest(c)
-	template := "users/form.html"
 	form, err := NewUserForm(&pgmodels.User{}, req.CurrentUser)
 	if AbortIfError(c, err) {
 		return
 	}
-	form.Action = "/users/new"
 	req.TemplateData["form"] = form
-	c.HTML(http.StatusOK, template, req.TemplateData)
+	c.HTML(http.StatusOK, form.Template, req.TemplateData)
 }
 
 // UserShow returns the user with the specified id.
@@ -123,9 +121,8 @@ func UserEdit(c *gin.Context) {
 	if AbortIfError(c, err) {
 		return
 	}
-	form.Action = fmt.Sprintf("/users/edit/%d", req.ResourceID)
 	req.TemplateData["form"] = form
-	c.HTML(http.StatusOK, "users/form.html", req.TemplateData)
+	c.HTML(http.StatusOK, form.Template, req.TemplateData)
 }
 
 // UserSignInShow shows the user sign-in form.
@@ -198,30 +195,16 @@ func getIndexQuery(c *gin.Context) (*pgmodels.Query, error) {
 	return fc.ToQuery()
 }
 
-// TODO: Move common code into Form.
 func saveUserForm(c *gin.Context) {
 	req := NewRequest(c)
 	userToEdit := &pgmodels.User{}
 	var err error
 	if req.ResourceID > 0 {
+		// Load existing user.
 		userToEdit, err = pgmodels.UserByID(req.ResourceID)
 		if AbortIfError(c, err) {
 			return
 		}
-	}
-
-	// Bind submitted form values in case we have to
-	// re-display the form with an error message.
-	c.ShouldBind(userToEdit)
-	form, err := NewUserForm(userToEdit, req.CurrentUser)
-	if AbortIfError(c, err) {
-		return
-	}
-
-	template := "users/form.html"
-	form.Action = "/users/new"
-	if req.ResourceID > 0 {
-		form.Action = fmt.Sprintf("/users/edit/%d", req.ResourceID)
 	} else {
 		// Assign random password to new user. They'll get an email
 		// asking them to reset their password.
@@ -232,25 +215,18 @@ func saveUserForm(c *gin.Context) {
 		userToEdit.EncryptedPassword = encPwd
 	}
 
-	req.TemplateData["form"] = form
-	status := http.StatusCreated
-	if userToEdit.ID > 0 {
-		status = http.StatusOK
-	}
-
-	err = userToEdit.Save()
-	if err != nil {
-		status = form.HandleError(err)
-		if form.Error != nil {
-			req.TemplateData["FormError"] = form.Error
-		}
-		//form.SetValues()
-	}
-	if err != nil {
-		c.HTML(status, template, req.TemplateData)
+	// Bind submitted form values in case we have to
+	// re-display the form with an error message.
+	c.ShouldBind(userToEdit)
+	form, err := NewUserForm(userToEdit, req.CurrentUser)
+	if AbortIfError(c, err) {
 		return
 	}
-
-	location := fmt.Sprintf("/users/show/%d?flash=User+saved", userToEdit.ID)
-	c.Redirect(http.StatusSeeOther, location)
+	req.TemplateData["form"] = form
+	if form.Save() {
+		c.Redirect(form.Status, form.PostSaveURL())
+	} else {
+		req.TemplateData["FormError"] = form.Error
+		c.HTML(form.Status, form.Template, req.TemplateData)
+	}
 }

@@ -1,7 +1,6 @@
 package web
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/APTrust/registry/pgmodels"
@@ -40,55 +39,41 @@ func WorkItemShow(c *gin.Context) {
 // This is an admin-only feature.
 // PUT /work_items/edit/:id
 func WorkItemUpdate(c *gin.Context) {
-	req := NewRequest(c)
-	workItem, err := pgmodels.WorkItemByID(req.ResourceID)
+	form, req, err := getFormAndRequest(c)
 	if AbortIfError(c, err) {
 		return
 	}
-
-	c.ShouldBind(workItem)
-	form, err := NewWorkItemForm(workItem)
-	if AbortIfError(c, err) {
-		return
+	if form.Save() {
+		c.Redirect(form.Status, form.PostSaveURL())
+	} else {
+		req.TemplateData["FormError"] = form.Error
+		c.HTML(form.Status, form.Template, req.TemplateData)
 	}
-	template := "work_items/form.html"
-	form.Action = fmt.Sprintf("/work_items/edit/%d", req.ResourceID)
-	req.TemplateData["form"] = form
-
-	status := http.StatusOK
-	err = workItem.Save()
-	if err != nil {
-		status = form.HandleError(err)
-		if form.Error != nil {
-			req.TemplateData["FormError"] = form.Error
-		}
-	}
-	if err != nil {
-		c.HTML(status, template, req.TemplateData)
-		return
-	}
-	location := fmt.Sprintf("/work_items/show/%d?flash=WorkItem+saved", workItem.ID)
-	c.Redirect(http.StatusSeeOther, location)
 }
 
 // WorkItemEdit shows a form to edit an exiting work item.
 // GET /work_items/edit/:id
 func WorkItemEdit(c *gin.Context) {
-	req := NewRequest(c)
-	item, err := pgmodels.WorkItemByID(req.ResourceID)
+	form, req, err := getFormAndRequest(c)
 	if AbortIfError(c, err) {
 		return
 	}
-	form, err := NewWorkItemForm(item)
-	if AbortIfError(c, err) {
-		return
-	}
-	form.Action = fmt.Sprintf("/work_items/edit/%d", item.ID)
-	req.TemplateData["form"] = form
-	c.HTML(http.StatusOK, "work_items/form.html", req.TemplateData)
+	c.HTML(http.StatusOK, form.Template, req.TemplateData)
 }
 
 func WorkItemRequeue(c *gin.Context) {
 	// TODO: Requeue logic from Pharos.
 	// See preservation services code for queueing via HTTPS
+}
+
+func getFormAndRequest(c *gin.Context) (*WorkItemForm, *Request, error) {
+	req := NewRequest(c)
+	workItem, err := pgmodels.WorkItemByID(req.ResourceID)
+	if err != nil {
+		return nil, nil, err
+	}
+	c.ShouldBind(workItem)
+	form := NewWorkItemForm(workItem)
+	req.TemplateData["form"] = form
+	return form, req, nil
 }

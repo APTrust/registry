@@ -65,14 +65,12 @@ func InstitutionIndex(c *gin.Context) {
 // GET /institutions/new
 func InstitutionNew(c *gin.Context) {
 	req := NewRequest(c)
-	template := "institutions/form.html"
 	form, err := NewInstitutionForm(&pgmodels.Institution{})
 	if AbortIfError(c, err) {
 		return
 	}
-	form.Action = "/institutions/new"
 	req.TemplateData["form"] = form
-	c.HTML(http.StatusOK, template, req.TemplateData)
+	c.HTML(http.StatusOK, form.Template, req.TemplateData)
 }
 
 // InstitutionShow returns the institution with the specified id.
@@ -121,12 +119,10 @@ func InstitutionEdit(c *gin.Context) {
 	if AbortIfError(c, err) {
 		return
 	}
-	form.Action = fmt.Sprintf("/institutions/edit/%d", institution.ID)
 	req.TemplateData["form"] = form
-	c.HTML(http.StatusOK, "institutions/form.html", req.TemplateData)
+	c.HTML(http.StatusOK, form.Template, req.TemplateData)
 }
 
-// TODO: Move common code into Form.
 func saveInstitutionForm(c *gin.Context) {
 	req := NewRequest(c)
 	var err error
@@ -144,31 +140,11 @@ func saveInstitutionForm(c *gin.Context) {
 	if AbortIfError(c, err) {
 		return
 	}
-
-	template := "institutions/form.html"
-	form.Action = "/institutions/new"
-	if req.ResourceID > 0 {
-		form.Action = fmt.Sprintf("/institutions/edit/%d", req.ResourceID)
-	}
-
 	req.TemplateData["form"] = form
-	status := http.StatusCreated
-	if institution.ID > 0 {
-		status = http.StatusOK
+	if form.Save() {
+		c.Redirect(form.Status, form.PostSaveURL())
+	} else {
+		req.TemplateData["FormError"] = form.Error
+		c.HTML(form.Status, form.Template, req.TemplateData)
 	}
-
-	err = institution.Save()
-	if err != nil {
-		status = form.HandleError(err)
-		if form.Error != nil {
-			req.TemplateData["FormError"] = form.Error
-		}
-		//form.SetValues()
-	}
-	if err != nil {
-		c.HTML(status, template, req.TemplateData)
-		return
-	}
-	location := fmt.Sprintf("/institutions/show/%d?flash=Institution+saved", institution.ID)
-	c.Redirect(http.StatusSeeOther, location)
 }

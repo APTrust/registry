@@ -8,15 +8,13 @@ import (
 
 type UserForm struct {
 	Form
-	User              *pgmodels.User
 	instOptions       []ListOption
 	actingUserIsAdmin bool
 }
 
 func NewUserForm(userToEdit *pgmodels.User, actingUser *pgmodels.User) (*UserForm, error) {
 	userForm := &UserForm{
-		Form:              NewForm(),
-		User:              userToEdit,
+		Form:              NewForm(userToEdit, "users/form.html", "/users"),
 		actingUserIsAdmin: actingUser.IsAdmin(),
 	}
 
@@ -112,17 +110,18 @@ func (f *UserForm) init() {
 
 // setValues sets the form values to match the User values.
 func (f *UserForm) SetValues() {
-	f.Fields["Name"].Value = f.User.Name
-	f.Fields["Email"].Value = f.User.Email
-	f.Fields["PhoneNumber"].Value = f.User.PhoneNumber
-	f.Fields["OTPRequiredForLogin"].Value = f.User.OTPRequiredForLogin
-	f.Fields["InstitutionID"].Value = f.User.InstitutionID
-	f.Fields["Role"].Value = f.User.Role
+	user := f.Model.(*pgmodels.User)
+	f.Fields["Name"].Value = user.Name
+	f.Fields["Email"].Value = user.Email
+	f.Fields["PhoneNumber"].Value = user.PhoneNumber
+	f.Fields["OTPRequiredForLogin"].Value = user.OTPRequiredForLogin
+	f.Fields["InstitutionID"].Value = user.InstitutionID
+	f.Fields["Role"].Value = user.Role
 
 	// Don't set date to 0001-01-01, because it makes
 	// the date picker hard to use. User has to scroll
 	// ahead 2000 years.
-	if !f.User.GracePeriod.IsZero() {
-		f.Fields["GracePeriod"].Value = f.User.GracePeriod.Format("2006-01-02")
+	if !user.GracePeriod.IsZero() {
+		f.Fields["GracePeriod"].Value = user.GracePeriod.Format("2006-01-02")
 	}
 }

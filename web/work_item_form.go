@@ -7,17 +7,15 @@ import (
 
 type WorkItemForm struct {
 	Form
-	WorkItem *pgmodels.WorkItem
 }
 
-func NewWorkItemForm(workItem *pgmodels.WorkItem) (*WorkItemForm, error) {
+func NewWorkItemForm(workItem *pgmodels.WorkItem) *WorkItemForm {
 	itemForm := &WorkItemForm{
-		Form:     NewForm(),
-		WorkItem: workItem,
+		Form: NewForm(workItem, "work_items/form.html", "/work_items"),
 	}
 	itemForm.init()
 	itemForm.SetValues()
-	return itemForm, nil
+	return itemForm
 }
 
 func (f *WorkItemForm) init() {
@@ -87,11 +85,12 @@ func (f *WorkItemForm) init() {
 }
 
 func (f *WorkItemForm) SetValues() {
-	f.Fields["Stage"].Value = f.WorkItem.Stage
-	f.Fields["Status"].Value = f.WorkItem.Status
-	f.Fields["Retry"].Value = f.WorkItem.Retry
-	f.Fields["NeedsAdminReview"].Value = f.WorkItem.NeedsAdminReview
-	f.Fields["Note"].Value = f.WorkItem.Note
-	f.Fields["Node"].Value = f.WorkItem.Node
-	f.Fields["PID"].Value = f.WorkItem.PID
+	item := f.Model.(*pgmodels.WorkItem)
+	f.Fields["Stage"].Value = item.Stage
+	f.Fields["Status"].Value = item.Status
+	f.Fields["Retry"].Value = item.Retry
+	f.Fields["NeedsAdminReview"].Value = item.NeedsAdminReview
+	f.Fields["Note"].Value = item.Note
+	f.Fields["Node"].Value = item.Node
+	f.Fields["PID"].Value = item.PID
 }

@@ -5,23 +5,56 @@ import (
 	"net/http"
 
 	"github.com/APTrust/registry/common"
+	"github.com/APTrust/registry/pgmodels"
 	"github.com/go-pg/pg/v10"
 )
 
 type Form struct {
-	Action string
-	Fields map[string]*Field
-	Error  error
+	BaseURL  string
+	Error    error
+	Fields   map[string]*Field
+	Model    pgmodels.Model
+	Status   int
+	Template string
 }
 
-func NewForm() Form {
+func NewForm(model pgmodels.Model, template, baseURL string) Form {
 	return Form{
-		Fields: make(map[string]*Field),
+		BaseURL:  baseURL,
+		Fields:   make(map[string]*Field),
+		Model:    model,
+		Template: template,
 	}
 }
 
-func (f *Form) HandleError(err error) int {
-	status := http.StatusBadRequest
+// Save saves the underlying object and sets the error value
+// and http status code as necessary.
+func (f *Form) Save() bool {
+	f.Status = http.StatusSeeOther
+	err := f.Model.Save()
+	if err != nil {
+		f.HandleError(err)
+	}
+	return err == nil
+}
+
+// Action returns the html form.action attribute for this form.
+func (f *Form) Action() string {
+	if f.Model.GetID() > 0 {
+		return fmt.Sprintf("%s/edit/%d", f.BaseURL, f.Model.GetID())
+	}
+	return fmt.Sprintf("%s/new", f.BaseURL)
+}
+
+// PostSaveURL is the url to redirect to after successful save.
+func (f *Form) PostSaveURL() string {
+	return fmt.Sprintf("%s/show/%d", f.BaseURL, f.Model.GetID())
+}
+
+// Handle error sets the error property and http status code on error.
+func (f *Form) HandleError(err error) {
+	f.Error = err
+	f.Status = http.StatusBadRequest
 	if valErr, ok := err.(*common.ValidationError); ok {
 		for fieldName, _ := range valErr.Errors {
 			f.Fields[fieldName].DisplayError = true
@@ -36,10 +69,9 @@ func (f *Form) HandleError(err error) int {
 			isIntegrityViolation = pgErr.IntegrityViolation()
 		}
 		if !isIntegrityViolation {
-			status = http.StatusInternalServerError
+			f.Status = http.StatusInternalServerError
 		}
 	}
-	return status
 }
 
 func (f *Form) SetValues() {
