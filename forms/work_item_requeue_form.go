@@ -58,7 +58,7 @@ func (f *WorkItemRequeueForm) setIngestStages() {
 			break
 		}
 	}
-
+	f.Fields["Stage"].Options = stages
 }
 
 // setValues sets the form values to match the WorkItem values.
