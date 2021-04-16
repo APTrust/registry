@@ -201,10 +201,10 @@ func getIndexQuery(c *gin.Context) (*pgmodels.Query, error) {
 // TODO: Move common code into Form.
 func saveUserForm(c *gin.Context) {
 	req := NewRequest(c)
-	user := &pgmodels.User{}
+	userToEdit := &pgmodels.User{}
 	var err error
 	if req.ResourceID > 0 {
-		user, err = pgmodels.UserByID(req.ResourceID)
+		userToEdit, err = pgmodels.UserByID(req.ResourceID)
 		if AbortIfError(c, err) {
 			return
 		}
@@ -212,8 +212,8 @@ func saveUserForm(c *gin.Context) {
 
 	// Bind submitted form values in case we have to
 	// re-display the form with an error message.
-	c.ShouldBind(user)
-	form, err := NewUserForm(user, req.CurrentUser)
+	c.ShouldBind(userToEdit)
+	form, err := NewUserForm(userToEdit, req.CurrentUser)
 	if AbortIfError(c, err) {
 		return
 	}
@@ -229,16 +229,16 @@ func saveUserForm(c *gin.Context) {
 		if AbortIfError(c, err) {
 			return
 		}
-		form.Model.(*pgmodels.User).EncryptedPassword = encPwd
+		userToEdit.EncryptedPassword = encPwd
 	}
 
 	req.TemplateData["form"] = form
 	status := http.StatusCreated
-	if user.ID > 0 {
+	if userToEdit.ID > 0 {
 		status = http.StatusOK
 	}
 
-	err = user.Save()
+	err = userToEdit.Save()
 	if err != nil {
 		status = form.HandleError(err)
 		if form.Error != nil {
@@ -251,6 +251,6 @@ func saveUserForm(c *gin.Context) {
 		return
 	}
 
-	location := fmt.Sprintf("/users/show/%d?flash=User+saved", form.Model.GetID())
+	location := fmt.Sprintf("/users/show/%d?flash=User+saved", userToEdit.ID)
 	c.Redirect(http.StatusSeeOther, location)
 }

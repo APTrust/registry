@@ -5,21 +5,18 @@ import (
 	"net/http"
 
 	"github.com/APTrust/registry/common"
-	"github.com/APTrust/registry/pgmodels"
 	"github.com/go-pg/pg/v10"
 )
 
 type Form struct {
 	Action string
 	Fields map[string]*Field
-	Model  pgmodels.Model
 	Error  error
 }
 
-func NewForm(model pgmodels.Model) Form {
+func NewForm() Form {
 	return Form{
 		Fields: make(map[string]*Field),
-		Model:  model,
 	}
 }
 

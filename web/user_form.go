@@ -8,14 +8,16 @@ import (
 
 type UserForm struct {
 	Form
-	instOptions []ListOption
-	userIsAdmin bool
+	User              *pgmodels.User
+	instOptions       []ListOption
+	actingUserIsAdmin bool
 }
 
 func NewUserForm(userToEdit *pgmodels.User, actingUser *pgmodels.User) (*UserForm, error) {
 	userForm := &UserForm{
-		Form:        NewForm(userToEdit),
-		userIsAdmin: actingUser.IsAdmin(),
+		Form:              NewForm(),
+		User:              userToEdit,
+		actingUserIsAdmin: actingUser.IsAdmin(),
 	}
 
 	var err error
@@ -94,7 +96,7 @@ func (f *UserForm) init() {
 		},
 	}
 	rolesList := InstRolesList
-	if f.userIsAdmin {
+	if f.actingUserIsAdmin {
 		rolesList = AllRolesList
 	}
 	f.Fields["Role"] = &Field{
@@ -110,18 +112,17 @@ func (f *UserForm) init() {
 
 // setValues sets the form values to match the User values.
 func (f *UserForm) SetValues() {
-	user := f.Model.(*pgmodels.User)
-	f.Fields["Name"].Value = user.Name
-	f.Fields["Email"].Value = user.Email
-	f.Fields["PhoneNumber"].Value = user.PhoneNumber
-	f.Fields["OTPRequiredForLogin"].Value = user.OTPRequiredForLogin
-	f.Fields["InstitutionID"].Value = user.InstitutionID
-	f.Fields["Role"].Value = user.Role
+	f.Fields["Name"].Value = f.User.Name
+	f.Fields["Email"].Value = f.User.Email
+	f.Fields["PhoneNumber"].Value = f.User.PhoneNumber
+	f.Fields["OTPRequiredForLogin"].Value = f.User.OTPRequiredForLogin
+	f.Fields["InstitutionID"].Value = f.User.InstitutionID
+	f.Fields["Role"].Value = f.User.Role
 
 	// Don't set date to 0001-01-01, because it makes
 	// the date picker hard to use. User has to scroll
 	// ahead 2000 years.
-	if !user.GracePeriod.IsZero() {
-		f.Fields["GracePeriod"].Value = user.GracePeriod.Format("2006-01-02")
+	if !f.User.GracePeriod.IsZero() {
+		f.Fields["GracePeriod"].Value = f.User.GracePeriod.Format("2006-01-02")
 	}
 }

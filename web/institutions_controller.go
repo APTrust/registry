@@ -121,7 +121,7 @@ func InstitutionEdit(c *gin.Context) {
 	if AbortIfError(c, err) {
 		return
 	}
-	form.Action = fmt.Sprintf("/institutions/edit/%d", form.Model.GetID())
+	form.Action = fmt.Sprintf("/institutions/edit/%d", institution.ID)
 	req.TemplateData["form"] = form
 	c.HTML(http.StatusOK, "institutions/form.html", req.TemplateData)
 }
@@ -169,6 +169,6 @@ func saveInstitutionForm(c *gin.Context) {
 		c.HTML(status, template, req.TemplateData)
 		return
 	}
-	location := fmt.Sprintf("/institutions/show/%d?flash=Institution+saved", form.Model.GetID())
+	location := fmt.Sprintf("/institutions/show/%d?flash=Institution+saved", institution.ID)
 	c.Redirect(http.StatusSeeOther, location)
 }

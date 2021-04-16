@@ -8,6 +8,7 @@ import (
 
 type WorkItemRequeueForm struct {
 	Form
+	WorkItem     *pgmodels.WorkItem
 	stageOptions []ListOption
 }
 
@@ -18,7 +19,8 @@ func NewWorkItemRequeueForm(workItem *pgmodels.WorkItem) (*WorkItemRequeueForm, 
 	}
 
 	itemForm := &WorkItemRequeueForm{
-		Form: NewForm(workItem),
+		Form:     NewForm(),
+		WorkItem: workItem,
 	}
 	itemForm.init()
 	return itemForm, nil
@@ -38,7 +40,7 @@ func (f *WorkItemRequeueForm) init() {
 			"required": "",
 		},
 	}
-	if f.Model.(*pgmodels.WorkItem).Action == constants.ActionIngest {
+	if f.WorkItem.Action == constants.ActionIngest {
 		f.setIngestStages()
 	}
 }
@@ -48,10 +50,9 @@ func (f *WorkItemRequeueForm) init() {
 // We cannot requeue to future stages. E.g. We cannot requeue to
 // the storage stage if the item hasn't even been validated yet.
 func (f *WorkItemRequeueForm) setIngestStages() {
-	item := f.Model.(*pgmodels.WorkItem)
 	stages := make([]ListOption, 0)
 	for _, stage := range constants.IngestStagesInOrder {
-		if item.Stage != stage {
+		if f.WorkItem.Stage != stage {
 			stages = append(stages, ListOption{stage, stage})
 		} else {
 			stages = append(stages, ListOption{stage, stage})

@@ -67,7 +67,7 @@ func WorkItemUpdate(c *gin.Context) {
 		c.HTML(status, template, req.TemplateData)
 		return
 	}
-	location := fmt.Sprintf("/work_items/show/%d?flash=WorkItem+saved", form.Model.GetID())
+	location := fmt.Sprintf("/work_items/show/%d?flash=WorkItem+saved", workItem.ID)
 	c.Redirect(http.StatusSeeOther, location)
 }
 
