@@ -1,8 +1,10 @@
 package web
 
 import (
+	"fmt"
 	"net/http"
 
+	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/forms"
 	"github.com/APTrust/registry/pgmodels"
@@ -78,7 +80,32 @@ func WorkItemEdit(c *gin.Context) {
 }
 
 func WorkItemRequeue(c *gin.Context) {
-	//requeue & redirect to show page
+	aptContext := common.Context()
+	req := NewRequest(c)
+	item, err := pgmodels.WorkItemByID(req.ResourceID)
+	if AbortIfError(c, err) {
+		return
+	}
+
+	stage := c.Request.PostFormValue("Stage")
+	aptContext.Log.Info().Msgf("Requeueing WorkItem %d to %s", item.ID, stage)
+
+	item.Stage = stage
+	item.Status = constants.StatusPending
+	item.Retry = true
+	item.NeedsAdminReview = false
+	item.Node = ""
+	item.PID = 0
+	item.Note = fmt.Sprintf("Requeued for %s", item.Stage)
+	err = item.Save()
+	if AbortIfError(c, err) {
+		return
+	}
+
+	aptContext.Log.Info().Msgf("TODO: Implement call to NSQ for requeue")
+
+	redirectTo := fmt.Sprintf("/work_items/show/%d?flash=Item+requeued", item.ID)
+	c.Redirect(http.StatusSeeOther, redirectTo)
 }
 
 func getFormAndRequest(c *gin.Context) (*forms.WorkItemForm, *Request, error) {

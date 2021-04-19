@@ -2,17 +2,22 @@
 
 <form action="{{ .form.Action }}" id="workItemRequeueForm" method="post">
 
-  {{ if .FormError }}
-  <div class="row form-error">
-    {{ .FormError }}
-  </div>
-  {{ end }}
+  <table class="no-borders">
+    <tr>
+      <td>
+        {{ if .FormError }}
+        <div class="row form-error">
+          {{ .FormError }}
+        </div>
+        {{ end }}
 
-  {{ template "forms/select.html" .form.Fields.Stage }}
-
-  <div class="float-right">
-    <input type="submit" value="Requeue">
-  </div>
+        {{ template "forms/select.html" .form.Fields.Stage }}
+      </td>
+      <td>
+        <input type="submit" value="Requeue">
+      </td>
+    </tr>
+  </table>
 
 </form>
 

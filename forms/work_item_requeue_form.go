@@ -32,7 +32,7 @@ func (f *WorkItemRequeueForm) init() {
 	}
 	f.Fields["Stage"] = &Field{
 		Name:        "Stage",
-		Label:       "Requeue to Stage",
+		Label:       "",
 		Placeholder: "Stage",
 		ErrMsg:      pgmodels.ErrItemStage,
 		Options:     options,

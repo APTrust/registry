@@ -42,6 +42,11 @@ div.flash {
     font-style: italic;
 }
 
+table.no-borders, table.no-borders td, table.no-borders th {
+    width: 100%;
+    border: none;
+}
+
 /* Milligram default weight 700 is too strong for form labels & legends. */
 label, legend {
     font-weight: 300;

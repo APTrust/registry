@@ -3,14 +3,14 @@
 {{ template "shared/header.html" . }}
 
 
-{{ if userCan .CurrentUser "WorkItemUpdate" .item.InstitutionID }}
-  <div class="float-right"><a class="button" href="/work_items/edit/{{ .item.ID }}">Edit</a></div>
-{{ end }}
-
 {{ if userCan .CurrentUser "WorkItemRequeue" .item.InstitutionID }}
   {{ if not .item.HasCompleted }}
     {{ template "work_items/requeue_form.html" . }}
   {{ end }}
+{{ end }}
+
+{{ if userCan .CurrentUser "WorkItemUpdate" .item.InstitutionID }}
+  <div class="float-right"><a class="button" href="/work_items/edit/{{ .item.ID }}">Edit</a></div>
 {{ end }}
 
 
@@ -49,6 +49,10 @@
     <tr>
       <th>Status</th>
       <td>{{ .item.Status }}</td>
+    </tr>
+    <tr>
+      <th>Note</th>
+      <td>{{ .item.Note }}</td>
     </tr>
     <tr>
       <th>Outcome</th>
