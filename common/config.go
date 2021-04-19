@@ -53,6 +53,7 @@ type Config struct {
 	DB      *DBConfig
 	EnvName string
 	Logging *LoggingConfig
+	NsqUrl  string
 }
 
 // Returns a new config based on APT_ENV
@@ -127,6 +128,7 @@ func loadConfig() *Config {
 			MaxAge:        v.GetInt("SESSION_MAX_AGE"),
 			SessionCookie: v.GetString("SESSION_COOKIE_NAME"),
 		},
+		NsqUrl: v.GetString("NSQ_URL"),
 	}
 }
 

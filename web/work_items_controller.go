@@ -3,6 +3,7 @@ package web
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
@@ -102,9 +103,13 @@ func WorkItemRequeue(c *gin.Context) {
 		return
 	}
 
+	topic := constants.TopicFor(item.Action, item.Stage)
+	nsqUrl := fmt.Sprintf("%s/pub?topic=%s", aptContext.Config.NsqUrl, topic)
+
+	// TODO: Implement NSQ requeue call
 	aptContext.Log.Info().Msgf("TODO: Implement call to NSQ for requeue")
 
-	redirectTo := fmt.Sprintf("/work_items/show/%d?flash=Item+requeued", item.ID)
+	redirectTo := fmt.Sprintf("/work_items/show/%d?flash=Item+requeued+to+%s", item.ID, url.PathEscape(nsqUrl))
 	c.Redirect(http.StatusSeeOther, redirectTo)
 }
 

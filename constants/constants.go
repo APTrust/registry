@@ -224,3 +224,20 @@ var NSQIngestTopicFor = map[string]string{
 	StageRecord:               IngestRecord,
 	StageCleanup:              IngestCleanup,
 }
+
+func TopicFor(action, stage string) string {
+	switch action {
+	case ActionDelete:
+		return TopicDelete
+	case ActionRestoreFile:
+		return TopicFileRestore
+	case ActionGlacierRestore:
+		return TopicGlacierRestore
+	case ActionRestoreObject:
+		return TopicObjectRestore
+	case ActionIngest:
+		return NSQIngestTopicFor[stage]
+	default:
+		return ""
+	}
+}
