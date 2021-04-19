@@ -9,7 +9,7 @@
 
 {{ if userCan .CurrentUser "WorkItemRequeue" .item.InstitutionID }}
   {{ if not .item.HasCompleted }}
-  <div class="float-right"><a class="button" href="/work_items/requeue/{{ .item.ID }}">Requeue</a></div>
+    {{ template "work_items/requeue_form.html" . }}
   {{ end }}
 {{ end }}
 

@@ -22,6 +22,7 @@ func NewWorkItemRequeueForm(workItem *pgmodels.WorkItem) (*WorkItemRequeueForm, 
 		Form: NewForm(workItem, "work_items/requeue_form.html", "/work_items"),
 	}
 	itemForm.init()
+	itemForm.SetValues()
 	return itemForm, nil
 }
 
@@ -36,7 +37,7 @@ func (f *WorkItemRequeueForm) init() {
 		ErrMsg:      pgmodels.ErrItemStage,
 		Options:     options,
 		Attrs: map[string]string{
-			"required": "",
+			"id": "requeueList",
 		},
 	}
 	if f.Model.(*pgmodels.WorkItem).Action == constants.ActionIngest {
@@ -69,5 +70,6 @@ func (f *WorkItemRequeueForm) setIngestStages() {
 
 // setValues sets the form values to match the WorkItem values.
 func (f *WorkItemRequeueForm) SetValues() {
-
+	item := f.Model.(*pgmodels.WorkItem)
+	f.Fields["Stage"].Value = item.Stage
 }
