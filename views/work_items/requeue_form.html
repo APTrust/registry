@@ -1,18 +1,25 @@
-{{ define "work_items/show.html" }}
+{{ define "work_items/requeue_form.html" }}
 
-{{ template "shared/header.html" . }}
+{{ template "shared/header.html" .}}
 
+<form action="{{ .form.Action }}" id="workItemRequeueForm" method="post">
 
-{{ if userCan .CurrentUser "WorkItemUpdate" .item.InstitutionID }}
-  <div class="float-right"><a class="button" href="/work_items/edit/{{ .item.ID }}">Edit</a></div>
-{{ end }}
-
-{{ if userCan .CurrentUser "WorkItemRequeue" .item.InstitutionID }}
-  {{ if not .item.HasCompleted }}
-  <div class="float-right"><a class="button" href="/work_items/requeue/{{ .item.ID }}">Requeue</a></div>
+  {{ if .FormError }}
+  <div class="row form-error">
+    {{ .FormError }}
+  </div>
   {{ end }}
-{{ end }}
 
+  {{ template "forms/select.html" .form.Fields.Stage }}
+
+  <div class="float-right">
+    <input type="submit" value="Submit">
+  </div>
+  <div class="float-left">
+    <a class="button button-outline" href="javascript:history.back()">Cancel</a>
+  </div>
+
+</form>
 
 <h1>{{ .item.Name }}</h1>
 
@@ -109,7 +116,7 @@
   </tbody>
 </table>
 
-{{ template "shared/footer.html" . }}
 
+{{ template "shared/footer.html" .}}
 
 {{ end }}

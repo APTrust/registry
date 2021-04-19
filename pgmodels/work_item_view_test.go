@@ -68,3 +68,15 @@ func TestWorkItemViewSelect(t *testing.T) {
 		assert.NotEqual(t, "coal.tar", item)
 	}
 }
+
+func TestWorkItemHasViewCompleted(t *testing.T) {
+	item := &pgmodels.WorkItemView{}
+	for _, status := range constants.IncompleteStatusValues {
+		item.Status = status
+		assert.False(t, item.HasCompleted())
+	}
+	for _, status := range constants.CompletedStatusValues {
+		item.Status = status
+		assert.True(t, item.HasCompleted())
+	}
+}

@@ -63,8 +63,24 @@ func WorkItemEdit(c *gin.Context) {
 }
 
 func WorkItemRequeue(c *gin.Context) {
-	// TODO: Requeue logic from Pharos.
-	// See preservation services code for queueing via HTTPS
+	form, req, err := getRequeueFormAndRequest(c)
+	if AbortIfError(c, err) {
+		return
+	}
+	if form.Save() {
+		c.Redirect(form.Status, form.PostSaveURL())
+	} else {
+		req.TemplateData["FormError"] = form.Error
+		c.HTML(form.Status, form.Template, req.TemplateData)
+	}
+}
+
+func WorkItemShowRequeue(c *gin.Context) {
+	form, req, err := getRequeueFormAndRequest(c)
+	if AbortIfError(c, err) {
+		return
+	}
+	c.HTML(http.StatusOK, form.Template, req.TemplateData)
 }
 
 func getFormAndRequest(c *gin.Context) (*forms.WorkItemForm, *Request, error) {
@@ -75,6 +91,21 @@ func getFormAndRequest(c *gin.Context) (*forms.WorkItemForm, *Request, error) {
 	}
 	c.ShouldBind(workItem)
 	form := forms.NewWorkItemForm(workItem)
+	req.TemplateData["form"] = form
+	return form, req, nil
+}
+
+func getRequeueFormAndRequest(c *gin.Context) (*forms.WorkItemRequeueForm, *Request, error) {
+	req := NewRequest(c)
+	workItem, err := pgmodels.WorkItemByID(req.ResourceID)
+	if err != nil {
+		return nil, nil, err
+	}
+	c.ShouldBind(workItem)
+	form, err := forms.NewWorkItemRequeueForm(workItem)
+	if err != nil {
+		return nil, nil, err
+	}
 	req.TemplateData["form"] = form
 	return form, req, nil
 }

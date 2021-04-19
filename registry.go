@@ -104,6 +104,9 @@ func initRoutes(router *gin.Engine) {
 		webRoutes.GET("/work_items/edit/:id", web.WorkItemEdit)
 		webRoutes.PUT("/work_items/edit/:id", web.WorkItemUpdate)
 		webRoutes.POST("/work_items/edit/:id", web.WorkItemUpdate)
+		webRoutes.GET("/work_items/requeue/:id", web.WorkItemShowRequeue)
+		webRoutes.PUT("/work_items/requeue/:id", web.WorkItemRequeue)
+		webRoutes.POST("/work_items/requeue/:id", web.WorkItemRequeue)
 
 		// Users
 		webRoutes.POST("/users/new", web.UserCreate)

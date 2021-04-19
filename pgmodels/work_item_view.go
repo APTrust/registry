@@ -4,6 +4,8 @@ import (
 	"time"
 
 	"github.com/APTrust/registry/common"
+	"github.com/APTrust/registry/constants"
+	"github.com/stretchr/stew/slice"
 )
 
 // WorkItemView is a read-only model for querying. It flattens out
@@ -78,4 +80,9 @@ func (item *WorkItemView) GetID() int64 {
 // This method is here to satisfy the Model interface.
 func (item *WorkItemView) Validate() *common.ValidationError {
 	return nil
+}
+
+// HasCompleted returns true if this item has completed processing.
+func (item *WorkItemView) HasCompleted() bool {
+	return slice.Contains(constants.CompletedStatusValues, item.Status)
 }

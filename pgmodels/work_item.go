@@ -42,10 +42,10 @@ type WorkItem struct {
 	Outcome              string    `json:"outcome" pg:"outcome"`
 	BagDate              time.Time `json:"bag_date" pg:"bag_date"`
 	DateProcessed        time.Time `json:"date_processed" pg:"date_processed"`
-	Retry                bool      `json:"retry" pg:"retry"`
+	Retry                bool      `json:"retry" pg:"retry,use_zero"`
 	Node                 string    `json:"node" pg:"node"`
 	PID                  int       `json:"pid" pg:"pid"`
-	NeedsAdminReview     bool      `json:"needs_admin_review" pg:"needs_admin_review"`
+	NeedsAdminReview     bool      `json:"needs_admin_review" pg:"needs_admin_review,use_zero"`
 	QueuedAt             time.Time `json:"queued_at" pg:"queued_at"`
 	Size                 int64     `json:"size" pg:"size"`
 	StageStartedAt       time.Time `json:"stage_started_at" pg:"stage_started_at"`

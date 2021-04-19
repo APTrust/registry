@@ -1,6 +1,7 @@
 package forms
 
 import (
+	"fmt"
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/pgmodels"
@@ -18,7 +19,7 @@ func NewWorkItemRequeueForm(workItem *pgmodels.WorkItem) (*WorkItemRequeueForm, 
 	}
 
 	itemForm := &WorkItemRequeueForm{
-		Form: NewForm(workItem, "work_items/form.html", "/work_items"),
+		Form: NewForm(workItem, "work_items/requeue_form.html", "/work_items"),
 	}
 	itemForm.init()
 	return itemForm, nil
@@ -41,6 +42,11 @@ func (f *WorkItemRequeueForm) init() {
 	if f.Model.(*pgmodels.WorkItem).Action == constants.ActionIngest {
 		f.setIngestStages()
 	}
+}
+
+// Action returns the html form.action attribute for this form.
+func (f *WorkItemRequeueForm) Action() string {
+	return fmt.Sprintf("%s/requeue/%d", f.BaseURL, f.Model.GetID())
 }
 
 // setIngestStages sets the stages we can requeue to. We can requeue

@@ -65,6 +65,7 @@ const (
 	UserDeleteSelf                    = "UserDeleteSelf"
 	WorkItemCreate                    = "WorkItemCreate"
 	WorkItemRead                      = "WorkItemRead"
+	WorkItemRequeue                   = "WorkItemRequeue"
 	WorkItemUpdate                    = "WorkItemUpdate"
 	WorkItemDelete                    = "WorkItemDelete"
 )
@@ -119,6 +120,7 @@ var Permissions = []Permission{
 	UserDeleteSelf,
 	WorkItemCreate,
 	WorkItemRead,
+	WorkItemRequeue,
 	WorkItemUpdate,
 	WorkItemDelete,
 }
@@ -236,6 +238,7 @@ func initPermissions() {
 	sysAdmin[UserUpdateSelf] = true
 	sysAdmin[WorkItemCreate] = true
 	sysAdmin[WorkItemRead] = true
+	sysAdmin[WorkItemRequeue] = true
 	sysAdmin[WorkItemUpdate] = true
 	sysAdmin[WorkItemDelete] = true
 
