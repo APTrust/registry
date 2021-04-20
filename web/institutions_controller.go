@@ -20,7 +20,7 @@ func InstitutionCreate(c *gin.Context) {
 // DELETE /institutions/delete/:id
 func InstitutionDelete(c *gin.Context) {
 	req := NewRequest(c)
-	inst, err := pgmodels.InstitutionByID(req.ResourceID)
+	inst, err := pgmodels.InstitutionByID(req.Auth.ResourceID)
 	if AbortIfError(c, err) {
 		return
 	}
@@ -35,7 +35,7 @@ func InstitutionDelete(c *gin.Context) {
 // GET /institutions/undelete/:id
 func InstitutionUndelete(c *gin.Context) {
 	req := NewRequest(c)
-	inst, err := pgmodels.InstitutionByID(req.ResourceID)
+	inst, err := pgmodels.InstitutionByID(req.Auth.ResourceID)
 	if AbortIfError(c, err) {
 		return
 	}
@@ -78,7 +78,7 @@ func InstitutionNew(c *gin.Context) {
 // GET /institutions/show/:id
 func InstitutionShow(c *gin.Context) {
 	req := NewRequest(c)
-	institution, err := pgmodels.InstitutionViewByID(req.ResourceID)
+	institution, err := pgmodels.InstitutionViewByID(req.Auth.ResourceID)
 	if AbortIfError(c, err) {
 		return
 	}
@@ -112,7 +112,7 @@ func InstitutionUpdate(c *gin.Context) {
 // GET /institutions/edit/:id
 func InstitutionEdit(c *gin.Context) {
 	req := NewRequest(c)
-	institution, err := pgmodels.InstitutionByID(req.ResourceID)
+	institution, err := pgmodels.InstitutionByID(req.Auth.ResourceID)
 	if AbortIfError(c, err) {
 		return
 	}
@@ -128,8 +128,8 @@ func saveInstitutionForm(c *gin.Context) {
 	req := NewRequest(c)
 	var err error
 	institution := &pgmodels.Institution{}
-	if req.ResourceID > 0 {
-		institution, err = pgmodels.InstitutionByID(req.ResourceID)
+	if req.Auth.ResourceID > 0 {
+		institution, err = pgmodels.InstitutionByID(req.Auth.ResourceID)
 		if AbortIfError(c, err) {
 			return
 		}

@@ -22,7 +22,7 @@ func UserCreate(c *gin.Context) {
 // DELETE /users/delete/:id
 func UserDelete(c *gin.Context) {
 	req := NewRequest(c)
-	user, err := pgmodels.UserByID(req.ResourceID)
+	user, err := pgmodels.UserByID(req.Auth.ResourceID)
 	if AbortIfError(c, err) {
 		return
 	}
@@ -38,7 +38,7 @@ func UserDelete(c *gin.Context) {
 // GET /users/undelete/:id
 func UserUndelete(c *gin.Context) {
 	req := NewRequest(c)
-	user, err := pgmodels.UserByID(req.ResourceID)
+	user, err := pgmodels.UserByID(req.Auth.ResourceID)
 	if AbortIfError(c, err) {
 		return
 	}
@@ -95,7 +95,7 @@ func UserNew(c *gin.Context) {
 // GET /users/show/:id
 func UserShow(c *gin.Context) {
 	req := NewRequest(c)
-	user, err := pgmodels.UserByID(req.ResourceID)
+	user, err := pgmodels.UserByID(req.Auth.ResourceID)
 	if AbortIfError(c, err) {
 		return
 	}
@@ -114,7 +114,7 @@ func UserUpdate(c *gin.Context) {
 // GET /users/edit/:id
 func UserEdit(c *gin.Context) {
 	req := NewRequest(c)
-	userToEdit, err := pgmodels.UserByID(req.ResourceID)
+	userToEdit, err := pgmodels.UserByID(req.Auth.ResourceID)
 	if AbortIfError(c, err) {
 		return
 	}
@@ -200,9 +200,9 @@ func saveUserForm(c *gin.Context) {
 	req := NewRequest(c)
 	userToEdit := &pgmodels.User{}
 	var err error
-	if req.ResourceID > 0 {
+	if req.Auth.ResourceID > 0 {
 		// Load existing user.
-		userToEdit, err = pgmodels.UserByID(req.ResourceID)
+		userToEdit, err = pgmodels.UserByID(req.Auth.ResourceID)
 		if AbortIfError(c, err) {
 			return
 		}

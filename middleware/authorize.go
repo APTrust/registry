@@ -20,6 +20,7 @@ import (
 func Authorize() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		auth := AuthorizeResource(c)
+		c.Set("ResourceAuthorization", auth)
 		if !auth.Checked {
 			showNotCheckedError(c, auth)
 			c.Abort()

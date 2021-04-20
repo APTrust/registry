@@ -30,7 +30,7 @@ func WorkItemIndex(c *gin.Context) {
 // GET /work_items/show/:id
 func WorkItemShow(c *gin.Context) {
 	req := NewRequest(c)
-	item, err := pgmodels.WorkItemViewByID(req.ResourceID)
+	item, err := pgmodels.WorkItemViewByID(req.Auth.ResourceID)
 	if AbortIfError(c, err) {
 		return
 	}
@@ -39,7 +39,7 @@ func WorkItemShow(c *gin.Context) {
 	// Show requeue options to Admin, if item has not completed.
 	userCanRequeue := req.CurrentUser.HasPermission(constants.WorkItemRequeue, item.InstitutionID)
 	if userCanRequeue && !item.HasCompleted() {
-		workItem, err := pgmodels.WorkItemByID(req.ResourceID)
+		workItem, err := pgmodels.WorkItemByID(req.Auth.ResourceID)
 		if AbortIfError(c, err) {
 			return
 		}
@@ -83,7 +83,7 @@ func WorkItemEdit(c *gin.Context) {
 func WorkItemRequeue(c *gin.Context) {
 	aptContext := common.Context()
 	req := NewRequest(c)
-	item, err := pgmodels.WorkItemByID(req.ResourceID)
+	item, err := pgmodels.WorkItemByID(req.Auth.ResourceID)
 	if AbortIfError(c, err) {
 		return
 	}
@@ -104,7 +104,7 @@ func WorkItemRequeue(c *gin.Context) {
 
 func getFormAndRequest(c *gin.Context) (*forms.WorkItemForm, *Request, error) {
 	req := NewRequest(c)
-	workItem, err := pgmodels.WorkItemByID(req.ResourceID)
+	workItem, err := pgmodels.WorkItemByID(req.Auth.ResourceID)
 	if err != nil {
 		return nil, nil, err
 	}
