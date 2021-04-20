@@ -27,6 +27,31 @@ const (
 	ErrItemOutcome       = "Outcome cannot be empty."
 )
 
+var WorkItemFilters = []string{
+	"action",
+	"bag_date",
+	"bucket",
+	"date_processed",
+	"etag",
+	"generic_file_id",
+	"instutition_id",
+	"intellectual_object_id",
+	"name",
+	"needs_admin_review",
+	"node",
+	"pid",
+	"queued__is_null",
+	"queued__not_null",
+	"retry",
+	"size__gteq",
+	"size__lteq",
+	"stage",
+	"stage_started_at__is_null",
+	"stage_started_at__not_null",
+	"status",
+	"user",
+}
+
 type WorkItem struct {
 	ID                   int64     `json:"id" pg:"id"`
 	Name                 string    `json:"name" pg:"name"`

@@ -9,7 +9,29 @@ import (
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/gin-gonic/gin"
+	"github.com/stretchr/stew/slice"
 )
+
+// The following request types should load a single resource
+// with a specific ID.
+var shouldLoadResorce = []string{
+	constants.RequestTypeShow,
+	constants.RequestTypeEdit,
+	constants.RequestTypeUpdate,
+	constants.RequestTypeCreate,
+	constants.RequestTypeDelete,
+	constants.RequestTypeUndelete,
+}
+
+// The following request types should try to bind submitted
+// data to the resource being created/updated.
+var shouldBind = []string{
+	constants.RequestTypeEdit,
+	constants.RequestTypeUpdate,
+	constants.RequestTypeCreate,
+	constants.RequestTypeDelete,
+	constants.RequestTypeUndelete,
+}
 
 // ResourceAuthorization contains information about the current request
 // handler, the resource and action being requested, and whether the
@@ -17,6 +39,7 @@ import (
 type ResourceAuthorization struct {
 	ginCtx         *gin.Context
 	Handler        string
+	RequestType    string
 	ResourceID     int64
 	ResourceInstID int64
 	ResourceType   string
@@ -30,7 +53,10 @@ type ResourceAuthorization struct {
 // describing what is being authorized and whether the current
 // user is allowed to do what they're trying to do.
 func AuthorizeResource(c *gin.Context) *ResourceAuthorization {
-	r := &ResourceAuthorization{ginCtx: c}
+	r := &ResourceAuthorization{
+		ginCtx:      c,
+		RequestType: constants.RequestTypeOther,
+	}
 	r.init()
 	fmt.Println(r)
 	return r
@@ -45,6 +71,7 @@ func (r *ResourceAuthorization) init() {
 		return
 	}
 	r.getPermissionType()
+	r.setRequestType()
 	r.readRequestIds()
 	if r.Error == nil {
 		r.checkPermission()
@@ -62,6 +89,31 @@ func (r *ResourceAuthorization) getPermissionType() {
 			r.Error = common.ErrResourcePermission
 		}
 	}
+}
+
+func (r *ResourceAuthorization) setRequestType() {
+	for _, reqType := range constants.RequestTypes {
+		if strings.HasSuffix(r.Handler, reqType) {
+			r.RequestType = reqType
+			break
+		}
+	}
+}
+
+func (r *ResourceAuthorization) ShouldLoadResource() bool {
+	return slice.Contains(shouldLoadResorce, r.RequestType)
+}
+
+func (r *ResourceAuthorization) ShouldLoadList() bool {
+	return r.RequestType == constants.RequestTypeIndex
+}
+
+func (r *ResourceAuthorization) ShouldLoadNewItem() bool {
+	return r.RequestType == constants.RequestTypeNew
+}
+
+func (r *ResourceAuthorization) ShouldBind() bool {
+	return slice.Contains(shouldBind, r.RequestType)
 }
 
 func (r *ResourceAuthorization) checkPermission() {

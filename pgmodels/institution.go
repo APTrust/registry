@@ -22,6 +22,11 @@ const (
 	ErrInstMemberID   = "Please choose a parent institution."
 )
 
+var InstitutionFilters = []string{
+	"identifier__contains",
+	"name__contains",
+}
+
 type Institution struct {
 	ID                  int64     `json:"id" form:"id" pg:"id"`
 	Name                string    `json:"name" pg:"name"`
