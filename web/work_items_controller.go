@@ -91,14 +91,7 @@ func WorkItemRequeue(c *gin.Context) {
 	stage := c.Request.PostFormValue("Stage")
 	aptContext.Log.Info().Msgf("Requeueing WorkItem %d to %s", item.ID, stage)
 
-	item.Stage = stage
-	item.Status = constants.StatusPending
-	item.Retry = true
-	item.NeedsAdminReview = false
-	item.Node = ""
-	item.PID = 0
-	item.Note = fmt.Sprintf("Requeued for %s", item.Stage)
-	err = item.Save()
+	err = item.SetForRequeue(stage)
 	if AbortIfError(c, err) {
 		return
 	}

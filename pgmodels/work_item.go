@@ -2,6 +2,7 @@ package pgmodels
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/APTrust/registry/common"
@@ -93,6 +94,28 @@ func (item *WorkItem) Save() error {
 		return insert(item)
 	}
 	return update(item)
+}
+
+// SetForRequeue sets properies so this item can be requeued.
+// Note that it saves the object. It will return common.ErrInvalidRequeue
+// if the stage is not valid, and may return validation or pg error
+// if the object cannot be saved.
+//
+// The call is responsible for actually pushing the WorkItem.ID into
+// the correct NSQ topic.
+func (item *WorkItem) SetForRequeue(stage string) error {
+	topic := constants.TopicFor(item.Action, stage)
+	if topic == "" {
+		return common.ErrInvalidRequeue
+	}
+	item.Stage = stage
+	item.Status = constants.StatusPending
+	item.Retry = true
+	item.NeedsAdminReview = false
+	item.Node = ""
+	item.PID = 0
+	item.Note = fmt.Sprintf("Requeued for %s", item.Stage)
+	return item.Save()
 }
 
 // The following statements have no effect other than to force a compile-time

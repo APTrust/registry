@@ -50,6 +50,10 @@ var ErrParentRecordNotFound = errors.New("parent record not found")
 // determine which permission is required to access the specified resoruce.
 var ErrResourcePermission = errors.New("cannot determine permission type for requested requested resource")
 
+// ErrInvalidRequeue occurs when someone attempts to requeue an item to the
+// wrong stage, or to a stage for which no NSQ topic exists.
+var ErrInvalidRequeue = errors.New("item cannot be requeued to the specified stage")
+
 // ErrInternal is a runtime error that is not the user's fault, hence
 // probably the programmer's fault.
 var ErrInternal = errors.New("internal server error")

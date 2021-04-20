@@ -3,6 +3,7 @@ package pgmodels_test
 import (
 	"testing"
 
+	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/db"
 	"github.com/APTrust/registry/pgmodels"
@@ -108,4 +109,42 @@ func TestWorkItemHasCompleted(t *testing.T) {
 		item.Status = status
 		assert.True(t, item.HasCompleted())
 	}
+}
+
+func TestWorkItemSetForRequeue(t *testing.T) {
+	db.LoadFixtures()
+	item := &pgmodels.WorkItem{
+		Name:          "unit_00002.tar",
+		ETag:          "12345678901234567890123456789022",
+		InstitutionID: 4,
+		User:          "system@aptrust.org",
+		Bucket:        "aptrust.receiving.test.test.edu",
+		Action:        constants.ActionIngest,
+		Stage:         constants.StageStore,
+		Status:        constants.StatusStarted,
+		Note:          "Item is being stored.",
+		Outcome:       "I said item is being stored.",
+		BagDate:       TestDate,
+		DateProcessed: TestDate,
+		Retry:         true,
+		Size:          8000,
+	}
+	err := item.Save()
+	require.Nil(t, err)
+
+	err = item.SetForRequeue(constants.StageFormatIdentification)
+	require.Nil(t, err)
+
+	assert.Equal(t, constants.StageFormatIdentification, item.Stage)
+	assert.Equal(t, constants.StatusPending, item.Status)
+	assert.True(t, item.Retry)
+	assert.False(t, item.NeedsAdminReview)
+	assert.Empty(t, item.Node)
+	assert.Empty(t, item.PID)
+	assert.Equal(t, "Requeued for Format Identification", item.Note)
+
+	// This should fail, because Package is not a valid stage for Ingest.
+	err = item.SetForRequeue(constants.StagePackage)
+	require.NotNil(t, err)
+	assert.ErrorIs(t, err, common.ErrInvalidRequeue)
 }
