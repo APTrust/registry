@@ -5,6 +5,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/APTrust/registry/network"
 	"github.com/go-pg/pg/v10"
 	"github.com/rs/zerolog"
 )
@@ -12,9 +13,10 @@ import (
 var ctx *APTContext
 
 type APTContext struct {
-	Config *Config
-	DB     *pg.DB
-	Log    zerolog.Logger
+	Config    *Config
+	DB        *pg.DB
+	Log       zerolog.Logger
+	NSQClient *network.NSQClient
 }
 
 // Context returns an APTContext object, which includes
@@ -42,9 +44,10 @@ func Context() *APTContext {
 		queryLogger := NewQueryLogger(logger)
 		db.AddQueryHook(queryLogger)
 		ctx = &APTContext{
-			Config: config,
-			DB:     db,
-			Log:    logger,
+			Config:    config,
+			DB:        db,
+			Log:       logger,
+			NSQClient: network.NewNSQClient(config.NsqUrl),
 		}
 	}
 	return ctx

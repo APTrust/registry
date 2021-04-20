@@ -9,6 +9,7 @@ require (
 	github.com/go-pg/pg/v10 v10.7.3
 	github.com/google/uuid v1.2.0
 	github.com/gorilla/securecookie v1.1.1
+	github.com/nsqio/nsq v1.2.0
 	github.com/rs/zerolog v1.20.0
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/stew v0.0.0-20130812190256-80ef0842b48b

@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/asaskevich/govalidator"
 	"github.com/gorilla/securecookie"
 	"github.com/rs/zerolog"
 	"github.com/spf13/viper"
@@ -104,6 +105,11 @@ func loadConfig() *Config {
 	}
 	var secureCookie = securecookie.New(hashKey, blockKey)
 
+	nsqUrl := v.GetString("NSQ_URL")
+	if !govalidator.IsURL(nsqUrl) {
+		PrintAndExit("NSQ_URL is missing or invalid")
+	}
+
 	return &Config{
 		Logging: &LoggingConfig{
 			File:         v.GetString("LOG_FILE"),
@@ -128,7 +134,7 @@ func loadConfig() *Config {
 			MaxAge:        v.GetInt("SESSION_MAX_AGE"),
 			SessionCookie: v.GetString("SESSION_COOKIE_NAME"),
 		},
-		NsqUrl: v.GetString("NSQ_URL"),
+		NsqUrl: nsqUrl,
 	}
 }
 

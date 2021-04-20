@@ -97,12 +97,8 @@ func WorkItemRequeue(c *gin.Context) {
 	}
 
 	topic := constants.TopicFor(item.Action, item.Stage)
-	nsqUrl := fmt.Sprintf("%s/pub?topic=%s", aptContext.Config.NsqUrl, topic)
-
-	// TODO: Implement NSQ requeue call
-	aptContext.Log.Info().Msgf("TODO: Implement call to NSQ for requeue")
-
-	redirectTo := fmt.Sprintf("/work_items/show/%d?flash=Item+requeued+to+%s", item.ID, url.PathEscape(nsqUrl))
+	err = aptContext.NSQClient.Enqueue(topic, item.ID)
+	redirectTo := fmt.Sprintf("/work_items/show/%d?flash=Item+requeued+to+%s", item.ID, url.QueryEscape(topic))
 	c.Redirect(http.StatusSeeOther, redirectTo)
 }
 
