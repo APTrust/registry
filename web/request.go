@@ -14,6 +14,13 @@ type Request struct {
 	Auth         *middleware.ResourceAuthorization
 	TemplateData gin.H
 	Error        error
+
+	inst         *pgmodels.Institution
+	instList     []*pgmodels.InstitutionView
+	user         *pgmodels.User
+	userList     []*pgmodels.UserView
+	workItem     *pgmodels.WorkItem
+	workItemList []*pgmodels.WorkItemView
 }
 
 func NewRequest(c *gin.Context) *Request {
@@ -41,11 +48,11 @@ func NewRequest(c *gin.Context) *Request {
 func (req *Request) LoadResource() {
 	switch req.Auth.ResourceType {
 	case "Institution":
-		req.TemplateData["item"], req.Error = pgmodels.InstitutionByID(req.Auth.ResourceID)
+		req.inst, req.Error = pgmodels.InstitutionByID(req.Auth.ResourceID)
 	case "User":
-		req.TemplateData["item"], req.Error = pgmodels.UserByID(req.Auth.ResourceID)
+		req.user, req.Error = pgmodels.UserByID(req.Auth.ResourceID)
 	case "WorkItem":
-		req.TemplateData["item"], req.Error = pgmodels.WorkItemByID(req.Auth.ResourceID)
+		req.workItem, req.Error = pgmodels.WorkItemByID(req.Auth.ResourceID)
 	default:
 		req.Error = common.ErrNotSupported
 	}
@@ -54,11 +61,11 @@ func (req *Request) LoadResource() {
 func (req *Request) LoadNewItem() {
 	switch req.Auth.ResourceType {
 	case "Institution":
-		req.TemplateData["item"] = pgmodels.Institution{}
+		req.inst = &pgmodels.Institution{}
 	case "User":
-		req.TemplateData["item"] = pgmodels.User{}
+		req.user = &pgmodels.User{}
 	case "WorkItem":
-		req.TemplateData["item"] = pgmodels.WorkItem{}
+		req.workItem = &pgmodels.WorkItem{}
 	default:
 		req.Error = common.ErrNotSupported
 	}
@@ -73,21 +80,21 @@ func (req *Request) LoadResourceList() {
 		if err != nil {
 			req.Error = err
 		} else {
-			req.TemplateData["items"], req.Error = pgmodels.InstitutionViewSelect(query)
+			req.instList, req.Error = pgmodels.InstitutionViewSelect(query)
 		}
 	case "User":
 		query, err = req.GetIndexQuery(pgmodels.UserFilters)
 		if err != nil {
 			req.Error = err
 		} else {
-			req.TemplateData["items"], req.Error = pgmodels.UserViewSelect(query)
+			req.userList, req.Error = pgmodels.UserViewSelect(query)
 		}
 	case "WorkItem":
 		query, err = req.GetIndexQuery(pgmodels.WorkItemFilters)
 		if err != nil {
 			req.Error = err
 		} else {
-			req.TemplateData["items"], req.Error = pgmodels.WorkItemViewSelect(query)
+			req.workItemList, req.Error = pgmodels.WorkItemViewSelect(query)
 		}
 	default:
 		req.Error = common.ErrNotSupported
@@ -100,4 +107,28 @@ func (req *Request) GetIndexQuery(allowedFilters []string) (*pgmodels.Query, err
 		fc.Add(key, req.GinContext.QueryArray(key))
 	}
 	return fc.ToQuery()
+}
+
+func (req *Request) Institution() *pgmodels.Institution {
+	return req.inst
+}
+
+func (req *Request) InstitutionList() []*pgmodels.InstitutionView {
+	return req.instList
+}
+
+func (req *Request) User() *pgmodels.User {
+	return req.user
+}
+
+func (req *Request) UserList() []*pgmodels.UserView {
+	return req.userList
+}
+
+func (req *Request) WorkItem() *pgmodels.WorkItem {
+	return req.workItem
+}
+
+func (req *Request) WorkItemList() []*pgmodels.WorkItemView {
+	return req.workItemList
 }
