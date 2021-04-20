@@ -52,7 +52,11 @@ func InstitutionUndelete(c *gin.Context) {
 func InstitutionIndex(c *gin.Context) {
 	req := NewRequest(c)
 	template := "institutions/index.html"
-	query := pgmodels.NewQuery().OrderBy("name")
+	query, err := req.GetIndexQuery()
+	if AbortIfError(c, err) {
+		return
+	}
+	query.OrderBy("name")
 	institutions, err := pgmodels.InstitutionViewSelect(query)
 	if AbortIfError(c, err) {
 		return

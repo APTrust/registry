@@ -51,15 +51,6 @@ const (
 	IngestCleanup              = "ingest09_cleanup"
 	InstTypeMember             = "MemberInstitution"
 	InstTypeSubscriber         = "SubscriptionInstitution"
-	RequestTypeCreate          = "Create"
-	RequestTypeDelete          = "Delete"
-	RequestTypeEdit            = "Edit"
-	RequestTypeIndex           = "Index"
-	RequestTypeNew             = "New"
-	RequestTypeOther           = "Other"
-	RequestTypeShow            = "Show"
-	RequestTypeUndelete        = "Undelete"
-	RequestTypeUpdate          = "Update"
 	RoleInstAdmin              = "institutional_admin"
 	RoleInstUser               = "institutional_user"
 	RoleNone                   = "none"
@@ -148,19 +139,6 @@ var IngestStagesInOrder = []string{
 var InstTypes = []string{
 	InstTypeMember,
 	InstTypeSubscriber,
-}
-
-// RequestTypes in the order they are likely to occur.
-var RequestTypes = []string{
-	RequestTypeIndex,
-	RequestTypeShow,
-	RequestTypeEdit,
-	RequestTypeUpdate,
-	RequestTypeCreate,
-	RequestTypeNew,
-	RequestTypeDelete,
-	RequestTypeUndelete,
-	RequestTypeOther,
 }
 
 var Roles = []string{
