@@ -44,6 +44,8 @@ func (req *Request) GetAllowedFilters() ([]string, error) {
 	switch req.Auth.ResourceType {
 	case "Institution":
 		return pgmodels.InstitutionFilters, nil
+	case "IntellectualObject":
+		return pgmodels.IntellectualObjectFilters, nil
 	case "User":
 		return pgmodels.UserFilters, nil
 	case "WorkItem":

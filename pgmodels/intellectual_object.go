@@ -3,8 +3,28 @@ package pgmodels
 import (
 	"time"
 	//"github.com/APTrust/registry/common"
-	//"github.com/APTrust/registry/constants"
+	"github.com/APTrust/registry/constants"
 )
+
+var IntellectualObjectFilters = []string{
+	"title",
+	"title__contains",
+	"description",
+	"description__contains",
+	"identifier",
+	"alt_identifier",
+	"access",
+	"bag_name",
+	"institution_id",
+	"state",
+	"etag",
+	"bag_group_identifier",
+	"storage_option",
+	"bagit_profile_identifier",
+	"source_organization",
+	"internal_sender_identifier",
+	"internal_sender_description",
+}
 
 type IntellectualObject struct {
 	ID                        int64     `json:"id" form:"id" pg:"id"`
@@ -29,4 +49,56 @@ type IntellectualObject struct {
 	Institution  *Institution   `json:"institution" pg:"rel:has-one"`
 	GenericFiles []*GenericFile `json:"generic_files" pg:"rel:has-many"`
 	PremisEvents []*PremisEvent `json:"premis_events" pg:"rel:has-many"`
+}
+
+// IntellectualObjectByID returns the object with the specified id.
+// Returns pg.ErrNoRows if there is no match.
+func IntellectualObjectByID(id int64) (*IntellectualObject, error) {
+	query := NewQuery().Where(`"intellectual_object"."id"`, "=", id)
+	return IntellectualObjectGet(query)
+}
+
+// IntellectualObjectByIdentifier returns the object with the specified
+// identifier. Returns pg.ErrNoRows if there is no match.
+func IntellectualObjectByIdentifier(identifier string) (*IntellectualObject, error) {
+	query := NewQuery().Where(`"intellectual_object"."identifier"`, "=", identifier)
+	return IntellectualObjectGet(query)
+}
+
+// IntellectualObjectGet returns the first object matching the query.
+func IntellectualObjectGet(query *Query) (*IntellectualObject, error) {
+	var object IntellectualObject
+	err := query.Relations("Institution").Select(&object)
+	return &object, err
+}
+
+// IntellectualObjectSelect returns all objects matching the query.
+func IntellectualObjectSelect(query *Query) ([]*IntellectualObject, error) {
+	var objects []*IntellectualObject
+	err := query.Select(&objects)
+	return objects, err
+}
+
+func (obj *IntellectualObject) GetID() int64 {
+	return obj.ID
+}
+
+// Save saves this object to the database. This will peform an insert
+// if IntellectualObject.ID is zero. Otherwise, it updates.
+func (obj *IntellectualObject) Save() error {
+	if obj.ID == int64(0) {
+		return insert(obj)
+	}
+	return update(obj)
+}
+
+// Delete soft-deletes this object by setting State to 'D' and
+// the DeletedAt timestamp to now. You can undo this with Undelete.
+func (obj *IntellectualObject) Delete() error {
+	obj.State = constants.StateDeleted
+	obj.UpdatedAt = time.Now().UTC()
+
+	// TODO: Create PremisEvents, update WorkItem
+
+	return update(obj)
 }

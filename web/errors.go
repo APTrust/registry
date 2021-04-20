@@ -25,7 +25,10 @@ func AbortIfError(c *gin.Context, err error) bool {
 }
 
 func ErrorShow(c *gin.Context) {
-	templateData := gin.H{}
+	currentUser, _ := c.Get("CurrentUser")
+	templateData := gin.H{
+		"CurrentUser": currentUser,
+	}
 	status := http.StatusInternalServerError
 	err, _ := c.Get("err")
 	if err != nil {

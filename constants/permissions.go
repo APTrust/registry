@@ -16,58 +16,58 @@ package constants
 type Permission string
 
 const (
-	AlertCreate            Permission = "AlertCreate"
-	AlertRead                         = "AlertRead"
-	AlertUpdate                       = "AlertUpdate"
-	AlertDelete                       = "AlertDelete"
-	ChecksumCreate                    = "ChecksumCreate"
-	ChecksumRead                      = "ChecksumRead"
-	ChecksumUpdate                    = "ChecksumUpdate"
-	ChecksumDelete                    = "ChecksumDelete"
-	DashboardShow                     = "DashboardShow"
-	EventCreate                       = "EventCreate"
-	EventRead                         = "EventRead"
-	EventUpdate                       = "EventUpdate"
-	EventDelete                       = "EventDelete"
-	FileCreate                        = "FileCreate"
-	FileRead                          = "FileRead"
-	FileUpdate                        = "FileUpdate"
-	FileDelete                        = "FileDelete"
-	FileRequestDelete                 = "FileRequestDelete"
-	FileApproveDelete                 = "FileApproveDelete"
-	FileFinishBulkDelete              = "FileFinishBulkDelete"
-	FileRestore                       = "FileRestore"
-	InstitutionCreate                 = "InstitutionCreate"
-	InstitutionRead                   = "InstitutionRead"
-	InstitutionUpdate                 = "InstitutionUpdate"
-	InstitutionDelete                 = "InstitutionDelete"
-	ObjectCreate                      = "ObjectCreate"
-	ObjectRead                        = "ObjectRead"
-	ObjectUpdate                      = "ObjectUpdate"
-	ObjectDelete                      = "ObjectDelete"
-	ObjectRequestDelete               = "ObjectRequestDelete"
-	ObjectApproveDelete               = "ObjectApproveDelete"
-	ObjectFinishBulkDelete            = "ObjectFinishBulkDelete"
-	ObjectRestore                     = "ObjectRestore"
-	ReportRead                        = "ReportRead"
-	StorageRecordCreate               = "StorageRecordCreate"
-	StorageRecordRead                 = "StorageRecordRead"
-	StorageRecordUpdate               = "StorageRecordUpdate"
-	StorageRecordDelete               = "StorageRecordDelete"
-	UserCreate                        = "UserCreate"
-	UserRead                          = "UserRead"
-	UserSignIn                        = "UserSignIn"
-	UserSignOut                       = "UserSignOut"
-	UserUpdate                        = "UserUpdate"
-	UserDelete                        = "UserDelete"
-	UserReadSelf                      = "UserReadSelf"
-	UserUpdateSelf                    = "UserUpdateSelf"
-	UserDeleteSelf                    = "UserDeleteSelf"
-	WorkItemCreate                    = "WorkItemCreate"
-	WorkItemRead                      = "WorkItemRead"
-	WorkItemRequeue                   = "WorkItemRequeue"
-	WorkItemUpdate                    = "WorkItemUpdate"
-	WorkItemDelete                    = "WorkItemDelete"
+	AlertCreate                        Permission = "AlertCreate"
+	AlertRead                                     = "AlertRead"
+	AlertUpdate                                   = "AlertUpdate"
+	AlertDelete                                   = "AlertDelete"
+	ChecksumCreate                                = "ChecksumCreate"
+	ChecksumRead                                  = "ChecksumRead"
+	ChecksumUpdate                                = "ChecksumUpdate"
+	ChecksumDelete                                = "ChecksumDelete"
+	DashboardShow                                 = "DashboardShow"
+	EventCreate                                   = "EventCreate"
+	EventRead                                     = "EventRead"
+	EventUpdate                                   = "EventUpdate"
+	EventDelete                                   = "EventDelete"
+	FileCreate                                    = "FileCreate"
+	FileRead                                      = "FileRead"
+	FileUpdate                                    = "FileUpdate"
+	FileDelete                                    = "FileDelete"
+	FileRequestDelete                             = "FileRequestDelete"
+	FileApproveDelete                             = "FileApproveDelete"
+	FileFinishBulkDelete                          = "FileFinishBulkDelete"
+	FileRestore                                   = "FileRestore"
+	InstitutionCreate                             = "InstitutionCreate"
+	InstitutionRead                               = "InstitutionRead"
+	InstitutionUpdate                             = "InstitutionUpdate"
+	InstitutionDelete                             = "InstitutionDelete"
+	IntellectualObjectCreate                      = "IntellectualObjectCreate"
+	IntellectualObjectRead                        = "IntellectualObjectRead"
+	IntellectualObjectUpdate                      = "IntellectualObjectUpdate"
+	IntellectualObjectDelete                      = "IntellectualObjectDelete"
+	IntellectualObjectRequestDelete               = "IntellectualObjectRequestDelete"
+	IntellectualObjectApproveDelete               = "IntellectualObjectApproveDelete"
+	IntellectualObjectFinishBulkDelete            = "IntellectualObjectFinishBulkDelete"
+	IntellectualObjectRestore                     = "IntellectualObjectRestore"
+	ReportRead                                    = "ReportRead"
+	StorageRecordCreate                           = "StorageRecordCreate"
+	StorageRecordRead                             = "StorageRecordRead"
+	StorageRecordUpdate                           = "StorageRecordUpdate"
+	StorageRecordDelete                           = "StorageRecordDelete"
+	UserCreate                                    = "UserCreate"
+	UserRead                                      = "UserRead"
+	UserSignIn                                    = "UserSignIn"
+	UserSignOut                                   = "UserSignOut"
+	UserUpdate                                    = "UserUpdate"
+	UserDelete                                    = "UserDelete"
+	UserReadSelf                                  = "UserReadSelf"
+	UserUpdateSelf                                = "UserUpdateSelf"
+	UserDeleteSelf                                = "UserDeleteSelf"
+	WorkItemCreate                                = "WorkItemCreate"
+	WorkItemRead                                  = "WorkItemRead"
+	WorkItemRequeue                               = "WorkItemRequeue"
+	WorkItemUpdate                                = "WorkItemUpdate"
+	WorkItemDelete                                = "WorkItemDelete"
 )
 
 var Permissions = []Permission{
@@ -96,14 +96,14 @@ var Permissions = []Permission{
 	InstitutionRead,
 	InstitutionUpdate,
 	InstitutionDelete,
-	ObjectCreate,
-	ObjectRead,
-	ObjectUpdate,
-	ObjectDelete,
-	ObjectRequestDelete,
-	ObjectApproveDelete,
-	ObjectFinishBulkDelete,
-	ObjectRestore,
+	IntellectualObjectCreate,
+	IntellectualObjectRead,
+	IntellectualObjectUpdate,
+	IntellectualObjectDelete,
+	IntellectualObjectRequestDelete,
+	IntellectualObjectApproveDelete,
+	IntellectualObjectFinishBulkDelete,
+	IntellectualObjectRestore,
 	ReportRead,
 	StorageRecordCreate,
 	StorageRecordRead,
@@ -152,7 +152,7 @@ func initPermissions() {
 	instUser[EventRead] = true
 	instUser[FileRead] = true
 	instUser[InstitutionRead] = true
-	instUser[ObjectRead] = true
+	instUser[IntellectualObjectRead] = true
 	instUser[ReportRead] = true
 	instUser[StorageRecordRead] = true
 	instUser[UserSignIn] = true
@@ -172,11 +172,11 @@ func initPermissions() {
 	instAdmin[FileApproveDelete] = true
 	instAdmin[FileRestore] = true
 	instAdmin[InstitutionRead] = true
-	instAdmin[ObjectRead] = true
-	instAdmin[ObjectDelete] = true
-	instAdmin[ObjectRequestDelete] = true
-	instAdmin[ObjectApproveDelete] = true
-	instAdmin[ObjectRestore] = true
+	instAdmin[IntellectualObjectRead] = true
+	instAdmin[IntellectualObjectDelete] = true
+	instAdmin[IntellectualObjectRequestDelete] = true
+	instAdmin[IntellectualObjectApproveDelete] = true
+	instAdmin[IntellectualObjectRestore] = true
 	instAdmin[ReportRead] = true
 	instAdmin[StorageRecordRead] = true
 	instAdmin[UserCreate] = true
@@ -214,14 +214,14 @@ func initPermissions() {
 	sysAdmin[InstitutionRead] = true
 	sysAdmin[InstitutionUpdate] = true
 	sysAdmin[InstitutionDelete] = true
-	sysAdmin[ObjectCreate] = true
-	sysAdmin[ObjectRead] = true
-	sysAdmin[ObjectUpdate] = true
-	sysAdmin[ObjectDelete] = true
-	sysAdmin[ObjectRequestDelete] = true
-	sysAdmin[ObjectApproveDelete] = true
-	sysAdmin[ObjectFinishBulkDelete] = true
-	sysAdmin[ObjectRestore] = true
+	sysAdmin[IntellectualObjectCreate] = true
+	sysAdmin[IntellectualObjectRead] = true
+	sysAdmin[IntellectualObjectUpdate] = true
+	sysAdmin[IntellectualObjectDelete] = true
+	sysAdmin[IntellectualObjectRequestDelete] = true
+	sysAdmin[IntellectualObjectApproveDelete] = true
+	sysAdmin[IntellectualObjectFinishBulkDelete] = true
+	sysAdmin[IntellectualObjectRestore] = true
 	sysAdmin[ReportRead] = true
 	sysAdmin[StorageRecordCreate] = true
 	sysAdmin[StorageRecordRead] = true

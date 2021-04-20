@@ -1,0 +1,35 @@
+{{ define "objects/index.html" }}
+
+{{ template "shared/header.html" .}}
+
+<h1>Objects</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Title/Identifier</th>
+      <th>Bag Group</th>
+      <th>Storage Option</th>
+      <th>Modified</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{ range $index, $obj := .objects }}
+    <tr class="clickable" onclick="window.location.href='/objects/show/{{ $obj.ID }}'">
+      <td>
+        {{ truncate $obj.Title 80 }}<br/>
+        {{ truncate $obj.Identifier 80 }}<br/>
+        {{ truncate $obj.AltIdentifier 80 }}<br/>
+      </td>
+      <td>{{ $obj.BagGroupIdentifier }}</td>
+      <td>{{ $obj.StorageOption }}</td>
+      <td>{{ $obj.UpdatedAt }}</td>
+    </tr>
+    {{ end }}
+  </tbody>
+</table>
+
+{{ template "shared/footer.html" .}}
+
+
+{{ end }}
