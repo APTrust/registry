@@ -17,6 +17,7 @@ var truncatedString = "The Academic Preservation Trust..."
 
 func TestTruncate(t *testing.T) {
 	assert.Equal(t, truncatedString, helpers.Truncate(textString, 31))
+	assert.Equal(t, "hello", helpers.Truncate("hello", 80))
 }
 
 func TestDateUS(t *testing.T) {

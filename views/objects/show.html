@@ -5,6 +5,76 @@
 <h1>{{ .object.Title }}</h1>
 <h3>{{ .object.Institution.Name }}</h3>
 
+<!-- https://bencoveney.github.io/Milligrid/#nesting -->
+
+<div class="container">
+  <div class="row">
+    <!-- Top Left Box -->
+    <div class="column column-67">
+      <div class="row">
+        <div class="column column-67">
+
+          <p>Identifier</p>
+          <p>{{ .object.Identifier }}</p>
+
+          <div>Bag Group Identifier</div>
+          <div>{{ .object.BagGroupIdentifier }}</div>
+
+          <div>Alt Identifier</div>
+          <div>{{ .object.AltIdentifier }}</div>
+
+        </div>
+        <div class="column column-33">
+
+          <div>Created</div>
+          <div>{{ dateUS .object.CreatedAt }}</div>
+
+          <div>Modified</div>
+          <div>{{ dateUS .object.UpdatedAt }}</div>
+
+          <div>Access</div>
+          <div>{{ .object.Access }}</div>
+
+          <div>Storage Option</div>
+          <div>{{ .object.StorageOption }}</div>
+
+        </div>
+      </div>
+      <div class="row">
+        <div class="column column-100">
+
+          <div>Description</div>
+          <div>{{ .object.Description }}</div>
+
+        </div>
+      </div>
+    </div> <!-- end col-67 -->
+
+
+    <!-- Top Right Box -->
+    <div class="column column-33">
+
+      <!-- Button Row -->
+      <div class="row">
+        <div class="column column-50">
+          <a class="button" href="#">Delete</a>
+        </div>
+        <div class="column column-50">
+          <a class="button" href="#">Restore</a>
+        </div>
+      </div>
+
+      <!-- Events -->
+      <div class="row">
+        <div class="column column-100">
+          Events go here
+        </div>
+      </div>
+
+    </div> <!-- end col-33 -->
+  </div> <!-- end top row -->
+</div> <!-- end container -->
+
 <table>
   <tbody>
     <tr>
