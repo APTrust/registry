@@ -47,11 +47,33 @@ func IntellectualObjectIndex(c *gin.Context) {
 // GET /objects/show/:id
 func IntellectualObjectShow(c *gin.Context) {
 	req := NewRequest(c)
-	object, err := pgmodels.IntellectualObjectByID(req.Auth.ResourceID)
+	object, err := pgmodels.IntellectualObjectViewByID(req.Auth.ResourceID)
 	if AbortIfError(c, err) {
 		return
 	}
+
+	// Select max 20 files to start. Some objects have > 100k files, and
+	// we definitely don't want that many results. Let the user page through.
+	fileQuery := pgmodels.NewQuery().Where("intellectual_object_id", "=", object.ID).OrderBy("identifier").Limit(20).Offset(0)
+	files, err := pgmodels.GenericFileSelect(fileQuery)
+	if AbortIfError(c, err) {
+		return
+	}
+
+	// Get object-level events only. I.e. those that match our object ID
+	// but have a null generic file id. Most object will have only a handful
+	// of object-level events, though they may have thousands or hundreds of
+	// thousands of file-level events. We'll get the first five, and let the
+	// user page through from there.
+	eventQuery := pgmodels.NewQuery().Where("intellectual_object_id", "=", object.ID).IsNull("generic_file_id").OrderBy("created_at desc").Limit(5).Offset(0)
+	events, err := pgmodels.PremisEventSelect(eventQuery)
+	if AbortIfError(c, err) {
+		return
+	}
+
 	req.TemplateData["object"] = object
+	req.TemplateData["files"] = files
+	req.TemplateData["events"] = events
 	req.TemplateData["flash"] = c.Query("flash")
 	c.HTML(http.StatusOK, "objects/show.html", req.TemplateData)
 }

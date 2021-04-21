@@ -24,3 +24,44 @@ type PremisEvent struct {
 	InstitutionID        int64     `json:"institution_id" form:"institution_id" pg:"institution_id"`
 	OldUUID              string    `json:"old_uuid" form:"old_uuid" pg:"old_uuid"`
 }
+
+// PremisEventByID returns the event with the specified id.
+// Returns pg.ErrNoRows if there is no match.
+func PremisEventByID(id int64) (*PremisEvent, error) {
+	query := NewQuery().Where(`"premis_event"."id"`, "=", id)
+	return PremisEventGet(query)
+}
+
+// PremisEventByIdentifier returns the event with the specified
+// identifier. Returns pg.ErrNoRows if there is no match.
+func PremisEventByIdentifier(identifier string) (*PremisEvent, error) {
+	query := NewQuery().Where(`"premis_event"."identifier"`, "=", identifier)
+	return PremisEventGet(query)
+}
+
+// PremisEventGet returns the first event matching the query.
+func PremisEventGet(query *Query) (*PremisEvent, error) {
+	var event PremisEvent
+	err := query.Select(&event)
+	return &event, err
+}
+
+// PremisEventSelect returns all events matching the query.
+func PremisEventSelect(query *Query) ([]*PremisEvent, error) {
+	var events []*PremisEvent
+	err := query.Select(&events)
+	return events, err
+}
+
+func (event *PremisEvent) GetID() int64 {
+	return event.ID
+}
+
+// Save saves this event to the database. This will peform an insert
+// if PremisEvent.ID is zero. Otherwise, it updates.
+func (event *PremisEvent) Save() error {
+	if event.ID == int64(0) {
+		return insert(event)
+	}
+	return update(event)
+}

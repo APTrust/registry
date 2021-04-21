@@ -3,7 +3,7 @@
 {{ template "shared/header.html" .}}
 
 <h1>{{ .object.Title }}</h1>
-<h3>{{ .object.Institution.Name }}</h3>
+<h3>{{ .object.InstitutionName }}</h3>
 
 <!-- https://bencoveney.github.io/Milligrid/#nesting -->
 
@@ -22,6 +22,12 @@
 
           <div>Alt Identifier</div>
           <div>{{ .object.AltIdentifier }}</div>
+
+          <div>File Count</div>
+          <div>{{ .object.FileCount }}</div>
+
+          <div>Size (Active Files)</div>
+          <div>{{ .object.Size }}</div>
 
         </div>
         <div class="column column-33">
@@ -67,7 +73,49 @@
       <!-- Events -->
       <div class="row">
         <div class="column column-100">
-          Events go here
+          <div class="row">
+            <div class="column column-100">
+              Events History
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="column column-100">
+              <table>
+                <tr>
+                  <td>Icon</td>
+                  <td>Ingest</td>
+                  <td>July 12, 2020</td>
+                </tr>
+                <tr>
+                  <td>Icon</td>
+                  <td>Identifier Assignment</td>
+                  <td>July 12, 2020</td>
+                </tr>
+                <tr>
+                  <td>Icon</td>
+                  <td>Replication</td>
+                  <td>July 12, 2020</td>
+                </tr>
+                <tr>
+                  <td>Icon</td>
+                  <td>Access Assignment</td>
+                  <td>July 12, 2020</td>
+                </tr>
+              </table>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="column column-50">
+              1-5 of 20
+            </div>
+            <div class="column column-50">
+              <a href="#">&lt;</a>
+              <a href="#">&gt;</a>
+            </div>
+          </div>
+
         </div>
       </div>
 

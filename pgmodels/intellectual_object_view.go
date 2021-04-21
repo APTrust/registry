@@ -64,21 +64,21 @@ type IntellectualObjectView struct {
 // IntellectualObjectViewByID returns the object with the specified id.
 // Returns pg.ErrNoRows if there is no match.
 func IntellectualObjectViewByID(id int64) (*IntellectualObjectView, error) {
-	query := NewQuery().Where(`"intellectual_object"."id"`, "=", id)
+	query := NewQuery().Where(`"intellectual_object_view"."id"`, "=", id)
 	return IntellectualObjectViewGet(query)
 }
 
 // IntellectualObjectViewByIdentifier returns the object with the specified
 // identifier. Returns pg.ErrNoRows if there is no match.
 func IntellectualObjectViewByIdentifier(identifier string) (*IntellectualObjectView, error) {
-	query := NewQuery().Where(`"intellectual_object"."identifier"`, "=", identifier)
+	query := NewQuery().Where(`"intellectual_object_view"."identifier"`, "=", identifier)
 	return IntellectualObjectViewGet(query)
 }
 
 // IntellectualObjectViewGet returns the first object matching the query.
 func IntellectualObjectViewGet(query *Query) (*IntellectualObjectView, error) {
 	var object IntellectualObjectView
-	err := query.Relations("Institution").Select(&object)
+	err := query.Select(&object)
 	return &object, err
 }
 
