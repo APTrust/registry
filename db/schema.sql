@@ -663,6 +663,37 @@ select
 from institutions i
 left join institutions parent on i.member_institution_id = parent.id;
 
+-- intellectual_objects_view
+
+create or replace view intellectual_objects_view as
+select
+	io.id,
+	io.title,
+	io.description,
+	io.identifier,
+	io.alt_identifier,
+	io.access,
+	io.bag_name,
+	io.institution_id,
+	io.state,
+	io.etag,
+	io.bag_group_identifier,
+	io.storage_option,
+	io.bagit_profile_identifier,
+	io.source_organization,
+	io.internal_sender_identifier,
+	io.internal_sender_description,
+	io.created_at,
+	io.updated_at,
+	i."name" as institution_name,
+	i.identifier as institution_identifier,
+	i."type" as institution_type,
+	i.member_institution_id as institution_parent_id,
+	(select count(1) from generic_files gf where gf.intellectual_object_id = io.id and gf.state = 'A') as "file_count",
+	(select sum(gf."size") from generic_files gf where gf.intellectual_object_id = io.id and gf.state = 'A') as "size"
+from intellectual_objects io
+left join institutions i on io.institution_id = i.id;
+
 
 -------------------------------------------------------------------------------
 -- Functions

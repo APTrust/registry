@@ -10,6 +10,8 @@
       <th>Title/Identifier</th>
       <th>Bag Group</th>
       <th>Storage Option</th>
+      <th>File Count</th>
+      <th>Size</th>
       <th>Modified</th>
     </tr>
   </thead>
@@ -23,6 +25,8 @@
       </td>
       <td>{{ $obj.BagGroupIdentifier }}</td>
       <td>{{ $obj.StorageOption }}</td>
+      <td>{{ $obj.FileCount }}</td>
+      <td>{{ $obj.Size }}</td>
       <td>{{ $obj.UpdatedAt }}</td>
     </tr>
     {{ end }}

@@ -35,7 +35,7 @@ func IntellectualObjectIndex(c *gin.Context) {
 		return
 	}
 	query.OrderBy("updated_at desc")
-	objects, err := pgmodels.IntellectualObjectSelect(query)
+	objects, err := pgmodels.IntellectualObjectViewSelect(query)
 	if AbortIfError(c, err) {
 		return
 	}
