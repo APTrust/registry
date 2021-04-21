@@ -94,3 +94,20 @@ func InstIDFor(resourceType string, resourceID int64) (id int64, err error) {
 	}
 	return id, err
 }
+
+var filters map[string][]string
+
+func FiltersFor(typeName string) []string {
+	if filters == nil || len(filters) == 0 {
+		initFilters()
+	}
+	return filters[typeName]
+}
+
+func initFilters() {
+	filters = make(map[string][]string)
+	filters["IntellectualObject"] = IntellectualObjectFilters
+	filters["Institution"] = InstitutionFilters
+	filters["User"] = UserFilters
+	filters["WorkItem"] = WorkItemFilters
+}
