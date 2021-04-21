@@ -91,5 +91,11 @@ func TestSplitCamelCase(t *testing.T) {
 
 	// Split into 2 words max (first two)
 	assert.Equal(t, []string{"User", "SignIn"}, common.SplitCamelCase("UserSignIn", 2))
+}
 
+func TestToHumanSize(t *testing.T) {
+	assert.Equal(t, "389.8 kB", common.ToHumanSize(389778, 1000))
+	assert.Equal(t, "380.6 kB", common.ToHumanSize(389778, 1024))
+	assert.Equal(t, "3.9 GB", common.ToHumanSize(3897784432, 1000))
+	assert.Equal(t, "3.6 GB", common.ToHumanSize(3897784432, 1024))
 }

@@ -30,6 +30,7 @@ func initTemplates(router *gin.Engine) {
 		"dateUS":      helpers.DateUS,
 		"escapeAttr":  helpers.EscapeAttr,
 		"escapeHTML":  helpers.EscapeHTML,
+		"humanSize":   helpers.HumanSize,
 		"replace":     strings.Replace,
 		"strEq":       helpers.StrEq,
 		"truncate":    helpers.Truncate,

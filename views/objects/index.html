@@ -8,7 +8,6 @@
   <thead>
     <tr>
       <th>Title/Identifier</th>
-      <th>Bag Group</th>
       <th>Storage Option</th>
       <th>File Count</th>
       <th>Size</th>
@@ -22,12 +21,12 @@
         {{ truncate $obj.Title 80 }}<br/>
         {{ truncate $obj.Identifier 80 }}<br/>
         {{ truncate $obj.AltIdentifier 80 }}<br/>
+        {{ $obj.BagGroupIdentifier }}
       </td>
-      <td>{{ $obj.BagGroupIdentifier }}</td>
       <td>{{ $obj.StorageOption }}</td>
       <td>{{ $obj.FileCount }}</td>
-      <td>{{ $obj.Size }}</td>
-      <td>{{ $obj.UpdatedAt }}</td>
+      <td>{{ humanSize $obj.Size }}</td>
+      <td>{{ dateUS $obj.UpdatedAt }}</td>
     </tr>
     {{ end }}
   </tbody>

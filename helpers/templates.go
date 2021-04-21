@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"time"
 
+	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/pgmodels"
 )
@@ -22,6 +23,9 @@ import (
 // will be stripped because truncating HTML can result in unclosed
 // tags that will ruin the page layout.
 func Truncate(value string, length int) string {
+	if len(value) < length {
+		return value
+	}
 	fmtStr := fmt.Sprintf("%%.%ds...", length)
 	return fmt.Sprintf(fmtStr, value)
 }
@@ -95,4 +99,11 @@ func EscapeHTML(s string) template.HTML {
 // UserCan returns true if the user has the specified permission.
 func UserCan(user *pgmodels.User, permission constants.Permission, instID int64) bool {
 	return user.HasPermission(permission, instID)
+}
+
+// HumanSize returns a number of bytes in a human-readable format.
+// Note that we use base 1024, not base 1000, because AWS uses 1024
+// to calculate the storage size of the objects we're reporting on.
+func HumanSize(size int64) string {
+	return common.ToHumanSize(size, 1024)
 }
