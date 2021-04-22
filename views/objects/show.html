@@ -82,26 +82,13 @@
           <div class="row">
             <div class="column column-100">
               <table>
+                {{ range $index, $event := .events }}
                 <tr>
                   <td>Icon</td>
-                  <td>Ingest</td>
-                  <td>July 12, 2020</td>
+                  <td>{{ $event.EventType }}</td>
+                  <td>{{ dateUS $event.DateTime }}</td>
                 </tr>
-                <tr>
-                  <td>Icon</td>
-                  <td>Identifier Assignment</td>
-                  <td>July 12, 2020</td>
-                </tr>
-                <tr>
-                  <td>Icon</td>
-                  <td>Replication</td>
-                  <td>July 12, 2020</td>
-                </tr>
-                <tr>
-                  <td>Icon</td>
-                  <td>Access Assignment</td>
-                  <td>July 12, 2020</td>
-                </tr>
+                {{ end }}
               </table>
             </div>
           </div>
@@ -123,46 +110,6 @@
   </div> <!-- end top row -->
 </div> <!-- end container -->
 
-<table>
-  <tbody>
-    <tr>
-      <th>Identifier</th><td>{{ .object.Identifier }}</td>
-    </tr>
-    <tr>
-      <th>Alt Identifier</th><td>{{ .object.AltIdentifier }}</td>
-    </tr>
-    <tr>
-      <th>Access</th><td>{{ .object.Access }}</td>
-    </tr>
-    <tr>
-      <th>Description</th><td>{{ .object.Description }}</td>
-    </tr>
-    <tr>
-      <th>State</th><td>{{ .object.State }}</td>
-    </tr>
-    <tr>
-      <th>ETag</th><td>{{ .object.ETag }}</td>
-    </tr>
-    <tr>
-      <th>Bag Group Identifier</th><td>{{ .object.BagGroupIdentifier }}</td>
-    </tr>
-    <tr>
-      <th>Storage Option</th><td>{{ .object.StorageOption }}</td>
-    </tr>
-    <tr>
-      <th>BagIt Profile Identifier</th><td>{{ .object.BagItProfileIdentifier }}</td>
-    </tr>
-    <tr>
-      <th>Source Organization</th><td>{{ .object.SourceOrganization }}</td>
-    </tr>
-    <tr>
-      <th>Internal Sender Identifier</th><td>{{ .object.InternalSenderIdentifier }}</td>
-    </tr>
-    <tr>
-      <th>Internal Sender Description</th><td>{{ .object.InternalSenderDescription }}</td>
-    </tr>
-  </tbody>
-</table>
 
 {{ template "shared/footer.html" .}}
 

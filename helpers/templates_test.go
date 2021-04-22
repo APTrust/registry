@@ -82,3 +82,17 @@ func TestUserCan(t *testing.T) {
 	assert.False(t, helpers.UserCan(instUser, constants.UserCreate, 100))
 
 }
+
+func TestIconFor(t *testing.T) {
+	// Should return item defined in map
+	assert.Equal(
+		t,
+		template.HTML(helpers.IconMap[constants.EventIngestion]),
+		helpers.IconFor(constants.EventIngestion))
+
+	// If item is not defined in map, should return IconMissing
+	assert.Equal(
+		t,
+		template.HTML(helpers.IconMissing),
+		helpers.IconFor("** missing **"))
+}

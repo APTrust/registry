@@ -107,3 +107,14 @@ func UserCan(user *pgmodels.User, permission constants.Permission, instID int64)
 func HumanSize(size int64) string {
 	return common.ToHumanSize(size, 1024)
 }
+
+// IconFor returns a FontAwesome icon for the specified string, as defined
+// in helpers.IconMap. If the IconMap has no entry for the string, this
+// returns helpers.IconMissing.
+func IconFor(str string) template.HTML {
+	icon := IconMap[str]
+	if icon == "" {
+		icon = IconMissing
+	}
+	return template.HTML(icon)
+}

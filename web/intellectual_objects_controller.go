@@ -71,9 +71,15 @@ func IntellectualObjectShow(c *gin.Context) {
 		return
 	}
 
+	stats, err := pgmodels.GetObjectStats(object.ID)
+	if AbortIfError(c, err) {
+		return
+	}
+
 	req.TemplateData["object"] = object
 	req.TemplateData["files"] = files
 	req.TemplateData["events"] = events
+	req.TemplateData["stats"] = stats
 	req.TemplateData["flash"] = c.Query("flash")
 	c.HTML(http.StatusOK, "objects/show.html", req.TemplateData)
 }
