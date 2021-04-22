@@ -30,14 +30,48 @@
   </div>
 
   <div class="column column-25">
-    Chart 1
+    <canvas id="sizeChart" width="120" height="120"></canvas>
   </div>
 
   <div class="column column-25">
-    Chart 2
+    <canvas id="countChart" width="120" height="120"></canvas>
   </div>
 
 </div>
 
+<!-- Dummy/placeholder charts -->
+<!-- https://www.chartjs.org/docs/latest/charts/doughnut.html -->
+<script>
+
+ var data = {
+     labels: [
+         'PDF',
+         'Text',
+         'TIFF'
+     ],
+     datasets: [{
+         label: '',
+         data: [60, 10, 30],
+         backgroundColor: [
+             'rgb(255, 99, 132)',
+             'rgb(54, 162, 235)',
+             'rgb(255, 205, 86)'
+         ],
+         hoverOffset: 4
+     }]
+ };
+ function initChart(elementId, label) {
+     let ctx = document.getElementById(elementId);
+     let copyOfData = JSON.parse(JSON.stringify(data))
+     copyOfData.datasets[0].label = label
+     return new Chart(ctx, { type: 'doughnut', data: copyOfData })
+ }
+
+ window.addEventListener('load', (event) => {
+     initChart("sizeChart", "File Distribution by Size")
+     initChart("countChart", "File Distribution by Count")
+ });
+
+</script>
 
 {{ end }}
