@@ -64,3 +64,23 @@ footer {
     padding: 2.0rem;
     text-align: center;
 }
+
+
+/* Intellectual Object detail page */
+div.object-detail h2 {
+    font-size: 2rem;
+    font-weight: bold;
+}
+div.rounded-box {
+    margin: 2rem;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 1.4rem !important;
+}
+
+dt {
+    font-weight: bold;
+}
+dd {
+    margin-left: 1.5rem;
+}

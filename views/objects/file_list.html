@@ -1,0 +1,51 @@
+{{ define "objects/file_list.html" }}
+
+
+  <div class="row">
+    <div class="column column-70">
+      <h2>Active Files</h2>
+    </div>
+    <div class="column column-30">
+      <a href="#">See Archived Files</a>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="column column-70">
+      <input type="text" placeholder="Filter by name, identifier or type" />
+    </div>
+    <div class="column column-30">
+      <input type="button" value="Filter"/>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="column column-100">
+      <table>
+        <thead>
+          <th></th>
+          <th>Identifier</th>
+          <th>Format</th>
+          <th>Size</th>
+          <th>Ingested</th>
+          <th>Modified</th>
+          <th>Last Fixity</th>
+        </thead>
+        {{ range $index, $file := .files }}
+        <tr>
+          <td>[+]</td>
+          <td>{{ $file.Identifier }}</td>
+          <td>{{ $file.FileFormat }}</td>
+          <td>{{ humanSize $file.Size }}</td>
+          <td>{{ dateUS $file.CreatedAt }}</td>
+          <td>{{ dateUS $file.UpdatedAt }}</td>
+          <td>{{ dateUS $file.LastFixityCheck }}</td>
+        </tr>
+        {{ end }}
+      </table>
+    </div>
+  </div>
+
+
+
+{{ end }}

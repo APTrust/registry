@@ -2,44 +2,46 @@
 
 <div class="row">
   <div class="column column-67">
+    <dl>
+      <dt>Identifier</dt>
+      <dd>{{ .object.Identifier }}</dd>
 
-    <p>Identifier</p>
-    <p>{{ .object.Identifier }}</p>
+      <dt>Bag Group Identifier</dt>
+      <dd>{{ .object.BagGroupIdentifier }}</dd>
 
-    <div>Bag Group Identifier</div>
-    <div>{{ .object.BagGroupIdentifier }}</div>
+      <dt>Alt Identifier</dt>
+      <dd>{{ .object.AltIdentifier }}</dd>
 
-    <div>Alt Identifier</div>
-    <div>{{ .object.AltIdentifier }}</div>
+      <dt>File Count</dt>
+      <dd>{{ .object.FileCount }}</dd>
 
-    <div>File Count</div>
-    <div>{{ .object.FileCount }}</div>
-
-    <div>Size (Active Files)</div>
-    <div>{{ .object.Size }}</div>
-
+      <dt>Size (Active Files)</dt>
+      <dd>{{ humanSize .object.Size }}</dd>
+    </dl>
   </div>
   <div class="column column-33">
+    <dl>
+      <dt>Created</dt>
+      <dd>{{ dateUS .object.CreatedAt }}</dd>
 
-    <div>Created</div>
-    <div>{{ dateUS .object.CreatedAt }}</div>
+      <dt>Modified</dt>
+      <dd>{{ dateUS .object.UpdatedAt }}</dd>
 
-    <div>Modified</div>
-    <div>{{ dateUS .object.UpdatedAt }}</div>
+      <dt>Access</dt>
+      <dd>{{ .object.Access }}</dd>
 
-    <div>Access</div>
-    <div>{{ .object.Access }}</div>
-
-    <div>Storage Option</div>
-    <div>{{ .object.StorageOption }}</div>
-
+      <dt>Storage Option</dt>
+      <dd>{{ .object.StorageOption }}</dd>
+    </dl>
   </div>
 </div>
 <div class="row">
   <div class="column column-100">
 
-    <div>Description</div>
-    <div>{{ .object.Description }}</div>
+    <dl>
+      <dt>Description</dt>
+      <dd>{{ .object.Description }}</dd>
+    </dl>
 
   </div>
 </div>

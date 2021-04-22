@@ -3,21 +3,20 @@
 {{ template "shared/header.html" .}}
 
 <h1>{{ .object.Title }}</h1>
-<h3>{{ .object.InstitutionName }}</h3>
 
 <!-- https://bencoveney.github.io/Milligrid/#nesting -->
 
-<div class="container">
+<div class="container object-detail">
 
   <!-- First Row: Intellectual Object -->
   <div class="row">
     <!-- Top Left Box: Contains object summary -->
-    <div class="column column-67">
+    <div class="column column-67 rounded-box">
       {{ template "objects/summary.html" . }}
     </div>
 
     <!-- Top Right Box: Buttons and events -->
-    <div class="column column-33">
+    <div class="column column-33 rounded-box">
       <div class="row">
         {{ template "objects/delete_restore.html" . }}
       </div>
@@ -30,7 +29,7 @@
 
   <!-- Second Row: File Summary -->
   <div class="row">
-    <div class="column column-100">
+    <div class="column column-100 rounded-box">
       {{ template "objects/file_summary.html" . }}
     </div>
   </div>
@@ -38,7 +37,9 @@
 
   <!-- Third Row: Active Files -->
   <div class="row">
-
+    <div class="column column-100 rounded-box">
+      {{ template "objects/file_list.html" . }}
+    </div>
   </div>
 
 
