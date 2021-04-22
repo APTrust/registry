@@ -76,9 +76,21 @@ func IntellectualObjectShow(c *gin.Context) {
 		return
 	}
 
+	eventCount, err := pgmodels.ObjectEventCount(object.ID)
+	if AbortIfError(c, err) {
+		return
+	}
+
 	req.TemplateData["object"] = object
 	req.TemplateData["files"] = files
+
 	req.TemplateData["events"] = events
+	req.TemplateData["eventsOffsetStart"] = 1
+	req.TemplateData["eventsOffsetEnd"] = len(events)
+	req.TemplateData["eventsCount"] = eventCount
+	req.TemplateData["eventsShowLeftArrow"] = true
+	req.TemplateData["eventsShowRightArrow"] = true
+
 	req.TemplateData["stats"] = stats
 	req.TemplateData["flash"] = c.Query("flash")
 	c.HTML(http.StatusOK, "objects/show.html", req.TemplateData)

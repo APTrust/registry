@@ -2,7 +2,8 @@ package pgmodels
 
 import (
 	"time"
-	//"github.com/APTrust/registry/common"
+
+	"github.com/APTrust/registry/common"
 	//"github.com/APTrust/registry/constants"
 )
 
@@ -64,4 +65,15 @@ func (event *PremisEvent) Save() error {
 		return insert(event)
 	}
 	return update(event)
+}
+
+// ObjectEventCount returns the number of object-level PremisEvents for the
+// specified IntellectualObject. Note that queries on the premis_events table
+// can be potentially quite expensive, since the table has well over 100M rows.
+//
+// Object-level events include ingest, identifier assignment, access assignment
+// and others. They exclude all events related to specific files (such as fixity
+// check, etc.).
+func ObjectEventCount(intellectualObjectID int64) (int, error) {
+	return common.Context().DB.Model((*PremisEvent)(nil)).Where(`intellectual_object_id = ? and generic_file_id is null`, intellectualObjectID).Count()
 }

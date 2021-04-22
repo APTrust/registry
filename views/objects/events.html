@@ -23,11 +23,16 @@
 
   <div class="row">
     <div class="column column-50">
-      1-5 of 20
+      {{ .eventsOffsetStart }} - {{ .eventsOffsetEnd }} of {{ .eventsCount }}
     </div>
     <div class="column column-50">
+      {{ if .eventsShowLeftArrow }}
       <a href="#">&lt;</a>
+      {{ end }}
+
+      {{ if .eventsShowRightArrow }}
       <a href="#">&gt;</a>
+      {{ end }}
     </div>
   </div>
 </div>

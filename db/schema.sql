@@ -689,7 +689,7 @@ select
 	i.identifier as institution_identifier,
 	i."type" as institution_type,
 	i.member_institution_id as institution_parent_id,
-	(select count(1) from generic_files gf where gf.intellectual_object_id = io.id and gf.state = 'A') as "file_count",
+	(select count(*) from generic_files gf where gf.intellectual_object_id = io.id and gf.state = 'A') as "file_count",
 	(select sum(gf."size") from generic_files gf where gf.intellectual_object_id = io.id and gf.state = 'A') as "size"
 from intellectual_objects io
 left join institutions i on io.institution_id = i.id;
