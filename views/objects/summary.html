@@ -1,0 +1,47 @@
+{{ define "objects/summary.html" }}
+
+<div class="row">
+  <div class="column column-67">
+
+    <p>Identifier</p>
+    <p>{{ .object.Identifier }}</p>
+
+    <div>Bag Group Identifier</div>
+    <div>{{ .object.BagGroupIdentifier }}</div>
+
+    <div>Alt Identifier</div>
+    <div>{{ .object.AltIdentifier }}</div>
+
+    <div>File Count</div>
+    <div>{{ .object.FileCount }}</div>
+
+    <div>Size (Active Files)</div>
+    <div>{{ .object.Size }}</div>
+
+  </div>
+  <div class="column column-33">
+
+    <div>Created</div>
+    <div>{{ dateUS .object.CreatedAt }}</div>
+
+    <div>Modified</div>
+    <div>{{ dateUS .object.UpdatedAt }}</div>
+
+    <div>Access</div>
+    <div>{{ .object.Access }}</div>
+
+    <div>Storage Option</div>
+    <div>{{ .object.StorageOption }}</div>
+
+  </div>
+</div>
+<div class="row">
+  <div class="column column-100">
+
+    <div>Description</div>
+    <div>{{ .object.Description }}</div>
+
+  </div>
+</div>
+
+{{ end }}

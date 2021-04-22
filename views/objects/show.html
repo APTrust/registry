@@ -8,106 +8,40 @@
 <!-- https://bencoveney.github.io/Milligrid/#nesting -->
 
 <div class="container">
+
+  <!-- First Row: Intellectual Object -->
   <div class="row">
-    <!-- Top Left Box -->
+    <!-- Top Left Box: Contains object summary -->
     <div class="column column-67">
-      <div class="row">
-        <div class="column column-67">
+      {{ template "objects/summary.html" . }}
+    </div>
 
-          <p>Identifier</p>
-          <p>{{ .object.Identifier }}</p>
-
-          <div>Bag Group Identifier</div>
-          <div>{{ .object.BagGroupIdentifier }}</div>
-
-          <div>Alt Identifier</div>
-          <div>{{ .object.AltIdentifier }}</div>
-
-          <div>File Count</div>
-          <div>{{ .object.FileCount }}</div>
-
-          <div>Size (Active Files)</div>
-          <div>{{ .object.Size }}</div>
-
-        </div>
-        <div class="column column-33">
-
-          <div>Created</div>
-          <div>{{ dateUS .object.CreatedAt }}</div>
-
-          <div>Modified</div>
-          <div>{{ dateUS .object.UpdatedAt }}</div>
-
-          <div>Access</div>
-          <div>{{ .object.Access }}</div>
-
-          <div>Storage Option</div>
-          <div>{{ .object.StorageOption }}</div>
-
-        </div>
-      </div>
-      <div class="row">
-        <div class="column column-100">
-
-          <div>Description</div>
-          <div>{{ .object.Description }}</div>
-
-        </div>
-      </div>
-    </div> <!-- end col-67 -->
-
-
-    <!-- Top Right Box -->
+    <!-- Top Right Box: Buttons and events -->
     <div class="column column-33">
-
-      <!-- Button Row -->
       <div class="row">
-        <div class="column column-50">
-          <a class="button" href="#">Delete</a>
-        </div>
-        <div class="column column-50">
-          <a class="button" href="#">Restore</a>
-        </div>
+        {{ template "objects/delete_restore.html" . }}
       </div>
-
-      <!-- Events -->
       <div class="row">
-        <div class="column column-100">
-          <div class="row">
-            <div class="column column-100">
-              Events History
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="column column-100">
-              <table>
-                {{ range $index, $event := .events }}
-                <tr>
-                  <td>Icon</td>
-                  <td>{{ $event.EventType }}</td>
-                  <td>{{ dateUS $event.DateTime }}</td>
-                </tr>
-                {{ end }}
-              </table>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="column column-50">
-              1-5 of 20
-            </div>
-            <div class="column column-50">
-              <a href="#">&lt;</a>
-              <a href="#">&gt;</a>
-            </div>
-          </div>
-
-        </div>
+        {{ template "objects/events.html" . }}
       </div>
+    </div>
+  </div>
 
-    </div> <!-- end col-33 -->
-  </div> <!-- end top row -->
+
+  <!-- Second Row: File Summary -->
+  <div class="row">
+    <div class="column column-100">
+      {{ template "objects/file_summary.html" . }}
+    </div>
+  </div>
+
+
+  <!-- Third Row: Active Files -->
+  <div class="row">
+
+  </div>
+
+
 </div> <!-- end container -->
 
 

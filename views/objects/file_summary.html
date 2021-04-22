@@ -1,0 +1,43 @@
+{{ define "objects/file_summary.html" }}
+
+<div class="row">
+  <div class="column column-100">File Summary</div>
+</div>
+
+<div class="row">
+  <div class="column column-50">
+    <table>
+      <thead>
+        <th></th>
+        <th>Format</th>
+        <th>Count</th>
+        <th>Size</th>
+      </thead>
+      <tbody>
+        {{ range $index, $stat := .stats }}
+          {{ if eq $stat.FileFormat "" }}
+            <tr class="file-stats-total">
+          {{ else }}
+            <tr>
+          {{ end }}
+              <td>{{ $stat.FileFormat }}</td>
+              <td>{{ $stat.FileCount }}</td>
+              <td>{{ $stat.FileSize }}</td>
+            </tr>
+        {{ end }}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="column column-25">
+    Chart 1
+  </div>
+
+  <div class="column column-25">
+    Chart 2
+  </div>
+
+</div>
+
+
+{{ end }}

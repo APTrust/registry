@@ -1,0 +1,36 @@
+{{ define "objects/events.html" }}
+
+<div class="column column-100">
+  <div class="row">
+    <div class="column column-100">
+      Events History
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="column column-100">
+      <table>
+        {{ range $index, $event := .events }}
+        <tr>
+          <td>{{ iconFor $event.EventType }}</td>
+          <td>{{ $event.EventType }}</td>
+          <td>{{ dateUS $event.DateTime }}</td>
+        </tr>
+        {{ end }}
+      </table>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="column column-50">
+      1-5 of 20
+    </div>
+    <div class="column column-50">
+      <a href="#">&lt;</a>
+      <a href="#">&gt;</a>
+    </div>
+  </div>
+</div>
+
+
+{{ end }}
