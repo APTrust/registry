@@ -112,7 +112,8 @@ func initRoutes(router *gin.Engine) {
 		// IntellectualObjects
 		webRoutes.GET("/objects", web.IntellectualObjectIndex)
 		webRoutes.GET("/objects/show/:id", web.IntellectualObjectShow)
-		webRoutes.GET("/objects/delete/:id", web.IntellectualObjectDelete)
+		webRoutes.GET("/objects/request_delete/:id", web.IntellectualObjectRequestDelete)
+		webRoutes.DELETE("/objects/init_delete/:id", web.IntellectualObjectInitDelete)
 		webRoutes.GET("/objects/restore/:id", web.IntellectualObjectRestore)
 
 		// WorkItems - Web UI allows only list, show, and limited editing for admin only

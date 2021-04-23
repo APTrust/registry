@@ -7,22 +7,26 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// IntellectualObjectDelete deletes a user.
-// DELETE /institutions/delete/:id
-func IntellectualObjectDelete(c *gin.Context) {
-	// req := NewRequest(c)
-	// obj, err := pgmodels.IntellectualObjectByID(req.Auth.ResourceID)
-	// if AbortIfError(c, err) {
-	// 	return
-	// }
+// IntellectualObjectRequestDelete shows a message asking if the user
+// really wants to delete this object.
+// GET /objects/request_delete/:id
+func IntellectualObjectRequestDelete(c *gin.Context) {
+	req := NewRequest(c)
+	obj, err := pgmodels.IntellectualObjectViewByID(req.Auth.ResourceID)
+	if AbortIfError(c, err) {
+		return
+	}
+	req.TemplateData["object"] = obj
+	req.TemplateData["error"] = err
+	c.HTML(http.StatusOK, "objects/_request_delete.html", req.TemplateData)
+}
 
-	// // TODO: Create a confirmation email. Check Pharos for existing implementation.
+// IntellectualObjectInitDelete creates an object deletion request. This
+// request must be approved by an administrator at the depositing institution
+// before the deletion will actually be queued.
+// GET /objects/init_delete/:id
+func IntellectualObjectInitDelete(c *gin.Context) {
 
-	// err = obj.Delete()
-	// if AbortIfError(c, err) {
-	// 	return
-	// }
-	// c.Redirect(http.StatusFound, "/objects")
 }
 
 // IntellectualObjectIndex shows list of objects.
