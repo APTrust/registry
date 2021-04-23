@@ -1,6 +1,6 @@
 {{ define "work_items/show.html" }}
 
-{{ template "shared/header.html" . }}
+{{ template "shared/_header.html" . }}
 
 
 {{ if userCan .CurrentUser "WorkItemRequeue" .item.InstitutionID }}
@@ -113,7 +113,7 @@
   </tbody>
 </table>
 
-{{ template "shared/footer.html" . }}
+{{ template "shared/_footer.html" . }}
 
 
 {{ end }}

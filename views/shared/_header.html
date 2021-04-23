@@ -1,4 +1,4 @@
-{{ define "shared/header.html" }}
+{{ define "shared/_header.html" }}
 
 <!DOCTYPE html>
 <html>
@@ -16,7 +16,7 @@
 
     {{ if not .suppressTopNav }}
     <div class="row top-nav">
-      {{ template "shared/top_nav.html" .}}
+      {{ template "shared/_top_nav.html" .}}
     </div>
     {{ end }}
 
@@ -24,7 +24,7 @@
 
       <div class="column column-20 side-nav">
         {{ if not .suppressSideNav }}
-        {{ template "shared/side_nav.html" .}}
+        {{ template "shared/_side_nav.html" .}}
         {{ end }}
       </div>
 

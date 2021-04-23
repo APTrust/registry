@@ -1,6 +1,6 @@
 {{ define "institutions/index.html" }}
 
-{{ template "shared/header.html" .}}
+{{ template "shared/_header.html" .}}
 
 {{ if .CurrentUser.IsAdmin }}
 <div class="float-right"><a class="button" href="/institutions/new">New</a></div>
@@ -35,7 +35,7 @@
   </tbody>
 </table>
 
-{{ template "shared/footer.html" .}}
+{{ template "shared/_footer.html" .}}
 
 
 {{ end }}

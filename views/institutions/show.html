@@ -1,6 +1,6 @@
 {{ define "institutions/show.html" }}
 
-{{ template "shared/header.html" .}}
+{{ template "shared/_header.html" .}}
 
 {{ if .institution.DeactivatedAt.IsZero }}
   {{ if userCan .CurrentUser "InstitutionUpdate" .institution.ID }}
@@ -78,7 +78,7 @@
   </tbody>
 </table>
 
-{{ template "shared/footer.html" .}}
+{{ template "shared/_footer.html" .}}
 
 
 {{ end }}

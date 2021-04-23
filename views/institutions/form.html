@@ -1,6 +1,6 @@
 {{ define "institutions/form.html" }}
 
-{{ template "shared/header.html" .}}
+{{ template "shared/_header.html" .}}
 
 <form action="{{ .form.Action }}" id="instForm" method="post">
 
@@ -49,6 +49,6 @@ window.addEventListener('load', (event) => {
 });
 </script>
 
-{{ template "shared/footer.html" .}}
+{{ template "shared/_footer.html" .}}
 
 {{ end }}
