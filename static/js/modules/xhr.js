@@ -28,8 +28,16 @@ function load(method, contentType, body, url, callback) {
 	});
 }
 
-function setContent(elementId) {
-	return function(htmlData) { document.getElementById(elementId).innerHTML = htmlData }
+// elementOrId is a DOM element or the id of a DOM element
+function setContent(elementOrId) {
+    let element = elementOrId
+    if (!isElement(elementOrId)) {
+        element = document.getElementById(elementOrId)
+    }
+    if (!isElement(element)) {
+        console.error("XHR target is not an element.", element)
+    }
+	return function(htmlData) { element.innerHTML = htmlData }
 }
 
 function deleteContent(elementId) {
@@ -47,12 +55,26 @@ function getJSON(url, callback) {
 	load("GET", "json", null, url, callback)
 }
 
+function isElement(element) {
+    return element instanceof Element || element instanceof HTMLDocument;
+}
+
 export function initXHR() {
 	let xhrItems = document.querySelectorAll("[data-xhr-url][data-xhr-target]");
 	xhrItems.forEach(function(item){
-		console.log(item.dataset.xhrUrl, item.dataset.xhrTarget)
+		//console.log(item.dataset.xhrUrl, item.dataset.xhrTarget)
 		item.addEventListener("click", function (event) {
 			getHTML(item.dataset.xhrUrl, item.dataset.xhrTarget)
+		});
+	});
+
+    let modalItems = document.querySelectorAll("[data-modal][data-xhr-url]");
+	modalItems.forEach(function(item){
+		//console.log(item.dataset.xhrUrl, item.dataset.xhrTarget)
+        let modal = document.getElementById(item.dataset.modal)
+        let modalContentDiv = modal.querySelector('.modal-content');
+		item.addEventListener("click", function (event) {
+			getHTML(item.dataset.xhrUrl, modalContentDiv)
 		});
 	});
 }
