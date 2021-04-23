@@ -96,3 +96,17 @@ func TestIconFor(t *testing.T) {
 		template.HTML(helpers.IconMissing),
 		helpers.IconFor("** missing **"))
 }
+
+var longString = "Somewhere in la Mancha, in a place whose name I do not care to remember, a gentleman lived not long ago, one of those who has a lance and ancient shield on a shelf and keeps a skinny nag and a greyhound for racing."
+
+func TestTruncateMiddle(t *testing.T) {
+	assert.Equal(t, "Somewher... racing.", helpers.TruncateMiddle(longString, 20))
+	assert.Equal(t, "Somewhere in ...d for racing.", helpers.TruncateMiddle(longString, 30))
+	assert.Equal(t, longString, helpers.TruncateMiddle(longString, 500))
+}
+
+func TestTruncateStart(t *testing.T) {
+	assert.Equal(t, "...a greyhound for racing.", helpers.TruncateStart(longString, 20))
+	assert.Equal(t, "...y nag and a greyhound for racing.", helpers.TruncateStart(longString, 30))
+	assert.Equal(t, longString, helpers.TruncateStart(longString, 500))
+}

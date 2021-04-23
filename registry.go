@@ -25,20 +25,22 @@ func main() {
 // parser will error out.
 func initTemplates(router *gin.Engine) {
 	router.SetFuncMap(template.FuncMap{
-		"dateISO":     helpers.DateISO,
-		"dateTimeISO": helpers.DateTimeISO,
-		"dateUS":      helpers.DateUS,
-		"escapeAttr":  helpers.EscapeAttr,
-		"escapeHTML":  helpers.EscapeHTML,
-		"iconFor":     helpers.IconFor,
-		"humanSize":   helpers.HumanSize,
-		"replace":     strings.Replace,
-		"strEq":       helpers.StrEq,
-		"titleCase":   strings.Title,
-		"truncate":    helpers.Truncate,
-		"roleName":    helpers.RoleName,
-		"userCan":     helpers.UserCan,
-		"yesNo":       helpers.YesNo,
+		"dateTimeISO":    helpers.DateTimeISO,
+		"dateUS":         helpers.DateUS,
+		"escapeAttr":     helpers.EscapeAttr,
+		"escapeHTML":     helpers.EscapeHTML,
+		"humanSize":      helpers.HumanSize,
+		"iconFor":        helpers.IconFor,
+		"replace":        strings.Replace,
+		"roleName":       helpers.RoleName,
+		"strEq":          helpers.StrEq,
+		"titleCase":      strings.Title,
+		"truncate":       helpers.Truncate,
+		"truncateMiddle": helpers.TruncateMiddle,
+		"truncateStart":  helpers.TruncateStart,
+		"userCan":        helpers.UserCan,
+		"yesNo":          helpers.YesNo,
+		"dateISO":        helpers.DateISO,
 	})
 	// Load the view templates
 	router.LoadHTMLGlob("views/**/*.html")

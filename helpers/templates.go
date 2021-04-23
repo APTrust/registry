@@ -118,3 +118,23 @@ func IconFor(str string) template.HTML {
 	}
 	return template.HTML(icon)
 }
+
+func TruncateMiddle(str string, maxLen int) string {
+	if len(str) <= maxLen {
+		return str
+	}
+	half := (maxLen - 3) / 2
+	end := len(str) - half
+	return str[0:half] + "..." + str[end:len(str)]
+}
+
+func TruncateStart(str string, maxLen int) string {
+	if len(str) <= maxLen {
+		return str
+	}
+	end := (len(str) - 3) - maxLen
+	if end < 0 {
+		end = 0
+	}
+	return "..." + str[end:len(str)]
+}
