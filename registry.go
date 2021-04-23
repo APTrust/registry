@@ -101,6 +101,12 @@ func initRoutes(router *gin.Engine) {
 		webRoutes.PUT("/institutions/edit/:id", web.InstitutionUpdate)
 		webRoutes.POST("/institutions/edit/:id", web.InstitutionUpdate)
 
+		// GenericFiles
+		webRoutes.GET("/files", web.GenericFileIndex)
+		webRoutes.GET("/files/show/:id", web.GenericFileShow)
+		webRoutes.GET("/files/delete/:id", web.GenericFileDelete)
+		webRoutes.GET("/files/restore/:id", web.GenericFileRestore)
+
 		// IntellectualObjects
 		webRoutes.GET("/objects", web.IntellectualObjectIndex)
 		webRoutes.GET("/objects/show/:id", web.IntellectualObjectShow)

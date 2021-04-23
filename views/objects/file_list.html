@@ -33,13 +33,18 @@
         </thead>
         {{ range $index, $file := .files }}
         <tr>
-          <td>[+]</td>
+          <td class="clickable" data-xhr-url="/files/show/{{ $file.ID }}" data-xhr-target="file-{{ $file.ID }}">[+]</td>
           <td>{{ $file.Identifier }}</td>
           <td>{{ $file.FileFormat }}</td>
           <td>{{ humanSize $file.Size }}</td>
           <td>{{ dateUS $file.CreatedAt }}</td>
           <td>{{ dateUS $file.UpdatedAt }}</td>
           <td>{{ dateUS $file.LastFixityCheck }}</td>
+        </tr>
+        <tr>
+          <td colspan="7" style="border:none">
+            <div id="file-{{ $file.ID }}"></div>
+          </td>
         </tr>
         {{ end }}
       </table>

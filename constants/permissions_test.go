@@ -12,15 +12,15 @@ func TestPermissions(t *testing.T) {
 	// Spot check a few institutional user permissions
 	assert.True(t, constants.CheckPermission(constants.RoleInstUser, constants.AlertRead))
 	assert.True(t, constants.CheckPermission(constants.RoleInstUser, constants.IntellectualObjectRead))
-	assert.True(t, constants.CheckPermission(constants.RoleInstUser, constants.FileRead))
+	assert.True(t, constants.CheckPermission(constants.RoleInstUser, constants.GenericFileRead))
 	assert.False(t, constants.CheckPermission(constants.RoleInstUser, constants.IntellectualObjectUpdate))
 	assert.False(t, constants.CheckPermission(constants.RoleInstUser, constants.WorkItemUpdate))
 
 	// Spot check a few institutional admin permissions
 	assert.True(t, constants.CheckPermission(constants.RoleInstAdmin, constants.EventRead))
-	assert.True(t, constants.CheckPermission(constants.RoleInstAdmin, constants.FileRequestDelete))
-	assert.True(t, constants.CheckPermission(constants.RoleInstAdmin, constants.FileApproveDelete))
-	assert.True(t, constants.CheckPermission(constants.RoleInstAdmin, constants.FileRestore))
+	assert.True(t, constants.CheckPermission(constants.RoleInstAdmin, constants.GenericFileRequestDelete))
+	assert.True(t, constants.CheckPermission(constants.RoleInstAdmin, constants.GenericFileApproveDelete))
+	assert.True(t, constants.CheckPermission(constants.RoleInstAdmin, constants.GenericFileRestore))
 	assert.True(t, constants.CheckPermission(constants.RoleInstAdmin, constants.IntellectualObjectRequestDelete))
 	assert.True(t, constants.CheckPermission(constants.RoleInstAdmin, constants.IntellectualObjectApproveDelete))
 	assert.True(t, constants.CheckPermission(constants.RoleInstAdmin, constants.IntellectualObjectRestore))
@@ -30,7 +30,7 @@ func TestPermissions(t *testing.T) {
 	assert.False(t, constants.CheckPermission(constants.RoleInstAdmin, constants.StorageRecordUpdate))
 
 	// Spot check SysAdmin privileges
-	assert.True(t, constants.CheckPermission(constants.RoleSysAdmin, constants.FileUpdate))
+	assert.True(t, constants.CheckPermission(constants.RoleSysAdmin, constants.GenericFileUpdate))
 	assert.True(t, constants.CheckPermission(constants.RoleSysAdmin, constants.IntellectualObjectUpdate))
 	assert.True(t, constants.CheckPermission(constants.RoleSysAdmin, constants.InstitutionUpdate))
 	assert.True(t, constants.CheckPermission(constants.RoleSysAdmin, constants.StorageRecordUpdate))

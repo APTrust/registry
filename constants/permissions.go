@@ -29,14 +29,14 @@ const (
 	EventRead                                     = "EventRead"
 	EventUpdate                                   = "EventUpdate"
 	EventDelete                                   = "EventDelete"
-	FileCreate                                    = "FileCreate"
-	FileRead                                      = "FileRead"
-	FileUpdate                                    = "FileUpdate"
-	FileDelete                                    = "FileDelete"
-	FileRequestDelete                             = "FileRequestDelete"
-	FileApproveDelete                             = "FileApproveDelete"
-	FileFinishBulkDelete                          = "FileFinishBulkDelete"
-	FileRestore                                   = "FileRestore"
+	GenericFileCreate                             = "FileCreate"
+	GenericFileRead                               = "FileRead"
+	GenericFileUpdate                             = "FileUpdate"
+	GenericFileDelete                             = "FileDelete"
+	GenericFileRequestDelete                      = "FileRequestDelete"
+	GenericFileApproveDelete                      = "FileApproveDelete"
+	GenericFileFinishBulkDelete                   = "FileFinishBulkDelete"
+	GenericFileRestore                            = "FileRestore"
 	InstitutionCreate                             = "InstitutionCreate"
 	InstitutionRead                               = "InstitutionRead"
 	InstitutionUpdate                             = "InstitutionUpdate"
@@ -84,14 +84,14 @@ var Permissions = []Permission{
 	EventRead,
 	EventUpdate,
 	EventDelete,
-	FileCreate,
-	FileRead,
-	FileUpdate,
-	FileDelete,
-	FileRequestDelete,
-	FileApproveDelete,
-	FileFinishBulkDelete,
-	FileRestore,
+	GenericFileCreate,
+	GenericFileRead,
+	GenericFileUpdate,
+	GenericFileDelete,
+	GenericFileRequestDelete,
+	GenericFileApproveDelete,
+	GenericFileFinishBulkDelete,
+	GenericFileRestore,
 	InstitutionCreate,
 	InstitutionRead,
 	InstitutionUpdate,
@@ -150,7 +150,7 @@ func initPermissions() {
 	instUser[ChecksumRead] = true
 	instUser[DashboardShow] = true
 	instUser[EventRead] = true
-	instUser[FileRead] = true
+	instUser[GenericFileRead] = true
 	instUser[InstitutionRead] = true
 	instUser[IntellectualObjectRead] = true
 	instUser[ReportRead] = true
@@ -166,11 +166,11 @@ func initPermissions() {
 	instAdmin[ChecksumRead] = true
 	instAdmin[DashboardShow] = true
 	instAdmin[EventRead] = true
-	instAdmin[FileRead] = true
-	instAdmin[FileDelete] = true
-	instAdmin[FileRequestDelete] = true
-	instAdmin[FileApproveDelete] = true
-	instAdmin[FileRestore] = true
+	instAdmin[GenericFileRead] = true
+	instAdmin[GenericFileDelete] = true
+	instAdmin[GenericFileRequestDelete] = true
+	instAdmin[GenericFileApproveDelete] = true
+	instAdmin[GenericFileRestore] = true
 	instAdmin[InstitutionRead] = true
 	instAdmin[IntellectualObjectRead] = true
 	instAdmin[IntellectualObjectDelete] = true
@@ -202,14 +202,14 @@ func initPermissions() {
 	sysAdmin[EventRead] = true
 	sysAdmin[EventUpdate] = false // no one can do this
 	sysAdmin[EventDelete] = false // no one can do this
-	sysAdmin[FileCreate] = true
-	sysAdmin[FileRead] = true
-	sysAdmin[FileUpdate] = true
-	sysAdmin[FileDelete] = true
-	sysAdmin[FileRequestDelete] = true
-	sysAdmin[FileApproveDelete] = true
-	sysAdmin[FileFinishBulkDelete] = true
-	sysAdmin[FileRestore] = true
+	sysAdmin[GenericFileCreate] = true
+	sysAdmin[GenericFileRead] = true
+	sysAdmin[GenericFileUpdate] = true
+	sysAdmin[GenericFileDelete] = true
+	sysAdmin[GenericFileRequestDelete] = true
+	sysAdmin[GenericFileApproveDelete] = true
+	sysAdmin[GenericFileFinishBulkDelete] = true
+	sysAdmin[GenericFileRestore] = true
 	sysAdmin[InstitutionCreate] = true
 	sysAdmin[InstitutionRead] = true
 	sysAdmin[InstitutionUpdate] = true

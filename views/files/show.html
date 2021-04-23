@@ -1,0 +1,12 @@
+{{ define "files/show.html" }}
+
+{{ if .file }}
+<p>File: {{ .file.Identifier }}</p>
+{{ end }}
+
+{{ if .err }}
+<p>Error: {{ .error.Error }}</p>
+{{ end }}
+
+
+{{ end }}
