@@ -117,6 +117,7 @@ func initRoutes(router *gin.Engine) {
 		webRoutes.GET("/objects/restore/:id", web.IntellectualObjectRestore)
 		webRoutes.GET("/objects/request_restore/:id", web.IntellectualObjectRequestRestore)
 		webRoutes.POST("/objects/init_restore/:id", web.IntellectualObjectInitRestore)
+		webRoutes.GET("/objects/events/:id", web.IntellectualObjectEvents)
 
 		// WorkItems - Web UI allows only list, show, and limited editing for admin only
 		webRoutes.GET("/work_items", web.WorkItemIndex)

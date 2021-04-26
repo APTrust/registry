@@ -86,8 +86,9 @@ export function initXHR() {
 		//console.log(item.dataset.xhrUrl, item.dataset.xhrTarget)
         let modal = document.getElementById(item.dataset.modal)
         let modalContentDiv = modal.querySelector('.modal-content');
+        let method = item.dataset.xhrMethod || "get"
 		item.addEventListener("click", function (event) {
-			getHTML(item.dataset.xhrUrl, modalContentDiv)
+			loadIntoElement(method, item.dataset.xhrUrl, modalContentDiv)
 		});
 	});
 }

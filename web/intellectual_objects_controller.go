@@ -99,6 +99,16 @@ func IntellectualObjectRestore(c *gin.Context) {
 	// TODO: Create a restoration WorkItem.
 }
 
+func IntellectualObjectEvents(c *gin.Context) {
+	// TODO: Create a restoration WorkItem.
+	req := NewRequest(c)
+	err := loadEvents(req, req.Auth.ResourceID)
+	if AbortIfError(c, err) {
+		return
+	}
+	c.HTML(http.StatusOK, "objects/_events.html", req.TemplateData)
+}
+
 // Select max 20 files to start. Some objects have > 100k files, and
 // we definitely don't want that many results. Let the user page through.
 func loadFiles(req *Request, objID int64) error {

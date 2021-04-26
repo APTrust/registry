@@ -1,6 +1,6 @@
 {{ define "objects/_events.html" }}
 
-<div class="column column-100">
+<div class="column column-100"  id="objEvents">
   <div class="row">
     <div class="column column-100">
       <h2>Events History</h2>
@@ -8,7 +8,7 @@
   </div>
 
   <div class="row">
-    <div class="column column-100" id="objEvents">
+    <div class="column column-100">
       <table>
         {{ range $index, $event := .events }}
         <tr>
@@ -27,18 +27,18 @@
     </div>
   </div>
   <div class="row">
-    <div class="column column-100">
+    {{ if .eventsShowLeftArrow }}
+    <div class="column column-50"><button type="button" class="button button-outline" data-xhr-url="/objects/events/{{ .object.ID }}?page={{ .eventsPreviousPage }}&per_page=5" data-xhr-target="objEvents">&lt;</button></div>
+    {{ end }}
 
-      {{ if .eventsShowLeftArrow }}
-        <i class="fas fa-angle-left fa-2x clickable" data-xhr-url="/objects/events/{{ .object.ID }}?page={{ .eventsPreviousPage }}" data-xhr-target="objEvents"></i>
-      {{ end }}
-
-        {{ if .eventsShowRightArrow }}
-        <i class="fas fa-angle-right fa-2x clickable" data-xhr-url="/objects/events/{{ .object.ID }}?page={{ .eventsNextPage }}" data-xhr-target="objEvents"></i>
-      {{ end }}
-    </div>
+    {{ if .eventsShowRightArrow }}
+    <div class="column column-50"><button type="button" class="button button-outline" data-xhr-url="/objects/events/{{ .object.ID }}?page={{ .eventsNextPage }}&per_page=5" data-xhr-target="objEvents">&gt;</button></div>
+    {{ end }}
   </div>
+
 </div>
+
+<!-- TODO: Make sure XHR events are bound after partial page load. -->
 
 
 {{ end }}
