@@ -1,0 +1,29 @@
+{{ define "objects/_request_restore.html" }}
+
+<div class="container">
+
+  <h1>Restore Object</h1>
+
+  <div class="row">
+    <div class="column column-30">
+    <p>This object will be restored to your institution's receiving bucket and you'll receive an email at {{ .CurrentUser.Email }} when it's ready.</p>
+
+    <p>Restoration times vary. Large objects take longer than smaller objects. Items restored from Glacier and Glacier Deep Archive take longer than items stored in S3 and Wasabi.</p>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="column column-30">
+      <button class="button button-outline">Cancel</button>
+    </div>
+    <div class="column column-40">
+
+    </div>
+    <div class="column column-30">
+      <button class="button">Confirm</button>
+    </div>
+  </div>
+
+</div>
+
+{{ end }}

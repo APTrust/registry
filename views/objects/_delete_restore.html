@@ -6,7 +6,7 @@
   <button class="button button-outline" data-modal="modal-one" data-xhr-url="/objects/request_delete/{{ .object.ID }}">Delete</button>
 </div>
 <div class="column column-50">
-  <button class="button button-outline" data-modal="modal-one" data-xhr-url="/files/show/2">Restore</button>
+  <button class="button button-outline" data-modal="modal-one" data-xhr-url="/objects/request_restore/{{ .object.ID }}">Restore</button>
 </div>
 
 {{ end }}

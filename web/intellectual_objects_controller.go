@@ -29,6 +29,28 @@ func IntellectualObjectInitDelete(c *gin.Context) {
 
 }
 
+// IntellectualObjectRequestRestore shows a message asking if the user
+// really wants to delete this object.
+// GET /objects/request_restore/:id
+func IntellectualObjectRequestRestore(c *gin.Context) {
+	req := NewRequest(c)
+	obj, err := pgmodels.IntellectualObjectViewByID(req.Auth.ResourceID)
+	if AbortIfError(c, err) {
+		return
+	}
+	req.TemplateData["object"] = obj
+	req.TemplateData["error"] = err
+	c.HTML(http.StatusOK, "objects/_request_restore.html", req.TemplateData)
+}
+
+// IntellectualObjectInitRestore creates an object restoration request,
+// which is really just a WorkItem that gets queued. Restoration can seconds
+// or hours, depending on where the object is stored and how big it is.
+// POST /objects/init_restore/:id
+func IntellectualObjectInitRestore(c *gin.Context) {
+
+}
+
 // IntellectualObjectIndex shows list of objects.
 // GET /objects
 func IntellectualObjectIndex(c *gin.Context) {
@@ -55,46 +77,19 @@ func IntellectualObjectShow(c *gin.Context) {
 	if AbortIfError(c, err) {
 		return
 	}
-
-	// Select max 20 files to start. Some objects have > 100k files, and
-	// we definitely don't want that many results. Let the user page through.
-	fileQuery := pgmodels.NewQuery().Where("intellectual_object_id", "=", object.ID).Relations("StorageRecords").OrderBy("identifier").Limit(20).Offset(0)
-	files, err := pgmodels.GenericFileSelect(fileQuery)
+	req.TemplateData["object"] = object
+	err = loadFiles(req, object.ID)
 	if AbortIfError(c, err) {
 		return
 	}
-
-	// Get object-level events only. I.e. those that match our object ID
-	// but have a null generic file id. Most object will have only a handful
-	// of object-level events, though they may have thousands or hundreds of
-	// thousands of file-level events. We'll get the first five, and let the
-	// user page through from there.
-	eventQuery := pgmodels.NewQuery().Where("intellectual_object_id", "=", object.ID).IsNull("generic_file_id").OrderBy("created_at desc").Limit(5).Offset(0)
-	events, err := pgmodels.PremisEventSelect(eventQuery)
+	err = loadEvents(req, object.ID)
 	if AbortIfError(c, err) {
 		return
 	}
-
 	stats, err := pgmodels.GetObjectStats(object.ID)
 	if AbortIfError(c, err) {
 		return
 	}
-
-	eventCount, err := pgmodels.ObjectEventCount(object.ID)
-	if AbortIfError(c, err) {
-		return
-	}
-
-	req.TemplateData["object"] = object
-	req.TemplateData["files"] = files
-
-	req.TemplateData["events"] = events
-	req.TemplateData["eventsOffsetStart"] = 1
-	req.TemplateData["eventsOffsetEnd"] = len(events)
-	req.TemplateData["eventsCount"] = eventCount
-	req.TemplateData["eventsShowLeftArrow"] = true
-	req.TemplateData["eventsShowRightArrow"] = true
-
 	req.TemplateData["stats"] = stats
 	req.TemplateData["flash"] = c.Query("flash")
 	c.HTML(http.StatusOK, "objects/show.html", req.TemplateData)
@@ -102,4 +97,34 @@ func IntellectualObjectShow(c *gin.Context) {
 
 func IntellectualObjectRestore(c *gin.Context) {
 	// TODO: Create a restoration WorkItem.
+}
+
+// Select max 20 files to start. Some objects have > 100k files, and
+// we definitely don't want that many results. Let the user page through.
+func loadFiles(req *Request, objID int64) error {
+	fileQuery := pgmodels.NewQuery().Where("intellectual_object_id", "=", objID).Relations("StorageRecords").OrderBy("identifier").Limit(20).Offset(0)
+	files, err := pgmodels.GenericFileSelect(fileQuery)
+	req.TemplateData["files"] = files
+	return err
+}
+
+// Get object-level events only. I.e. those that match our object ID
+// but have a null generic file id. Most object will have only a handful
+// of object-level events, though they may have thousands or hundreds of
+// thousands of file-level events. We'll get the first five, and let the
+// user page through from there.
+func loadEvents(req *Request, objID int64) error {
+	eventQuery := pgmodels.NewQuery().Where("intellectual_object_id", "=", objID).IsNull("generic_file_id").OrderBy("created_at desc").Limit(5).Offset(0)
+	events, err := pgmodels.PremisEventSelect(eventQuery)
+	if err != nil {
+		return err
+	}
+	req.TemplateData["events"] = events
+	eventCount, err := pgmodels.ObjectEventCount(objID)
+	req.TemplateData["eventsOffsetStart"] = 1
+	req.TemplateData["eventsOffsetEnd"] = len(events)
+	req.TemplateData["eventsCount"] = eventCount
+	req.TemplateData["eventsShowLeftArrow"] = true
+	req.TemplateData["eventsShowRightArrow"] = true
+	return err
 }
