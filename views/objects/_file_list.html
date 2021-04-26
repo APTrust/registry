@@ -33,7 +33,7 @@
         </thead>
         {{ range $index, $file := .files }}
         <tr>
-          <td class="clickable" data-xhr-url="/files/show/{{ $file.ID }}" data-xhr-target="file-{{ $file.ID }}">[+]</td>
+          <td class="clickable" data-toggle="file-{{ $file.ID }}">[+]</td>
           <td>{{ truncateStart $file.Identifier 60 }}</td>
           <td>{{ $file.FileFormat }}</td>
           <td>{{ humanSize $file.Size }}</td>
@@ -43,7 +43,13 @@
         </tr>
         <tr>
           <td colspan="7" style="border:none">
-            <div id="file-{{ $file.ID }}"></div>
+            <div id="file-{{ $file.ID }}" style="display:none;">
+              <p>{{ $file.Identifier }} <br/>
+                {{ range $index, $sr := $file.StorageRecords }}
+                  {{ $sr.URL }} <br/>
+                {{ end }}
+              </p>
+            </div>
           </td>
         </tr>
         {{ end }}

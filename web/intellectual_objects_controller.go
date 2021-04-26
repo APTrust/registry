@@ -58,7 +58,7 @@ func IntellectualObjectShow(c *gin.Context) {
 
 	// Select max 20 files to start. Some objects have > 100k files, and
 	// we definitely don't want that many results. Let the user page through.
-	fileQuery := pgmodels.NewQuery().Where("intellectual_object_id", "=", object.ID).OrderBy("identifier").Limit(20).Offset(0)
+	fileQuery := pgmodels.NewQuery().Where("intellectual_object_id", "=", object.ID).Relations("StorageRecords").OrderBy("identifier").Limit(20).Offset(0)
 	files, err := pgmodels.GenericFileSelect(fileQuery)
 	if AbortIfError(c, err) {
 		return
