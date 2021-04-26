@@ -102,7 +102,13 @@ func IntellectualObjectRestore(c *gin.Context) {
 // Select max 20 files to start. Some objects have > 100k files, and
 // we definitely don't want that many results. Let the user page through.
 func loadFiles(req *Request, objID int64) error {
-	fileQuery := pgmodels.NewQuery().Where("intellectual_object_id", "=", objID).Relations("StorageRecords").OrderBy("identifier").Limit(20).Offset(0)
+	fileQuery := pgmodels.NewQuery().
+		Where("intellectual_object_id", "=", objID).
+		Relations("StorageRecords").
+		OrderBy("identifier").
+		Limit(req.Auth.PerPage).
+		Offset(req.Auth.PagingOffset)
+
 	files, err := pgmodels.GenericFileSelect(fileQuery)
 	req.TemplateData["files"] = files
 	return err
@@ -114,7 +120,12 @@ func loadFiles(req *Request, objID int64) error {
 // thousands of file-level events. We'll get the first five, and let the
 // user page through from there.
 func loadEvents(req *Request, objID int64) error {
-	eventQuery := pgmodels.NewQuery().Where("intellectual_object_id", "=", objID).IsNull("generic_file_id").OrderBy("created_at desc").Limit(5).Offset(0)
+	eventQuery := pgmodels.NewQuery().
+		Where("intellectual_object_id", "=", objID).
+		IsNull("generic_file_id").
+		OrderBy("created_at desc").
+		Limit(req.Auth.PerPage).
+		Offset(req.Auth.PagingOffset)
 	events, err := pgmodels.PremisEventSelect(eventQuery)
 	if err != nil {
 		return err
@@ -126,5 +137,9 @@ func loadEvents(req *Request, objID int64) error {
 	req.TemplateData["eventsCount"] = eventCount
 	req.TemplateData["eventsShowLeftArrow"] = true
 	req.TemplateData["eventsShowRightArrow"] = true
+
+	req.TemplateData["eventsNextPage"] = req.Auth.Page + 1
+	req.TemplateData["eventsPreviousPage"] = req.Auth.Page - 1
+
 	return err
 }

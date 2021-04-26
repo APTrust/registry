@@ -47,8 +47,12 @@ function deleteContent(elementId) {
 	}
 }
 
-function getHTML(url, elementId) {
-	load("GET", "html", null, url, setContent(elementId))
+function loadIntoElement(method, url, elementId) {
+	load(method, "html", null, url, setContent(elementId))
+}
+
+function appendToElement(method, url, elementId) {
+	load(method, "html", null, url, setContent(elementId))
 }
 
 function getJSON(url, callback) {
@@ -62,9 +66,18 @@ function isElement(element) {
 export function initXHR() {
 	let xhrItems = document.querySelectorAll("[data-xhr-url][data-xhr-target]");
 	xhrItems.forEach(function(item){
-		//console.log(item.dataset.xhrUrl, item.dataset.xhrTarget)
+        // method can be get, put, post, delete
+        // action can be replace or append
+        let method = item.dataset.xhrMethod || "get"
+        let fn = item.dataset.xhrAction || "replace"
+        let url = item.dataset.xhrUrl
+        let target = item.dataset.xhrTarget
 		item.addEventListener("click", function (event) {
-			getHTML(item.dataset.xhrUrl, item.dataset.xhrTarget)
+            if (fn == "append") {
+			    appendToElement(method, url, target)
+            } else {
+                loadIntoElement(method, url, target)
+            }
 		});
 	});
 

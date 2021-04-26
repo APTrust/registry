@@ -57,6 +57,10 @@ input[type="color"], input[type="date"], input[type="datetime"], input[type="dat
     font-size: 1.4rem;
 }
 
+.center-text {
+    text-align: center;
+}
+
 footer {
     border-top: 0.1rem solid #f4f5f6;
     font-size: 1.2rem;

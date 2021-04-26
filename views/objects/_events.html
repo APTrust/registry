@@ -8,7 +8,7 @@
   </div>
 
   <div class="row">
-    <div class="column column-100">
+    <div class="column column-100" id="objEvents">
       <table>
         {{ range $index, $event := .events }}
         <tr>
@@ -22,16 +22,19 @@
   </div>
 
   <div class="row">
-    <div class="column column-50">
+    <div class="column column-100 center-text">
       {{ .eventsOffsetStart }} - {{ .eventsOffsetEnd }} of {{ .eventsCount }}
     </div>
-    <div class="column column-50">
+  </div>
+  <div class="row">
+    <div class="column column-100">
+
       {{ if .eventsShowLeftArrow }}
-      <a href="#">&lt;</a>
+        <i class="fas fa-angle-left fa-2x clickable" data-xhr-url="/objects/events/{{ .object.ID }}?page={{ .eventsPreviousPage }}" data-xhr-target="objEvents"></i>
       {{ end }}
 
-      {{ if .eventsShowRightArrow }}
-      <a href="#">&gt;</a>
+        {{ if .eventsShowRightArrow }}
+        <i class="fas fa-angle-right fa-2x clickable" data-xhr-url="/objects/events/{{ .object.ID }}?page={{ .eventsNextPage }}" data-xhr-target="objEvents"></i>
       {{ end }}
     </div>
   </div>
