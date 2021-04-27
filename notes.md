@@ -88,15 +88,13 @@ Clarity is a guiding principle for this entire code base. When choosing between 
 
 During development, we'll create a barebones web UI that simply renders the required data without polish. Later, we'll work toward [the UI that Simple Thread mocked up](./docs/APTrust_Wireframes.pdf). During development, however, we only need to ensure that our pages get the data that Simple Thread's UI requires.
 
-Consider using some Tailwind themes, such as:
+After two years of maintaining a Node.js app with it's whole tangled dependency hell, we want to keep JavaScript to a minimum. For simple tasks like XHR loading, modals, and the like, we'll write our own vanilla JavaScript.
 
-* [Semantic UI](https://semantic-ui.com/) may be the best of the lot. Very clean and simple. It's well documented and its [GitHub repo has 49k stars](https://github.com/semantic-org/semantic-ui). It's nearly as heavy as Bootstrap and includes it's own JavaScript and themes. Looks like maintenance ended in 2018. Take a look at [Formantic-UI](https://fomantic-ui.com/), which is the community fork. [Formantic on GitHub](https://github.com/fomantic/fomantic-ui).
-* [UIKit](https://getuikit.com/docs/introduction) also looks top-notch. Very clean and feature-rich, though the class markup is a little heavier than Semantic UI. Development seems active on [GitHub](https://github.com/uikit/uikit) and it has a simple static distribution (i.e. does not rely on Node or SASS pre-processing).
-* [Bulma](https://bulma.io/) is also simple and clean, and is easy to customize. It neither includes nor requires JavaScript. It has a number of [extensions](https://bulma.io/extensions/) and over [42k stars on GitHub](https://github.com/jgthms/bulma). The default colors are too pastel, but should be easy to change. Bulma's one drawback (compared to Bootstrap) is weaker accessibility support.
-* [Boostrap](https://getbootstrap.com/) is useful, well documented, well-supported, and often a pain in the ass. It also requires JQuery, which is another pain in the ass.
-* [Tailwind Admin](https://github.com/tailwindadmin/admin) - See the [live demo](https://tailwindadmin.netlify.app/index.html) for component samples, but note that it includes heavy class markup and 56k lines of CSS.
-* [Zurb's stupid website](https://get.foundation/) isn't even working. That bodes ill.
+While it take a little more time up front, avoiding huge dependency trees saves enormous time in the long run. Don't import thousand-line libraries to do something you can accomplish in ten lines of script.
 
+For functionality we don't want to write ourselves, such as charts, look for small, proven, dependency-free libraries like chart.js.
+
+Remember, depdenency hell and mountains of garbage code are only one npm package away.
 
 ## Accounts
 
