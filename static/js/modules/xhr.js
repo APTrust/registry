@@ -1,5 +1,26 @@
 // xhr module
 
+import { initModals } from './modal.js';
+import { initToggles } from './toggle.js';
+
+//
+// observer observes elements into which we dynamically load content
+// via xhr requests. When the childList or characterData of these nodes
+// change, the obeserver fires our callback, which ensures that xhr
+// events are attached to newly-loaded content as necessary.
+//
+// Note that we track which elements have xhr events attached using
+// the attribute data-xhr-initialized.
+//
+// https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver
+// https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver/observe
+const callback = function(mutationsList, observer) {
+    initXHR()
+    initModals()
+    initToggles()
+}
+const observer = new MutationObserver(callback);
+
 function opts(method, contentType, body) {
 	let type = contentType == 'json' ? 'application/json' : 'text/html'
 	return {
@@ -36,8 +57,12 @@ function setContent(elementOrId) {
     }
     if (!isElement(element)) {
         console.error("XHR target is not an element.", element)
+        return
     }
-	return function(htmlData) { element.innerHTML = htmlData }
+    observer.observe(element, {childList: true, characterData: true})
+	return function(htmlData) {
+        element.innerHTML = htmlData
+    }
 }
 
 function deleteContent(elementId) {
@@ -72,13 +97,16 @@ export function initXHR() {
         let fn = item.dataset.xhrAction || "replace"
         let url = item.dataset.xhrUrl
         let target = item.dataset.xhrTarget
-		item.addEventListener("click", function (event) {
-            if (fn == "append") {
-			    appendToElement(method, url, target)
-            } else {
-                loadIntoElement(method, url, target)
-            }
-		});
+        if (item.dataset.xhrInitialized != "true") {
+		    item.addEventListener("click", function (event) {
+                if (fn == "append") {
+			        appendToElement(method, url, target)
+                } else {
+                    loadIntoElement(method, url, target)
+                }
+		    });
+            item.dataset.xhrInitialized = "true"
+        }
 	});
 
     let modalItems = document.querySelectorAll("[data-modal][data-xhr-url]");
@@ -87,8 +115,11 @@ export function initXHR() {
         let modal = document.getElementById(item.dataset.modal)
         let modalContentDiv = modal.querySelector('.modal-content');
         let method = item.dataset.xhrMethod || "get"
-		item.addEventListener("click", function (event) {
-			loadIntoElement(method, item.dataset.xhrUrl, modalContentDiv)
-		});
+        if (item.dataset.initialized != "true") {
+		    item.addEventListener("click", function (event) {
+			    loadIntoElement(method, item.dataset.xhrUrl, modalContentDiv)
+		    });
+            item.dataset.initialized = "true"
+        }
 	});
 }
