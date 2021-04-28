@@ -113,15 +113,26 @@ func IntellectualObjectEvents(c *gin.Context) {
 // Select max 20 files to start. Some objects have > 100k files, and
 // we definitely don't want that many results. Let the user page through.
 func loadFiles(req *Request, objID int64) error {
+	baseURL := fmt.Sprintf("/objects/files/%d", objID)
+	pager, err := NewPager(req.GinContext, baseURL, 10)
+	if err != nil {
+		return err
+	}
 	fileQuery := pgmodels.NewQuery().
 		Where("intellectual_object_id", "=", objID).
 		Relations("StorageRecords").
 		OrderBy("identifier").
-		Limit(req.Auth.PerPage).
-		Offset(req.Auth.PagingOffset)
+		Limit(pager.PerPage).
+		Offset(pager.QueryOffset)
 
 	files, err := pgmodels.GenericFileSelect(fileQuery)
+	if err != nil {
+		return err
+	}
+	totalFileCount, err := pgmodels.ObjectFileCount(objID)
+	pager.SetCounts(totalFileCount, len(files))
 	req.TemplateData["files"] = files
+	req.TemplateData["filePager"] = pager
 	return err
 }
 

@@ -2,6 +2,8 @@ package pgmodels
 
 import (
 	"time"
+
+	"github.com/APTrust/registry/common"
 )
 
 type GenericFile struct {
@@ -64,4 +66,10 @@ func (gf *GenericFile) Save() error {
 		return insert(gf)
 	}
 	return update(gf)
+}
+
+// ObjectFileCount returns the number of active files with the specified
+// Intellectial Object ID.
+func ObjectFileCount(intellectualObjectID int64) (int, error) {
+	return common.Context().DB.Model((*GenericFile)(nil)).Where(`intellectual_object_id = ? and state = 'A'`, intellectualObjectID).Count()
 }

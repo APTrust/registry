@@ -23,9 +23,6 @@ type ResourceAuthorization struct {
 	Permission     constants.Permission
 	Checked        bool
 	Approved       bool
-	Page           int
-	PagingOffset   int
-	PerPage        int
 	Error          error
 }
 
@@ -51,7 +48,6 @@ func (r *ResourceAuthorization) init() {
 	}
 	r.getPermissionType()
 	r.readRequestIds()
-	r.readCommonParams()
 	if r.Error == nil {
 		r.checkPermission()
 	}
@@ -104,16 +100,6 @@ func (r *ResourceAuthorization) idFromRequest(name string) int64 {
 	}
 	idAsInt, _ := strconv.ParseInt(id, 10, 64)
 	return idAsInt
-}
-
-func (r *ResourceAuthorization) readCommonParams() {
-	page := r.ginCtx.DefaultQuery("page", "1")
-	perPage := r.ginCtx.DefaultQuery("per_page", "20")
-	r.Page, _ = strconv.Atoi(page)
-	r.PerPage, _ = strconv.Atoi(perPage)
-	if r.Page > 1 {
-		r.PagingOffset = (r.Page - 1) * r.PerPage
-	}
 }
 
 func (r *ResourceAuthorization) CurrentUser() *pgmodels.User {
