@@ -5,10 +5,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/helpers"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 var testDate, _ = time.Parse(time.RFC3339, "2021-04-16T12:24:16Z")
@@ -109,4 +111,26 @@ func TestTruncateStart(t *testing.T) {
 	assert.Equal(t, "...a greyhound for racing.", helpers.TruncateStart(longString, 20))
 	assert.Equal(t, "...y nag and a greyhound for racing.", helpers.TruncateStart(longString, 30))
 	assert.Equal(t, longString, helpers.TruncateStart(longString, 500))
+}
+
+func TestDict(t *testing.T) {
+	expected := map[string]interface{}{
+		"key1": 1,
+		"key2": "two",
+	}
+	dict, err := helpers.Dict("key1", 1, "key2", "two")
+	require.Nil(t, err)
+	assert.Equal(t, expected, dict)
+
+	dict, err = helpers.Dict("key1", 1, "key2")
+	assert.Equal(t, common.ErrInvalidParam, err)
+
+	dict, err = helpers.Dict(1, "key2")
+	assert.Equal(t, common.ErrWrongDataType, err)
+}
+
+func TestDefaultString(t *testing.T) {
+	assert.Equal(t, "---", helpers.DefaultString("", "---"))
+	assert.Equal(t, "---", helpers.DefaultString("  ", "---"))
+	assert.Equal(t, "birdy num num", helpers.DefaultString("birdy num num", "---"))
 }
