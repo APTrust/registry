@@ -27,6 +27,7 @@ func initTemplates(router *gin.Engine) {
 	router.SetFuncMap(template.FuncMap{
 		"dateTimeISO":    helpers.DateTimeISO,
 		"dateUS":         helpers.DateUS,
+		"dict":           helpers.Dict,
 		"escapeAttr":     helpers.EscapeAttr,
 		"escapeHTML":     helpers.EscapeHTML,
 		"humanSize":      helpers.HumanSize,

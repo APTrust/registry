@@ -1,7 +1,7 @@
 package web
 
 import (
-	"math"
+	"fmt"
 	"net/http"
 
 	"github.com/APTrust/registry/pgmodels"
@@ -131,35 +131,24 @@ func loadFiles(req *Request, objID int64) error {
 // thousands of file-level events. We'll get the first five, and let the
 // user page through from there.
 func loadEvents(req *Request, objID int64) error {
-	perPage := int(math.Min(float64(req.Auth.PerPage), 5))
+	baseURL := fmt.Sprintf("/objects/events/%d", objID)
+	pager, err := NewPager(req.GinContext, baseURL, 5)
+	if err != nil {
+		return err
+	}
 	eventQuery := pgmodels.NewQuery().
 		Where("intellectual_object_id", "=", objID).
 		IsNull("generic_file_id").
 		OrderBy("created_at desc").
-		Limit(perPage).
-		Offset(req.Auth.PagingOffset)
+		Limit(pager.PerPage).
+		Offset(pager.QueryOffset)
 	events, err := pgmodels.PremisEventSelect(eventQuery)
 	if err != nil {
 		return err
 	}
+	totalEventCount, err := pgmodels.ObjectEventCount(objID)
+	pager.SetCounts(totalEventCount, len(events))
 	req.TemplateData["events"] = events
-	eventCount, err := pgmodels.ObjectEventCount(objID)
-	req.TemplateData["eventsOffsetStart"] = req.Auth.PagingOffset + 1
-	req.TemplateData["eventsOffsetEnd"] = req.Auth.PagingOffset + len(events)
-	req.TemplateData["eventsCount"] = eventCount
-	req.TemplateData["eventsNextPage"] = req.Auth.Page + 1
-	req.TemplateData["eventsPreviousPage"] = req.Auth.Page - 1
-
-	// Need to fix this...
-	if req.TemplateData["object"] == nil {
-		req.TemplateData["object"] = &pgmodels.IntellectualObject{ID: objID}
-	}
-
-	if req.Auth.Page > 1 {
-		req.TemplateData["eventsShowLeftArrow"] = true
-	}
-	if eventCount > req.Auth.PagingOffset+perPage {
-		req.TemplateData["eventsShowRightArrow"] = true
-	}
+	req.TemplateData["eventPager"] = pager
 	return err
 }

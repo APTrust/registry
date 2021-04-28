@@ -119,6 +119,9 @@ func IconFor(str string) template.HTML {
 	return template.HTML(icon)
 }
 
+// TruncateStart trims str to maxLen by removing them from the
+// middle of the string. It adds dots to the middle of the string
+// to indicate text was trimmed.
 func TruncateMiddle(str string, maxLen int) string {
 	if len(str) <= maxLen {
 		return str
@@ -128,6 +131,9 @@ func TruncateMiddle(str string, maxLen int) string {
 	return str[0:half] + "..." + str[end:len(str)]
 }
 
+// TruncateStart trims str to maxLen by removing them from the
+// start of the string. It adds leading dots to indicate some
+// text was trimmed.
 func TruncateStart(str string, maxLen int) string {
 	if len(str) <= maxLen {
 		return str
@@ -137,4 +143,21 @@ func TruncateStart(str string, maxLen int) string {
 		end = 0
 	}
 	return "..." + str[end:len(str)]
+}
+
+// Dict returns an interface map suitable for passing into
+// sub templates.
+func Dict(values ...interface{}) (map[string]interface{}, error) {
+	if len(values)%2 != 0 {
+		return nil, common.ErrInvalidParam
+	}
+	dict := make(map[string]interface{}, len(values)/2)
+	for i := 0; i < len(values); i += 2 {
+		key, ok := values[i].(string)
+		if !ok {
+			return nil, common.ErrWrongDataType
+		}
+		dict[key] = values[i+1]
+	}
+	return dict, nil
 }

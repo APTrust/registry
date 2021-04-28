@@ -1,0 +1,18 @@
+{{ define "shared/_pager.html" }}
+
+<div class="row">
+  <div class="column column-100 center-text">
+    {{ .pager.ItemFirst }} - {{ .pager.ItemLast }} of {{ .pager.TotalItems }}
+  </div>
+</div>
+<div class="row">
+  {{ if .pager.PreviousLink }}
+  <div class="column column-50"><button type="button" class="button button-outline clickable" data-xhr-url="{{ .pager.PreviousLink }}" data-xhr-target="{{ .xhrTarget }}">&lt;</button></div>
+  {{ end }}
+
+  {{ if .pager.NextLink }}
+  <div class="column column-50"><button type="button" class="button button-outline clickable" data-xhr-url="{{ .pager.NextLink }}" data-xhr-target="{{ .xhrTarget }}">&gt;</button></div>
+  {{ end }}
+</div>
+
+{{ end }}
