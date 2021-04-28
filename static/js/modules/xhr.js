@@ -72,7 +72,7 @@ function deleteContent(elementId) {
 	}
 }
 
-function loadIntoElement(method, url, elementId) {
+export function loadIntoElement(method, url, elementId) {
 	load(method, "html", null, url, setContent(elementId))
 }
 

@@ -2,6 +2,14 @@
 
 {{ template "shared/_header.html" .}}
 
+<script>
+ function filterFiles() {
+     let filter = document.getElementById("fileFilter").value
+     let url = "/objects/files/{{ .object.ID }}/?file_filter=" + encodeURIComponent(filter)
+     APT.loadIntoElement("get", url, "objFileList")
+ }
+</script>
+
 <h1>{{ .object.Title }}</h1>
 
 <!-- https://bencoveney.github.io/Milligrid/#nesting -->
