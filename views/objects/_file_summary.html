@@ -23,7 +23,7 @@
           {{ end }}
               <td>{{ $stat.FileFormat }}</td>
               <td>{{ $stat.FileCount }}</td>
-              <td>{{ $stat.FileSize }}</td>
+              <td>{{ humanSize $stat.FileSize }}</td>
             </tr>
         {{ end }}
       </tbody>

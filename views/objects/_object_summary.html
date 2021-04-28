@@ -7,10 +7,10 @@
       <dd>{{ .object.Identifier }}</dd>
 
       <dt>Bag Group Identifier</dt>
-      <dd>{{ .object.BagGroupIdentifier }}</dd>
+      <dd>{{ defaultString .object.BagGroupIdentifier "---" }}</dd>
 
       <dt>Alt Identifier</dt>
-      <dd>{{ .object.AltIdentifier }}</dd>
+      <dd>{{ defaultString .object.AltIdentifier "---" }}</dd>
 
       <dt>File Count</dt>
       <dd>{{ .object.FileCount }}</dd>
@@ -40,7 +40,7 @@
 
     <dl>
       <dt>Description</dt>
-      <dd>{{ .object.Description }}</dd>
+      <dd>{{ defaultString .object.Description "---" }}</dd>
     </dl>
 
   </div>

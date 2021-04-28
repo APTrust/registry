@@ -3,6 +3,7 @@ package helpers
 import (
 	"fmt"
 	"html/template"
+	"strings"
 	"time"
 
 	"github.com/APTrust/registry/common"
@@ -160,4 +161,13 @@ func Dict(values ...interface{}) (map[string]interface{}, error) {
 		dict[key] = values[i+1]
 	}
 	return dict, nil
+}
+
+// DefaultString returns value if it's non-empty.
+// Otherwise, it returns _default.
+func DefaultString(value, _default string) string {
+	if len(strings.TrimSpace(value)) > 0 {
+		return value
+	}
+	return _default
 }
