@@ -100,14 +100,28 @@ func IntellectualObjectRestore(c *gin.Context) {
 	// TODO: Create a restoration WorkItem.
 }
 
+// This is called when user pages through events on the
+// intellectual object detail page. This returns an HTML
+// fragment, not an entire page.
 func IntellectualObjectEvents(c *gin.Context) {
-	// TODO: Create a restoration WorkItem.
 	req := NewRequest(c)
 	err := loadEvents(req, req.Auth.ResourceID)
 	if AbortIfError(c, err) {
 		return
 	}
 	c.HTML(http.StatusOK, "objects/_events.html", req.TemplateData)
+}
+
+// This is called when user pages through files on the
+// intellectual object detail page. This returns an HTML
+// fragment, not an entire page.
+func IntellectualObjectFiles(c *gin.Context) {
+	req := NewRequest(c)
+	err := loadFiles(req, req.Auth.ResourceID)
+	if AbortIfError(c, err) {
+		return
+	}
+	c.HTML(http.StatusOK, "objects/_file_list.html", req.TemplateData)
 }
 
 // Select max 20 files to start. Some objects have > 100k files, and
@@ -120,6 +134,7 @@ func loadFiles(req *Request, objID int64) error {
 	}
 	fileQuery := pgmodels.NewQuery().
 		Where("intellectual_object_id", "=", objID).
+		Where("state", "=", "A").
 		Relations("StorageRecords").
 		OrderBy("identifier").
 		Limit(pager.PerPage).

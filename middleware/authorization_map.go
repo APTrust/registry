@@ -77,6 +77,7 @@ var AuthMap = map[string]AuthMetadata{
 	"IntellectualObjectUpdate":           {"IntellectualObject", constants.IntellectualObjectUpdate},
 	"IntellectualObjectDelete":           {"IntellectualObject", constants.IntellectualObjectDelete},
 	"IntellectualObjectEvents":           {"PremisEvent", constants.EventRead},
+	"IntellectualObjectFiles":            {"PremisEvent", constants.GenericFileRead},
 	"IntellectualObjectRequestDelete":    {"IntellectualObject", constants.IntellectualObjectRequestDelete},
 	"IntellectualObjectInitDelete":       {"IntellectualObject", constants.IntellectualObjectRequestDelete},
 	"IntellectualObjectApproveDelete":    {"IntellectualObject", constants.IntellectualObjectApproveDelete},
