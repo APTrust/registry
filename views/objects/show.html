@@ -3,9 +3,9 @@
 {{ template "shared/_header.html" .}}
 
 <script>
- function filterFiles() {
+ function filterFiles(state) {
      let filter = document.getElementById("fileFilter").value
-     let url = "/objects/files/{{ .object.ID }}/?file_filter=" + encodeURIComponent(filter)
+     let url = "/objects/files/{{ .object.ID }}/?file_filter=" + encodeURIComponent(filter) + "&state=" + encodeURIComponent(state)
      APT.loadIntoElement("get", url, "objFileList")
  }
 </script>

@@ -72,7 +72,7 @@ func (gf *GenericFile) Save() error {
 
 // ObjectFileCount returns the number of active files with the specified
 // Intellectial Object ID.
-func ObjectFileCount(objID int64, filter string) (int, error) {
+func ObjectFileCount(objID int64, filter, state string) (int, error) {
 	if filter != "" {
 		db := common.Context().DB
 		likeFilter := fmt.Sprintf("%%%s%%", filter)
@@ -82,19 +82,20 @@ func ObjectFileCount(objID int64, filter string) (int, error) {
 		var result Result
 		idQuery := `select count(distinct(gf.id)) from generic_files gf
 		left join checksums cs on cs.generic_file_id = gf.id
-		where gf.intellectual_object_id = ? and state = 'A'
+		where gf.intellectual_object_id = ? and state = ?
 		and (gf.identifier like ? or cs.digest = ?)`
-		_, err := db.QueryOne(&result, idQuery, objID, likeFilter, filter)
+		_, err := db.QueryOne(&result, idQuery, objID, state, likeFilter, filter)
 		return result.Count, err
 	}
-	return common.Context().DB.Model((*GenericFile)(nil)).Where(`intellectual_object_id = ? and state = 'A'`, objID).Count()
+	return common.Context().DB.Model((*GenericFile)(nil)).Where(`intellectual_object_id = ? and state = ?`, objID, state).Count()
 }
 
 // Object files returns files belonging to an intellectual object.
 // This function is used to filter files on the IntellectualObjectShow page.
 // objID is the id of the object. filter is an optional file identifier or
-// checksum. offset and limit are for paging.
-func ObjectFiles(objID int64, filter string, offset, limit int) ([]*GenericFile, error) {
+// checksum. offset and limit are for paging. state is "A" for active (default)
+// or "D" for deleted.
+func ObjectFiles(objID int64, filter, state string, offset, limit int) ([]*GenericFile, error) {
 	db := common.Context().DB
 	var err error
 	var files []*GenericFile
@@ -109,12 +110,15 @@ func ObjectFiles(objID int64, filter string, offset, limit int) ([]*GenericFile,
 		var fileIds []*int
 		idQuery := `select distinct(gf.id) from generic_files gf
 		left join checksums cs on cs.generic_file_id = gf.id
-		where gf.intellectual_object_id = ? and state = 'A'
+		where gf.intellectual_object_id = ? and state = ?
 		and (gf.identifier like ? or cs.digest = ?)
 		order by gf.id offset ? limit ?`
-		_, err = db.Query(&fileIds, idQuery, objID, likeFilter, filter, offset, limit)
+		_, err = db.Query(&fileIds, idQuery, objID, state, likeFilter, filter, offset, limit)
 		if err != nil {
 			return nil, err
+		}
+		if len(fileIds) == 0 {
+			return files, err
 		}
 		err = db.Model(&files).Where("id in (?)", pg.In(fileIds)).Relation("StorageRecords").
 			Relation("Checksums", func(q *pg.Query) (*pg.Query, error) {
@@ -126,11 +130,11 @@ func ObjectFiles(objID int64, filter string, offset, limit int) ([]*GenericFile,
 	} else {
 		// If filter is empty, this query is much simpler.
 		// Just get all active files.
-		err = db.Model(&files).Where("intellectual_object_id = ? and state = 'A'", objID).
+		err = db.Model(&files).Where("intellectual_object_id = ? and state = ?", objID, state).
 			Relation("StorageRecords").
 			Relation("Checksums", func(q *pg.Query) (*pg.Query, error) {
 				return q.Order("datetime desc").Order("algorithm asc"), nil
-			}).Select()
+			}).Limit(limit).Offset(offset).Select()
 		if err != nil {
 			return nil, err
 		}
