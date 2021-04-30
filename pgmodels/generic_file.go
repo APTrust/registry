@@ -116,21 +116,21 @@ func ObjectFiles(objID int64, filter string, offset, limit int) ([]*GenericFile,
 		if err != nil {
 			return nil, err
 		}
-		err = db.Model(&files).Where("id in (?)", pg.In(fileIds)).Relation("StorageRecords").Relation("Checksums").Select()
+		err = db.Model(&files).Where("id in (?)", pg.In(fileIds)).Relation("StorageRecords").
+			Relation("Checksums", func(q *pg.Query) (*pg.Query, error) {
+				return q.Order("datetime desc").Order("algorithm asc"), nil
+			}).Select()
 		if err != nil {
 			return nil, err
 		}
 	} else {
 		// If filter is empty, this query is much simpler.
 		// Just get all active files.
-		fileQuery := NewQuery().
-			Where("intellectual_object_id", "=", objID).
-			Where("state", "=", "A").
-			Relations("StorageRecords", "Checksums").
-			OrderBy("identifier").
-			Limit(limit).
-			Offset(offset)
-		files, err = GenericFileSelect(fileQuery)
+		err = db.Model(&files).Where("intellectual_object_id = ? and state = 'A'", objID).
+			Relation("StorageRecords").
+			Relation("Checksums", func(q *pg.Query) (*pg.Query, error) {
+				return q.Order("datetime desc").Order("algorithm asc"), nil
+			}).Select()
 		if err != nil {
 			return nil, err
 		}
