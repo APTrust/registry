@@ -139,7 +139,7 @@ func loadFiles(req *Request, objID int64) error {
 	if err != nil {
 		return err
 	}
-	totalFileCount, err := pgmodels.ObjectFileCount(objID)
+	totalFileCount, err := pgmodels.ObjectFileCount(objID, fileFilter)
 	pager.SetCounts(totalFileCount, len(files))
 	req.TemplateData["files"] = files
 	req.TemplateData["filePager"] = pager

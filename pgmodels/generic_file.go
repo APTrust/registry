@@ -72,7 +72,21 @@ func (gf *GenericFile) Save() error {
 
 // ObjectFileCount returns the number of active files with the specified
 // Intellectial Object ID.
-func ObjectFileCount(objID int64) (int, error) {
+func ObjectFileCount(objID int64, filter string) (int, error) {
+	if filter != "" {
+		db := common.Context().DB
+		likeFilter := fmt.Sprintf("%%%s%%", filter)
+		type Result struct {
+			Count int
+		}
+		var result Result
+		idQuery := `select count(distinct(gf.id)) from generic_files gf
+		left join checksums cs on cs.generic_file_id = gf.id
+		where gf.intellectual_object_id = ? and state = 'A'
+		and (gf.identifier like ? or cs.digest = ?)`
+		_, err := db.QueryOne(&result, idQuery, objID, likeFilter, filter)
+		return result.Count, err
+	}
 	return common.Context().DB.Model((*GenericFile)(nil)).Where(`intellectual_object_id = ? and state = 'A'`, objID).Count()
 }
 
