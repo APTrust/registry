@@ -199,7 +199,7 @@ func (user *User) Validate() *common.ValidationError {
 		errors["EncryptedPassword"] = ErrUserPwdMissing
 	}
 	if len(errors) > 0 {
-		return &common.ValidationError{errors}
+		return &common.ValidationError{Errors: errors}
 	}
 	return nil
 }

@@ -174,7 +174,7 @@ func (inst *Institution) Validate() *common.ValidationError {
 		errors["MemberInstitutionID"] = ErrInstMemberID
 	}
 	if len(errors) > 0 {
-		return &common.ValidationError{errors}
+		return &common.ValidationError{Errors: errors}
 	}
 	return nil
 }
