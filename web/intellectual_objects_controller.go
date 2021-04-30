@@ -3,6 +3,7 @@ package web
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/gin-gonic/gin"
@@ -132,28 +133,9 @@ func loadFiles(req *Request, objID int64) error {
 	if err != nil {
 		return err
 	}
-	fileQuery := pgmodels.NewQuery().
-		Where("intellectual_object_id", "=", objID).
-		Where("state", "=", "A").
-		Relations("StorageRecords", "Checksums").
-		OrderBy("identifier").
-		Limit(pager.PerPage).
-		Offset(pager.QueryOffset)
 
-	//
-	// This query won't work as is.
-	// See https://pg.uptrace.dev/orm/has-many-relation/
-	//
-
-	// fileFilter := req.GinContext.Query("file_filter")
-	// if fileFilter != "" {
-	// 	cols := []string{"identifier", "checksum.digest"}
-	// 	ops := []string{"ilike", "="}
-	// 	vals := []interface{}{fmt.Sprintf("%%%s%%", fileFilter), fileFilter}
-	// 	fileQuery.Or(cols, ops, vals)
-	// }
-
-	files, err := pgmodels.GenericFileSelect(fileQuery)
+	fileFilter := strings.TrimSpace(req.GinContext.Query("file_filter"))
+	files, err := pgmodels.ObjectFiles(objID, fileFilter, pager.QueryOffset, pager.PerPage)
 	if err != nil {
 		return err
 	}

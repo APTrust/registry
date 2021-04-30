@@ -1,9 +1,11 @@
 package pgmodels
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/APTrust/registry/common"
+	"github.com/go-pg/pg/v10"
 )
 
 type GenericFile struct {
@@ -70,6 +72,54 @@ func (gf *GenericFile) Save() error {
 
 // ObjectFileCount returns the number of active files with the specified
 // Intellectial Object ID.
-func ObjectFileCount(intellectualObjectID int64) (int, error) {
-	return common.Context().DB.Model((*GenericFile)(nil)).Where(`intellectual_object_id = ? and state = 'A'`, intellectualObjectID).Count()
+func ObjectFileCount(objID int64) (int, error) {
+	return common.Context().DB.Model((*GenericFile)(nil)).Where(`intellectual_object_id = ? and state = 'A'`, objID).Count()
+}
+
+// Object files returns files belonging to an intellectual object.
+// This function is used to filter files on the IntellectualObjectShow page.
+// objID is the id of the object. filter is an optional file identifier or
+// checksum. offset and limit are for paging.
+func ObjectFiles(objID int64, filter string, offset, limit int) ([]*GenericFile, error) {
+	db := common.Context().DB
+	var err error
+	var files []*GenericFile
+
+	// If we have a string filter, try to match on partial file name
+	// or exact checksum value. First get the ids, then return the whole
+	// records. Sorting here gets tricky because the sort column must
+	// be included in the query while we're using distinct. To sort, we'd
+	// need to create a custom struct with id and sort column fields.
+	if filter != "" {
+		likeFilter := fmt.Sprintf("%%%s%%", filter)
+		var fileIds []*int
+		idQuery := `select distinct(gf.id) from generic_files gf
+		left join checksums cs on cs.generic_file_id = gf.id
+		where gf.intellectual_object_id = ? and state = 'A'
+		and (gf.identifier like ? or cs.digest = ?)
+		order by gf.id offset ? limit ?`
+		_, err = db.Query(&fileIds, idQuery, objID, likeFilter, filter, offset, limit)
+		if err != nil {
+			return nil, err
+		}
+		err = db.Model(&files).Where("id in (?)", pg.In(fileIds)).Relation("StorageRecords").Relation("Checksums").Select()
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		// If filter is empty, this query is much simpler.
+		// Just get all active files.
+		fileQuery := NewQuery().
+			Where("intellectual_object_id", "=", objID).
+			Where("state", "=", "A").
+			Relations("StorageRecords", "Checksums").
+			OrderBy("identifier").
+			Limit(limit).
+			Offset(offset)
+		files, err = GenericFileSelect(fileQuery)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return files, err
 }
