@@ -108,6 +108,8 @@ func initRoutes(router *gin.Engine) {
 		// GenericFiles
 		webRoutes.GET("/files", web.GenericFileIndex)
 		webRoutes.GET("/files/show/:id", web.GenericFileShow)
+		webRoutes.GET("/files/request_delete/:id", web.GenericFileRequestDelete)
+		webRoutes.GET("/files/request_restore/:id", web.GenericFileRequestRestore)
 		webRoutes.GET("/files/delete/:id", web.GenericFileDelete)
 		webRoutes.GET("/files/restore/:id", web.GenericFileRestore)
 

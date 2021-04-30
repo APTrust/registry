@@ -63,7 +63,7 @@
                 </tbody>
               </table>
 
-                <h3>Checksums</h3>
+              <h3>Checksums</h3>
               <table>
                 <thead>
                   <tr>
@@ -83,6 +83,15 @@
                 </tbody>
               </table>
               </p>
+
+              <div class="float-left">
+                <button class="button button-outline" data-modal="modal-one" data-xhr-url="/files/request_delete/{{ $file.ID }}">Delete File</button>
+              </div>
+              <div class="float-right">
+                <button class="button button-outline" data-modal="modal-one" data-xhr-url="/files/request_restore/{{ $file.ID }}">Restore File</button>
+              </div>
+
+
             </div>
           </td>
         </tr>
