@@ -83,4 +83,32 @@ The system creates a Restore or Glacier Restore WorkItem and queues the WorkItem
 
 Note that spot tests are for object restoration only, not for file restoration. Part of the purpose of the spot tests is to ensure that all files are restored and that the BagIt package is complete and correct.
 
-**TODO:** Add a column to the institutions table to indicate whether spot test restorations are on or off.
+# Alerts
+
+**TODO:** How is the current system finding these? Storing them? Sending them?
+
+# Restructuring Database Tables
+
+The Pharos database includes a number of tables to track emails and the items emails are related to. Some of these tables should be consolidated, and we need to preserve the data from legacy tables, possibly as a simple set of JSON records.
+
+The existing Pharos tables include:
+
+* bulk_delete_jobs - This tracks requestor and approver information for bulk delete jobs.
+* bulk_delete_jobs_emails - Maps one bulk delete job to many recipient emails.
+* bulk_delete_jobs_generic_files - Maps one bulk delete job to many files (files to be deleted).
+* bulk_delete_jobs_institutions - Maps one bulk delete job to many institutions. _This table probably shouldn't exist because a bulk delete job can only belong to one institution._
+* bulk_delete_jobs_intellectual_objects - Maps one bulk delete job to many objects (objects to be deleted).
+* confirmation_tokens - Associates a unique confirmation token with a user, institution, object and/or generic file. These tokens are used to confirm deletions. Not sure why this is in its own table, or why it does not include a bulk deletion job id column.
+* emails - Contains email body, type, recipient list and other info used by a cron job to construct and send emails. _This table needs review._
+* emails_generic_files - Associates emails with generic files. **Why? Alerts?**
+* emails_intellectual_objects - Associates emails with intellectual objects. **Why? Alerts?**
+* emails_premis_events - Associates emails with generic files. **Why? Alerts?**
+* emails_work_items - Associates emails with work items. **Why? Alerts?**
+
+
+## Other Database Tables to Examine
+
+* old_passwords - Tracks old passwords so users can't re-use them. Do we still need this? Are we still forcing user to reset passwords?
+* schema_migrations - Rails-specific table to track DB migrations.
+* snapshots - This is probably meant to track deposits by depositors over time. Mostly useless.
+* usage_samples - No idea what this is.
