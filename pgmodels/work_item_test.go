@@ -196,4 +196,43 @@ func TestWorkItemsPendingForObject(t *testing.T) {
 func TestWorkItemsPendingForFile(t *testing.T) {
 	db.LoadFixtures()
 
+	// File 1 from fixtures is institution1.edu/photos/picture1
+	item := &pgmodels.WorkItem{
+		Name:                 "photos.tar",
+		ETag:                 "99995678901234567890123456789999",
+		InstitutionID:        1,
+		IntellectualObjectID: 1,
+		GenericFileID:        1,
+		User:                 "system@aptrust.org",
+		Bucket:               "aptrust.receiving.test.test.edu",
+		Action:               constants.ActionRestore,
+		Stage:                constants.StageRequested,
+		Status:               constants.StatusPending,
+		Note:                 "Test restoration item (file)",
+		Outcome:              "Item is pending",
+		BagDate:              TestDate,
+		DateProcessed:        TestDate,
+		Retry:                true,
+		Size:                 8000,
+	}
+	err := item.Save()
+	require.Nil(t, err)
+
+	// This should get the item above
+	itemsInProgress, err := pgmodels.WorkItemsPendingForFile(1)
+	require.Nil(t, err)
+	require.Equal(t, 1, len(itemsInProgress))
+
+	item = itemsInProgress[0]
+	item.Stage = constants.StageAvailableInS3
+	item.Status = constants.StatusSuccess
+	item.Note = "This thing is done. Look in S3."
+	err = item.Save()
+	require.Nil(t, err)
+
+	// It should not come back this time because it has a completed status.
+	itemsInProgress, err = pgmodels.WorkItemsPendingForFile(1)
+	require.Nil(t, err)
+	assert.Equal(t, 0, len(itemsInProgress))
+
 }

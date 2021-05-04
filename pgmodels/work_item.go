@@ -123,7 +123,6 @@ func WorkItemsPendingForObject(instID int64, bagName string) ([]*WorkItem, error
 		Where("name", "=", bagName).
 		WhereNotIn("status", completed...).
 		OrderBy(`date_processed desc`)
-	fmt.Println(query.WhereClause(), query.Params())
 	return WorkItemSelect(query)
 }
 
@@ -133,7 +132,7 @@ func WorkItemsPendingForFile(fileID int64) ([]*WorkItem, error) {
 	completed := common.InterfaceList(constants.CompletedStatusValues)
 	query := NewQuery().Where("generic_file_id", "=", fileID).
 		WhereNotIn("status", completed...).
-		OrderBy(`"work_item"."date_processed" desc`)
+		OrderBy(`date_processed desc`)
 	return WorkItemSelect(query)
 }
 
