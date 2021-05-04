@@ -85,7 +85,18 @@ Note that spot tests are for object restoration only, not for file restoration. 
 
 # Alerts
 
-**TODO:** How is the current system finding these? Storing them? Sending them?
+Pharos includes an alerts page that queries for specific items such as failed fixity checks, stalled work items, etc. It queries mostly for items in the past 24 hours and does not proactively alert anyone about any of these problems.
+
+The Registry's alert system should do the following:
+
+* Put alerts into a database table, so we have a record of them. The table should include:
+    * Who is to be alerted.
+    * What the alert is about - at least a type, like "Failed Fixities," "Stalled Work Items," etc.
+    * Whether the alert has been read.
+* The registry should display unread alerts when a user logs in.
+* The registry may email a weekly digest of alerts to users.
+
+Consider having a shared alerts table, since some alert types should go to more than one user at an institution. E.g. Fixity and stalled work item alerts.
 
 # Restructuring Database Tables
 
@@ -96,19 +107,20 @@ The existing Pharos tables include:
 * bulk_delete_jobs - This tracks requestor and approver information for bulk delete jobs.
 * bulk_delete_jobs_emails - Maps one bulk delete job to many recipient emails.
 * bulk_delete_jobs_generic_files - Maps one bulk delete job to many files (files to be deleted).
-* bulk_delete_jobs_institutions - Maps one bulk delete job to many institutions. _This table probably shouldn't exist because a bulk delete job can only belong to one institution._
+* bulk_delete_jobs_institutions - Maps one bulk delete job to many institutions. _This table probably shouldn't exist because a bulk delete job can only belong to one institution._ This table is empty in production and can probably be deleted.
 * bulk_delete_jobs_intellectual_objects - Maps one bulk delete job to many objects (objects to be deleted).
 * confirmation_tokens - Associates a unique confirmation token with a user, institution, object and/or generic file. These tokens are used to confirm deletions. Not sure why this is in its own table, or why it does not include a bulk deletion job id column.
-* emails - Contains email body, type, recipient list and other info used by a cron job to construct and send emails. _This table needs review._
-* emails_generic_files - Associates emails with generic files. **Why? Alerts?**
-* emails_intellectual_objects - Associates emails with intellectual objects. **Why? Alerts?**
-* emails_premis_events - Associates emails with generic files. **Why? Alerts?**
-* emails_work_items - Associates emails with work items. **Why? Alerts?**
+* emails - Contains email body, type, recipient list and other info used by a cron job to construct and send emails.
+* emails_generic_files - Associates emails with generic files. Why? Table is empty in production DB. Can probably be deleted.
+* emails_intellectual_objects - Associates emails with intellectual objects. Why? Table is empty in production DB. Can probably be deleted.
+* emails_premis_events - Associates emails with generic files. Why? Table is empty in production DB. Can probably be deleted.
+* emails_work_items - Associates emails with work items. Why? Table is empty in production DB. Can probably be deleted.
 
 
 ## Other Database Tables to Examine
 
+* ar_internal_metadata - ActiveRecord internal metadata. Contains a single row of data describing the Rails environment name. Can be deleted after we're in production and stable.
 * old_passwords - Tracks old passwords so users can't re-use them. Do we still need this? Are we still forcing user to reset passwords?
-* schema_migrations - Rails-specific table to track DB migrations.
-* snapshots - This is probably meant to track deposits by depositors over time. Mostly useless.
-* usage_samples - No idea what this is.
+* schema_migrations - Rails-specific table to track DB migrations. We can get rid of this after we're stable in production.
+* snapshots - This is probably meant to track deposits by depositors over time. Contains data but is probably useless because it doesn't break deposits down by type. Should be superseded by on-demand reporting, but don't delete this table, since we may need to look back at historical data.
+* usage_samples - No idea what this is. The table has no data in the production DB, so we probably don't need to keep it.
