@@ -123,7 +123,7 @@ func (pf *ParamFilter) AddToQuery(q *pgmodels.Query) error {
 	case "not_null":
 		q.IsNotNull(pf.Column)
 	case "in":
-		q.WithAny(pf.Column, pf.InterfaceValues()...)
+		q.WhereIn(pf.Column, pf.InterfaceValues()...)
 	default:
 		return fmt.Errorf("Invalid query string param '%s': unknown operator '%s'", pf.Key, pf.RawOp)
 	}

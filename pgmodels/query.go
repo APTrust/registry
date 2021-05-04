@@ -17,6 +17,7 @@ var QueryOp = map[string]string{
 	"starts_with": "ILIKE",
 	"contains":    "ILIKE",
 	"in":          "IN",
+	"not_in":      "NOT IN",
 	"is_null":     "IS NULL",
 	"not_null":    "IS NOT NULL",
 }
@@ -98,10 +99,18 @@ func (q *Query) BetweenExclusive(col string, low, high interface{}) *Query {
 	return q
 }
 
-func (q *Query) WithAny(col string, vals ...interface{}) *Query {
+func (q *Query) WhereIn(col string, vals ...interface{}) *Query {
+	return q.inOrNotIn(col, "IN", vals...)
+}
+
+func (q *Query) WhereNotIn(col string, vals ...interface{}) *Query {
+	return q.inOrNotIn(col, "NOT IN", vals...)
+}
+
+func (q *Query) inOrNotIn(col, op string, vals ...interface{}) *Query {
 	if len(vals) > 0 {
 		paramStr := q.MakePlaceholders(len(q.params), len(vals))
-		cond := fmt.Sprintf(`(%s IN (%s))`, col, paramStr)
+		cond := fmt.Sprintf(`(%s %s (%s))`, col, op, paramStr)
 		q.conditions = append(q.conditions, cond)
 		q.params = append(q.params, vals...)
 	}
@@ -173,11 +182,11 @@ func (q *Query) GetOrderBy() []string {
 	return q.orderBy
 }
 
-func (q *Query) OrderBy(orderBy ...string) *Query {
-	q.orderBy = make([]string, len(orderBy))
-	for i, order := range orderBy {
-		q.orderBy[i] = order
+func (q *Query) OrderBy(colAndDirection string) *Query {
+	if q.orderBy == nil {
+		q.orderBy = make([]string, 0)
 	}
+	q.orderBy = append(q.orderBy, colAndDirection)
 	return q
 }
 

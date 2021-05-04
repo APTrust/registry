@@ -113,7 +113,7 @@ func TestMakePlaceholders(t *testing.T) {
 
 func TestWithAny(t *testing.T) {
 	q := pgmodels.NewQuery()
-	q.WithAny("col12", []interface{}{1, 2, 3, 4}...)
+	q.WhereIn("col12", []interface{}{1, 2, 3, 4}...)
 	assert.Equal(t, `(col12 IN (?, ?, ?, ?))`, q.WhereClause())
 	assert.Equal(t, 4, len(q.Params()))
 }
@@ -132,7 +132,7 @@ func TestWithMultipleConditions(t *testing.T) {
 	vals := []interface{}{"val1", "val2", "val3"}
 	q.Or(cols, ops, vals)
 
-	q.WithAny("col12", []interface{}{1, 2, 3, 4}...)
+	q.WhereIn("col12", []interface{}{1, 2, 3, 4}...)
 	q.IsNull("col99")
 
 	assert.Equal(t, `(org_id = ?) AND (name = ?) AND (active = ?) AND (created_at >= ?) AND (age >= ? AND age <= ?) AND (col1 = ? OR col2 < ? OR col3 > ?) AND (col12 IN (?, ?, ?, ?)) AND (col99 is null)`, q.WhereClause())

@@ -56,29 +56,29 @@ type WorkItem struct {
 	ID                   int64     `json:"id" pg:"id"`
 	Name                 string    `json:"name" pg:"name"`
 	ETag                 string    `json:"etag" pg:"etag"`
-	InstitutionID        int64     `json:"institution_id" pg:"institution_id"`
-	IntellectualObjectID int64     `json:"intellectual_object_id" pg:"intellectual_object_id"`
-	GenericFileID        int64     `json:"generic_file_id" pg:"generic_file_id"`
-	Bucket               string    `json:"bucket" pg:"bucket"`
-	User                 string    `json:"user" pg:"user"`
-	Note                 string    `json:"note" pg:"note"`
-	Action               string    `json:"action" pg:"action"`
-	Stage                string    `json:"stage" pg:"stage"`
-	Status               string    `json:"status" pg:"status"`
-	Outcome              string    `json:"outcome" pg:"outcome"`
-	BagDate              time.Time `json:"bag_date" pg:"bag_date"`
-	DateProcessed        time.Time `json:"date_processed" pg:"date_processed"`
-	Retry                bool      `json:"retry" pg:"retry,use_zero"`
-	Node                 string    `json:"node" pg:"node"`
-	PID                  int       `json:"pid" pg:"pid"`
-	NeedsAdminReview     bool      `json:"needs_admin_review" pg:"needs_admin_review,use_zero"`
-	QueuedAt             time.Time `json:"queued_at" pg:"queued_at"`
-	Size                 int64     `json:"size" pg:"size"`
-	StageStartedAt       time.Time `json:"stage_started_at" pg:"stage_started_at"`
+	InstitutionID        int64     `json:"institution_id"`
+	IntellectualObjectID int64     `json:"intellectual_object_id"`
+	GenericFileID        int64     `json:"generic_file_id"`
+	Bucket               string    `json:"bucket"`
+	User                 string    `json:"user"`
+	Note                 string    `json:"note"`
+	Action               string    `json:"action"`
+	Stage                string    `json:"stage"`
+	Status               string    `json:"status"`
+	Outcome              string    `json:"outcome"`
+	BagDate              time.Time `json:"bag_date"`
+	DateProcessed        time.Time `json:"date_processed"`
+	Retry                bool      `json:"retry" pg:",use_zero"`
+	Node                 string    `json:"node"`
+	PID                  int       `json:"pid"`
+	NeedsAdminReview     bool      `json:"needs_admin_review" pg:",use_zero"`
+	QueuedAt             time.Time `json:"queued_at"`
+	Size                 int64     `json:"size"`
+	StageStartedAt       time.Time `json:"stage_started_at"`
 	APTrustApprover      string    `json:"aptrust_approver" pg:"aptrust_approver"`
-	InstApprover         string    `json:"inst_approver" pg:"inst_approver"`
-	CreatedAt            time.Time `json:"created_at" pg:"created_at"`
-	UpdatedAt            time.Time `json:"updated_at" pg:"updated_at"`
+	InstApprover         string    `json:"inst_approver"`
+	CreatedAt            time.Time `json:"created_at"`
+	UpdatedAt            time.Time `json:"updated_at"`
 }
 
 // WorkItemByID returns the work item with the specified id.
@@ -100,6 +100,41 @@ func WorkItemSelect(query *Query) ([]*WorkItem, error) {
 	var items []*WorkItem
 	err := query.Select(&items)
 	return items, err
+}
+
+// WorkItemsPendingForObject returns a list of in-progress WorkItems
+// for the IntellectualObject with the specified institution ID and
+// bag name. We don't use an IntellectualObjectID here because when
+// we're ingesting or re-ingesting an object, the WorkItem won't have
+// an ObjectID until the ingest/re-ingest is complete.
+//
+// This method is called before initializing a new restoration or deletion
+// request. We specifically want to avoid the case where a user requests a
+// restoration or deletion on an object that is about to be reingested.
+// If that were to happen, the delete worker would be deleting files
+// that an ingest worker just wrote. Or the ingest worker would be
+// overwriting files that the restore worker was trying to restore.
+//
+// Pharos queried by object id, which was a mistake that would not
+// catch re-ingests. This corrects that.
+func WorkItemsPendingForObject(instID int64, bagName string) ([]*WorkItem, error) {
+	completed := common.InterfaceList(constants.CompletedStatusValues)
+	query := NewQuery().Where("institution_id", "=", instID).
+		Where("name", "=", bagName).
+		WhereNotIn("status", completed...).
+		OrderBy(`date_processed desc`)
+	fmt.Println(query.WhereClause(), query.Params())
+	return WorkItemSelect(query)
+}
+
+// WorkItemsPendingForFile returns a list of in-progress WorkItems
+// for the GenericFile with the specified ID.
+func WorkItemsPendingForFile(fileID int64) ([]*WorkItem, error) {
+	completed := common.InterfaceList(constants.CompletedStatusValues)
+	query := NewQuery().Where("generic_file_id", "=", fileID).
+		WhereNotIn("status", completed...).
+		OrderBy(`"work_item"."date_processed" desc`)
+	return WorkItemSelect(query)
 }
 
 // GetID returns this item's ID.

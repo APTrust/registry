@@ -10,77 +10,77 @@ import (
 )
 
 var valid = []*web.ParamFilter{
-	&web.ParamFilter{
+	{
 		Key:    "name__eq",
 		Column: "name",
 		RawOp:  "eq",
 		SQLOp:  "=",
 		Values: []string{"Homer"},
 	},
-	&web.ParamFilter{
+	{
 		Key:    "name__ne",
 		Column: "name",
 		RawOp:  "ne",
 		SQLOp:  "!=",
 		Values: []string{"Homer"},
 	},
-	&web.ParamFilter{
+	{
 		Key:    "age__gt",
 		Column: "age",
 		RawOp:  "gt",
 		SQLOp:  ">",
 		Values: []string{"38"},
 	},
-	&web.ParamFilter{
+	{
 		Key:    "age__gteq",
 		Column: "age",
 		RawOp:  "gteq",
 		SQLOp:  ">=",
 		Values: []string{"38"},
 	},
-	&web.ParamFilter{
+	{
 		Key:    "age__lt",
 		Column: "age",
 		RawOp:  "lt",
 		SQLOp:  "<",
 		Values: []string{"38"},
 	},
-	&web.ParamFilter{
+	{
 		Key:    "age__lteq",
 		Column: "age",
 		RawOp:  "lteq",
 		SQLOp:  "<=",
 		Values: []string{"38"},
 	},
-	&web.ParamFilter{
+	{
 		Key:    "name__starts_with",
 		Column: "name",
 		RawOp:  "starts_with",
 		SQLOp:  "ILIKE",
 		Values: []string{"Simpson"},
 	},
-	&web.ParamFilter{
+	{
 		Key:    "name__contains",
 		Column: "name",
 		RawOp:  "contains",
 		SQLOp:  "ILIKE",
 		Values: []string{"Simpson"},
 	},
-	&web.ParamFilter{
+	{
 		Key:    "name__is_null",
 		Column: "name",
 		RawOp:  "is_null",
 		SQLOp:  "IS NULL",
 		Values: []string{"true"},
 	},
-	&web.ParamFilter{
+	{
 		Key:    "name__not_null",
 		Column: "name",
 		RawOp:  "not_null",
 		SQLOp:  "IS NOT NULL",
 		Values: []string{"true"},
 	},
-	&web.ParamFilter{
+	{
 		Key:    "name__in",
 		Column: "name",
 		RawOp:  "in",
@@ -90,7 +90,7 @@ var valid = []*web.ParamFilter{
 }
 
 var invalid = []*web.ParamFilter{
-	&web.ParamFilter{
+	{
 		Key:    "name__xyz",
 		Column: "name",
 		RawOp:  "xyz",
@@ -123,7 +123,7 @@ func expectedQuery(index int) *pgmodels.Query {
 	case 9:
 		q.IsNotNull("name")
 	case 10:
-		q.WithAny("name", []interface{}{"Bart", "Lisa", "Maggie"}...)
+		q.WhereIn("name", []interface{}{"Bart", "Lisa", "Maggie"}...)
 	}
 	return q
 }

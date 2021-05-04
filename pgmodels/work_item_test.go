@@ -148,3 +148,52 @@ func TestWorkItemSetForRequeue(t *testing.T) {
 	require.NotNil(t, err)
 	assert.ErrorIs(t, err, common.ErrInvalidRequeue)
 }
+
+func TestWorkItemsPendingForObject(t *testing.T) {
+	db.LoadFixtures()
+
+	item := &pgmodels.WorkItem{
+		Name:          "pending.tar",
+		ETag:          "12345678901234567890123456789022",
+		InstitutionID: 4,
+		User:          "system@aptrust.org",
+		Bucket:        "aptrust.receiving.test.test.edu",
+		Action:        constants.ActionIngest,
+		Stage:         constants.StageStore,
+		Status:        constants.StatusStarted,
+		Note:          "Item is being stored.",
+		Outcome:       "I said item is being stored.",
+		BagDate:       TestDate,
+		DateProcessed: TestDate,
+		Retry:         true,
+		Size:          8000,
+	}
+	err := item.Save()
+	require.Nil(t, err)
+
+	// Should return nothing, because inst ID doesn't match.
+	itemsInProgress, err := pgmodels.WorkItemsPendingForObject(3, "pending.tar")
+	require.Nil(t, err)
+	assert.Equal(t, 0, len(itemsInProgress))
+
+	// This should get the item above
+	itemsInProgress, err = pgmodels.WorkItemsPendingForObject(4, "pending.tar")
+	require.Nil(t, err)
+	assert.Equal(t, 1, len(itemsInProgress))
+
+	item = itemsInProgress[0]
+	item.Status = constants.StatusCancelled
+	err = item.Save()
+	require.Nil(t, err)
+
+	// It should not come back this time because it has a completed status.
+	itemsInProgress, err = pgmodels.WorkItemsPendingForObject(4, "pending.tar")
+	require.Nil(t, err)
+	assert.Equal(t, 0, len(itemsInProgress))
+
+}
+
+func TestWorkItemsPendingForFile(t *testing.T) {
+	db.LoadFixtures()
+
+}
