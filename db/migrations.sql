@@ -105,3 +105,7 @@ drop index if exists index_premis_events_on_identifier_and_institution_id;
 create unique index if not exists index_institutions_identifier on public.institutions using btree(identifier);
 create unique index if not exists index_institutions_receiving_bucket on public.institutions using btree(receiving_bucket);
 create unique index if not exists index_institutions_restore_bucket on public.institutions using btree(restore_bucket);
+
+-- Allow institutions to turn spot restoration tests on or off.
+-- Default is off.
+alter table institutions add column if not exists enable_spot_restore boolean not null default false;

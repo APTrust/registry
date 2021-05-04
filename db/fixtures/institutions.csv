@@ -1,6 +1,6 @@
-"id","name","identifier","created_at","updated_at","state","type","member_institution_id","deactivated_at","otp_enabled","receiving_bucket","restore_bucket"
-1,APTrust,aptrust.org,2021-01-12 17:14:35,2021-01-12 17:14:35,A,,,,,aptrust.receiving.test.aptrust.org,aptrust.restore.test.aptrust.org
-2,Institution One,institution1.edu,2021-01-12 17:14:35,2021-01-12 17:14:35,A,MemberInstitution,,,,aptrust.receiving.test.institution1.edu,aptrust.restore.test.institution1.edu
-3,Institution Two,institution2.edu,2021-01-12 17:14:35,2021-01-12 17:14:35,A,MemberInstitution,,,,aptrust.receiving.test.institution2.edu,aptrust.restore.test.institution2.edu
-4,Test Institution (for integration tests),test.edu,2021-01-12 17:14:35,2021-01-12 17:14:35,A,MemberInstitution,,,,aptrust.receiving.test.test.edu,aptrust.restore.test.test.edu
-5,Example Institution (for integration tests),example.edu,2021-01-12 17:14:35,2021-01-12 17:14:35,A,MemberInstitution,,,,aptrust.receiving.test.example.edu,aptrust.restore.test.example.edu
+"id","name","identifier","created_at","updated_at","state","type","member_institution_id","deactivated_at","otp_enabled","enable_spot_restore","receiving_bucket","restore_bucket"
+1,APTrust,aptrust.org,2021-01-12 17:14:35,2021-01-12 17:14:35,A,,,,,false,aptrust.receiving.test.aptrust.org,aptrust.restore.test.aptrust.org
+2,Institution One,institution1.edu,2021-01-12 17:14:35,2021-01-12 17:14:35,A,MemberInstitution,,,,true,aptrust.receiving.test.institution1.edu,aptrust.restore.test.institution1.edu
+3,Institution Two,institution2.edu,2021-01-12 17:14:35,2021-01-12 17:14:35,A,MemberInstitution,,,,true,aptrust.receiving.test.institution2.edu,aptrust.restore.test.institution2.edu
+4,Test Institution (for integration tests),test.edu,2021-01-12 17:14:35,2021-01-12 17:14:35,A,MemberInstitution,,,,true,aptrust.receiving.test.test.edu,aptrust.restore.test.test.edu
+5,Example Institution (for integration tests),example.edu,2021-01-12 17:14:35,2021-01-12 17:14:35,A,MemberInstitution,,,,false,aptrust.receiving.test.example.edu,aptrust.restore.test.example.edu

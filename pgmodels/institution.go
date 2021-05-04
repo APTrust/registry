@@ -28,18 +28,19 @@ var InstitutionFilters = []string{
 }
 
 type Institution struct {
-	ID                  int64     `json:"id" form:"id" pg:"id"`
-	Name                string    `json:"name" pg:"name"`
-	Identifier          string    `json:"identifier" pg:"identifier"`
-	State               string    `json:"state" pg:"state"`
-	Type                string    `json:"type" pg:"type"`
-	MemberInstitutionID int64     `json:"member_institution_id" pg:"member_institution_id"`
-	DeactivatedAt       time.Time `json:"deactivated_at" pg:"deactivated_at"`
-	OTPEnabled          bool      `json:"otp_enabled" pg:"otp_enabled"`
-	ReceivingBucket     string    `json:"receiving_bucket" pg:"receiving_bucket"`
-	RestoreBucket       string    `json:"restore_bucket" pg:"restore_bucket"`
-	CreatedAt           time.Time `json:"created_at" pg:"created_at"`
-	UpdatedAt           time.Time `json:"updated_at" pg:"updated_at"`
+	ID                  int64     `json:"id"`
+	Name                string    `json:"name"`
+	Identifier          string    `json:"identifier"`
+	State               string    `json:"state"`
+	Type                string    `json:"type"`
+	MemberInstitutionID int64     `json:"member_institution_id"`
+	DeactivatedAt       time.Time `json:"deactivated_at"`
+	OTPEnabled          bool      `json:"otp_enabled" pg:",use_zero"`
+	EnableSpotRestore   bool      `json:"enable_spot_restore" pg:",use_zero"`
+	ReceivingBucket     string    `json:"receiving_bucket"`
+	RestoreBucket       string    `json:"restore_bucket"`
+	CreatedAt           time.Time `json:"created_at"`
+	UpdatedAt           time.Time `json:"updated_at"`
 }
 
 // InstitutionByID returns the institution with the specified id.

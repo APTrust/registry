@@ -48,6 +48,7 @@ func TestInstitutionValidation(t *testing.T) {
 	inst.Identifier = "library.valid.edu"
 	inst.State = constants.StateActive
 	inst.Type = constants.InstTypeMember
+	inst.EnableSpotRestore = true
 	inst.MemberInstitutionID = int64(33)
 	inst.ReceivingBucket = "aptrust.receiving.test.library.valid.edu"
 	inst.RestoreBucket = "aptrust.restore.test.library.valid.edu"

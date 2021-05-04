@@ -36,6 +36,10 @@
       <td>{{ yesNo .institution.OTPEnabled }}</td>
     </tr>
     <tr>
+      <th>Restoration Spot Tests Enabled</th>
+      <td>{{ yesNo .institution.EnableSpotRestore }}</td>
+    </tr>
+    <tr>
       <th>Active?</th>
       <td>{{ if eq .institution.State "A" }} Yes {{ else }} No - deactivated {{ dateUS .institution.DeactivatedAt }} {{ end }}</td>
     </tr>

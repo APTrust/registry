@@ -74,6 +74,16 @@ func (f *InstitutionForm) init() {
 			"required": "",
 		},
 	}
+	f.Fields["EnableSpotRestore"] = &Field{
+		Name:        "EnableSpotRestore",
+		Label:       "Enable restoration spot tests?",
+		Placeholder: "",
+		ErrMsg:      "Please choose yes or no.",
+		Options:     YesNoList,
+		Attrs: map[string]string{
+			"required": "",
+		},
+	}
 	f.Fields["ReceivingBucket"] = &Field{
 		Name:        "Receiving Bucket",
 		Label:       "Receiving Bucket",
@@ -102,6 +112,7 @@ func (f *InstitutionForm) SetValues() {
 	f.Fields["Type"].Value = institution.Type
 	f.Fields["MemberInstitutionID"].Value = institution.MemberInstitutionID
 	f.Fields["OTPEnabled"].Value = institution.OTPEnabled
+	f.Fields["EnableSpotRestore"].Value = institution.EnableSpotRestore
 	f.Fields["ReceivingBucket"].Value = institution.ReceivingBucket
 	f.Fields["RestoreBucket"].Value = institution.RestoreBucket
 

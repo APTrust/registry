@@ -234,6 +234,7 @@ CREATE TABLE public.institutions (
 	member_institution_id int4 NULL,
 	deactivated_at timestamp NULL,
 	otp_enabled bool NULL,
+    enable_spot_restore bool not null default false,
 	receiving_bucket varchar NOT NULL,
 	restore_bucket varchar NOT NULL,
 	CONSTRAINT institutions_pkey PRIMARY KEY (id)
@@ -651,6 +652,7 @@ select
 	i."type",
 	i.deactivated_at,
 	i.otp_enabled,
+	i.enable_spot_restore,
 	i.receiving_bucket,
 	i.restore_bucket,
 	i.created_at,
