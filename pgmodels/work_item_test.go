@@ -2,11 +2,13 @@ package pgmodels_test
 
 import (
 	"testing"
+	"time"
 
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/db"
 	"github.com/APTrust/registry/pgmodels"
+	"github.com/jinzhu/copier"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -234,5 +236,40 @@ func TestWorkItemsPendingForFile(t *testing.T) {
 	itemsInProgress, err = pgmodels.WorkItemsPendingForFile(1)
 	require.Nil(t, err)
 	assert.Equal(t, 0, len(itemsInProgress))
+}
+
+func TestLastSuccessfulIngest(t *testing.T) {
+	db.LoadFixtures()
+
+	// This item in our fixtures is the last successful ingest
+	// of object id #4 from fixtures, institution2.edu/chocolate
+	item, err := pgmodels.WorkItemByID(26)
+	require.Nil(t, err)
+	require.NotNil(t, item)
+
+	// Make sure LastSuccessfulIngest returns the
+	// expected WorkItem.
+	lastIngest, err := pgmodels.LastSuccessfulIngest(item.IntellectualObjectID)
+	require.Nil(t, err)
+	assert.Equal(t, item.ID, lastIngest.ID)
+
+	// Save work item with a later ingest of same object
+	var copyOfItem pgmodels.WorkItem
+	err = copier.Copy(&copyOfItem, item)
+	require.Nil(t, err)
+
+	copyOfItem.ETag = "xxxxxxxx-00000000-xxxxxxxx"
+	copyOfItem.DateProcessed = time.Now().UTC()
+	err = copyOfItem.Save()
+	require.Nil(t, err)
+
+	// Now we should get that later work item.
+	lastIngest, err = pgmodels.LastSuccessfulIngest(item.IntellectualObjectID)
+	require.Nil(t, err)
+	assert.Equal(t, copyOfItem.ID, lastIngest.ID)
+	assert.Equal(t, copyOfItem.ETag, lastIngest.ETag)
+}
+
+func TestNewRestorationItem(t *testing.T) {
 
 }

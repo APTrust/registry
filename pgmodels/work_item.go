@@ -248,14 +248,21 @@ func (item *WorkItem) Validate() *common.ValidationError {
 	return nil
 }
 
-// LastSuccessfulIngestItemFor returns the last successful
+// LastSuccessfulIngest returns the last successful
 // ingest WorkItem for the specified intellectual object id.
-func LastSuccessfulIngestItemFor(objID int64) (*WorkItem, error) {
-	db := common.Context().DB
-	query := `select * from work_items where object_identifier = ? and action = ? and (stage = ? or stage = ?) and status = ?`
-	var item WorkItem
-	_, err := db.QueryOne(&item, query, objID, constants.ActionIngest, constants.StageRecord, constants.StageCleanup, constants.StatusSuccess)
-	return &item, err
+func LastSuccessfulIngest(objID int64) (*WorkItem, error) {
+	//db := common.Context().DB
+	query := NewQuery().
+		Where("intellectual_object_id", "=", objID).
+		Where("status", "=", constants.StatusSuccess).
+		WhereIn("stage", constants.StageRecord, constants.StageCleanup).
+		OrderBy("date_processed desc").
+		Limit(1)
+	items, err := WorkItemSelect(query)
+	if len(items) > 0 {
+		return items[0], err
+	}
+	return nil, err
 }
 
 // CreateObjectRestorationItem creates and saves a new WorkItem
@@ -271,7 +278,7 @@ func NewRestorationItem(obj *IntellectualObject, gf *GenericFile, user *User) (*
 	}
 	// We need some essential info from this item's last
 	// successful ingest, including ETag, bucket, etc.
-	lastIngestItem, err := LastSuccessfulIngestItemFor(obj.ID)
+	lastIngestItem, err := LastSuccessfulIngest(obj.ID)
 	if err != nil {
 		return nil, err
 	}
