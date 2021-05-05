@@ -272,6 +272,10 @@ func LastSuccessfulIngest(objID int64) (*WorkItem, error) {
 // gf is the GenericFile to be restored. This can be zero
 // if we're restoring an object instead of a file. Param user is the
 // user initiating the restoration.
+//
+// Before creating a restoration WorkItem, the caller should ensure
+// that the object and file have no pending work items. See
+// WorkItemsPendingForObject() and WorkItemsPendinForFile().
 func NewRestorationItem(obj *IntellectualObject, gf *GenericFile, user *User) (*WorkItem, error) {
 	if obj == nil {
 		return nil, common.ErrInvalidParam
@@ -283,27 +287,37 @@ func NewRestorationItem(obj *IntellectualObject, gf *GenericFile, user *User) (*
 		return nil, err
 	}
 	restorationItem := &WorkItem{}
-	err = copier.Copy(restorationItem, lastIngestItem)
+	err = copier.Copy(&restorationItem, lastIngestItem)
 	if err != nil {
 		return nil, err
 	}
+
+	// Clear the ID so when we save this it creates a new record.
+	// We don't want to overwrite the old record.
+	restorationItem.ID = 0
 
 	// Figure out the restoration type. This determines which
 	// queue it will go into and which worker will handle it.
 	if obj.IsGlacierOnly() {
 		restorationItem.Action = constants.ActionGlacierRestore
 	} else {
-		if gf == nil {
-			restorationItem.Action = constants.ActionRestore
-		} else {
-			// TODO: https://trello.com/c/GirQ712I
+		// TODO: https://trello.com/c/GirQ712I
+		if gf != nil {
 			restorationItem.Action = constants.ActionRestoreFile
-			restorationItem.GenericFileID = gf.ID
+		} else {
+			restorationItem.Action = constants.ActionRestore
 		}
 	}
 
-	restorationItem.CreatedAt = time.Time{}
-	restorationItem.DateProcessed = time.Now().UTC()
+	// If this is a file restoration, we have to set the
+	// generic file id.
+	if gf != nil {
+		restorationItem.GenericFileID = gf.ID
+	}
+
+	now := time.Now().UTC()
+	restorationItem.CreatedAt = now
+	restorationItem.DateProcessed = now
 	restorationItem.NeedsAdminReview = false
 	restorationItem.Node = ""
 	restorationItem.Note = ""
@@ -314,7 +328,7 @@ func NewRestorationItem(obj *IntellectualObject, gf *GenericFile, user *User) (*
 	restorationItem.Stage = constants.StageRequested
 	restorationItem.StageStartedAt = time.Time{}
 	restorationItem.Status = constants.StatusPending
-	restorationItem.UpdatedAt = time.Time{}
+	restorationItem.UpdatedAt = now
 	restorationItem.User = user.Email
 
 	err = restorationItem.Save()

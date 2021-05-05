@@ -258,7 +258,7 @@ func TestLastSuccessfulIngest(t *testing.T) {
 	err = copier.Copy(&copyOfItem, item)
 	require.Nil(t, err)
 
-	copyOfItem.ETag = "xxxxxxxx-00000000-xxxxxxxx"
+	copyOfItem.ETag = "aaaabbbb4939474aa6f5f77bf56faaaa"
 	copyOfItem.DateProcessed = time.Now().UTC()
 	err = copyOfItem.Save()
 	require.Nil(t, err)
@@ -271,5 +271,64 @@ func TestLastSuccessfulIngest(t *testing.T) {
 }
 
 func TestNewRestorationItem(t *testing.T) {
+	// Object id #4 from fixtures, institution2.edu/chocolate
+	// has at least one successful ingest WorkItem.
+	// File id #11, institution2.edu/chocolate/picture1,
+	// belongs to that object.
 
+	obj, err := pgmodels.IntellectualObjectByID(4)
+	require.Nil(t, err)
+	require.NotNil(t, obj)
+
+	file, err := pgmodels.GenericFileByID(11)
+	require.Nil(t, err)
+	require.NotNil(t, file)
+
+	user := &pgmodels.User{
+		Email: "unittest@example.com",
+	}
+
+	// Object restoration
+	item, err := pgmodels.NewRestorationItem(obj, nil, user)
+	require.Nil(t, err)
+	require.NotNil(t, item)
+	assert.True(t, item.ID > 0)
+	assert.Equal(t, obj.ID, item.IntellectualObjectID)
+	assert.EqualValues(t, 0, item.GenericFileID)
+	assert.Equal(t, constants.ActionRestore, item.Action)
+	assert.Equal(t, user.Email, item.User)
+	assert.Empty(t, item.Node)
+	assert.Empty(t, item.PID)
+	assert.True(t, item.Retry)
+	assert.False(t, item.NeedsAdminReview)
+	assert.Empty(t, item.QueuedAt)
+	assert.Equal(t, constants.StageRequested, item.Stage)
+	assert.Equal(t, constants.StatusPending, item.Status)
+
+	// File restoration
+	item, err = pgmodels.NewRestorationItem(obj, file, user)
+	require.Nil(t, err)
+	require.NotNil(t, item)
+	assert.Equal(t, obj.ID, item.IntellectualObjectID)
+	assert.Equal(t, file.ID, item.GenericFileID)
+	assert.Equal(t, constants.ActionRestoreFile, item.Action)
+
+	// Now check Glacier restoration. This is on an object.
+	obj.StorageOption = constants.StorageOptionGlacierDeepOH
+	item, err = pgmodels.NewRestorationItem(obj, nil, user)
+	require.Nil(t, err)
+	require.NotNil(t, item)
+	assert.Equal(t, obj.ID, item.IntellectualObjectID)
+	assert.EqualValues(t, 0, item.GenericFileID)
+	assert.Equal(t, constants.ActionGlacierRestore, item.Action)
+
+	// Restoring a file from Glacier should also result
+	// in action being GlacierRestoration
+	obj.StorageOption = constants.StorageOptionGlacierDeepOH
+	item, err = pgmodels.NewRestorationItem(obj, file, user)
+	require.Nil(t, err)
+	require.NotNil(t, item)
+	assert.Equal(t, obj.ID, item.IntellectualObjectID)
+	assert.EqualValues(t, file.ID, item.GenericFileID)
+	assert.Equal(t, constants.ActionGlacierRestore, item.Action)
 }

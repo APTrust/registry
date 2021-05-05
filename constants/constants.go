@@ -216,6 +216,7 @@ var UserActions = []string{
 var WorkItemActions = []string{
 	ActionDelete,
 	ActionRestore,
+	ActionRestoreFile,
 	ActionGlacierRestore,
 	ActionIngest,
 	ActionRestore,
