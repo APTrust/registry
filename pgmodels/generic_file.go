@@ -10,16 +10,16 @@ import (
 
 type GenericFile struct {
 	ID                   int64     `json:"id" pg:"id"`
-	FileFormat           string    `json:"file_format" pg:"file_format"`
-	Size                 int64     `json:"size" pg:"size"`
-	Identifier           string    `json:"identifier" pg:"identifier"`
-	IntellectualObjectID int64     `json:"intellectual_object_id" pg:"intellectual_object_id"`
-	CreatedAt            time.Time `json:"created_at" pg:"created_at"`
-	UpdatedAt            time.Time `json:"updated_at" pg:"updated_at"`
-	State                string    `json:"state" pg:"state"`
-	LastFixityCheck      time.Time `json:"last_fixity_check" pg:"last_fixity_check"`
-	InstitutionID        int64     `json:"institution_id" pg:"institution_id"`
-	StorageOption        string    `json:"storage_option" pg:"storage_option"`
+	FileFormat           string    `json:"file_format"`
+	Size                 int64     `json:"size"`
+	Identifier           string    `json:"identifier"`
+	IntellectualObjectID int64     `json:"intellectual_object_id"`
+	CreatedAt            time.Time `json:"created_at"`
+	UpdatedAt            time.Time `json:"updated_at"`
+	State                string    `json:"state"`
+	LastFixityCheck      time.Time `json:"last_fixity_check"`
+	InstitutionID        int64     `json:"institution_id"`
+	StorageOption        string    `json:"storage_option"`
 	UUID                 string    `json:"uuid" pg:"uuid"`
 
 	Institution        *Institution        `json:"-" pg:"rel:has-one"`
@@ -68,6 +68,12 @@ func (gf *GenericFile) Save() error {
 		return insert(gf)
 	}
 	return update(gf)
+}
+
+// IsGlacierOnly returns true if this file is stored only
+// in Glacier.
+func (gf *GenericFile) IsGlacierOnly() bool {
+	return isGlacierOnly(gf.StorageOption)
 }
 
 // ObjectFileCount returns the number of active files with the specified

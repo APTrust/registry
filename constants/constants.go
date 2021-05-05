@@ -119,6 +119,15 @@ var DigestAlgs = []string{
 	AlgSha512,
 }
 
+var GlacierOnlyOptions = []string{
+	StorageOptionGlacierDeepOH,
+	StorageOptionGlacierDeepOR,
+	StorageOptionGlacierDeepVA,
+	StorageOptionGlacierOH,
+	StorageOptionGlacierOR,
+	StorageOptionGlacierVA,
+}
+
 var IncompleteStatusValues = []string{
 	StatusPending,
 	StatusStarted,

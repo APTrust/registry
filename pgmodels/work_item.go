@@ -9,6 +9,7 @@ import (
 	"github.com/APTrust/registry/constants"
 	v "github.com/asaskevich/govalidator"
 	"github.com/go-pg/pg/v10"
+	"github.com/jinzhu/copier"
 	"github.com/stretchr/stew/slice"
 )
 
@@ -245,4 +246,71 @@ func (item *WorkItem) Validate() *common.ValidationError {
 		return &common.ValidationError{Errors: errors}
 	}
 	return nil
+}
+
+// LastSuccessfulIngestItemFor returns the last successful
+// ingest WorkItem for the specified intellectual object id.
+func LastSuccessfulIngestItemFor(objID int64) (*WorkItem, error) {
+	db := common.Context().DB
+	query := `select * from work_items where object_identifier = ? and action = ? and (stage = ? or stage = ?) and status = ?`
+	var item WorkItem
+	_, err := db.QueryOne(&item, query, objID, constants.ActionIngest, constants.StageRecord, constants.StageCleanup, constants.StatusSuccess)
+	return &item, err
+}
+
+// CreateObjectRestorationItem creates and saves a new WorkItem
+// for an object or file restoration.
+//
+// Param obj (required) is the object to be restored.
+// gf is the GenericFile to be restored. This can be zero
+// if we're restoring an object instead of a file. Param user is the
+// user initiating the restoration.
+func NewRestorationItem(obj *IntellectualObject, gf *GenericFile, user *User) (*WorkItem, error) {
+	if obj == nil {
+		return nil, common.ErrInvalidParam
+	}
+	// We need some essential info from this item's last
+	// successful ingest, including ETag, bucket, etc.
+	lastIngestItem, err := LastSuccessfulIngestItemFor(obj.ID)
+	if err != nil {
+		return nil, err
+	}
+	restorationItem := &WorkItem{}
+	err = copier.Copy(restorationItem, lastIngestItem)
+	if err != nil {
+		return nil, err
+	}
+
+	// Figure out the restoration type. This determines which
+	// queue it will go into and which worker will handle it.
+	if obj.IsGlacierOnly() {
+		restorationItem.Action = constants.ActionGlacierRestore
+	} else {
+		if gf == nil {
+			restorationItem.Action = constants.ActionRestore
+		} else {
+			// TODO: https://trello.com/c/GirQ712I
+			restorationItem.Action = constants.ActionRestoreFile
+			restorationItem.GenericFileID = gf.ID
+		}
+	}
+
+	restorationItem.CreatedAt = time.Time{}
+	restorationItem.DateProcessed = time.Now().UTC()
+	restorationItem.NeedsAdminReview = false
+	restorationItem.Node = ""
+	restorationItem.Note = ""
+	restorationItem.Outcome = "Not started"
+	restorationItem.PID = 0
+	restorationItem.QueuedAt = time.Time{}
+	restorationItem.Retry = true
+	restorationItem.Stage = constants.StageRequested
+	restorationItem.StageStartedAt = time.Time{}
+	restorationItem.Status = constants.StatusPending
+	restorationItem.UpdatedAt = time.Time{}
+	restorationItem.User = user.Email
+
+	err = restorationItem.Save()
+
+	return restorationItem, err
 }

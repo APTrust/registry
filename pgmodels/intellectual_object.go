@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/APTrust/registry/constants"
+	"github.com/stretchr/stew/slice"
 )
 
 // Filters are defined in IntellectualObjectView, since we query on the view.
@@ -74,6 +75,12 @@ func (obj *IntellectualObject) Save() error {
 	return update(obj)
 }
 
+// IsGlacierOnly returns true if this object is stored only
+// in Glacier.
+func (obj *IntellectualObject) IsGlacierOnly() bool {
+	return isGlacierOnly(obj.StorageOption)
+}
+
 // Delete soft-deletes this object by setting State to 'D' and
 // the DeletedAt timestamp to now. You can undo this with Undelete.
 func (obj *IntellectualObject) Delete() error {
@@ -83,4 +90,8 @@ func (obj *IntellectualObject) Delete() error {
 	// TODO: Create PremisEvents, update WorkItem
 
 	return update(obj)
+}
+
+func isGlacierOnly(storageOption string) bool {
+	return slice.Contains(constants.GlacierOnlyOptions, storageOption)
 }

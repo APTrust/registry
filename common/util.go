@@ -7,7 +7,6 @@ import (
 	"crypto/md5"
 	"crypto/sha256"
 	"encoding/hex"
-	//"flag"
 	"fmt"
 	"io/ioutil"
 	"os"

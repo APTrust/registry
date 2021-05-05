@@ -22,6 +22,26 @@ var QueryOp = map[string]string{
 	"not_null":    "IS NOT NULL",
 }
 
+// Query provides a fluent model for constructing SQL queries,
+// though it currently constructs only the where, order by,
+// limit and offset clauses, which is all we need to pass to the
+// go-pg adapter. The adapter knows how to construct the select
+// and from clauses based on the model.
+//
+// Query's functionality is a subset of go-pg's query builder
+// features. It doesn't support joins, for example, though
+// it does support relations.
+//
+// Query exists to help the web front-end construct queries based
+// on named inputs in GET requests. The web.FilterCollection functions
+// can dynamically translate query string params into complex
+// where clauses like "name ilike '%homer%' and age >= 31 and
+// city not in ('Shelbyville', 'Atlanta', 'New York')".
+//
+// We decided to omit complex joins in our dynamic queries and create
+// SQL views instead, because after several years in production, we
+// already know virtually all of the ways users want to join tables.
+// Views allow us to issue simple queries, which this package supports.
 type Query struct {
 	conditions []string
 	params     []interface{}
