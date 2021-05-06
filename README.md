@@ -54,7 +54,15 @@ Or if you want to run in the test environment after running tests, use:
 
 `./run.sh server`
 
+To run the server with NSQ and Redis with a different env:
+
+`APT_ENV=dev ./run.sh server`
+
 The run.sh script starts Redis and NSQ in addition to the registry. These services are required for some functionality, such as initiating restorations and deletions and requeueing WorkItems.
+
+You can also run the server without NSQ and Redis. Use either `dev` or `test` for APT_ENV:
+
+`APT_ENV=test go run registry.go`
 
 You'll have some minimal data available in the DB, including a number of user accounts. You can log in with any of the following:
 

@@ -43,6 +43,14 @@ echo "Starting Redis"
 eval "$DIR/redis-server --save "" --appendonly no > /dev/null 2>&1 &"
 REDIS_PID=$!
 
+
+if [[ $TRAVIS == "true" ]]; then
+    APT_ENV=travis
+elif [[ -z "${APT_ENV}" ]]; then
+    APT_ENV=test
+fi
+echo "APT_ENV is $APT_ENV"
+
 # ----------------------------------------------------------------------
 #
 # Run tests or server, based on command line arg.
@@ -50,11 +58,14 @@ REDIS_PID=$!
 # ----------------------------------------------------------------------
 if [[ $1 == "tests" ]]; then
     echo "Running registry tests..."
-    APT_ENV=test go test -p 1 ./...
+    APT_ENV=$APT_ENV go test -p 1 ./...
 elif [[ $1 == "server" ]]; then
     echo "Starting registry app..."
-    APT_ENV=test go run registry.go
+    APT_ENV=$APT_ENV go run registry.go
 fi
+
+EXIT_CODE=$?
+
 
 # ----------------------------------------------------------------------
 #
@@ -69,6 +80,7 @@ kill $NSQ_PID
 echo "Killing Redis pid $REDIS_PID"
 kill $REDIS_PID
 
-rm *.dat
+#rm *.dat
 
-echo "Done"
+echo "Finished with code $EXIT_CODE"
+exit $EXIT_CODE
