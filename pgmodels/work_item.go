@@ -281,7 +281,7 @@ func NewRestorationItem(obj *IntellectualObject, gf *GenericFile, user *User) (*
 		return nil, common.ErrInvalidParam
 	}
 	// We need some essential info from this item's last
-	// successful ingest, including ETag, bucket, etc.
+	// successful ingest, including ETag, BagDate, etc.
 	lastIngestItem, err := LastSuccessfulIngest(obj.ID)
 	if err != nil {
 		return nil, err
@@ -305,7 +305,7 @@ func NewRestorationItem(obj *IntellectualObject, gf *GenericFile, user *User) (*
 		if gf != nil {
 			restorationItem.Action = constants.ActionRestoreFile
 		} else {
-			restorationItem.Action = constants.ActionRestore
+			restorationItem.Action = constants.ActionRestoreObject
 		}
 	}
 

@@ -207,7 +207,7 @@ func TestWorkItemsPendingForFile(t *testing.T) {
 		GenericFileID:        1,
 		User:                 "system@aptrust.org",
 		Bucket:               "aptrust.receiving.test.test.edu",
-		Action:               constants.ActionRestore,
+		Action:               constants.ActionRestoreFile,
 		Stage:                constants.StageRequested,
 		Status:               constants.StatusPending,
 		Note:                 "Test restoration item (file)",
@@ -295,7 +295,7 @@ func TestNewRestorationItem(t *testing.T) {
 	assert.True(t, item.ID > 0)
 	assert.Equal(t, obj.ID, item.IntellectualObjectID)
 	assert.EqualValues(t, 0, item.GenericFileID)
-	assert.Equal(t, constants.ActionRestore, item.Action)
+	assert.Equal(t, constants.ActionRestoreObject, item.Action)
 	assert.Equal(t, user.Email, item.User)
 	assert.Empty(t, item.Node)
 	assert.Empty(t, item.PID)

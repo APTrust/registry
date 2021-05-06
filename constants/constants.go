@@ -16,7 +16,6 @@ const (
 	ActionIngest               = "Ingest"
 	ActionRead                 = "Read"
 	ActionRequestDelete        = "RequestDelete"
-	ActionRestore              = "Restore"
 	ActionRestoreObject        = "Restore Object"
 	ActionUpdate               = "Update"
 	AlgMd5                     = "md5"
@@ -212,16 +211,16 @@ var UserActions = []string{
 	ActionRequestDelete,
 	ActionApproveDelete,
 	ActionFinishBulkDelete,
-	ActionRestore,
+	ActionRestoreObject,
+	ActionRestoreFile,
 }
 
 var WorkItemActions = []string{
 	ActionDelete,
-	ActionRestore,
+	ActionRestoreObject,
 	ActionRestoreFile,
 	ActionGlacierRestore,
 	ActionIngest,
-	ActionRestore,
 }
 
 // NSQIngestTopicFor maps ingest stage names to NSQ topics.
