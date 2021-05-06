@@ -54,6 +54,15 @@ var ErrResourcePermission = errors.New("cannot determine permission type for req
 // wrong stage, or to a stage for which no NSQ topic exists.
 var ErrInvalidRequeue = errors.New("item cannot be requeued to the specified stage")
 
+// ErrPendingWorkItems occurs when a user wants to restore or delete an
+// object or file but the WorkItems list shows other operations are pending
+// on that item. For example, we can't delete or restore an object or file
+// while another version of that object/file is pending ingest. Doing so
+// would cause newly ingested files to be deleted as soon as they're sent
+// to preservation, or would cause a restoration to contain a mix of new
+// and old versions of a bag's files.
+var ErrPendingWorkItems = errors.New("task cannot be completed because this object has pending work items")
+
 // ErrInternal is a runtime error that is not the user's fault, hence
 // probably the programmer's fault.
 var ErrInternal = errors.New("internal server error")

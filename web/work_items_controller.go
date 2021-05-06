@@ -102,6 +102,9 @@ func WorkItemRequeue(c *gin.Context) {
 	}
 
 	err = aptContext.NSQClient.Enqueue(topic, item.ID)
+	if AbortIfError(c, err) {
+		return
+	}
 	redirectTo := fmt.Sprintf("/work_items/show/%d?flash=Item+requeued+to+%s", item.ID, url.QueryEscape(topic))
 	c.Redirect(http.StatusSeeOther, redirectTo)
 }

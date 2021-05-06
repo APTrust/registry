@@ -62,7 +62,7 @@ func IntellectualObjectInitRestore(c *gin.Context) {
 		return
 	}
 	if len(pendingWorkItems) > 0 {
-		// Return message saying work items are pending.
+		AbortIfError(c, common.ErrPendingWorkItems)
 		return
 	}
 	workItem, err := pgmodels.NewRestorationItem(obj, nil, req.CurrentUser)
