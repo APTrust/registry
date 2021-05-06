@@ -8,13 +8,15 @@ This will be the third-generation of our registry software, based on the [Gin We
 
 To run the registry on your local dev machine, you will need the following for ALL operations:
 
-* [Go](https://golang.org/dl/) 1.13 or higher
+* [Go](https://golang.org/dl/) 1.16 or higher
 * [Postgres](https://www.postgresql.org/download/) 11 or higher
 
 You will also need the following for some Admin operations:
 
 * [Redis](https://redis.io/download) 5.07 or higher
 * [NSQ](https://nsq.io/deployment/installing.html) version 1.20 or higher
+
+If you're running on Linux or OSX, you'll find the required Redis and NSQ binaries in this repo's .bin/linux and ./bin/osx directories. The run.sh script automatically starts them when it runs the server and tests.
 
 # Database Setup
 
@@ -48,6 +50,22 @@ If you want more data in your dev DB, we have a copy of the staging database in 
 
 You can change APT_ENV to test if you want to run against the test database, but note that the test DB is regenerated every time we run the test suite.
 
+Or if you want to run in the test environment after running tests, use:
+
+`./run.sh server`
+
+The run.sh script starts Redis and NSQ in addition to the registry. These services are required for some functionality, such as initiating restorations and deletions and requeueing WorkItems.
+
+You'll have some minimal data available in the DB, including a number of user accounts. You can log in with any of the following:
+
+| Email                | Password | Role                            |
+| -------------------- | -------- | ------------------------------- |
+| system@aptrust.org   | password | Sys Admin                       |
+| admin@inst1.edu      | password | Institutional Admin at Inst 1   |
+| user@inst1.edu       | password | Institutional User at Inst 1    |
+| inactive@inst1.edu   | password | Deactivated Inst User at Inst 1 |
+
+
 # Testing
 
-`APT_ENV=test go test -p 1 ./...`
+`./run.sh tests`
