@@ -53,6 +53,16 @@ func (r *ResourceAuthorization) init() {
 	}
 }
 
+// getPermissionType figures out the resource type the user
+// is requesting and the action they are trying to perform on
+// that resource.
+//
+// HandlerName should be the name of a function in the web
+// namespace. URLs are mapped to handlers in registry.go.
+// If you see an anonymous handler name like "func1", that usually
+// means the user requested a route not defined in registry.go.
+// This happens most often when we get a GET request on a route
+// that is defined for POST or PUT.
 func (r *ResourceAuthorization) getPermissionType() {
 	nameParts := strings.Split(r.ginCtx.HandlerName(), ".")
 	if len(nameParts) > 1 {

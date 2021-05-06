@@ -79,7 +79,8 @@ func IntellectualObjectInitRestore(c *gin.Context) {
 	if AbortIfError(c, err) {
 		return
 	}
-	// Show success message
+	redirectUrl := fmt.Sprintf("/objects/show/%d?flash=Object+queued+for+restoration", obj.ID)
+	c.Redirect(http.StatusFound, redirectUrl)
 }
 
 // IntellectualObjectIndex shows list of objects.

@@ -14,15 +14,19 @@
 
   <div class="row">
     <div class="column column-30">
-      <button class="button button-outline">Cancel</button>
+      <button class="button button-outline" onclick="document.getElementById('modal-one').classList.remove('open')">Cancel</button>
     </div>
     <div class="column column-40">
 
     </div>
     <div class="column column-30">
-      <button class="button">Confirm</button>
+      <button class="button" onclick="document.forms['objRestoreForm'].submit()">Confirm</button>
     </div>
   </div>
+
+  <form method="post" id="objRestoreForm" action="/objects/init_restore/{{ .object.ID }}">
+    <input type="hidden" name="id" value="{{ .object.ID }}"/>
+  </form>
 
 </div>
 
