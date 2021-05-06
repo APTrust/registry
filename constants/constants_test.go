@@ -5,21 +5,59 @@ import (
 
 	"github.com/APTrust/registry/constants"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestTopicFor(t *testing.T) {
-	assert.Equal(t, constants.TopicDelete, constants.TopicFor(constants.ActionDelete, ""))
-	assert.Equal(t, constants.TopicFileRestore, constants.TopicFor(constants.ActionRestoreFile, ""))
-	assert.Equal(t, constants.TopicGlacierRestore, constants.TopicFor(constants.ActionGlacierRestore, ""))
-	assert.Equal(t, constants.TopicObjectRestore, constants.TopicFor(constants.ActionRestoreObject, ""))
+	topic, err := constants.TopicFor(constants.ActionDelete, "")
+	require.Nil(t, err)
+	assert.Equal(t, constants.TopicDelete, topic)
 
-	assert.Equal(t, constants.IngestPreFetch, constants.TopicFor(constants.ActionIngest, constants.StageReceive))
-	assert.Equal(t, constants.IngestValidation, constants.TopicFor(constants.ActionIngest, constants.StageValidate))
-	assert.Equal(t, constants.IngestReingestCheck, constants.TopicFor(constants.ActionIngest, constants.StageReingestCheck))
-	assert.Equal(t, constants.IngestStaging, constants.TopicFor(constants.ActionIngest, constants.StageCopyToStaging))
-	assert.Equal(t, constants.IngestFormatIdentification, constants.TopicFor(constants.ActionIngest, constants.StageFormatIdentification))
-	assert.Equal(t, constants.IngestStorage, constants.TopicFor(constants.ActionIngest, constants.StageStore))
-	assert.Equal(t, constants.IngestStorageValidation, constants.TopicFor(constants.ActionIngest, constants.StageStorageValidation))
-	assert.Equal(t, constants.IngestRecord, constants.TopicFor(constants.ActionIngest, constants.StageRecord))
-	assert.Equal(t, constants.IngestCleanup, constants.TopicFor(constants.ActionIngest, constants.StageCleanup))
+	topic, err = constants.TopicFor(constants.ActionRestoreFile, "")
+	require.Nil(t, err)
+	assert.Equal(t, constants.TopicFileRestore, topic)
+
+	topic, err = constants.TopicFor(constants.ActionGlacierRestore, "")
+	require.Nil(t, err)
+	assert.Equal(t, constants.TopicGlacierRestore, topic)
+
+	topic, err = constants.TopicFor(constants.ActionRestoreObject, "")
+	require.Nil(t, err)
+	assert.Equal(t, constants.TopicObjectRestore, topic)
+
+	topic, err = constants.TopicFor(constants.ActionIngest, constants.StageReceive)
+	require.Nil(t, err)
+	assert.Equal(t, constants.IngestPreFetch, topic)
+
+	topic, err = constants.TopicFor(constants.ActionIngest, constants.StageValidate)
+	require.Nil(t, err)
+	assert.Equal(t, constants.IngestValidation, topic)
+
+	topic, err = constants.TopicFor(constants.ActionIngest, constants.StageReingestCheck)
+	require.Nil(t, err)
+	assert.Equal(t, constants.IngestReingestCheck, topic)
+
+	topic, err = constants.TopicFor(constants.ActionIngest, constants.StageCopyToStaging)
+	require.Nil(t, err)
+	assert.Equal(t, constants.IngestStaging, topic)
+
+	topic, err = constants.TopicFor(constants.ActionIngest, constants.StageFormatIdentification)
+	require.Nil(t, err)
+	assert.Equal(t, constants.IngestFormatIdentification, topic)
+
+	topic, err = constants.TopicFor(constants.ActionIngest, constants.StageStore)
+	require.Nil(t, err)
+	assert.Equal(t, constants.IngestStorage, topic)
+
+	topic, err = constants.TopicFor(constants.ActionIngest, constants.StageStorageValidation)
+	require.Nil(t, err)
+	assert.Equal(t, constants.IngestStorageValidation, topic)
+
+	topic, err = constants.TopicFor(constants.ActionIngest, constants.StageRecord)
+	require.Nil(t, err)
+	assert.Equal(t, constants.IngestRecord, topic)
+
+	topic, err = constants.TopicFor(constants.ActionIngest, constants.StageCleanup)
+	require.Nil(t, err)
+	assert.Equal(t, constants.IngestCleanup, topic)
 }

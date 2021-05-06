@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/APTrust/registry/common"
+	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/gin-gonic/gin"
 )
@@ -50,7 +52,34 @@ func IntellectualObjectRequestRestore(c *gin.Context) {
 // or hours, depending on where the object is stored and how big it is.
 // POST /objects/init_restore/:id
 func IntellectualObjectInitRestore(c *gin.Context) {
+	req := NewRequest(c)
+	obj, err := pgmodels.IntellectualObjectByID(req.Auth.ResourceID)
+	if AbortIfError(c, err) {
+		return
+	}
+	pendingWorkItems, err := pgmodels.WorkItemsPendingForObject(obj.InstitutionID, obj.BagName)
+	if AbortIfError(c, err) {
+		return
+	}
+	if len(pendingWorkItems) > 0 {
+		// Return message saying work items are pending.
+		return
+	}
+	workItem, err := pgmodels.NewRestorationItem(obj, nil, req.CurrentUser)
+	if AbortIfError(c, err) {
+		return
+	}
+	topic, err := constants.TopicFor(workItem.Action, workItem.Stage)
+	if AbortIfError(c, err) {
+		return
+	}
 
+	ctx := common.Context()
+	err = ctx.NSQClient.Enqueue(topic, workItem.ID)
+	if AbortIfError(c, err) {
+		return
+	}
+	// Show success message
 }
 
 // IntellectualObjectIndex shows list of objects.

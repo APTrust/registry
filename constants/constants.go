@@ -1,5 +1,7 @@
 package constants
 
+import "github.com/APTrust/registry/common"
+
 const (
 	AccessConsortia            = "consortia"
 	AccessInstitution          = "institution"
@@ -235,19 +237,25 @@ var NSQIngestTopicFor = map[string]string{
 	StageCleanup:              IngestCleanup,
 }
 
-func TopicFor(action, stage string) string {
+func TopicFor(action, stage string) (string, error) {
+	var err error
+	topic := ""
 	switch action {
 	case ActionDelete:
-		return TopicDelete
+		topic = TopicDelete
 	case ActionRestoreFile:
-		return TopicFileRestore
+		topic = TopicFileRestore
 	case ActionGlacierRestore:
-		return TopicGlacierRestore
+		topic = TopicGlacierRestore
 	case ActionRestoreObject:
-		return TopicObjectRestore
+		topic = TopicObjectRestore
 	case ActionIngest:
-		return NSQIngestTopicFor[stage]
+		topic = NSQIngestTopicFor[stage]
 	default:
-		return ""
+		topic = ""
 	}
+	if topic == "" {
+		err = common.ErrInvalidRequeue
+	}
+	return topic, err
 }

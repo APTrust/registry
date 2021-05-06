@@ -164,9 +164,9 @@ func (item *WorkItem) Save() error {
 // The call is responsible for actually pushing the WorkItem.ID into
 // the correct NSQ topic.
 func (item *WorkItem) SetForRequeue(stage string) error {
-	topic := constants.TopicFor(item.Action, stage)
-	if topic == "" {
-		return common.ErrInvalidRequeue
+	_, err := constants.TopicFor(item.Action, stage)
+	if err != nil {
+		return err
 	}
 	item.Stage = stage
 	item.Status = constants.StatusPending
