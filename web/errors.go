@@ -59,6 +59,8 @@ func StatusCodeForError(err error) (status int) {
 		status = http.StatusMethodNotAllowed
 	case common.ErrInternal:
 		status = http.StatusInternalServerError
+	case common.ErrPendingWorkItems:
+		status = http.StatusConflict
 	default:
 		status = http.StatusInternalServerError
 	}
