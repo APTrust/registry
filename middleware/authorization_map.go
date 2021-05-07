@@ -61,7 +61,7 @@ var AuthMap = map[string]AuthMetadata{
 	"GenericFileApproveDelete":           {"GenericFile", constants.GenericFileApproveDelete},
 	"GenericFileFinishBulkDelete":        {"GenericFile", constants.GenericFileFinishBulkDelete},
 	"GenericFileRequestRestore":          {"GenericFile", constants.GenericFileRestore},
-	"GenericFileInitRestore":             {"IntellectualObject", constants.GenericFileRestore},
+	"GenericFileInitRestore":             {"GenericFile", constants.GenericFileRestore},
 	"InstitutionNew":                     {"Institution", constants.InstitutionCreate},
 	"InstitutionCreate":                  {"Institution", constants.InstitutionCreate},
 	"InstitutionEdit":                    {"Institution", constants.InstitutionUpdate},

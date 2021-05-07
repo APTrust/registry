@@ -110,15 +110,14 @@ func initRoutes(router *gin.Engine) {
 		webRoutes.GET("/files/show/:id", web.GenericFileShow)
 		webRoutes.GET("/files/request_delete/:id", web.GenericFileRequestDelete)
 		webRoutes.GET("/files/request_restore/:id", web.GenericFileRequestRestore)
+		webRoutes.POST("/files/init_restore/:id", web.GenericFileInitRestore)
 		webRoutes.GET("/files/delete/:id", web.GenericFileDelete)
-		webRoutes.GET("/files/restore/:id", web.GenericFileRestore)
 
 		// IntellectualObjects
 		webRoutes.GET("/objects", web.IntellectualObjectIndex)
 		webRoutes.GET("/objects/show/:id", web.IntellectualObjectShow)
 		webRoutes.GET("/objects/request_delete/:id", web.IntellectualObjectRequestDelete)
 		webRoutes.DELETE("/objects/init_delete/:id", web.IntellectualObjectInitDelete)
-		webRoutes.GET("/objects/restore/:id", web.IntellectualObjectRestore)
 		webRoutes.GET("/objects/request_restore/:id", web.IntellectualObjectRequestRestore)
 		webRoutes.POST("/objects/init_restore/:id", web.IntellectualObjectInitRestore)
 		webRoutes.GET("/objects/events/:id", web.IntellectualObjectEvents)

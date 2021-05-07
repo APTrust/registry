@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
@@ -49,8 +50,8 @@ func IntellectualObjectRequestRestore(c *gin.Context) {
 }
 
 // IntellectualObjectInitRestore creates an object restoration request,
-// which is really just a WorkItem that gets queued. Restoration can seconds
-// or hours, depending on where the object is stored and how big it is.
+// which is really just a WorkItem that gets queued. Restoration can take
+// seconds or hours, depending on where the object is stored and how big it is.
 // POST /objects/init_restore/:id
 func IntellectualObjectInitRestore(c *gin.Context) {
 	req := NewRequest(c)
@@ -58,6 +59,8 @@ func IntellectualObjectInitRestore(c *gin.Context) {
 	if AbortIfError(c, err) {
 		return
 	}
+
+	// Make sure there are no pending work items...
 	pendingWorkItems, err := pgmodels.WorkItemsPendingForObject(obj.InstitutionID, obj.BagName)
 	if AbortIfError(c, err) {
 		return
@@ -66,20 +69,31 @@ func IntellectualObjectInitRestore(c *gin.Context) {
 		AbortIfError(c, common.ErrPendingWorkItems)
 		return
 	}
+
+	// Create the new restoration work item
 	workItem, err := pgmodels.NewRestorationItem(obj, nil, req.CurrentUser)
 	if AbortIfError(c, err) {
 		return
 	}
+
+	// Queue the new work item in NSQ
 	topic, err := constants.TopicFor(workItem.Action, workItem.Stage)
 	if AbortIfError(c, err) {
 		return
 	}
-
 	ctx := common.Context()
 	err = ctx.NSQClient.Enqueue(topic, workItem.ID)
 	if AbortIfError(c, err) {
 		return
 	}
+
+	workItem.QueuedAt = time.Now().UTC()
+	err = workItem.Save()
+	if AbortIfError(c, err) {
+		return
+	}
+
+	// Respond
 	helpers.SetFlashCookie(c, "Object has been queued for restoration.")
 	redirectUrl := fmt.Sprintf("/objects/show/%d", obj.ID)
 	c.Redirect(http.StatusFound, redirectUrl)
@@ -126,10 +140,6 @@ func IntellectualObjectShow(c *gin.Context) {
 	}
 	req.TemplateData["stats"] = stats
 	c.HTML(http.StatusOK, "objects/show.html", req.TemplateData)
-}
-
-func IntellectualObjectRestore(c *gin.Context) {
-	// TODO: Create a restoration WorkItem.
 }
 
 // This is called when user pages through events on the

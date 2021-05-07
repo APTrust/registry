@@ -1,8 +1,13 @@
 package web
 
 import (
+	"fmt"
 	"net/http"
+	"time"
 
+	"github.com/APTrust/registry/common"
+	"github.com/APTrust/registry/constants"
+	"github.com/APTrust/registry/helpers"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/gin-gonic/gin"
 )
@@ -56,6 +61,57 @@ func GenericFileRequestRestore(c *gin.Context) {
 	c.HTML(http.StatusOK, "files/_request_restore.html", req.TemplateData)
 }
 
-func GenericFileRestore(c *gin.Context) {
-	// TODO: Create a restoration WorkItem.
+// GenericFileInitRestore creates a file restoration request,
+// which is really just a WorkItem that gets queued. Restoration can take
+// seconds or hours, depending on where the file is stored and how big it is.
+// POST /files/init_restore/:id
+func GenericFileInitRestore(c *gin.Context) {
+	req := NewRequest(c)
+	gf, err := pgmodels.GenericFileByID(req.Auth.ResourceID)
+	if AbortIfError(c, err) {
+		return
+	}
+
+	// Make sure there are no pending work items...
+	pendingWorkItems, err := pgmodels.WorkItemsPendingForFile(gf.ID)
+	if AbortIfError(c, err) {
+		return
+	}
+	if len(pendingWorkItems) > 0 {
+		AbortIfError(c, common.ErrPendingWorkItems)
+		return
+	}
+
+	// Create the new restoration work item
+	obj, err := pgmodels.IntellectualObjectByID(gf.IntellectualObjectID)
+	if AbortIfError(c, err) {
+		return
+	}
+	workItem, err := pgmodels.NewRestorationItem(obj, gf, req.CurrentUser)
+	if AbortIfError(c, err) {
+		return
+	}
+
+	// Queue the new work item in NSQ
+	topic, err := constants.TopicFor(workItem.Action, workItem.Stage)
+	if AbortIfError(c, err) {
+		return
+	}
+	ctx := common.Context()
+	err = ctx.NSQClient.Enqueue(topic, workItem.ID)
+	if AbortIfError(c, err) {
+		return
+	}
+
+	workItem.QueuedAt = time.Now().UTC()
+	err = workItem.Save()
+	if AbortIfError(c, err) {
+		return
+	}
+
+	// Respond
+	msg := fmt.Sprintf("File %s has been queued for restoration.", gf.Identifier)
+	helpers.SetFlashCookie(c, msg)
+	redirectUrl := fmt.Sprintf("/objects/show/%d", obj.ID)
+	c.Redirect(http.StatusFound, redirectUrl)
 }
