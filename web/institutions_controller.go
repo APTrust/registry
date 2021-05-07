@@ -101,8 +101,6 @@ func InstitutionShow(c *gin.Context) {
 		return
 	}
 	req.TemplateData["users"] = users
-
-	req.TemplateData["flash"] = c.Query("flash")
 	c.HTML(http.StatusOK, "institutions/show.html", req.TemplateData)
 }
 

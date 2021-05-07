@@ -7,6 +7,7 @@ import (
 
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
+	"github.com/APTrust/registry/helpers"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/gin-gonic/gin"
 )
@@ -79,7 +80,8 @@ func IntellectualObjectInitRestore(c *gin.Context) {
 	if AbortIfError(c, err) {
 		return
 	}
-	redirectUrl := fmt.Sprintf("/objects/show/%d?flash=Object+queued+for+restoration", obj.ID)
+	helpers.SetFlashCookie(c, "Object has been queued for restoration.")
+	redirectUrl := fmt.Sprintf("/objects/show/%d", obj.ID)
 	c.Redirect(http.StatusFound, redirectUrl)
 }
 
@@ -123,7 +125,6 @@ func IntellectualObjectShow(c *gin.Context) {
 		return
 	}
 	req.TemplateData["stats"] = stats
-	req.TemplateData["flash"] = c.Query("flash")
 	c.HTML(http.StatusOK, "objects/show.html", req.TemplateData)
 }
 

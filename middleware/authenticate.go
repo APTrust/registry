@@ -14,6 +14,7 @@ import (
 // than those going to "/" or static resources.
 func Authenticate() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		LoadCookies(c)
 		if !ExemptFromAuth(c) {
 			user, err := GetUserFromSession(c)
 			if err != nil {
@@ -48,6 +49,36 @@ func GetUserFromSession(c *gin.Context) (user *pgmodels.User, err error) {
 		user, err = pgmodels.UserByID(userID)
 	}
 	return user, err
+}
+
+// LoadCookies loads the user's flash and preference cookes into
+// the request context.
+func LoadCookies(c *gin.Context) error {
+	ctx := common.Context()
+	err := LoadCookie(c, ctx.Config.Cookies.FlashCookie)
+	if err != nil && err != http.ErrNoCookie {
+		return err
+	}
+	err = LoadCookie(c, ctx.Config.Cookies.PrefsCookie)
+	if err != nil && err != http.ErrNoCookie {
+		return err
+	}
+	return nil
+}
+
+// LoadCookie loads a cookie's value into the request context.
+func LoadCookie(c *gin.Context, name string) error {
+	ctx := common.Context()
+	cookie, err := c.Cookie(name)
+	if err != nil {
+		return err
+	}
+	value := ""
+	if err = ctx.Config.Cookies.Secure.Decode(name, cookie, &value); err != nil {
+		return common.ErrDecodeCookie
+	}
+	c.Set(name, value)
+	return nil
 }
 
 func ExemptFromAuth(c *gin.Context) bool {

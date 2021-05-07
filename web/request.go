@@ -1,6 +1,7 @@
 package web
 
 import (
+	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/helpers"
 	"github.com/APTrust/registry/middleware"
 	"github.com/APTrust/registry/pgmodels"
@@ -16,14 +17,20 @@ type Request struct {
 }
 
 func NewRequest(c *gin.Context) *Request {
+	ctx := common.Context()
+	flash, _ := c.Get(ctx.Config.Cookies.FlashCookie)
 	currentUser := helpers.CurrentUser(c)
 	auth, _ := c.Get("ResourceAuthorization")
 	req := &Request{
-		CurrentUser:  currentUser,
-		GinContext:   c,
-		Auth:         auth.(*middleware.ResourceAuthorization),
-		TemplateData: gin.H{"CurrentUser": currentUser},
+		CurrentUser: currentUser,
+		GinContext:  c,
+		Auth:        auth.(*middleware.ResourceAuthorization),
+		TemplateData: gin.H{
+			"CurrentUser": currentUser,
+			"flash":       flash,
+		},
 	}
+	helpers.DeleteCookie(c, ctx.Config.Cookies.FlashCookie)
 	return req
 }
 

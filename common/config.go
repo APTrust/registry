@@ -40,6 +40,8 @@ type CookieConfig struct {
 	HTTPSOnly     bool
 	MaxAge        int
 	SessionCookie string
+	FlashCookie   string
+	PrefsCookie   string
 }
 
 type LoggingConfig struct {
@@ -133,6 +135,8 @@ func loadConfig() *Config {
 			HTTPSOnly:     v.GetBool("HTTPS_COOKIES"),
 			MaxAge:        v.GetInt("SESSION_MAX_AGE"),
 			SessionCookie: v.GetString("SESSION_COOKIE_NAME"),
+			FlashCookie:   v.GetString("FLASH_COOKIE_NAME"),
+			PrefsCookie:   v.GetString("PREFS_COOKIE_NAME"),
 		},
 		NsqUrl: nsqUrl,
 	}

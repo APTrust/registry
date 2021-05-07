@@ -3,11 +3,11 @@ package web
 import (
 	"fmt"
 	"net/http"
-	"net/url"
 
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/forms"
+	"github.com/APTrust/registry/helpers"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/gin-gonic/gin"
 )
@@ -49,8 +49,6 @@ func WorkItemShow(c *gin.Context) {
 		}
 		req.TemplateData["form"] = form
 	}
-
-	req.TemplateData["flash"] = c.Query("flash")
 	c.HTML(http.StatusOK, "work_items/show.html", req.TemplateData)
 }
 
@@ -105,7 +103,8 @@ func WorkItemRequeue(c *gin.Context) {
 	if AbortIfError(c, err) {
 		return
 	}
-	redirectTo := fmt.Sprintf("/work_items/show/%d?flash=Item+requeued+to+%s", item.ID, url.QueryEscape(topic))
+	helpers.SetFlashCookie(c, fmt.Sprintf("Item has been requeued to %s", topic))
+	redirectTo := fmt.Sprintf("/work_items/show/%d", item.ID)
 	c.Redirect(http.StatusSeeOther, redirectTo)
 }
 

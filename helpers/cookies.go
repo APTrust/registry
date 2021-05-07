@@ -9,14 +9,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func SetSessionCookie(c *gin.Context, user *pgmodels.User) error {
+func SetCookie(c *gin.Context, name, value string) error {
 	c.SetSameSite(http.SameSiteStrictMode)
 	ctx := common.Context()
-	id := fmt.Sprintf("%d", user.ID)
-	if encoded, err := ctx.Config.Cookies.Secure.Encode(ctx.Config.Cookies.SessionCookie, id); err == nil {
-		ctx.Log.Info().Msgf("Setting session cookie for %s", user.Email)
+	if encoded, err := ctx.Config.Cookies.Secure.Encode(name, value); err == nil {
 		c.SetCookie(
-			ctx.Config.Cookies.SessionCookie,
+			name,
 			encoded,
 			ctx.Config.Cookies.MaxAge,
 			"/",
@@ -28,16 +26,10 @@ func SetSessionCookie(c *gin.Context, user *pgmodels.User) error {
 	return nil
 }
 
-func DeleteSessionCookie(c *gin.Context) {
+func DeleteCookie(c *gin.Context, name string) {
 	ctx := common.Context()
-	user := CurrentUser(c)
-	email := "unknown@not-logged-in.edu"
-	if user != nil {
-		email = user.Email
-	}
-	ctx.Log.Info().Msgf("Deleting session cookie for %s", email)
 	c.SetCookie(
-		ctx.Config.Cookies.SessionCookie,
+		name,
 		"",
 		-1, // -1 means expire immediately, which equals delete
 		"/",
@@ -45,6 +37,37 @@ func DeleteSessionCookie(c *gin.Context) {
 		ctx.Config.Cookies.HTTPSOnly, // set only via HTTPS?
 		true,                         // http-only: javascript can't access
 	)
+}
+
+func SetSessionCookie(c *gin.Context, user *pgmodels.User) error {
+	ctx := common.Context()
+	id := fmt.Sprintf("%d", user.ID)
+	return SetCookie(c, ctx.Config.Cookies.SessionCookie, id)
+}
+
+func DeleteSessionCookie(c *gin.Context) {
+	ctx := common.Context()
+	DeleteCookie(c, ctx.Config.Cookies.SessionCookie)
+}
+
+func SetFlashCookie(c *gin.Context, value string) error {
+	ctx := common.Context()
+	return SetCookie(c, ctx.Config.Cookies.FlashCookie, value)
+}
+
+func DeleteFlashCookie(c *gin.Context) {
+	ctx := common.Context()
+	DeleteCookie(c, ctx.Config.Cookies.FlashCookie)
+}
+
+func SetPrefsCookie(c *gin.Context, value string) error {
+	ctx := common.Context()
+	return SetCookie(c, ctx.Config.Cookies.PrefsCookie, value)
+}
+
+func DeletePrefsCookie(c *gin.Context) {
+	ctx := common.Context()
+	DeleteCookie(c, ctx.Config.Cookies.PrefsCookie)
 }
 
 func CurrentUser(c *gin.Context) *pgmodels.User {

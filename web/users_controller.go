@@ -100,7 +100,6 @@ func UserShow(c *gin.Context) {
 		return
 	}
 	req.TemplateData["user"] = user
-	req.TemplateData["flash"] = c.Query("flash")
 	c.HTML(http.StatusOK, "users/show.html", req.TemplateData)
 }
 
