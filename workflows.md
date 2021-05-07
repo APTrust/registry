@@ -124,3 +124,103 @@ The existing Pharos tables include:
 * schema_migrations - Rails-specific table to track DB migrations. We can get rid of this after we're stable in production.
 * snapshots - This is probably meant to track deposits by depositors over time. Contains data but is probably useless because it doesn't break deposits down by type. Should be superseded by on-demand reporting, but don't delete this table, since we may need to look back at historical data.
 * usage_samples - No idea what this is. The table has no data in the production DB, so we probably don't need to keep it.
+
+## Refactoring Email Tables
+
+We should keep and expand the emails table, and get rid of unused email-related tables.
+
+The current structure of the emails table in Pharos:
+
+* id - Unique numeric identifier.
+* email_type - See the list below.
+* event_identifier - Not used. Probably meant to hold a PremisEvent UUID.
+* item_id - Sometimes used. Probably points to a WorkItem ID.
+* email_text - The body of the email. For emails that include attachments, the attachments are inside this field, base-64 encoded as multi-part email mime types. Bleck.
+* user_list - The recipients to whom to send the emails, stored as a semi-colon delimited list of email addresses. More bleck.
+* intellectual_object_id - ID of intellectual object to be deleted in single-item deletion emails (types deletion_request and deletion_confirmation) .
+* generic_file_id - Never used. Probably for file deletion requests.
+* institution_id - ID of institution. Used in deletion_notifications and in bulk_deletion emails.
+* created_at - Generic Rails timestamp.
+* updated_at - Generic Rails timestamp.
+
+### Email Types
+
+In Pharos, `select distinct email_type from emails` yields the following result:
+
+```
+ bulk_deletion_request
+ bulk_deletion_confirmation_partial
+ bulk_deletion_confirmation_final
+ deletion_request
+ deletion_confirmation
+ deletion_notifications
+ restoration
+```
+
+* bulk_deletion_request - Tells institutional admins that someone has requested a bulk deletion. Lists items to be deleted (as attachment) and has a confirmation link.
+* bulk_deletion_confirmation_partial - Tells APTrust admins that someone has requested a bulk deletion. Lists items to be deleted (as attachment) and has a confirmation link.
+* bulk_deletion_confirmation_final - Tells institutional admins that bulk deletion has all required approvals and has been queued.
+* deletion_request - Tells institutional admins that a user has requested a single object or file deletion.
+* deletion_confirmation - Tells institutional admins that an individual deletion job has been approved and queued for processing.
+* deletion_notifications - Tells institutional admins that deletions have been completed. The list of deleted items is in an attached CSV file.
+* restoration - Tells institutional admins that a restoration has been completed and give the URL for downloading it.
+
+### Proposed Changes
+
+1. Remove user_list and use a many-to-many join table instead: emails_users (or alerts_users). This table should include columns indicating whether 1) alert was emailed, and 2) whether item was marked read in the web UI.
+2. Remove intellectual_object_id and generic_file_id and point instead to a deletion job id. The deletion_jobs table (or whatever we decide to call it) can link to multiple files and objects through many-to-many join tables. This means there will no longer be a distinction between regular one-off deletions and bulk deletions. (On the front-end, we would have to allow users to build a deletion list, choosing a number of items to be deleted together. This would prevent admins from getting spammed with deletion confirmations.)
+3. Instead of attaching a CSV file to list deletions, we should store this info a local table and the email can link to a display/download page. Storing large CSV files as base 64 encoded items in the emails table sucks. An actual table will give us better records.
+4. Replace event_identifier with event_id or have a many-to-many emails to events join table.
+5. Replace item_id with a many-to-many join table, so we can email about multiple items.
+6. Allow for more types, such as event notification.
+7. Consider changing `emails` to `alerts` so users can see these messages on login.
+8. For deletions, consider adding a Cancel token in addition to the confirm token, so an admin can be sure a deletion is cancelled and no one else can accidentally approve it.
+9. Get rid of confirmation_tokens table (or rename to legacy_confirmation_tokens) and put confirmation and cancellation tokens directly into the deletions table.
+10. Rename emails table to legacy_emails.
+11. Rename all of the bulk_delete tables to legacy_bulk_delete.
+
+The new emails/alerts table would look somewhat like this:
+
+```
+alerts
+  - id
+  - alert_type
+  - alert_text
+  - sent_at
+  - created_at
+  - updated_at
+```
+
+Whether or not alerts are emailed or just shown in the web UI should depend on the type. For example, deletion confirmations must be emailed. Some other types may not need to be.
+
+### Sketch of Schema
+
+```
+alerts
+  |_ users          (1 - many)  [recipients]
+      - alert_id
+      - user_id
+      - read_at
+  |_ work_items     (0 - many)  [restorations, stalled items]
+  |_ premis_events  (0 - many)  [failed fixities]
+  |_ deletion_jobs  (0 - many)  [deletion approval, confirmation]
+
+deletion_jobs
+  - id
+  - institution_id
+  - requested_by   (user id)
+  - requestd_at
+  - confirmation_token
+  - cancellation_token
+  - confirmed_by_inst_user
+  - confirmed_by_inst_at
+  - cancelled_by_inst_user
+  - cancelled_by_inst_at
+  - confirmed_by_apt_user
+  - confirmed_by_apt_at
+  - cancelled_by_apt_user
+  - cancelled_by_apt_at
+  - timestamps
+  |_ intellectual objects (0 - many)
+  |_ generic_files        (0 - many)
+```
