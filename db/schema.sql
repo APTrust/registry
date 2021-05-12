@@ -1,9 +1,20 @@
+-- 
+-- schema.sql
+--
+-- This file represents the full registry schema.
+--
+-- The migrations.sql file updates the old Pharos schema, as it existed
+-- in the feature/storage_record branch, so that it matches this schema.
+-- 
+-- https://github.com/APTrust/pharos/blob/feature/storage-record/db/schema.rb
+--
+
+
 -- public.ar_internal_metadata definition
-
--- Drop table
-
--- DROP TABLE public.ar_internal_metadata;
-
+--
+-- This is a legacy table used by ActiveRecord.
+-- We can drop this once production is stable.
+--
 CREATE TABLE public.ar_internal_metadata (
 	"key" varchar NOT NULL,
 	value varchar NULL,
@@ -14,11 +25,11 @@ CREATE TABLE public.ar_internal_metadata (
 
 
 -- public.bulk_delete_jobs definition
-
--- Drop table
-
--- DROP TABLE public.bulk_delete_jobs;
-
+--
+-- This is the legacy bulk delete table. 
+-- We should eventually archive this, but keep the
+-- data somewhere for historical and audit purposes.
+--
 CREATE TABLE public.bulk_delete_jobs (
 	id bigserial NOT NULL,
 	requested_by varchar NULL,
@@ -35,11 +46,11 @@ CREATE TABLE public.bulk_delete_jobs (
 
 
 -- public.bulk_delete_jobs_emails definition
-
--- Drop table
-
--- DROP TABLE public.bulk_delete_jobs_emails;
-
+-- 
+-- Related to the legacy bulk delete table. 
+-- We should eventually archive this, but keep the
+-- data somewhere for historical and audit purposes.
+--
 CREATE TABLE public.bulk_delete_jobs_emails (
 	bulk_delete_job_id int8 NULL,
 	email_id int8 NULL
@@ -49,11 +60,11 @@ CREATE INDEX index_bulk_delete_jobs_emails_on_email_id ON public.bulk_delete_job
 
 
 -- public.bulk_delete_jobs_generic_files definition
-
--- Drop table
-
--- DROP TABLE public.bulk_delete_jobs_generic_files;
-
+-- 
+-- Related to the legacy bulk delete table. 
+-- We should eventually archive this, but keep the
+-- data somewhere for historical and audit purposes.
+--
 CREATE TABLE public.bulk_delete_jobs_generic_files (
 	bulk_delete_job_id int8 NULL,
 	generic_file_id int8 NULL
@@ -63,11 +74,11 @@ CREATE INDEX index_bulk_delete_jobs_generic_files_on_generic_file_id ON public.b
 
 
 -- public.bulk_delete_jobs_institutions definition
-
--- Drop table
-
--- DROP TABLE public.bulk_delete_jobs_institutions;
-
+-- 
+-- Related to the legacy bulk delete table. 
+-- We should eventually archive this, but keep the
+-- data somewhere for historical and audit purposes.
+--
 CREATE TABLE public.bulk_delete_jobs_institutions (
 	bulk_delete_job_id int8 NULL,
 	institution_id int8 NULL
@@ -77,11 +88,11 @@ CREATE INDEX index_bulk_delete_jobs_institutions_on_institution_id ON public.bul
 
 
 -- public.bulk_delete_jobs_intellectual_objects definition
-
--- Drop table
-
--- DROP TABLE public.bulk_delete_jobs_intellectual_objects;
-
+-- 
+-- Related to the legacy bulk delete table. 
+-- We should eventually archive this, but keep the
+-- data somewhere for historical and audit purposes.
+--
 CREATE TABLE public.bulk_delete_jobs_intellectual_objects (
 	bulk_delete_job_id int8 NULL,
 	intellectual_object_id int8 NULL
@@ -91,11 +102,10 @@ CREATE INDEX index_bulk_delete_jobs_intellectual_objects_on_object_id ON public.
 
 
 -- public.confirmation_tokens definition
-
--- Drop table
-
--- DROP TABLE public.confirmation_tokens;
-
+-- 
+-- This is a legacy table. We can likely delete it
+-- after production is stable.
+--
 CREATE TABLE public.confirmation_tokens (
 	id bigserial NOT NULL,
 	"token" varchar NULL,
@@ -108,11 +118,11 @@ CREATE TABLE public.confirmation_tokens (
 
 
 -- public.emails definition
-
--- Drop table
-
--- DROP TABLE public.emails;
-
+-- 
+-- This legacy table will be replaced by the new alerts table. 
+-- We should eventually archive this, but keep the
+-- data somewhere for historical and audit purposes.
+--
 CREATE TABLE public.emails (
 	id bigserial NOT NULL,
 	email_type varchar NULL,
@@ -130,11 +140,11 @@ CREATE TABLE public.emails (
 
 
 -- public.emails_generic_files definition
-
--- Drop table
-
--- DROP TABLE public.emails_generic_files;
-
+-- 
+-- Related to the legacy emails table. 
+-- We should eventually archive this, but keep the
+-- data somewhere for historical and audit purposes.
+--
 CREATE TABLE public.emails_generic_files (
 	generic_file_id int8 NULL,
 	email_id int8 NULL
@@ -144,11 +154,11 @@ CREATE INDEX index_emails_generic_files_on_generic_file_id ON public.emails_gene
 
 
 -- public.emails_intellectual_objects definition
-
--- Drop table
-
--- DROP TABLE public.emails_intellectual_objects;
-
+-- 
+-- Related to the legacy emails table. 
+-- We should eventually archive this, but keep the
+-- data somewhere for historical and audit purposes.
+--
 CREATE TABLE public.emails_intellectual_objects (
 	intellectual_object_id int8 NULL,
 	email_id int8 NULL
@@ -158,11 +168,11 @@ CREATE INDEX index_emails_intellectual_objects_on_intellectual_object_id ON publ
 
 
 -- public.emails_premis_events definition
-
--- Drop table
-
--- DROP TABLE public.emails_premis_events;
-
+-- 
+-- Related to the legacy emails table. 
+-- We should eventually archive this, but keep the
+-- data somewhere for historical and audit purposes.
+--
 CREATE TABLE public.emails_premis_events (
 	premis_event_id int8 NULL,
 	email_id int8 NULL
@@ -172,11 +182,11 @@ CREATE INDEX index_emails_premis_events_on_premis_event_id ON public.emails_prem
 
 
 -- public.emails_work_items definition
-
--- Drop table
-
--- DROP TABLE public.emails_work_items;
-
+-- 
+-- Related to the legacy emails table. 
+-- We should eventually archive this, but keep the
+-- data somewhere for historical and audit purposes.
+--
 CREATE TABLE public.emails_work_items (
 	work_item_id int8 NULL,
 	email_id int8 NULL
@@ -186,11 +196,6 @@ CREATE INDEX index_emails_work_items_on_work_item_id ON public.emails_work_items
 
 
 -- public.generic_files definition
-
--- Drop table
-
--- DROP TABLE public.generic_files;
-
 CREATE TABLE public.generic_files (
 	id serial NOT NULL,
 	file_format varchar NULL,
@@ -218,11 +223,6 @@ CREATE INDEX ix_gf_last_fixity_check ON public.generic_files USING btree (last_f
 
 
 -- public.institutions definition
-
--- Drop table
-
--- DROP TABLE public.institutions;
-
 CREATE TABLE public.institutions (
 	id serial NOT NULL,
 	"name" varchar NULL,
@@ -243,11 +243,6 @@ CREATE INDEX index_institutions_on_name ON public.institutions USING btree (name
 
 
 -- public.intellectual_objects definition
-
--- Drop table
-
--- DROP TABLE public.intellectual_objects;
-
 CREATE TABLE public.intellectual_objects (
 	id serial NOT NULL,
 	title varchar NULL,
@@ -277,11 +272,11 @@ CREATE INDEX index_intellectual_objects_on_updated_at ON public.intellectual_obj
 
 
 -- public.old_passwords definition
-
--- Drop table
-
--- DROP TABLE public.old_passwords;
-
+-- 
+-- This is a legacy table. We can get rid of this if we
+-- abandon mandatory password changes. Wait until that's
+-- decided.
+--
 CREATE TABLE public.old_passwords (
 	id bigserial NOT NULL,
 	encrypted_password varchar NOT NULL,
@@ -295,11 +290,6 @@ CREATE INDEX index_password_archivable ON public.old_passwords USING btree (pass
 
 
 -- public.premis_events definition
-
--- Drop table
-
--- DROP TABLE public.premis_events;
-
 CREATE TABLE public.premis_events (
 	id serial NOT NULL,
 	identifier varchar NULL,
@@ -330,11 +320,12 @@ CREATE INDEX index_premis_events_on_outcome ON public.premis_events USING btree 
 
 
 -- public.schema_migrations definition
-
--- Drop table
-
--- DROP TABLE public.schema_migrations;
-
+--
+-- This is a legacy table used by ActiveRecord
+-- to track which migrations have been applied.
+--
+-- We can delete this when production is stable.
+--
 CREATE TABLE public.schema_migrations (
 	"version" varchar NOT NULL,
 	CONSTRAINT schema_migrations_pkey PRIMARY KEY (version)
@@ -342,11 +333,12 @@ CREATE TABLE public.schema_migrations (
 
 
 -- public.snapshots definition
-
--- Drop table
-
--- DROP TABLE public.snapshots;
-
+--
+-- This table stores point-in-time snapshots
+-- of how much data each depositor has in the repo.
+--
+-- We may eventually delete this, but keep for now.
+--
 CREATE TABLE public.snapshots (
 	id bigserial NOT NULL,
 	audit_date timestamp NULL,
@@ -363,11 +355,11 @@ CREATE TABLE public.snapshots (
 
 
 -- public.usage_samples definition
-
--- Drop table
-
--- DROP TABLE public.usage_samples;
-
+-- 
+-- No idea what this was supposed to be, but the
+-- table never had any data in the production DB.
+-- Consider deleting this after we're sure it's not used.
+--
 CREATE TABLE public.usage_samples (
 	id serial NOT NULL,
 	created_at timestamp NOT NULL,
@@ -379,11 +371,6 @@ CREATE TABLE public.usage_samples (
 
 
 -- public.work_items definition
-
--- Drop table
-
--- DROP TABLE public.work_items;
-
 CREATE TABLE public.work_items (
 	id serial NOT NULL,
 	created_at timestamp NOT NULL,
@@ -425,11 +412,6 @@ CREATE INDEX index_work_items_on_status ON public.work_items USING btree (status
 
 
 -- public.checksums definition
-
--- Drop table
-
--- DROP TABLE public.checksums;
-
 CREATE TABLE public.checksums (
 	id serial NOT NULL,
 	algorithm varchar NULL,
@@ -445,11 +427,6 @@ CREATE INDEX index_checksums_on_generic_file_id ON public.checksums USING btree 
 
 
 -- public.storage_records definition
-
--- Drop table
-
--- DROP TABLE public.storage_records;
-
 CREATE TABLE public.storage_records (
 	id bigserial NOT NULL,
 	generic_file_id int4 NULL,
@@ -461,11 +438,6 @@ CREATE INDEX index_storage_records_on_generic_file_id ON public.storage_records 
 
 
 -- public.users definition
-
--- Drop table
-
--- DROP TABLE public.users;
-
 CREATE TABLE public.users (
 	id serial NOT NULL,
 	"name" varchar NULL,
@@ -511,6 +483,91 @@ CREATE UNIQUE INDEX index_users_on_email ON public.users USING btree (email);
 CREATE INDEX index_users_on_institution_id ON public.users USING btree (institution_id);
 CREATE INDEX index_users_on_password_changed_at ON public.users USING btree (password_changed_at);
 CREATE UNIQUE INDEX index_users_on_reset_password_token ON public.users USING btree (reset_password_token);
+
+-------------------------------------------------------------------------------
+-- New tables that were not part of Pharos.
+-- alerts              + join tables
+-- deletion_requests   + join tables
+-------------------------------------------------------------------------------
+
+-- deletion_requests track requests for file and object deletions,
+-- who initiated them and who approved them
+create table public.deletion_requests (
+	id bigserial primary key,
+	institution_id integer not null references public.institutions(id),
+	requested_by integer not null references public.users(id),
+	requested_at timestamp not null,
+	confirmation_token varchar not null,
+	cancellation_token varchar not null,
+	confirmed_by integer references public.users(id),
+	confirmed_at timestamp,
+	cancelled_by integer references public.users(id),
+	cancelled_at timestamp
+);
+create index index_deletion_requests_institution_id ON public.deletion_requests (institution_id);
+
+
+-- deletion_requests_generic_files records which files belong to a deletion request
+create table public.deletion_requests_generic_files (
+	deletion_request_id integer not null references public.deletion_requests(id),
+	generic_file_id integer not null references public.generic_files(id)
+);
+create index index_drgf_deletion_request_id ON public.deletion_requests_generic_files (deletion_request_id);
+
+
+-- deletion_requests_intellectual_objects records which objects belong to a deletion request
+create table public.deletion_requests_intellectual_objects (
+	deletion_request_id integer not null references public.deletion_requests(id),
+	intellectual_object_id integer not null references public.intellectual_objects(id)
+);
+create index index_drio_deletion_request_id ON public.deletion_requests_intellectual_objects (deletion_request_id);
+
+
+-- alerts stores the content of alert messages. These messages appear in the web UI
+-- and may also be emailed to users, depending on the alert type.
+-- Column deletion_request_id will typically be null.
+create table public.alerts (
+	id bigserial primary key,
+	institution_id integer references public.institutions(id),
+	"type" varchar not null,
+	"content" text not null,
+	deletion_request_id integer references public.deletion_requests(id),
+	created_at timestamp not null
+);
+create index index_alerts_institution_id ON public.alerts (institution_id);
+create index index_alerts_type ON public.alerts ("type");
+
+
+-- alerts_users tracks which users should see which alerts. Depending on alert.type,
+-- the message may be emailed to the user (for example, a deletion approval alert),
+-- or it may simply be displayed in the web UI.
+create table public.alerts_users (
+	alert_id integer not null references public.alerts(id),
+	user_id integer not null references public.users(id),
+	sent_at timestamp default null,
+	read_at timestamp default null
+);
+create index index_alerts_users_alert_id ON public.alerts_users (alert_id);
+create index index_alerts_users_user_id ON public.alerts_users (user_id);
+
+
+-- alerts_work_items link an alerts to one or more work items.
+create table public.alerts_work_items (
+	alert_id integer not null references public.alerts(id),
+	work_item_id integer not null references public.work_items(id)
+);
+create index index_alerts_work_items_alert_id ON public.alerts_work_items (alert_id);
+
+
+-- alerts_premis_events link alerts to one or more premis_events.
+create table public.alerts_premis_events (
+	alert_id integer not null references public.alerts(id),
+	premis_event_id integer not null references public.premis_events(id)
+);
+create index index_alerts_premis_events_alert_id ON public.alerts_premis_events(alert_id);
+
+
+
 
 -------------------------------------------------------------------------------
 -- Views

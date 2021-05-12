@@ -179,48 +179,6 @@ In Pharos, `select distinct email_type from emails` yields the following result:
 10. Rename emails table to legacy_emails.
 11. Rename all of the bulk_delete tables to legacy_bulk_delete.
 
-The new emails/alerts table would look somewhat like this:
+Updated 2021-05-12: See the [schema](./db/schema.sql) for new alerts and deletion_requests tables.
 
-```
-alerts
-  - id
-  - alert_type
-  - alert_text
-  - sent_at
-  - created_at
-  - updated_at
-```
-
-Whether or not alerts are emailed or just shown in the web UI should depend on the type. For example, deletion confirmations must be emailed. Some other types may not need to be.
-
-### Sketch of Schema
-
-```
-alerts
-  |_ users          (1 - many)  [recipients]
-      - alert_id
-      - user_id
-      - read_at
-  |_ work_items     (0 - many)  [restorations, stalled items]
-  |_ premis_events  (0 - many)  [failed fixities]
-  |_ deletion_jobs  (0 - many)  [deletion approval, confirmation]
-
-deletion_jobs
-  - id
-  - institution_id
-  - requested_by   (user id)
-  - requestd_at
-  - confirmation_token
-  - cancellation_token
-  - confirmed_by_inst_user
-  - confirmed_by_inst_at
-  - cancelled_by_inst_user
-  - cancelled_by_inst_at
-  - confirmed_by_apt_user
-  - confirmed_by_apt_at
-  - cancelled_by_apt_user
-  - cancelled_by_apt_at
-  - timestamps
-  |_ intellectual objects (0 - many)
-  |_ generic_files        (0 - many)
-```
+The [migrations](./db/migrations.sql) file should bring the Pharos DB into line with the current schema.
