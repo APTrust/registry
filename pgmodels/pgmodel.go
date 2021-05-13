@@ -3,7 +3,16 @@ package pgmodels
 import (
 	"github.com/APTrust/registry/common"
 	"github.com/go-pg/pg/v10"
+	"github.com/go-pg/pg/v10/orm"
 )
+
+// init does some setup work so go-pg can recognize many-to-many
+// relations. Go automatically calls this function once when package
+// is imported.
+func init() {
+	orm.RegisterTable((*DeletionRequestsGenericFiles)(nil))
+	orm.RegisterTable((*DeletionRequestsIntellectualObjects)(nil))
+}
 
 type Model interface {
 	GetID() int64

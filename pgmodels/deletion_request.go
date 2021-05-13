@@ -28,9 +28,9 @@ type DeletionRequest struct {
 	ConfirmedAt                time.Time             `json:"confirmed_at"`
 	CancelledByID              int64                 `json:"-"`
 	CancelledAt                time.Time             `json:"cancelled_at"`
-	RequestedBy                *User                 `json:"requested_by" pg:"has-one"`
-	ConfirmedBy                *User                 `json:"confirmed_by" pg:"has-one"`
-	CancelledBy                *User                 `json:"cancelled_by" pg:"has-one"`
+	RequestedBy                *User                 `json:"requested_by" pg:"rel:has-one"`
+	ConfirmedBy                *User                 `json:"confirmed_by" pg:"rel:has-one"`
+	CancelledBy                *User                 `json:"cancelled_by" pg:"rel:has-one"`
 	GenericFiles               []*GenericFile        `json:"generic_files" pg:"many2many:deletion_requests_generic_files"`
 	IntellectualObjects        []*IntellectualObject `json:"intellectual_objects" pg:"many2many:deletion_requests_intellectual_objects"`
 }
@@ -50,7 +50,7 @@ type DeletionRequestsIntellectualObjects struct {
 // DeletionRequestByID returns the institution with the specified id.
 // Returns pg.ErrNoRows if there is no match.
 func DeletionRequestByID(id int64) (*DeletionRequest, error) {
-	query := NewQuery().Relations("RequestedBy", "ConfirmedBy", "CancelledBy").Where("id", "=", id)
+	query := NewQuery().Relations("RequestedBy", "ConfirmedBy", "CancelledBy", "GenericFiles", "IntellectualObjects").Where(`"deletion_request"."id"`, "=", id)
 	return DeletionRequestGet(query)
 }
 
