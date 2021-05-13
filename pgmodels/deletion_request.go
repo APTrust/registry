@@ -5,6 +5,7 @@ import (
 
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
+	"github.com/go-pg/pg/v10/orm"
 )
 
 const (
@@ -15,6 +16,14 @@ const (
 	ErrDeletionUserInactive = "User has been deactivated."
 	ErrTokenNotEncrypted    = "Token must be encrypted."
 )
+
+// init does some setup work so go-pg can recognize many-to-many
+// relations. Go automatically calls this function once when package
+// is imported.
+func init() {
+	orm.RegisterTable((*DeletionRequestsGenericFiles)(nil))
+	orm.RegisterTable((*DeletionRequestsIntellectualObjects)(nil))
+}
 
 type DeletionRequest struct {
 	ID                         int64                 `json:"id"`
