@@ -18,6 +18,12 @@ const (
 	ActionRequestDelete        = "RequestDelete"
 	ActionRestoreObject        = "Restore Object"
 	ActionUpdate               = "Update"
+	AlertDeletionCancelled     = "Deletion Cancelled"
+	AlertDeletionCompleted     = "Deletion Completed"
+	AlertDeletionConfirmed     = "Deletion Confirmed"
+	AlertDeletionRequested     = "Deletion Requested"
+	AlertFailedFixity          = "Failed Fixity Check"
+	AlertRestorationCompleted  = "Restoration Completed"
 	AlgMd5                     = "md5"
 	AlgSha1                    = "sha1"
 	AlgSha256                  = "sha256"
@@ -105,6 +111,15 @@ var AccessSettings = []string{
 	AccessConsortia,
 	AccessInstitution,
 	AccessRestricted,
+}
+
+var AlertTypes = []string{
+	AlertDeletionCancelled,
+	AlertDeletionCompleted,
+	AlertDeletionConfirmed,
+	AlertDeletionRequested,
+	AlertFailedFixity,
+	AlertRestorationCompleted,
 }
 
 var CompletedStatusValues = []string{
