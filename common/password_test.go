@@ -54,3 +54,19 @@ func TestLegacyPassword(t *testing.T) {
 	assert.True(t, common.ComparePasswords(hashed, plaintext))
 	assert.False(t, common.ComparePasswords(hashed, "should-not-match"))
 }
+
+func TestRandomToken(t *testing.T) {
+	seen := make(map[string]bool)
+	for i := 1; i < 5; i++ {
+		token := common.RandomToken()
+		assert.False(t, seen[token])
+		seen[token] = true
+	}
+}
+
+func TestLooksEncrypted(t *testing.T) {
+	encrypted, err := common.EncryptPassword("Ned Flanders")
+	require.Nil(t, err)
+	assert.True(t, common.LooksEncrypted(encrypted))
+	assert.False(t, common.LooksEncrypted("Barney Gumble"))
+}

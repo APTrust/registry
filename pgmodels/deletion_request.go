@@ -1,7 +1,6 @@
 package pgmodels
 
 import (
-	"strings"
 	"time"
 
 	"github.com/APTrust/registry/common"
@@ -22,6 +21,8 @@ type DeletionRequest struct {
 	InstitutionID              int64                 `json:"institution_id"`
 	RequestedByID              int64                 `json:"-"`
 	RequestedAt                time.Time             `json:"requested_at"`
+	ConfirmationToken          string                `json:"-" pg:"-"`
+	CancellationToken          string                `json:"-" pg:"-"`
 	EncryptedConfirmationToken string                `json:"-"`
 	EncryptedCancellationToken string                `json:"-"`
 	ConfirmedByID              int64                 `json:"-"`
@@ -45,6 +46,25 @@ type DeletionRequestsIntellectualObjects struct {
 	tableName            struct{} `pg:"deletion_requests_intellectual_objects"`
 	DeletionRequestID    int64
 	IntellectualObjectID int64
+}
+
+func NewDeletionRequest() (*DeletionRequest, error) {
+	confToken := common.RandomToken()
+	cancelToken := common.RandomToken()
+	encConfToken, err := common.EncryptPassword(confToken)
+	if err != nil {
+		return nil, err
+	}
+	encCancelToken, err := common.EncryptPassword(cancelToken)
+	if err != nil {
+		return nil, err
+	}
+	return &DeletionRequest{
+		ConfirmationToken:          confToken,
+		CancellationToken:          cancelToken,
+		EncryptedConfirmationToken: encConfToken,
+		EncryptedCancellationToken: encCancelToken,
+	}, nil
 }
 
 // DeletionRequestByID returns the institution with the specified id.
@@ -136,10 +156,10 @@ func (request *DeletionRequest) Validate() *common.ValidationError {
 	}
 
 	// Make sure tokens are actually encrypted
-	if !strings.HasPrefix(request.EncryptedConfirmationToken, constants.EncryptedTokenPrefix) {
+	if !common.LooksEncrypted(request.EncryptedConfirmationToken) {
 		errors["EncryptedConfirmationToken"] = ErrTokenNotEncrypted
 	}
-	if !strings.HasPrefix(request.EncryptedCancellationToken, constants.EncryptedTokenPrefix) {
+	if !common.LooksEncrypted(request.EncryptedCancellationToken) {
 		errors["EncryptedCancellationToken"] = ErrTokenNotEncrypted
 	}
 

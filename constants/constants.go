@@ -23,7 +23,6 @@ const (
 	AlgSha256                  = "sha256"
 	AlgSha512                  = "sha512"
 	DefaultProfileIdentifier   = "https://raw.githubusercontent.com/APTrust/preservation-services/master/profiles/aptrust-v2.2.json"
-	EncryptedTokenPrefix       = "$2a$10$"
 	EventAccessAssignment      = "access assignment"
 	EventCapture               = "capture"
 	EventCompression           = "compression"

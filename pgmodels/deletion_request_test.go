@@ -3,8 +3,7 @@ package pgmodels_test
 import (
 	"testing"
 
-	//"github.com/APTrust/registry/constants"
-	//"github.com/APTrust/registry/db"
+	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -16,6 +15,22 @@ const (
 	ConfTokenEncrypted   = "$2a$10$TK8s1XnmWulSUdze8GN5uOgGmDDsnndQKF5/Rz1j0xaHT7AwXRVma"
 	CancelTokenEncrypted = "$2a$10$xwxTFn.k1TbfbNSW3/udduwtjwo7nQSBlIlARHvTXADAhCfQtZt46"
 )
+
+func TestNewDeletionRequest(t *testing.T) {
+	request, err := pgmodels.NewDeletionRequest()
+	require.Nil(t, err)
+	require.NotNil(t, request)
+	assert.Equal(t, 32, len(request.ConfirmationToken))
+	assert.False(t, common.LooksEncrypted(request.ConfirmationToken))
+	assert.Equal(t, 32, len(request.CancellationToken))
+	assert.False(t, common.LooksEncrypted(request.CancellationToken))
+
+	assert.True(t, len(request.EncryptedConfirmationToken) > 30)
+	assert.True(t, len(request.EncryptedCancellationToken) > 30)
+
+	assert.True(t, common.LooksEncrypted(request.EncryptedConfirmationToken))
+	assert.True(t, common.LooksEncrypted(request.EncryptedCancellationToken))
+}
 
 func TestDeletionRequestByID(t *testing.T) {
 	request, err := pgmodels.DeletionRequestByID(1)
@@ -52,3 +67,5 @@ func TestDeletionRequestByID(t *testing.T) {
 	assert.NotNil(t, request.CancelledBy)
 	assert.Equal(t, 1, len(request.IntellectualObjects))
 }
+
+// TODO: Test validation.
