@@ -111,9 +111,9 @@ create unique index if not exists index_institutions_restore_bucket on instituti
 alter table institutions add column if not exists enable_spot_restore boolean not null default false;
 
 -- ********************************************************************
--- 
+--
 -- Add tables for alerts and deletions that did not exist in Pharos
--- 
+--
 -- ********************************************************************
 
 -- deletion_requests track requests for file and object deletions,
@@ -121,13 +121,13 @@ alter table institutions add column if not exists enable_spot_restore boolean no
 create table if not exists public.deletion_requests (
 	id bigserial primary key,
 	institution_id integer not null references public.institutions(id),
-	requested_by integer not null references public.users(id),
+	requested_by_id integer not null references public.users(id),
 	requested_at timestamp not null,
 	confirmation_token varchar not null,
 	cancellation_token varchar not null,
-	confirmed_by integer references public.users(id),
+	confirmed_by_id integer references public.users(id),
 	confirmed_at timestamp,
-	cancelled_by integer references public.users(id),
+	cancelled_by_id integer references public.users(id),
 	cancelled_at timestamp
 );
 create index if not exists index_deletion_requests_institution_id ON public.deletion_requests (institution_id);

@@ -1,11 +1,11 @@
--- 
+--
 -- schema.sql
 --
 -- This file represents the full registry schema.
 --
 -- The migrations.sql file updates the old Pharos schema, as it existed
 -- in the feature/storage_record branch, so that it matches this schema.
--- 
+--
 -- https://github.com/APTrust/pharos/blob/feature/storage-record/db/schema.rb
 --
 
@@ -26,7 +26,7 @@ CREATE TABLE public.ar_internal_metadata (
 
 -- public.bulk_delete_jobs definition
 --
--- This is the legacy bulk delete table. 
+-- This is the legacy bulk delete table.
 -- We should eventually archive this, but keep the
 -- data somewhere for historical and audit purposes.
 --
@@ -46,8 +46,8 @@ CREATE TABLE public.bulk_delete_jobs (
 
 
 -- public.bulk_delete_jobs_emails definition
--- 
--- Related to the legacy bulk delete table. 
+--
+-- Related to the legacy bulk delete table.
 -- We should eventually archive this, but keep the
 -- data somewhere for historical and audit purposes.
 --
@@ -60,8 +60,8 @@ CREATE INDEX index_bulk_delete_jobs_emails_on_email_id ON public.bulk_delete_job
 
 
 -- public.bulk_delete_jobs_generic_files definition
--- 
--- Related to the legacy bulk delete table. 
+--
+-- Related to the legacy bulk delete table.
 -- We should eventually archive this, but keep the
 -- data somewhere for historical and audit purposes.
 --
@@ -74,8 +74,8 @@ CREATE INDEX index_bulk_delete_jobs_generic_files_on_generic_file_id ON public.b
 
 
 -- public.bulk_delete_jobs_institutions definition
--- 
--- Related to the legacy bulk delete table. 
+--
+-- Related to the legacy bulk delete table.
 -- We should eventually archive this, but keep the
 -- data somewhere for historical and audit purposes.
 --
@@ -88,8 +88,8 @@ CREATE INDEX index_bulk_delete_jobs_institutions_on_institution_id ON public.bul
 
 
 -- public.bulk_delete_jobs_intellectual_objects definition
--- 
--- Related to the legacy bulk delete table. 
+--
+-- Related to the legacy bulk delete table.
 -- We should eventually archive this, but keep the
 -- data somewhere for historical and audit purposes.
 --
@@ -102,7 +102,7 @@ CREATE INDEX index_bulk_delete_jobs_intellectual_objects_on_object_id ON public.
 
 
 -- public.confirmation_tokens definition
--- 
+--
 -- This is a legacy table. We can likely delete it
 -- after production is stable.
 --
@@ -118,8 +118,8 @@ CREATE TABLE public.confirmation_tokens (
 
 
 -- public.emails definition
--- 
--- This legacy table will be replaced by the new alerts table. 
+--
+-- This legacy table will be replaced by the new alerts table.
 -- We should eventually archive this, but keep the
 -- data somewhere for historical and audit purposes.
 --
@@ -140,8 +140,8 @@ CREATE TABLE public.emails (
 
 
 -- public.emails_generic_files definition
--- 
--- Related to the legacy emails table. 
+--
+-- Related to the legacy emails table.
 -- We should eventually archive this, but keep the
 -- data somewhere for historical and audit purposes.
 --
@@ -154,8 +154,8 @@ CREATE INDEX index_emails_generic_files_on_generic_file_id ON public.emails_gene
 
 
 -- public.emails_intellectual_objects definition
--- 
--- Related to the legacy emails table. 
+--
+-- Related to the legacy emails table.
 -- We should eventually archive this, but keep the
 -- data somewhere for historical and audit purposes.
 --
@@ -168,8 +168,8 @@ CREATE INDEX index_emails_intellectual_objects_on_intellectual_object_id ON publ
 
 
 -- public.emails_premis_events definition
--- 
--- Related to the legacy emails table. 
+--
+-- Related to the legacy emails table.
 -- We should eventually archive this, but keep the
 -- data somewhere for historical and audit purposes.
 --
@@ -182,8 +182,8 @@ CREATE INDEX index_emails_premis_events_on_premis_event_id ON public.emails_prem
 
 
 -- public.emails_work_items definition
--- 
--- Related to the legacy emails table. 
+--
+-- Related to the legacy emails table.
 -- We should eventually archive this, but keep the
 -- data somewhere for historical and audit purposes.
 --
@@ -272,7 +272,7 @@ CREATE INDEX index_intellectual_objects_on_updated_at ON public.intellectual_obj
 
 
 -- public.old_passwords definition
--- 
+--
 -- This is a legacy table. We can get rid of this if we
 -- abandon mandatory password changes. Wait until that's
 -- decided.
@@ -355,7 +355,7 @@ CREATE TABLE public.snapshots (
 
 
 -- public.usage_samples definition
--- 
+--
 -- No idea what this was supposed to be, but the
 -- table never had any data in the production DB.
 -- Consider deleting this after we're sure it's not used.
@@ -495,13 +495,13 @@ CREATE UNIQUE INDEX index_users_on_reset_password_token ON public.users USING bt
 create table public.deletion_requests (
 	id bigserial primary key,
 	institution_id integer not null references public.institutions(id),
-	requested_by integer not null references public.users(id),
+	requested_by_id integer not null references public.users(id),
 	requested_at timestamp not null,
 	confirmation_token varchar not null,
 	cancellation_token varchar not null,
-	confirmed_by integer references public.users(id),
+	confirmed_by_id integer references public.users(id),
 	confirmed_at timestamp,
-	cancelled_by integer references public.users(id),
+	cancelled_by_id integer references public.users(id),
 	cancelled_at timestamp
 );
 create index index_deletion_requests_institution_id ON public.deletion_requests (institution_id);

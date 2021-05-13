@@ -60,6 +60,10 @@ func InstIDFor(resourceType string, resourceID int64) (id int64, err error) {
 		if cs != nil && cs.GenericFile != nil {
 			id = cs.GenericFile.InstitutionID
 		}
+	case "DeletionRequest":
+		req := &DeletionRequest{}
+		err = db.Model(req).Column("institution_id").Where("id = ?", resourceID).Select()
+		id = req.InstitutionID
 	case "GenericFile":
 		gf := &GenericFile{}
 		err = db.Model(gf).Column("institution_id").Where("id = ?", resourceID).Select()
