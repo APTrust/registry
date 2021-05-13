@@ -34,12 +34,17 @@ var LoadOrder = []string{
 	"storage_records",
 	"premis_events",
 	"work_items",
+	"deletion_requests",
+	"deletion_requests_generic_files",
+	"deletion_requests_intellectual_objects",
 }
 
 // HasNoIDColumn lists tables that have no identity column. Attempting
 // to reset the id sequences on these tables will cause an error.
 var HasNoIDColumn = []string{
 	"roles_users",
+	"deletion_requests_generic_files",
+	"deletion_requests_intellectual_objects",
 }
 
 // DropOrder lists tables to be dropped, in the order they should be

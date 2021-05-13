@@ -1,0 +1,4 @@
+"id","institution_id","requested_by_id","requested_at","confirmation_token","cancellation_token","confirmed_by_id","confirmed_at","cancelled_by_id","cancelled_at"
+1,2,3,2021-05-13 11:10:32,$2a$10$TK8s1XnmWulSUdze8GN5uOgGmDDsnndQKF5/Rz1j0xaHT7AwXRVma,$2a$10$xwxTFn.k1TbfbNSW3/udduwtjwo7nQSBlIlARHvTXADAhCfQtZt46,,,,
+2,2,3,2021-05-13 11:10:32,$2a$10$TK8s1XnmWulSUdze8GN5uOgGmDDsnndQKF5/Rz1j0xaHT7AwXRVma,$2a$10$xwxTFn.k1TbfbNSW3/udduwtjwo7nQSBlIlARHvTXADAhCfQtZt46,2,2021-05-13 11:10:32,,
+3,2,3,2021-05-13 11:10:32,$2a$10$TK8s1XnmWulSUdze8GN5uOgGmDDsnndQKF5/Rz1j0xaHT7AwXRVma,$2a$10$xwxTFn.k1TbfbNSW3/udduwtjwo7nQSBlIlARHvTXADAhCfQtZt46,,,2,2021-05-13 11:10:32
