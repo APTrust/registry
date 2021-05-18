@@ -175,6 +175,7 @@ create table if not exists public.alerts_users (
 );
 create index if not exists index_alerts_users_alert_id ON public.alerts_users (alert_id);
 create index if not exists index_alerts_users_user_id ON public.alerts_users (user_id);
+create unique index if not exists index_alerts_users_unique ON public.alerts_users (alert_id, user_id);
 
 
 -- alerts_work_items link an alerts to one or more work items.
@@ -183,6 +184,7 @@ create table if not exists public.alerts_work_items (
 	work_item_id integer not null references public.work_items(id)
 );
 create index if not exists index_alerts_work_items_alert_id ON public.alerts_work_items (alert_id);
+create unique index if not exists index_alerts_work_items_unique ON public.alerts_work_items (alert_id, work_item_id);
 
 
 -- alerts_premis_events link alerts to one or more premis_events.
@@ -191,3 +193,4 @@ create table if not exists public.alerts_premis_events (
 	premis_event_id integer not null references public.premis_events(id)
 );
 create index if not exists index_alerts_premis_events_alert_id ON public.alerts_premis_events(alert_id);
+create unique index if not exists index_alerts_premis_events_unique ON public.alerts_premis_events(alert_id, premis_event_id);

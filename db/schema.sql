@@ -542,21 +542,23 @@ create index index_alerts_type ON public.alerts ("type");
 -- the message may be emailed to the user (for example, a deletion approval alert),
 -- or it may simply be displayed in the web UI.
 create table public.alerts_users (
-	alert_id integer not null references public.alerts(id),
+    alert_id integer not null references public.alerts(id),
 	user_id integer not null references public.users(id),
 	sent_at timestamp default null,
 	read_at timestamp default null
 );
 create index index_alerts_users_alert_id ON public.alerts_users (alert_id);
 create index index_alerts_users_user_id ON public.alerts_users (user_id);
+create unique index index_alerts_users_unique ON public.alerts_users (alert_id, user_id);
 
 
 -- alerts_work_items link an alerts to one or more work items.
 create table public.alerts_work_items (
-	alert_id integer not null references public.alerts(id),
+    alert_id integer not null references public.alerts(id),
 	work_item_id integer not null references public.work_items(id)
 );
 create index index_alerts_work_items_alert_id ON public.alerts_work_items (alert_id);
+create unique index index_alerts_work_items_unique ON public.alerts_work_items (alert_id, work_item_id);
 
 
 -- alerts_premis_events link alerts to one or more premis_events.
@@ -565,7 +567,7 @@ create table public.alerts_premis_events (
 	premis_event_id integer not null references public.premis_events(id)
 );
 create index index_alerts_premis_events_alert_id ON public.alerts_premis_events(alert_id);
-
+create unique index index_alerts_premis_events_unique ON public.alerts_premis_events(alert_id, premis_event_id);
 
 
 
