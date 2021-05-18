@@ -45,4 +45,11 @@ func TestAlertRelations(t *testing.T) {
 	require.Nil(t, err)
 	assert.True(t, alert.ID > 0)
 
+	// Fetch the alert...
+	alert, err = pgmodels.AlertByID(alert.ID)
+	require.Nil(t, err)
+
+	assert.Equal(t, 3, len(alert.Users))
+	assert.Equal(t, 3, len(alert.PremisEvents))
+	assert.Equal(t, 3, len(alert.WorkItems))
 }

@@ -83,7 +83,11 @@ func (alert *Alert) GetID() int64 {
 }
 
 // Save saves this alert to the database. This will peform an insert
-// if Alert.ID is zero. Otherwise, it updates.
+// if Alert.ID is zero. Otherwise, it updates. It also saves all of
+// the many-to-many relations (PremisEvents, Users, and WorkItems), though
+// note that on update it does not delete any of these relations. We don't
+// have a use case for that yet, since alerts are generally created and never
+// updated.
 func (alert *Alert) Save() error {
 	registryContext := common.Context()
 	db := registryContext.DB
@@ -101,6 +105,7 @@ func (alert *Alert) Save() error {
 	})
 }
 
+// This is run inside the Save transaction.
 func (alert *Alert) saveRelations(db *pg.DB) error {
 	err := alert.saveEvents(db)
 	if err != nil {
@@ -114,7 +119,6 @@ func (alert *Alert) saveRelations(db *pg.DB) error {
 	return err
 }
 
-// This is run inside the Save transaction.
 func (alert *Alert) saveEvents(db *pg.DB) error {
 	sql := "insert into alerts_premis_events (alert_id, premis_event_id) values (?, ?) on conflict do nothing"
 	for _, event := range alert.PremisEvents {
@@ -126,7 +130,6 @@ func (alert *Alert) saveEvents(db *pg.DB) error {
 	return nil
 }
 
-// This is run inside the Save transaction.
 func (alert *Alert) saveUsers(db *pg.DB) error {
 	sql := "insert into alerts_users (alert_id, user_id, sent_at, read_at) values (?, ?, ?, ?) on conflict do nothing"
 	for _, user := range alert.Users {
@@ -138,7 +141,6 @@ func (alert *Alert) saveUsers(db *pg.DB) error {
 	return nil
 }
 
-// This is run inside the Save transaction.
 func (alert *Alert) saveWorkItems(db *pg.DB) error {
 	sql := "insert into alerts_work_items (alert_id, work_item_id) values (?, ?) on conflict do nothing"
 	for _, item := range alert.WorkItems {
