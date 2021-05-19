@@ -64,6 +64,8 @@ func NewDeletionRequest() (*DeletionRequest, error) {
 	return &DeletionRequest{
 		ConfirmationToken:          confToken,
 		EncryptedConfirmationToken: encConfToken,
+		GenericFiles:               make([]*GenericFile, 0),
+		IntellectualObjects:        make([]*IntellectualObject, 0),
 	}, nil
 }
 
@@ -166,5 +168,37 @@ func (request *DeletionRequest) Validate() *common.ValidationError {
 	if len(errors) > 0 {
 		return &common.ValidationError{Errors: errors}
 	}
+	return nil
+}
+
+// AddFile adds a file to the list of GenericFiles to be deleted.
+// This causes an immediate SQL insert.
+func (request *DeletionRequest) AddFile(gf *GenericFile) error {
+	db := common.Context().DB
+	sql := "insert into deletion_requests_generic_files (deletion_request_id, generic_file_id) values (?, ?) on conflict do nothing"
+	_, err := db.Exec(sql, request.ID, gf.ID)
+	if err != nil {
+		return err
+	}
+	if request.GenericFiles == nil {
+		request.GenericFiles = make([]*GenericFile, 0)
+	}
+	request.GenericFiles = append(request.GenericFiles, gf)
+	return nil
+}
+
+// AddObject adds an object to the list of IntellectualObjects to be deleted.
+// This causes an immediate SQL insert.
+func (request *DeletionRequest) AddObject(obj *IntellectualObject) error {
+	db := common.Context().DB
+	sql := "insert into deletion_requests_intellectual_objects (deletion_request_id, intellectual_object_id) values (?, ?) on conflict do nothing"
+	_, err := db.Exec(sql, request.ID, obj.ID)
+	if err != nil {
+		return err
+	}
+	if request.IntellectualObjects == nil {
+		request.IntellectualObjects = make([]*IntellectualObject, 0)
+	}
+	request.IntellectualObjects = append(request.IntellectualObjects, obj)
 	return nil
 }

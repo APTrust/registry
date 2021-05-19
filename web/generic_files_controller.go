@@ -115,3 +115,64 @@ func GenericFileInitRestore(c *gin.Context) {
 	redirectUrl := fmt.Sprintf("/objects/show/%d", obj.ID)
 	c.Redirect(http.StatusFound, redirectUrl)
 }
+
+// GenericFileInitDelete occurs when user clicks the button confirming
+// they want to delete a file. This creates a deletion confirmation message,
+// which will be emailed to institutional admins for approval.
+func GenericFileInitDelete(c *gin.Context) {
+	req := NewRequest(c)
+	gf, err := pgmodels.GenericFileByID(req.Auth.ResourceID)
+	if AbortIfError(c, err) {
+		return
+	}
+
+	// Make sure there are no pending work items...
+	pendingWorkItems, err := pgmodels.WorkItemsPendingForFile(gf.ID)
+	if AbortIfError(c, err) {
+		return
+	}
+	if len(pendingWorkItems) > 0 {
+		AbortIfError(c, common.ErrPendingWorkItems)
+		return
+	}
+
+	// Get list of inst admins.
+	adminsQuery := pgmodels.NewQuery().Where("institution_id", "=", gf.InstitutionID).Where("role", "=", constants.RoleInstAdmin)
+	instAdmins, err := pgmodels.UserSelect(adminsQuery)
+	if AbortIfError(c, err) {
+		return
+	}
+
+	// Create the deletion request and the alert, which will become
+	// the deletion confirmation email.
+	deleteRequest, err := pgmodels.NewDeletionRequest()
+	if AbortIfError(c, err) {
+		return
+	}
+	err = deleteRequest.AddFile(gf)
+	if AbortIfError(c, err) {
+		return
+	}
+
+	// Get the content for the confirmation email.
+	// TODO: Use the template in views/alerts/deletion_requested.txt.
+	alertContent := ""
+
+	// Put confirmation token into URL
+	confirmationAlert := &pgmodels.Alert{
+		InstitutionID:     gf.InstitutionID,
+		Type:              constants.AlertDeletionRequested,
+		Content:           alertContent,
+		DeletionRequestID: deleteRequest.ID,
+		CreatedAt:         time.Now().UTC(),
+		Users:             instAdmins,
+	}
+	err = confirmationAlert.Save()
+	if AbortIfError(c, err) {
+		return
+	}
+
+	// Respond
+	// TODO: Get the right template here
+	c.HTML(http.StatusCreated, "", nil)
+}
