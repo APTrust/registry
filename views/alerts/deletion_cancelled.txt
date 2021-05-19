@@ -1,0 +1,15 @@
+Hello from APTrust,
+
+The deletion requested by {{ .RequesterName }} has been cancelled by {{ .ApproverName }}.
+
+For your reference, the link below has information about the cancelled request.
+
+{{ .DeletionReviewURL }}
+
+If you have questions, please contact us at help@aptrust.org.
+
+The APTrust Team
+https://aptrust.org
+help@aptrust.org
+
+More about deletions: https://aptrust.github.io/userguide/preservation/deletion/

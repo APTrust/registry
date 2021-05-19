@@ -1,0 +1,15 @@
+Hello from APTrust,
+
+The deletion requested by {{ .RequesterName }} has been approved by {{ .ApproverName }}. We'll send a confirmation email when the deletion is complete.
+
+The link below shows a summary of what will be deleted.
+
+{{ .DeletionReviewURL }}
+
+If you have questions, please contact us at help@aptrust.org.
+
+The APTrust Team
+https://aptrust.org
+help@aptrust.org
+
+More about deletions: https://aptrust.github.io/userguide/preservation/deletion/

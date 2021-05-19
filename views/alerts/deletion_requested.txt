@@ -1,0 +1,15 @@
+Hello from APTrust,
+
+User {{ .RequesterName }} has requested some files be deleted from preservation storage. We won't process this request until you or another APTrust administrator at your instituion approves it.
+
+Follow the link below to see the list of items in the deletion request. From there you may approve or cancel the request.
+
+{{ .DeletionReviewURL }}
+
+If you have questions, please contact us at help@aptrust.org.
+
+The APTrust Team
+https://aptrust.org
+help@aptrust.org
+
+More about deletions: https://aptrust.github.io/userguide/preservation/deletion/

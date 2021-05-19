@@ -1,0 +1,15 @@
+Hello from APTrust,
+
+The restoration requested by {{ .RequesterName }} is complete. {{ .ItemName }} is now in your restoration bucket at:
+
+{{ .RestorationURL }}
+
+To download this file, you'll need your S3 credentials an S3 client such as Minio (https://docs.min.io/docs/minio-client-quickstart-guide.html) or APTrust's Partner Tools (https://aptrust.github.io/userguide/partner_tools/).
+
+If you have questions, please contact us at help@aptrust.org.
+
+The APTrust Team
+https://aptrust.org
+help@aptrust.org
+
+More about restoration: https://aptrust.github.io/userguide/preservation/restoration/

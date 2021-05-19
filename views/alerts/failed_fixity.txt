@@ -1,0 +1,11 @@
+Hello from APTrust,
+
+While checking the integrity of your files, one or more fixity checks failed. The link below has more information.
+
+{{ .AlertURL }}
+
+If you have questions, please contact us at help@aptrust.org.
+
+The APTrust Team
+https://aptrust.org
+help@aptrust.org
