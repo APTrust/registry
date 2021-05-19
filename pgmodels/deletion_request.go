@@ -31,9 +31,7 @@ type DeletionRequest struct {
 	RequestedByID              int64                 `json:"-"`
 	RequestedAt                time.Time             `json:"requested_at"`
 	ConfirmationToken          string                `json:"-" pg:"-"`
-	CancellationToken          string                `json:"-" pg:"-"`
 	EncryptedConfirmationToken string                `json:"-"`
-	EncryptedCancellationToken string                `json:"-"`
 	ConfirmedByID              int64                 `json:"-"`
 	ConfirmedAt                time.Time             `json:"confirmed_at"`
 	CancelledByID              int64                 `json:"-"`
@@ -59,20 +57,13 @@ type DeletionRequestsIntellectualObjects struct {
 
 func NewDeletionRequest() (*DeletionRequest, error) {
 	confToken := common.RandomToken()
-	cancelToken := common.RandomToken()
 	encConfToken, err := common.EncryptPassword(confToken)
-	if err != nil {
-		return nil, err
-	}
-	encCancelToken, err := common.EncryptPassword(cancelToken)
 	if err != nil {
 		return nil, err
 	}
 	return &DeletionRequest{
 		ConfirmationToken:          confToken,
-		CancellationToken:          cancelToken,
 		EncryptedConfirmationToken: encConfToken,
-		EncryptedCancellationToken: encCancelToken,
 	}, nil
 }
 
@@ -167,9 +158,6 @@ func (request *DeletionRequest) Validate() *common.ValidationError {
 	// Make sure tokens are actually encrypted
 	if !common.LooksEncrypted(request.EncryptedConfirmationToken) {
 		errors["EncryptedConfirmationToken"] = ErrTokenNotEncrypted
-	}
-	if !common.LooksEncrypted(request.EncryptedCancellationToken) {
-		errors["EncryptedCancellationToken"] = ErrTokenNotEncrypted
 	}
 
 	// TODO: Ensure that all objects and files actually belong to the

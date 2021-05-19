@@ -498,7 +498,6 @@ create table public.deletion_requests (
 	requested_by_id integer not null references public.users(id),
 	requested_at timestamp not null,
 	encrypted_confirmation_token varchar not null,
-	encrypted_cancellation_token varchar not null,
 	confirmed_by_id integer references public.users(id),
 	confirmed_at timestamp,
 	cancelled_by_id integer references public.users(id),

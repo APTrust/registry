@@ -10,10 +10,8 @@ import (
 )
 
 const (
-	ConfTokenPlain       = "ConfirmationToken"
-	CancelTokenPlain     = "CancelToken"
-	ConfTokenEncrypted   = "$2a$10$TK8s1XnmWulSUdze8GN5uOgGmDDsnndQKF5/Rz1j0xaHT7AwXRVma"
-	CancelTokenEncrypted = "$2a$10$xwxTFn.k1TbfbNSW3/udduwtjwo7nQSBlIlARHvTXADAhCfQtZt46"
+	ConfTokenPlain     = "ConfirmationToken"
+	ConfTokenEncrypted = "$2a$10$TK8s1XnmWulSUdze8GN5uOgGmDDsnndQKF5/Rz1j0xaHT7AwXRVma"
 )
 
 func TestNewDeletionRequest(t *testing.T) {
@@ -22,14 +20,10 @@ func TestNewDeletionRequest(t *testing.T) {
 	require.NotNil(t, request)
 	assert.Equal(t, 32, len(request.ConfirmationToken))
 	assert.False(t, common.LooksEncrypted(request.ConfirmationToken))
-	assert.Equal(t, 32, len(request.CancellationToken))
-	assert.False(t, common.LooksEncrypted(request.CancellationToken))
 
 	assert.True(t, len(request.EncryptedConfirmationToken) > 30)
-	assert.True(t, len(request.EncryptedCancellationToken) > 30)
 
 	assert.True(t, common.LooksEncrypted(request.EncryptedConfirmationToken))
-	assert.True(t, common.LooksEncrypted(request.EncryptedCancellationToken))
 }
 
 func TestDeletionRequestByID(t *testing.T) {
