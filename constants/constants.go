@@ -24,6 +24,7 @@ const (
 	AlertDeletionRequested     = "Deletion Requested"
 	AlertFailedFixity          = "Failed Fixity Check"
 	AlertRestorationCompleted  = "Restoration Completed"
+	AlertStalledItems          = "Stalled Work Items"
 	AlgMd5                     = "md5"
 	AlgSha1                    = "sha1"
 	AlgSha256                  = "sha256"
@@ -120,6 +121,7 @@ var AlertTypes = []string{
 	AlertDeletionRequested,
 	AlertFailedFixity,
 	AlertRestorationCompleted,
+	AlertStalledItems,
 }
 
 var CompletedStatusValues = []string{
