@@ -163,8 +163,8 @@ func GenericFileInitDelete(c *gin.Context) {
 		"RequesterName":     req.CurrentUser.Name,
 		"DeletionReviewURL": "URL?token=" + deleteRequest.ConfirmationToken,
 	}
-	var buf *bytes.Buffer
-	err = common.AlertTemplate.ExecuteTemplate(buf, "alerts/deletion_requested.txt", alertData)
+	var buf bytes.Buffer
+	err = common.TextTemplates["alerts/deletion_requested.txt"].Execute(&buf, alertData)
 	if AbortIfError(c, err) {
 		return
 	}
