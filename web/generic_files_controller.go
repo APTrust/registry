@@ -150,10 +150,10 @@ func GenericFileInitDelete(c *gin.Context) {
 	if AbortIfError(c, err) {
 		return
 	}
-	err = deleteRequest.AddFile(gf)
-	if AbortIfError(c, err) {
-		return
-	}
+	deleteRequest.InstitutionID = gf.InstitutionID
+	deleteRequest.RequestedByID = req.CurrentUser.ID
+	deleteRequest.RequestedAt = time.Now().UTC()
+	deleteRequest.AddFile(gf)
 	err = deleteRequest.Save()
 	if AbortIfError(c, err) {
 		return

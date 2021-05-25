@@ -5,16 +5,18 @@ import (
 
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
+	"github.com/go-pg/pg/v10"
 	"github.com/go-pg/pg/v10/orm"
 )
 
 const (
-	ErrDeletionRequesterID  = "Deletion request requires requester id."
-	ErrDeletionWrongInst    = "Deletion request user belongs to wrong institution."
-	ErrDeletionWrongRole    = "Deletion confirmer/canceller must be institutional admin."
-	ErrDeletionUserNotFound = "User does not exist."
-	ErrDeletionUserInactive = "User has been deactivated."
-	ErrTokenNotEncrypted    = "Token must be encrypted."
+	ErrDeletionInstitutionID = "Deletion request requires institution id."
+	ErrDeletionRequesterID   = "Deletion request requires requester id."
+	ErrDeletionWrongInst     = "Deletion request user belongs to wrong institution."
+	ErrDeletionWrongRole     = "Deletion confirmer/canceller must be institutional admin."
+	ErrDeletionUserNotFound  = "User does not exist."
+	ErrDeletionUserInactive  = "User has been deactivated."
+	ErrTokenNotEncrypted     = "Token must be encrypted."
 )
 
 // init does some setup work so go-pg can recognize many-to-many
@@ -97,10 +99,20 @@ func (request *DeletionRequest) GetID() int64 {
 // Save saves this requestitution to the database. This will peform an insert
 // if DeletionRequest.ID is zero. Otherwise, it updates.
 func (request *DeletionRequest) Save() error {
-	if request.ID == int64(0) {
-		return insert(request)
-	}
-	return update(request)
+	registryContext := common.Context()
+	db := registryContext.DB
+	return db.RunInTransaction(db.Context(), func(*pg.Tx) error {
+		var err error
+		if request.ID == 0 {
+			_, err = db.Model(request).Insert()
+		} else {
+			_, err = db.Model(request).WherePK().Update()
+		}
+		if err != nil {
+			registryContext.Log.Error().Msgf("Transaction failed. Model: %v. Error: %v", request, err)
+		}
+		return request.saveRelations(db)
+	})
 }
 
 // Validation enforces business rules, including who can request and
@@ -111,6 +123,10 @@ func (request *DeletionRequest) Save() error {
 // deliberate act initiated and confirmed by authorized individuals.
 func (request *DeletionRequest) Validate() *common.ValidationError {
 	errors := make(map[string]string)
+
+	if request.InstitutionID < 1 {
+		errors["InstitutionID"] = ErrDeletionInstitutionID
+	}
 
 	// Make sure requester is valid
 	if request.RequestedByID < 1 {
@@ -171,37 +187,46 @@ func (request *DeletionRequest) Validate() *common.ValidationError {
 	return nil
 }
 
-// TODO: Remove AddFile and AddObject. These fail if you add items
-// before the deletion request itself has been saved.
-
-// AddFile adds a file to the list of GenericFiles to be deleted.
-// This causes an immediate SQL insert.
-func (request *DeletionRequest) AddFile(gf *GenericFile) error {
-	db := common.Context().DB
-	sql := "insert into deletion_requests_generic_files (deletion_request_id, generic_file_id) values (?, ?) on conflict do nothing"
-	_, err := db.Exec(sql, request.ID, gf.ID)
-	if err != nil {
-		return err
-	}
+func (request *DeletionRequest) AddFile(gf *GenericFile) {
 	if request.GenericFiles == nil {
 		request.GenericFiles = make([]*GenericFile, 0)
 	}
 	request.GenericFiles = append(request.GenericFiles, gf)
-	return nil
 }
 
-// AddObject adds an object to the list of IntellectualObjects to be deleted.
-// This causes an immediate SQL insert.
-func (request *DeletionRequest) AddObject(obj *IntellectualObject) error {
-	db := common.Context().DB
-	sql := "insert into deletion_requests_intellectual_objects (deletion_request_id, intellectual_object_id) values (?, ?) on conflict do nothing"
-	_, err := db.Exec(sql, request.ID, obj.ID)
-	if err != nil {
-		return err
-	}
+func (request *DeletionRequest) AddObject(obj *IntellectualObject) {
 	if request.IntellectualObjects == nil {
 		request.IntellectualObjects = make([]*IntellectualObject, 0)
 	}
 	request.IntellectualObjects = append(request.IntellectualObjects, obj)
+}
+
+func (request *DeletionRequest) saveRelations(db *pg.DB) error {
+	err := request.saveFiles(db)
+	if err != nil {
+		return err
+	}
+	return request.saveObjects(db)
+}
+
+func (request *DeletionRequest) saveFiles(db *pg.DB) error {
+	sql := "insert into deletion_requests_generic_files (deletion_request_id, generic_file_id) values (?, ?) on conflict do nothing"
+	for _, gf := range request.GenericFiles {
+		_, err := db.Exec(sql, request.ID, gf.ID)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (request *DeletionRequest) saveObjects(db *pg.DB) error {
+	sql := "insert into deletion_requests_intellectual_objects (deletion_request_id, intellectual_object_id) values (?, ?) on conflict do nothing"
+	for _, obj := range request.IntellectualObjects {
+		_, err := db.Exec(sql, request.ID, obj.ID)
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }
