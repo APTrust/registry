@@ -1,6 +1,7 @@
 package web
 
 import (
+	"bytes"
 	"fmt"
 	"net/http"
 	"time"
@@ -154,16 +155,22 @@ func GenericFileInitDelete(c *gin.Context) {
 		return
 	}
 
-	// Get the content for the confirmation email.
-	// TODO: Use the template in views/alerts/deletion_requested.txt.
-	alertContent := ""
+	alertData := map[string]string{
+		"RequesterName":     req.CurrentUser.Name,
+		"DeletionReviewURL": "URL?token=" + deleteRequest.ConfirmationToken,
+	}
+	var buf *bytes.Buffer
+	err = common.AlertTemplate.ExecuteTemplate(buf, "alerts/deletion_requested.txt", alertData)
+	if AbortIfError(c, err) {
+		return
+	}
 
 	// Put confirmation token into URL
 	confirmationAlert := &pgmodels.Alert{
 		InstitutionID:     gf.InstitutionID,
 		Type:              constants.AlertDeletionRequested,
-		Content:           alertContent,
 		DeletionRequestID: deleteRequest.ID,
+		Content:           buf.String(),
 		CreatedAt:         time.Now().UTC(),
 		Users:             instAdmins,
 	}
@@ -172,7 +179,6 @@ func GenericFileInitDelete(c *gin.Context) {
 		return
 	}
 
-	// Respond
-	// TODO: Get the right template here
-	c.HTML(http.StatusCreated, "", nil)
+	req.TemplateData["fileIdentifier"] = gf.Identifier
+	c.HTML(http.StatusCreated, "files/deletion_requested.html", req.TemplateData)
 }

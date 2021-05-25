@@ -25,7 +25,7 @@ func ProjectRoot() string {
 	return absPath
 }
 
-// LoadTestFile loads the file at the specified path relative to
+// LoadRelativeFile loads the file at the specified path relative to
 // ProjectRoot() and returns the contents as a byte array.
 //
 // Example:
