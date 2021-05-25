@@ -31,9 +31,14 @@
 
     </div>
     <div class="column column-30">
-      <button class="button">Confirm</button>
+      <button class="button" onclick="document.forms['fileDeleteForm'].submit()">Confirm</button>
     </div>
   </div>
+
+  <form method="post" id="fileDeleteForm" action="/files/init_delete/{{ .file.ID }}">
+    <input type="hidden" name="id" value="{{ .file.ID }}"/>
+  </form>
+
 
 </div>
 

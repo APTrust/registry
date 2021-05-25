@@ -171,6 +171,9 @@ func (request *DeletionRequest) Validate() *common.ValidationError {
 	return nil
 }
 
+// TODO: Remove AddFile and AddObject. These fail if you add items
+// before the deletion request itself has been saved.
+
 // AddFile adds a file to the list of GenericFiles to be deleted.
 // This causes an immediate SQL insert.
 func (request *DeletionRequest) AddFile(gf *GenericFile) error {

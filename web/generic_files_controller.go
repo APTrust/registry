@@ -154,6 +154,10 @@ func GenericFileInitDelete(c *gin.Context) {
 	if AbortIfError(c, err) {
 		return
 	}
+	err = deleteRequest.Save()
+	if AbortIfError(c, err) {
+		return
+	}
 
 	alertData := map[string]string{
 		"RequesterName":     req.CurrentUser.Name,
