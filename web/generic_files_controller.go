@@ -159,12 +159,26 @@ func GenericFileInitDelete(c *gin.Context) {
 		return
 	}
 
+	// DEBUG
+	fmt.Println(c.Request.URL.String())
+	fmt.Println(c.Request.RequestURI)
+	fmt.Println(c.Request.URL.Scheme)
+	fmt.Println(c.Request.Proto) // HTTP 1.1
+	fmt.Println(c.Request.URL.Port())
+	fmt.Println(c.Request.Host) // ***
+	// END DEBUG
+
+	reviewURL := fmt.Sprintf("%s?token=%s",
+		common.BaseURL(c.Request.URL),
+		deleteRequest.ConfirmationToken)
+
 	alertData := map[string]string{
 		"RequesterName":     req.CurrentUser.Name,
-		"DeletionReviewURL": "URL?token=" + deleteRequest.ConfirmationToken,
+		"DeletionReviewURL": reviewURL,
 	}
+	tmpl := common.TextTemplates["alerts/deletion_requested.txt"]
 	var buf bytes.Buffer
-	err = common.TextTemplates["alerts/deletion_requested.txt"].Execute(&buf, alertData)
+	err = tmpl.Execute(&buf, alertData)
 	if AbortIfError(c, err) {
 		return
 	}
