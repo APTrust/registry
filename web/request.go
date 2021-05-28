@@ -1,6 +1,8 @@
 package web
 
 import (
+	"fmt"
+
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/helpers"
 	"github.com/APTrust/registry/middleware"
@@ -41,4 +43,13 @@ func (req *Request) GetIndexQuery() (*pgmodels.Query, error) {
 		fc.Add(key, req.GinContext.QueryArray(key))
 	}
 	return fc.ToQuery()
+}
+
+// BaseURL returns the base of param _url. The base includes the scheme,
+// optional port, and hostname. In other words, the URL stripped of path
+// and query.
+func (req *Request) BaseURL() string {
+	scheme := common.Context().Config.HTTPScheme()
+	host := req.GinContext.Request.Host // host or host:port
+	return fmt.Sprintf("%s://%s", scheme, host)
 }

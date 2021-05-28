@@ -206,3 +206,13 @@ func (config *Config) ToJSON() string {
 	data, _ := json.Marshal(config)
 	return string(data)
 }
+
+// HTTPScheme returns "http" for the dev, test, ci, and travis
+// environments. It returns "https" for all other environments.
+func (config *Config) HTTPScheme() string {
+	switch config.EnvName {
+	case "dev", "test", "ci", "travis":
+		return "http"
+	}
+	return "https"
+}

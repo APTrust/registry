@@ -64,3 +64,28 @@ func TestConfigBucketQualifier(t *testing.T) {
 	config.EnvName = "invalid-name"
 	assert.Equal(t, ".test", config.BucketQualifier())
 }
+
+func TestHTTPScheme(t *testing.T) {
+	config := common.NewConfig()
+
+	config.EnvName = "test"
+	assert.Equal(t, "http", config.HTTPScheme())
+
+	config.EnvName = "dev"
+	assert.Equal(t, "http", config.HTTPScheme())
+
+	config.EnvName = "travis"
+	assert.Equal(t, "http", config.HTTPScheme())
+
+	config.EnvName = "ci"
+	assert.Equal(t, "http", config.HTTPScheme())
+
+	config.EnvName = "demo"
+	assert.Equal(t, "https", config.HTTPScheme())
+
+	config.EnvName = "staging"
+	assert.Equal(t, "https", config.HTTPScheme())
+
+	config.EnvName = "production"
+	assert.Equal(t, "https", config.HTTPScheme())
+}
