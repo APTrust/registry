@@ -1,10 +1,8 @@
 package pgmodels_test
 
 import (
-	//"fmt"
 	"testing"
 
-	//"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/db"
 	"github.com/APTrust/registry/pgmodels"
@@ -52,4 +50,14 @@ func TestAlertRelations(t *testing.T) {
 	assert.Equal(t, 3, len(alert.Users))
 	assert.Equal(t, 3, len(alert.PremisEvents))
 	assert.Equal(t, 3, len(alert.WorkItems))
+}
+
+func TestAlertValidate(t *testing.T) {
+	alert := &pgmodels.Alert{}
+	err := alert.Validate()
+	require.NotNil(t, err)
+
+	assert.Equal(t, pgmodels.ErrAlertInstitutionID, err.Errors["InstitutionID"])
+	assert.Equal(t, pgmodels.ErrAlertType, err.Errors["Type"])
+	assert.Equal(t, pgmodels.ErrAlertContent, err.Errors["Content"])
 }
