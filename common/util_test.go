@@ -2,7 +2,6 @@ package common_test
 
 import (
 	"fmt"
-	"net/url"
 	"os"
 	"path"
 	"strings"
@@ -99,12 +98,4 @@ func TestToHumanSize(t *testing.T) {
 	assert.Equal(t, "380.6 kB", common.ToHumanSize(389778, 1024))
 	assert.Equal(t, "3.9 GB", common.ToHumanSize(3897784432, 1000))
 	assert.Equal(t, "3.6 GB", common.ToHumanSize(3897784432, 1024))
-}
-
-func TestBaseURL(t *testing.T) {
-	_url, _ := url.Parse("http://localhost:8080/path/to/file.txt?q=where")
-	assert.Equal(t, "http://localhost:8080", common.BaseURL(_url))
-
-	_url, _ = url.Parse("https://example.com/path/to/file.txt?q=where")
-	assert.Equal(t, "https://example.com", common.BaseURL(_url))
 }

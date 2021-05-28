@@ -9,7 +9,6 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io/ioutil"
-	"net/url"
 	"os"
 	"os/user"
 	"path"
@@ -204,11 +203,4 @@ func ToHumanSize(size, unit int64) string {
 		exp++
 	}
 	return fmt.Sprintf("%.1f %cB", float64(size)/float64(div), "kMGTPE"[exp])
-}
-
-// BaseURL returns the base of param _url. The base includes the scheme,
-// optional port, and hostname. In other words, the URL stripped of path
-// and query.
-func BaseURL(_url *url.URL) string {
-	return fmt.Sprintf("%s://%s", _url.Scheme, _url.Host)
 }
