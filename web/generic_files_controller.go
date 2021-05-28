@@ -159,7 +159,7 @@ func GenericFileInitDelete(c *gin.Context) {
 		return
 	}
 
-	reviewURL := fmt.Sprintf("%s?token=%s",
+	reviewURL := fmt.Sprintf("%s/files/review_deletion?token=%s",
 		req.BaseURL(),
 		deleteRequest.ConfirmationToken)
 
