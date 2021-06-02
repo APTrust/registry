@@ -111,6 +111,9 @@ func initRoutes(router *gin.Engine) {
 		webRoutes.GET("/files/request_delete/:id", web.GenericFileRequestDelete)
 		webRoutes.GET("/files/request_restore/:id", web.GenericFileRequestRestore)
 		webRoutes.POST("/files/init_delete/:id", web.GenericFileInitDelete)
+		webRoutes.GET("/files/review_delete/:id", web.GenericFileReviewDelete)
+		webRoutes.POST("/files/approve_delete/:id", web.GenericFileApproveDelete)
+		webRoutes.POST("/files/cancel_delete/:id", web.GenericFileCancelDelete)
 		webRoutes.POST("/files/init_restore/:id", web.GenericFileInitRestore)
 		webRoutes.GET("/files/delete/:id", web.GenericFileDelete)
 

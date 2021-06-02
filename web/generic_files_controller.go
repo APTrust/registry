@@ -191,3 +191,25 @@ func GenericFileInitDelete(c *gin.Context) {
 	req.TemplateData["fileIdentifier"] = gf.Identifier
 	c.HTML(http.StatusCreated, "files/deletion_requested.html", req.TemplateData)
 }
+
+// GenericFileReviewDelete displays a page on which an institutional
+// admin can review a requested file deletion and choose whether to approve
+// or cancel it.
+// GET /files/approve_delete/:id
+func GenericFileReviewDelete(c *gin.Context) {
+
+}
+
+// GenericFileApproveDelete handles the case where an institutional
+// admin approves a file deletion request.
+// POST /files/approve_delete/:id
+func GenericFileApproveDelete(c *gin.Context) {
+
+}
+
+// GenericFileCancelDelete handles the case where an institutional
+// admin cancels (rejects) a file deletion request.
+// POST /files/cancel_delete/:id
+func GenericFileCancelDelete(c *gin.Context) {
+
+}
