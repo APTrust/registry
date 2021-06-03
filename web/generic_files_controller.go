@@ -232,10 +232,6 @@ func GenericFileReviewDelete(c *gin.Context) {
 // admin approves a file deletion request.
 // POST /files/approve_delete/:id
 func GenericFileApproveDelete(c *gin.Context) {
-	// Match token and deletion request id
-	// Set ConfirmedAt and ConfirmedByID
-	// Create WorkItem
-	// Queue WorkItem
 	req := NewRequest(c)
 
 	// Find the deletion request
@@ -253,7 +249,12 @@ func GenericFileApproveDelete(c *gin.Context) {
 
 	deletionRequest.ConfirmedByID = req.CurrentUser.ID
 	deletionRequest.ConfirmedAt = time.Now().UTC()
-	deletionRequest.Save()
+	err = deletionRequest.Save()
+	if AbortIfError(c, err) {
+		return
+	}
+
+	// TODO: Reload deletion request, so we get associated records.
 
 	gf := deletionRequest.GenericFiles[0]
 
@@ -271,6 +272,8 @@ func GenericFileApproveDelete(c *gin.Context) {
 		return
 	}
 
+	// TODO: Queue this WorkItem
+
 	req.TemplateData["deletionRequest"] = deletionRequest
 	c.HTML(http.StatusOK, "files/deletion_approved.html", req.TemplateData)
 }
@@ -279,6 +282,30 @@ func GenericFileApproveDelete(c *gin.Context) {
 // admin cancels (rejects) a file deletion request.
 // POST /files/cancel_delete/:id
 func GenericFileCancelDelete(c *gin.Context) {
-	// Match token and deletion request id
-	// Set CancelledAt and CancelledByID
+	req := NewRequest(c)
+
+	// Find the deletion request
+	deletionRequest, err := pgmodels.DeletionRequestByID(req.Auth.ResourceID)
+	if AbortIfError(c, err) {
+		return
+	}
+
+	// Make sure the token is valid for that deletion request
+	token := c.PostForm("token")
+	if !common.ComparePasswords(deletionRequest.EncryptedConfirmationToken, token) {
+		AbortIfError(c, common.ErrInvalidToken)
+		return
+	}
+
+	deletionRequest.CancelledByID = req.CurrentUser.ID
+	deletionRequest.CancelledAt = time.Now().UTC()
+	err = deletionRequest.Save()
+	if AbortIfError(c, err) {
+		return
+	}
+
+	// TODO: Reload deletion request, so we get associated records.
+
+	req.TemplateData["deletionRequest"] = deletionRequest
+	c.HTML(http.StatusOK, "files/deletion_cancelled.html", req.TemplateData)
 }

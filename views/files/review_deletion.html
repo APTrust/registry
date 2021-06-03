@@ -30,13 +30,13 @@
   </div>
 </div>
 
-<form method="post" id="fileDeleteCancelForm" action="/files/cancel_delete/{{ $gf.ID }}">
-  <input type="hidden" name="id" value="{{ $gf.ID }}"/>
+<form method="post" id="fileDeleteCancelForm" action="/files/cancel_delete/{{ .deletionRequest.ID }}">
+  <input type="hidden" name="id" value="{{ .deletionRequest.ID }}"/>
   <input type="hidden" name="token" value="{{ .token }}"/>
 </form>
 
-<form method="post" id="fileDeleteApproveForm" action="/files/approve_delete/{{ $gf.ID }}">
-  <input type="hidden" name="id" value="{{ $gf.ID }}"/>
+<form method="post" id="fileDeleteApproveForm" action="/files/approve_delete/{{ .deletionRequest.ID }}">
+  <input type="hidden" name="id" value="{{ .deletionRequest.ID }}"/>
   <input type="hidden" name="token" value="{{ .token }}"/>
 </form>
 
