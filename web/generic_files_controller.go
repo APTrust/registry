@@ -189,6 +189,17 @@ func GenericFileInitDelete(c *gin.Context) {
 		return
 	}
 
+	// For now, show this in dev and test, so we don't have
+	// to look it up in the DB.
+	envName := common.Context().Config.EnvName
+	if envName == "dev" || envName == "test" {
+		fmt.Println("***********************")
+		fmt.Println(confirmationAlert.Content)
+		fmt.Println("***********************")
+	}
+
+	// TODO: Add WorkItemID to DeletionRequest
+
 	req.TemplateData["fileIdentifier"] = gf.Identifier
 	c.HTML(http.StatusCreated, "files/deletion_requested.html", req.TemplateData)
 }

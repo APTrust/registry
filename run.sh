@@ -46,6 +46,15 @@ echo "APT_ENV is $APT_ENV"
 
 # ----------------------------------------------------------------------
 #
+# Get rid of NSQ data lingering from prior test runs
+#
+# ----------------------------------------------------------------------
+rm "$TMPDIR/nsqd.dat"
+NSQ_DATA_FILES="$TMPDIR*diskqueue*dat"
+rm $NSQ_DATA_FILES
+
+# ----------------------------------------------------------------------
+#
 # Start the services: NSQ and Redis
 #
 # ----------------------------------------------------------------------
