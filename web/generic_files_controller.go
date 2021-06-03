@@ -159,8 +159,9 @@ func GenericFileInitDelete(c *gin.Context) {
 		return
 	}
 
-	reviewURL := fmt.Sprintf("%s/files/review_deletion?token=%s",
+	reviewURL := fmt.Sprintf("%s/files/review_delete/%d?token=%s",
 		req.BaseURL(),
+		deleteRequest.ID,
 		deleteRequest.ConfirmationToken)
 
 	alertData := map[string]string{
@@ -195,21 +196,50 @@ func GenericFileInitDelete(c *gin.Context) {
 // GenericFileReviewDelete displays a page on which an institutional
 // admin can review a requested file deletion and choose whether to approve
 // or cancel it.
-// GET /files/approve_delete/:id
+// GET /files/review_delete/:id?token=<token>
 func GenericFileReviewDelete(c *gin.Context) {
+	// Match token and deletion request id
+	// Show deletion request with Approve/Cancel buttons if
+	// request is already approved or cancelled, otherwise,
+	// show approval/cancellation info.
+	req := NewRequest(c)
 
+	// Find the deletion request
+	deletionRequest, err := pgmodels.DeletionRequestByID(req.Auth.ResourceID)
+	if AbortIfError(c, err) {
+		return
+	}
+
+	// Make sure the token is valid for that deletion request
+	token := c.Query("token")
+	if !common.ComparePasswords(deletionRequest.EncryptedConfirmationToken, token) {
+		AbortIfError(c, common.ErrInvalidToken)
+		return
+	}
+
+	// Present the page describing the request, and if it hasn't
+	// already been cancelled or approved, give the user the option
+	// to cancel or approve.
+
+	req.TemplateData["deletionRequest"] = deletionRequest
+	req.TemplateData["token"] = token
+	c.HTML(http.StatusOK, "files/review_deletion.html", req.TemplateData)
 }
 
 // GenericFileApproveDelete handles the case where an institutional
 // admin approves a file deletion request.
 // POST /files/approve_delete/:id
 func GenericFileApproveDelete(c *gin.Context) {
-
+	// Match token and deletion request id
+	// Set ConfirmedAt and ConfirmedByID
+	// Create WorkItem
+	// Queue WorkItem
 }
 
 // GenericFileCancelDelete handles the case where an institutional
 // admin cancels (rejects) a file deletion request.
 // POST /files/cancel_delete/:id
 func GenericFileCancelDelete(c *gin.Context) {
-
+	// Match token and deletion request id
+	// Set CancelledAt and CancelledByID
 }

@@ -63,6 +63,12 @@ var ErrInvalidRequeue = errors.New("item cannot be requeued to the specified sta
 // and old versions of a bag's files.
 var ErrPendingWorkItems = errors.New("task cannot be completed because this object has pending work items")
 
+// ErrInvalidToken means that the token presented for an action like
+// password reset or deletion confirmation does not match the encrypted
+// token in the database. When this error occurs, the user may not
+// proceed with the requested action.
+var ErrInvalidToken = errors.New("invalid token")
+
 // ErrInternal is a runtime error that is not the user's fault, hence
 // probably the programmer's fault.
 var ErrInternal = errors.New("internal server error")
