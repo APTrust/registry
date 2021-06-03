@@ -1,0 +1,24 @@
+{{ define "files/deletion_approved.html" }}
+
+{{ template "shared/_header.html" .}}
+
+{{ $gf := (index .deletionRequest.GenericFiles 0) }}
+
+<h1>Deletion Approved</h1>
+
+<p>You have approved deletion of the following file:</p>
+
+<p>
+  <b>{{ $gf.Identifier }}</b><br/>
+  Size: {{ humanSize $gf.Size }} <br/>
+  Created: {{ dateUS $gf.CreatedAt }} <br/>
+  Updated: {{ dateUS $gf.UpdatedAt }} <br/>
+  Requested: {{ .deletionRequest.RequestedBy.Name }} on {{ dateUS .deletionRequest.RequestedAt }} <br/>
+  Approved: {{ .deletionRequest.ConfirmedBy.Name }}  on {{ dateUS .deletionRequest.ConfirmedAt }} <br/>
+</p>
+
+<p>This file will be deleted from preservation storage within the next few minutes. We'll retain a tombstone record of the file along with a PREMIS event recording when it was deleted and at whose request.</p>
+
+{{ template "shared/_footer.html" .}}
+
+{{ end }}

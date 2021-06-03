@@ -2,11 +2,18 @@
 
 {{ template "shared/_header.html" .}}
 
+{{ $gf := (index .deletionRequest.GenericFiles 0) }}
+
 <h1>Review Deletion Request</h1>
 
 <p>User {{ .deletionRequest.RequestedBy.Name }} ({{ .deletionRequest.RequestedBy.Email }}) wants to delete the following file:</p>
 
-<p><b>{{ (index .deletionRequest.GenericFiles 0).Identifier }}</b></p>
+<p>
+  <b>{{ $gf.Identifier }}</b><br/>
+  Size: {{ humanSize $gf.Size }} <br/>
+  Created: {{ dateUS $gf.CreatedAt }} <br/>
+  Updated: {{ dateUS $gf.UpdatedAt }} <br/>
+</p>
 
 <p>Do you want to approve or cancel this request? If you approve, the file will be deleted as soon as possible. Deletion cannot be undone. If you cancel, the file will stay and no one else will be able to approve this request.</p>
 
@@ -23,13 +30,13 @@
   </div>
 </div>
 
-<form method="post" id="fileDeleteCancelForm" action="/files/cancel_delete/{{ .genericFile.ID }}">
-  <input type="hidden" name="id" value="{{ .genericFile.ID }}"/>
+<form method="post" id="fileDeleteCancelForm" action="/files/cancel_delete/{{ $gf.ID }}">
+  <input type="hidden" name="id" value="{{ $gf.ID }}"/>
   <input type="hidden" name="token" value="{{ .token }}"/>
 </form>
 
-<form method="post" id="fileDeleteApproveForm" action="/files/approve_delete/{{ .genericFile.ID }}">
-  <input type="hidden" name="id" value="{{ .genericFile.ID }}"/>
+<form method="post" id="fileDeleteApproveForm" action="/files/approve_delete/{{ $gf.ID }}">
+  <input type="hidden" name="id" value="{{ $gf.ID }}"/>
   <input type="hidden" name="token" value="{{ .token }}"/>
 </form>
 

@@ -265,6 +265,48 @@ func LastSuccessfulIngest(objID int64) (*WorkItem, error) {
 	return nil, err
 }
 
+// NewItemFromLastSuccessfulIngest creates a new WorkItem based on
+// the last successful ingest WorkItem of the specified object.
+// This is used for creating various deletion and restoration WorkItems.
+// The returned WorkItem will include the proper object name, object id,
+// object identifier and etag. All other fields will be cleared out.
+// The caller must set essential fields like Action, User, GenericFileID
+// (if appropriate) and the like.
+//
+// This will return an error if the system can't find the last
+// successful ingest record for the specified object.
+func NewItemFromLastSuccessfulIngest(objID int64) (*WorkItem, error) {
+	item, err := LastSuccessfulIngest(objID)
+	if err != nil {
+		return nil, err
+	}
+	newItem := &WorkItem{}
+	err = copier.Copy(&newItem, item)
+	if err != nil {
+		return nil, err
+	}
+
+	now := time.Now().UTC()
+
+	// Reset essential fields
+	newItem.ID = 0
+	newItem.CreatedAt = now
+	newItem.DateProcessed = now
+	newItem.NeedsAdminReview = false
+	newItem.Node = ""
+	newItem.Note = "Not started"
+	newItem.Outcome = "Not started"
+	newItem.PID = 0
+	newItem.QueuedAt = time.Time{}
+	newItem.Retry = true
+	newItem.Stage = constants.StageRequested
+	newItem.StageStartedAt = time.Time{}
+	newItem.Status = constants.StatusPending
+	newItem.UpdatedAt = now
+
+	return newItem, err
+}
+
 // CreateObjectRestorationItem creates and saves a new WorkItem
 // for an object or file restoration.
 //
@@ -280,21 +322,11 @@ func NewRestorationItem(obj *IntellectualObject, gf *GenericFile, user *User) (*
 	if obj == nil {
 		return nil, common.ErrInvalidParam
 	}
-	// We need some essential info from this item's last
-	// successful ingest, including ETag, BagDate, etc.
-	lastIngestItem, err := LastSuccessfulIngest(obj.ID)
-	if err != nil {
-		return nil, err
-	}
-	restorationItem := &WorkItem{}
-	err = copier.Copy(&restorationItem, lastIngestItem)
-	if err != nil {
-		return nil, err
-	}
 
-	// Clear the ID so when we save this it creates a new record.
-	// We don't want to overwrite the old record.
-	restorationItem.ID = 0
+	restorationItem, err := NewItemFromLastSuccessfulIngest(obj.ID)
+	if err != nil {
+		return nil, err
+	}
 
 	// Figure out the restoration type. This determines which
 	// queue it will go into and which worker will handle it.
@@ -314,24 +346,28 @@ func NewRestorationItem(obj *IntellectualObject, gf *GenericFile, user *User) (*
 	if gf != nil {
 		restorationItem.GenericFileID = gf.ID
 	}
-
-	now := time.Now().UTC()
-	restorationItem.CreatedAt = now
-	restorationItem.DateProcessed = now
-	restorationItem.NeedsAdminReview = false
-	restorationItem.Node = ""
-	restorationItem.Note = ""
-	restorationItem.Outcome = "Not started"
-	restorationItem.PID = 0
-	restorationItem.QueuedAt = time.Time{}
-	restorationItem.Retry = true
-	restorationItem.Stage = constants.StageRequested
-	restorationItem.StageStartedAt = time.Time{}
-	restorationItem.Status = constants.StatusPending
-	restorationItem.UpdatedAt = now
 	restorationItem.User = user.Email
-
 	err = restorationItem.Save()
-
 	return restorationItem, err
+}
+
+func NewDeletionItem(obj *IntellectualObject, gf *GenericFile, user *User) (*WorkItem, error) {
+	if obj == nil {
+		return nil, common.ErrInvalidParam
+	}
+
+	deletionItem, err := NewItemFromLastSuccessfulIngest(obj.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	// If file deletion, set the file id
+	if gf != nil {
+		deletionItem.GenericFileID = gf.ID
+	}
+
+	deletionItem.Action = constants.ActionDelete
+	deletionItem.User = user.Email
+	err = deletionItem.Save()
+	return deletionItem, err
 }

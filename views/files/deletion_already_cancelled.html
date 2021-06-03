@@ -1,0 +1,13 @@
+{{ define "files/deletion_already_cancelled.html" }}
+
+{{ template "shared/_header.html" .}}
+
+<h1>Deletion Previously Cancelled</h1>
+
+<p>The deletion of file <b>{{ (index .deletionRequest.GenericFiles 0).Identifier }}</b> was cancelled by {{ .deletionRequest.CancelledBy.Name }} ({{ .deletionRequest.CancelledBy.Email }} on {{ dateUS .deletionRequest.CancelledAt }}.</p>
+
+<p>This deletion request will not be executed. Unless the file was deleted by a subsequent request, this file should still exist.</p>
+
+{{ template "shared/_footer.html" .}}
+
+{{ end }}

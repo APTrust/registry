@@ -198,10 +198,6 @@ func GenericFileInitDelete(c *gin.Context) {
 // or cancel it.
 // GET /files/review_delete/:id?token=<token>
 func GenericFileReviewDelete(c *gin.Context) {
-	// Match token and deletion request id
-	// Show deletion request with Approve/Cancel buttons if
-	// request is already approved or cancelled, otherwise,
-	// show approval/cancellation info.
 	req := NewRequest(c)
 
 	// Find the deletion request
@@ -220,10 +216,16 @@ func GenericFileReviewDelete(c *gin.Context) {
 	// Present the page describing the request, and if it hasn't
 	// already been cancelled or approved, give the user the option
 	// to cancel or approve.
-
 	req.TemplateData["deletionRequest"] = deletionRequest
 	req.TemplateData["token"] = token
-	c.HTML(http.StatusOK, "files/review_deletion.html", req.TemplateData)
+
+	template := "files/review_deletion.html"
+	if deletionRequest.ConfirmedByID > 0 {
+		template = "files/deletion_already_approved.html"
+	} else if deletionRequest.CancelledByID > 0 {
+		template = "files/deletion_already_cancelled.html"
+	}
+	c.HTML(http.StatusOK, template, req.TemplateData)
 }
 
 // GenericFileApproveDelete handles the case where an institutional
@@ -234,6 +236,43 @@ func GenericFileApproveDelete(c *gin.Context) {
 	// Set ConfirmedAt and ConfirmedByID
 	// Create WorkItem
 	// Queue WorkItem
+	req := NewRequest(c)
+
+	// Find the deletion request
+	deletionRequest, err := pgmodels.DeletionRequestByID(req.Auth.ResourceID)
+	if AbortIfError(c, err) {
+		return
+	}
+
+	// Make sure the token is valid for that deletion request
+	token := c.PostForm("token")
+	if !common.ComparePasswords(deletionRequest.EncryptedConfirmationToken, token) {
+		AbortIfError(c, common.ErrInvalidToken)
+		return
+	}
+
+	deletionRequest.ConfirmedByID = req.CurrentUser.ID
+	deletionRequest.ConfirmedAt = time.Now().UTC()
+	deletionRequest.Save()
+
+	gf := deletionRequest.GenericFiles[0]
+
+	obj, err := pgmodels.IntellectualObjectByID(gf.IntellectualObjectID)
+	if AbortIfError(c, err) {
+		return
+	}
+
+	workItem, err := pgmodels.NewDeletionItem(obj, gf, req.CurrentUser)
+	if AbortIfError(c, err) {
+		return
+	}
+	err = workItem.Save()
+	if AbortIfError(c, err) {
+		return
+	}
+
+	req.TemplateData["deletionRequest"] = deletionRequest
+	c.HTML(http.StatusOK, "files/deletion_approved.html", req.TemplateData)
 }
 
 // GenericFileCancelDelete handles the case where an institutional
