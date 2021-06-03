@@ -19,6 +19,8 @@
 
 <p>This file will be deleted from preservation storage within the next few minutes. We'll retain a tombstone record of the file along with a PREMIS event recording when it was deleted and at whose request.</p>
 
+<p><a href="{{ .workItemURL }}">Work Item #{{ .workItem.ID }}</a> shows the status of this deletion.</p>
+
 {{ template "shared/_footer.html" .}}
 
 {{ end }}

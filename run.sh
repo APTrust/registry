@@ -30,6 +30,20 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
     DIR="./bin/osx"
 fi
 
+
+# ----------------------------------------------------------------------
+#
+# Figure out our environment
+#
+# ----------------------------------------------------------------------
+if [[ $TRAVIS == "true" ]]; then
+    APT_ENV=travis
+elif [[ -z "${APT_ENV}" ]]; then
+    APT_ENV=test
+fi
+echo "APT_ENV is $APT_ENV"
+
+
 # ----------------------------------------------------------------------
 #
 # Start the services: NSQ and Redis
@@ -39,17 +53,19 @@ echo "Starting NSQ"
 eval "$DIR/nsqd --data-path=$TMPDIR > /dev/null 2>&1 &"
 NSQ_PID=$!
 
+if [[ $TRAVIS != "true" && $1 != "tests" ]]; then
+    echo "Starting NSQ Lookup daemon"
+    eval "$DIR/nsqlookupd &"
+    NSQ_LOOKUPD_PID=$!
+
+    echo "Starting NSQ Admin service"
+    eval "$DIR/nsqadmin --nsqd-http-address=127.0.0.1:4151 &"
+    NSQ_ADMIN_PID=$!
+fi
+
 echo "Starting Redis"
 eval "$DIR/redis-server --save "" --appendonly no > /dev/null 2>&1 &"
 REDIS_PID=$!
-
-
-if [[ $TRAVIS == "true" ]]; then
-    APT_ENV=travis
-elif [[ -z "${APT_ENV}" ]]; then
-    APT_ENV=test
-fi
-echo "APT_ENV is $APT_ENV"
 
 # ----------------------------------------------------------------------
 #
@@ -76,6 +92,14 @@ EXIT_CODE=$?
 
 echo "Killing NSQ pid $NSQ_PID"
 kill $NSQ_PID
+
+if [[ $TRAVIS != "true" && $1 != "tests" ]]; then
+    echo "Killing NSQ Admin pid $NSQ_ADMIN_PID"
+    kill $NSQ_PID
+
+    echo "Killing NSQ Lookup pid $NSQ_LOOKUPD_PID"
+    kill $NSQ_LOOKUPD_PID
+fi
 
 echo "Killing Redis pid $REDIS_PID"
 kill $REDIS_PID

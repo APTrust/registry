@@ -254,7 +254,10 @@ func GenericFileApproveDelete(c *gin.Context) {
 		return
 	}
 
-	// TODO: Reload deletion request, so we get associated records.
+	// We either have to set this explicitly or reload the
+	// deletion request to ensure the ConfirmedBy user object
+	// is set. It's easier and less expensive to set it here.
+	deletionRequest.ConfirmedBy = req.CurrentUser
 
 	gf := deletionRequest.GenericFiles[0]
 
@@ -263,6 +266,7 @@ func GenericFileApproveDelete(c *gin.Context) {
 		return
 	}
 
+	// Create the deletion WorkItem
 	workItem, err := pgmodels.NewDeletionItem(obj, gf, req.CurrentUser)
 	if AbortIfError(c, err) {
 		return
@@ -272,9 +276,21 @@ func GenericFileApproveDelete(c *gin.Context) {
 		return
 	}
 
-	// TODO: Queue this WorkItem
+	// Queue the new work item in NSQ
+	topic, err := constants.TopicFor(workItem.Action, workItem.Stage)
+	if AbortIfError(c, err) {
+		return
+	}
+	ctx := common.Context()
+	ctx.Log.Info().Msgf("Queueing WorkItem %d to topic %s", workItem.ID, topic)
+	err = ctx.NSQClient.Enqueue(topic, workItem.ID)
+	if AbortIfError(c, err) {
+		return
+	}
 
 	req.TemplateData["deletionRequest"] = deletionRequest
+	req.TemplateData["workItemURL"] = fmt.Sprintf("/work_items/show/%d", workItem.ID)
+	req.TemplateData["workItem"] = workItem
 	c.HTML(http.StatusOK, "files/deletion_approved.html", req.TemplateData)
 }
 
@@ -304,7 +320,9 @@ func GenericFileCancelDelete(c *gin.Context) {
 		return
 	}
 
-	// TODO: Reload deletion request, so we get associated records.
+	// Explicitly set CancelledBy, because it wasn't set when we
+	// loaded the DeletionRequest object.
+	deletionRequest.CancelledBy = req.CurrentUser
 
 	req.TemplateData["deletionRequest"] = deletionRequest
 	c.HTML(http.StatusOK, "files/deletion_cancelled.html", req.TemplateData)

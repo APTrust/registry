@@ -9,10 +9,12 @@ import (
 	"strconv"
 
 	"github.com/nsqio/nsq/nsqd"
+	"github.com/rs/zerolog"
 )
 
 type NSQClient struct {
-	URL string
+	URL    string
+	logger zerolog.Logger
 }
 
 // NSQStatsData contains the important info returned by a call
@@ -74,8 +76,11 @@ func (data *NSQStatsData) GetChannelSummary(topicName, channelName string) (*Cha
 // Note that this client provides write access to queue, so we can
 // add things. It does not provide read access. The workers do the
 // reading.
-func NewNSQClient(url string) *NSQClient {
-	return &NSQClient{URL: url}
+func NewNSQClient(url string, logger zerolog.Logger) *NSQClient {
+	return &NSQClient{
+		URL:    url,
+		logger: logger,
+	}
 }
 
 // Enqueue posts data to NSQ, which essentially means putting it into a work
@@ -90,6 +95,7 @@ func (client *NSQClient) Enqueue(topic string, workItemID int64) error {
 // EnqueueString posts string data to the specified NSQ topic
 func (client *NSQClient) EnqueueString(topic string, data string) error {
 	url := fmt.Sprintf("%s/pub?topic=%s", client.URL, topic)
+	client.logger.Info().Msgf("Enqueue: %s", url)
 	resp, err := http.Post(url, "text/html", bytes.NewBuffer([]byte(data)))
 	if err != nil {
 		return fmt.Errorf("Nsqd returned an error when queuing data: %v", err)
@@ -102,6 +108,11 @@ func (client *NSQClient) EnqueueString(topic string, data string) error {
 	// or the connection will hang open forever.
 	body, _ := ioutil.ReadAll(resp.Body)
 	resp.Body.Close()
+
+	// NSQ response body is short. "OK" on success,
+	// or about 100-200 bytes on error.
+	client.logger.Info().Msgf("NSQ response from %s: [%d]  %s",
+		url, resp.StatusCode, body)
 
 	if resp.StatusCode != 200 {
 		bodyText := "[no response body]"

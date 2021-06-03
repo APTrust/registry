@@ -47,7 +47,7 @@ func Context() *APTContext {
 			Config:    config,
 			DB:        db,
 			Log:       logger,
-			NSQClient: network.NewNSQClient(config.NsqUrl),
+			NSQClient: network.NewNSQClient(config.NsqUrl, logger),
 		}
 	}
 	return ctx

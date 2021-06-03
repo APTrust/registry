@@ -4,7 +4,7 @@
 
 <h1>Deletion Previously Confirmed</h1>
 
-<p>The deletion of file <b>{{ (index .deletionRequest.GenericFiles 0).Identifier }}</b> was approved by {{ .deletionRequest.ConfirmedBy.Name }} ({{ .deletionRequest.ConfirmedBy.Email }} on {{ dateUS .deletionRequest.ConfirmedAt }}.</p>
+<p>The deletion of file <b>{{ (index .deletionRequest.GenericFiles 0).Identifier }}</b> was approved by {{ .deletionRequest.ConfirmedBy.Name }} ({{ .deletionRequest.ConfirmedBy.Email }}) on {{ dateUS .deletionRequest.ConfirmedAt }}.</p>
 
 <p>If the file has not yet been deleted, it will be soon.</p>
 
