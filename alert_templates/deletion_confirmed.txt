@@ -2,6 +2,10 @@ Hello from APTrust,
 
 The deletion requested by {{ .deletionRequest.RequestedBy.Name }} has been approved by {{ .deletionRequest.ConfirmedBy.Name }}. We'll send a confirmation email when the deletion is complete.
 
+For your reference, the link below has information about the request.
+
+--- ADD URL ---
+
 The Work Item showing the status of this deletion is at {{ .workItemURL }}
 
 If you have questions, please contact us at help@aptrust.org.

@@ -122,6 +122,11 @@ func GenericFileInitRestore(c *gin.Context) {
 // which will be emailed to institutional admins for approval.
 func GenericFileInitDelete(c *gin.Context) {
 	req := NewRequest(c)
+
+	// ---------------------------------------------------------------------
+	// TODO: Refactor and break this up.
+	// ---------------------------------------------------------------------
+
 	gf, err := pgmodels.GenericFileByID(req.Auth.ResourceID)
 	if AbortIfError(c, err) {
 		return
@@ -361,6 +366,10 @@ func GenericFileApproveDelete(c *gin.Context) {
 func GenericFileCancelDelete(c *gin.Context) {
 	req := NewRequest(c)
 
+	// ---------------------------------------------------------------------
+	// TODO: Refactor and break this up.
+	// ---------------------------------------------------------------------
+
 	// Find the deletion request
 	deletionRequest, err := pgmodels.DeletionRequestByID(req.Auth.ResourceID)
 	if AbortIfError(c, err) {
@@ -384,6 +393,47 @@ func GenericFileCancelDelete(c *gin.Context) {
 	// Explicitly set CancelledBy, because it wasn't set when we
 	// loaded the DeletionRequest object.
 	deletionRequest.CancelledBy = req.CurrentUser
+
+	alertData := map[string]interface{}{
+		"deletionRequest": deletionRequest,
+	}
+	tmpl := common.TextTemplates["alerts/deletion_cancelled.txt"]
+	var buf bytes.Buffer
+	err = tmpl.Execute(&buf, alertData)
+	if AbortIfError(c, err) {
+		return
+	}
+
+	// Create deletion approved alert (refactor later)
+	// Get list of inst admins.
+	gf := deletionRequest.GenericFiles[0]
+	adminsQuery := pgmodels.NewQuery().Where("institution_id", "=", gf.InstitutionID).Where("role", "=", constants.RoleInstAdmin)
+	instAdmins, err := pgmodels.UserSelect(adminsQuery)
+	if AbortIfError(c, err) {
+		return
+	}
+
+	cancellationAlert := &pgmodels.Alert{
+		InstitutionID:     deletionRequest.InstitutionID,
+		Type:              constants.AlertDeletionCancelled,
+		DeletionRequestID: deletionRequest.ID,
+		Content:           buf.String(),
+		CreatedAt:         time.Now().UTC(),
+		Users:             instAdmins,
+	}
+
+	err = cancellationAlert.Save()
+	if AbortIfError(c, err) {
+		return
+	}
+
+	// Temporary local debugging
+	envName := common.Context().Config.EnvName
+	if envName == "dev" || envName == "test" {
+		fmt.Println("***********************")
+		fmt.Println(cancellationAlert.Content)
+		fmt.Println("***********************")
+	}
 
 	req.TemplateData["deletionRequest"] = deletionRequest
 	c.HTML(http.StatusOK, "files/deletion_cancelled.html", req.TemplateData)
