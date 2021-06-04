@@ -368,6 +368,7 @@ func NewDeletionItem(obj *IntellectualObject, gf *GenericFile, user *User) (*Wor
 
 	deletionItem.Action = constants.ActionDelete
 	deletionItem.User = user.Email
+	deletionItem.Size = gf.Size
 	err = deletionItem.Save()
 	return deletionItem, err
 }

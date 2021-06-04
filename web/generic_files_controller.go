@@ -176,7 +176,7 @@ func GenericFileInitDelete(c *gin.Context) {
 	}
 
 	// Put confirmation token into URL
-	confirmationAlert := &pgmodels.Alert{
+	requestAlert := &pgmodels.Alert{
 		InstitutionID:     gf.InstitutionID,
 		Type:              constants.AlertDeletionRequested,
 		DeletionRequestID: deleteRequest.ID,
@@ -184,7 +184,7 @@ func GenericFileInitDelete(c *gin.Context) {
 		CreatedAt:         time.Now().UTC(),
 		Users:             instAdmins,
 	}
-	err = confirmationAlert.Save()
+	err = requestAlert.Save()
 	if AbortIfError(c, err) {
 		return
 	}
@@ -194,11 +194,9 @@ func GenericFileInitDelete(c *gin.Context) {
 	envName := common.Context().Config.EnvName
 	if envName == "dev" || envName == "test" {
 		fmt.Println("***********************")
-		fmt.Println(confirmationAlert.Content)
+		fmt.Println(requestAlert.Content)
 		fmt.Println("***********************")
 	}
-
-	// TODO: Add WorkItemID to DeletionRequest
 
 	req.TemplateData["fileIdentifier"] = gf.Identifier
 	c.HTML(http.StatusCreated, "files/deletion_requested.html", req.TemplateData)
@@ -244,6 +242,10 @@ func GenericFileReviewDelete(c *gin.Context) {
 // POST /files/approve_delete/:id
 func GenericFileApproveDelete(c *gin.Context) {
 	req := NewRequest(c)
+
+	// ---------------------------------------------------------------------
+	// TODO: Refactor and break this up.
+	// ---------------------------------------------------------------------
 
 	// Find the deletion request
 	deletionRequest, err := pgmodels.DeletionRequestByID(req.Auth.ResourceID)
@@ -300,6 +302,54 @@ func GenericFileApproveDelete(c *gin.Context) {
 	if AbortIfError(c, err) {
 		return
 	}
+
+	// Create deletion approved alert (refactor later)
+	// Get list of inst admins.
+	adminsQuery := pgmodels.NewQuery().Where("institution_id", "=", gf.InstitutionID).Where("role", "=", constants.RoleInstAdmin)
+	instAdmins, err := pgmodels.UserSelect(adminsQuery)
+	if AbortIfError(c, err) {
+		return
+	}
+
+	workItemURL := fmt.Sprintf("%s/work_items/show/%d",
+		req.BaseURL(),
+		deletionRequest.WorkItemID)
+
+	alertData := map[string]interface{}{
+		"deletionRequest": deletionRequest,
+		"workItemURL":     workItemURL,
+	}
+	tmpl := common.TextTemplates["alerts/deletion_confirmed.txt"]
+	var buf bytes.Buffer
+	err = tmpl.Execute(&buf, alertData)
+	if AbortIfError(c, err) {
+		return
+	}
+
+	workItems := []*pgmodels.WorkItem{workItem}
+	approvalAlert := &pgmodels.Alert{
+		InstitutionID:     gf.InstitutionID,
+		Type:              constants.AlertDeletionConfirmed,
+		DeletionRequestID: deletionRequest.ID,
+		Content:           buf.String(),
+		CreatedAt:         time.Now().UTC(),
+		Users:             instAdmins,
+		WorkItems:         workItems,
+	}
+	err = approvalAlert.Save()
+	if AbortIfError(c, err) {
+		return
+	}
+
+	// Temporary local debugging
+	envName := common.Context().Config.EnvName
+	if envName == "dev" || envName == "test" {
+		fmt.Println("***********************")
+		fmt.Println(approvalAlert.Content)
+		fmt.Println("***********************")
+	}
+
+	// --------
 
 	req.TemplateData["deletionRequest"] = deletionRequest
 	c.HTML(http.StatusOK, "files/deletion_approved.html", req.TemplateData)
