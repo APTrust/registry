@@ -127,7 +127,8 @@ create table if not exists public.deletion_requests (
 	confirmed_by_id integer references public.users(id),
 	confirmed_at timestamp,
 	cancelled_by_id integer references public.users(id),
-	cancelled_at timestamp
+	cancelled_at timestamp,
+    work_item_id integer null references public.work_items(id)
 );
 create index if not exists index_deletion_requests_institution_id ON public.deletion_requests (institution_id);
 

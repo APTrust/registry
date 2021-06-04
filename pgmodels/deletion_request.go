@@ -41,6 +41,7 @@ type DeletionRequest struct {
 	RequestedBy                *User                 `json:"requested_by" pg:"rel:has-one"`
 	ConfirmedBy                *User                 `json:"confirmed_by" pg:"rel:has-one"`
 	CancelledBy                *User                 `json:"cancelled_by" pg:"rel:has-one"`
+	WorkItemID                 int64                 `json:"work_item_id"`
 	GenericFiles               []*GenericFile        `json:"generic_files" pg:"many2many:deletion_requests_generic_files"`
 	IntellectualObjects        []*IntellectualObject `json:"intellectual_objects" pg:"many2many:deletion_requests_intellectual_objects"`
 }
