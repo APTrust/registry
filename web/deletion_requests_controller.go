@@ -50,7 +50,7 @@ func DeletionRequestIndex(c *gin.Context) {
 		query.Where("institution_id", "=", req.CurrentUser.InstitutionID)
 	}
 	query.OrderBy("requested_at desc")
-	deletions, err := pgmodels.DeletionRequestSelect(query)
+	deletions, err := pgmodels.DeletionRequestViewSelect(query)
 	if AbortIfError(c, err) {
 		return
 	}

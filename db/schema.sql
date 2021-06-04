@@ -755,6 +755,39 @@ select
 from intellectual_objects io
 left join institutions i on io.institution_id = i.id;
 
+-- deletion_requests_view
+
+create or replace view deletion_requests_view as
+select dr.id,
+       dr.institution_id,
+       i."name" as institution_name,
+       i.identifier as institution_identifier,
+       dr.requested_by_id,
+       req."name" as requested_by_name,
+       req.email as requested_by_email,
+       dr.requested_at,
+       dr.confirmed_by_id,
+       conf."name" as confirmed_by_name,
+       conf.email as confirmed_by_email,
+       dr.confirmed_at,
+       dr.cancelled_by_id,
+       can."name" as cancelled_by_name,
+       can.email as cancelled_by_email,
+       dr.cancelled_at,
+       (select count(*) from deletion_requests_generic_files drgf where drgf.deletion_request_id = dr.id) as file_count,
+       (select count(*) from deletion_requests_intellectual_objects drio where drio.deletion_request_id = dr.id) as object_count,
+       dr.work_item_id,
+       wi.stage,
+       wi.status,
+       wi.date_processed,
+       wi."size",
+       wi.note
+from deletion_requests dr
+left join institutions i on dr.institution_id = i.id
+left join users req on dr.requested_by_id = req.id
+left join users conf on dr.confirmed_by_id = conf.id
+left join users can on dr.confirmed_by_id = can.id
+left join work_items wi on dr.work_item_id = wi.id;
 
 -------------------------------------------------------------------------------
 -- Functions

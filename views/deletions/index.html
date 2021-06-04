@@ -9,17 +9,19 @@
     <tr>
       <th>Requested By</th>
       <th>Request Date</th>
-      <th>Type</th>
+      <th>Files</th>
+      <th>Objects</th>
       <th>Status</th>
     </tr>
   </thead>
   <tbody>
     {{ range $index, $deletion := .deletions }}
     <tr class="clickable" onclick="window.location.href='/deletions/show/{{ $deletion.ID }}'">
-      <td>REQUESTER NAME</td>
+      <td>{{ $deletion.RequestedByName }}</td>
       <td>{{ dateUS $deletion.RequestedAt }}</td>
-      <td>File</td>
-      <td>Pending, Rejected, or Completed</td>
+      <td>{{ $deletion.FileCount }}</td>
+      <td>{{ $deletion.ObjectCount }}</td>
+      <td>{{ $deletion.DisplayStatus }}</td>
     </tr>
     {{ end }}
   </tbody>

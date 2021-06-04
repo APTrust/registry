@@ -2,8 +2,6 @@ package pgmodels
 
 import (
 	"time"
-	//"github.com/APTrust/registry/common"
-	//"github.com/APTrust/registry/constants"
 )
 
 // InstitutionView contains information about an institution and its
@@ -47,14 +45,14 @@ func InstitutionViewByEmail(email string) (*InstitutionView, error) {
 // InstitutionViewSelect returns all InstitutionView records matching
 // the query.
 func InstitutionViewSelect(query *Query) ([]*InstitutionView, error) {
-	var users []*InstitutionView
-	err := query.Select(&users)
-	return users, err
+	var institutions []*InstitutionView
+	err := query.Select(&institutions)
+	return institutions, err
 }
 
 // InstitutionViewGet returns the first user view record matching the query.
 func InstitutionViewGet(query *Query) (*InstitutionView, error) {
-	var user InstitutionView
-	err := query.Select(&user)
-	return &user, err
+	var institution InstitutionView
+	err := query.Select(&institution)
+	return &institution, err
 }
