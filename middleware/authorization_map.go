@@ -44,6 +44,8 @@ var AuthMap = map[string]AuthMetadata{
 	"ChecksumShow":                       {"Checksum", constants.ChecksumRead},
 	"ChecksumUpdate":                     {"Checksum", constants.ChecksumUpdate},
 	"DashboardShow":                      {"Dashboard", constants.DashboardShow},
+	"DeletionRequestIndex":               {"DeletionRequest", constants.DeletionRequestList},
+	"DeletionRequestShow":                {"DeletionRequest", constants.DeletionRequestShow},
 	"EventCreate":                        {"Event", constants.EventCreate},
 	"EventDelete":                        {"Event", constants.EventDelete},
 	"EventIndex":                         {"Event", constants.EventRead},

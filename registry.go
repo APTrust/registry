@@ -90,6 +90,13 @@ func initRoutes(router *gin.Engine) {
 
 	webRoutes := router.Group("/")
 	{
+		// Deletion Requests
+		// Note that these routes are for read-only views.
+		// Routes for initiating, approving and rejecting deletions
+		// are in the GenericFiles and IntellectualObjects controllers.
+		webRoutes.GET("/deletions/", web.DeletionRequestIndex)
+		webRoutes.GET("/deletions/show/:id", web.DeletionRequestShow)
+
 		// Dashboard
 		webRoutes.GET("/dashboard", web.DashboardShow)
 

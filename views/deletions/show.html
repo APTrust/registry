@@ -1,0 +1,30 @@
+{{ define "deletions/show.html" }}
+
+{{ template "shared/_header.html" .}}
+
+<h1>Deletion Request</h1>
+
+<p>User {{ .deletionRequest.RequestedBy.Name }} ({{ .deletionRequest.RequestedBy.Email }}) asked to delete the following item:</p>
+
+<p>
+  <b>FILE OR OBJECT ID</b><br/>
+  Size: PLACEHOLDER SIZE <br/>
+  Created: PLACEHOLDER DATE <br/>
+  Updated: PLACEHOLDER DATE <br/>
+
+  {{ if .deletetionRequest.ConfirmedBy }}
+  Confirmed By: {{ .deletionRequest.ConfirmedBy.Name }} <br/>
+  Confirmed On: {{ dateUS .deletionRequest.ConfirmedAt }} <br/>
+  {{ end }}
+
+  {{ if .deletetionRequest.CancelledBy }}
+  Cancelled By: {{ .deletionRequest.CancelledBy.Name }} <br/>
+  Cancelled On: {{ dateUS .deletionRequest.CancelledAt }} <br/>
+  {{ end }}
+
+  {{ if .workItemURL }}
+  Work Item: <a href="{{ .workItemURL }}">Work Item #{{ .deletionRequest.WorkItemID }}</a>
+  {{ end }}
+</p>
+
+{{ end }}

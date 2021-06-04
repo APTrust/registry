@@ -25,6 +25,8 @@ const (
 	ChecksumUpdate                                = "ChecksumUpdate"
 	ChecksumDelete                                = "ChecksumDelete"
 	DashboardShow                                 = "DashboardShow"
+	DeletionRequestList                           = "DeletionRequestList"
+	DeletionRequestShow                           = "DeletionRequestShow"
 	EventCreate                                   = "EventCreate"
 	EventRead                                     = "EventRead"
 	EventUpdate                                   = "EventUpdate"
@@ -149,6 +151,8 @@ func initPermissions() {
 	instUser[AlertUpdate] = true
 	instUser[ChecksumRead] = true
 	instUser[DashboardShow] = true
+	instUser[DeletionRequestShow] = true
+	instUser[DeletionRequestList] = true
 	instUser[EventRead] = true
 	instUser[GenericFileRead] = true
 	instUser[InstitutionRead] = true
@@ -165,6 +169,8 @@ func initPermissions() {
 	instAdmin[AlertUpdate] = true
 	instAdmin[ChecksumRead] = true
 	instAdmin[DashboardShow] = true
+	instAdmin[DeletionRequestShow] = true
+	instAdmin[DeletionRequestList] = true
 	instAdmin[EventRead] = true
 	instAdmin[GenericFileRead] = true
 	instAdmin[GenericFileDelete] = true
@@ -198,6 +204,8 @@ func initPermissions() {
 	sysAdmin[ChecksumUpdate] = false // no one can do this
 	sysAdmin[ChecksumDelete] = false // no one can do this
 	sysAdmin[DashboardShow] = true
+	sysAdmin[DeletionRequestShow] = true
+	sysAdmin[DeletionRequestList] = true
 	sysAdmin[EventCreate] = true
 	sysAdmin[EventRead] = true
 	sysAdmin[EventUpdate] = false // no one can do this

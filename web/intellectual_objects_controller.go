@@ -108,6 +108,9 @@ func IntellectualObjectIndex(c *gin.Context) {
 	if AbortIfError(c, err) {
 		return
 	}
+	if !req.CurrentUser.IsAdmin() {
+		query.Where("institution_id", "=", req.CurrentUser.InstitutionID)
+	}
 	query.OrderBy("updated_at desc")
 	objects, err := pgmodels.IntellectualObjectViewSelect(query)
 	if AbortIfError(c, err) {

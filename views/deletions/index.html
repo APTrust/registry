@@ -1,0 +1,31 @@
+{{ define "deletions/index.html" }}
+
+{{ template "shared/_header.html" .}}
+
+<h1>Deletions</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Requested By</th>
+      <th>Request Date</th>
+      <th>Type</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{ range $index, $deletion := .deletions }}
+    <tr class="clickable" onclick="window.location.href='/deletions/show/{{ $deletion.ID }}'">
+      <td>REQUESTER NAME</td>
+      <td>{{ dateUS $deletion.RequestedAt }}</td>
+      <td>File</td>
+      <td>Pending, Rejected, or Completed</td>
+    </tr>
+    {{ end }}
+  </tbody>
+</table>
+
+{{ template "shared/_footer.html" .}}
+
+
+{{ end }}
