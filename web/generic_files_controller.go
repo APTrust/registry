@@ -260,10 +260,6 @@ func GenericFileApproveDelete(c *gin.Context) {
 
 	deletionRequest.ConfirmedByID = req.CurrentUser.ID
 	deletionRequest.ConfirmedAt = time.Now().UTC()
-	err = deletionRequest.Save()
-	if AbortIfError(c, err) {
-		return
-	}
 
 	// We either have to set this explicitly or reload the
 	// deletion request to ensure the ConfirmedBy user object
@@ -287,6 +283,12 @@ func GenericFileApproveDelete(c *gin.Context) {
 		return
 	}
 
+	deletionRequest.WorkItemID = workItem.ID
+	err = deletionRequest.Save()
+	if AbortIfError(c, err) {
+		return
+	}
+
 	// Queue the new work item in NSQ
 	topic, err := constants.TopicFor(workItem.Action, workItem.Stage)
 	if AbortIfError(c, err) {
@@ -300,8 +302,6 @@ func GenericFileApproveDelete(c *gin.Context) {
 	}
 
 	req.TemplateData["deletionRequest"] = deletionRequest
-	req.TemplateData["workItemURL"] = fmt.Sprintf("/work_items/show/%d", workItem.ID)
-	req.TemplateData["workItem"] = workItem
 	c.HTML(http.StatusOK, "files/deletion_approved.html", req.TemplateData)
 }
 
