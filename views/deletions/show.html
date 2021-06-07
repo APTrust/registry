@@ -4,13 +4,9 @@
 
 <h1>Deletion Request</h1>
 
-<p>User {{ .deletionRequest.RequestedBy.Name }} ({{ .deletionRequest.RequestedBy.Email }}) asked to delete the following item:</p>
-
 <p>
-  <b>FILE OR OBJECT ID</b><br/>
-  Size: PLACEHOLDER SIZE <br/>
-  Created: PLACEHOLDER DATE <br/>
-  Updated: PLACEHOLDER DATE <br/>
+  Requested By: {{ .deletionRequest.RequestedBy.Name }} <br/>
+  Requested At: {{ dateUS .deletionRequest.RequestedAt }} <br/>
 
   {{ if .deletetionRequest.ConfirmedBy }}
   Confirmed By: {{ .deletionRequest.ConfirmedBy.Name }} <br/>
@@ -25,6 +21,26 @@
   {{ if .workItemURL }}
   Work Item: <a href="{{ .workItemURL }}">Work Item #{{ .deletionRequest.WorkItemID }}</a>
   {{ end }}
+
+  {{ if .deletionRequest.IntellectualObjects }}
+  <h2>Objects</h2>
+  <ol>
+  {{ range $index, $obj := .deletionRequest.IntellectualObjects }}
+    <li><a href="/objects/show/{{ $obj.ID }}" target="_blank">{{ $obj.Identifier }}</a></li>
+  {{ end }}
+  </ol>
+  {{ end }}
+
+  {{ if .deletionRequest.GenericFiles }}
+  <h2>Files</h2>
+  <ol>
+  {{ range $index, $gf := .deletionRequest.GenericFiles }}
+    <li><a href="/files/show/{{ $gf.ID }}" target="_blank">{{ $gf.Identifier }}</a></li>
+  {{ end }}
+  </ol>
+  {{ end }}
+
+
 </p>
 
 {{ end }}
