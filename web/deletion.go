@@ -111,11 +111,49 @@ func NewDeletionForReview(req *Request) (*Deletion, error) {
 }
 
 func (del *Deletion) CreateWorkItem() (*pgmodels.WorkItem, error) {
-	return nil, nil
+	// Create the deletion WorkItem
+	obj := del.DeletionRequest.FirstObject()
+	gf := del.DeletionRequest.FirstFile()
+
+	// Deletion may be file only, no object.
+	var err error
+	if obj == nil && gf != nil {
+		obj, err = pgmodels.IntellectualObjectByID(gf.IntellectualObjectID)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	workItem, err := pgmodels.NewDeletionItem(obj, gf, del.currentUser)
+	if err != nil {
+		return nil, err
+	}
+	del.DeletionRequest.WorkItem = workItem
+	err = del.DeletionRequest.Save()
+
+	return workItem, err
 }
 
-func (del *Deletion) QueueWorkItem() (*pgmodels.WorkItem, error) {
-	return nil, nil
+func (del *Deletion) QueueWorkItem() error {
+	workItem := del.DeletionRequest.WorkItem
+	if workItem == nil {
+		return common.ErrInternal
+	}
+	topic, err := constants.TopicFor(workItem.Action, workItem.Stage)
+	if err != nil {
+		return err
+	}
+	ctx := common.Context()
+	ctx.Log.Info().Msgf("Queueing WorkItem %d to topic %s", workItem.ID, topic)
+	return ctx.NSQClient.Enqueue(topic, workItem.ID)
+}
+
+func (del *Deletion) CreateAndQueueWorkItem() (*pgmodels.WorkItem, error) {
+	workItem, err := del.CreateWorkItem()
+	if err == nil {
+		err = del.QueueWorkItem()
+	}
+	return workItem, err
 }
 
 func (del *Deletion) CreateRequestAlert() (*pgmodels.Alert, error) {
@@ -132,8 +170,18 @@ func (del *Deletion) CreateRequestAlert() (*pgmodels.Alert, error) {
 	return del.createAlert(templateName, alertType, alertData)
 }
 
-func (del *Deletion) CreateApprovalAlert() {
-
+func (del *Deletion) CreateApprovalAlert() (*pgmodels.Alert, error) {
+	templateName := "alerts/deletion_confirmed.txt"
+	alertType := constants.AlertDeletionConfirmed
+	workItemURL, err := del.WorkItemURL()
+	if err != nil {
+		return nil, err
+	}
+	alertData := map[string]interface{}{
+		"deletionRequest": del.DeletionRequest,
+		"workItemURL":     workItemURL,
+	}
+	return del.createAlert(templateName, alertType, alertData)
 }
 
 func (del *Deletion) CreateCancellationAlert() {

@@ -44,6 +44,7 @@ type DeletionRequest struct {
 	WorkItemID                 int64                 `json:"work_item_id"`
 	GenericFiles               []*GenericFile        `json:"generic_files" pg:"many2many:deletion_requests_generic_files"`
 	IntellectualObjects        []*IntellectualObject `json:"intellectual_objects" pg:"many2many:deletion_requests_intellectual_objects"`
+	WorkItem                   *WorkItem             `json:"work_item"`
 }
 
 type DeletionRequestsGenericFiles struct {
@@ -75,7 +76,7 @@ func NewDeletionRequest() (*DeletionRequest, error) {
 // DeletionRequestByID returns the institution with the specified id.
 // Returns pg.ErrNoRows if there is no match.
 func DeletionRequestByID(id int64) (*DeletionRequest, error) {
-	query := NewQuery().Relations("RequestedBy", "ConfirmedBy", "CancelledBy", "GenericFiles", "IntellectualObjects").Where(`"deletion_request"."id"`, "=", id)
+	query := NewQuery().Relations("RequestedBy", "ConfirmedBy", "CancelledBy", "GenericFiles", "IntellectualObjects", "WorkItem").Where(`"deletion_request"."id"`, "=", id)
 	return DeletionRequestGet(query)
 }
 
@@ -207,7 +208,11 @@ func (request *DeletionRequest) saveRelations(db *pg.DB) error {
 	if err != nil {
 		return err
 	}
-	return request.saveObjects(db)
+	err = request.saveObjects(db)
+	if err != nil {
+		return err
+	}
+	return request.saveWorkItem(db)
 }
 
 func (request *DeletionRequest) saveFiles(db *pg.DB) error {
@@ -232,6 +237,20 @@ func (request *DeletionRequest) saveObjects(db *pg.DB) error {
 	return nil
 }
 
+func (request *DeletionRequest) saveWorkItem(db *pg.DB) error {
+	if request.WorkItem != nil {
+		err := request.WorkItem.Save()
+		if err != nil {
+			return err
+		}
+		request.WorkItemID = request.WorkItem.ID
+		sql := "update deletion_requests set work_item_id = ? where id = ?"
+		_, err = db.Exec(sql, request.WorkItem.ID, request.ID)
+		return err
+	}
+	return nil
+}
+
 // FirstFile returns the first GenericFile associated with this deletion
 // request. Use this for simple, single-file deletions.
 func (request *DeletionRequest) FirstFile() *GenericFile {
@@ -252,14 +271,16 @@ func (request *DeletionRequest) FirstObject() *IntellectualObject {
 
 // Confirm marks this DeletionRequest as confirmed. It's up to the caller
 // to save the request and create an appropriate WorkItem.
-func (request *DeletionRequest) Confirm(userID int64) {
-	request.ConfirmedByID = userID
+func (request *DeletionRequest) Confirm(user *User) {
+	request.ConfirmedBy = user
+	request.ConfirmedByID = user.ID
 	request.ConfirmedAt = time.Now().UTC()
 }
 
 // Cancel cancels this DeletionRequest. It's up to the caller to save
 // this request after cancelling it.
-func (request *DeletionRequest) Cancel(userID int64) {
-	request.CancelledByID = userID
+func (request *DeletionRequest) Cancel(user *User) {
+	request.CancelledBy = user
+	request.CancelledByID = user.ID
 	request.CancelledAt = time.Now().UTC()
 }

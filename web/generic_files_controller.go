@@ -123,87 +123,17 @@ func GenericFileInitRestore(c *gin.Context) {
 func GenericFileInitDelete(c *gin.Context) {
 	req := NewRequest(c)
 
-	// ---------------------------------------------------------------------
-	// TODO: Refactor and break this up.
-	// ---------------------------------------------------------------------
-
-	gf, err := pgmodels.GenericFileByID(req.Auth.ResourceID)
+	del, err := NewDeletionForFile(req)
 	if AbortIfError(c, err) {
 		return
 	}
 
-	// Make sure there are no pending work items...
-	pendingWorkItems, err := pgmodels.WorkItemsPendingForFile(gf.ID)
-	if AbortIfError(c, err) {
-		return
-	}
-	if len(pendingWorkItems) > 0 {
-		AbortIfError(c, common.ErrPendingWorkItems)
-		return
-	}
-
-	// Get list of inst admins.
-	adminsQuery := pgmodels.NewQuery().Where("institution_id", "=", gf.InstitutionID).Where("role", "=", constants.RoleInstAdmin)
-	instAdmins, err := pgmodels.UserSelect(adminsQuery)
+	_, err = del.CreateRequestAlert()
 	if AbortIfError(c, err) {
 		return
 	}
 
-	// Create the deletion request and the alert, which will become
-	// the deletion confirmation email.
-	deleteRequest, err := pgmodels.NewDeletionRequest()
-	if AbortIfError(c, err) {
-		return
-	}
-	deleteRequest.InstitutionID = gf.InstitutionID
-	deleteRequest.RequestedByID = req.CurrentUser.ID
-	deleteRequest.RequestedAt = time.Now().UTC()
-	deleteRequest.AddFile(gf)
-	err = deleteRequest.Save()
-	if AbortIfError(c, err) {
-		return
-	}
-
-	reviewURL := fmt.Sprintf("%s/files/review_delete/%d?token=%s",
-		req.BaseURL(),
-		deleteRequest.ID,
-		deleteRequest.ConfirmationToken)
-
-	alertData := map[string]string{
-		"RequesterName":     req.CurrentUser.Name,
-		"DeletionReviewURL": reviewURL,
-	}
-	tmpl := common.TextTemplates["alerts/deletion_requested.txt"]
-	var buf bytes.Buffer
-	err = tmpl.Execute(&buf, alertData)
-	if AbortIfError(c, err) {
-		return
-	}
-
-	// Put confirmation token into URL
-	requestAlert := &pgmodels.Alert{
-		InstitutionID:     gf.InstitutionID,
-		Type:              constants.AlertDeletionRequested,
-		DeletionRequestID: deleteRequest.ID,
-		Content:           buf.String(),
-		CreatedAt:         time.Now().UTC(),
-		Users:             instAdmins,
-	}
-	err = requestAlert.Save()
-	if AbortIfError(c, err) {
-		return
-	}
-
-	// For now, show this in dev and test, so we don't have
-	// to look it up in the DB.
-	envName := common.Context().Config.EnvName
-	if envName == "dev" || envName == "test" {
-		fmt.Println("***********************")
-		fmt.Println(requestAlert.Content)
-		fmt.Println("***********************")
-	}
-
-	req.TemplateData["fileIdentifier"] = gf.Identifier
+	req.TemplateData["fileIdentifier"] = del.DeletionRequest.FirstFile().Identifier
 	c.HTML(http.StatusCreated, "files/deletion_requested.html", req.TemplateData)
 }
 
@@ -248,115 +178,22 @@ func GenericFileReviewDelete(c *gin.Context) {
 func GenericFileApproveDelete(c *gin.Context) {
 	req := NewRequest(c)
 
-	// ---------------------------------------------------------------------
-	// TODO: Refactor and break this up.
-	// ---------------------------------------------------------------------
-
-	// Find the deletion request
-	deletionRequest, err := pgmodels.DeletionRequestByID(req.Auth.ResourceID)
+	del, err := NewDeletionForReview(req)
+	if AbortIfError(c, err) {
+		return
+	}
+	del.DeletionRequest.Confirm(req.CurrentUser)
+	_, err = del.CreateAndQueueWorkItem()
 	if AbortIfError(c, err) {
 		return
 	}
 
-	// Make sure the token is valid for that deletion request
-	token := c.PostForm("token")
-	if !common.ComparePasswords(deletionRequest.EncryptedConfirmationToken, token) {
-		AbortIfError(c, common.ErrInvalidToken)
-		return
-	}
-
-	deletionRequest.ConfirmedByID = req.CurrentUser.ID
-	deletionRequest.ConfirmedAt = time.Now().UTC()
-
-	// We either have to set this explicitly or reload the
-	// deletion request to ensure the ConfirmedBy user object
-	// is set. It's easier and less expensive to set it here.
-	deletionRequest.ConfirmedBy = req.CurrentUser
-
-	gf := deletionRequest.GenericFiles[0]
-
-	obj, err := pgmodels.IntellectualObjectByID(gf.IntellectualObjectID)
+	_, err = del.CreateApprovalAlert()
 	if AbortIfError(c, err) {
 		return
 	}
 
-	// Create the deletion WorkItem
-	workItem, err := pgmodels.NewDeletionItem(obj, gf, req.CurrentUser)
-	if AbortIfError(c, err) {
-		return
-	}
-	err = workItem.Save()
-	if AbortIfError(c, err) {
-		return
-	}
-
-	deletionRequest.WorkItemID = workItem.ID
-	err = deletionRequest.Save()
-	if AbortIfError(c, err) {
-		return
-	}
-
-	// Queue the new work item in NSQ
-	topic, err := constants.TopicFor(workItem.Action, workItem.Stage)
-	if AbortIfError(c, err) {
-		return
-	}
-	ctx := common.Context()
-	ctx.Log.Info().Msgf("Queueing WorkItem %d to topic %s", workItem.ID, topic)
-	err = ctx.NSQClient.Enqueue(topic, workItem.ID)
-	if AbortIfError(c, err) {
-		return
-	}
-
-	// Create deletion approved alert (refactor later)
-	// Get list of inst admins.
-	adminsQuery := pgmodels.NewQuery().Where("institution_id", "=", gf.InstitutionID).Where("role", "=", constants.RoleInstAdmin)
-	instAdmins, err := pgmodels.UserSelect(adminsQuery)
-	if AbortIfError(c, err) {
-		return
-	}
-
-	workItemURL := fmt.Sprintf("%s/work_items/show/%d",
-		req.BaseURL(),
-		deletionRequest.WorkItemID)
-
-	alertData := map[string]interface{}{
-		"deletionRequest": deletionRequest,
-		"workItemURL":     workItemURL,
-	}
-	tmpl := common.TextTemplates["alerts/deletion_confirmed.txt"]
-	var buf bytes.Buffer
-	err = tmpl.Execute(&buf, alertData)
-	if AbortIfError(c, err) {
-		return
-	}
-
-	workItems := []*pgmodels.WorkItem{workItem}
-	approvalAlert := &pgmodels.Alert{
-		InstitutionID:     gf.InstitutionID,
-		Type:              constants.AlertDeletionConfirmed,
-		DeletionRequestID: deletionRequest.ID,
-		Content:           buf.String(),
-		CreatedAt:         time.Now().UTC(),
-		Users:             instAdmins,
-		WorkItems:         workItems,
-	}
-	err = approvalAlert.Save()
-	if AbortIfError(c, err) {
-		return
-	}
-
-	// Temporary local debugging
-	envName := common.Context().Config.EnvName
-	if envName == "dev" || envName == "test" {
-		fmt.Println("***********************")
-		fmt.Println(approvalAlert.Content)
-		fmt.Println("***********************")
-	}
-
-	// --------
-
-	req.TemplateData["deletionRequest"] = deletionRequest
+	req.TemplateData["deletionRequest"] = del.DeletionRequest
 	c.HTML(http.StatusOK, "files/deletion_approved.html", req.TemplateData)
 }
 
