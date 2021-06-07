@@ -245,9 +245,11 @@ func (request *DeletionRequest) saveWorkItem(db *pg.DB) error {
 		if err != nil {
 			return err
 		}
-		request.WorkItemID = request.WorkItem.ID
-		sql := "update deletion_requests set work_item_id = ? where id = ?"
-		_, err = db.Exec(sql, request.WorkItem.ID, request.ID)
+		if request.WorkItemID == 0 {
+			request.WorkItemID = request.WorkItem.ID
+			sql := "update deletion_requests set work_item_id = ? where id = ?"
+			_, err = db.Exec(sql, request.WorkItem.ID, request.ID)
+		}
 		return err
 	}
 	return nil
