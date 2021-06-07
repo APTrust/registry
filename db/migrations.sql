@@ -138,15 +138,14 @@ create table if not exists public.deletion_requests_generic_files (
 	deletion_request_id integer not null references public.deletion_requests(id),
 	generic_file_id integer not null references public.generic_files(id)
 );
-create index if not exists index_drgf_deletion_request_id ON public.deletion_requests_generic_files (deletion_request_id);
-
+create unique index if not exists index_drgf_unique ON public.deletion_requests_generic_files (deletion_request_id, generic_file_id);
 
 -- deletion_requests_intellectual_objects records which objects belong to a deletion request
 create table if not exists public.deletion_requests_intellectual_objects (
 	deletion_request_id integer not null references public.deletion_requests(id),
 	intellectual_object_id integer not null references public.intellectual_objects(id)
 );
-create index if not exists index_drio_deletion_request_id ON public.deletion_requests_intellectual_objects (deletion_request_id);
+create unique index if not exists index_drio_unique ON public.deletion_requests_intellectual_objects (deletion_request_id, intellectual_object_id);
 
 
 -- alerts stores the content of alert messages. These messages appear in the web UI

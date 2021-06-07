@@ -216,6 +216,7 @@ func (request *DeletionRequest) saveRelations(db *pg.DB) error {
 }
 
 func (request *DeletionRequest) saveFiles(db *pg.DB) error {
+	// Note: on conflict refers to unique index index_drgf_unique
 	sql := "insert into deletion_requests_generic_files (deletion_request_id, generic_file_id) values (?, ?) on conflict do nothing"
 	for _, gf := range request.GenericFiles {
 		_, err := db.Exec(sql, request.ID, gf.ID)
@@ -227,6 +228,7 @@ func (request *DeletionRequest) saveFiles(db *pg.DB) error {
 }
 
 func (request *DeletionRequest) saveObjects(db *pg.DB) error {
+	// Note: on conflict refers to unique index index_drio_unique
 	sql := "insert into deletion_requests_intellectual_objects (deletion_request_id, intellectual_object_id) values (?, ?) on conflict do nothing"
 	for _, obj := range request.IntellectualObjects {
 		_, err := db.Exec(sql, request.ID, obj.ID)
