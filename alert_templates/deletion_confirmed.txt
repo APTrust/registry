@@ -4,7 +4,7 @@ The deletion requested by {{ .deletionRequest.RequestedBy.Name }} has been appro
 
 For your reference, the link below has information about the request.
 
---- ADD URL ---
+{{ .deletionReadOnlyURL }}
 
 The Work Item showing the status of this deletion is at {{ .workItemURL }}
 

@@ -164,8 +164,9 @@ func (del *Deletion) CreateRequestAlert() (*pgmodels.Alert, error) {
 		return nil, err
 	}
 	alertData := map[string]interface{}{
-		"RequesterName":     del.currentUser.Name,
-		"DeletionReviewURL": reviewURL,
+		"requesterName":       del.currentUser.Name,
+		"deletionReviewURL":   reviewURL,
+		"deletionReadOnlyURL": del.ReadOnlyURL(),
 	}
 	return del.createAlert(templateName, alertType, alertData)
 }
@@ -178,8 +179,9 @@ func (del *Deletion) CreateApprovalAlert() (*pgmodels.Alert, error) {
 		return nil, err
 	}
 	alertData := map[string]interface{}{
-		"deletionRequest": del.DeletionRequest,
-		"workItemURL":     workItemURL,
+		"deletionRequest":     del.DeletionRequest,
+		"workItemURL":         workItemURL,
+		"deletionReadOnlyURL": del.ReadOnlyURL(),
 	}
 	return del.createAlert(templateName, alertType, alertData)
 }
@@ -188,7 +190,8 @@ func (del *Deletion) CreateCancellationAlert() (*pgmodels.Alert, error) {
 	templateName := "alerts/deletion_cancelled.txt"
 	alertType := constants.AlertDeletionCancelled
 	alertData := map[string]interface{}{
-		"deletionRequest": del.DeletionRequest,
+		"deletionRequest":     del.DeletionRequest,
+		"deletionReadOnlyURL": del.ReadOnlyURL(),
 	}
 	return del.createAlert(templateName, alertType, alertData)
 }
@@ -262,4 +265,11 @@ func (del *Deletion) WorkItemURL() (string, error) {
 	return fmt.Sprintf("%s/work_items/show/%d",
 		del.baseURL,
 		del.DeletionRequest.WorkItemID), nil
+}
+
+// ReadOnlyURL returns a URL that displays info about the deletion request
+// but does not include buttons to approve or cancel. This view is for
+// the depositor's historical/auditing purposes.
+func (del *Deletion) ReadOnlyURL() string {
+	return fmt.Sprintf("%s/deletions/show/%d", del.baseURL, del.DeletionRequest.ID)
 }

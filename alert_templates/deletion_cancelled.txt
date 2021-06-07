@@ -4,7 +4,7 @@ The deletion requested by {{ .deletionRequest.RequestedBy.Name }} has been cance
 
 For your reference, the link below has information about the cancelled request.
 
---- ADD URL ---
+{{ .deletionReadOnlyURL }}
 
 If you have questions, please contact us at help@aptrust.org.
 

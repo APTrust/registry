@@ -32,8 +32,8 @@ func TestAlertTemplates(t *testing.T) {
 	name := "Spongebob"
 	link := "https://example.com/confirm?token=ABCD"
 	data := map[string]string{
-		"RequesterName":     name,
-		"DeletionReviewURL": link,
+		"requesterName":     name,
+		"deletionReviewURL": link,
 	}
 	tmpl := common.TextTemplates["alerts/deletion_requested.txt"]
 	require.NotNil(t, tmpl)
