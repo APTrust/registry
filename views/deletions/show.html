@@ -8,12 +8,12 @@
   Requested By: {{ .deletionRequest.RequestedBy.Name }} <br/>
   Requested At: {{ dateUS .deletionRequest.RequestedAt }} <br/>
 
-  {{ if .deletetionRequest.ConfirmedBy }}
+  {{ if .deletionRequest.ConfirmedBy }}
   Confirmed By: {{ .deletionRequest.ConfirmedBy.Name }} <br/>
   Confirmed On: {{ dateUS .deletionRequest.ConfirmedAt }} <br/>
   {{ end }}
 
-  {{ if .deletetionRequest.CancelledBy }}
+  {{ if .deletionRequest.CancelledBy }}
   Cancelled By: {{ .deletionRequest.CancelledBy.Name }} <br/>
   Cancelled On: {{ dateUS .deletionRequest.CancelledAt }} <br/>
   {{ end }}
