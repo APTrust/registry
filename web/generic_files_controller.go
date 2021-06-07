@@ -1,7 +1,7 @@
 package web
 
 import (
-	"bytes"
+	//"bytes"
 	"fmt"
 	"net/http"
 	"time"
@@ -177,22 +177,23 @@ func GenericFileReviewDelete(c *gin.Context) {
 // POST /files/approve_delete/:id
 func GenericFileApproveDelete(c *gin.Context) {
 	req := NewRequest(c)
-
 	del, err := NewDeletionForReview(req)
 	if AbortIfError(c, err) {
 		return
 	}
 	del.DeletionRequest.Confirm(req.CurrentUser)
+	err = del.DeletionRequest.Save()
+	if AbortIfError(c, err) {
+		return
+	}
 	_, err = del.CreateAndQueueWorkItem()
 	if AbortIfError(c, err) {
 		return
 	}
-
 	_, err = del.CreateApprovalAlert()
 	if AbortIfError(c, err) {
 		return
 	}
-
 	req.TemplateData["deletionRequest"] = del.DeletionRequest
 	c.HTML(http.StatusOK, "files/deletion_approved.html", req.TemplateData)
 }
@@ -202,76 +203,19 @@ func GenericFileApproveDelete(c *gin.Context) {
 // POST /files/cancel_delete/:id
 func GenericFileCancelDelete(c *gin.Context) {
 	req := NewRequest(c)
-
-	// ---------------------------------------------------------------------
-	// TODO: Refactor and break this up.
-	// ---------------------------------------------------------------------
-
-	// Find the deletion request
-	deletionRequest, err := pgmodels.DeletionRequestByID(req.Auth.ResourceID)
+	del, err := NewDeletionForReview(req)
 	if AbortIfError(c, err) {
 		return
 	}
-
-	// Make sure the token is valid for that deletion request
-	token := c.PostForm("token")
-	if !common.ComparePasswords(deletionRequest.EncryptedConfirmationToken, token) {
-		AbortIfError(c, common.ErrInvalidToken)
-		return
-	}
-
-	deletionRequest.CancelledByID = req.CurrentUser.ID
-	deletionRequest.CancelledAt = time.Now().UTC()
-	err = deletionRequest.Save()
+	del.DeletionRequest.Cancel(req.CurrentUser)
+	err = del.DeletionRequest.Save()
 	if AbortIfError(c, err) {
 		return
 	}
-
-	// Explicitly set CancelledBy, because it wasn't set when we
-	// loaded the DeletionRequest object.
-	deletionRequest.CancelledBy = req.CurrentUser
-
-	alertData := map[string]interface{}{
-		"deletionRequest": deletionRequest,
-	}
-	tmpl := common.TextTemplates["alerts/deletion_cancelled.txt"]
-	var buf bytes.Buffer
-	err = tmpl.Execute(&buf, alertData)
+	_, err = del.CreateCancellationAlert()
 	if AbortIfError(c, err) {
 		return
 	}
-
-	// Create deletion approved alert (refactor later)
-	// Get list of inst admins.
-	gf := deletionRequest.GenericFiles[0]
-	adminsQuery := pgmodels.NewQuery().Where("institution_id", "=", gf.InstitutionID).Where("role", "=", constants.RoleInstAdmin)
-	instAdmins, err := pgmodels.UserSelect(adminsQuery)
-	if AbortIfError(c, err) {
-		return
-	}
-
-	cancellationAlert := &pgmodels.Alert{
-		InstitutionID:     deletionRequest.InstitutionID,
-		Type:              constants.AlertDeletionCancelled,
-		DeletionRequestID: deletionRequest.ID,
-		Content:           buf.String(),
-		CreatedAt:         time.Now().UTC(),
-		Users:             instAdmins,
-	}
-
-	err = cancellationAlert.Save()
-	if AbortIfError(c, err) {
-		return
-	}
-
-	// Temporary local debugging
-	envName := common.Context().Config.EnvName
-	if envName == "dev" || envName == "test" {
-		fmt.Println("***********************")
-		fmt.Println(cancellationAlert.Content)
-		fmt.Println("***********************")
-	}
-
-	req.TemplateData["deletionRequest"] = deletionRequest
+	req.TemplateData["deletionRequest"] = del.DeletionRequest
 	c.HTML(http.StatusOK, "files/deletion_cancelled.html", req.TemplateData)
 }

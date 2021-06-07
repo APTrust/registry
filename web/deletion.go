@@ -184,8 +184,13 @@ func (del *Deletion) CreateApprovalAlert() (*pgmodels.Alert, error) {
 	return del.createAlert(templateName, alertType, alertData)
 }
 
-func (del *Deletion) CreateCancellationAlert() {
-
+func (del *Deletion) CreateCancellationAlert() (*pgmodels.Alert, error) {
+	templateName := "alerts/deletion_cancelled.txt"
+	alertType := constants.AlertDeletionCancelled
+	alertData := map[string]interface{}{
+		"deletionRequest": del.DeletionRequest,
+	}
+	return del.createAlert(templateName, alertType, alertData)
 }
 
 func (del *Deletion) createAlert(templateName, alertType string, alertData map[string]interface{}) (*pgmodels.Alert, error) {
