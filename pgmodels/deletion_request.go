@@ -231,3 +231,35 @@ func (request *DeletionRequest) saveObjects(db *pg.DB) error {
 	}
 	return nil
 }
+
+// FirstFile returns the first GenericFile associated with this deletion
+// request. Use this for simple, single-file deletions.
+func (request *DeletionRequest) FirstFile() *GenericFile {
+	if len(request.GenericFiles) > 0 {
+		return request.GenericFiles[0]
+	}
+	return nil
+}
+
+// FirstObject returns the first IntellectualObject associated with
+// this deletion request. Use this for simple, single-object deletions.
+func (request *DeletionRequest) FirstObject() *IntellectualObject {
+	if len(request.IntellectualObjects) > 0 {
+		return request.IntellectualObjects[0]
+	}
+	return nil
+}
+
+// Confirm marks this DeletionRequest as confirmed. It's up to the caller
+// to save the request and create an appropriate WorkItem.
+func (request *DeletionRequest) Confirm(userID int64) {
+	request.ConfirmedByID = userID
+	request.ConfirmedAt = time.Now().UTC()
+}
+
+// Cancel cancels this DeletionRequest. It's up to the caller to save
+// this request after cancelling it.
+func (request *DeletionRequest) Cancel(userID int64) {
+	request.CancelledByID = userID
+	request.CancelledAt = time.Now().UTC()
+}
