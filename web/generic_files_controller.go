@@ -122,17 +122,14 @@ func GenericFileInitRestore(c *gin.Context) {
 // which will be emailed to institutional admins for approval.
 func GenericFileInitDelete(c *gin.Context) {
 	req := NewRequest(c)
-
 	del, err := NewDeletionForFile(req)
 	if AbortIfError(c, err) {
 		return
 	}
-
 	_, err = del.CreateRequestAlert()
 	if AbortIfError(c, err) {
 		return
 	}
-
 	req.TemplateData["fileIdentifier"] = del.DeletionRequest.FirstFile().Identifier
 	c.HTML(http.StatusCreated, "files/deletion_requested.html", req.TemplateData)
 }
@@ -143,30 +140,21 @@ func GenericFileInitDelete(c *gin.Context) {
 // GET /files/review_delete/:id?token=<token>
 func GenericFileReviewDelete(c *gin.Context) {
 	req := NewRequest(c)
-
-	// Find the deletion request
-	deletionRequest, err := pgmodels.DeletionRequestByID(req.Auth.ResourceID)
+	del, err := NewDeletionForReview(req)
 	if AbortIfError(c, err) {
-		return
-	}
-
-	// Make sure the token is valid for that deletion request
-	token := c.Query("token")
-	if !common.ComparePasswords(deletionRequest.EncryptedConfirmationToken, token) {
-		AbortIfError(c, common.ErrInvalidToken)
 		return
 	}
 
 	// Present the page describing the request, and if it hasn't
 	// already been cancelled or approved, give the user the option
 	// to cancel or approve.
-	req.TemplateData["deletionRequest"] = deletionRequest
-	req.TemplateData["token"] = token
+	req.TemplateData["deletionRequest"] = del.DeletionRequest
+	req.TemplateData["token"] = c.Query("token")
 
 	template := "files/review_deletion.html"
-	if deletionRequest.ConfirmedByID > 0 {
+	if del.DeletionRequest.ConfirmedByID > 0 {
 		template = "files/deletion_already_approved.html"
-	} else if deletionRequest.CancelledByID > 0 {
+	} else if del.DeletionRequest.CancelledByID > 0 {
 		template = "files/deletion_already_cancelled.html"
 	}
 	c.HTML(http.StatusOK, template, req.TemplateData)

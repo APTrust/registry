@@ -89,6 +89,9 @@ func NewDeletionForReview(req *Request) (*Deletion, error) {
 
 	// Make sure the token is valid for that deletion request
 	token := req.GinContext.PostForm("token")
+	if token == "" {
+		token = req.GinContext.Query("token")
+	}
 	if !common.ComparePasswords(deletionRequest.EncryptedConfirmationToken, token) {
 		return nil, common.ErrInvalidToken
 	}
