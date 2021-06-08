@@ -13,8 +13,9 @@ var expected = []*pgmodels.ObjectStats{
 	{1, 2233889, "application/binary"},
 	{1, 78333, "audio/mp3"},
 	{1, 988226, "text/plain"},
+	{1, 44344, "text/sgml"},
 	{1, 399288, "video/mp4"},
-	{4, 3699736, ""},
+	{5, 3744080, ""},
 }
 
 func TestGetObjectStats(t *testing.T) {

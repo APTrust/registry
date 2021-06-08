@@ -65,7 +65,7 @@ func TestWorkItemSelect(t *testing.T) {
 	items, err := pgmodels.WorkItemSelect(query)
 	require.Nil(t, err)
 	require.NotEmpty(t, items)
-	assert.True(t, (len(items) > 20 && len(items) < 30))
+	assert.True(t, (len(items) > 25 && len(items) < 35))
 	for _, item := range items {
 		assert.NotEqual(t, "pdfs.tar", item)
 		assert.NotEqual(t, "coal.tar", item)

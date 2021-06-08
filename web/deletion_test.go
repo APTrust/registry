@@ -3,7 +3,7 @@ package web_test
 import (
 	"testing"
 
-	//"github.com/APTrust/registry/common"
+	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/db"
 	"github.com/APTrust/registry/pgmodels"
@@ -16,8 +16,7 @@ var baseURL = "https://example.com"
 
 func getFileAndInstAdmins() (*pgmodels.GenericFile, []*pgmodels.User, error) {
 	db.LoadFixtures()
-	gfQuery := pgmodels.NewQuery().Where("institution_id", "=", 2).Limit(1).Offset(0)
-	gf, err := pgmodels.GenericFileGet(gfQuery)
+	gf, err := pgmodels.GenericFileByIdentifier("institution1.edu/glass/shard3")
 	if err != nil {
 		return nil, nil, err
 	}
@@ -44,6 +43,24 @@ func TestNewDeletionForFile(t *testing.T) {
 	assert.NotEmpty(t, del.DeletionRequest.GenericFiles)
 
 	assert.ElementsMatch(t, instAdmins, del.InstAdmins)
+}
+
+func TestNewDeletionForFileWithPendingItems(t *testing.T) {
+	db.LoadFixtures()
+
+	// Generic file test fixture 49 has a pending restoration
+	// WorkItem. This should prevent us from initializing a
+	// deletion request, since the deletion would conflict with
+	// the restoration.
+	gf, err := pgmodels.GenericFileByID(49)
+	require.Nil(t, err)
+	require.NotNil(t, gf)
+
+	// The user param doesn't matter here, because we should get
+	// ErrPendingWorkItems before the function even looks at the user.
+	del, err := web.NewDeletionForFile(gf.ID, &pgmodels.User{}, baseURL)
+	assert.Nil(t, del)
+	assert.Equal(t, common.ErrPendingWorkItems, err)
 }
 
 func TestNewDeletionForReview(t *testing.T) {
