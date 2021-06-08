@@ -31,11 +31,10 @@ type Deletion struct {
 // and returns the Deletion object. This constructor is only for initializing
 // new DeletionRequests, not for reviewing, approving or cancelling
 // existing requests.
-func NewDeletionForFile(req *Request) (*Deletion, error) {
+func NewDeletionForFile(genericFileID int64, currentUser *pgmodels.User, baseURL string) (*Deletion, error) {
 	// Make sure there are no pending work items for this
-	// generic file or its parent object. req.Auth.ResourceID
-	// is the GenericFile.ID
-	pendingWorkItems, err := pgmodels.WorkItemsPendingForFile(req.Auth.ResourceID)
+	// generic file or its parent object.
+	pendingWorkItems, err := pgmodels.WorkItemsPendingForFile(genericFileID)
 	if err != nil {
 		return nil, err
 	}
@@ -44,10 +43,10 @@ func NewDeletionForFile(req *Request) (*Deletion, error) {
 	}
 
 	del := &Deletion{
-		baseURL:     req.BaseURL(),
-		currentUser: req.CurrentUser,
+		baseURL:     baseURL,
+		currentUser: currentUser,
 	}
-	err = del.initFileDeletionRequest(req.Auth.ResourceID)
+	err = del.initFileDeletionRequest(genericFileID)
 	if err != nil {
 		return nil, err
 	}
@@ -58,20 +57,23 @@ func NewDeletionForFile(req *Request) (*Deletion, error) {
 // NewDeletionForReview pulls up information about an existing deletion
 // request that an institutional admin will review before deciding whether
 // to approve or cancel the request.
-func NewDeletionForReview(req *Request) (*Deletion, error) {
+func NewDeletionForReview(deletionRequestID int64, currentUser *pgmodels.User, baseURL, token string) (*Deletion, error) {
 	del := &Deletion{
-		baseURL:     req.BaseURL(),
-		currentUser: req.CurrentUser,
+		baseURL:     baseURL,
+		currentUser: currentUser,
 	}
-	err := del.loadDeletionRequest(req.Auth.ResourceID)
+	err := del.loadDeletionRequest(deletionRequestID)
 	if err != nil {
 		return nil, err
 	}
-	// Check the token, because we're going to allow the
-	// user to approve or cancel the deletion.
-	if !del.tokenIsValid(req) {
+
+	if !common.ComparePasswords(del.DeletionRequest.EncryptedConfirmationToken, token) {
 		return nil, common.ErrInvalidToken
 	}
+	if err != nil {
+		return nil, err
+	}
+
 	err = del.loadInstAdmins()
 	return del, err
 }
@@ -100,19 +102,6 @@ func (del *Deletion) loadInstAdmins() error {
 	}
 	del.InstAdmins = instAdmins
 	return nil
-}
-
-// tokenIsValid returns true if the confirmation token in the query string
-// or post form matches the encrypted token for this deletion request.
-// Although our auth middleware ensures only authorized users can reach
-// the deletion confirmation page, we also want to ensure that for any
-// particular deletion, the user has the token we sent.
-func (del *Deletion) tokenIsValid(req *Request) bool {
-	token := req.GinContext.PostForm("token")
-	if token == "" {
-		token = req.GinContext.Query("token")
-	}
-	return common.ComparePasswords(del.DeletionRequest.EncryptedConfirmationToken, token)
 }
 
 // initFileDeletionRequest creates a new file DeletionRequest. When this

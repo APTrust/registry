@@ -122,7 +122,7 @@ func GenericFileInitRestore(c *gin.Context) {
 // which will be emailed to institutional admins for approval.
 func GenericFileInitDelete(c *gin.Context) {
 	req := NewRequest(c)
-	del, err := NewDeletionForFile(req)
+	del, err := NewDeletionForFile(req.Auth.ResourceID, req.CurrentUser, req.BaseURL())
 	if AbortIfError(c, err) {
 		return
 	}
@@ -140,7 +140,7 @@ func GenericFileInitDelete(c *gin.Context) {
 // GET /files/review_delete/:id?token=<token>
 func GenericFileReviewDelete(c *gin.Context) {
 	req := NewRequest(c)
-	del, err := NewDeletionForReview(req)
+	del, err := NewDeletionForReview(req.Auth.ResourceID, req.CurrentUser, req.BaseURL(), c.Query("token"))
 	if AbortIfError(c, err) {
 		return
 	}
@@ -161,11 +161,12 @@ func GenericFileReviewDelete(c *gin.Context) {
 }
 
 // GenericFileApproveDelete handles the case where an institutional
-// admin approves a file deletion request.
+// admin approves a file deletion request. Note that the token comes
+// in through the post form here, not through the URL.
 // POST /files/approve_delete/:id
 func GenericFileApproveDelete(c *gin.Context) {
 	req := NewRequest(c)
-	del, err := NewDeletionForReview(req)
+	del, err := NewDeletionForReview(req.Auth.ResourceID, req.CurrentUser, req.BaseURL(), c.PostForm("token"))
 	if AbortIfError(c, err) {
 		return
 	}
@@ -187,11 +188,12 @@ func GenericFileApproveDelete(c *gin.Context) {
 }
 
 // GenericFileCancelDelete handles the case where an institutional
-// admin cancels (rejects) a file deletion request.
+// admin cancels (rejects) a file deletion request. Token comes in
+// through post form, not query string.
 // POST /files/cancel_delete/:id
 func GenericFileCancelDelete(c *gin.Context) {
 	req := NewRequest(c)
-	del, err := NewDeletionForReview(req)
+	del, err := NewDeletionForReview(req.Auth.ResourceID, req.CurrentUser, req.BaseURL(), c.PostForm("token"))
 	if AbortIfError(c, err) {
 		return
 	}
