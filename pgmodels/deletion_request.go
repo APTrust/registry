@@ -44,7 +44,7 @@ type DeletionRequest struct {
 	WorkItemID                 int64                 `json:"work_item_id"`
 	GenericFiles               []*GenericFile        `json:"generic_files" pg:"many2many:deletion_requests_generic_files"`
 	IntellectualObjects        []*IntellectualObject `json:"intellectual_objects" pg:"many2many:deletion_requests_intellectual_objects"`
-	WorkItem                   *WorkItem             `json:"work_item"`
+	WorkItem                   *WorkItem             `json:"work_item" pg:"rel:has-one"`
 }
 
 type DeletionRequestsGenericFiles struct {

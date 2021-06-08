@@ -186,7 +186,11 @@ func (del *Deletion) CreateAndQueueWorkItem() (*pgmodels.WorkItem, error) {
 
 // CreateRequestAlert creates an alert saying that a user has requested
 // a deletion. This alert goes via email to all admins at the institution
-// that owns the file or object to be deleted.
+// that owns the file or object to be deleted. This method is supported
+// only for new deletion requests. If you try to call this on a deletion
+// request you retrieved from the DB, you'll get "operation not supported"
+// because we don't have access to the plaintext confirmation token for
+// the review URL.
 func (del *Deletion) CreateRequestAlert() (*pgmodels.Alert, error) {
 	templateName := "alerts/deletion_requested.txt"
 	alertType := constants.AlertDeletionRequested
@@ -284,6 +288,8 @@ func (del *Deletion) createAlert(templateName, alertType string, alertData map[s
 // retrieve it from the database. If you call this method after
 // retrieving a DeletionRequest, you'll get common.ErrNotSupported,
 // because we no longer have access to the plaintext ConfirmationToken.
+// This works only after calling initFileDeletionRequest or
+// initObjectDeletionRequest.
 func (del *Deletion) ReviewURL() (string, error) {
 	if del.DeletionRequest.ConfirmationToken == "" {
 		return "", common.ErrNotSupported

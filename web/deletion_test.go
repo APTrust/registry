@@ -1,7 +1,9 @@
 package web_test
 
 import (
+	"fmt"
 	"testing"
+	"time"
 
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
@@ -47,6 +49,14 @@ func TestNewDeletionForFile(t *testing.T) {
 	assert.NotEmpty(t, del.DeletionRequest.GenericFiles)
 
 	assert.ElementsMatch(t, instAdmins, del.InstAdmins)
+
+	expectedReviewURL := fmt.Sprintf("https://example.com/files/review_delete/4?token=%s", del.DeletionRequest.ConfirmationToken)
+	actualReviewURL, err := del.ReviewURL()
+	require.Nil(t, err)
+	assert.Equal(t, expectedReviewURL, actualReviewURL)
+
+	// CreateRequestAlert only works on new deletion requests.
+	testCreateRequestAlert(t, del)
 }
 
 func TestNewDeletionForFileWithPendingItems(t *testing.T) {
@@ -67,6 +77,17 @@ func TestNewDeletionForFileWithPendingItems(t *testing.T) {
 	assert.Equal(t, common.ErrPendingWorkItems, err)
 }
 
+func TestNewDeletionBadToken(t *testing.T) {
+	db.LoadFixtures()
+	admin, err := pgmodels.UserByEmail("admin@inst1.edu")
+	require.Nil(t, err)
+	require.NotNil(t, admin)
+
+	del, err := web.NewDeletionForReview(1, admin, baseURL, "InvalidToken")
+	require.Nil(t, del)
+	assert.Equal(t, common.ErrInvalidToken, err)
+}
+
 func TestNewDeletionForReview(t *testing.T) {
 	db.LoadFixtures()
 	admin, err := pgmodels.UserByEmail("admin@inst1.edu")
@@ -82,43 +103,88 @@ func TestNewDeletionForReview(t *testing.T) {
 
 	assert.Equal(t, 1, len(del.InstAdmins))
 	assert.Equal(t, admin.ID, del.InstAdmins[0].ID)
-}
 
-func TestNewDeletionBadToken(t *testing.T) {
-	db.LoadFixtures()
-	admin, err := pgmodels.UserByEmail("admin@inst1.edu")
+	del.DeletionRequest.Cancel(admin)
+	err = del.DeletionRequest.Save()
 	require.Nil(t, err)
-	require.NotNil(t, admin)
+	testCreateCancellationAlert(t, del)
 
-	del, err := web.NewDeletionForReview(1, admin, baseURL, "InvalidToken")
-	require.Nil(t, del)
-	assert.Equal(t, common.ErrInvalidToken, err)
+	del.DeletionRequest.CancelledByID = 0
+	del.DeletionRequest.CancelledAt = time.Time{}
+	del.DeletionRequest.Confirm(admin)
+	err = del.DeletionRequest.Save()
+	require.Nil(t, err)
+
+	testCreateAndQueueWorkItem(t, del)
+	testCreateApprovalAlert(t, del)
+
+	readOnlyURL := fmt.Sprintf("https://example.com/deletions/show/%d", del.DeletionRequest.ID)
+	assert.Equal(t, readOnlyURL, del.ReadOnlyURL())
+
+	expectedWorkItemURL := fmt.Sprintf("https://example.com/work_items/show/%d", del.DeletionRequest.WorkItemID)
+	actualWorkItemURL, err := del.WorkItemURL()
+	assert.Equal(t, expectedWorkItemURL, actualWorkItemURL)
 }
 
-func TestCreateAndQueueWorkItem(t *testing.T) {
-
+func testCreateAndQueueWorkItem(t *testing.T, del *web.Deletion) {
+	item, err := del.CreateAndQueueWorkItem()
+	require.Nil(t, err)
+	require.NotNil(t, item)
+	assert.True(t, item.ID > 0)
+	assert.Equal(t, del.DeletionRequest.GenericFiles[0].ID, item.GenericFileID)
+	assert.Equal(t, constants.ActionDelete, item.Action)
 }
 
-func TestCreateRequestAlert(t *testing.T) {
+func testCreateRequestAlert(t *testing.T, del *web.Deletion) {
+	alert, err := del.CreateRequestAlert()
+	require.Nil(t, err)
+	require.NotNil(t, alert)
+	assert.Equal(t, constants.AlertDeletionRequested, alert.Type)
+	assert.Equal(t, del.DeletionRequest.ID, alert.DeletionRequestID)
+	assert.Equal(t, del.DeletionRequest.InstitutionID, alert.InstitutionID)
+	assert.True(t, len(alert.Content) > 100)
+	assert.True(t, len(alert.Users) > 0)
+	for _, recipient := range alert.Users {
+		assert.Equal(t, constants.RoleInstAdmin, recipient.Role)
+		assert.Equal(t, del.DeletionRequest.InstitutionID, recipient.InstitutionID)
+	}
 
+	reviewURL, err := del.ReviewURL()
+	require.Nil(t, err)
+	assert.Contains(t, alert.Content, reviewURL)
 }
 
-func TestCreateApprovalAlert(t *testing.T) {
+func testCreateApprovalAlert(t *testing.T, del *web.Deletion) {
+	alert, err := del.CreateApprovalAlert()
+	require.Nil(t, err)
+	require.NotNil(t, alert)
+	assert.Equal(t, constants.AlertDeletionConfirmed, alert.Type)
+	assert.Equal(t, del.DeletionRequest.ID, alert.DeletionRequestID)
+	assert.Equal(t, del.DeletionRequest.InstitutionID, alert.InstitutionID)
+	assert.True(t, len(alert.Content) > 100)
+	assert.True(t, len(alert.Users) > 0)
+	for _, recipient := range alert.Users {
+		assert.Equal(t, constants.RoleInstAdmin, recipient.Role)
+		assert.Equal(t, del.DeletionRequest.InstitutionID, recipient.InstitutionID)
+	}
 
+	workItemURL, err := del.WorkItemURL()
+	require.Nil(t, err)
+	assert.Contains(t, alert.Content, workItemURL)
 }
 
-func TestCreateCancellationAlert(t *testing.T) {
-
-}
-
-func TestReviewURL(t *testing.T) {
-
-}
-
-func TestWorkItemURL(t *testing.T) {
-
-}
-
-func TestReadOnlyURL(t *testing.T) {
-
+func testCreateCancellationAlert(t *testing.T, del *web.Deletion) {
+	alert, err := del.CreateCancellationAlert()
+	require.Nil(t, err)
+	require.NotNil(t, alert)
+	assert.Equal(t, constants.AlertDeletionCancelled, alert.Type)
+	assert.Equal(t, del.DeletionRequest.ID, alert.DeletionRequestID)
+	assert.Equal(t, del.DeletionRequest.InstitutionID, alert.InstitutionID)
+	assert.True(t, len(alert.Content) > 100)
+	assert.True(t, len(alert.Users) > 0)
+	for _, recipient := range alert.Users {
+		assert.Equal(t, constants.RoleInstAdmin, recipient.Role)
+		assert.Equal(t, del.DeletionRequest.InstitutionID, recipient.InstitutionID)
+	}
+	assert.Contains(t, alert.Content, del.ReadOnlyURL())
 }
