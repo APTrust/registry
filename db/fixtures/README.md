@@ -8,7 +8,7 @@ The password for all users in the user.csv file is `password`.
 
 ## DeletionRequests
 
-For all deletion requests in deletion_requests.csv, the plaintext value of the encrypted confirmation token is `ConfirmationToken`. The plaintext value of the cancellation token is `CancelToken`.
+For all deletion requests in deletion_requests.csv, the plaintext value of the encrypted confirmation token is `ConfirmationToken`.
 
 | ID  | Description |
 | --- | ----------- |

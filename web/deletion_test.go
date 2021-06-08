@@ -14,6 +14,10 @@ import (
 
 var baseURL = "https://example.com"
 
+// As documented in db/fixtures/README, this is the confirmation
+// token for all DeletionRequests in the fixture data.
+var confToken = "ConfirmationToken"
+
 func getFileAndInstAdmins() (*pgmodels.GenericFile, []*pgmodels.User, error) {
 	db.LoadFixtures()
 	gf, err := pgmodels.GenericFileByIdentifier("institution1.edu/glass/shard3")
@@ -65,6 +69,30 @@ func TestNewDeletionForFileWithPendingItems(t *testing.T) {
 
 func TestNewDeletionForReview(t *testing.T) {
 	db.LoadFixtures()
+	admin, err := pgmodels.UserByEmail("admin@inst1.edu")
+	require.Nil(t, err)
+	require.NotNil(t, admin)
+
+	del, err := web.NewDeletionForReview(1, admin, baseURL, confToken)
+	require.Nil(t, err)
+	require.NotNil(t, del)
+
+	require.NotNil(t, del.DeletionRequest)
+	assert.Equal(t, int64(1), del.DeletionRequest.ID)
+
+	assert.Equal(t, 1, len(del.InstAdmins))
+	assert.Equal(t, admin.ID, del.InstAdmins[0].ID)
+}
+
+func TestNewDeletionBadToken(t *testing.T) {
+	db.LoadFixtures()
+	admin, err := pgmodels.UserByEmail("admin@inst1.edu")
+	require.Nil(t, err)
+	require.NotNil(t, admin)
+
+	del, err := web.NewDeletionForReview(1, admin, baseURL, "InvalidToken")
+	require.Nil(t, del)
+	assert.Equal(t, common.ErrInvalidToken, err)
 }
 
 func TestCreateAndQueueWorkItem(t *testing.T) {
