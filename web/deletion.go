@@ -24,7 +24,6 @@ type Deletion struct {
 	InstAdmins []*pgmodels.User
 
 	baseURL     string
-	instID      int64
 	currentUser *pgmodels.User
 }
 
@@ -33,13 +32,10 @@ type Deletion struct {
 // new DeletionRequests, not for reviewing, approving or cancelling
 // existing requests.
 func NewDeletionForFile(req *Request) (*Deletion, error) {
-	gf, err := pgmodels.GenericFileByID(req.Auth.ResourceID)
-	if err != nil {
-		return nil, err
-	}
-
-	// Make sure there are no pending work items...
-	pendingWorkItems, err := pgmodels.WorkItemsPendingForFile(gf.ID)
+	// Make sure there are no pending work items for this
+	// generic file or its parent object. req.Auth.ResourceID
+	// is the GenericFile.ID
+	pendingWorkItems, err := pgmodels.WorkItemsPendingForFile(req.Auth.ResourceID)
 	if err != nil {
 		return nil, err
 	}
@@ -47,72 +43,107 @@ func NewDeletionForFile(req *Request) (*Deletion, error) {
 		return nil, common.ErrPendingWorkItems
 	}
 
-	// Get list of inst admins.
-	adminsQuery := pgmodels.NewQuery().
-		Where("institution_id", "=", gf.InstitutionID).
-		Where("role", "=", constants.RoleInstAdmin)
-	instAdmins, err := pgmodels.UserSelect(adminsQuery)
+	del := &Deletion{
+		baseURL:     req.BaseURL(),
+		currentUser: req.CurrentUser,
+	}
+	err = del.initFileDeletionRequest(req.Auth.ResourceID)
 	if err != nil {
 		return nil, err
 	}
-
-	// Create the deletion request and the alert, which will become
-	// the deletion confirmation email.
-	deletionRequest, err := pgmodels.NewDeletionRequest()
-	if err != nil {
-		return nil, err
-	}
-	deletionRequest.InstitutionID = gf.InstitutionID
-	deletionRequest.RequestedByID = req.CurrentUser.ID
-	deletionRequest.RequestedAt = time.Now().UTC()
-	deletionRequest.AddFile(gf)
-	err = deletionRequest.Save()
-
-	return &Deletion{
-		DeletionRequest: deletionRequest,
-		InstAdmins:      instAdmins,
-		baseURL:         req.BaseURL(),
-		currentUser:     req.CurrentUser,
-		instID:          gf.InstitutionID,
-	}, err
+	err = del.loadInstAdmins()
+	return del, err
 }
 
 // NewDeletionForReview pulls up information about an existing deletion
 // request that an institutional admin will review before deciding whether
 // to approve or cancel the request.
 func NewDeletionForReview(req *Request) (*Deletion, error) {
-	// Find the deletion request
-	deletionRequest, err := pgmodels.DeletionRequestByID(req.Auth.ResourceID)
+	del := &Deletion{
+		baseURL:     req.BaseURL(),
+		currentUser: req.CurrentUser,
+	}
+	err := del.loadDeletionRequest(req.Auth.ResourceID)
 	if err != nil {
 		return nil, err
 	}
+	// Check the token, because we're going to allow the
+	// user to approve or cancel the deletion.
+	if !del.tokenIsValid(req) {
+		return nil, common.ErrInvalidToken
+	}
+	err = del.loadInstAdmins()
+	return del, err
+}
 
-	// Make sure the token is valid for that deletion request
+// loadDeletionRequest loads an existing request so an admin can
+// review it for approval or cancellation.
+func (del *Deletion) loadDeletionRequest(deletionRequestID int64) error {
+	deletionRequest, err := pgmodels.DeletionRequestByID(deletionRequestID)
+	if err != nil {
+		return err
+	}
+	del.DeletionRequest = deletionRequest
+	return nil
+}
+
+// loadInstAdmins loads the list of institutional admins who should
+// receive an alert about this deletion request. The inst admins choose
+// whether to approve or deny the request.
+func (del *Deletion) loadInstAdmins() error {
+	adminsQuery := pgmodels.NewQuery().
+		Where("institution_id", "=", del.DeletionRequest.InstitutionID).
+		Where("role", "=", constants.RoleInstAdmin)
+	instAdmins, err := pgmodels.UserSelect(adminsQuery)
+	if err != nil {
+		return err
+	}
+	del.InstAdmins = instAdmins
+	return nil
+}
+
+// tokenIsValid returns true if the confirmation token in the query string
+// or post form matches the encrypted token for this deletion request.
+// Although our auth middleware ensures only authorized users can reach
+// the deletion confirmation page, we also want to ensure that for any
+// particular deletion, the user has the token we sent.
+func (del *Deletion) tokenIsValid(req *Request) bool {
 	token := req.GinContext.PostForm("token")
 	if token == "" {
 		token = req.GinContext.Query("token")
 	}
-	if !common.ComparePasswords(deletionRequest.EncryptedConfirmationToken, token) {
-		return nil, common.ErrInvalidToken
-	}
-
-	adminsQuery := pgmodels.NewQuery().
-		Where("institution_id", "=", deletionRequest.InstitutionID).
-		Where("role", "=", constants.RoleInstAdmin)
-	instAdmins, err := pgmodels.UserSelect(adminsQuery)
-	if err != nil {
-		return nil, err
-	}
-
-	return &Deletion{
-		DeletionRequest: deletionRequest,
-		InstAdmins:      instAdmins,
-		baseURL:         req.BaseURL(),
-		currentUser:     req.CurrentUser,
-		instID:          deletionRequest.InstitutionID,
-	}, nil
+	return common.ComparePasswords(del.DeletionRequest.EncryptedConfirmationToken, token)
 }
 
+// initFileDeletionRequest creates a new file DeletionRequest. When this
+// request is created, it includes a plaintext token that we add to the
+// confirmation URL below. We do not save the plaintext version of the token,
+// only the encrypted version. When this new DeletionRequest goes out of
+// scope, there's no further access to the token, so get it while you can.
+func (del *Deletion) initFileDeletionRequest(genericFileID int64) error {
+	gf, err := pgmodels.GenericFileByID(genericFileID)
+	if err != nil {
+		return err
+	}
+
+	deletionRequest, err := pgmodels.NewDeletionRequest()
+	if err != nil {
+		return err
+	}
+	deletionRequest.InstitutionID = gf.InstitutionID
+	deletionRequest.RequestedByID = del.currentUser.ID
+	deletionRequest.RequestedAt = time.Now().UTC()
+	deletionRequest.AddFile(gf)
+	err = deletionRequest.Save()
+	if err != nil {
+		return err
+	}
+	del.DeletionRequest = deletionRequest
+	return nil
+}
+
+// CreateWorkItem creates a WorkItem describing this deletion. We call
+// this only if the admin approves the deletion.
 func (del *Deletion) CreateWorkItem() (*pgmodels.WorkItem, error) {
 	// Create the deletion WorkItem
 	obj := del.DeletionRequest.FirstObject()
@@ -137,6 +168,9 @@ func (del *Deletion) CreateWorkItem() (*pgmodels.WorkItem, error) {
 	return workItem, err
 }
 
+// QueueWorkItem sends the WorkItem.ID into the appropriate NSQ topic.
+// We call this after calling CreateWorkItem, and only if the admin
+// approves the deletion.
 func (del *Deletion) QueueWorkItem() error {
 	workItem := del.DeletionRequest.WorkItem
 	if workItem == nil {
@@ -151,6 +185,8 @@ func (del *Deletion) QueueWorkItem() error {
 	return ctx.NSQClient.Enqueue(topic, workItem.ID)
 }
 
+// CreateAndQueueWorkItem creates and queues a deletion WorkItem.
+// We call this only if the admin approves the DeletionRequest.
 func (del *Deletion) CreateAndQueueWorkItem() (*pgmodels.WorkItem, error) {
 	workItem, err := del.CreateWorkItem()
 	if err == nil {
@@ -159,6 +195,9 @@ func (del *Deletion) CreateAndQueueWorkItem() (*pgmodels.WorkItem, error) {
 	return workItem, err
 }
 
+// CreateRequestAlert creates an alert saying that a user has requested
+// a deletion. This alert goes via email to all admins at the institution
+// that owns the file or object to be deleted.
 func (del *Deletion) CreateRequestAlert() (*pgmodels.Alert, error) {
 	templateName := "alerts/deletion_requested.txt"
 	alertType := constants.AlertDeletionRequested
@@ -174,6 +213,9 @@ func (del *Deletion) CreateRequestAlert() (*pgmodels.Alert, error) {
 	return del.createAlert(templateName, alertType, alertData)
 }
 
+// CreateApprovalAlert creates an alert saying that an admin has approved
+// a deletion. This alert goes via email to all admins at the institution
+// that owns the file or object to be deleted.
 func (del *Deletion) CreateApprovalAlert() (*pgmodels.Alert, error) {
 	templateName := "alerts/deletion_confirmed.txt"
 	alertType := constants.AlertDeletionConfirmed
@@ -189,6 +231,9 @@ func (del *Deletion) CreateApprovalAlert() (*pgmodels.Alert, error) {
 	return del.createAlert(templateName, alertType, alertData)
 }
 
+// CreateCancellationAlert creates an alert saying that an admin has
+// rejected a deletion request. This alert goes via email to all admins
+// at the institution that owns the file or object to be deleted.
 func (del *Deletion) CreateCancellationAlert() (*pgmodels.Alert, error) {
 	templateName := "alerts/deletion_cancelled.txt"
 	alertType := constants.AlertDeletionCancelled
@@ -199,6 +244,8 @@ func (del *Deletion) CreateCancellationAlert() (*pgmodels.Alert, error) {
 	return del.createAlert(templateName, alertType, alertData)
 }
 
+// createAlert does the grunt work for all of the specific alert creation
+// methods.
 func (del *Deletion) createAlert(templateName, alertType string, alertData map[string]interface{}) (*pgmodels.Alert, error) {
 
 	// Create the alert text from the template...
@@ -214,7 +261,7 @@ func (del *Deletion) createAlert(templateName, alertType string, alertData map[s
 	// recipients. In this case, it goes to institutional
 	// admins at the institution that owns the content.
 	alert := &pgmodels.Alert{
-		InstitutionID:     del.instID,
+		InstitutionID:     del.DeletionRequest.InstitutionID,
 		Type:              alertType,
 		DeletionRequestID: del.DeletionRequest.ID,
 		Content:           buf.String(),
