@@ -26,7 +26,6 @@ type Alert struct {
 	Content           string           `json:"content"`
 	DeletionRequestID int64            `json:"deletion_request_id"`
 	CreatedAt         time.Time        `json:"created_at"`
-	ReadAt            time.Time        `json:"read_at"`
 	DeletionRequest   *DeletionRequest `json:"-" pg:"rel:has-one"`
 	PremisEvents      []*PremisEvent   `json:"premis_events" pg:"many2many:alerts_premis_events"`
 	Users             []*User          `json:"users" pg:"many2many:alerts_users"`
