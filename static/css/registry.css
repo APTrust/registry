@@ -89,6 +89,10 @@ dd {
     margin-left: 1.5rem;
 }
 
+tr.total, tr.total td {
+    background-color: #eee;
+}
+
 /* Modal Dialog (https://dev.to/dailydevtips1/vanilla-javascript-modal-pop-up-2oki) */
 .modal {
   position: fixed;

@@ -53,7 +53,9 @@ func loadDashAlerts(r *Request) error {
 
 func loadDashDeposits(r *Request) error {
 	query := pgmodels.NewQuery().OrderBy("institution_name asc").OrderBy("storage_option asc")
-	if !r.Auth.CurrentUser().IsAdmin() {
+	if r.Auth.CurrentUser().IsAdmin() {
+		query.IsNull("institution_id")
+	} else {
 		query.Where("institution_id", "=", r.Auth.CurrentUser().InstitutionID)
 	}
 	stats, err := pgmodels.StorageOptionStatsSelect(query)

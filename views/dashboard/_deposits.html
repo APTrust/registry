@@ -18,19 +18,25 @@
     <div class="row">
       <table>
         <thead>
-          <th>Institution</th>
           <th>Storage Option</th>
+          <th>Files</th>
           <th>Size</th>
         </thead>
         <tbody>
           {{ range $index, $stat := .stats }}
           {{ if eq $stat.StorageOption "" }}
-          <tr class="file-stats-total">
-            {{ else }}
+            <tr class="total">
+          {{ else }}
             <tr>
-              {{ end }}
-              <td>{{ $stat.InstitutionName }}</td>
-              <td>{{ $stat.StorageOption }}</td>
+          {{ end }}
+              <td>
+                {{ if eq $stat.StorageOption "" }}
+                Total
+                {{ else }}
+                {{ $stat.StorageOption }}
+                {{ end }}
+              </td>
+              <td>{{ $stat.FileCount }}</td>
               <td>{{ humanSize $stat.TotalBytes }}</td>
             </tr>
             {{ end }}

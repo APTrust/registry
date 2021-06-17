@@ -17,11 +17,17 @@
       <tbody>
         {{ range $index, $stat := .stats }}
           {{ if eq $stat.FileFormat "" }}
-            <tr class="file-stats-total">
+            <tr class="total">
           {{ else }}
             <tr>
           {{ end }}
-              <td>{{ $stat.FileFormat }}</td>
+              <td>
+              {{ if eq $stat.FileFormat "" }}
+              Total
+              {{ else }}
+              {{ $stat.FileFormat }}
+              {{ end }}
+              </td>
               <td>{{ $stat.FileCount }}</td>
               <td>{{ humanSize $stat.FileSize }}</td>
             </tr>

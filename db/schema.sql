@@ -818,14 +818,16 @@ create or replace view storage_option_stats as
 with stats as (
 	select
 		sum("gf"."size") as total_bytes,
+		count(*) as file_count,
 		gf.institution_id,
 		gf.storage_option
 	from generic_files gf
 	where gf.state = 'A'
-	group by gf.institution_id, gf.storage_option
+	group by rollup (gf.institution_id, gf.storage_option)
 	)
 select
 	s.total_bytes,
+	s.file_count,
 	s.institution_id,
 	s.storage_option,
 	i."name" as institution_name,
