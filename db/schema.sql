@@ -530,9 +530,11 @@ create table public.alerts (
 	id bigserial primary key,
 	institution_id integer references public.institutions(id),
 	"type" varchar not null,
+    "subject" varchar not null,
 	"content" text not null,
 	deletion_request_id integer references public.deletion_requests(id),
-	created_at timestamp not null
+	created_at timestamp not null,
+    read_at timestamp default null
 );
 create index index_alerts_institution_id ON public.alerts (institution_id);
 create index index_alerts_type ON public.alerts ("type");

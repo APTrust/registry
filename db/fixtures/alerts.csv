@@ -1,9 +1,9 @@
-"id","institution_id","type","content","deletion_request_id","created_at"
-1,2,Deletion Requested,user@inst1.edu wants to delete some things.,1,2021-05-13 14:30:25
-2,2,Deletion Requested,user@inst1.edu wants to delete some things.,2,2021-05-13 14:30:25
-3,2,Deletion Confirmed,admin@inst1.edu confirmed deletion.,2,2021-05-13 14:30:25
-4,2,Deletion Completed,Deletion complete,2,2021-05-13 14:30:25
-5,2,Deletion Requested,user@inst1.edu wants to delete some things.,3,2021-05-13 14:30:25
-6,2,Deletion Cancelled,admin@inst1.edu cancelled deletion.,3,2021-05-13 14:30:25
-7,2,Failed Fixity Check,File abc.pdf has gone wack.,,2021-05-13 14:30:25
-8,2,Restoration Completed,File photos/photo1.jpg restored to https://example.com/photo1.jpg,,2021-05-13 14:30:25
+"id","institution_id","type","subject","content","deletion_request_id","created_at", "read_at"
+1,2,Deletion Requested,Deletion Requested,user@inst1.edu wants to delete some things.,1,2021-05-13 14:30:25,
+2,2,Deletion Requested,Deletion Requested,user@inst1.edu wants to delete some things.,2,2021-05-13 14:30:25,2021-05-18 14:33:25
+3,2,Deletion Confirmed,Deletion Confirmed,admin@inst1.edu confirmed deletion.,2,2021-05-13 14:30:25,
+4,2,Deletion Completed,Deletion Completed,Deletion complete,2,2021-05-13 14:30:25,
+5,2,Deletion Requested,Deletion Requested,user@inst1.edu wants to delete some things.,3,2021-05-13 14:30:25,
+6,2,Deletion Cancelled,Deletion Cancelled,admin@inst1.edu cancelled deletion.,3,2021-05-13 14:30:25,
+7,2,Failed Fixity Check,Failed Fixity Check,File abc.pdf has gone wack.,,2021-05-13 14:30:25,
+8,2,Restoration Completed,Restoration Completed,File photos/photo1.jpg restored to https://example.com/photo1.jpg,,2021-05-13 14:30:25,

@@ -256,6 +256,7 @@ func (del *Deletion) createAlert(templateName, alertType string, alertData map[s
 	alert := &pgmodels.Alert{
 		InstitutionID:     del.DeletionRequest.InstitutionID,
 		Type:              alertType,
+		Subject:           alertType,
 		DeletionRequestID: del.DeletionRequest.ID,
 		Content:           buf.String(),
 		CreatedAt:         time.Now().UTC(),

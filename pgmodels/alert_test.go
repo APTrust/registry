@@ -33,6 +33,7 @@ func TestAlertRelations(t *testing.T) {
 	alert := &pgmodels.Alert{
 		InstitutionID: 2,
 		Type:          constants.AlertRestorationCompleted,
+		Subject:       "Order Up!",
 		Content:       "Your fries are ready.",
 		PremisEvents:  events,
 		Users:         users,
