@@ -1,0 +1,15 @@
+{{ define "dashboard/_alerts.html" }}
+
+<h2>Notifications</h2>
+<table>
+  <tbody>
+    {{ range $index, $alert := .alerts }}
+    <tr class="clickable" onclick="window.location.href='/alerts/show/{{ $alert.ID }}'">
+      <td>{{ $alert.Subject }}</td>
+      <td>{{ dateUS $alert.CreatedAt }}</td>
+    </tr>
+    {{ end }}
+  </tbody>
+</table>
+
+{{ end }}
