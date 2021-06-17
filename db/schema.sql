@@ -796,7 +796,7 @@ create or replace view alerts_view as
 select
 	a.id,
 	a.institution_id,
-	i."name" as instituion_name,
+	i."name" as institution_name,
 	i.identifier as institution_identifier,
 	a."type",
 	a.subject,
@@ -811,6 +811,27 @@ from alerts a
 left join alerts_users au on a.id = au.alert_id
 left join users u on au.user_id = u.id
 left join institutions i on a.institution_id = i.id;
+
+-- storage_option_stats
+
+create or replace view storage_option_stats as
+with stats as (
+	select
+		sum("gf"."size") as total_bytes,
+		gf.institution_id,
+		gf.storage_option
+	from generic_files gf
+	where gf.state = 'A'
+	group by gf.institution_id, gf.storage_option
+	)
+select
+	s.total_bytes,
+	s.institution_id,
+	s.storage_option,
+	i."name" as institution_name,
+	i.identifier as institution_identifier
+from stats s
+left join institutions i on s.institution_id = i.id;
 
 -------------------------------------------------------------------------------
 -- Functions
