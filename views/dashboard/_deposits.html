@@ -2,40 +2,41 @@
 
 <div class="row">
   <div class="column column-100">
-    <h2>Deposits</h2>
+    <h2>Deposits by Storage Option</h2>
   </div>
 </div>
 
 <div class="row">
-  <div class="column column-50">
-    <table>
-      <thead>
-        <th>Format</th>
-        <th>Count</th>
-        <th>Size</th>
-      </thead>
-      <tbody>
-        {{ range $index, $stat := .stats }}
-          {{ if eq $stat.FileFormat "" }}
-            <tr class="file-stats-total">
-          {{ else }}
+  <div class="column column-100">
+
+    <!-- Chart -->
+    <div class="row">
+      <canvas id="depositChart" width="240" height="240"></canvas>
+    </div>
+
+    <!-- Stats -->
+    <div class="row">
+      <table>
+        <thead>
+          <th>Institution</th>
+          <th>Storage Option</th>
+          <th>Size</th>
+        </thead>
+        <tbody>
+          {{ range $index, $stat := .stats }}
+          {{ if eq $stat.StorageOption "" }}
+          <tr class="file-stats-total">
+            {{ else }}
             <tr>
-          {{ end }}
-              <td>{{ $stat.FileFormat }}</td>
-              <td>{{ $stat.FileCount }}</td>
-              <td>{{ humanSize $stat.FileSize }}</td>
+              {{ end }}
+              <td>{{ $stat.InstitutionName }}</td>
+              <td>{{ $stat.StorageOption }}</td>
+              <td>{{ humanSize $stat.TotalBytes }}</td>
             </tr>
-        {{ end }}
-      </tbody>
-    </table>
-  </div>
-
-  <div class="column column-25">
-    <canvas id="sizeChart" width="120" height="120"></canvas>
-  </div>
-
-  <div class="column column-25">
-    <canvas id="countChart" width="120" height="120"></canvas>
+            {{ end }}
+        </tbody>
+      </table>
+    </div>
   </div>
 
 </div>
@@ -46,9 +47,9 @@
 
  var data = {
      labels: [
-         'PDF',
-         'Text',
-         'TIFF'
+         'Standard',
+         'Glacier-VA',
+         'Wasabi-OR'
      ],
      datasets: [{
          label: '',
@@ -69,8 +70,7 @@
  }
 
  window.addEventListener('load', (event) => {
-     initChart("sizeChart", "File Distribution by Size")
-     initChart("countChart", "File Distribution by Count")
+     initChart("depositChart", "Deposits")
  });
 
 </script>
