@@ -790,6 +790,28 @@ left join users conf on dr.confirmed_by_id = conf.id
 left join users can on dr.confirmed_by_id = can.id
 left join work_items wi on dr.work_item_id = wi.id;
 
+-- alerts view
+
+create or replace view alerts_view as
+select
+	a.id,
+	a.institution_id,
+	i."name" as instituion_name,
+	i.identifier as institution_identifier,
+	a."type",
+	a.subject,
+	a."content",
+	a.deletion_request_id,
+	a.created_at,
+	au.user_id,
+	u."name" as user_name,
+	au.sent_at,
+	au.read_at
+from alerts a
+left join alerts_users au on a.id = au.alert_id
+left join users u on au.user_id = u.id
+left join institutions i on a.institution_id = i.id;
+
 -------------------------------------------------------------------------------
 -- Functions
 -------------------------------------------------------------------------------
