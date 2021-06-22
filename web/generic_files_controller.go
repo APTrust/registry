@@ -60,7 +60,9 @@ func GenericFileShow(c *gin.Context) {
 	req := NewRequest(c)
 	file, err := pgmodels.GenericFileByID(req.Auth.ResourceID)
 	req.TemplateData["file"] = file
-	req.TemplateData["error"] = err
+	if AbortIfError(c, err) {
+		return
+	}
 	c.HTML(http.StatusOK, "files/show.html", req.TemplateData)
 }
 

@@ -29,10 +29,12 @@ type GenericFile struct {
 	StorageRecords     []*StorageRecord    `json:"storage_records" pg:"rel:has-many"`
 }
 
+// TODO: When selecting relations, order by UpdatedAt asc.
+
 // GenericFileByID returns the file with the specified id.
 // Returns pg.ErrNoRows if there is no match.
 func GenericFileByID(id int64) (*GenericFile, error) {
-	query := NewQuery().Where(`"generic_file"."id"`, "=", id)
+	query := NewQuery().Where(`"generic_file"."id"`, "=", id).Relations("Institution", "IntellectualObject", "PremisEvents", "Checksums", "StorageRecords")
 	return GenericFileGet(query)
 }
 
