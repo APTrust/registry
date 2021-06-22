@@ -36,7 +36,22 @@ func GenericFileDelete(c *gin.Context) {
 // GenericFileIndex shows list of objects.
 // GET /files
 func GenericFileIndex(c *gin.Context) {
-
+	req := NewRequest(c)
+	template := "files/index.html"
+	query, err := req.GetIndexQuery()
+	if AbortIfError(c, err) {
+		return
+	}
+	if !req.CurrentUser.IsAdmin() {
+		query.Where("institution_id", "=", req.CurrentUser.InstitutionID)
+	}
+	query.OrderBy("updated_at desc")
+	files, err := pgmodels.GenericFileSelect(query)
+	if AbortIfError(c, err) {
+		return
+	}
+	req.TemplateData["files"] = files
+	c.HTML(http.StatusOK, template, req.TemplateData)
 }
 
 // GenericFileShow returns the object with the specified id.
