@@ -4,6 +4,8 @@
 
 <h1>Generic Files</h1>
 
+{{ template "files/_filters.html" . }}
+
 <table>
   <thead>
     <tr>
@@ -28,7 +30,6 @@
 </table>
 
 {{ template "shared/_pager.html" dict "pager" .pager }}
-
 
 {{ template "shared/_footer.html" .}}
 

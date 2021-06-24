@@ -18,7 +18,7 @@ var GenericFileFilters = []string{
 	"size__gteq",
 	"size__lteq",
 	"created_at__gteq",
-	"crated_at__lteq",
+	"created_at__lteq",
 	"updated_at__gteq",
 	"updated_at__lteq",
 	"last_fixity_check__gteq",

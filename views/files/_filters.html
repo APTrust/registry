@@ -1,0 +1,71 @@
+{{ define "files/_filters.html" }}
+
+<!--
+     Proof of concept. Used to test filtering on backend.
+
+     TODO: Use a standard form for this, so that we bind values
+     correctly after reload.
+-->
+
+<form method="get">
+  <div class="row">
+    <div class="column col-30">
+      <label>Identifier</label>
+      <input type="text" name="identifier" placeholder="Generic File Identifier"/>
+    </div>
+    <div class="column col-30">
+      <label>File State</label>
+      <select name="state">
+        <option value="">All</option>
+        <option value="A">Active</option>
+        <option value="D">Deleted</option>
+      </select>
+    </div>
+    <div class="column col-30">
+      <label>Storage Option</label>
+      <select name="storage_option">
+        <option value="">All</option>
+        <option value="Glacier-Deep-OH">Glacier Deep Ohio</option>
+        <option value="Glacier-Deep-OR">Glacier Deep Oregon</option>
+        <option value="Glacier-Deep-VA">Glacier Deep Virginia</option>
+        <option value="Glacier-OH">Glacier Ohio</option>
+        <option value="Glacier-OR">Glacier Oregon</option>
+        <option value="Glacier-VA">Glacier Virginia</option>
+        <option value="Standard">Standard</option>
+        <option value="Wasabi-OR">Wasabi Oregon</option>
+        <option value="Wasabi-VA">Wasabi Virginia</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="column col-30">
+      <label>Minimum Size (Bytes)</label>
+      <input type="number" name="size__gteq" placeholder="Minimum Size"/>
+    </div>
+    <div class="column col-30">
+      <label>Maximum Size (Bytes)</label>
+      <input type="number" name="size__lteq" placeholder="Maximum Size"/>
+    </div>
+    <div class="column col-30">
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="column col-30">
+      <label>Created On or Before</label>
+      <input type="date" name="created_at__gteq"/>
+    </div>
+    <div class="column col-30">
+      <label>Created On or After</label>
+      <input type="date" name="created_at__lteq"/>
+    </div>
+    <div class="column col-30">
+      <input type="submit" value="Go"></input>
+    </div>
+  </div>
+
+
+</form>
+
+{{ end }}
