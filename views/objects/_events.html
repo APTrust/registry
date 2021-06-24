@@ -11,7 +11,7 @@
     <div class="column column-100">
       <table>
         {{ range $index, $event := .events }}
-        <tr>
+        <tr class="clickable" data-modal="modal-one" data-xhr-url="/events/show_xhr/{{ $event.ID }}">
           <td>{{ iconFor $event.EventType }}</td>
           <td>{{ $event.EventType }}</td>
           <td>{{ dateUS $event.DateTime }}</td>

@@ -1,0 +1,61 @@
+{{ define "events/_show.html" }}
+
+<h1>Premis Event</h1>
+
+<table>
+  <tbody>
+    <tr>
+      <th>Identifier</th>
+      <td>{{ .event.Identifier }}</td>
+    </tr>
+    <tr>
+      <th>Type</th>
+      <td>{{ .event.EventType }}</td>
+    </tr>
+    <tr>
+      <th>Date</th>
+      <td>{{ dateUS .event.DateTime }}</td>
+    </tr>
+    <tr>
+      <th>Outcome</th>
+      <td>{{ .event.Outcome }}</td>
+    </tr>
+    <tr>
+      <th>Outcome Detail</th>
+      <td>{{ .event.OutcomeDetail }}</td>
+    </tr>
+    <tr>
+      <th>Outcome Information</th>
+      <td>{{ .event.OutcomeInformation }}</td>
+    </tr>
+    <tr>
+      <th>Object</th>
+      <td>{{ .event.Object }}</td>
+    </tr>
+    <tr>
+      <th>Agent</th>
+      <td>{{ .event.Agent }}</td>
+    </tr>
+    <tr>
+      <th>Intellectual Object</th>
+      <td><a href="/objects/show/{{ .event.IntellectualObjectID }}">{{ .event.IntellectualObjectIdentifier }}</a></td>
+    </tr>
+    <tr>
+      <th>Generic File</th>
+      <td>
+        {{ if .event.GenericFileIdentifier }}
+        <a href="/files/show/{{ .event.GenericFileID }}">{{ .event.GenericFileIdentifier }}</a>
+        {{ else }}
+        N/A - This is an object-level event
+        {{ end }}
+      </td>
+    <tr>
+      <th>Institution</th>
+      <td><a href="/institutions/show/{{ .event.InstitutionID }}">{{ .event.InstitutionName }}</a></td>
+    </tr>
+    </tr>
+  </tbody>
+</table>
+
+
+{{ end }}

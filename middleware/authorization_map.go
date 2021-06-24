@@ -88,6 +88,7 @@ var AuthMap = map[string]AuthMetadata{
 	"IntellectualObjectRequestRestore":   {"IntellectualObject", constants.IntellectualObjectRestore},
 	"IntellectualObjectShow":             {"IntellectualObject", constants.IntellectualObjectRead},
 	"IntellectualObjectUpdate":           {"IntellectualObject", constants.IntellectualObjectUpdate},
+	"PremisEventShowXHR":                 {"PremisEvent", constants.EventRead},
 	"StorageRecordCreate":                {"StorageRecord", constants.StorageRecordCreate},
 	"StorageRecordDelete":                {"StorageRecord", constants.StorageRecordDelete},
 	"StorageRecordIndex":                 {"StorageRecord", constants.StorageRecordRead},

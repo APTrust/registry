@@ -134,6 +134,11 @@ func initRoutes(router *gin.Engine) {
 		webRoutes.GET("/objects/events/:id", web.IntellectualObjectEvents)
 		webRoutes.GET("/objects/files/:id", web.IntellectualObjectFiles)
 
+		// PremisEvents
+		//webRoutes.GET("/events", web.PremisEventIndex)
+		//webRoutes.GET("/events/show/:id", web.PremisEventShow)
+		webRoutes.GET("/events/show_xhr/:id", web.PremisEventShowXHR)
+
 		// WorkItems - Web UI allows only list, show, and limited editing for admin only
 		webRoutes.GET("/work_items", web.WorkItemIndex)
 		webRoutes.GET("/work_items/show/:id", web.WorkItemShow)

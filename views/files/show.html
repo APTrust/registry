@@ -65,9 +65,8 @@
     <tr>
       <th>PREMIS Events</th>
       <td>
-        [ TODO: Make events clickable, show detail in modal ]
         {{ range $index, $event := .file.PremisEvents }}
-            {{ dateUS $event.DateTime }} - {{ $event.EventType }} - {{ $event.Outcome }}<br/>
+            <a href="#" data-modal="modal-one" data-xhr-url="/events/show_xhr/{{ $event.ID }}">{{ dateUS $event.DateTime }} - {{ $event.EventType }} - {{ $event.Outcome }}</a><br/>
         {{ end }}
       </td>
     </tr>

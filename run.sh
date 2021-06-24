@@ -14,7 +14,7 @@
 # ----------------------------------------------------------------------
 if [[ $1 != "tests" && $1 != "server" ]]; then
     echo "Usage:"
-    echo "./run.sh tests     - to run unit tests"
+    echo "./run.sh tests   - to run unit tests"
     echo "./run.sh server  - to run application on port 8080"
     exit 0
 fi
