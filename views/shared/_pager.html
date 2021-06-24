@@ -6,12 +6,35 @@
   </div>
 </div>
 <div class="row">
+
+  <!--
+       Previous and Next links.
+
+       If .xhrTarget is defined, the link should be a button that calls
+       a JavaScript AJAX function, which will load results into the
+       HTML container whose ID matches .xhrTarget. For more info on how
+       that works, see /static/js/modules/xhr.js.
+
+       If there's no .xhrTarget, the buttons should be standard <a> elements,
+       and clicking them will cause a full page reload.
+  -->
+
+
   {{ if .pager.PreviousLink }}
-  <div class="column column-50"><button type="button" class="button button-outline clickable" data-xhr-url="{{ .pager.PreviousLink }}" data-xhr-target="{{ .xhrTarget }}">&lt;</button></div>
+    {{ if .xhrTarget }}
+    <div class="column column-50"><button type="button" class="button button-outline clickable" data-xhr-url="{{ .pager.PreviousLink }}" data-xhr-target="{{ .xhrTarget }}">&lt;</button></div>
+    {{ else }}
+    <div class="column column-50"><a class="button button-outline clickable" href="{{ .pager.PreviousLink }}">&lt;</a></div>
+    {{ end }}
   {{ end }}
 
+
   {{ if .pager.NextLink }}
-  <div class="column column-50"><button type="button" class="button button-outline clickable" data-xhr-url="{{ .pager.NextLink }}" data-xhr-target="{{ .xhrTarget }}">&gt;</button></div>
+    {{ if .xhrTarget }}
+    <div class="column column-50"><button type="button" class="button button-outline clickable" data-xhr-url="{{ .pager.NextLink }}" data-xhr-target="{{ .xhrTarget }}">&gt;</button></div>
+    {{ else }}
+    <div class="column column-50"><a class="button button-outline clickable" href="{{ .pager.NextLink }}">&gt;</a></div>
+    {{ end }}
   {{ end }}
 </div>
 

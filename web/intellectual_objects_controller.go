@@ -172,9 +172,8 @@ func IntellectualObjectFiles(c *gin.Context) {
 // Select max 20 files to start. Some objects have > 100k files, and
 // we definitely don't want that many results. Let the user page through.
 func loadFiles(req *Request, objID int64) error {
-	//baseURL := fmt.Sprintf("/objects/files/%d", objID)
 	baseURL := req.GinContext.Request.URL.Path + "?" + req.GinContext.Request.URL.RawQuery
-	pager, err := NewPager(req.GinContext, baseURL, 10)
+	pager, err := NewPager(req.GinContext, baseURL, 20)
 	if err != nil {
 		return err
 	}

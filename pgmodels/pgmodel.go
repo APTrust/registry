@@ -110,6 +110,7 @@ func FiltersFor(typeName string) []string {
 
 func initFilters() {
 	filters = make(map[string][]string)
+	filters["GenericFile"] = GenericFileFilters
 	filters["IntellectualObject"] = IntellectualObjectFilters
 	filters["Institution"] = InstitutionFilters
 	filters["User"] = UserFilters

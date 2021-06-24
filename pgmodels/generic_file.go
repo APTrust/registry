@@ -8,6 +8,23 @@ import (
 	"github.com/go-pg/pg/v10"
 )
 
+var GenericFileFilters = []string{
+	"identifier",
+	"uuid",
+	"intellectual_object_id",
+	"institution_id",
+	"state",
+	"storage_option",
+	"size__gteq",
+	"size__lteq",
+	"created_at__gteq",
+	"crated_at__lteq",
+	"updated_at__gteq",
+	"updated_at__lteq",
+	"last_fixity_check__gteq",
+	"last_fixity_check__lteq",
+}
+
 type GenericFile struct {
 	ID                   int64     `json:"id" pg:"id"`
 	FileFormat           string    `json:"file_format"`

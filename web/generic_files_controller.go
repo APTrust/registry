@@ -38,19 +38,10 @@ func GenericFileDelete(c *gin.Context) {
 func GenericFileIndex(c *gin.Context) {
 	req := NewRequest(c)
 	template := "files/index.html"
-	query, err := req.GetIndexQuery()
+	err := gfIndexLoadFiles(req)
 	if AbortIfError(c, err) {
 		return
 	}
-	if !req.CurrentUser.IsAdmin() {
-		query.Where("institution_id", "=", req.CurrentUser.InstitutionID)
-	}
-	query.OrderBy("updated_at desc")
-	files, err := pgmodels.GenericFileSelect(query)
-	if AbortIfError(c, err) {
-		return
-	}
-	req.TemplateData["files"] = files
 	c.HTML(http.StatusOK, template, req.TemplateData)
 }
 
@@ -225,4 +216,35 @@ func GenericFileCancelDelete(c *gin.Context) {
 	}
 	req.TemplateData["deletionRequest"] = del.DeletionRequest
 	c.HTML(http.StatusOK, "files/deletion_cancelled.html", req.TemplateData)
+}
+
+func gfIndexLoadFiles(req *Request) error {
+	query, err := req.GetIndexQuery()
+	if err != nil {
+		return err
+	}
+	if !req.CurrentUser.IsAdmin() {
+		query.Where("institution_id", "=", req.CurrentUser.InstitutionID)
+	}
+	query.OrderBy("updated_at desc")
+
+	baseURL := req.GinContext.Request.URL.Path + "?" + req.GinContext.Request.URL.RawQuery
+	pager, err := NewPager(req.GinContext, baseURL, 20)
+	if err != nil {
+		return err
+	}
+
+	query.Offset(pager.QueryOffset).Limit(pager.PerPage)
+	files, err := pgmodels.GenericFileSelect(query)
+	if err != nil {
+		return err
+	}
+
+	totalFileCount, err := query.Count(&pgmodels.GenericFile{})
+	pager.SetCounts(totalFileCount, len(files))
+
+	req.TemplateData["files"] = files
+	req.TemplateData["pager"] = pager
+
+	return err
 }

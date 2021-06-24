@@ -249,3 +249,11 @@ func (q *Query) Select(structOrSlice interface{}) error {
 	}
 	return orm.Select()
 }
+
+func (q *Query) Count(model interface{}) (int, error) {
+	orm := common.Context().DB.Model(model)
+	if q.WhereClause() != "" {
+		orm.Where(q.WhereClause(), q.Params()...)
+	}
+	return orm.Count()
+}
