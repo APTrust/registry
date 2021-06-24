@@ -37,8 +37,10 @@ grant pg_read_server_files to dev_user;
 Now load the schema into the dev database:
 
 ```
-psql -U dev_user -d apt_registry_development -a -f db/schema.sql
+APT_ENV=dev ./run.sh tests
 ```
+
+Note that this will delete and rebuild your dev DB with some starter data. You probably don't want to run this after the first time you set up your dev environment.
 
 If you want more data in your dev DB, we have a copy of the staging database in an undisclosed location.
 
@@ -77,3 +79,11 @@ You'll have some minimal data available in the DB, including a number of user ac
 # Testing
 
 `./run.sh tests`
+
+This drops everything in the test DB, recreates the tables and views, loads in some fixtures, and runs the unit tests. Unless you say otherwise, the script assumes APT_ENV=test.
+
+Note that Go does not rerun tests that passed on the prior run. If you want to force all tests to run, run this before the tests themselves:
+
+`go clean -testcache`
+
+This may be necessary if the tests passed on the prior run, but you want to force a reload of the schema or the fixtures.

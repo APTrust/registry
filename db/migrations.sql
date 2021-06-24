@@ -12,6 +12,29 @@
 --       views in the schema.sql file.
 -------------------------------------------------------------------------------
 
+-- The premis_events.date_time column is varchar, but it should be
+-- timestamp. We need to change it. This change may fail if 1) there
+-- are invalid or badly formatted dates in the date_time column, or
+-- 2) if any views referencing premis_events.date_time already exist.
+-- Drop premis_events_view if necessary and recreate it after this alteration.
+--
+-- This change may take a long time, as premis_events has over 100M rows.
+do
+$$
+begin
+	if exists(
+		select 1 from information_schema.columns
+		where table_schema = 'public'
+		and table_name = 'premis_events'
+		and column_name = 'date_time'
+		and data_type = 'character varying')
+	then
+		alter table premis_events alter column date_time type timestamp
+		using TO_TIMESTAMP(date_time, 'YYYY-MM-DD HH24:MI:SS');
+	end if;
+end
+$$;
+
 -- We need to fix the user role structure. Pharos allows a user to have
 -- multiple roles at a single institution, though our business rules disallow
 -- that, and no user has ever had more than one role. To simplify the DB

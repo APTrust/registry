@@ -18,6 +18,7 @@ var fixturesLoaded = false
 // Since data loading DELETES THE ENTIRE DB before reloading fixtures, we want
 // this to run only on local dev machines and test/CI systems.
 var SafeEnvironments = []string{
+	"dev",
 	"integration",
 	"test",
 	"travis",
@@ -114,6 +115,10 @@ func LoadFixtures() error {
 			ctx.Log.Error().Stack().Err(err).Msg("")
 			return err
 		}
+		if err := loadViews(ctx.DB); err != nil {
+			ctx.Log.Error().Stack().Err(err).Msg("")
+			return err
+		}
 		if err := loadCSVFiles(ctx.DB); err != nil {
 			ctx.Log.Error().Stack().Err(err).Msg("")
 			return err
@@ -141,7 +146,8 @@ func dropEverything(db *pg.DB) error {
 	return nil
 }
 
-// Reload the entire DB schema.
+// Reload the entire DB table schema.
+// Views will be loaded separately below.
 func loadSchema(db *pg.DB) error {
 	panicOnWrongEnv()
 	file := filepath.Join("db", "schema.sql")
@@ -156,6 +162,17 @@ func loadSchema(db *pg.DB) error {
 func runMigrations(db *pg.DB) error {
 	panicOnWrongEnv()
 	file := filepath.Join("db", "migrations.sql")
+	ddl, err := common.LoadRelativeFile(file)
+	if err != nil {
+		return fmt.Errorf("File %s: %v", file, err)
+	}
+	return runTransaction(db, string(ddl))
+}
+
+// Recreate the views.
+func loadViews(db *pg.DB) error {
+	panicOnWrongEnv()
+	file := filepath.Join("db", "views.sql")
 	ddl, err := common.LoadRelativeFile(file)
 	if err != nil {
 		return fmt.Errorf("File %s: %v", file, err)
