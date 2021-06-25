@@ -188,7 +188,7 @@ func getIndexQuery(c *gin.Context) (*pgmodels.Query, error) {
 	allowedFilters := []string{
 		"institution_id",
 	}
-	fc := NewFilterCollection()
+	fc := pgmodels.NewFilterCollection()
 	for _, key := range allowedFilters {
 		fc.Add(key, c.QueryArray(key))
 	}

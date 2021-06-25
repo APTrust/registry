@@ -1,11 +1,10 @@
-package web
+package pgmodels
 
 import (
 	"fmt"
 	"strings"
 
 	"github.com/APTrust/registry/common"
-	"github.com/APTrust/registry/pgmodels"
 )
 
 // FilterCollection converts query string params such as name__eq=Homer to
@@ -42,8 +41,8 @@ func (fc *FilterCollection) Add(key string, values []string) error {
 // The Query's WhereClause() will return the where conditions for the filters
 // passed in through Add(), and the Query's Params() method will return the
 // params. Conditions and params come back in the order they were added.
-func (fc *FilterCollection) ToQuery() (*pgmodels.Query, error) {
-	query := pgmodels.NewQuery()
+func (fc *FilterCollection) ToQuery() (*Query, error) {
+	query := NewQuery()
 	for _, filter := range fc.filters {
 		if common.ListIsEmpty(filter.Values) {
 			continue // no need to apply filter
@@ -54,6 +53,18 @@ func (fc *FilterCollection) ToQuery() (*pgmodels.Query, error) {
 		}
 	}
 	return query, nil
+}
+
+// ValueOf returns the value of the filter with the specified name.
+// Returns an empty string if the specified filter is missing or
+// has no value.
+func (fc *FilterCollection) ValueOf(filterName string) string {
+	for _, pf := range fc.filters {
+		if pf.Key == filterName && len(pf.Values) > 0 {
+			return pf.Values[0]
+		}
+	}
+	return ""
 }
 
 // ParamFilter parses query string params into filters that can be added
@@ -84,7 +95,7 @@ func NewParamFilter(key string, values []string) (*ParamFilter, error) {
 	}
 	col := colAndOp[0]
 	rawOp := colAndOp[1]
-	sqlOp, ok := pgmodels.QueryOp[rawOp]
+	sqlOp, ok := QueryOp[rawOp]
 	if !ok {
 		return nil, fmt.Errorf("Invalid query string param '%s': unknown operator '%s'", key, rawOp)
 	}
@@ -100,7 +111,7 @@ func NewParamFilter(key string, values []string) (*ParamFilter, error) {
 // AddToQuery adds this ParamFilter to SQL query q. If it can't map the
 // RawOp to a known Query method, it returns a custom error. The caller
 // should log the error and then return a basic common.ErrInvalidParam.
-func (pf *ParamFilter) AddToQuery(q *pgmodels.Query) error {
+func (pf *ParamFilter) AddToQuery(q *Query) error {
 	switch pf.RawOp {
 	case "eq":
 		q.Where(pf.Column, pf.SQLOp, pf.Values[0])

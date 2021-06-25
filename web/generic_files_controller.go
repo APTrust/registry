@@ -8,6 +8,7 @@ import (
 
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
+	"github.com/APTrust/registry/forms"
 	"github.com/APTrust/registry/helpers"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/gin-gonic/gin"
@@ -242,10 +243,16 @@ func gfIndexLoadFiles(req *Request) error {
 	}
 
 	totalFileCount, err := query.Count(&pgmodels.GenericFile{})
+	if err != nil {
+		return err
+	}
 	pager.SetCounts(totalFileCount, len(files))
+
+	form, err := forms.NewFileFilterForm(filterCollection, req.CurrentUser)
 
 	req.TemplateData["files"] = files
 	req.TemplateData["pager"] = pager
+	req.TemplateData["filterForm"] = form
 
 	return err
 }

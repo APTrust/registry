@@ -40,9 +40,9 @@ func NewRequest(c *gin.Context) *Request {
 // wants to apply to an index/list request. These come from the
 // query string. Call the ToQuery() method of the returned
 // FilterCollection to translate query string params to SQL.
-func (req *Request) GetFilterCollection() *FilterCollection {
+func (req *Request) GetFilterCollection() *pgmodels.FilterCollection {
 	allowedFilters := pgmodels.FiltersFor(req.Auth.ResourceType)
-	fc := NewFilterCollection()
+	fc := pgmodels.NewFilterCollection()
 	for _, key := range allowedFilters {
 		fc.Add(key, req.GinContext.QueryArray(key))
 	}

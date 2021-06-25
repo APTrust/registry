@@ -27,6 +27,23 @@ var InstTypeList = []ListOption{
 	{constants.InstTypeSubscriber, "Subscriber (Sub-Account)"},
 }
 
+var ObjectStateList = []ListOption{
+	{constants.StateActive, "Active"},
+	{constants.StateDeleted, "Deleted"},
+}
+
+var StorageOptionList = []ListOption{
+	{constants.StorageOptionGlacierDeepOH, "Glacier Deep - Ohio"},
+	{constants.StorageOptionGlacierDeepOR, "Glacier Deep - Oregon"},
+	{constants.StorageOptionGlacierDeepVA, "Glacier Deep - Virginia"},
+	{constants.StorageOptionGlacierOH, "Glacier - Ohio"},
+	{constants.StorageOptionGlacierOR, "Glacier - Oregon"},
+	{constants.StorageOptionGlacierVA, "Glacier - Virginia"},
+	{constants.StorageOptionStandard, "Standard"},
+	{constants.StorageOptionWasabiOR, "Wasabi - Oregon"},
+	{constants.StorageOptionWasabiVA, "Wasabi - Virginia"},
+}
+
 var YesNoList = []ListOption{
 	{"true", "Yes"},
 	{"false", "No"},

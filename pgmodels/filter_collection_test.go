@@ -1,15 +1,14 @@
-package web_test
+package pgmodels_test
 
 import (
 	"testing"
 
 	"github.com/APTrust/registry/pgmodels"
-	"github.com/APTrust/registry/web"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-var valid = []*web.ParamFilter{
+var valid = []*pgmodels.ParamFilter{
 	{
 		Key:    "name__eq",
 		Column: "name",
@@ -89,7 +88,7 @@ var valid = []*web.ParamFilter{
 	},
 }
 
-var invalid = []*web.ParamFilter{
+var invalid = []*pgmodels.ParamFilter{
 	{
 		Key:    "name__xyz",
 		Column: "name",
@@ -132,7 +131,7 @@ func expectedQuery(index int) *pgmodels.Query {
 // based on input params.
 func TestNewParamFilter(t *testing.T) {
 	for _, obj := range valid {
-		filter, err := web.NewParamFilter(obj.Key, obj.Values)
+		filter, err := pgmodels.NewParamFilter(obj.Key, obj.Values)
 		assert.Nil(t, err)
 		require.NotNil(t, filter)
 		assert.Equal(t, obj.Key, filter.Key)
@@ -142,7 +141,7 @@ func TestNewParamFilter(t *testing.T) {
 		assert.Equal(t, obj.Values, filter.Values)
 	}
 	for _, obj := range invalid {
-		filter, err := web.NewParamFilter(obj.Key, obj.Values)
+		filter, err := pgmodels.NewParamFilter(obj.Key, obj.Values)
 		assert.NotNil(t, err)
 		require.Nil(t, filter)
 	}
@@ -160,7 +159,7 @@ func TestNewParamFilter(t *testing.T) {
 func TestAddToQuery(t *testing.T) {
 	for i, obj := range valid {
 		q := pgmodels.NewQuery()
-		filter, err := web.NewParamFilter(obj.Key, obj.Values)
+		filter, err := pgmodels.NewParamFilter(obj.Key, obj.Values)
 		assert.Nil(t, err)
 		err = filter.AddToQuery(q)
 		require.Nil(t, err)
@@ -179,13 +178,13 @@ func TestInterfaceValues(t *testing.T) {
 		"val2",
 		"val3",
 	}
-	filter, err := web.NewParamFilter("col1__in", values)
+	filter, err := pgmodels.NewParamFilter("col1__in", values)
 	require.Nil(t, err)
 	assert.Equal(t, []interface{}{"val1", "val2", "val3"}, filter.InterfaceValues())
 }
 
 func TestFilterCollection(t *testing.T) {
-	fc := web.NewFilterCollection()
+	fc := pgmodels.NewFilterCollection()
 	for _, obj := range valid {
 		err := fc.Add(obj.Key, obj.Values)
 		require.Nil(t, err)
