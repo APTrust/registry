@@ -36,13 +36,17 @@ func NewRequest(c *gin.Context) *Request {
 	return req
 }
 
-func (req *Request) GetIndexQuery() (*pgmodels.Query, error) {
+// GetFilterCollection returns a collection of filters the user
+// wants to apply to an index/list request. These come from the
+// query string. Call the ToQuery() method of the returned
+// FilterCollection to translate query string params to SQL.
+func (req *Request) GetFilterCollection() *FilterCollection {
 	allowedFilters := pgmodels.FiltersFor(req.Auth.ResourceType)
 	fc := NewFilterCollection()
 	for _, key := range allowedFilters {
 		fc.Add(key, req.GinContext.QueryArray(key))
 	}
-	return fc.ToQuery()
+	return fc
 }
 
 // BaseURL returns the base of param _url. The base includes the scheme,

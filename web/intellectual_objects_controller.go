@@ -104,7 +104,8 @@ func IntellectualObjectInitRestore(c *gin.Context) {
 func IntellectualObjectIndex(c *gin.Context) {
 	req := NewRequest(c)
 	template := "objects/index.html"
-	query, err := req.GetIndexQuery()
+	filterCollection := req.GetFilterCollection()
+	query, err := filterCollection.ToQuery()
 	if AbortIfError(c, err) {
 		return
 	}

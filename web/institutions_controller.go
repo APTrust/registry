@@ -52,7 +52,8 @@ func InstitutionUndelete(c *gin.Context) {
 func InstitutionIndex(c *gin.Context) {
 	req := NewRequest(c)
 	template := "institutions/index.html"
-	query, err := req.GetIndexQuery()
+	filterCollection := req.GetFilterCollection()
+	query, err := filterCollection.ToQuery()
 	if AbortIfError(c, err) {
 		return
 	}

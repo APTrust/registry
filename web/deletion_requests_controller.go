@@ -42,7 +42,8 @@ func DeletionRequestShow(c *gin.Context) {
 // GET /deletions
 func DeletionRequestIndex(c *gin.Context) {
 	req := NewRequest(c)
-	query, err := req.GetIndexQuery()
+	filterCollection := req.GetFilterCollection()
+	query, err := filterCollection.ToQuery()
 	if AbortIfError(c, err) {
 		return
 	}

@@ -219,7 +219,8 @@ func GenericFileCancelDelete(c *gin.Context) {
 }
 
 func gfIndexLoadFiles(req *Request) error {
-	query, err := req.GetIndexQuery()
+	filterCollection := req.GetFilterCollection()
+	query, err := filterCollection.ToQuery()
 	if err != nil {
 		return err
 	}
