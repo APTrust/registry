@@ -29,6 +29,7 @@ const (
 	AlgSha1                    = "sha1"
 	AlgSha256                  = "sha256"
 	AlgSha512                  = "sha512"
+	BTRProfileIdentifier       = "https://github.com/dpscollaborative/btr_bagit_profile/releases/download/1.0/btr-bagit-profile.json"
 	DefaultProfileIdentifier   = "https://raw.githubusercontent.com/APTrust/preservation-services/master/profiles/aptrust-v2.2.json"
 	EventAccessAssignment      = "access assignment"
 	EventCapture               = "capture"

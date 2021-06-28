@@ -4,6 +4,8 @@
 
 <h1>Objects</h1>
 
+{{ template "objects/_filters.html" . }}
+
 <table>
   <thead>
     <tr>
@@ -31,6 +33,8 @@
     {{ end }}
   </tbody>
 </table>
+
+{{ template "shared/_pager.html" dict "pager" .pager }}
 
 {{ template "shared/_footer.html" .}}
 

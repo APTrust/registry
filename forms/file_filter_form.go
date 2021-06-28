@@ -32,6 +32,16 @@ func NewFileFilterForm(fc *pgmodels.FilterCollection, actingUser *pgmodels.User)
 }
 
 func (f *FileFilterForm) init() {
+	f.Fields["created_at__lteq"] = &Field{
+		Name:        "created_at__lteq",
+		Label:       "Created On or Before",
+		Placeholder: "Created On or Before",
+	}
+	f.Fields["created_at__gteq"] = &Field{
+		Name:        "created_at__gteq",
+		Label:       "Created On or After",
+		Placeholder: "Created On or After",
+	}
 	f.Fields["identifier"] = &Field{
 		Name:        "identifier",
 		Label:       "File Identifier",
@@ -49,12 +59,6 @@ func (f *FileFilterForm) init() {
 		Placeholder: "State",
 		Options:     ObjectStateList,
 	}
-	f.Fields["storage_option"] = &Field{
-		Name:        "storage_option",
-		Label:       "Storage Option",
-		Placeholder: "Storage Option",
-		Options:     StorageOptionList,
-	}
 	f.Fields["size__gteq"] = &Field{
 		Name:        "size__gteq",
 		Label:       "Min Size",
@@ -65,15 +69,21 @@ func (f *FileFilterForm) init() {
 		Label:       "Max Size",
 		Placeholder: "Max Size",
 	}
-	f.Fields["created_at__lteq"] = &Field{
-		Name:        "created_at__lteq",
-		Label:       "Created On or Before",
-		Placeholder: "Created On or Before",
+	f.Fields["storage_option"] = &Field{
+		Name:        "storage_option",
+		Label:       "Storage Option",
+		Placeholder: "Storage Option",
+		Options:     StorageOptionList,
 	}
-	f.Fields["created_at__gteq"] = &Field{
-		Name:        "created_at__gteq",
-		Label:       "Created On or After",
-		Placeholder: "Created On or After",
+	f.Fields["updated_at__lteq"] = &Field{
+		Name:        "updated_at__lteq",
+		Label:       "Updated On or Before",
+		Placeholder: "Updated On or Before",
+	}
+	f.Fields["updated_at__gteq"] = &Field{
+		Name:        "updated_at__gteq",
+		Label:       "Updated On or After",
+		Placeholder: "Updated On or After",
 	}
 }
 
@@ -82,9 +92,11 @@ func (f *FileFilterForm) SetValues() {
 	f.Fields["identifier"].Value = f.FilterCollection.ValueOf("identifier")
 	f.Fields["institution_id"].Value = f.FilterCollection.ValueOf("institution_id")
 	f.Fields["state"].Value = f.FilterCollection.ValueOf("state")
-	f.Fields["storage_option"].Value = f.FilterCollection.ValueOf("storage_option")
 	f.Fields["size__gteq"].Value = f.FilterCollection.ValueOf("size__gteq")
 	f.Fields["size__lteq"].Value = f.FilterCollection.ValueOf("size__lteq")
+	f.Fields["storage_option"].Value = f.FilterCollection.ValueOf("storage_option")
 	f.Fields["created_at__gteq"].Value = f.FilterCollection.ValueOf("created_at__gteq")
 	f.Fields["created_at__lteq"].Value = f.FilterCollection.ValueOf("created_at__lteq")
+	f.Fields["updated_at__gteq"].Value = f.FilterCollection.ValueOf("updated_at__gteq")
+	f.Fields["updated_at__lteq"].Value = f.FilterCollection.ValueOf("updated_at__lteq")
 }

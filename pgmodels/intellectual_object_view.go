@@ -4,31 +4,36 @@ import (
 	"time"
 )
 
+// IntellectualObjectFilters describes the allowed filters for searching
+// IntellectualObjects. Some of these are commented out because, while they
+// are supported in Pharo's v2 member API, we want to phase them out.
+// "Contains" queries, in particular, which use SQL "like" on the backend,
+// cause performance problems.
 var IntellectualObjectFilters = []string{
-	"title",
-	"title__contains",
-	"description",
-	"description__contains",
-	"identifier",
-	"alt_identifier",
 	"access",
-	"bag_name",
-	"institution_id",
-	"state",
-	"etag",
+	"alt_identifier",
 	"bag_group_identifier",
-	"storage_option",
+	"bag_name",
 	"bagit_profile_identifier",
-	"source_organization",
-	"internal_sender_identifier",
-	"internal_sender_description",
-	"institution_parent_id",
+	"created_at__lteq",
+	"created_at__gteq",
+	// "description",
+	// "description__contains",
+	"etag",
 	"file_count__gteq",
 	"file_count__lteq",
+	"identifier",
+	"institution_id",
+	"institution_parent_id",
+	"internal_sender_description",
+	"internal_sender_identifier",
 	"size__gteq",
 	"size__lteq",
-	"created_at__gteq",
-	"crated_at__lteq",
+	"source_organization",
+	"state",
+	"storage_option",
+	// "title",
+	// "title__contains",
 	"updated_at__gteq",
 	"updated_at__lteq",
 }

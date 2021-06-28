@@ -16,6 +16,11 @@ var AllRolesList = []ListOption{
 	{constants.RoleSysAdmin, "APTrust System Administrator"},
 }
 
+var BagItProfileIdentifiers = []ListOption{
+	{constants.DefaultProfileIdentifier, "APTrust"},
+	{constants.BTRProfileIdentifier, "BTR"},
+}
+
 // InstRolesList is a list of user roles for institutions.
 var InstRolesList = []ListOption{
 	{constants.RoleInstAdmin, "Institutional Admin"},
@@ -30,6 +35,12 @@ var InstTypeList = []ListOption{
 var ObjectStateList = []ListOption{
 	{constants.StateActive, "Active"},
 	{constants.StateDeleted, "Deleted"},
+}
+
+var ObjectAccessList = []ListOption{
+	{constants.AccessConsortia, constants.AccessConsortia},
+	{constants.AccessInstitution, constants.AccessInstitution},
+	{constants.AccessRestricted, constants.AccessRestricted},
 }
 
 var StorageOptionList = []ListOption{

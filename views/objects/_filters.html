@@ -1,4 +1,4 @@
-{{ define "files/_filters.html" }}
+{{ define "objects/_filters.html" }}
 
 <form id="fileFilterForm" method="get">
 
@@ -16,6 +16,30 @@
 
   <div class="row">
     <div class="column col-30">
+      {{ template "forms/text_input.html" .filterForm.Fields.bag_name }}
+    </div>
+    <div class="column col-30">
+      {{ template "forms/text_input.html" .filterForm.Fields.alt_identifier }}
+    </div>
+    <div class="column col-30">
+      {{ template "forms/text_input.html" .filterForm.Fields.bag_group_identifier }}
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="column col-30">
+      {{ template "forms/text_input.html" .filterForm.Fields.internal_sender_identifier }}
+    </div>
+    <div class="column col-30">
+      {{ template "forms/select.html" .filterForm.Fields.bagit_profile_identifier }}
+    </div>
+    <div class="column col-30">
+      {{ template "forms/select.html" .filterForm.Fields.access }}
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="column col-30">
       {{ template "forms/number.html" .filterForm.Fields.size__gteq }}
     </div>
     <div class="column col-30">
@@ -27,6 +51,21 @@
       {{ end }}
     </div>
   </div>
+
+  <div class="row">
+    <div class="column col-30">
+      {{ template "forms/number.html" .filterForm.Fields.file_count__gteq }}
+    </div>
+    <div class="column col-30">
+      {{ template "forms/number.html" .filterForm.Fields.file_count__lteq }}
+    </div>
+    <div class="column col-30">
+      {{ if .CurrentUser.IsAdmin }}
+      {{ template "forms/select.html" .filterForm.Fields.institution_parent_id }}
+      {{ end }}
+    </div>
+  </div>
+
 
   <div class="row">
     <div class="column col-30">
@@ -51,6 +90,7 @@
       <input type="submit" value="Filter">
     </div>
   </div>
+
 
 </form>
 
