@@ -8,6 +8,30 @@ import (
 	"github.com/stretchr/stew/slice"
 )
 
+var WorkItemFilters = []string{
+	"action",
+	"alt_identifier",
+	"bag_date__gteq",
+	"bag_date__lteq",
+	"bag_group_identifier",
+	"bagit_profile_identifier",
+	"bucket",
+	"date_processed__gteq",
+	"date_processed__lteq",
+	"etag",
+	"generic_file_identifier",
+	"institution_id",
+	"name",
+	"needs_admin_review",
+	"object_identifier",
+	"size__gteq",
+	"size__lteq",
+	"stage",
+	"status",
+	"storage_option",
+	"user",
+}
+
 // WorkItemView is a read-only model for querying. It flattens out
 // WorkItem and some of its one-to-one relations for easy querying.
 type WorkItemView struct {

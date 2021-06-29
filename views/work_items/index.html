@@ -2,6 +2,8 @@
 
 {{ template "shared/_header.html" .}}
 
+{{ template "work_items/_filters.html" . }}
+
 <h1>Work Items</h1>
 
 <table>
@@ -27,7 +29,8 @@
   </tbody>
 </table>
 
-{{ template "shared/_footer.html" .}}
+{{ template "shared/_pager.html" dict "pager" .pager }}
 
+{{ template "shared/_footer.html" .}}
 
 {{ end }}

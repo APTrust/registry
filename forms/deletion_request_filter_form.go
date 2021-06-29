@@ -6,7 +6,7 @@ import (
 )
 
 // DeletionRequestFilterForm is the form that displays filtering options for
-// the generic file list page.
+// the deletion request list page.
 type DeletionRequestFilterForm struct {
 	Form
 	FilterCollection  *pgmodels.FilterCollection

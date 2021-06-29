@@ -1,0 +1,93 @@
+{{ define "work_items/_filters.html" }}
+
+<form id="itemFilterForm" method="get">
+
+  <div class="row">
+    <div class="column col-30">
+      {{ template "forms/select.html" .filterForm.Fields.action }}
+    </div>
+    <div class="column col-30">
+      {{ template "forms/select.html" .filterForm.Fields.stage }}
+    </div>
+    <div class="column col-30">
+      {{ template "forms/select.html" .filterForm.Fields.status }}
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="column col-30">
+      {{ template "forms/text_input.html" .filterForm.Fields.name }}
+    </div>
+    <div class="column col-30">
+      {{ template "forms/text_input.html" .filterForm.Fields.etag }}
+    </div>
+    <div class="column col-30">
+      {{ if .CurrentUser.IsAdmin }}
+      {{ template "forms/select.html" .filterForm.Fields.institution_id }}
+      {{ end }}
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="column col-30">
+      {{ template "forms/date.html" .filterForm.Fields.date_processed__gteq }}
+    </div>
+    <div class="column col-30">
+      {{ template "forms/date.html" .filterForm.Fields.date_processed__lteq }}
+    </div>
+    <div class="column col-30">
+      {{ template "forms/select.html" .filterForm.Fields.needs_admin_review }}
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="column col-30">
+      {{ template "forms/text_input.html" .filterForm.Fields.object_identifier }}
+    </div>
+    <div class="column col-30">
+      {{ template "forms/text_input.html" .filterForm.Fields.generic_file_identifier }}
+    </div>
+    <div class="column col-30">
+      {{ template "forms/select.html" .filterForm.Fields.storage_option }}
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="column col-30">
+      {{ template "forms/text_input.html" .filterForm.Fields.alt_identifier }}
+    </div>
+    <div class="column col-30">
+      {{ template "forms/text_input.html" .filterForm.Fields.bag_group_identifier }}
+    </div>
+    <div class="column col-30">
+      {{ template "forms/text_input.html" .filterForm.Fields.bucket }}
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="column col-30">
+      {{ template "forms/text_input.html" .filterForm.Fields.user }}
+    </div>
+    <div class="column col-30">
+      {{ template "forms/select.html" .filterForm.Fields.bagit_profile_identifier }}
+    </div>
+    <div class="column col-30">
+
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="column col-30">
+      {{ template "forms/number.html" .filterForm.Fields.size__gteq }}
+    </div>
+    <div class="column col-30">
+      {{ template "forms/number.html" .filterForm.Fields.size__lteq }}
+    </div>
+    <div class="column col-30">
+      <input type="submit" value="Filter">
+    </div>
+  </div>
+
+</form>
+
+{{ end }}

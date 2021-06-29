@@ -16,14 +16,11 @@ import (
 // GET /work_items
 func WorkItemIndex(c *gin.Context) {
 	req := NewRequest(c)
-	template := "work_items/index.html"
-	query := pgmodels.NewQuery().OrderBy("name")
-	items, err := pgmodels.WorkItemViewSelect(query)
+	err := wiIndexLoadItems(req)
 	if AbortIfError(c, err) {
 		return
 	}
-	req.TemplateData["items"] = items
-	c.HTML(http.StatusOK, template, req.TemplateData)
+	c.HTML(http.StatusOK, "work_items/index.html", req.TemplateData)
 }
 
 // WorkItemShow returns the work item with the specified id.
@@ -118,4 +115,42 @@ func getFormAndRequest(c *gin.Context) (*forms.WorkItemForm, *Request, error) {
 	form := forms.NewWorkItemForm(workItem)
 	req.TemplateData["form"] = form
 	return form, req, nil
+}
+
+func wiIndexLoadItems(req *Request) error {
+	filterCollection := req.GetFilterCollection()
+	query, err := filterCollection.ToQuery()
+	if err != nil {
+		return err
+	}
+	if !req.CurrentUser.IsAdmin() {
+		query.Where("institution_id", "=", req.CurrentUser.InstitutionID)
+	}
+	query.OrderBy("updated_at desc")
+
+	baseURL := req.GinContext.Request.URL.Path + "?" + req.GinContext.Request.URL.RawQuery
+	pager, err := NewPager(req.GinContext, baseURL, 20)
+	if err != nil {
+		return err
+	}
+
+	query.Offset(pager.QueryOffset).Limit(pager.PerPage)
+	items, err := pgmodels.WorkItemViewSelect(query)
+	if err != nil {
+		return err
+	}
+
+	count, err := query.Count(&pgmodels.WorkItemView{})
+	if err != nil {
+		return err
+	}
+	pager.SetCounts(count, len(items))
+
+	form, err := forms.NewWorkItemFilterForm(filterCollection, req.CurrentUser)
+
+	req.TemplateData["items"] = items
+	req.TemplateData["pager"] = pager
+	req.TemplateData["filterForm"] = form
+
+	return err
 }
