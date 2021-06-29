@@ -108,8 +108,11 @@ func FiltersFor(typeName string) []string {
 	return filters[typeName]
 }
 
+// TODO: Have an init function in each model to take care of this.
+// Init function should register info about each model.
 func initFilters() {
 	filters = make(map[string][]string)
+	filters["DeletionRequest"] = DeletionRequestFilters
 	filters["GenericFile"] = GenericFileFilters
 	filters["IntellectualObject"] = IntellectualObjectFilters
 	filters["Institution"] = InstitutionFilters

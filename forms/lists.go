@@ -37,12 +37,6 @@ var ObjectStateList = []ListOption{
 	{constants.StateDeleted, "Deleted"},
 }
 
-var ObjectAccessList = []ListOption{
-	{constants.AccessConsortia, constants.AccessConsortia},
-	{constants.AccessInstitution, constants.AccessInstitution},
-	{constants.AccessRestricted, constants.AccessRestricted},
-}
-
 var StorageOptionList = []ListOption{
 	{constants.StorageOptionGlacierDeepOH, "Glacier Deep - Ohio"},
 	{constants.StorageOptionGlacierDeepOR, "Glacier Deep - Oregon"},

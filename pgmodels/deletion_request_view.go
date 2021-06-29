@@ -4,6 +4,14 @@ import (
 	"time"
 )
 
+var DeletionRequestFilters = []string{
+	"institution_id",
+	"requested_at__gteq",
+	"requested_at__lteq",
+	"stage",
+	"status",
+}
+
 // DeletionRequestsView contains a flattened view of deletion requests
 // suitable for the index page.
 type DeletionRequestView struct {
@@ -67,10 +75,10 @@ func DeletionRequestViewGet(query *Query) (*DeletionRequestView, error) {
 // has been cancelled, is in progress, or complete, or whatever.
 func (request *DeletionRequestView) DisplayStatus() string {
 	if request.CancelledByID > 0 {
-		return "Cancelled"
+		return "Rejected"
 	}
 	if request.Status != "" {
 		return request.Status
 	}
-	return "Pending"
+	return "Awaiting Approval"
 }

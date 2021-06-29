@@ -1,6 +1,7 @@
 package forms
 
 import (
+	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/pgmodels"
 )
 
@@ -36,7 +37,7 @@ func (f *ObjectFilterForm) init() {
 		Name:        "access",
 		Label:       "Access",
 		Placeholder: "Access",
-		Options:     ObjectAccessList,
+		Options:     Options(constants.AccessSettings),
 	}
 	f.Fields["alt_identifier"] = &Field{
 		Name:        "alt_identifier",
