@@ -90,6 +90,10 @@ func initRoutes(router *gin.Engine) {
 
 	webRoutes := router.Group("/")
 	{
+		// Alerts
+		webRoutes.GET("/alerts/", web.AlertIndex)
+		webRoutes.GET("/alerts/show/:id/:user_id", web.AlertShow)
+
 		// Deletion Requests
 		// Note that these routes are for read-only views.
 		// Routes for initiating, approving and rejecting deletions

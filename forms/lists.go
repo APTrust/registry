@@ -70,6 +70,22 @@ func ListInstitutions(membersOnly bool) ([]ListOption, error) {
 	return options, nil
 }
 
+func ListUsers(institutionID int64) ([]ListOption, error) {
+	query := pgmodels.NewQuery().Columns("id", "name").OrderBy("name asc").Limit(200).Offset(0)
+	if institutionID > 0 {
+		query.Where("institution_id", "=", institutionID)
+	}
+	users, err := pgmodels.UserSelect(query)
+	if err != nil {
+		return nil, err
+	}
+	options := make([]ListOption, len(users))
+	for i, user := range users {
+		options[i] = ListOption{strconv.FormatInt(user.ID, 10), user.Name}
+	}
+	return options, nil
+}
+
 // Options returns a list of options for the given string list.
 // This is intended mainly to provide select list filters
 // for the web ui for constants such as:

@@ -54,6 +54,10 @@ func InstIDFor(resourceType string, resourceID int64) (id int64, err error) {
 	ctx := common.Context()
 	db := ctx.DB
 	switch resourceType {
+	case "Alert":
+		alert := &Alert{}
+		err = db.Model(alert).Column("institution_id").Where("id = ?", resourceID).Select()
+		id = alert.InstitutionID
 	case "Checksum":
 		cs := &Checksum{}
 		err = db.Model(cs).Column("_").Relation("GenericFile.institution_id").Where(`"checksum"."id" = ?`, resourceID).Select()
@@ -112,6 +116,7 @@ func FiltersFor(typeName string) []string {
 // Init function should register info about each model.
 func initFilters() {
 	filters = make(map[string][]string)
+	filters["Alert"] = AlertFilters
 	filters["DeletionRequest"] = DeletionRequestFilters
 	filters["GenericFile"] = GenericFileFilters
 	filters["IntellectualObject"] = IntellectualObjectFilters

@@ -1,0 +1,35 @@
+{{ define "alerts/_filters.html" }}
+
+<form id="alertFilterForm" method="get">
+
+  <div class="row">
+    <div class="column col-30">
+      {{ template "forms/select.html" .filterForm.Fields.type }}
+    </div>
+    <div class="column col-30">
+      {{ template "forms/date.html" .filterForm.Fields.created_at__gteq }}
+    </div>
+    <div class="column col-30">
+      {{ template "forms/date.html" .filterForm.Fields.created_at__lteq }}
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="column col-30">
+      {{ if .CurrentUser.IsAdmin }}
+      {{ template "forms/select.html" .filterForm.Fields.user_id }}
+      {{ end }}
+    </div>
+    <div class="column col-30">
+      {{ if .CurrentUser.IsAdmin }}
+      {{ template "forms/select.html" .filterForm.Fields.institution_id }}
+      {{ end }}
+    </div>
+    <div class="column col-30">
+      <input type="submit" value="Filter">
+    </div>
+  </div>
+
+</form>
+
+{{ end }}

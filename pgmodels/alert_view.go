@@ -4,6 +4,14 @@ import (
 	"time"
 )
 
+var AlertFilters = []string{
+	"created_at__gteq",
+	"created_at__lteq",
+	"institution_id",
+	"type",
+	"user_id",
+}
+
 type AlertView struct {
 	tableName             struct{}  `pg:"alerts_view"`
 	ID                    int64     `json:"id"`
@@ -21,10 +29,11 @@ type AlertView struct {
 	ReadAt                time.Time `json:"read_at"`
 }
 
-// AlertViewByID returns the alert with the specified id.
+// AlertViewForUser returns the alert with the specified ID
+// for the specified recipient (user id).
 // Returns pg.ErrNoRows if there is no match.
-func AlertViewByID(id int64) (*AlertView, error) {
-	query := NewQuery().Where(`"alerts_view"."id"`, "=", id)
+func AlertViewForUser(alertID, recipientID int64) (*AlertView, error) {
+	query := NewQuery().Where(`"alert_view"."id"`, "=", alertID).Where(`"alert_view"."user_id"`, "=", recipientID)
 	return AlertViewGet(query)
 }
 

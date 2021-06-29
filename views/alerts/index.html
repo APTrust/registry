@@ -1,0 +1,42 @@
+{{ define "alerts/index.html" }}
+
+{{ template "shared/_header.html" .}}
+
+{{ template "alerts/_filters.html" . }}
+
+{{ $isAdmin := .CurrentUser.IsAdmin }}
+
+<h1>Alerts</h1>
+
+<table>
+  <thead>
+    <tr>
+      {{ if $isAdmin }}
+      <th>Recipient</th>
+      {{ end }}
+      <th>Type</th>
+      <th>Subject</th>
+      <th>Created</th>
+      <th>Read</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{ range $index, $alert := .alerts }}
+    <tr class="clickable" onclick="window.location.href='/alerts/show/{{ $alert.ID }}/{{ $alert.UserID }}'">
+      {{ if $isAdmin }}
+      <td>{{ $alert.UserName }}</td>
+      {{ end }}
+      <td>{{ $alert.Type }}</td>
+      <td>{{ $alert.Subject }}</td>
+      <td>{{ dateUS $alert.CreatedAt }}</td>
+      <td>{{ dateUS $alert.ReadAt }}</td>
+    </tr>
+    {{ end }}
+  </tbody>
+</table>
+
+{{ template "shared/_pager.html" dict "pager" .pager }}
+
+{{ template "shared/_footer.html" .}}
+
+{{ end }}

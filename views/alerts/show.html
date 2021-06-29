@@ -1,0 +1,29 @@
+{{ define "alerts/show.html" }}
+
+{{ template "shared/_header.html" . }}
+
+<!-- Note: The object here is AlertView, not Alert. -->
+
+<h1>Alert</h1>
+
+<table>
+  <tbody>
+    <tr>
+      <th>To</th>
+      <td>{{ .alert.UserName }} - {{ dateUS .alert.CreatedAt }}</td>
+    </tr>
+    <tr>
+      <th>Subject</th>
+      <td>{{ .alert.Subject }}</td>
+    </tr>
+    <tr>
+      <th>Content</th>
+      <td>{{ .alert.Content }}</td>
+    </tr>
+  </tbody>
+</table>
+
+{{ template "shared/_footer.html" . }}
+
+
+{{ end }}
