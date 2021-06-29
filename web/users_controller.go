@@ -129,7 +129,8 @@ func UserEdit(c *gin.Context) {
 // GET /users/sign_in
 func UserSignInShow(c *gin.Context) {
 	c.HTML(200, "users/sign_in.html", gin.H{
-		"cover": helpers.GetCover(),
+		"cover":             helpers.GetCover(),
+		"preFillTestLogins": common.Context().Config.EnvName == "test",
 	})
 }
 

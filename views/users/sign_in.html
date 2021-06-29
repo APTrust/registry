@@ -61,8 +61,17 @@
     <div class="sign-in">
       <img src="/static/img/APTrustLogo.gif">
       <form action="/users/sign_in/" method="post">
+        {{ if .preFillTestLogins }}
+        <select name="email">
+          <option value="system@aptrust.org">system@aptrust.org (Sys Admin)</option>
+          <option value="admin@inst1.edu">admin@inst1.edu (Inst Admin)</option>
+          <option value="user@inst1.edu">user@inst1.edu (Inst User)</option>
+        </select>
+        <input type="password" name="password" placeholder="Password" value="password">
+        {{ else }}
         <input type="text" name="email" placeholder="Email address">
         <input type="password" name="password" placeholder="Password">
+        {{ end }}
         <div class="sign-in-submit">
           <input type="submit" value="Sign In">
         </div>
