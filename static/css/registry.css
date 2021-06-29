@@ -136,3 +136,17 @@ tr.total, tr.total td {
     font-weight: bold;
     cursor: pointer;
 }
+
+/*
+   pre with-wrap is used to display alert text, which is plain text,
+   but may have long lines.
+*/
+pre.with-wrap {
+    overflow-x: auto;
+    white-space: pre-wrap;
+    white-space: -moz-pre-wrap;
+    white-space: -pre-wrap;
+    white-space: -o-pre-wrap;
+    word-wrap: break-word;
+    padding: 1.2rem;
+}
