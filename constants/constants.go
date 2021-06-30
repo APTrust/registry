@@ -60,6 +60,8 @@ const (
 	IngestCleanup              = "ingest09_cleanup"
 	InstTypeMember             = "MemberInstitution"
 	InstTypeSubscriber         = "SubscriptionInstitution"
+	OutcomeFailure             = "Failure"
+	OutcomeSuccess             = "Success"
 	RoleInstAdmin              = "institutional_admin"
 	RoleInstUser               = "institutional_user"
 	RoleNone                   = "none"
@@ -136,6 +138,23 @@ var DigestAlgs = []string{
 	AlgSha1,
 	AlgSha256,
 	AlgSha512,
+}
+
+var EventOutcomes = []string{
+	OutcomeFailure,
+	OutcomeSuccess,
+}
+
+var EventTypes = []string{
+	EventAccessAssignment,
+	EventCreation,
+	EventDeletion,
+	EventDigestCalculation,
+	EventFixityCheck,
+	EventIdentifierAssignment,
+	EventIngestion,
+	EventReplication,
+	EventValidation,
 }
 
 var GlacierOnlyOptions = []string{

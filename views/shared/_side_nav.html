@@ -5,6 +5,8 @@
   {{ if .CurrentUser.IsAdmin }}
   <li><a href="/dashboard"><i class="fa fa-home"></i> Dashboard</a></li>
   <li><a href="/objects"><i class="fa fa-archive"></i> Objects</a></li>
+  <li><a href="/files"><i class="fa fa-file"></i> Files</a></li>
+  <li><a href="/events"><i class="fab fa-elementor"></i> Events</a></li>
   <li><a href="/work_items"><i class="fa fa-cog"></i> Work Items</a></li>
   <li><a href="/deletions"><i class="fa fa-backspace"></i> Deletions</a></li>
   <li><a href="/reports"><i class="fa fa-chart-line"></i> Reports</a></li>
@@ -20,6 +22,14 @@
 
   {{ if userCan .CurrentUser "ObjectRead" .CurrentUser.InstitutionID }}
   <li><a href="/objects?institution_id={{ .CurrentUser.InstitutionID }}"><i class="fa fa-archive"></i> Objects</a></li>
+  {{ end }}
+
+  {{ if userCan .CurrentUser "GenericFileRead" .CurrentUser.InstitutionID }}
+  <li><a href="/files?institution_id={{ .CurrentUser.InstitutionID }}"><i class="fa fa-file"></i> Objects</a></li>
+  {{ end }}
+
+  {{ if userCan .CurrentUser "EventRead" .CurrentUser.InstitutionID }}
+  <li><a href="/events?institution_id={{ .CurrentUser.InstitutionID }}"><i class="fab fa-elementor"></i> Objects</a></li>
   {{ end }}
 
   {{ if userCan .CurrentUser "WorkItemRead" .CurrentUser.InstitutionID }}

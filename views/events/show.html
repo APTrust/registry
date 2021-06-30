@@ -1,0 +1,59 @@
+{{ define "events/show.html" }}
+
+{{ template "shared/_header.html" .}}
+
+<h1>Premis Event</h1>
+
+<table>
+  <tbody>
+    <tr>
+      <th>Agent</th>
+      <td>{{ .event.Agent }}</td>
+    </tr>
+    <tr>
+      <th>Date/Time</th>
+      <td>{{ .event.DateTime }}</td>
+    </tr>
+    <tr>
+      <th>Detail</th>
+      <td>{{ .event.Detail }}</td>
+    </tr>
+    <tr>
+      <th>Event Type</th>
+      <td>{{ .event.EventType }}</td>
+    </tr>
+    <tr>
+      <th>Generic File</th>
+      <td><a href="/files/show/{{ .event.GenericFileID }}">{{ .event.GenericFileIdentifier }}</a></td>
+    </tr>
+    <tr>
+      <th>Event Identifier</th>
+      <td>{{ .event.Identifier }}</td>
+    </tr>
+    <tr>
+      <th>Institution</th>
+      <td><a href="/institutions/show/{{ .event.InstitutionID }}">{{ .event.InstitutionName }}</a></td>
+    </tr>
+    <tr>
+      <th>Object</th>
+      <td>{{ .event.Object }}</td>
+    </tr>
+    <tr>
+      <th>Outcome</th>
+      <td>{{ .event.Outcome }}</td>
+    </tr>
+    <tr>
+      <th>Outcome Detail</th>
+      <td>{{ .event.OutcomeDetail }}</td>
+    </tr>
+    <tr>
+      <th>Outcome Information</th>
+      <td>{{ .event.OutcomeInformation }}</td>
+    </tr>
+  </tbody>
+</table>
+
+
+{{ template "shared/_footer.html" .}}
+
+{{ end }}

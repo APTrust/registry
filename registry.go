@@ -104,18 +104,6 @@ func initRoutes(router *gin.Engine) {
 		// Dashboard
 		webRoutes.GET("/dashboard", web.DashboardShow)
 
-		// Institutions
-		webRoutes.POST("/institutions/new", web.InstitutionCreate)
-		webRoutes.DELETE("/institutions/delete/:id", web.InstitutionDelete)
-		webRoutes.GET("/institutions/delete/:id", web.InstitutionDelete)
-		webRoutes.GET("/institutions/undelete/:id", web.InstitutionUndelete)
-		webRoutes.GET("/institutions", web.InstitutionIndex)
-		webRoutes.GET("/institutions/new", web.InstitutionNew)
-		webRoutes.GET("/institutions/show/:id", web.InstitutionShow)
-		webRoutes.GET("/institutions/edit/:id", web.InstitutionEdit)
-		webRoutes.PUT("/institutions/edit/:id", web.InstitutionUpdate)
-		webRoutes.POST("/institutions/edit/:id", web.InstitutionUpdate)
-
 		// GenericFiles
 		webRoutes.GET("/files", web.GenericFileIndex)
 		webRoutes.GET("/files/show/:id", web.GenericFileShow)
@@ -128,6 +116,18 @@ func initRoutes(router *gin.Engine) {
 		webRoutes.POST("/files/init_restore/:id", web.GenericFileInitRestore)
 		webRoutes.GET("/files/delete/:id", web.GenericFileDelete)
 
+		// Institutions
+		webRoutes.POST("/institutions/new", web.InstitutionCreate)
+		webRoutes.DELETE("/institutions/delete/:id", web.InstitutionDelete)
+		webRoutes.GET("/institutions/delete/:id", web.InstitutionDelete)
+		webRoutes.GET("/institutions/undelete/:id", web.InstitutionUndelete)
+		webRoutes.GET("/institutions", web.InstitutionIndex)
+		webRoutes.GET("/institutions/new", web.InstitutionNew)
+		webRoutes.GET("/institutions/show/:id", web.InstitutionShow)
+		webRoutes.GET("/institutions/edit/:id", web.InstitutionEdit)
+		webRoutes.PUT("/institutions/edit/:id", web.InstitutionUpdate)
+		webRoutes.POST("/institutions/edit/:id", web.InstitutionUpdate)
+
 		// IntellectualObjects
 		webRoutes.GET("/objects", web.IntellectualObjectIndex)
 		webRoutes.GET("/objects/show/:id", web.IntellectualObjectShow)
@@ -139,8 +139,8 @@ func initRoutes(router *gin.Engine) {
 		webRoutes.GET("/objects/files/:id", web.IntellectualObjectFiles)
 
 		// PremisEvents
-		//webRoutes.GET("/events", web.PremisEventIndex)
-		//webRoutes.GET("/events/show/:id", web.PremisEventShow)
+		webRoutes.GET("/events", web.PremisEventIndex)
+		webRoutes.GET("/events/show/:id", web.PremisEventShow)
 		webRoutes.GET("/events/show_xhr/:id", web.PremisEventShowXHR)
 
 		// WorkItems - Web UI allows only list, show, and limited editing for admin only

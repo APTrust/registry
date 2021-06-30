@@ -1,0 +1,45 @@
+{{ define "events/_filters.html" }}
+
+<form id="eventFilterForm" method="get">
+
+  <div class="row">
+    <div class="column col-30">
+      {{ template "forms/select.html" .filterForm.Fields.event_type }}
+    </div>
+    <div class="column col-30">
+      {{ template "forms/select.html" .filterForm.Fields.outcome }}
+    </div>
+    <div class="column col-30">
+      {{ template "forms/text_input.html" .filterForm.Fields.identifier }}
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="column col-30">
+      {{ template "forms/text_input.html" .filterForm.Fields.intellectual_object_identifier }}
+    </div>
+    <div class="column col-30">
+      {{ template "forms/text_input.html" .filterForm.Fields.generic_file_identifier }}
+    </div>
+    <div class="column col-30">
+      {{ if .CurrentUser.IsAdmin }}
+      {{ template "forms/select.html" .filterForm.Fields.institution_id }}
+      {{ end }}
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="column col-30">
+      {{ template "forms/date.html" .filterForm.Fields.date_time__gteq }}
+    </div>
+    <div class="column col-30">
+      {{ template "forms/date.html" .filterForm.Fields.date_time__lteq }}
+    </div>
+    <div class="column col-30">
+      <input type="submit" value="Filter">
+    </div>
+  </div>
+
+</form>
+
+{{ end }}

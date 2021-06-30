@@ -1,0 +1,36 @@
+{{ define "events/index.html" }}
+
+{{ template "shared/_header.html" .}}
+
+<h1>Premis Events</h1>
+
+{{ template "events/_filters.html" . }}
+
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Date</th>
+      <th>Outcome</th>
+      <th>Object Identifier</th>
+      <th>File Identifier</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{ range $index, $event := .events }}
+    <tr class="clickable" onclick="window.location.href='/events/show/{{ $event.ID }}'">
+      <td>{{ $event.EventType }}</td>
+      <td>{{ dateUS $event.DateTime }}</td>
+      <td>{{ $event.Outcome }}</td>
+      <td>{{ truncate $event.IntellectualObjectIdentifier 80 }}</td>
+      <td>{{ truncate $event.GenericFileIdentifier 80 }}</td>
+    </tr>
+    {{ end }}
+  </tbody>
+</table>
+
+{{ template "shared/_pager.html" dict "pager" .pager }}
+
+{{ template "shared/_footer.html" .}}
+
+{{ end }}

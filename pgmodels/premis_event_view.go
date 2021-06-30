@@ -4,6 +4,17 @@ import (
 	"time"
 )
 
+var PremisEventFilters = []string{
+	"date_time__gteq",
+	"date_time__lteq",
+	"event_type",
+	"generic_file_identifier",
+	"identifier",
+	"institution_id",
+	"intellectual_object_identifier",
+	"outcome",
+}
+
 type PremisEventView struct {
 	tableName                    struct{}  `pg:"premis_events_view"`
 	ID                           int64     `json:"id" form:"id"`

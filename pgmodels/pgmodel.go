@@ -121,6 +121,7 @@ func initFilters() {
 	filters["GenericFile"] = GenericFileFilters
 	filters["IntellectualObject"] = IntellectualObjectFilters
 	filters["Institution"] = InstitutionFilters
+	filters["PremisEvent"] = PremisEventFilters
 	filters["User"] = UserFilters
 	filters["WorkItem"] = WorkItemFilters
 }
