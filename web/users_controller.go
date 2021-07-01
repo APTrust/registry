@@ -157,8 +157,44 @@ func UserSignOut(c *gin.Context) {
 	}
 	helpers.DeleteSessionCookie(c)
 	c.HTML(http.StatusOK, "users/sign_in.html", gin.H{
-		"cover": helpers.GetCover(),
+		"cover":             helpers.GetCover(),
+		"preFillTestLogins": common.Context().Config.EnvName == "test",
 	})
+}
+
+// UserShowChangePassword displays the change password page
+// for the user with the specified ID.
+//
+// GET /users/change_password/:id
+func UserShowChangePassword(c *gin.Context) {
+	// Force error if CurrentUser.ID != req.Auth.ResourceID
+}
+
+// UserChangePassword changes a user's password. The user gets
+// to specify what the new password will be.
+//
+// POST /users/change_password/:id
+func UserChangePassword(c *gin.Context) {
+	// Force error if CurrentUser.ID != req.Auth.ResourceID
+}
+
+// UserForcePasswordReset resets a user's password to something
+// random and sends them an email with a link that has an embedded
+// login token. When they follow the link, they'll be automatically
+// logged in and will have to choose a new password.
+//
+// POST /users/force_password_reset/:id
+func UserForcePasswordReset(c *gin.Context) {
+	// This is admin triggering a password reset for another user,
+	// so current user id does not need to match subject user id.
+}
+
+// UserGetAPIKey issues a new API key for the user, which replaces the
+// user's existing API key. This key will be displayed once only.
+//
+// POST /users/get_api_key/:id
+func UserGetAPIKey(c *gin.Context) {
+	// Force error if CurrentUser.ID != req.Auth.ResourceID
 }
 
 func SignInUser(c *gin.Context) (int, string, error) {

@@ -9,6 +9,7 @@ import (
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/gin-gonic/gin"
+	"github.com/stretchr/stew/slice"
 )
 
 // ResourceAuthorization contains information about the current request
@@ -78,7 +79,16 @@ func (r *ResourceAuthorization) getPermissionType() {
 
 func (r *ResourceAuthorization) checkPermission() {
 	currentUser := r.CurrentUser()
+
 	r.Approved = currentUser != nil && currentUser.HasPermission(r.Permission, r.ResourceInstID)
+
+	// Special checks for user viewing/updating their own
+	// account info.
+	if slice.Contains(constants.SelfAccountPermissions, r.Permission) && currentUser.ID != r.ResourceID {
+		fmt.Println("User", currentUser.ID, "doesn't have permission", r.Permission, "for other user", r.ResourceID)
+		r.Approved = false
+	}
+
 	r.Checked = true
 }
 

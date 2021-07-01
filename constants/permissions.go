@@ -134,6 +134,19 @@ var ForbiddenToAll = []Permission{
 	EventDelete,
 }
 
+// SelfAccountPermissions are those which permit users to modify their
+// own account information (password, email, name, API key, etc.).
+// These are treated specially in the auth middleware because unlike
+// other permissions, which are based on the subject resource's insitution id,
+// these are based on the subject resource's user id. See
+// ResourceAuthorization.checkPermission to understand how this specific
+// set of permissions is used.
+var SelfAccountPermissions = []Permission{
+	UserReadSelf,
+	UserUpdateSelf,
+	UserDeleteSelf,
+}
+
 var permissionsInitialized = false
 var permissionCount = len(Permissions)
 

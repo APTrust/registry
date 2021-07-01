@@ -20,23 +20,23 @@
   <li><a href="/dashboard?institution_id={{ .CurrentUser.InstitutionID }}"><i class="fa fa-home"></i> Dashboard</a></li>
   {{ end }}
 
-  {{ if userCan .CurrentUser "ObjectRead" .CurrentUser.InstitutionID }}
+  {{ if userCan .CurrentUser "IntellectualObjectRead" .CurrentUser.InstitutionID }}
   <li><a href="/objects?institution_id={{ .CurrentUser.InstitutionID }}"><i class="fa fa-archive"></i> Objects</a></li>
   {{ end }}
 
-  {{ if userCan .CurrentUser "GenericFileRead" .CurrentUser.InstitutionID }}
-  <li><a href="/files?institution_id={{ .CurrentUser.InstitutionID }}"><i class="fa fa-file"></i> Objects</a></li>
+  {{ if userCan .CurrentUser "FileRead" .CurrentUser.InstitutionID }}
+  <li><a href="/files?institution_id={{ .CurrentUser.InstitutionID }}"><i class="fa fa-file"></i> Files</a></li>
   {{ end }}
 
   {{ if userCan .CurrentUser "EventRead" .CurrentUser.InstitutionID }}
-  <li><a href="/events?institution_id={{ .CurrentUser.InstitutionID }}"><i class="fab fa-elementor"></i> Objects</a></li>
+  <li><a href="/events?institution_id={{ .CurrentUser.InstitutionID }}"><i class="fab fa-elementor"></i> Events</a></li>
   {{ end }}
 
   {{ if userCan .CurrentUser "WorkItemRead" .CurrentUser.InstitutionID }}
   <li><a href="/work_items?institution_id={{ .CurrentUser.InstitutionID }}"><i class="fa fa-cog"></i> Work Items</a></li>
   {{ end }}
 
-  {{ if userCan .CurrentUser "DeletionRequestRead" .CurrentUser.InstitutionID }}
+  {{ if userCan .CurrentUser "DeletionRequestList" .CurrentUser.InstitutionID }}
   <li><a href="/deletions?institution_id={{ .CurrentUser.InstitutionID }}"><i class="fa fa-backspace"></i> Deletions</a></li>
   {{ end }}
 
@@ -45,7 +45,7 @@
   {{ end }}
 
   {{ if userCan .CurrentUser "AlertRead" .CurrentUser.InstitutionID }}
-  <li><a href="/alerts"><i class="fa fa-bell"></i> Alerts</a></li>
+  <li><a href="/alerts?institution_id={{ .CurrentUser.InstitutionID }}&user_id={{ .CurrentUser.ID }}"><i class="fa fa-bell"></i> Alerts</a></li>
   {{ end }}
 
   {{ if userCan .CurrentUser "InstitutionRead" .CurrentUser.InstitutionID }}
