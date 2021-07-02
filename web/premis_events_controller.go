@@ -29,7 +29,8 @@ func PremisEventShowXHR(c *gin.Context) {
 func PremisEventIndex(c *gin.Context) {
 	req := NewRequest(c)
 	template := "events/index.html"
-	err := peIndexLoadEvents(req)
+	var events []*pgmodels.PremisEventView
+	err := req.LoadResourceList(&events, "date_time desc", forms.NewPremisEventFilterForm)
 	if AbortIfError(c, err) {
 		return
 	}
@@ -46,42 +47,4 @@ func PremisEventShow(c *gin.Context) {
 		return
 	}
 	c.HTML(http.StatusOK, "events/show.html", req.TemplateData)
-}
-
-func peIndexLoadEvents(req *Request) error {
-	filterCollection := req.GetFilterCollection()
-	query, err := filterCollection.ToQuery()
-	if err != nil {
-		return err
-	}
-	if !req.CurrentUser.IsAdmin() {
-		query.Where("institution_id", "=", req.CurrentUser.InstitutionID)
-	}
-	query.OrderBy("updated_at desc")
-
-	baseURL := req.GinContext.Request.URL.Path + "?" + req.GinContext.Request.URL.RawQuery
-	pager, err := NewPager(req.GinContext, baseURL, 20)
-	if err != nil {
-		return err
-	}
-
-	query.Offset(pager.QueryOffset).Limit(pager.PerPage)
-	events, err := pgmodels.PremisEventViewSelect(query)
-	if err != nil {
-		return err
-	}
-
-	count, err := query.Count(&pgmodels.PremisEvent{})
-	if err != nil {
-		return err
-	}
-	pager.SetCounts(count, len(events))
-
-	form, err := forms.NewPremisEventFilterForm(filterCollection, req.CurrentUser)
-
-	req.TemplateData["events"] = events
-	req.TemplateData["pager"] = pager
-	req.TemplateData["filterForm"] = form
-
-	return err
 }

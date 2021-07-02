@@ -105,7 +105,8 @@ func IntellectualObjectInitRestore(c *gin.Context) {
 func IntellectualObjectIndex(c *gin.Context) {
 	req := NewRequest(c)
 	template := "objects/index.html"
-	err := objIndexLoadObjects(req)
+	var objects []*pgmodels.IntellectualObjectView
+	err := req.LoadResourceList(&objects, "updated_at desc", forms.NewObjectFilterForm)
 	if AbortIfError(c, err) {
 		return
 	}
@@ -226,43 +227,5 @@ func loadEvents(req *Request, objID int64) error {
 	pager.SetCounts(totalEventCount, len(events))
 	req.TemplateData["events"] = events
 	req.TemplateData["eventPager"] = pager
-	return err
-}
-
-func objIndexLoadObjects(req *Request) error {
-	filterCollection := req.GetFilterCollection()
-	query, err := filterCollection.ToQuery()
-	if err != nil {
-		return err
-	}
-	if !req.CurrentUser.IsAdmin() {
-		query.Where("institution_id", "=", req.CurrentUser.InstitutionID)
-	}
-	query.OrderBy("updated_at desc")
-
-	baseURL := req.GinContext.Request.URL.Path + "?" + req.GinContext.Request.URL.RawQuery
-	pager, err := NewPager(req.GinContext, baseURL, 20)
-	if err != nil {
-		return err
-	}
-
-	query.Offset(pager.QueryOffset).Limit(pager.PerPage)
-	objects, err := pgmodels.IntellectualObjectViewSelect(query)
-	if err != nil {
-		return err
-	}
-
-	totalObjectCount, err := query.Count(&pgmodels.IntellectualObjectView{})
-	if err != nil {
-		return err
-	}
-	pager.SetCounts(totalObjectCount, len(objects))
-
-	form, err := forms.NewObjectFilterForm(filterCollection, req.CurrentUser)
-
-	req.TemplateData["objects"] = objects
-	req.TemplateData["pager"] = pager
-	req.TemplateData["filterForm"] = form
-
 	return err
 }

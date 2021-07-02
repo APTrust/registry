@@ -57,17 +57,6 @@ func InstitutionIndex(c *gin.Context) {
 	if AbortIfError(c, err) {
 		return
 	}
-	// filterCollection := req.GetFilterCollection()
-	// query, err := filterCollection.ToQuery()
-	// if AbortIfError(c, err) {
-	// 	return
-	// }
-	// query.OrderBy("name")
-	// institutions, err := pgmodels.InstitutionViewSelect(query)
-	// if AbortIfError(c, err) {
-	// 	return
-	// }
-	// req.TemplateData["institutions"] = institutions
 	c.HTML(http.StatusOK, template, req.TemplateData)
 }
 

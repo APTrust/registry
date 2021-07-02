@@ -71,6 +71,7 @@ func (req *Request) LoadResourceList(items interface{}, orderBy string, ffConstr
 	// Ensure that items is a pointer to a slice of pointers, so we don't
 	// get a panic in call to Elem() below.
 	if items == nil || !strings.HasPrefix(reflect.TypeOf(items).String(), "*[]*pgmodels.") {
+		common.Context().Log.Error().Msgf("Request.LoadResourceList: Param items should be pointer to slice of pointers.")
 		return common.ErrInvalidParam
 	}
 
