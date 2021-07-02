@@ -23,8 +23,8 @@ const (
 )
 
 var InstitutionFilters = []string{
-	"identifier__contains",
 	"name__contains",
+	"type",
 }
 
 type Institution struct {

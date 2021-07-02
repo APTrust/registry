@@ -4,6 +4,8 @@
 
 {{ template "deletions/_filters.html" . }}
 
+<!-- .items type is []DeletionRequestView -->
+
 <h1>Deletions</h1>
 
 <table>
@@ -18,7 +20,7 @@
     </tr>
   </thead>
   <tbody>
-    {{ range $index, $deletion := .deletions }}
+    {{ range $index, $deletion := .items }}
     <tr class="clickable" onclick="window.location.href='/deletions/show/{{ $deletion.ID }}'">
       <td>{{ $deletion.RequestedByName }}</td>
       <td>{{ dateUS $deletion.RequestedAt }}</td>

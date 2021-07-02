@@ -43,45 +43,10 @@ func DeletionRequestShow(c *gin.Context) {
 // GET /deletions
 func DeletionRequestIndex(c *gin.Context) {
 	req := NewRequest(c)
-	err := drIndexLoadDeletions(req)
+	var deletions []*pgmodels.DeletionRequestView
+	err := req.LoadResourceList(&deletions, "requested_at desc", forms.NewDeletionRequestFilterForm)
 	if AbortIfError(c, err) {
 		return
 	}
 	c.HTML(http.StatusOK, "deletions/index.html", req.TemplateData)
-}
-
-func drIndexLoadDeletions(req *Request) error {
-	filterCollection := req.GetFilterCollection()
-	query, err := filterCollection.ToQuery()
-	if err != nil {
-		return err
-	}
-	if !req.CurrentUser.IsAdmin() {
-		query.Where("institution_id", "=", req.CurrentUser.InstitutionID)
-	}
-	query.OrderBy("requested_at desc")
-	baseURL := req.GinContext.Request.URL.Path + "?" + req.GinContext.Request.URL.RawQuery
-	pager, err := NewPager(req.GinContext, baseURL, 20)
-	if err != nil {
-		return err
-	}
-	query.Offset(pager.QueryOffset).Limit(pager.PerPage)
-	deletions, err := pgmodels.DeletionRequestViewSelect(query)
-	if err != nil {
-		return err
-	}
-
-	totalRecordCount, err := query.Count(&pgmodels.DeletionRequestView{})
-	if err != nil {
-		return err
-	}
-	pager.SetCounts(totalRecordCount, len(deletions))
-
-	form, err := forms.NewDeletionRequestFilterForm(filterCollection, req.CurrentUser)
-
-	req.TemplateData["deletions"] = deletions
-	req.TemplateData["pager"] = pager
-	req.TemplateData["filterForm"] = form
-
-	return err
 }

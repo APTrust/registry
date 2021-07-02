@@ -2,8 +2,11 @@
 
 {{ template "shared/_header.html" .}}
 
+<!-- .items type is []*InstitutionView -->
+
 {{ if .CurrentUser.IsAdmin }}
 <div class="float-right"><a class="button" href="/institutions/new">New</a></div>
+{{ template "institutions/_filters.html" . }}
 {{ end }}
 
 <h1>Institutions</h1>
@@ -19,7 +22,7 @@
     </tr>
   </thead>
   <tbody>
-    {{ range $index, $inst := .institutions }}
+    {{ range $index, $inst := .items }}
       {{ $cssClass := "clickable" }}
       {{ if not $inst.DeactivatedAt.IsZero }}
         {{ $cssClass = "clickable row-disabled" }}

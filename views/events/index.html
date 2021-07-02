@@ -6,6 +6,8 @@
 
 {{ template "events/_filters.html" . }}
 
+<!-- .items type is []*PremisEventView -->
+
 <table>
   <thead>
     <tr>
@@ -17,7 +19,7 @@
     </tr>
   </thead>
   <tbody>
-    {{ range $index, $event := .events }}
+    {{ range $index, $event := .items }}
     <tr class="clickable" onclick="window.location.href='/events/show/{{ $event.ID }}'">
       <td>{{ $event.EventType }}</td>
       <td>{{ dateUS $event.DateTime }}</td>

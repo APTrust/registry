@@ -1,0 +1,19 @@
+{{ define "institutions/_filters.html" }}
+
+<form id="institutionFilterForm" method="get">
+
+  <div class="row">
+    <div class="column col-30">
+      {{ template "forms/text_input.html" .filterForm.Fields.name__contains }}
+    </div>
+    <div class="column col-30">
+      {{ template "forms/select.html" .filterForm.Fields.type }}
+    </div>
+    <div class="column col-30">
+      <input type="submit" value="Filter">
+    </div>
+  </div>
+
+</form>
+
+{{ end }}

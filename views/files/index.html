@@ -2,6 +2,8 @@
 
 {{ template "shared/_header.html" .}}
 
+<!-- .items type is []GenericFile (not view) -->
+
 <h1>Generic Files</h1>
 
 {{ template "files/_filters.html" . }}
@@ -17,7 +19,7 @@
     </tr>
   </thead>
   <tbody>
-    {{ range $index, $gf := .files }}
+    {{ range $index, $gf := .items }}
     <tr class="clickable" onclick="window.location.href='/files/show/{{ $gf.ID }}'">
       <td>{{ truncate $gf.Identifier 80 }}</td>
       <td>{{ humanSize $gf.Size }}</td>

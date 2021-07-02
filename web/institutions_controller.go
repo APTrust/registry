@@ -52,17 +52,22 @@ func InstitutionUndelete(c *gin.Context) {
 func InstitutionIndex(c *gin.Context) {
 	req := NewRequest(c)
 	template := "institutions/index.html"
-	filterCollection := req.GetFilterCollection()
-	query, err := filterCollection.ToQuery()
+	var institutions []*pgmodels.InstitutionView
+	err := req.LoadResourceList(&institutions, "name", forms.NewInstitutionFilterForm)
 	if AbortIfError(c, err) {
 		return
 	}
-	query.OrderBy("name")
-	institutions, err := pgmodels.InstitutionViewSelect(query)
-	if AbortIfError(c, err) {
-		return
-	}
-	req.TemplateData["institutions"] = institutions
+	// filterCollection := req.GetFilterCollection()
+	// query, err := filterCollection.ToQuery()
+	// if AbortIfError(c, err) {
+	// 	return
+	// }
+	// query.OrderBy("name")
+	// institutions, err := pgmodels.InstitutionViewSelect(query)
+	// if AbortIfError(c, err) {
+	// 	return
+	// }
+	// req.TemplateData["institutions"] = institutions
 	c.HTML(http.StatusOK, template, req.TemplateData)
 }
 

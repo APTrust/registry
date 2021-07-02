@@ -2,6 +2,8 @@
 
 {{ template "shared/_header.html" .}}
 
+<!-- .items type is []*IntellectualObjectView -->
+
 <h1>Objects</h1>
 
 {{ template "objects/_filters.html" . }}
@@ -17,7 +19,7 @@
     </tr>
   </thead>
   <tbody>
-    {{ range $index, $obj := .objects }}
+    {{ range $index, $obj := .items }}
     <tr class="clickable" onclick="window.location.href='/objects/show/{{ $obj.ID }}'">
       <td>
         {{ truncate $obj.Title 80 }}<br/>

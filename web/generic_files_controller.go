@@ -39,7 +39,8 @@ func GenericFileDelete(c *gin.Context) {
 func GenericFileIndex(c *gin.Context) {
 	req := NewRequest(c)
 	template := "files/index.html"
-	err := gfIndexLoadFiles(req)
+	var files []*pgmodels.GenericFile
+	err := req.LoadResourceList(&files, "updated_at desc", forms.NewFileFilterForm)
 	if AbortIfError(c, err) {
 		return
 	}
@@ -217,42 +218,4 @@ func GenericFileCancelDelete(c *gin.Context) {
 	}
 	req.TemplateData["deletionRequest"] = del.DeletionRequest
 	c.HTML(http.StatusOK, "files/deletion_cancelled.html", req.TemplateData)
-}
-
-func gfIndexLoadFiles(req *Request) error {
-	filterCollection := req.GetFilterCollection()
-	query, err := filterCollection.ToQuery()
-	if err != nil {
-		return err
-	}
-	if !req.CurrentUser.IsAdmin() {
-		query.Where("institution_id", "=", req.CurrentUser.InstitutionID)
-	}
-	query.OrderBy("updated_at desc")
-
-	baseURL := req.GinContext.Request.URL.Path + "?" + req.GinContext.Request.URL.RawQuery
-	pager, err := NewPager(req.GinContext, baseURL, 20)
-	if err != nil {
-		return err
-	}
-
-	query.Offset(pager.QueryOffset).Limit(pager.PerPage)
-	files, err := pgmodels.GenericFileSelect(query)
-	if err != nil {
-		return err
-	}
-
-	totalFileCount, err := query.Count(&pgmodels.GenericFile{})
-	if err != nil {
-		return err
-	}
-	pager.SetCounts(totalFileCount, len(files))
-
-	form, err := forms.NewFileFilterForm(filterCollection, req.CurrentUser)
-
-	req.TemplateData["files"] = files
-	req.TemplateData["pager"] = pager
-	req.TemplateData["filterForm"] = form
-
-	return err
 }
