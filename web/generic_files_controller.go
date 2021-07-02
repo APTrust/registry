@@ -239,7 +239,7 @@ func genericFileInitRestore(req *Request) (*pgmodels.GenericFile, *pgmodels.Inte
 	if err == nil {
 		ctx.Log.Info().Msgf("[GenericFileInitRestore] Marked WorkItem %d as queued", workItem.ID)
 	} else {
-		ctx.Log.Error().Msgf("[GenericFileInitRestore] Error saving WorkItem %s with QueuedAt timestamp for GenericFile %d: %v", workItem.ID, req.Auth.ResourceID, err)
+		ctx.Log.Error().Msgf("[GenericFileInitRestore] Error saving WorkItem %d with QueuedAt timestamp for GenericFile %d: %v", workItem.ID, req.Auth.ResourceID, err)
 	}
 
 	return gf, obj, workItem, err
