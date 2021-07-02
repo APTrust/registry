@@ -21,7 +21,7 @@
     </tr>
   </thead>
   <tbody>
-    {{ range $index, $alert := .alerts }}
+    {{ range $index, $alert := .items }}
     <tr class="clickable" onclick="window.location.href='/alerts/show/{{ $alert.ID }}/{{ $alert.UserID }}'">
       {{ if $isAdmin }}
       <td>{{ $alert.UserName }}</td>

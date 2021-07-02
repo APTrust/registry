@@ -2,8 +2,11 @@ package web
 
 import (
 	"fmt"
+	"reflect"
+	"strings"
 
 	"github.com/APTrust/registry/common"
+	"github.com/APTrust/registry/forms"
 	"github.com/APTrust/registry/helpers"
 	"github.com/APTrust/registry/middleware"
 	"github.com/APTrust/registry/pgmodels"
@@ -11,6 +14,7 @@ import (
 )
 
 type Request struct {
+	PathAndQuery string
 	CurrentUser  *pgmodels.User
 	GinContext   *gin.Context
 	Auth         *middleware.ResourceAuthorization
@@ -23,10 +27,15 @@ func NewRequest(c *gin.Context) *Request {
 	flash, _ := c.Get(ctx.Config.Cookies.FlashCookie)
 	currentUser := helpers.CurrentUser(c)
 	auth, _ := c.Get("ResourceAuthorization")
+	pathAndQuery := c.Request.URL.Path
+	if c.Request.URL.RawQuery != "" {
+		pathAndQuery = c.Request.URL.Path + "?" + c.Request.URL.RawQuery
+	}
 	req := &Request{
-		CurrentUser: currentUser,
-		GinContext:  c,
-		Auth:        auth.(*middleware.ResourceAuthorization),
+		PathAndQuery: pathAndQuery,
+		CurrentUser:  currentUser,
+		GinContext:   c,
+		Auth:         auth.(*middleware.ResourceAuthorization),
 		TemplateData: gin.H{
 			"CurrentUser": currentUser,
 			"flash":       flash,
@@ -56,4 +65,47 @@ func (req *Request) BaseURL() string {
 	scheme := common.Context().Config.HTTPScheme()
 	host := req.GinContext.Request.Host // host or host:port
 	return fmt.Sprintf("%s://%s", scheme, host)
+}
+
+func (req *Request) LoadResourceList(items interface{}, orderBy string, ffConstructor forms.FilterFormConstructor) error {
+	// Ensure that items is a pointer to a slice of pointers, so we don't
+	// get a panic in call to Elem() below.
+	if items == nil || !strings.HasPrefix(reflect.TypeOf(items).String(), "*[]*pgmodels.") {
+		return common.ErrInvalidParam
+	}
+
+	filterCollection := req.GetFilterCollection()
+	query, err := filterCollection.ToQuery()
+	if err != nil {
+		return err
+	}
+	if !req.CurrentUser.IsAdmin() {
+		query.Where("institution_id", "=", req.CurrentUser.InstitutionID)
+		if reflect.ValueOf(items).Elem().Type() == reflect.TypeOf([]*pgmodels.AlertView{}) {
+			query.Where("user_id", "=", req.CurrentUser.ID)
+		}
+	}
+	query.OrderBy(orderBy)
+	pager, err := NewPager(req.GinContext, req.PathAndQuery, 20)
+	if err != nil {
+		return err
+	}
+	query.Offset(pager.QueryOffset).Limit(pager.PerPage)
+	err = query.Select(items)
+	if err != nil {
+		return err
+	}
+	count, err := query.Count(items)
+	if err != nil {
+		return err
+	}
+	pager.SetCounts(count, reflect.ValueOf(items).Elem().Len())
+
+	form, err := ffConstructor(filterCollection, req.CurrentUser)
+
+	req.TemplateData["items"] = items
+	req.TemplateData["pager"] = pager
+	req.TemplateData["filterForm"] = form
+
+	return err
 }

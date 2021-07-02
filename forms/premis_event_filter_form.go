@@ -16,7 +16,7 @@ type PremisEventFilterForm struct {
 	instOptions       []ListOption
 }
 
-func NewPremisEventFilterForm(fc *pgmodels.FilterCollection, actingUser *pgmodels.User) (*PremisEventFilterForm, error) {
+func NewPremisEventFilterForm(fc *pgmodels.FilterCollection, actingUser *pgmodels.User) (FilterForm, error) {
 	f := &PremisEventFilterForm{
 		Form:             NewForm(nil, "events/_filters.html", "/events"),
 		FilterCollection: fc,

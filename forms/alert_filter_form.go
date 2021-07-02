@@ -17,7 +17,7 @@ type AlertFilterForm struct {
 	userOptions       []ListOption
 }
 
-func NewAlertFilterForm(fc *pgmodels.FilterCollection, actingUser *pgmodels.User) (*AlertFilterForm, error) {
+func NewAlertFilterForm(fc *pgmodels.FilterCollection, actingUser *pgmodels.User) (FilterForm, error) {
 	f := &AlertFilterForm{
 		Form:             NewForm(nil, "alerts/_filters.html", "/alerts"),
 		FilterCollection: fc,

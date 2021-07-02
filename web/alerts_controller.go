@@ -39,7 +39,9 @@ func AlertShow(c *gin.Context) {
 // GET /alerts
 func AlertIndex(c *gin.Context) {
 	req := NewRequest(c)
-	err := alIndexLoadAlerts(req)
+	//err := alIndexLoadAlerts(req)
+	var alerts []*pgmodels.AlertView
+	err := req.LoadResourceList(&alerts, "created_at desc", forms.NewAlertFilterForm)
 	if AbortIfError(c, err) {
 		return
 	}

@@ -13,7 +13,7 @@ type FileFilterForm struct {
 	instOptions       []ListOption
 }
 
-func NewFileFilterForm(fc *pgmodels.FilterCollection, actingUser *pgmodels.User) (*FileFilterForm, error) {
+func NewFileFilterForm(fc *pgmodels.FilterCollection, actingUser *pgmodels.User) (FilterForm, error) {
 	f := &FileFilterForm{
 		Form:             NewForm(nil, "files/_filters.html", "/files"),
 		FilterCollection: fc,

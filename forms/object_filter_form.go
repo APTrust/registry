@@ -14,7 +14,7 @@ type ObjectFilterForm struct {
 	instOptions       []ListOption
 }
 
-func NewObjectFilterForm(fc *pgmodels.FilterCollection, actingUser *pgmodels.User) (*ObjectFilterForm, error) {
+func NewObjectFilterForm(fc *pgmodels.FilterCollection, actingUser *pgmodels.User) (FilterForm, error) {
 	f := &ObjectFilterForm{
 		Form:             NewForm(nil, "objects/_filters.html", "/objects"),
 		FilterCollection: fc,

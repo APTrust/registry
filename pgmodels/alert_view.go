@@ -2,6 +2,8 @@ package pgmodels
 
 import (
 	"time"
+
+	"github.com/APTrust/registry/common"
 )
 
 var AlertFilters = []string{
@@ -49,4 +51,12 @@ func AlertViewSelect(query *Query) ([]*AlertView, error) {
 	var alerts []*AlertView
 	err := query.Select(&alerts)
 	return alerts, err
+}
+
+func (a *AlertView) Save() error {
+	return common.ErrNotSupported
+}
+
+func (a *AlertView) GetID() int64 {
+	return a.ID
 }

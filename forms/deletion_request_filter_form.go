@@ -14,7 +14,7 @@ type DeletionRequestFilterForm struct {
 	instOptions       []ListOption
 }
 
-func NewDeletionRequestFilterForm(fc *pgmodels.FilterCollection, actingUser *pgmodels.User) (*DeletionRequestFilterForm, error) {
+func NewDeletionRequestFilterForm(fc *pgmodels.FilterCollection, actingUser *pgmodels.User) (FilterForm, error) {
 	f := &DeletionRequestFilterForm{
 		Form:             NewForm(nil, "deletions/_filters.html", "/deletions"),
 		FilterCollection: fc,

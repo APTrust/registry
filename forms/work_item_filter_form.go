@@ -16,7 +16,7 @@ type WorkItemFilterForm struct {
 	instOptions       []ListOption
 }
 
-func NewWorkItemFilterForm(fc *pgmodels.FilterCollection, actingUser *pgmodels.User) (*WorkItemFilterForm, error) {
+func NewWorkItemFilterForm(fc *pgmodels.FilterCollection, actingUser *pgmodels.User) (FilterForm, error) {
 	f := &WorkItemFilterForm{
 		Form:             NewForm(nil, "work_items/_filters.html", "/work_items"),
 		FilterCollection: fc,

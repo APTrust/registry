@@ -9,6 +9,15 @@ import (
 	"github.com/go-pg/pg/v10"
 )
 
+// FilterFormConstructor describes the function signature for the
+// constructors of all our filter forms. Filter forms appear on
+// index pages, allowing users to filter lists by name, date, etc.
+type FilterFormConstructor func(*pgmodels.FilterCollection, *pgmodels.User) (FilterForm, error)
+
+type FilterForm interface {
+	SetValues()
+}
+
 type Form struct {
 	BaseURL  string
 	Error    error
