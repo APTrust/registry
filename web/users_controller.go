@@ -55,27 +55,11 @@ func UserUndelete(c *gin.Context) {
 func UserIndex(c *gin.Context) {
 	req := NewRequest(c)
 	template := "users/index.html"
-	query, err := getIndexQuery(c)
+	var users []*pgmodels.UserView
+	err := req.LoadResourceList(&users, "name asc", forms.NewUserFilterForm)
 	if AbortIfError(c, err) {
 		return
 	}
-
-	query.OrderBy("name asc")
-	req.TemplateData["selectedID"] = c.Query("institution_id")
-
-	users, err := pgmodels.UserViewSelect(query)
-	if AbortIfError(c, err) {
-		return
-	}
-	req.TemplateData["users"] = users
-
-	// Get institutions for filter list
-	institutionOptions, err := forms.ListInstitutions(false)
-	if AbortIfError(c, err) {
-		return
-	}
-	req.TemplateData["institutionOptions"] = institutionOptions
-
 	c.HTML(http.StatusOK, template, req.TemplateData)
 }
 

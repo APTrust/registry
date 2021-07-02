@@ -1,0 +1,31 @@
+{{ define "users/_filters.html" }}
+
+<form id="userFilterForm" method="get">
+
+  <div class="row">
+    <div class="column col-30">
+      {{ template "forms/text_input.html" .filterForm.Fields.name__contains }}
+    </div>
+    <div class="column col-30">
+      {{ template "forms/text_input.html" .filterForm.Fields.email__contains }}
+    </div>
+    <div class="column col-30">
+
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="column col-30">
+      {{ template "forms/select.html" .filterForm.Fields.institution_id }}
+    </div>
+    <div class="column col-30">
+      {{ template "forms/select.html" .filterForm.Fields.role }}
+    </div>
+    <div class="column col-30">
+      <input type="submit" value="Filter">
+    </div>
+  </div>
+
+</form>
+
+{{ end }}

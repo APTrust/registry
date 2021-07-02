@@ -29,12 +29,6 @@ const (
 	ErrUserPwdMissing   = "Encrypted password is missing."
 )
 
-var UserFilters = []string{
-	"email__contains",
-	"institution_id",
-	"name__contains",
-}
-
 // User is a person who can log in and do stuff.
 type User struct {
 	ID                     int64        `json:"id" form:"id" pg:"id"`

@@ -2,9 +2,14 @@ package pgmodels
 
 import (
 	"time"
-	//"github.com/APTrust/registry/common"
-	//"github.com/APTrust/registry/constants"
 )
+
+var UserFilters = []string{
+	"email__contains",
+	"institution_id",
+	"name__contains",
+	"role",
+}
 
 type UserView struct {
 	tableName              struct{}  `pg:"users_view"`

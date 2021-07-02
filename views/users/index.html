@@ -12,22 +12,7 @@
 <h1>Users</h1>
 
 {{ if .CurrentUser.IsAdmin }}
-<form method="get">
-  <div class="row">
-    <div class="column-50">
-      <select id="institution_id" name="institution_id">
-        <option value="">All Institutions</option>
-        {{ $selectedID := .selectedID }}
-        {{ range $index, $option := .institutionOptions }}
-        <option value="{{ $option.Value }}" {{ if eq $selectedID $option.Value }}selected{{ end}}>{{ $option.Text }}</option>
-        {{ end }}
-      </select>
-    </div>
-    <div class="column-25">
-      <input class="button-primary" type="submit" value="Filter">
-    </div>
-  </div>
-</form>
+{{ template "users/_filters.html" . }}
 {{ end }}
 
 <table>
@@ -43,8 +28,8 @@
     </tr>
   </thead>
   <tbody>
-    <!-- Obj type is UsersView, not User -->
-    {{ range $index, $user := .users }}
+    <!-- .items type is UsersView, not User -->
+    {{ range $index, $user := .items }}
       {{ $cssClass := "clickable" }}
       {{ if not $user.DeactivatedAt.IsZero }}
         {{ $cssClass = "clickable row-disabled" }}

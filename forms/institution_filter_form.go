@@ -7,7 +7,7 @@ import (
 )
 
 // InstitutionFilterForm is the form that displays filtering options for
-// the work item list page.
+// the institution list page.
 type InstitutionFilterForm struct {
 	Form
 	FilterCollection  *pgmodels.FilterCollection
