@@ -78,48 +78,10 @@ func GenericFileRequestRestore(c *gin.Context) {
 // POST /files/init_restore/:id
 func GenericFileInitRestore(c *gin.Context) {
 	req := NewRequest(c)
-	gf, err := pgmodels.GenericFileByID(req.Auth.ResourceID)
+	gf, obj, _, err := genericFileInitRestore(req)
 	if AbortIfError(c, err) {
 		return
 	}
-
-	// Make sure there are no pending work items...
-	pendingWorkItems, err := pgmodels.WorkItemsPendingForFile(gf.ID)
-	if AbortIfError(c, err) {
-		return
-	}
-	if len(pendingWorkItems) > 0 {
-		AbortIfError(c, common.ErrPendingWorkItems)
-		return
-	}
-
-	// Create the new restoration work item
-	obj, err := pgmodels.IntellectualObjectByID(gf.IntellectualObjectID)
-	if AbortIfError(c, err) {
-		return
-	}
-	workItem, err := pgmodels.NewRestorationItem(obj, gf, req.CurrentUser)
-	if AbortIfError(c, err) {
-		return
-	}
-
-	// Queue the new work item in NSQ
-	topic, err := constants.TopicFor(workItem.Action, workItem.Stage)
-	if AbortIfError(c, err) {
-		return
-	}
-	ctx := common.Context()
-	err = ctx.NSQClient.Enqueue(topic, workItem.ID)
-	if AbortIfError(c, err) {
-		return
-	}
-
-	workItem.QueuedAt = time.Now().UTC()
-	err = workItem.Save()
-	if AbortIfError(c, err) {
-		return
-	}
-
 	// Respond
 	msg := fmt.Sprintf("File %s has been queued for restoration.", gf.Identifier)
 	helpers.SetFlashCookie(c, msg)
@@ -218,4 +180,67 @@ func GenericFileCancelDelete(c *gin.Context) {
 	}
 	req.TemplateData["deletionRequest"] = del.DeletionRequest
 	c.HTML(http.StatusOK, "files/deletion_cancelled.html", req.TemplateData)
+}
+
+func genericFileInitRestore(req *Request) (*pgmodels.GenericFile, *pgmodels.IntellectualObject, *pgmodels.WorkItem, error) {
+	ctx := common.Context()
+	ctx.Log.Info().Msgf("[GenericFileInitRestore] Got restore request for GenericFile %d", req.Auth.ResourceID)
+	gf, err := pgmodels.GenericFileByID(req.Auth.ResourceID)
+	if err != nil {
+		ctx.Log.Error().Msgf("[GenericFileInitRestore] Error finding GenericFile %d: %v", req.Auth.ResourceID, err)
+		return nil, nil, nil, err
+	}
+
+	// Make sure there are no pending work items...
+	pendingWorkItems, err := pgmodels.WorkItemsPendingForFile(gf.ID)
+	if err != nil {
+		ctx.Log.Error().Msgf("[GenericFileInitRestore] Error finding pending WorkItems for GenericFile %d: %v", req.Auth.ResourceID, err)
+		return gf, nil, nil, err
+	}
+	if len(pendingWorkItems) > 0 {
+		ctx.Log.Warn().Msgf("[GenericFileInitRestore] GenericFile %d can't be restored due to pending work items (%s)", gf.ID, gf.Identifier)
+		return gf, nil, nil, common.ErrPendingWorkItems
+	}
+
+	// Create the new restoration work item
+	obj, err := pgmodels.IntellectualObjectByID(gf.IntellectualObjectID)
+	if err != nil {
+		ctx.Log.Error().Msgf("[GenericFileInitRestore] Error finding parent object of GenericFile %d (IntellectualObjectID = %d): %v", req.Auth.ResourceID, gf.IntellectualObjectID, err)
+		return gf, nil, nil, err
+	}
+	ctx.Log.Info().Msgf("[GenericFileInitRestore] Found Object %d for GenericFile %d", gf.ID, obj.ID)
+
+	workItem, err := pgmodels.NewRestorationItem(obj, gf, req.CurrentUser)
+	if err != nil {
+		ctx.Log.Error().Msgf("[GenericFileInitRestore] Error creating restoration WorkItem for GenericFile %d: %v", req.Auth.ResourceID, err)
+		return gf, obj, nil, err
+	}
+	ctx.Log.Info().Msgf("[GenericFileInitRestore] Created restoration WorkItem %d for GenericFile %d", workItem.ID, gf.ID)
+
+	// Get the name of the NSQ topic for file restorations
+	topic, err := constants.TopicFor(workItem.Action, workItem.Stage)
+	if err != nil {
+		ctx.Log.Error().Msgf("[GenericFileInitRestore] Error NSQ topic for GenericFile %d restoration (action=%s, stage=%s): %v", req.Auth.ResourceID, workItem.Action, workItem.Stage, err)
+		return gf, obj, workItem, err
+	}
+
+	// Queue the new work item in NSQ
+	err = ctx.NSQClient.Enqueue(topic, workItem.ID)
+	if err != nil {
+		ctx.Log.Error().Msgf("[GenericFileInitRestore] NSQ returned error when queueing GenericFile %d. WorkItem %d, topic=%s: %v", req.Auth.ResourceID, workItem.ID, topic, err)
+		return gf, obj, workItem, err
+	}
+	ctx.Log.Info().Msgf("[GenericFileInitRestore] Queued WorkItem %d in topic %s", workItem.ID, topic)
+
+	// Mark the WorkItem as queued
+	workItem.QueuedAt = time.Now().UTC()
+	err = workItem.Save()
+
+	if err == nil {
+		ctx.Log.Info().Msgf("[GenericFileInitRestore] Marked WorkItem %d as queued", workItem.ID)
+	} else {
+		ctx.Log.Error().Msgf("[GenericFileInitRestore] Error saving WorkItem %s with QueuedAt timestamp for GenericFile %d: %v", workItem.ID, req.Auth.ResourceID, err)
+	}
+
+	return gf, obj, workItem, err
 }

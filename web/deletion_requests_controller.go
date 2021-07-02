@@ -24,18 +24,10 @@ import (
 // GET /deletions/show/:id
 func DeletionRequestShow(c *gin.Context) {
 	req := NewRequest(c)
-	deletionRequest, err := pgmodels.DeletionRequestByID(req.Auth.ResourceID)
+	err := deletionRequestLoad(req)
 	if AbortIfError(c, err) {
 		return
 	}
-	req.TemplateData["deletionRequest"] = deletionRequest
-
-	if deletionRequest.WorkItemID > 0 {
-		req.TemplateData["workItemURL"] = fmt.Sprintf("%s/work_items/show/%d",
-			req.BaseURL(),
-			deletionRequest.WorkItemID)
-	}
-
 	c.HTML(http.StatusOK, "deletions/show.html", req.TemplateData)
 }
 
@@ -49,4 +41,19 @@ func DeletionRequestIndex(c *gin.Context) {
 		return
 	}
 	c.HTML(http.StatusOK, "deletions/index.html", req.TemplateData)
+}
+
+func deletionRequestLoad(req *Request) error {
+	deletionRequest, err := pgmodels.DeletionRequestByID(req.Auth.ResourceID)
+	if err != nil {
+		return err
+	}
+	req.TemplateData["deletionRequest"] = deletionRequest
+
+	if deletionRequest.WorkItemID > 0 {
+		req.TemplateData["workItemURL"] = fmt.Sprintf("%s/work_items/show/%d",
+			req.BaseURL(),
+			deletionRequest.WorkItemID)
+	}
+	return nil
 }
