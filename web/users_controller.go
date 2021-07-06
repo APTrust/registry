@@ -3,8 +3,10 @@ package web
 import (
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/APTrust/registry/common"
+	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/forms"
 	"github.com/APTrust/registry/helpers"
 	"github.com/APTrust/registry/pgmodels"
@@ -151,12 +153,7 @@ func UserSignOut(c *gin.Context) {
 //
 // GET /users/change_password/:id
 func UserShowChangePassword(c *gin.Context) {
-	req := NewRequest(c)
-	if req.CurrentUser.ID != req.Auth.ResourceID && !req.CurrentUser.IsAdmin() {
-		AbortIfError(c, common.ErrPermissionDenied)
-		return
-	}
-	userToEdit, err := pgmodels.UserByID(req.Auth.ResourceID)
+	req, userToEdit, err := reqAndUserForPwdEdit(c)
 	if AbortIfError(c, err) {
 		return
 	}
@@ -170,7 +167,68 @@ func UserShowChangePassword(c *gin.Context) {
 //
 // POST /users/change_password/:id
 func UserChangePassword(c *gin.Context) {
-	// Force error if CurrentUser.ID != req.Auth.ResourceID
+	req, userToEdit, err := reqAndUserForPwdEdit(c)
+	if AbortIfError(c, err) {
+		return
+	}
+	pwd := c.PostForm("NewPassword")
+	confirm := c.PostForm("ConfirmNewPassword")
+	if pwd != confirm {
+		err := fmt.Errorf("Passwords don't match.")
+		AbortIfError(c, err)
+		return
+	}
+	if !common.PasswordMeetsRequirements(pwd) {
+		AbortIfError(c, common.ErrPasswordReqs)
+		return
+	}
+	encPassword, err := common.EncryptPassword(pwd)
+	if AbortIfError(c, err) {
+		return
+	}
+	userToEdit.EncryptedPassword = encPassword
+	userToEdit.PasswordChangedAt = time.Now().UTC()
+	err = userToEdit.Save()
+	if AbortIfError(c, err) {
+		return
+	}
+	helpers.SetFlashCookie(c, "Password changed.")
+	redirectURL := fmt.Sprintf("/users/show/%d", userToEdit.ID)
+	if !req.CurrentUser.HasPermission(constants.UserRead, userToEdit.InstitutionID) {
+		redirectURL = fmt.Sprintf("/dashboard?institution_id=%d", req.CurrentUser.InstitutionID)
+	}
+	c.Redirect(http.StatusFound, redirectURL)
+}
+
+func reqAndUserForPwdEdit(c *gin.Context) (*Request, *pgmodels.User, error) {
+	req := NewRequest(c)
+	userToEdit, err := pgmodels.UserByID(req.Auth.ResourceID)
+	if err != nil {
+		return req, nil, err
+	}
+
+	// Let's be real clear about the permissions governing who can
+	// change a user's password.
+
+	// Is the current user editing him/herself?
+	isEditingSelf := req.CurrentUser.ID == req.Auth.ResourceID
+
+	// Is current user an inst admin editing a user at their own institution?
+	canEditInstUser := req.CurrentUser.HasPermission(constants.UserUpdate, userToEdit.InstitutionID)
+
+	// Is current user sys admin?
+	isSysAdmin := req.CurrentUser.IsAdmin()
+
+	// Does the current user meet any of the three use cases above
+	// that would allow them to change the password of the subject
+	// user (userToEdit)?
+	canEditSubject := isEditingSelf || canEditInstUser || isSysAdmin
+
+	if !canEditSubject {
+		return nil, nil, common.ErrPermissionDenied
+	}
+
+	return req, userToEdit, err
 }
 
 // UserForcePasswordReset resets a user's password to something

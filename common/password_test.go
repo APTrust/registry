@@ -70,3 +70,21 @@ func TestLooksEncrypted(t *testing.T) {
 	assert.True(t, common.LooksEncrypted(encrypted))
 	assert.False(t, common.LooksEncrypted("Barney Gumble"))
 }
+
+func TestPasswordMeetsRequirements(t *testing.T) {
+	// Too short
+	assert.False(t, common.PasswordMeetsRequirements("aBc1"))
+
+	// No uppercase
+	assert.False(t, common.PasswordMeetsRequirements("abc12345678"))
+
+	// No lowercase
+	assert.False(t, common.PasswordMeetsRequirements("ABC12345678"))
+
+	// No numeric
+	assert.False(t, common.PasswordMeetsRequirements("abcABCxyzXYZ"))
+
+	// Goldilocks! Just right!
+	assert.True(t, common.PasswordMeetsRequirements("abc123XYZ"))
+	assert.True(t, common.PasswordMeetsRequirements("IAmOk110"))
+}

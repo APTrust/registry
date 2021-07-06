@@ -3,10 +3,15 @@ package common
 import (
 	"crypto/rand"
 	"fmt"
+	"regexp"
 	"strings"
 
 	"golang.org/x/crypto/bcrypt"
 )
+
+var reLower = regexp.MustCompile(`[a-z]`)
+var reUpper = regexp.MustCompile(`[A-Z]`)
+var reNumeric = regexp.MustCompile(`[0-9]`)
 
 // Cost is the cost of the bcrypt digest. This is hard-coded at 10 to match
 // the value that Rails/Devise uses. We're porting a Rails database and we
@@ -48,4 +53,10 @@ func RandomToken() string {
 // we're not saving unencrypted passwords or tokens.
 func LooksEncrypted(s string) bool {
 	return strings.HasPrefix(s, EncryptedTokenPrefix)
+}
+
+// PasswordMeetsRequirements returns true if param pwd meets our
+// minimum password requirements.
+func PasswordMeetsRequirements(pwd string) bool {
+	return len(pwd) >= 8 && reLower.MatchString(pwd) && reUpper.MatchString(pwd) && reNumeric.MatchString(pwd)
 }

@@ -69,6 +69,10 @@ var ErrPendingWorkItems = errors.New("task cannot be completed because this obje
 // proceed with the requested action.
 var ErrInvalidToken = errors.New("invalid token")
 
+// ErrPasswordReqs indicates that the password the user is trying to set
+// does not meet minimum requirements.
+var ErrPasswordReqs = errors.New("password does not meet minimum requirements")
+
 // ErrInternal is a runtime error that is not the user's fault, hence
 // probably the programmer's fault.
 var ErrInternal = errors.New("internal server error")
