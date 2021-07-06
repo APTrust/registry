@@ -27,6 +27,7 @@ const (
 	ErrUserInstNotFound = "Internal error: cannot find institution."
 	ErrUserInvalidAdmin = "Sys Admin role is not valid for this institution."
 	ErrUserPwdMissing   = "Encrypted password is missing."
+	ErrUserPwdIncorrect = "Incorrect Password."
 )
 
 // User is a person who can log in and do stuff.

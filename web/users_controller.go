@@ -151,7 +151,18 @@ func UserSignOut(c *gin.Context) {
 //
 // GET /users/change_password/:id
 func UserShowChangePassword(c *gin.Context) {
-	// Force error if CurrentUser.ID != req.Auth.ResourceID
+	req := NewRequest(c)
+	if req.CurrentUser.ID != req.Auth.ResourceID && !req.CurrentUser.IsAdmin() {
+		AbortIfError(c, common.ErrPermissionDenied)
+		return
+	}
+	userToEdit, err := pgmodels.UserByID(req.Auth.ResourceID)
+	if AbortIfError(c, err) {
+		return
+	}
+	form := forms.NewPasswordResetForm(userToEdit)
+	req.TemplateData["form"] = form
+	c.HTML(http.StatusOK, form.Template, req.TemplateData)
 }
 
 // UserChangePassword changes a user's password. The user gets
