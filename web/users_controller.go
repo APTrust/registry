@@ -192,6 +192,10 @@ func UserChangePassword(c *gin.Context) {
 	if AbortIfError(c, err) {
 		return
 	}
+
+	// TODO: Create password change alert here.
+	// See account_alert.go
+
 	helpers.SetFlashCookie(c, "Password changed.")
 	redirectURL := fmt.Sprintf("/users/show/%d", userToEdit.ID)
 	if !req.CurrentUser.HasPermission(constants.UserRead, userToEdit.InstitutionID) {
