@@ -1,7 +1,6 @@
 package web
 
 import (
-	"bytes"
 	"fmt"
 	"time"
 
@@ -203,7 +202,7 @@ func (del *Deletion) CreateRequestAlert() (*pgmodels.Alert, error) {
 		"deletionReviewURL":   reviewURL,
 		"deletionReadOnlyURL": del.ReadOnlyURL(),
 	}
-	return del.createAlert(templateName, alertType, alertData)
+	return del.createDeletionAlert(templateName, alertType, alertData)
 }
 
 // CreateApprovalAlert creates an alert saying that an admin has approved
@@ -221,7 +220,7 @@ func (del *Deletion) CreateApprovalAlert() (*pgmodels.Alert, error) {
 		"workItemURL":         workItemURL,
 		"deletionReadOnlyURL": del.ReadOnlyURL(),
 	}
-	return del.createAlert(templateName, alertType, alertData)
+	return del.createDeletionAlert(templateName, alertType, alertData)
 }
 
 // CreateCancellationAlert creates an alert saying that an admin has
@@ -234,53 +233,24 @@ func (del *Deletion) CreateCancellationAlert() (*pgmodels.Alert, error) {
 		"deletionRequest":     del.DeletionRequest,
 		"deletionReadOnlyURL": del.ReadOnlyURL(),
 	}
-	return del.createAlert(templateName, alertType, alertData)
+	return del.createDeletionAlert(templateName, alertType, alertData)
 }
 
-// createAlert does the grunt work for all of the specific alert creation
-// methods.
-func (del *Deletion) createAlert(templateName, alertType string, alertData map[string]interface{}) (*pgmodels.Alert, error) {
+// createDeletionAlert does the grunt work for all of the specific
+// deletion alert creation methods.
+func (del *Deletion) createDeletionAlert(templateName, alertType string, alertData map[string]interface{}) (*pgmodels.Alert, error) {
 
-	// Create the alert text from the template...
-	tmpl := common.TextTemplates[templateName]
-	var buf bytes.Buffer
-	err := tmpl.Execute(&buf, alertData)
-	if err != nil {
-		return nil, err
-	}
-
-	// Create and save the alert, with our custom text,
-	// and make sure it's associated with the right
-	// recipients. In this case, it goes to institutional
-	// admins at the institution that owns the content.
 	alert := &pgmodels.Alert{
 		InstitutionID:     del.DeletionRequest.InstitutionID,
 		Type:              alertType,
 		Subject:           alertType,
 		DeletionRequestID: del.DeletionRequest.ID,
-		Content:           buf.String(),
 		CreatedAt:         time.Now().UTC(),
 		Users:             del.InstAdmins,
 	}
 
-	err = alert.Save()
-	if err != nil {
-		return nil, err
-	}
-
-	// Show the alert text in dev and test consoles,
-	// so we don't have to look it up in the DB.
-	// For dev/test, we need to see the review and
-	// confirmation URLS in this alert so we can
-	// review and test them.
-	envName := common.Context().Config.EnvName
-	if envName == "dev" || envName == "test" {
-		fmt.Println("***********************")
-		fmt.Println(alert.Content)
-		fmt.Println("***********************")
-	}
-
-	return alert, err
+	// createAlert is in account_alert.go
+	return createAlert(alert, templateName, alertData)
 }
 
 // ReviewURL returns the URL for an institutional admin to review
