@@ -238,15 +238,28 @@ func reqAndUserForPwdEdit(c *gin.Context) (*Request, *pgmodels.User, error) {
 	return req, userToEdit, err
 }
 
-// UserForcePasswordReset resets a user's password to something
+// UserInitPasswordReset resets a user's password to something
 // random and sends them an email with a link that has an embedded
 // login token. When they follow the link, they'll be automatically
 // logged in and will have to choose a new password.
 //
-// POST /users/force_password_reset/:id
-func UserForcePasswordReset(c *gin.Context) {
+// GET /users/init_password_reset/:id
+func UserInitPasswordReset(c *gin.Context) {
 	// This is admin triggering a password reset for another user,
 	// so current user id does not need to match subject user id.
+}
+
+// UserCompletePasswordReset allows a user to complete the password
+// reset process.
+//
+// GET /users/complete_password_reset/:id
+func UserCompletePasswordReset(c *gin.Context) {
+	// Check token, log the user in, and force them to
+	// pick a new password before moving on.
+	// Show the password change form and don't let the
+	// user off this page until they've changed their
+	// password. If token is invalid, return forbidden and
+	// log the attempt.
 }
 
 // UserGetAPIKey issues a new API key for the user, which replaces the
