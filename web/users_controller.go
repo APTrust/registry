@@ -193,8 +193,10 @@ func UserChangePassword(c *gin.Context) {
 		return
 	}
 
-	// TODO: Create password change alert here.
-	// See account_alert.go
+	// Create a password changed alert, so we know this
+	// happened and user knows too. If user gets a suspicious
+	// "password changed" alert, they can contact us.
+	_, err = CreatePasswordChangedAlert(req, userToEdit)
 
 	helpers.SetFlashCookie(c, "Password changed.")
 	redirectURL := fmt.Sprintf("/users/show/%d", userToEdit.ID)

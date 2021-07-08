@@ -3,20 +3,34 @@ package web
 import (
 	"bytes"
 	"fmt"
-	// "time"
+	"time"
 
 	"github.com/APTrust/registry/common"
-	// "github.com/APTrust/registry/constants"
+	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/pgmodels"
 )
-
-// TODO: Refactor Deletion.createAlert() so it's reusable.
 
 // CreatePasswordChangedAlert creates an alert telling a user that
 // their password has been changed. It should say who changed the
 // password, from where (IP address) and when.
-func CreatePasswordChangedAlert() {
-
+func CreatePasswordChangedAlert(req *Request, userToEdit *pgmodels.User) (*pgmodels.Alert, error) {
+	templateName := "alerts/password_changed.txt"
+	alertData := map[string]interface{}{
+		"registryURL": req.BaseURL(),
+		"userName":    req.CurrentUser.Name,
+		"changeDate":  time.Now().Format(time.RFC3339),
+		"userAgent":   req.GinContext.GetHeader("User-Agent"),
+		"ipAddress":   req.GinContext.ClientIP(),
+	}
+	recipients := []*pgmodels.User{userToEdit}
+	alert := &pgmodels.Alert{
+		InstitutionID: userToEdit.InstitutionID,
+		Type:          constants.AlertPasswordChanged,
+		Subject:       "Your APTrust password has been changed",
+		CreatedAt:     time.Now().UTC(),
+		Users:         recipients,
+	}
+	return createAlert(alert, templateName, alertData)
 }
 
 // CreatePasswordResetAlert creates an alert telling a user to

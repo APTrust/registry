@@ -23,6 +23,8 @@ const (
 	AlertDeletionConfirmed     = "Deletion Confirmed"
 	AlertDeletionRequested     = "Deletion Requested"
 	AlertFailedFixity          = "Failed Fixity Check"
+	AlertPasswordChanged       = "Password Changed"
+	AlertPasswordReset         = "Password Reset"
 	AlertRestorationCompleted  = "Restoration Completed"
 	AlertStalledItems          = "Stalled Work Items"
 	AlgMd5                     = "md5"
@@ -124,6 +126,8 @@ var AlertTypes = []string{
 	AlertDeletionRequested,
 	AlertFailedFixity,
 	AlertRestorationCompleted,
+	AlertPasswordChanged,
+	AlertPasswordReset,
 	AlertStalledItems,
 }
 
