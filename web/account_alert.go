@@ -43,12 +43,13 @@ func CreatePasswordResetAlert(req *Request, userToEdit *pgmodels.User) (*pgmodel
 	templateName := "alerts/reset_password.txt"
 
 	// TODO: encrypt reset token
+	token := ""
 	//userToEdit.ResetPasswordToken = ""
 	userToEdit.ForcePasswordUpdate = true
 	userToEdit.ResetPasswordSentAt = time.Now().UTC()
 
 	alertData := map[string]interface{}{
-		"registryURL": fmt.Sprintf("%s/complete_password_reset/%d?token=%s", req.BaseURL(), userToEdit.ID),
+		"registryURL": fmt.Sprintf("%s/complete_password_reset/%d?token=%s", req.BaseURL(), userToEdit.ID, token),
 	}
 	recipients := []*pgmodels.User{userToEdit}
 	alert := &pgmodels.Alert{
