@@ -159,6 +159,7 @@ func UserShowChangePassword(c *gin.Context) {
 	}
 	form := forms.NewPasswordResetForm(userToEdit)
 	req.TemplateData["form"] = form
+	req.TemplateData["user"] = userToEdit
 	c.HTML(http.StatusOK, form.Template, req.TemplateData)
 }
 

@@ -9,6 +9,10 @@
   {{ if userCan .CurrentUser "UserDelete" .user.InstitutionID }}
   <div class="float-right"><a class="button" href="/users/delete/{{ .user.ID }}">Deactivate</a></div>
   {{ end }}
+  {{ if userCan .CurrentUser "UserUpdate" .user.InstitutionID }}
+  <div class="float-right"><a class="button" href="/users/change_password/{{ .user.ID }}">Change Password</a></div>
+  {{ end }}
+
 {{ else }}
   {{ if userCan .CurrentUser "UserUpdate" .user.InstitutionID }}
   <div class="float-right"><a class="button" href="/users/undelete/{{ .user.ID }}">Reactivate</a></div>
