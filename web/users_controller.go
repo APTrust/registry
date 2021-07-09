@@ -161,6 +161,22 @@ func UserShowChangePassword(c *gin.Context) {
 	form := forms.NewPasswordResetForm(userToEdit)
 	req.TemplateData["form"] = form
 	req.TemplateData["user"] = userToEdit
+
+	// Not the prettiest solution, but for now, don't show
+	// top and side nav if user is editing their own password.
+	// On a forced password reset, we want the user to change
+	// their password, not navigate to another page.
+	//
+	// This may annoy users changing their own password, and
+	// it won't deter anyone from manually typing in a URL,
+	// but it will suffice for now. No sense building in complex
+	// logic now if ST is going to redo the UI anyway.
+	// We'll come back to this one.
+	if req.CurrentUser.ID == userToEdit.ID {
+		req.TemplateData["suppressTopNav"] = true
+		req.TemplateData["suppressSideNav"] = true
+	}
+
 	c.HTML(http.StatusOK, form.Template, req.TemplateData)
 }
 
