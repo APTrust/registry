@@ -1,0 +1,88 @@
+{{ define "users/my_account.html" }}
+
+{{ template "shared/_header.html" .}}
+
+{{ if userCan .CurrentUser "UserUpdateSelf" .CurrentUser.InstitutionID }}
+  <div class="float-right"><a class="button" href="/users/change_password/{{ .CurrentUser.ID }}">Change Password</a></div>
+  <div class="float-right"><a class="button" href="javascript:getAPIKey()">Get API Key</a></div>
+{{ end }}
+
+
+<h1>{{ .CurrentUser.Name }}</h1>
+<h3>{{ roleName .CurrentUser.Role }} at {{ .CurrentUser.Institution.Name }}</h3>
+
+<table>
+  <tbody>
+    <tr>
+      <th>Email</th><td>{{ .CurrentUser.Email }}</td>
+    </tr>
+    <tr>
+      <th>Verified</th><td>{{ yesNo .CurrentUser.EmailVerified }}</td>
+    </tr>
+    <tr>
+      <th>Phone</th><td>{{ .CurrentUser.PhoneNumber }}</td>
+    </tr>
+    <tr>
+      <th>Last Updated</th><td>{{ dateUS .CurrentUser.UpdatedAt }}</td>
+    </tr>
+    <tr>
+      <th>Sign In Count</th><td>{{ .CurrentUser.SignInCount }}</td>
+    </tr>
+    <tr>
+      <th>Current Sign In</th><td>{{ dateUS .CurrentUser.CurrentSignInAt }} from {{ .CurrentUser.CurrentSignInIP }}</td>
+    </tr>
+    <tr>
+      <th>Last Sign In</th><td>{{ dateUS .CurrentUser.LastSignInAt }} from {{ .CurrentUser.LastSignInIP }}</td>
+    </tr>
+    <tr>
+      <th>Initial Password Updated</th><td>{{ yesNo .CurrentUser.InitialPasswordUpdated }}</td>
+    </tr>
+    <tr>
+      <th>Force Password Update?</th><td>{{ yesNo .CurrentUser.ForcePasswordUpdate }}</td>
+    </tr>
+    <tr>
+      <th>Deactivated</th><td>{{ dateUS .CurrentUser.DeactivatedAt }}</td>
+    </tr>
+    <tr>
+      <th>2FA Required</th><td>{{ yesNo .CurrentUser.OTPRequiredForLogin }}</td>
+    </tr>
+    <tr>
+      <th>2FA Enabled</th><td>{{ yesNo .CurrentUser.EnabledTwoFactor }}</td>
+    </tr>
+    <tr>
+      <th>2FA Confirmed</th><td>{{ yesNo .CurrentUser.ConfirmedTwoFactor }}</td>
+    </tr>
+    <tr>
+      <th>2FA Required By</th><td>{{ dateUS .CurrentUser.GracePeriod }}</td>
+    </tr>
+    <tr>
+      <th>Authy Status</th><td>{{ .CurrentUser.AuthyStatus }}</td>
+    </tr>
+    <tr>
+      <th>Authy ID</th><td>{{ .CurrentUser.AuthyID }}</td>
+    </tr>
+    <tr>
+      <th>Last Authy SignIn</th><td>{{ dateUS .CurrentUser.LastSignInWithAuthy }}</td>
+    </tr>
+    <tr>
+  </tbody>
+</table>
+
+
+<form name="apiKeyForm" action="/users/get_api_key/{{ .CurrentUser.ID }}" method="post">
+  <input type="hidden" name="id" value="{{ .CurrentUser.ID }}">
+  <!-- TODO: Need CSRF token. -->
+</form>
+
+<script>
+ function getAPIKey() {
+     if (confirm("Do you want to get a new API key? This will invalidate your existing key if you have one.")) {
+         document.forms["apiKeyForm"].submit()
+     }
+ }
+</script>
+
+
+{{ template "shared/_footer.html" .}}
+
+{{ end }}

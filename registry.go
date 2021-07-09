@@ -163,6 +163,7 @@ func initRoutes(router *gin.Engine) {
 		webRoutes.GET("/users/edit/:id", web.UserEdit)
 		webRoutes.PUT("/users/edit/:id", web.UserUpdate)
 		webRoutes.POST("/users/edit/:id", web.UserUpdate)
+		webRoutes.GET("/users/my_account", web.UserMyAccount)
 		webRoutes.GET("/users/change_password/:id", web.UserShowChangePassword)
 		webRoutes.POST("/users/change_password/:id", web.UserChangePassword)
 		webRoutes.GET("/users/init_password_reset/:id", web.UserInitPasswordReset)

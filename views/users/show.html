@@ -14,7 +14,7 @@
   <div class="float-right"><a class="button" href="javascript:forcePasswordReset()">Force Password Reset</a></div>
   {{ end }}
 
-{{ else }}
+{{ else }} <!-- User is deactivated. Just show reactivation button. -->
   {{ if userCan .CurrentUser "UserUpdate" .user.InstitutionID }}
   <div class="float-right"><a class="button" href="/users/undelete/{{ .user.ID }}">Reactivate</a></div>
   {{ end }}

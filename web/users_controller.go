@@ -347,7 +347,37 @@ func UserCompletePasswordReset(c *gin.Context) {
 //
 // POST /users/get_api_key/:id
 func UserGetAPIKey(c *gin.Context) {
-	// Force error if CurrentUser.ID != req.Auth.ResourceID
+	req := NewRequest(c)
+	if req.CurrentUser.ID != req.Auth.ResourceID {
+		common.Context().Log.Warn().Msgf("Permission denied: User %d requested API key for user %d", req.CurrentUser.ID, req.Auth.ResourceID)
+		AbortIfError(c, common.ErrPermissionDenied)
+	}
+	apiKey := common.RandomToken()
+	encKey, err := common.EncryptPassword(apiKey)
+	if AbortIfError(c, err) {
+		return
+	}
+	req.CurrentUser.EncryptedAPISecretKey = encKey
+	err = req.CurrentUser.Save()
+	if AbortIfError(c, err) {
+		return
+	}
+
+	req.TemplateData["user"] = req.CurrentUser
+	req.TemplateData["apiKey"] = apiKey
+	c.HTML(http.StatusOK, "users/show_api_key.html", req.TemplateData)
+}
+
+// UserMyAccount displays the user's account info. From this page, they
+// can see account details, change their password, and get an API key.
+//
+// GET /users/my_account
+func UserMyAccount(c *gin.Context) {
+	req := NewRequest(c)
+
+	// TODO: Need CSRF token here!
+
+	c.HTML(http.StatusOK, "users/my_account.html", req.TemplateData)
 }
 
 func SignInUser(c *gin.Context) (int, string, error) {
