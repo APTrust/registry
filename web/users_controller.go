@@ -3,6 +3,7 @@ package web
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/APTrust/registry/common"
@@ -272,16 +273,57 @@ func UserInitPasswordReset(c *gin.Context) {
 }
 
 // UserCompletePasswordReset allows a user to complete the password
-// reset process.
+// reset process. Note that this is one of the few pages that does
+// not require a login.
 //
 // GET /users/complete_password_reset/:id
 func UserCompletePasswordReset(c *gin.Context) {
-	// Check token, log the user in, and force them to
-	// pick a new password before moving on.
-	// Show the password change form and don't let the
-	// user off this page until they've changed their
-	// password. If token is invalid, return forbidden and
-	// log the attempt.
+	userID, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if userID == 0 || err != nil {
+		AbortIfError(c, common.ErrInvalidParam)
+		return
+	}
+	token := c.Query("token")
+	if token == "" {
+		AbortIfError(c, common.ErrInvalidToken)
+		return
+	}
+	user, err := pgmodels.UserByID(userID)
+	if AbortIfError(c, err) {
+		return
+	}
+	if !user.DeactivatedAt.IsZero() {
+		AbortIfError(c, common.ErrAccountDeactivated)
+		return
+	}
+	if !common.ComparePasswords(user.ResetPasswordToken, token) {
+		AbortIfError(c, common.ErrInvalidToken)
+		return
+	}
+
+	user.ResetPasswordToken = ""
+	user.ResetPasswordSentAt = time.Time{}
+	user.SignInCount = user.SignInCount + 1
+	if user.CurrentSignInIP != "" {
+		user.LastSignInIP = user.CurrentSignInIP
+	}
+	if user.CurrentSignInAt.IsZero() {
+		user.LastSignInAt = user.CurrentSignInAt
+	}
+	user.CurrentSignInIP = c.ClientIP()
+	user.CurrentSignInAt = time.Now().UTC()
+	err = user.Save()
+	if AbortIfError(c, err) {
+		return
+	}
+
+	err = helpers.SetSessionCookie(c, user)
+	if AbortIfError(c, err) {
+		return
+	}
+	c.Set("CurrentUser", user)
+	pageURL := fmt.Sprintf("/users/change_password/%d", user.ID)
+	c.Redirect(http.StatusFound, pageURL)
 }
 
 // UserGetAPIKey issues a new API key for the user, which replaces the
