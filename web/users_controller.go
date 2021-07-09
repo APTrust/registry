@@ -247,6 +247,28 @@ func reqAndUserForPwdEdit(c *gin.Context) (*Request, *pgmodels.User, error) {
 func UserInitPasswordReset(c *gin.Context) {
 	// This is admin triggering a password reset for another user,
 	// so current user id does not need to match subject user id.
+	req, userToEdit, err := reqAndUserForPwdEdit(c)
+	if AbortIfError(c, err) {
+		return
+	}
+	token := common.RandomToken()
+	encryptedToken, err := common.EncryptPassword(token)
+	if AbortIfError(c, err) {
+		return
+	}
+	userToEdit.ResetPasswordToken = encryptedToken
+	userToEdit.ForcePasswordUpdate = true
+	err = userToEdit.Save()
+	if AbortIfError(c, err) {
+		return
+	}
+	_, err = CreatePasswordResetAlert(req, userToEdit, token)
+	if AbortIfError(c, err) {
+		return
+	}
+
+	req.TemplateData["user"] = userToEdit
+	c.HTML(http.StatusOK, "users/reset_password_initiated.html", req.TemplateData)
 }
 
 // UserCompletePasswordReset allows a user to complete the password

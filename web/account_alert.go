@@ -39,17 +39,10 @@ func CreatePasswordChangedAlert(req *Request, userToEdit *pgmodels.User) (*pgmod
 // when a user clicks the "Forgot Password" link on the login page
 // and when an admin creates a new user account. In each case, the
 // user clicks the email link and then has to set a new password.
-func CreatePasswordResetAlert(req *Request, userToEdit *pgmodels.User) (*pgmodels.Alert, error) {
+func CreatePasswordResetAlert(req *Request, userToEdit *pgmodels.User, token string) (*pgmodels.Alert, error) {
 	templateName := "alerts/reset_password.txt"
-
-	// TODO: encrypt reset token
-	token := ""
-	//userToEdit.ResetPasswordToken = ""
-	userToEdit.ForcePasswordUpdate = true
-	userToEdit.ResetPasswordSentAt = time.Now().UTC()
-
 	alertData := map[string]interface{}{
-		"registryURL": fmt.Sprintf("%s/complete_password_reset/%d?token=%s", req.BaseURL(), userToEdit.ID, token),
+		"passwordResetURL": fmt.Sprintf("%s/complete_password_reset/%d?token=%s", req.BaseURL(), userToEdit.ID, token),
 	}
 	recipients := []*pgmodels.User{userToEdit}
 	alert := &pgmodels.Alert{
@@ -59,7 +52,14 @@ func CreatePasswordResetAlert(req *Request, userToEdit *pgmodels.User) (*pgmodel
 		CreatedAt:     time.Now().UTC(),
 		Users:         recipients,
 	}
-	return createAlert(alert, templateName, alertData)
+	alert, err := createAlert(alert, templateName, alertData)
+
+	if err == nil {
+		userToEdit.ResetPasswordSentAt = time.Now().UTC()
+		err = userToEdit.Save()
+	}
+
+	return alert, err
 }
 
 // createAlert adds customized text to the alert and saves it in the

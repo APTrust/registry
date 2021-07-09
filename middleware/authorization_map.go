@@ -104,6 +104,7 @@ var AuthMap = map[string]AuthMetadata{
 	"UserEdit":                           {"User", constants.UserUpdate},
 	"UserGetAPIKey":                      {"User", constants.UserUpdateSelf},
 	"UserIndex":                          {"User", constants.UserRead},
+	"UserInitPasswordReset":              {"User", constants.UserUpdate},
 	"UserNew":                            {"User", constants.UserCreate},
 	"UserReadSelf":                       {"User", constants.UserReadSelf},
 	"UserShow":                           {"User", constants.UserRead},
