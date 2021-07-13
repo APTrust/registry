@@ -1,0 +1,27 @@
+{{ define "deletions/cancelled_object.html" }}
+
+{{ template "shared/_header.html" .}}
+
+{{ $obj := (index .deletionRequest.IntellectualObjects 0) }}
+
+<h1>Deletion Cancelled</h1>
+
+<p>You have cancelled deletion of the following object:</p>
+
+<p>
+  <b>{{ $obj.Identifier }}</b><br/>
+  Alt Identifier: {{ $obj.AltIdentifier }} <br/>
+  Internal Sender Identifier: {{ $obj.InternalSenderIdentifier }} <br/>
+  Bag Group: {{ $obj.BagGroupIdentifier }} <br/>
+  Storage Option: {{ $obj.StorageOption }} <br/>
+  Created: {{ dateUS $obj.CreatedAt }} <br/>
+  Updated: {{ dateUS $obj.UpdatedAt }} <br/>
+  Requested: {{ .deletionRequest.RequestedBy.Name }} on {{ dateUS .deletionRequest.RequestedAt }} <br/>
+  Cancelled: {{ .deletionRequest.CancelledBy.Name }}  on {{ dateUS .deletionRequest.CancelledAt }} <br/>
+</p>
+
+<p>This object will <b>NOT</b> be deleted from preservation storage, and no one else will be able to approve this deletion request. If anyone wants to delete this object, they'll need to submit a new request.</p>
+
+{{ template "shared/_footer.html" .}}
+
+{{ end }}

@@ -1,0 +1,29 @@
+{{ define "deletions/approved_object.html" }}
+
+{{ template "shared/_header.html" .}}
+
+{{ $obj := (index .deletionRequest.IntellectualObjects 0) }}
+
+<h1>Deletion Approved</h1>
+
+<p>You have approved deletion of the following object:</p>
+
+<p>
+  <b>{{ $obj.Identifier }}</b><br/>
+  Alt Identifier: {{ $obj.AltIdentifier }} <br/>
+  Internal Sender Identifier: {{ $obj.InternalSenderIdentifier }} <br/>
+  Bag Group: {{ $obj.BagGroupIdentifier }} <br/>
+  Storage Option: {{ $obj.StorageOption }} <br/>
+  Created: {{ dateUS $obj.CreatedAt }} <br/>
+  Updated: {{ dateUS $obj.UpdatedAt }} <br/>
+  Requested: {{ .deletionRequest.RequestedBy.Name }} on {{ dateUS .deletionRequest.RequestedAt }} <br/>
+  Approved: {{ .deletionRequest.ConfirmedBy.Name }}  on {{ dateUS .deletionRequest.ConfirmedAt }} <br/>
+</p>
+
+<p>All files belonging to this object will be deleted from preservation storage shortly. We'll retain a tombstone record of the object and its files along with PREMIS events recording when each item was deleted and at whose request.</p>
+
+<p><a href="/work_items/show/{{ .deletionRequest.WorkItemID }}">Work Item #{{ .deletionRequest.WorkItemID }}</a> shows the status of this deletion.</p>
+
+{{ template "shared/_footer.html" .}}
+
+{{ end }}

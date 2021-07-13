@@ -19,10 +19,9 @@ func TestPermissions(t *testing.T) {
 	// Spot check a few institutional admin permissions
 	assert.True(t, constants.CheckPermission(constants.RoleInstAdmin, constants.EventRead))
 	assert.True(t, constants.CheckPermission(constants.RoleInstAdmin, constants.GenericFileRequestDelete))
-	assert.True(t, constants.CheckPermission(constants.RoleInstAdmin, constants.GenericFileApproveDelete))
+	assert.True(t, constants.CheckPermission(constants.RoleInstAdmin, constants.DeletionRequestApprove))
 	assert.True(t, constants.CheckPermission(constants.RoleInstAdmin, constants.GenericFileRestore))
 	assert.True(t, constants.CheckPermission(constants.RoleInstAdmin, constants.IntellectualObjectRequestDelete))
-	assert.True(t, constants.CheckPermission(constants.RoleInstAdmin, constants.IntellectualObjectApproveDelete))
 	assert.True(t, constants.CheckPermission(constants.RoleInstAdmin, constants.IntellectualObjectRestore))
 
 	assert.False(t, constants.CheckPermission(constants.RoleInstAdmin, constants.EventDelete))

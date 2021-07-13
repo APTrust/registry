@@ -1,0 +1,63 @@
+{{ define "deletions/review.html" }}
+
+{{ template "shared/_header.html" .}}
+
+<h1>Review Deletion Request</h1>
+
+<p>User {{ .deletionRequest.RequestedBy.Name }} ({{ .deletionRequest.RequestedBy.Email }}) wants to delete the following item:</p>
+
+{{ if (eq .itemType "file") }}
+
+<h3>Generic File</h3>
+
+<p>
+  <b>{{ .file.Identifier }}</b><br/>
+  Size: {{ humanSize .file.Size }} <br/>
+  Created: {{ dateUS .file.CreatedAt }} <br/>
+  Updated: {{ dateUS .file.UpdatedAt }} <br/>
+</p>
+
+{{ else }}
+
+<h3>Intellectual Object</h3>
+
+<p>
+  <b>{{ .object.Identifier }}</b><br/>
+  Alt Identifier: {{ .object.AltIdentifier }} <br/>
+  Internal Sender Identifier: {{ .object.InternalSenderIdentifier }} <br/>
+  Bag Group: {{ .object.BagGroupIdentifier }} <br/>
+  Storage Option: {{ .object.StorageOption }} <br/>
+  Created: {{ dateUS .object.CreatedAt }} <br/>
+  Updated: {{ dateUS .object.UpdatedAt }} <br/>
+</p>
+
+{{ end }}
+
+<p>Do you want to approve or cancel this request? If you approve, the file(s) will be deleted as soon as possible. Deletion cannot be undone. If you cancel, the file(s) will stay and no one else will be able to approve this request.</p>
+
+
+<div class="row">
+  <div class="column column-30">
+    <button class="button button-outline" onclick="document.forms['deletionCancelForm'].submit()">Cancel</button>
+  </div>
+  <div class="column column-40">
+
+  </div>
+  <div class="column column-30">
+    <button class="button" onclick="document.forms['deletionApprovalForm'].submit()">Approve</button>
+  </div>
+</div>
+
+<form method="post" id="deletionCancelForm" action="/deletions/cancel/{{ .deletionRequest.ID }}">
+  <input type="hidden" name="id" value="{{ .deletionRequest.ID }}"/>
+  <input type="hidden" name="token" value="{{ .token }}"/>
+</form>
+
+<form method="post" id="deletionApprovalForm" action="/deletions/approve/{{ .deletionRequest.ID }}">
+  <input type="hidden" name="id" value="{{ .deletionRequest.ID }}"/>
+  <input type="hidden" name="token" value="{{ .token }}"/>
+</form>
+
+{{ template "shared/_footer.html" .}}
+
+{{ end }}

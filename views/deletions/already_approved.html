@@ -1,0 +1,13 @@
+{{ define "deletions/already_approved.html" }}
+
+{{ template "shared/_header.html" .}}
+
+<h1>Deletion Previously Confirmed</h1>
+
+<p>The deletion of file <b>{{ .itemIdentifier }}</b> was approved by {{ .deletionRequest.ConfirmedBy.Name }} ({{ .deletionRequest.ConfirmedBy.Email }}) on {{ dateUS .deletionRequest.ConfirmedAt }}.</p>
+
+<p>If the file has not yet been deleted, it will be soon.</p>
+
+{{ template "shared/_footer.html" .}}
+
+{{ end }}

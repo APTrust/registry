@@ -324,7 +324,7 @@ func (del *Deletion) ReviewURL() (string, error) {
 	if del.DeletionRequest.ConfirmationToken == "" {
 		return "", common.ErrNotSupported
 	}
-	return fmt.Sprintf("%s/files/review_delete/%d?token=%s",
+	return fmt.Sprintf("%s/deletions/review/%d?token=%s",
 		del.baseURL,
 		del.DeletionRequest.ID,
 		del.DeletionRequest.ConfirmationToken), nil

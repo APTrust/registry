@@ -25,6 +25,7 @@ const (
 	ChecksumUpdate                                = "ChecksumUpdate"
 	ChecksumDelete                                = "ChecksumDelete"
 	DashboardShow                                 = "DashboardShow"
+	DeletionRequestApprove                        = "DeletionRequestApprove"
 	DeletionRequestList                           = "DeletionRequestList"
 	DeletionRequestShow                           = "DeletionRequestShow"
 	EventCreate                                   = "EventCreate"
@@ -36,7 +37,6 @@ const (
 	GenericFileUpdate                             = "FileUpdate"
 	GenericFileDelete                             = "FileDelete"
 	GenericFileRequestDelete                      = "FileRequestDelete"
-	GenericFileApproveDelete                      = "FileApproveDelete"
 	GenericFileFinishBulkDelete                   = "FileFinishBulkDelete"
 	GenericFileRestore                            = "FileRestore"
 	InstitutionCreate                             = "InstitutionCreate"
@@ -48,7 +48,6 @@ const (
 	IntellectualObjectUpdate                      = "IntellectualObjectUpdate"
 	IntellectualObjectDelete                      = "IntellectualObjectDelete"
 	IntellectualObjectRequestDelete               = "IntellectualObjectRequestDelete"
-	IntellectualObjectApproveDelete               = "IntellectualObjectApproveDelete"
 	IntellectualObjectFinishBulkDelete            = "IntellectualObjectFinishBulkDelete"
 	IntellectualObjectRestore                     = "IntellectualObjectRestore"
 	ReportRead                                    = "ReportRead"
@@ -82,6 +81,9 @@ var Permissions = []Permission{
 	ChecksumUpdate,
 	ChecksumDelete,
 	DashboardShow,
+	DeletionRequestApprove,
+	DeletionRequestList,
+	DeletionRequestShow,
 	EventCreate,
 	EventRead,
 	EventUpdate,
@@ -91,7 +93,6 @@ var Permissions = []Permission{
 	GenericFileUpdate,
 	GenericFileDelete,
 	GenericFileRequestDelete,
-	GenericFileApproveDelete,
 	GenericFileFinishBulkDelete,
 	GenericFileRestore,
 	InstitutionCreate,
@@ -103,7 +104,6 @@ var Permissions = []Permission{
 	IntellectualObjectUpdate,
 	IntellectualObjectDelete,
 	IntellectualObjectRequestDelete,
-	IntellectualObjectApproveDelete,
 	IntellectualObjectFinishBulkDelete,
 	IntellectualObjectRestore,
 	ReportRead,
@@ -182,19 +182,18 @@ func initPermissions() {
 	instAdmin[AlertUpdate] = true
 	instAdmin[ChecksumRead] = true
 	instAdmin[DashboardShow] = true
+	instAdmin[DeletionRequestApprove] = true
 	instAdmin[DeletionRequestShow] = true
 	instAdmin[DeletionRequestList] = true
 	instAdmin[EventRead] = true
 	instAdmin[GenericFileRead] = true
 	instAdmin[GenericFileDelete] = true
 	instAdmin[GenericFileRequestDelete] = true
-	instAdmin[GenericFileApproveDelete] = true
 	instAdmin[GenericFileRestore] = true
 	instAdmin[InstitutionRead] = true
 	instAdmin[IntellectualObjectRead] = true
 	instAdmin[IntellectualObjectDelete] = true
 	instAdmin[IntellectualObjectRequestDelete] = true
-	instAdmin[IntellectualObjectApproveDelete] = true
 	instAdmin[IntellectualObjectRestore] = true
 	instAdmin[ReportRead] = true
 	instAdmin[StorageRecordRead] = true
@@ -217,6 +216,7 @@ func initPermissions() {
 	sysAdmin[ChecksumUpdate] = false // no one can do this
 	sysAdmin[ChecksumDelete] = false // no one can do this
 	sysAdmin[DashboardShow] = true
+	sysAdmin[DeletionRequestApprove] = true
 	sysAdmin[DeletionRequestShow] = true
 	sysAdmin[DeletionRequestList] = true
 	sysAdmin[EventCreate] = true
@@ -228,7 +228,6 @@ func initPermissions() {
 	sysAdmin[GenericFileUpdate] = true
 	sysAdmin[GenericFileDelete] = true
 	sysAdmin[GenericFileRequestDelete] = true
-	sysAdmin[GenericFileApproveDelete] = true
 	sysAdmin[GenericFileFinishBulkDelete] = true
 	sysAdmin[GenericFileRestore] = true
 	sysAdmin[InstitutionCreate] = true
@@ -240,7 +239,6 @@ func initPermissions() {
 	sysAdmin[IntellectualObjectUpdate] = true
 	sysAdmin[IntellectualObjectDelete] = true
 	sysAdmin[IntellectualObjectRequestDelete] = true
-	sysAdmin[IntellectualObjectApproveDelete] = true
 	sysAdmin[IntellectualObjectFinishBulkDelete] = true
 	sysAdmin[IntellectualObjectRestore] = true
 	sysAdmin[ReportRead] = true

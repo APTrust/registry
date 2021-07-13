@@ -336,14 +336,15 @@ func NewDeletionItem(obj *IntellectualObject, gf *GenericFile, user *User) (*Wor
 		return nil, err
 	}
 
-	// If file deletion, set the file id
+	// If file deletion, set the file id & override object
+	// with file size
 	if gf != nil {
 		deletionItem.GenericFileID = gf.ID
+		deletionItem.Size = gf.Size
 	}
 
 	deletionItem.Action = constants.ActionDelete
 	deletionItem.User = user.Email
-	deletionItem.Size = gf.Size
 	err = deletionItem.Save()
 	return deletionItem, err
 }

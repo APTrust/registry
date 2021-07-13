@@ -98,8 +98,11 @@ func initRoutes(router *gin.Engine) {
 		// Note that these routes are for read-only views.
 		// Routes for initiating, approving and rejecting deletions
 		// are in the GenericFiles and IntellectualObjects controllers.
-		webRoutes.GET("/deletions/", web.DeletionRequestIndex)
 		webRoutes.GET("/deletions/show/:id", web.DeletionRequestShow)
+		webRoutes.GET("/deletions/review/:id", web.DeletionRequestReview)
+		webRoutes.POST("/deletions/approve/:id", web.DeletionRequestApprove)
+		webRoutes.POST("/deletions/cancel/:id", web.DeletionRequestCancel)
+		webRoutes.GET("/deletions/", web.DeletionRequestIndex)
 
 		// Dashboard
 		webRoutes.GET("/dashboard", web.DashboardShow)
@@ -110,9 +113,6 @@ func initRoutes(router *gin.Engine) {
 		webRoutes.GET("/files/request_delete/:id", web.GenericFileRequestDelete)
 		webRoutes.GET("/files/request_restore/:id", web.GenericFileRequestRestore)
 		webRoutes.POST("/files/init_delete/:id", web.GenericFileInitDelete)
-		webRoutes.GET("/files/review_delete/:id", web.GenericFileReviewDelete)
-		webRoutes.POST("/files/approve_delete/:id", web.GenericFileApproveDelete)
-		webRoutes.POST("/files/cancel_delete/:id", web.GenericFileCancelDelete)
 		webRoutes.POST("/files/init_restore/:id", web.GenericFileInitRestore)
 
 		// Institutions

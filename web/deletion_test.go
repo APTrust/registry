@@ -50,7 +50,7 @@ func TestNewDeletionForFile(t *testing.T) {
 
 	assert.ElementsMatch(t, instAdmins, del.InstAdmins)
 
-	expectedReviewURL := fmt.Sprintf("https://example.com/files/review_delete/4?token=%s", del.DeletionRequest.ConfirmationToken)
+	expectedReviewURL := fmt.Sprintf("https://example.com/deletions/review/4?token=%s", del.DeletionRequest.ConfirmationToken)
 	actualReviewURL, err := del.ReviewURL()
 	require.Nil(t, err)
 	assert.Equal(t, expectedReviewURL, actualReviewURL)
