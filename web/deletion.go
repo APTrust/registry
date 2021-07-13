@@ -53,6 +53,37 @@ func NewDeletionForFile(genericFileID int64, currentUser *pgmodels.User, baseURL
 	return del, err
 }
 
+// NewDeletionForObject creates a new DeletionRequest for an IntellectualObject
+// and returns the Deletion object. This constructor is only for initializing
+// new DeletionRequests, not for reviewing, approving or cancelling
+// existing requests.
+func NewDeletionForObject(objID int64, currentUser *pgmodels.User, baseURL string) (*Deletion, error) {
+	obj, err := pgmodels.IntellectualObjectByID(objID)
+	if err != nil {
+		return nil, err
+	}
+
+	// Make sure there are no pending work items for this object.
+	pendingWorkItems, err := pgmodels.WorkItemsPendingForObject(obj.ID, obj.BagName)
+	if err != nil {
+		return nil, err
+	}
+	if len(pendingWorkItems) > 0 {
+		return nil, common.ErrPendingWorkItems
+	}
+
+	del := &Deletion{
+		baseURL:     baseURL,
+		currentUser: currentUser,
+	}
+	err = del.initObjectDeletionRequest(objID)
+	if err != nil {
+		return nil, err
+	}
+	err = del.loadInstAdmins()
+	return del, err
+}
+
 // NewDeletionForReview pulls up information about an existing deletion
 // request that an institutional admin will review before deciding whether
 // to approve or cancel the request.
@@ -122,6 +153,34 @@ func (del *Deletion) initFileDeletionRequest(genericFileID int64) error {
 	deletionRequest.RequestedByID = del.currentUser.ID
 	deletionRequest.RequestedAt = time.Now().UTC()
 	deletionRequest.AddFile(gf)
+	err = deletionRequest.Save()
+	if err != nil {
+		return err
+	}
+	del.DeletionRequest = deletionRequest
+	return nil
+}
+
+// initObjectDeletionRequest creates a new DeletionRequest for an
+// IntellectualObject. When this request is created, it includes a
+// plaintext token that we add to the confirmation URL below.
+// We do not save the plaintext version of the token,
+// only the encrypted version. When this new DeletionRequest goes out of
+// scope, there's no further access to the token, so get it while you can.
+func (del *Deletion) initObjectDeletionRequest(objID int64) error {
+	obj, err := pgmodels.IntellectualObjectByID(objID)
+	if err != nil {
+		return err
+	}
+
+	deletionRequest, err := pgmodels.NewDeletionRequest()
+	if err != nil {
+		return err
+	}
+	deletionRequest.InstitutionID = obj.InstitutionID
+	deletionRequest.RequestedByID = del.currentUser.ID
+	deletionRequest.RequestedAt = time.Now().UTC()
+	deletionRequest.AddObject(obj)
 	err = deletionRequest.Save()
 	if err != nil {
 		return err

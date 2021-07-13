@@ -1,6 +1,6 @@
 Hello from APTrust,
 
-User {{ .requesterName }} has requested some files be deleted from preservation storage. We won't process this request until you or another APTrust administrator at your institution approves it.
+User {{ .requesterName }} has requested some files or objects be deleted from preservation storage. We won't process this request until you or another APTrust administrator at your institution approves it.
 
 Follow the link below to see the list of items in the deletion request. From there you may approve or cancel the request.
 

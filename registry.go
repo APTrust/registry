@@ -114,7 +114,6 @@ func initRoutes(router *gin.Engine) {
 		webRoutes.POST("/files/approve_delete/:id", web.GenericFileApproveDelete)
 		webRoutes.POST("/files/cancel_delete/:id", web.GenericFileCancelDelete)
 		webRoutes.POST("/files/init_restore/:id", web.GenericFileInitRestore)
-		webRoutes.GET("/files/delete/:id", web.GenericFileDelete)
 
 		// Institutions
 		webRoutes.POST("/institutions/new", web.InstitutionCreate)
@@ -132,7 +131,7 @@ func initRoutes(router *gin.Engine) {
 		webRoutes.GET("/objects", web.IntellectualObjectIndex)
 		webRoutes.GET("/objects/show/:id", web.IntellectualObjectShow)
 		webRoutes.GET("/objects/request_delete/:id", web.IntellectualObjectRequestDelete)
-		webRoutes.DELETE("/objects/init_delete/:id", web.IntellectualObjectInitDelete)
+		webRoutes.POST("/objects/init_delete/:id", web.IntellectualObjectInitDelete)
 		webRoutes.GET("/objects/request_restore/:id", web.IntellectualObjectRequestRestore)
 		webRoutes.POST("/objects/init_restore/:id", web.IntellectualObjectInitRestore)
 		webRoutes.GET("/objects/events/:id", web.IntellectualObjectEvents)

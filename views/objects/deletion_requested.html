@@ -1,0 +1,16 @@
+{{ define "objects/deletion_requested.html" }}
+
+{{ template "shared/_header.html" .}}
+
+<h1>Deletion Requested</h1>
+
+<p>Thanks. We have received your request to delete the following object:</p>
+
+<p><b>{{ .objIdentifier }}</b></p>
+
+<p>The APTrust administrators at your institution will soon receive an email
+asking them to approve the deletion.</p>
+
+{{ template "shared/_footer.html" .}}
+
+{{ end }}

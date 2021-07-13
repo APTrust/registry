@@ -31,9 +31,20 @@ func IntellectualObjectRequestDelete(c *gin.Context) {
 // IntellectualObjectInitDelete creates an object deletion request. This
 // request must be approved by an administrator at the depositing institution
 // before the deletion will actually be queued.
-// GET /objects/init_delete/:id
+//
+// POST /objects/init_delete/:id
 func IntellectualObjectInitDelete(c *gin.Context) {
-
+	req := NewRequest(c)
+	del, err := NewDeletionForObject(req.Auth.ResourceID, req.CurrentUser, req.BaseURL())
+	if AbortIfError(c, err) {
+		return
+	}
+	_, err = del.CreateRequestAlert()
+	if AbortIfError(c, err) {
+		return
+	}
+	req.TemplateData["objIdentifier"] = del.DeletionRequest.FirstObject().Identifier
+	c.HTML(http.StatusCreated, "objects/deletion_requested.html", req.TemplateData)
 }
 
 // IntellectualObjectRequestRestore shows a message asking if the user

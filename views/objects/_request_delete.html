@@ -36,6 +36,11 @@
 
   </div>
 
+  <form name="objDeleteForm" action="/objects/init_delete/{{ .object.ID }}" method="post">
+    <!-- TODO: CSRF -->
+    <input type="hidden" name="id" value="{{ .object.ID }}" />
+  </form>
+
 
   <div class="row">
     <div class="column column-30">
@@ -45,7 +50,7 @@
 
     </div>
     <div class="column column-30">
-      <button class="button">Confirm</button>
+      <button class="button" onclick="document.forms['objDeleteForm'].submit()">Confirm</button>
     </div>
   </div>
 

@@ -28,12 +28,6 @@ func GenericFileRequestDelete(c *gin.Context) {
 	c.HTML(http.StatusOK, "files/_request_delete.html", req.TemplateData)
 }
 
-// GenericFileDelete deletes a user.
-// DELETE /files/delete/:id
-func GenericFileDelete(c *gin.Context) {
-
-}
-
 // GenericFileIndex shows list of objects.
 // GET /files
 func GenericFileIndex(c *gin.Context) {
@@ -59,7 +53,7 @@ func GenericFileShow(c *gin.Context) {
 	c.HTML(http.StatusOK, "files/show.html", req.TemplateData)
 }
 
-// GenericFileRequestRestore shows a confirmation message asking whether
+// GenericFileRequestRestore shows a message asking whether
 // user really wants to restore a file.
 func GenericFileRequestRestore(c *gin.Context) {
 	req := NewRequest(c)
@@ -92,6 +86,8 @@ func GenericFileInitRestore(c *gin.Context) {
 // GenericFileInitDelete occurs when user clicks the button confirming
 // they want to delete a file. This creates a deletion confirmation message,
 // which will be emailed to institutional admins for approval.
+//
+// POST /files/init_delete/:id
 func GenericFileInitDelete(c *gin.Context) {
 	req := NewRequest(c)
 	del, err := NewDeletionForFile(req.Auth.ResourceID, req.CurrentUser, req.BaseURL())
