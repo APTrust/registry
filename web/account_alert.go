@@ -91,12 +91,9 @@ func createAlert(alert *pgmodels.Alert, templateName string, alertData map[strin
 	// For dev/test, we need to see the review and
 	// confirmation URLS in this alert so we can
 	// review and test them.
-	envName := common.Context().Config.EnvName
-	if envName == "dev" || envName == "test" {
-		fmt.Println("***********************")
-		fmt.Println(alert.Content)
-		fmt.Println("***********************")
-	}
+	common.ConsoleDebug("***********************")
+	common.ConsoleDebug(alert.Content)
+	common.ConsoleDebug("***********************")
 
 	return alert, err
 }

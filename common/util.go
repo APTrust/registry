@@ -191,8 +191,8 @@ func SplitCamelCase(str string, max int) []string {
 	return strings.Split(b.String(), " ")
 }
 
-// ToHumanSize converts a raw byte count (size) to a human-friendly representation.
-
+// ToHumanSize converts a raw byte count (size) to a human-friendly
+// representation.
 func ToHumanSize(size, unit int64) string {
 	if size < unit {
 		return fmt.Sprintf("%d B", size)
@@ -203,4 +203,16 @@ func ToHumanSize(size, unit int64) string {
 		exp++
 	}
 	return fmt.Sprintf("%.1f %cB", float64(size)/float64(div), "kMGTPE"[exp])
+}
+
+// ConsoleDebug prints a message to the console if the following we are
+// running in the dev or test environment and we are not running automated
+// tests. We want to see these messages in the console when we're doing
+// interactive testing in the dev or test environments, but NOT when running
+// automated tests because they clutter the test output.
+func ConsoleDebug(message string) {
+	envName := Context().Config.EnvName
+	if !TestsAreRunning() && (envName == "dev" || envName == "test") {
+		fmt.Println(message)
+	}
 }

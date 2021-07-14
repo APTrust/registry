@@ -34,7 +34,7 @@ func AuthorizeResource(c *gin.Context) *ResourceAuthorization {
 		ginCtx: c,
 	}
 	r.init()
-	fmt.Println(r)
+	common.ConsoleDebug(r.String())
 	return r
 }
 
