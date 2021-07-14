@@ -3,6 +3,7 @@ package web_test
 import (
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/APTrust/registry/app"
 	"github.com/gavv/httpexpect/v2"
@@ -22,11 +23,12 @@ func TestGinHandler(t *testing.T) {
 		Client: &http.Client{
 			Transport: httpexpect.NewBinder(engine),
 			Jar:       httpexpect.NewJar(),
+			Timeout:   time.Second * 3,
 		},
 		Reporter: httpexpect.NewAssertReporter(t),
-		Printers: []httpexpect.Printer{
-			httpexpect.NewDebugPrinter(t, true),
-		},
+		//Printers: []httpexpect.Printer{
+		//	httpexpect.NewDebugPrinter(t, true),
+		//},
 	})
 
 	signInForm := map[string]string{
