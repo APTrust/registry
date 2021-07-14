@@ -45,7 +45,7 @@ func alertLoad(req *Request) error {
 	if !req.CurrentUser.IsAdmin() && recipientID != req.CurrentUser.ID {
 		aptContext := common.Context()
 		aptContext.Log.Warn().Msgf("User %d illegally tried to access alert %d belonging to user %d. Permission was denied.", req.CurrentUser.ID, req.Auth.ResourceID, recipientID)
-		return err
+		return common.ErrPermissionDenied
 	}
 	alert, err := pgmodels.AlertViewForUser(req.Auth.ResourceID, recipientID)
 	req.TemplateData["alert"] = alert
