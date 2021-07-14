@@ -6,7 +6,9 @@ import (
 	"time"
 
 	"github.com/APTrust/registry/app"
+	"github.com/APTrust/registry/pgmodels"
 	"github.com/gavv/httpexpect/v2"
+	"github.com/stretchr/testify/require"
 )
 
 // TODO: Single setup with admin login, as with loadFixtures, then test.
@@ -37,8 +39,12 @@ func TestGinHandler(t *testing.T) {
 	}
 	e.POST("/users/sign_in").WithForm(signInForm).Expect().Status(http.StatusOK)
 
+	alert1, err := pgmodels.AlertByID(1)
+	require.Nil(t, err)
+	require.NotNil(t, alert1)
+
 	// Assert response
 	e.GET("/alerts/show/1/1").
 		Expect().
-		Status(http.StatusOK)
+		Status(http.StatusOK).Body().Contains(alert1.Content)
 }
