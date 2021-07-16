@@ -122,7 +122,7 @@ func initRoutes(router *gin.Engine) {
 	webRoutes := router.Group("/")
 	{
 		// Alerts
-		webRoutes.GET("/alerts/", web.AlertIndex)
+		webRoutes.GET("/alerts", web.AlertIndex)
 		webRoutes.GET("/alerts/show/:id/:user_id", web.AlertShow)
 
 		// Deletion Requests
