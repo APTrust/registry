@@ -49,12 +49,14 @@ func TestAlertShow(t *testing.T) {
 func TestAlertIndex(t *testing.T) {
 	initHTTPTests(t)
 
+	// All users should see these filters on the index page.
 	commonFilters := []string{
 		`select name="type"`,
 		`name="created_at__gteq"`,
 		`name="created_at__lteq"`,
 	}
 
+	// Only admins should see these filters.
 	adminFilters := []string{
 		`select name="user_id"`,
 		`select name="institution_id"`,
@@ -69,6 +71,15 @@ func TestAlertIndex(t *testing.T) {
 	MatchesAll(t, html, AllInstitutionNames(t))
 	MatchesAll(t, html, AllUserNames(t))
 	MatchesResultCount(t, html, 15)
+
+	// Make sure filters work. Should be 1 deletion confirmed
+	// alerts for the inst 1 admin.
+	resp = sysAdminClient.GET("/alerts").
+		WithQuery("user_id", inst1Admin.ID).
+		WithQuery("type", constants.AlertDeletionConfirmed).
+		Expect().Status(http.StatusOK)
+	html = resp.Body().Raw()
+	MatchesResultCount(t, html, 1)
 
 	// Inst admin should see only his own alerts and the
 	// alert type and date filters
