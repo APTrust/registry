@@ -56,8 +56,8 @@ func TestAlertIndex(t *testing.T) {
 		`name="created_at__lteq"`,
 	}
 
-	// Only admins should see these filters.
-	adminFilters := []string{
+	// Only sys admin should see these filters.
+	sysAdminFilters := []string{
 		`select name="user_id"`,
 		`select name="institution_id"`,
 	}
@@ -66,7 +66,7 @@ func TestAlertIndex(t *testing.T) {
 	resp := sysAdminClient.GET("/alerts").Expect().Status(http.StatusOK)
 	html := resp.Body().Raw()
 	MatchesAll(t, html, commonFilters)
-	MatchesAll(t, html, adminFilters)
+	MatchesAll(t, html, sysAdminFilters)
 	MatchesAll(t, html, constants.AlertTypes)
 	MatchesAll(t, html, AllInstitutionNames(t))
 	MatchesAll(t, html, AllUserNames(t))
@@ -86,7 +86,7 @@ func TestAlertIndex(t *testing.T) {
 	resp = instAdminClient.GET("/alerts").WithQuery("institution_id", inst1Admin.InstitutionID).WithQuery("user_id", inst1Admin.ID).Expect().Status(http.StatusOK)
 	html = resp.Body().Raw()
 	MatchesAll(t, html, commonFilters)
-	MatchesNone(t, html, adminFilters)
+	MatchesNone(t, html, sysAdminFilters)
 	MatchesAll(t, html, constants.AlertTypes)
 	MatchesResultCount(t, html, 6)
 
@@ -95,7 +95,7 @@ func TestAlertIndex(t *testing.T) {
 	resp = instUserClient.GET("/alerts").WithQuery("institution_id", inst1User.InstitutionID).WithQuery("user_id", inst1User.ID).Expect().Status(http.StatusOK)
 	html = resp.Body().Raw()
 	MatchesAll(t, html, commonFilters)
-	MatchesNone(t, html, adminFilters)
+	MatchesNone(t, html, sysAdminFilters)
 	MatchesAll(t, html, constants.AlertTypes)
 	MatchesResultCount(t, html, 2)
 

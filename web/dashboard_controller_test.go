@@ -1,7 +1,6 @@
 package web_test
 
 import (
-	"fmt"
 	"net/http"
 	"testing"
 
@@ -18,12 +17,10 @@ func TestDashboardShow(t *testing.T) {
 		"Deposits by Storage Option",
 	}
 	for _, client := range allClients {
-		fmt.Println(client)
 		req := client.GET("/dashboard")
 		require.NotNil(t, req)
 		resp := req.Expect()
 		require.NotNil(t, resp)
-		fmt.Println(resp.Body().Raw())
 		resp.Status(http.StatusOK)
 		html := resp.Body().Raw()
 		MatchesAll(t, html, sections)
