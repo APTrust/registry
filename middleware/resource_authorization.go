@@ -92,11 +92,18 @@ func (r *ResourceAuthorization) readRequestIds() {
 		r.ResourceInstID = r.ResourceID
 	}
 
-	// TODO: Consider forcing institution_id = User.InstitutionID
-	// on requests where user is not admin: New, Create, Index.
-
 	if r.ResourceID != 0 {
 		r.ResourceInstID, r.Error = pgmodels.InstIDFor(r.ResourceType, r.ResourceID)
+	} else {
+
+		// If institution ID is nowhere in request and we can't get it from
+		// the resource either, force institution ID to the user's own
+		// institution for everyone except Sys Admin. All non-sysadmins
+		// are restricted to their own institution.
+		currentUser := r.CurrentUser()
+		if r.ResourceInstID == 0 && !currentUser.IsAdmin() {
+			r.ResourceInstID = currentUser.InstitutionID
+		}
 	}
 }
 

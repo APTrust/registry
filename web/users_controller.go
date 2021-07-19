@@ -33,8 +33,7 @@ func UserDelete(c *gin.Context) {
 	if AbortIfError(c, err) {
 		return
 	}
-	location := fmt.Sprintf("/users?institution_id=%d", user.InstitutionID)
-	c.Redirect(http.StatusFound, location)
+	c.Redirect(http.StatusFound, "/users")
 }
 
 // UserUndelete reactivates a user.
@@ -219,7 +218,7 @@ func UserChangePassword(c *gin.Context) {
 	helpers.SetFlashCookie(c, "Password changed.")
 	redirectURL := fmt.Sprintf("/users/show/%d", userToEdit.ID)
 	if !req.CurrentUser.HasPermission(constants.UserRead, userToEdit.InstitutionID) {
-		redirectURL = fmt.Sprintf("/dashboard?institution_id=%d", req.CurrentUser.InstitutionID)
+		redirectURL = "/dashboard"
 	}
 	c.Redirect(http.StatusFound, redirectURL)
 }
@@ -397,11 +396,7 @@ func SignInUser(c *gin.Context) (int, string, error) {
 		return http.StatusInternalServerError, redirectTo, err
 	}
 	c.Set("CurrentUser", user)
-	startPage := "/dashboard"
-	if !user.IsAdmin() {
-		startPage += fmt.Sprintf("?institution_id=%d", user.InstitutionID)
-	}
-	return http.StatusFound, startPage, nil
+	return http.StatusFound, "/dashboard", nil
 }
 
 func getIndexQuery(c *gin.Context) (*pgmodels.Query, error) {

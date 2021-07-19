@@ -2,63 +2,52 @@
 
 <ul>
 
-  {{ if .CurrentUser.IsAdmin }}
-  <li><a href="/dashboard"><i class="fa fa-home"></i> Dashboard</a></li>
-  <li><a href="/objects"><i class="fa fa-archive"></i> Objects</a></li>
-  <li><a href="/files"><i class="fa fa-file"></i> Files</a></li>
-  <li><a href="/events"><i class="fab fa-elementor"></i> Events</a></li>
-  <li><a href="/work_items"><i class="fa fa-cog"></i> Work Items</a></li>
-  <li><a href="/deletions"><i class="fa fa-backspace"></i> Deletions</a></li>
-  <li><a href="/reports"><i class="fa fa-chart-line"></i> Reports</a></li>
-  <li><a href="/alerts"><i class="fa fa-bell"></i> Alerts</a></li>
-  <li><a href="/institutions"><i class="fa fa-landmark"></i> Institutions</a></li>
-  <li><a href="/users"><i class="fa fa-users"></i> Users</a></li>
-
-  {{ else }}
-
   {{ if userCan .CurrentUser "DashboardShow" .CurrentUser.InstitutionID }}
-  <li><a href="/dashboard?institution_id={{ .CurrentUser.InstitutionID }}"><i class="fa fa-home"></i> Dashboard</a></li>
+  <li><a href="/dashboard"><i class="fa fa-home"></i> Dashboard</a></li>
   {{ end }}
 
   {{ if userCan .CurrentUser "IntellectualObjectRead" .CurrentUser.InstitutionID }}
-  <li><a href="/objects?institution_id={{ .CurrentUser.InstitutionID }}"><i class="fa fa-archive"></i> Objects</a></li>
+  <li><a href="/objects"><i class="fa fa-archive"></i> Objects</a></li>
   {{ end }}
 
   {{ if userCan .CurrentUser "FileRead" .CurrentUser.InstitutionID }}
-  <li><a href="/files?institution_id={{ .CurrentUser.InstitutionID }}"><i class="fa fa-file"></i> Files</a></li>
+  <li><a href="/files"><i class="fa fa-file"></i> Files</a></li>
   {{ end }}
 
   {{ if userCan .CurrentUser "EventRead" .CurrentUser.InstitutionID }}
-  <li><a href="/events?institution_id={{ .CurrentUser.InstitutionID }}"><i class="fab fa-elementor"></i> Events</a></li>
+  <li><a href="/events"><i class="fab fa-elementor"></i> Events</a></li>
   {{ end }}
 
   {{ if userCan .CurrentUser "WorkItemRead" .CurrentUser.InstitutionID }}
-  <li><a href="/work_items?institution_id={{ .CurrentUser.InstitutionID }}"><i class="fa fa-cog"></i> Work Items</a></li>
+  <li><a href="/work_items"><i class="fa fa-cog"></i> Work Items</a></li>
   {{ end }}
 
   {{ if userCan .CurrentUser "DeletionRequestList" .CurrentUser.InstitutionID }}
-  <li><a href="/deletions?institution_id={{ .CurrentUser.InstitutionID }}"><i class="fa fa-backspace"></i> Deletions</a></li>
+  <li><a href="/deletions"><i class="fa fa-backspace"></i> Deletions</a></li>
   {{ end }}
 
   {{ if userCan .CurrentUser "ReportRead" .CurrentUser.InstitutionID }}
-  <li><a href="/reports?institution_id={{ .CurrentUser.InstitutionID }}"><i class="fa fa-chart-line"></i> Reports</a></li>
+  <li><a href="/reports"><i class="fa fa-chart-line"></i> Reports</a></li>
   {{ end }}
 
   {{ if userCan .CurrentUser "AlertRead" .CurrentUser.InstitutionID }}
-  <li><a href="/alerts?institution_id={{ .CurrentUser.InstitutionID }}&user_id={{ .CurrentUser.ID }}"><i class="fa fa-bell"></i> Alerts</a></li>
+  <li><a href="/alerts"><i class="fa fa-bell"></i> Alerts</a></li>
   {{ end }}
 
-  {{ if userCan .CurrentUser "InstitutionRead" .CurrentUser.InstitutionID }}
-  <li><a href="/institutions/show/{{ .CurrentUser.InstitutionID }}"><i class="fa fa-landmark"></i> Institution</a></li>
+  {{ if .CurrentUser.IsAdmin }}
+    <li><a href="/institutions"><i class="fa fa-landmark"></i> Institutions</a></li>
+  {{ else }}
+    {{ if userCan .CurrentUser "InstitutionRead" .CurrentUser.InstitutionID }}
+    <li><a href="/institutions/show/{{ .CurrentUser.InstitutionID }}"><i class="fa fa-landmark"></i> Institution</a></li>
+    {{ end }}
   {{ end }}
 
-  {{ if userCan .CurrentUser "UserCreate" .CurrentUser.InstitutionID }}
-  <li><a href="/users?institution_id={{ .CurrentUser.InstitutionID }}"><i class="fa fa-users"></i> Users</a></li>
-  {{ end }}
+    {{ if userCan .CurrentUser "UserCreate" .CurrentUser.InstitutionID }}
+    <li><a href="/users"><i class="fa fa-users"></i> Users</a></li>
+    {{ end }}
 
-  {{ end }}
 
-  <li><a href="/users/my_account?institution_id={{ .CurrentUser.InstitutionID }}"><i class="far fa-user-circle"></i> My Account</a></li>
+  <li><a href="/users/my_account"><i class="far fa-user-circle"></i> My Account</a></li>
   <li><a href="/users/sign_out"><i class="fas fa-sign-out-alt"></i> Sign Out</a></li>
 </ul>
 
