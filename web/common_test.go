@@ -22,6 +22,7 @@ var appEngine *gin.Engine
 var sysAdminClient *httpexpect.Expect
 var instAdminClient *httpexpect.Expect
 var instUserClient *httpexpect.Expect
+var allClients []*httpexpect.Expect
 
 var sysAdmin *pgmodels.User
 var inst1Admin *pgmodels.User
@@ -39,6 +40,11 @@ func initHTTPTests(t *testing.T) {
 		sysAdminClient = initClient(t, "system@aptrust.org", appEngine)
 		instAdminClient = initClient(t, "admin@inst1.edu", appEngine)
 		instUserClient = initClient(t, "user@inst1.edu", appEngine)
+		allClients = []*httpexpect.Expect{
+			sysAdminClient,
+			instAdminClient,
+			instUserClient,
+		}
 
 		sysAdmin = initUser(t, "system@aptrust.org")
 		inst1Admin = initUser(t, "admin@inst1.edu")
