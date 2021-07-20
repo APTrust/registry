@@ -39,4 +39,14 @@ func TestPermissions(t *testing.T) {
 	assert.False(t, constants.CheckPermission(constants.RoleSysAdmin, constants.ChecksumUpdate))
 	assert.False(t, constants.CheckPermission(constants.RoleSysAdmin, constants.ChecksumDelete))
 
+	// Check these because they were misbehaving in dev
+	assert.True(t, constants.CheckPermission(constants.RoleInstUser, constants.GenericFileRequestDelete))
+	assert.True(t, constants.CheckPermission(constants.RoleInstUser, constants.GenericFileRestore))
+
+	assert.True(t, constants.CheckPermission(constants.RoleInstAdmin, constants.GenericFileRequestDelete))
+	assert.True(t, constants.CheckPermission(constants.RoleInstAdmin, constants.GenericFileRestore))
+
+	assert.True(t, constants.CheckPermission(constants.RoleSysAdmin, constants.GenericFileRequestDelete))
+	assert.True(t, constants.CheckPermission(constants.RoleSysAdmin, constants.GenericFileRestore))
+
 }

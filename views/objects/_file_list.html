@@ -1,5 +1,6 @@
 {{ define "objects/_file_list.html" }}
 
+{{ $CurrentUser := .CurrentUser }}
 
   <div class="row">
     <div class="column column-70">
@@ -84,13 +85,17 @@
               </table>
               </p>
 
+              {{ if userCan $CurrentUser "FileRequestDelete" $file.InstitutionID }}
               <div class="float-left">
                 <button class="button button-outline" data-modal="modal-one" data-xhr-url="/files/request_delete/{{ $file.ID }}">Delete File</button>
               </div>
+              {{ end }}
+
+              {{ if userCan $CurrentUser "FileRestore" $file.InstitutionID }}
               <div class="float-right">
                 <button class="button button-outline" data-modal="modal-one" data-xhr-url="/files/request_restore/{{ $file.ID }}">Restore File</button>
               </div>
-
+              {{ end }}
 
             </div>
           </td>

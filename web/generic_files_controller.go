@@ -13,7 +13,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// GenericFileRequestDelete shows a confirmation message asking
+// GenericFileRequestDelete shows a message asking
 // if user really wants to delete a file.
 // DELETE /files/request_delete/:id
 func GenericFileRequestDelete(c *gin.Context) {

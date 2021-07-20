@@ -168,6 +168,8 @@ func initPermissions() {
 	instUser[DeletionRequestList] = true
 	instUser[EventRead] = true
 	instUser[GenericFileRead] = true
+	instUser[GenericFileRequestDelete] = true
+	instUser[GenericFileRestore] = true
 	instUser[InstitutionRead] = true
 	instUser[IntellectualObjectRead] = true
 	instUser[ReportRead] = true
