@@ -3,8 +3,6 @@ package web_test
 import (
 	"net/http"
 	"testing"
-
-	"github.com/stretchr/testify/require"
 )
 
 func TestDeletionRequestShow(t *testing.T) {
@@ -22,12 +20,8 @@ func TestDeletionRequestShow(t *testing.T) {
 	}
 
 	for _, client := range allClients {
-		req := client.GET("/deletions/show/1")
-		require.NotNil(t, req)
-		resp := req.Expect()
-		require.NotNil(t, resp)
-		resp.Status(http.StatusOK)
-		html := resp.Body().Raw()
+		html := client.GET("/deletions/show/1").Expect().
+			Status(http.StatusOK).Body().Raw()
 		MatchesAll(t, html, items)
 	}
 
@@ -56,15 +50,10 @@ func TestDeletionRequestIndex(t *testing.T) {
 	}
 
 	for _, client := range allClients {
-		req := client.GET("/deletions")
-		require.NotNil(t, req)
-		resp := req.Expect()
-		require.NotNil(t, resp)
-		resp.Status(http.StatusOK)
-		html := resp.Body().Raw()
+		html := client.GET("/deletions").Expect().
+			Status(http.StatusOK).Body().Raw()
 		MatchesAll(t, html, deletionLinks)
 		MatchesAll(t, html, commonFilters)
-
 		if client == sysAdminClient {
 			MatchesAll(t, html, sysAdminFilters)
 		} else {

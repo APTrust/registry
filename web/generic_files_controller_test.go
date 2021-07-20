@@ -3,8 +3,7 @@ package web_test
 import (
 	"net/http"
 	"testing"
-
-	"github.com/stretchr/testify/require"
+	//"github.com/stretchr/testify/require"
 )
 
 func TestGenericFileShow(t *testing.T) {
@@ -20,12 +19,8 @@ func TestGenericFileShow(t *testing.T) {
 	}
 
 	for _, client := range allClients {
-		req := client.GET("/files/show/1")
-		require.NotNil(t, req)
-		resp := req.Expect()
-		require.NotNil(t, resp)
-		resp.Status(http.StatusOK)
-		html := resp.Body().Raw()
+		html := client.GET("/files/show/1").Expect().
+			Status(http.StatusOK).Body().Raw()
 		MatchesAll(t, html, items)
 	}
 
@@ -65,12 +60,8 @@ func TestGenericFileIndex(t *testing.T) {
 	}
 
 	for _, client := range allClients {
-		req := client.GET("/files")
-		require.NotNil(t, req)
-		resp := req.Expect()
-		require.NotNil(t, resp)
-		resp.Status(http.StatusOK)
-		html := resp.Body().Raw()
+		html := client.GET("/files").Expect().
+			Status(http.StatusOK).Body().Raw()
 		MatchesAll(t, html, items)
 		MatchesAll(t, html, commonFilters)
 		if client == sysAdminClient {
@@ -84,14 +75,11 @@ func TestGenericFileIndex(t *testing.T) {
 
 	// Test some filters
 	for _, client := range allClients {
-		req := client.GET("/files").
+		html := client.GET("/files").
 			WithQuery("size__gteq", 20000).
-			WithQuery("size__lteq", 5500000)
-		require.NotNil(t, req)
-		resp := req.Expect()
-		require.NotNil(t, resp)
-		resp.Status(http.StatusOK)
-		html := resp.Body().Raw()
+			WithQuery("size__lteq", 5500000).
+			Expect().
+			Status(http.StatusOK).Body().Raw()
 		if client == sysAdminClient {
 			MatchesResultCount(t, html, 34)
 		} else {
@@ -115,6 +103,27 @@ func TestGenericFileIndex(t *testing.T) {
 
 func TestGenericFileRequestDelete(t *testing.T) {
 	initHTTPTests(t)
+
+	items := []string{
+		"Are you sure you want to delete this file?",
+		"institution1.edu/photos/picture1",
+		"Cancel",
+		"Confirm",
+	}
+
+	// Users can request deletions of their own files
+	for _, client := range allClients {
+		html := client.GET("/files/request_delete/1").
+			Expect().Status(http.StatusOK).Body().Raw()
+		MatchesAll(t, html, items)
+	}
+
+	// Sys Admin can request any deletion, but others cannot
+	// request deletions outside their own institution.
+	// File 18 from fixtures belongs to Inst2
+	sysAdminClient.GET("/files/request_delete/18").Expect().Status(http.StatusOK)
+	instAdminClient.GET("/files/request_delete/18").Expect().Status(http.StatusForbidden)
+	instUserClient.GET("/files/request_delete/18").Expect().Status(http.StatusForbidden)
 }
 
 func TestGenericFileInitDelete(t *testing.T) {
