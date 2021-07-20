@@ -66,10 +66,10 @@ func TestUserCan(t *testing.T) {
 	assert.True(t, helpers.UserCan(admin, constants.UserCreate, 1))
 	assert.True(t, helpers.UserCan(admin, constants.UserCreate, 2))
 	assert.True(t, helpers.UserCan(admin, constants.UserCreate, 100))
-	assert.True(t, helpers.UserCan(admin, constants.GenericFileRequestDelete, 1))
-	assert.True(t, helpers.UserCan(admin, constants.GenericFileRequestDelete, 2))
-	assert.True(t, helpers.UserCan(admin, constants.GenericFileRestore, 1))
-	assert.True(t, helpers.UserCan(admin, constants.GenericFileRestore, 2))
+	assert.True(t, helpers.UserCan(admin, constants.FileRequestDelete, 1))
+	assert.True(t, helpers.UserCan(admin, constants.FileRequestDelete, 2))
+	assert.True(t, helpers.UserCan(admin, constants.FileRestore, 1))
+	assert.True(t, helpers.UserCan(admin, constants.FileRestore, 2))
 
 	instAdmin := &pgmodels.User{
 		Role:          constants.RoleInstAdmin,
@@ -78,10 +78,10 @@ func TestUserCan(t *testing.T) {
 	assert.True(t, helpers.UserCan(instAdmin, constants.UserCreate, 1))
 	assert.False(t, helpers.UserCan(instAdmin, constants.UserCreate, 2))
 	assert.False(t, helpers.UserCan(instAdmin, constants.UserCreate, 100))
-	assert.True(t, helpers.UserCan(instAdmin, constants.GenericFileRequestDelete, 1))
-	assert.False(t, helpers.UserCan(instAdmin, constants.GenericFileRequestDelete, 2))
-	assert.True(t, helpers.UserCan(instAdmin, constants.GenericFileRestore, 1))
-	assert.False(t, helpers.UserCan(instAdmin, constants.GenericFileRestore, 2))
+	assert.True(t, helpers.UserCan(instAdmin, constants.FileRequestDelete, 1))
+	assert.False(t, helpers.UserCan(instAdmin, constants.FileRequestDelete, 2))
+	assert.True(t, helpers.UserCan(instAdmin, constants.FileRestore, 1))
+	assert.False(t, helpers.UserCan(instAdmin, constants.FileRestore, 2))
 
 	instUser := &pgmodels.User{
 		Role:          constants.RoleInstUser,
@@ -90,10 +90,10 @@ func TestUserCan(t *testing.T) {
 	assert.False(t, helpers.UserCan(instUser, constants.UserCreate, 1))
 	assert.False(t, helpers.UserCan(instUser, constants.UserCreate, 2))
 	assert.False(t, helpers.UserCan(instUser, constants.UserCreate, 100))
-	assert.True(t, helpers.UserCan(instUser, constants.GenericFileRequestDelete, 1))
-	assert.False(t, helpers.UserCan(instUser, constants.GenericFileRequestDelete, 2))
-	assert.True(t, helpers.UserCan(instUser, constants.GenericFileRestore, 1))
-	assert.False(t, helpers.UserCan(instUser, constants.GenericFileRestore, 2))
+	assert.True(t, helpers.UserCan(instUser, constants.FileRequestDelete, 1))
+	assert.False(t, helpers.UserCan(instUser, constants.FileRequestDelete, 2))
+	assert.True(t, helpers.UserCan(instUser, constants.FileRestore, 1))
+	assert.False(t, helpers.UserCan(instUser, constants.FileRestore, 2))
 }
 
 func TestIconFor(t *testing.T) {
