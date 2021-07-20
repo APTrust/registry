@@ -1,7 +1,6 @@
 package web
 
 import (
-	//"bytes"
 	"fmt"
 	"net/http"
 	"time"

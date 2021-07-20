@@ -61,10 +61,8 @@ func initClient(t *testing.T, email string, engine *gin.Engine) *httpexpect.Expe
 			Timeout:   time.Second * 3,
 		},
 
-		// We can choose NewAssertReporter, which continues after
-		// test failures, or NewRequireReporter, which stops on failure.
-		// The AssertReporter leads to panics, so let's use require for now.
-		Reporter: httpexpect.NewRequireReporter(t),
+		// NewAssertReporter or NewRequireReporter
+		Reporter: httpexpect.NewAssertReporter(t),
 		//Printers: []httpexpect.Printer{
 		//	httpexpect.NewDebugPrinter(t, true),
 		//},

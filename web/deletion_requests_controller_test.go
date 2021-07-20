@@ -4,8 +4,6 @@ import (
 	"net/http"
 	"testing"
 
-	//"github.com/APTrust/registry/constants"
-	//"github.com/APTrust/registry/pgmodels"
 	"github.com/stretchr/testify/require"
 )
 
