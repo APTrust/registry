@@ -22,7 +22,7 @@ func TestDeletionRequestShow(t *testing.T) {
 	for _, client := range allClients {
 		html := client.GET("/deletions/show/1").Expect().
 			Status(http.StatusOK).Body().Raw()
-		MatchesAll(t, html, items)
+		AssertMatchesAll(t, html, items)
 	}
 
 }
@@ -52,12 +52,12 @@ func TestDeletionRequestIndex(t *testing.T) {
 	for _, client := range allClients {
 		html := client.GET("/deletions").Expect().
 			Status(http.StatusOK).Body().Raw()
-		MatchesAll(t, html, deletionLinks)
-		MatchesAll(t, html, commonFilters)
+		AssertMatchesAll(t, html, deletionLinks)
+		AssertMatchesAll(t, html, commonFilters)
 		if client == sysAdminClient {
-			MatchesAll(t, html, sysAdminFilters)
+			AssertMatchesAll(t, html, sysAdminFilters)
 		} else {
-			MatchesNone(t, html, sysAdminFilters)
+			AssertMatchesNone(t, html, sysAdminFilters)
 		}
 	}
 }

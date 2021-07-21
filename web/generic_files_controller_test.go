@@ -25,7 +25,7 @@ func TestGenericFileShow(t *testing.T) {
 	for _, client := range allClients {
 		html := client.GET("/files/show/1").Expect().
 			Status(http.StatusOK).Body().Raw()
-		MatchesAll(t, html, items)
+		AssertMatchesAll(t, html, items)
 	}
 
 	// This file belongs to institution 2, so sys admin
@@ -66,14 +66,14 @@ func TestGenericFileIndex(t *testing.T) {
 	for _, client := range allClients {
 		html := client.GET("/files").Expect().
 			Status(http.StatusOK).Body().Raw()
-		MatchesAll(t, html, items)
-		MatchesAll(t, html, commonFilters)
+		AssertMatchesAll(t, html, items)
+		AssertMatchesAll(t, html, commonFilters)
 		if client == sysAdminClient {
-			MatchesAll(t, html, adminFilters)
-			MatchesResultCount(t, html, 49)
+			AssertMatchesAll(t, html, adminFilters)
+			AssertMatchesResultCount(t, html, 49)
 		} else {
-			MatchesNone(t, html, adminFilters)
-			MatchesResultCount(t, html, 11)
+			AssertMatchesNone(t, html, adminFilters)
+			AssertMatchesResultCount(t, html, 11)
 		}
 	}
 
@@ -85,10 +85,10 @@ func TestGenericFileIndex(t *testing.T) {
 			Expect().
 			Status(http.StatusOK).Body().Raw()
 		if client == sysAdminClient {
-			MatchesResultCount(t, html, 34)
+			AssertMatchesResultCount(t, html, 34)
 		} else {
-			MatchesNone(t, html, adminFilters)
-			MatchesResultCount(t, html, 10)
+			AssertMatchesNone(t, html, adminFilters)
+			AssertMatchesResultCount(t, html, 10)
 		}
 	}
 
@@ -119,7 +119,7 @@ func TestGenericFileRequestDelete(t *testing.T) {
 	for _, client := range allClients {
 		html := client.GET("/files/request_delete/1").
 			Expect().Status(http.StatusOK).Body().Raw()
-		MatchesAll(t, html, items)
+		AssertMatchesAll(t, html, items)
 	}
 
 	// Sys Admin can request any deletion, but others cannot
@@ -144,7 +144,7 @@ func TestGenericFileInitDelete(t *testing.T) {
 	// User at inst 1 can initiate deletion of their own
 	// institution's file.
 	html := instUserClient.POST("/files/init_delete/4").Expect().Status(http.StatusCreated).Body().Raw()
-	MatchesAll(t, html, items)
+	AssertMatchesAll(t, html, items)
 
 	// This should create a deletion request...
 	query := pgmodels.NewQuery().Where("generic_file_id", "=", 4)
@@ -187,7 +187,7 @@ func TestGenericFileRequestRestore(t *testing.T) {
 	for _, client := range allClients {
 		html := client.GET("/files/request_restore/2").
 			Expect().Status(http.StatusOK).Body().Raw()
-		MatchesAll(t, html, items)
+		AssertMatchesAll(t, html, items)
 	}
 
 	// Sys Admin can request any deletion, but others cannot
@@ -216,7 +216,7 @@ func TestGenericFileInitRestore(t *testing.T) {
 	// new data for each test. Sigh.)
 	html := instUserClient.POST("/files/init_restore/2").
 		Expect().Status(http.StatusOK).Body().Raw()
-	MatchesAll(t, html, items)
+	AssertMatchesAll(t, html, items)
 
 	query := pgmodels.NewQuery().
 		Where("action", "=", constants.ActionRestoreFile).

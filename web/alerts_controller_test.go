@@ -65,12 +65,12 @@ func TestAlertIndex(t *testing.T) {
 	// Sys Admin should see all alerts and filters
 	resp := sysAdminClient.GET("/alerts").Expect().Status(http.StatusOK)
 	html := resp.Body().Raw()
-	MatchesAll(t, html, commonFilters)
-	MatchesAll(t, html, sysAdminFilters)
-	MatchesAll(t, html, constants.AlertTypes)
-	MatchesAll(t, html, AllInstitutionNames(t))
-	MatchesAll(t, html, AllUserNames(t))
-	MatchesResultCount(t, html, 15)
+	AssertMatchesAll(t, html, commonFilters)
+	AssertMatchesAll(t, html, sysAdminFilters)
+	AssertMatchesAll(t, html, constants.AlertTypes)
+	AssertMatchesAll(t, html, AllInstitutionNames(t))
+	AssertMatchesAll(t, html, AllUserNames(t))
+	AssertMatchesResultCount(t, html, 15)
 
 	// Make sure filters work. Should be 1 deletion confirmed
 	// alerts for the inst 1 admin.
@@ -79,24 +79,24 @@ func TestAlertIndex(t *testing.T) {
 		WithQuery("type", constants.AlertDeletionConfirmed).
 		Expect().Status(http.StatusOK)
 	html = resp.Body().Raw()
-	MatchesResultCount(t, html, 1)
+	AssertMatchesResultCount(t, html, 1)
 
 	// Inst admin should see only his own alerts and the
 	// alert type and date filters
 	resp = instAdminClient.GET("/alerts").WithQuery("institution_id", inst1Admin.InstitutionID).WithQuery("user_id", inst1Admin.ID).Expect().Status(http.StatusOK)
 	html = resp.Body().Raw()
-	MatchesAll(t, html, commonFilters)
-	MatchesNone(t, html, sysAdminFilters)
-	MatchesAll(t, html, constants.AlertTypes)
-	MatchesResultCount(t, html, 6)
+	AssertMatchesAll(t, html, commonFilters)
+	AssertMatchesNone(t, html, sysAdminFilters)
+	AssertMatchesAll(t, html, constants.AlertTypes)
+	AssertMatchesResultCount(t, html, 6)
 
 	// Inst user should see only his own alerts and the
 	// alert type and date filters
 	resp = instUserClient.GET("/alerts").WithQuery("institution_id", inst1User.InstitutionID).WithQuery("user_id", inst1User.ID).Expect().Status(http.StatusOK)
 	html = resp.Body().Raw()
-	MatchesAll(t, html, commonFilters)
-	MatchesNone(t, html, sysAdminFilters)
-	MatchesAll(t, html, constants.AlertTypes)
-	MatchesResultCount(t, html, 2)
+	AssertMatchesAll(t, html, commonFilters)
+	AssertMatchesNone(t, html, sysAdminFilters)
+	AssertMatchesAll(t, html, constants.AlertTypes)
+	AssertMatchesResultCount(t, html, 2)
 
 }

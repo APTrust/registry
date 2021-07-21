@@ -17,6 +17,6 @@ func TestDashboardShow(t *testing.T) {
 	for _, client := range allClients {
 		html := client.GET("/dashboard").Expect().
 			Status(http.StatusOK).Body().Raw()
-		MatchesAll(t, html, sections)
+		AssertMatchesAll(t, html, sections)
 	}
 }

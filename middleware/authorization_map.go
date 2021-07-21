@@ -69,7 +69,7 @@ var AuthMap = map[string]AuthMetadata{
 	"InstitutionCreate":                  {"Institution", constants.InstitutionCreate},
 	"InstitutionDelete":                  {"Institution", constants.InstitutionDelete},
 	"InstitutionEdit":                    {"Institution", constants.InstitutionUpdate},
-	"InstitutionIndex":                   {"Institution", constants.InstitutionRead},
+	"InstitutionIndex":                   {"Institution", constants.InstitutionList},
 	"InstitutionNew":                     {"Institution", constants.InstitutionCreate},
 	"InstitutionShow":                    {"Institution", constants.InstitutionRead},
 	"InstitutionUndelete":                {"Institution", constants.InstitutionUpdate},

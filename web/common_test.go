@@ -137,15 +137,15 @@ func InstUserNames(t *testing.T, institutionID int64) []string {
 // don't behave well in loops. We get panics instead of proper
 // test failure reports.
 
-// MatchesAll asserts that all strings in items appear in body.
-func MatchesAll(t *testing.T, body string, items []string) {
+// AssertMatchesAll asserts that all strings in items appear in body.
+func AssertMatchesAll(t *testing.T, body string, items []string) {
 	for _, item := range items {
 		assert.True(t, strings.Contains(body, item), "Missing expected string: %s", item)
 	}
 }
 
-// MatchesNone asserts that no strings in items appear in body.
-func MatchesNone(t *testing.T, body string, items []string) {
+// AssertMatchesNone asserts that no strings in items appear in body.
+func AssertMatchesNone(t *testing.T, body string, items []string) {
 	for _, item := range items {
 		assert.False(t, strings.Contains(body, item), "Found unexpected string: %s", item)
 	}
@@ -154,7 +154,7 @@ func MatchesNone(t *testing.T, body string, items []string) {
 // MatchResult count asserts that the result count at the bottom of
 // a list/index page matches the expected count. In the HTML pager,
 // the result count appears in the format "1 - 20 of 215".
-func MatchesResultCount(t *testing.T, body string, count int) {
+func AssertMatchesResultCount(t *testing.T, body string, count int) {
 	countStr := fmt.Sprintf("%d", count)
 	re := regexp.MustCompile(`\d+ - \d+ of (\d+)`)
 	matches := re.FindAllStringSubmatch(body, 1)

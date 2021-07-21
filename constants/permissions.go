@@ -40,6 +40,7 @@ const (
 	FileFinishBulkDelete               = "FileFinishBulkDelete"
 	FileRestore                        = "FileRestore"
 	InstitutionCreate                  = "InstitutionCreate"
+	InstitutionList                    = "InstitutionList"
 	InstitutionRead                    = "InstitutionRead"
 	InstitutionUpdate                  = "InstitutionUpdate"
 	InstitutionDelete                  = "InstitutionDelete"
@@ -96,6 +97,7 @@ var Permissions = []Permission{
 	FileFinishBulkDelete,
 	FileRestore,
 	InstitutionCreate,
+	InstitutionList,
 	InstitutionRead,
 	InstitutionUpdate,
 	InstitutionDelete,
@@ -232,6 +234,7 @@ func initPermissions() {
 	sysAdmin[FileFinishBulkDelete] = true
 	sysAdmin[FileRestore] = true
 	sysAdmin[InstitutionCreate] = true
+	sysAdmin[InstitutionList] = true
 	sysAdmin[InstitutionRead] = true
 	sysAdmin[InstitutionUpdate] = true
 	sysAdmin[InstitutionDelete] = true
