@@ -54,6 +54,7 @@ func GenericFileShow(c *gin.Context) {
 
 // GenericFileRequestRestore shows a message asking whether
 // user really wants to restore a file.
+// GET /files/request_restore/:id
 func GenericFileRequestRestore(c *gin.Context) {
 	req := NewRequest(c)
 	gf, err := pgmodels.GenericFileByID(req.Auth.ResourceID)

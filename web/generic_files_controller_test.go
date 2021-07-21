@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -175,8 +176,59 @@ func TestGenericFileInitDelete(t *testing.T) {
 
 func TestGenericFileRequestRestore(t *testing.T) {
 	initHTTPTests(t)
+
+	items := []string{
+		"This file will be restored",
+		"Cancel",
+		"Confirm",
+	}
+
+	// Users can request deletions of their own files
+	for _, client := range allClients {
+		html := client.GET("/files/request_restore/2").
+			Expect().Status(http.StatusOK).Body().Raw()
+		MatchesAll(t, html, items)
+	}
+
+	// Sys Admin can request any deletion, but others cannot
+	// request deletions outside their own institution.
+	// File 18 from fixtures belongs to Inst2
+	sysAdminClient.GET("/files/request_restore/18").
+		Expect().Status(http.StatusOK)
+	instAdminClient.GET("/files/request_restore/18").
+		Expect().Status(http.StatusForbidden)
+	instUserClient.GET("/files/request_restore/18").
+		Expect().Status(http.StatusForbidden)
 }
 
 func TestGenericFileInitRestore(t *testing.T) {
 	initHTTPTests(t)
+
+	items := []string{
+		"File institution1.edu/photos/picture2 has been queued for restoration",
+	}
+
+	// User should see flash message saying item is queued for restoration.
+	// This means the work item was created and queued.
+	// If other tests have created an ingest, deletion, or restoration
+	// request request for this file, we'll get a "pending work item"
+	// error. (One of the risks of using fixtures instead of generating
+	// new data for each test. Sigh.)
+	html := instUserClient.POST("/files/init_restore/2").
+		Expect().Status(http.StatusOK).Body().Raw()
+	MatchesAll(t, html, items)
+
+	query := pgmodels.NewQuery().
+		Where("action", "=", constants.ActionRestoreFile).
+		Where("generic_file_id", "=", 2).
+		Limit(1)
+	workItem, err := pgmodels.WorkItemGet(query)
+	require.Nil(t, err)
+	require.NotNil(t, workItem)
+
+	// Users cannot restore files belonging to other institutions.
+	instAdminClient.POST("/files/init_restore/18").
+		Expect().Status(http.StatusForbidden)
+	instUserClient.POST("/files/init_restore/18").
+		Expect().Status(http.StatusForbidden)
 }
