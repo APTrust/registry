@@ -19,6 +19,7 @@ import (
 )
 
 var appEngine *gin.Engine
+var fixturesReloaded = false
 var sysAdminClient *httpexpect.Expect
 var instAdminClient *httpexpect.Expect
 var instUserClient *httpexpect.Expect
@@ -32,10 +33,15 @@ var allInstNames []string
 var allUserNames []string
 
 func initHTTPTests(t *testing.T) {
-	if appEngine == nil {
-		err := db.LoadFixtures()
+	// Force fixture reload to get rid of any records
+	// that the pgmodels tests may have inserted or changed.
+	// This gives us a known set of fixtures to work with.
+	if fixturesReloaded == false {
+		err := db.ForceFixtureReload()
 		require.Nil(t, err)
-
+		fixturesReloaded = true
+	}
+	if appEngine == nil {
 		appEngine = app.InitAppEngine(true)
 		sysAdminClient = initClient(t, "system@aptrust.org", appEngine)
 		instAdminClient = initClient(t, "admin@inst1.edu", appEngine)

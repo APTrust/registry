@@ -18,6 +18,7 @@ func InstitutionCreate(c *gin.Context) {
 
 // InstitutionDelete deletes a user.
 // DELETE /institutions/delete/:id
+// GET /institutions/delete/:id
 func InstitutionDelete(c *gin.Context) {
 	req := NewRequest(c)
 	inst, err := pgmodels.InstitutionByID(req.Auth.ResourceID)

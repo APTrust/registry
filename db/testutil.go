@@ -96,7 +96,11 @@ var DropOrder = []string{
 // LoadFixtures wipes out and resets the test database, loading
 // all of the fixtures we use for unit and intergration tests.
 // This method effectively runs only once per test run. All calls
-// to this function after the first call are no-ops.
+// to this function after the first call are no-ops to prevent
+// time-consuming reloading of DB for each test.
+//
+// If you truly want to force a reloading of all fixtures, call
+// ForceFixtureReload().
 //
 // This will panic if run in any APT_ENV other than "test" or "integration".
 func LoadFixtures() error {
@@ -130,6 +134,14 @@ func LoadFixtures() error {
 		fixturesLoaded = true
 	}
 	return nil
+}
+
+// ForceFixtureReload forces reloading of all test fixtures.
+// This is useful when you want to ensure a clean slate, wiping
+// out all records left by prior tests.
+func ForceFixtureReload() error {
+	fixturesLoaded = false
+	return LoadFixtures()
 }
 
 // Drop all tables in the DB.
