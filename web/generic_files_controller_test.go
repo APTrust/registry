@@ -2,9 +2,11 @@ package web_test
 
 import (
 	"net/http"
+	"strings"
 	"testing"
 
 	"github.com/APTrust/registry/constants"
+	"github.com/APTrust/registry/db"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -134,6 +136,10 @@ func TestGenericFileRequestDelete(t *testing.T) {
 }
 
 func TestGenericFileInitDelete(t *testing.T) {
+	// Force fixture reload to prevent "pending work item"
+	// error when requesting deletion.
+	err := db.ForceFixtureReload()
+	require.Nil(t, err)
 	initHTTPTests(t)
 
 	items := []string{
@@ -149,7 +155,7 @@ func TestGenericFileInitDelete(t *testing.T) {
 	// This should create a deletion request...
 	query := pgmodels.NewQuery().Where("generic_file_id", "=", 4)
 	drgf := pgmodels.DeletionRequestsGenericFiles{}
-	err := query.Select(&drgf)
+	err = query.Select(&drgf)
 	require.Nil(t, err)
 	require.NotEqual(t, int64(0), drgf.DeletionRequestID)
 
@@ -167,6 +173,9 @@ func TestGenericFileInitDelete(t *testing.T) {
 	assert.NotNil(t, alert)
 	assert.NotNil(t, alert.DeletionRequest)
 	assert.True(t, len(alert.Users) > 0)
+
+	// Alert should include link to review the deletion request.
+	assert.True(t, strings.Contains(alert.Content, "token="))
 
 	// The user should NOT be able to initiate deletion of a file
 	// that belongs to another institution. In fixture data, file
@@ -202,6 +211,10 @@ func TestGenericFileRequestRestore(t *testing.T) {
 }
 
 func TestGenericFileInitRestore(t *testing.T) {
+	// Force fixture reload to prevent "pending work item"
+	// error when requesting restoration.
+	err := db.ForceFixtureReload()
+	require.Nil(t, err)
 	initHTTPTests(t)
 
 	items := []string{
@@ -210,10 +223,6 @@ func TestGenericFileInitRestore(t *testing.T) {
 
 	// User should see flash message saying item is queued for restoration.
 	// This means the work item was created and queued.
-	// If other tests have created an ingest, deletion, or restoration
-	// request request for this file, we'll get a "pending work item"
-	// error. (One of the risks of using fixtures instead of generating
-	// new data for each test. Sigh.)
 	html := instUserClient.POST("/files/init_restore/2").
 		Expect().Status(http.StatusOK).Body().Raw()
 	AssertMatchesAll(t, html, items)

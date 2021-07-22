@@ -173,6 +173,8 @@ func initPermissions() {
 	instUser[FileRestore] = true
 	instUser[InstitutionRead] = true
 	instUser[IntellectualObjectRead] = true
+	instUser[IntellectualObjectRequestDelete] = true
+	instUser[IntellectualObjectRestore] = true
 	instUser[ReportRead] = true
 	instUser[StorageRecordRead] = true
 	instUser[UserSignIn] = true
