@@ -48,6 +48,13 @@ func TestObjectShow(t *testing.T) {
 			Status(http.StatusOK).Body().Raw()
 		AssertMatchesAll(t, html, items)
 	}
+
+	// inst 1 users cannot see objects belonging to inst 2
+	instAdminClient.GET("/objects/show/6").
+		Expect().Status(http.StatusForbidden)
+	instUserClient.GET("/objects/show/6").
+		Expect().Status(http.StatusForbidden)
+
 }
 
 func TestObjectList(t *testing.T) {
