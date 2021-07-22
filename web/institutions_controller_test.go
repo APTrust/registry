@@ -13,8 +13,6 @@ import (
 func TestInstitutionShow(t *testing.T) {
 	initHTTPTests(t)
 
-	initHTTPTests(t)
-
 	items := []string{
 		"institution1.edu",
 		"Member",
