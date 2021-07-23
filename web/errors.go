@@ -29,6 +29,12 @@ func ErrorShow(c *gin.Context) {
 	templateData := gin.H{
 		"CurrentUser": currentUser,
 	}
+
+	// Do this or the side nav template throws an error
+	if currentUser == nil {
+		templateData["suppressSideNav"] = true
+	}
+
 	status := http.StatusInternalServerError
 	err, _ := c.Get("err")
 	if err != nil {

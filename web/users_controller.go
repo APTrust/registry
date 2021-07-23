@@ -259,6 +259,8 @@ func reqAndUserForPwdEdit(c *gin.Context) (*Request, *pgmodels.User, error) {
 // login token. When they follow the link, they'll be automatically
 // logged in and will have to choose a new password.
 //
+// TODO: This should be POST or PUT, not GET
+//
 // GET /users/init_password_reset/:id
 func UserInitPasswordReset(c *gin.Context) {
 	// This is admin triggering a password reset for another user,

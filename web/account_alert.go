@@ -39,6 +39,9 @@ func CreatePasswordChangedAlert(req *Request, userToEdit *pgmodels.User) (*pgmod
 // when a user clicks the "Forgot Password" link on the login page
 // and when an admin creates a new user account. In each case, the
 // user clicks the email link and then has to set a new password.
+//
+// Note that the token in the URL is random but unencrypted. The one
+// in the DB is encrypted, so stealing it will do an attacker no good.
 func CreatePasswordResetAlert(req *Request, userToEdit *pgmodels.User, token string) (*pgmodels.Alert, error) {
 	templateName := "alerts/reset_password.txt"
 	alertData := map[string]interface{}{

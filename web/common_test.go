@@ -33,6 +33,8 @@ var inst2Admin *pgmodels.User
 var allInstNames []string
 var allUserNames []string
 
+var userFor map[*httpexpect.Expect]*pgmodels.User
+
 func initHTTPTests(t *testing.T) {
 	// Force fixture reload to get rid of any records
 	// that the pgmodels tests may have inserted or changed.
@@ -57,6 +59,11 @@ func initHTTPTests(t *testing.T) {
 		inst1Admin = initUser(t, "admin@inst1.edu")
 		inst1User = initUser(t, "user@inst1.edu")
 		inst2Admin = initUser(t, "admin@inst2.edu")
+
+		userFor = make(map[*httpexpect.Expect]*pgmodels.User)
+		userFor[sysAdminClient] = sysAdmin
+		userFor[instAdminClient] = inst1Admin
+		userFor[instUserClient] = inst1User
 	}
 }
 

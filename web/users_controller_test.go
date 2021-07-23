@@ -2,6 +2,7 @@ package web_test
 
 import (
 	"net/http"
+	"regexp"
 	"testing"
 
 	"github.com/APTrust/registry/common"
@@ -244,14 +245,96 @@ func TestUserChangePassword(t *testing.T) {
 
 func TestUserForcePasswordReset(t *testing.T) {
 	initHTTPTests(t)
+
+	defer restorePassword(t, inst1User)
+
+	instAdminClient.GET("/users/init_password_reset/{id}", inst1User.ID).
+		Expect().Status(http.StatusOK)
+
+	// This should create an alert for the user.
+	query := pgmodels.NewQuery().
+		Where("type", "=", constants.AlertPasswordReset).
+		Where("user_id", "=", inst1User.ID)
+	alertView, err := pgmodels.AlertViewGet(query)
+	require.Nil(t, err)
+	require.NotNil(t, alertView)
+
+	// It should also set a password reset token
+	user, err := pgmodels.UserByID(inst1User.ID)
+	require.Nil(t, err)
+	require.NotNil(t, user)
+	require.NotEmpty(t, user.ResetPasswordToken)
+
+	// Extract unencrypted reset token from the URL in the alert message
+	re := regexp.MustCompile(`token=([^\n]+)`)
+	m := re.FindAllStringSubmatch(alertView.Content, 1)
+	require.True(t, len(m) > 0, "Token is missing from alert")
+	require.True(t, len(m[0]) > 1, "Token is missing from alert")
+	unencryptedToken := m[0][1]
+
+	// inst1user should be able to use this token to reset
+	// their password. Note that the user will arrive without
+	// logging in (because they don't have their password).
+	client := getAnonymousClient(t)
+
+	// First: Bad token should result in error
+	client.GET("/users/complete_password_reset/{id}", inst1User.ID).
+		WithQuery("token", "BAD_TOKEN").
+		Expect().Status(http.StatusInternalServerError)
+
+	// Good token should succeed.
+	client.GET("/users/complete_password_reset/{id}", inst1User.ID).
+		WithQuery("token", unencryptedToken).
+		Expect().Status(http.StatusOK)
+
+	// Regular user cannot reset other user's password.
+	instUserClient.GET("/users/init_password_reset/{id}", inst1Admin.ID).
+		Expect().Status(http.StatusForbidden)
+	instUserClient.GET("/users/init_password_reset/{id}", inst2Admin.ID).
+		Expect().Status(http.StatusForbidden)
+
+	// Admin cannot reset password of anyone at other institution
+	instAdminClient.GET("/users/init_password_reset/{id}", inst2Admin.ID).
+		Expect().Status(http.StatusForbidden)
 }
 
 func TestUserGetAPIKey(t *testing.T) {
 	initHTTPTests(t)
+
+	items := []string{
+		"Your new API key is",
+	}
+
+	// Any user can get their own API key
+	for _, client := range allClients {
+		html := client.POST("/users/get_api_key/{id}", userFor[client].ID).
+			Expect().Status(http.StatusOK).Body().Raw()
+		AssertMatchesAll(t, html, items)
+	}
+
+	// No user can get another user's API key
+	instAdminClient.POST("/users/get_api_key/{id}", inst1User.ID).
+		Expect().Status(http.StatusForbidden)
+	instUserClient.POST("/users/get_api_key/{id}", inst1Admin.ID).
+		Expect().Status(http.StatusForbidden)
+	instAdminClient.POST("/users/get_api_key/{id}", inst2Admin.ID).
+		Expect().Status(http.StatusForbidden)
+
 }
 
 func TestUserMyAccount(t *testing.T) {
 	initHTTPTests(t)
+
+	items := []string{
+		"Get API Key",
+		"Change Password",
+	}
+
+	for _, client := range allClients {
+		html := client.GET("/users/my_account").
+			Expect().Status(http.StatusOK).Body().Raw()
+		AssertMatchesAll(t, html, items)
+	}
 }
 
 func restorePassword(t *testing.T, user *pgmodels.User) {
