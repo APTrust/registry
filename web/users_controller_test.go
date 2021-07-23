@@ -3,10 +3,11 @@ package web_test
 import (
 	"net/http"
 	"testing"
-	// "github.com/APTrust/registry/constants"
-	// "github.com/APTrust/registry/pgmodels"
-	// "github.com/stretchr/testify/assert"
-	// "github.com/stretchr/testify/require"
+
+	"github.com/APTrust/registry/constants"
+	"github.com/APTrust/registry/pgmodels"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestUserShow(t *testing.T) {
@@ -95,12 +96,94 @@ func TestUserIndex(t *testing.T) {
 
 func TestUserCreateEditDeleteUndelete(t *testing.T) {
 	initHTTPTests(t)
+
+	// Make sure admins can get to this page and regular users cannot.
+	sysAdminClient.GET("/users/new").Expect().Status(http.StatusOK)
+	instAdminClient.GET("/users/new").Expect().Status(http.StatusOK)
+	instUserClient.GET("/users/new").Expect().Status(http.StatusForbidden)
+
+	formData := map[string]interface{}{
+		"Name":           "Unit Test User",
+		"Email":          "utest-user@inst1.edu",
+		"PhoneNumber":    "+12025559815",
+		"institution_id": inst1Admin.InstitutionID,
+		"Role":           constants.RoleInstUser,
+	}
+
+	instAdminClient.POST("/users/new").
+		WithForm(formData).Expect().Status(http.StatusOK)
+
+	// Make sure the new user exists and has the correct info
+	user, err := pgmodels.UserByEmail("utest-user@inst1.edu")
+	require.Nil(t, err)
+	require.NotNil(t, user)
+	assert.Equal(t, formData["Name"], user.Name)
+	assert.Equal(t, formData["Email"], user.Email)
+	assert.Equal(t, formData["PhoneNumber"], user.PhoneNumber)
+	assert.Equal(t, formData["institution_id"], user.InstitutionID)
+	assert.Equal(t, formData["Role"], user.Role)
+	assert.NotEmpty(t, user.EncryptedPassword)
+
+	// Get the edit page for the new user
+	instAdminClient.GET("/users/edit/{id}", user.ID).
+		Expect().Status(http.StatusOK)
+
+	// Update the user
+	formData["Name"] = "Unit Test User (edited)"
+	formData["PhoneNumber"] = "+15058981234"
+	instAdminClient.PUT("/users/edit/{id}", user.ID).
+		WithForm(formData).Expect().Status(http.StatusOK)
+
+	// Make sure the edits were saved
+	user, err = pgmodels.UserByEmail("utest-user@inst1.edu")
+	require.Nil(t, err)
+	require.NotNil(t, user)
+	assert.Equal(t, formData["Name"], user.Name)
+	assert.Equal(t, formData["PhoneNumber"], user.PhoneNumber)
+
+	// Delete the user. This winds up with an OK because of redirect.
+	instAdminClient.DELETE("/users/delete/{id}", user.ID).
+		Expect().Status(http.StatusOK)
+
+	// Undelete the user. Again, we get a redirect ending with an OK.
+	instAdminClient.GET("/users/undelete/{id}", user.ID).
+		Expect().Status(http.StatusOK)
+
 }
 
 func TestUserSignInSignOut(t *testing.T) {
 	initHTTPTests(t)
+
+	client := getAnonymousClient(t)
+
+	// Make sure anonymous client can access the sign-in page
+	client.GET("/").Expect().Status(http.StatusOK)
+
+	// Make sure they can sign in and are redirected to dashboard
+	html := client.POST("/users/sign_in").
+		WithFormField("email", "user@inst1.edu").
+		WithFormField("password", "password").
+		Expect().Status(http.StatusOK).Body().Raw()
+
+	dashboardItems := []string{
+		"Recent Work Items",
+		"Notifications",
+		"Deposits by Storage Option",
+	}
+	AssertMatchesAll(t, html, dashboardItems)
+
+	// Make sure user can sign out.
+	client.GET("/users/sign_out").Expect().Status(http.StatusOK)
+
+	// After signout, attempts to access valid pages should return
+	// unauthorized.
+	client.GET("/dashboard").Expect().Status(http.StatusUnauthorized)
 }
 
 func TestUserChangePassword(t *testing.T) {
+	initHTTPTests(t)
+}
+
+func TestUserForcePasswordReset(t *testing.T) {
 	initHTTPTests(t)
 }

@@ -43,9 +43,9 @@ func initHTTPTests(t *testing.T) {
 	}
 	if appEngine == nil {
 		appEngine = app.InitAppEngine(true)
-		sysAdminClient = initClient(t, "system@aptrust.org", appEngine)
-		instAdminClient = initClient(t, "admin@inst1.edu", appEngine)
-		instUserClient = initClient(t, "user@inst1.edu", appEngine)
+		sysAdminClient = initClient(t, "system@aptrust.org")
+		instAdminClient = initClient(t, "admin@inst1.edu")
+		instUserClient = initClient(t, "user@inst1.edu")
 		allClients = []*httpexpect.Expect{
 			sysAdminClient,
 			instAdminClient,
@@ -58,11 +58,29 @@ func initHTTPTests(t *testing.T) {
 	}
 }
 
-func initClient(t *testing.T, email string, engine *gin.Engine) *httpexpect.Expect {
-	e := httpexpect.WithConfig(httpexpect.Config{
+func initClient(t *testing.T, email string) *httpexpect.Expect {
+	client := getAnonymousClient(t)
+
+	// In fixture data, password for all users is 'password'
+	signInForm := map[string]string{
+		"email":    email,
+		"password": "password",
+	}
+
+	// Sign the user in, and be sure we got on OK.
+	// The client cookie jar will store the session
+	// cookie for this user.
+	client.POST("/users/sign_in").
+		WithForm(signInForm).Expect().Status(http.StatusOK)
+
+	return client
+}
+
+func getAnonymousClient(t *testing.T) *httpexpect.Expect {
+	client := httpexpect.WithConfig(httpexpect.Config{
 		BaseURL: "http://localhost",
 		Client: &http.Client{
-			Transport: httpexpect.NewBinder(engine),
+			Transport: httpexpect.NewBinder(appEngine),
 			Jar:       httpexpect.NewJar(),
 			Timeout:   time.Second * 3,
 		},
@@ -73,21 +91,7 @@ func initClient(t *testing.T, email string, engine *gin.Engine) *httpexpect.Expe
 		//	httpexpect.NewDebugPrinter(t, true),
 		//},
 	})
-
-	// Create sign-in data for the requested user.
-	// Remember that in fixtures, the password for all users
-	// is "password".
-	signInForm := map[string]string{
-		"email":    email,
-		"password": "password",
-	}
-
-	// Sign the user in, and be sure we got on OK.
-	// The client cookie jar will store the session
-	// cookie for this user.
-	e.POST("/users/sign_in").WithForm(signInForm).Expect().Status(http.StatusOK)
-
-	return e
+	return client
 }
 
 func initUser(t *testing.T, email string) *pgmodels.User {
