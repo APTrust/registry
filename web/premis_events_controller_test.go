@@ -1,7 +1,6 @@
 package web_test
 
 import (
-	"fmt"
 	"net/http"
 	"testing"
 )
@@ -102,7 +101,6 @@ func TestEventShowXHR(t *testing.T) {
 	for _, client := range allClients {
 		html := client.GET("/events/show_xhr/31").Expect().
 			Status(http.StatusOK).Body().Raw()
-		fmt.Println(html)
 		AssertMatchesAll(t, html, items)
 	}
 
