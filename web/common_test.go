@@ -28,6 +28,7 @@ var allClients []*httpexpect.Expect
 var sysAdmin *pgmodels.User
 var inst1Admin *pgmodels.User
 var inst1User *pgmodels.User
+var inst2Admin *pgmodels.User
 
 var allInstNames []string
 var allUserNames []string
@@ -55,6 +56,7 @@ func initHTTPTests(t *testing.T) {
 		sysAdmin = initUser(t, "system@aptrust.org")
 		inst1Admin = initUser(t, "admin@inst1.edu")
 		inst1User = initUser(t, "user@inst1.edu")
+		inst2Admin = initUser(t, "admin@inst2.edu")
 	}
 }
 

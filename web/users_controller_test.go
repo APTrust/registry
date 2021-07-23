@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/stretchr/testify/assert"
@@ -182,8 +183,81 @@ func TestUserSignInSignOut(t *testing.T) {
 
 func TestUserChangePassword(t *testing.T) {
 	initHTTPTests(t)
+
+	// After tests, restore inst1User's password so that we
+	// run interactive tests in browser afterward, we can log
+	// in with the usual password.
+	defer restorePassword(t, inst1User)
+
+	originalEncrypedPwd := inst1User.EncryptedPassword
+
+	// Make sure user can get to the change password page
+	// to change their own password.
+	instUserClient.GET("/users/change_password/{id}", inst1User.ID).
+		Expect().Status(http.StatusOK)
+
+	// Submit and test the password change.
+	// Password requirements: uppercase, lowercase, number, min 8 chars
+	instUserClient.POST("/users/change_password/{id}", inst1User.ID).
+		WithFormField("NewPassword", "Password1234").
+		WithFormField("ConfirmNewPassword", "Password1234").
+		Expect().Status(http.StatusOK)
+
+	user, err := pgmodels.UserByID(inst1User.ID)
+	require.Nil(t, err)
+	require.NotNil(t, user)
+	assert.NotEqual(t, originalEncrypedPwd, user.EncryptedPassword)
+
+	secondPwd := user.EncryptedPassword
+
+	// Institutional admin can change another user's password,
+	// as long as that user is at their institution.
+	instAdminClient.GET("/users/change_password/{id}", inst1User.ID).
+		Expect().Status(http.StatusOK)
+	instAdminClient.POST("/users/change_password/{id}", inst1User.ID).
+		WithFormField("NewPassword", "Password5678").
+		WithFormField("ConfirmNewPassword", "Password5678").
+		Expect().Status(http.StatusOK)
+
+	user, err = pgmodels.UserByID(inst1User.ID)
+	require.Nil(t, err)
+	require.NotNil(t, user)
+	assert.NotEqual(t, secondPwd, user.EncryptedPassword)
+
+	// inst1Admin cannot change password for anyone at inst2
+	instAdminClient.GET("/users/change_password/{id}", inst2Admin.ID).
+		Expect().Status(http.StatusForbidden)
+	instAdminClient.POST("/users/change_password/{id}", inst2Admin.ID).
+		WithFormField("NewPassword", "Password5678").
+		WithFormField("ConfirmNewPassword", "Password5678").
+		Expect().Status(http.StatusForbidden)
+
+	// Regular user cannot access anyone else's change password page
+	// In this case, inst1User is trying to change inst1Admin
+	instUserClient.GET("/users/change_password/{id}", inst1Admin.ID).
+		Expect().Status(http.StatusForbidden)
+	instUserClient.POST("/users/change_password/{id}", inst1Admin.ID).
+		WithFormField("NewPassword", "Password5678").
+		WithFormField("ConfirmNewPassword", "Password5678").
+		Expect().Status(http.StatusForbidden)
 }
 
 func TestUserForcePasswordReset(t *testing.T) {
 	initHTTPTests(t)
+}
+
+func TestUserGetAPIKey(t *testing.T) {
+	initHTTPTests(t)
+}
+
+func TestUserMyAccount(t *testing.T) {
+	initHTTPTests(t)
+}
+
+func restorePassword(t *testing.T, user *pgmodels.User) {
+	encPwd, err := common.EncryptPassword("password")
+	require.Nil(t, err, "After tests, error restoring password for user %s", user.Name)
+	user.EncryptedPassword = encPwd
+	err = user.Save()
+	assert.Nil(t, err, "After tests, error restoring password for user %s", user.Name)
 }
