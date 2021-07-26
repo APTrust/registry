@@ -298,6 +298,11 @@ func TestUserForcePasswordReset(t *testing.T) {
 		WithQuery("token", unencryptedToken).
 		Expect().Status(http.StatusOK)
 
+	// Need to clear this token for the next two tests, so inst1User
+	// isn't being forced to complete their own password reset.
+	inst1User.ResetPasswordToken = ""
+	require.Nil(t, inst1User.Save())
+
 	// Regular user cannot reset other user's password.
 	instUserClient.GET("/users/init_password_reset/{id}", inst1Admin.ID).
 		Expect().Status(http.StatusForbidden)

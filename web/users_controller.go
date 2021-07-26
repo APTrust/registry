@@ -171,7 +171,7 @@ func UserShowChangePassword(c *gin.Context) {
 	// but it will suffice for now. No sense building in complex
 	// logic now if ST is going to redo the UI anyway.
 	// We'll come back to this one.
-	if req.CurrentUser.ID == userToEdit.ID {
+	if req.CurrentUser.ResetPasswordToken != "" {
 		req.TemplateData["suppressTopNav"] = true
 		req.TemplateData["suppressSideNav"] = true
 	}
@@ -205,6 +205,8 @@ func UserChangePassword(c *gin.Context) {
 	}
 	userToEdit.EncryptedPassword = encPassword
 	userToEdit.PasswordChangedAt = time.Now().UTC()
+	userToEdit.ResetPasswordToken = ""
+	userToEdit.ResetPasswordSentAt = time.Time{}
 	err = userToEdit.Save()
 	if AbortIfError(c, err) {
 		return
@@ -318,8 +320,6 @@ func UserCompletePasswordReset(c *gin.Context) {
 		return
 	}
 
-	user.ResetPasswordToken = ""
-	user.ResetPasswordSentAt = time.Time{}
 	user.SignInCount = user.SignInCount + 1
 	if user.CurrentSignInIP != "" {
 		user.LastSignInIP = user.CurrentSignInIP

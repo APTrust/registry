@@ -15,8 +15,10 @@ import (
 func Authenticate() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		LoadCookies(c)
+		var user *pgmodels.User
+		var err error
 		if !ExemptFromAuth(c) {
-			user, err := GetUserFromSession(c)
+			user, err = GetUserFromSession(c)
 			if err != nil {
 				c.HTML(http.StatusUnauthorized, "errors/show.html", gin.H{
 					"suppressSideNav": true,
@@ -28,6 +30,14 @@ func Authenticate() gin.HandlerFunc {
 			} else {
 				c.Set("CurrentUser", user)
 			}
+		}
+		if forceCompletionOfPasswordChange(c, user) {
+			c.HTML(http.StatusUnauthorized, "errors/show.html", gin.H{
+				"suppressSideNav": true,
+				"suppressTopNav":  false,
+				"error":           "Please finish changing your password",
+			})
+			c.Abort()
 		}
 		c.Next()
 	}
@@ -79,6 +89,16 @@ func LoadCookie(c *gin.Context, name string) error {
 	}
 	c.Set(name, value)
 	return nil
+}
+
+func forceCompletionOfPasswordChange(c *gin.Context, currentUser *pgmodels.User) bool {
+	if currentUser == nil {
+		return false // user isn't even signed in
+	}
+	p := c.FullPath()
+	return currentUser.ResetPasswordToken != "" &&
+		!strings.HasPrefix(p, "/users/change_password/") &&
+		!strings.HasPrefix(p, "/errors/show/")
 }
 
 func ExemptFromAuth(c *gin.Context) bool {
