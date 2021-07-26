@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# run.sh
+# registry
 #
 # Run registry unit tests or run the registry app on port 8080.
 # This starts NSQ and Redis as well, since some tests and app
@@ -12,10 +12,10 @@
 # Make sure we got a valid command line arg
 #
 # ----------------------------------------------------------------------
-if [[ $1 != "tests" && $1 != "server" ]]; then
+if [[ $1 != "test" && $1 != "serve" ]]; then
     echo "Usage:"
-    echo "./run.sh tests   - to run unit tests"
-    echo "./run.sh server  - to run application on port 8080"
+    echo "registry test   - to run unit tests"
+    echo "registry serve  - to run application on port 8080"
     exit 0
 fi
 
@@ -81,10 +81,10 @@ REDIS_PID=$!
 # Run tests or server, based on command line arg.
 #
 # ----------------------------------------------------------------------
-if [[ $1 == "tests" ]]; then
+if [[ $1 == "test" ]]; then
     echo "Running registry tests..."
     APT_ENV=$APT_ENV go test -p 1 ./...
-elif [[ $1 == "server" ]]; then
+elif [[ $1 == "serve" ]]; then
     echo "Starting registry app..."
     APT_ENV=$APT_ENV go run registry.go
 fi

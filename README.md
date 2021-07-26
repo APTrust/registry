@@ -16,7 +16,7 @@ You will also need the following for some Admin operations:
 * [Redis](https://redis.io/download) 5.07 or higher
 * [NSQ](https://nsq.io/deployment/installing.html) version 1.20 or higher
 
-If you're running on Linux or OSX, you'll find the required Redis and NSQ binaries in this repo's .bin/linux and ./bin/osx directories. The run.sh script automatically starts them when it runs the server and tests.
+If you're running on Linux or OSX, you'll find the required Redis and NSQ binaries in this repo's .bin/linux and ./bin/osx directories. The registry script automatically starts them when it runs the server and tests.
 
 # Database Setup
 
@@ -37,7 +37,7 @@ grant pg_read_server_files to dev_user;
 Now load the schema into the dev database:
 
 ```
-APT_ENV=dev ./run.sh tests
+APT_ENV=dev registry test
 ```
 
 Note that this will delete and rebuild your dev DB with some starter data. You probably don't want to run this after the first time you set up your dev environment.
@@ -48,23 +48,19 @@ If you want more data in your dev DB, we have a copy of the staging database in 
 
 # Running
 
-`APT_ENV=dev go run registry.go`
+`APT_ENV=dev registry serve`
 
 You can change APT_ENV to test if you want to run against the test database, but note that the test DB is regenerated every time we run the test suite.
 
 Or if you want to run in the test environment after running tests, use:
 
-`./run.sh server`
+`registry serve`
 
 To run the server with NSQ and Redis with a different env:
 
-`APT_ENV=dev ./run.sh server`
+`APT_ENV=dev registry serve`
 
 The run.sh script starts Redis and NSQ in addition to the registry. These services are required for some functionality, such as initiating restorations and deletions and requeueing WorkItems.
-
-You can also run the server without NSQ and Redis. Use either `dev` or `test` for APT_ENV:
-
-`APT_ENV=test go run registry.go`
 
 You'll have some minimal data available in the DB, including a number of user accounts. You can log in with any of the following:
 
@@ -74,11 +70,12 @@ You'll have some minimal data available in the DB, including a number of user ac
 | admin@inst1.edu      | password | Institutional Admin at Inst 1   |
 | user@inst1.edu       | password | Institutional User at Inst 1    |
 | inactive@inst1.edu   | password | Deactivated Inst User at Inst 1 |
+| admin@inst2.edu      | password | Institutional User at Inst 2    |
 
 
 # Testing
 
-`./run.sh tests`
+`registry test`
 
 This drops everything in the test DB, recreates the tables and views, loads in some fixtures, and runs the unit tests. Unless you say otherwise, the script assumes APT_ENV=test.
 
