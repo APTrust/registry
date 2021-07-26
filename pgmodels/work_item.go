@@ -15,7 +15,7 @@ import (
 
 const (
 	ErrItemName          = "Name is required."
-	ErrItemETag          = "ETag is required."
+	ErrItemETag          = "ETag is required (32-40 bytes)."
 	ErrItemBagDate       = "BagDate is required."
 	ErrItemBucket        = "Bucket is required."
 	ErrItemUser          = "User must be a valid email address."

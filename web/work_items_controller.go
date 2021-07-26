@@ -76,6 +76,10 @@ func WorkItemEdit(c *gin.Context) {
 	c.HTML(http.StatusOK, form.Template, req.TemplateData)
 }
 
+// WorkItemRequeue requeues a WorkItem. This is an admin-only feature
+// typically used to recover from system errors.
+//
+// PUT or POST /work_items/requeue/:id
 func WorkItemRequeue(c *gin.Context) {
 	aptContext := common.Context()
 	req := NewRequest(c)
