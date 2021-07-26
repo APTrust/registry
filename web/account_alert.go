@@ -65,6 +65,33 @@ func CreatePasswordResetAlert(req *Request, userToEdit *pgmodels.User, token str
 	return alert, err
 }
 
+// CreateNewAccountAlert creates an alert telling a newly added user that
+// they now have an APTrust account. The alert includes a link for
+// the user to set a custom password.
+func CreateNewAccountAlert(req *Request, newUser *pgmodels.User, token string) (*pgmodels.Alert, error) {
+	templateName := "alerts/welcome.txt"
+	alertData := map[string]interface{}{
+		"passwordResetURL": fmt.Sprintf("%s/users/complete_password_reset/%d?token=%s", req.BaseURL(), newUser.ID, token),
+		"adminName":        req.CurrentUser.Name,
+	}
+	recipients := []*pgmodels.User{newUser}
+	alert := &pgmodels.Alert{
+		InstitutionID: newUser.InstitutionID,
+		Type:          constants.AlertWelcome,
+		Subject:       "Your New APTrust Registry Account",
+		CreatedAt:     time.Now().UTC(),
+		Users:         recipients,
+	}
+	alert, err := createAlert(alert, templateName, alertData)
+
+	if err == nil {
+		newUser.ResetPasswordSentAt = time.Now().UTC()
+		err = newUser.Save()
+	}
+
+	return alert, err
+}
+
 // createAlert adds customized text to the alert and saves it in the
 // database. Param templateName is the name of the text template used
 // to construct the alert message. Param alertData is the custom data

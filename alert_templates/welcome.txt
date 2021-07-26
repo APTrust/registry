@@ -1,0 +1,11 @@
+Hello from APTrust,
+
+{{ .adminName }} just set up an APTrust Registry account for you. To complete the setup, follow the link below and choose a new password.
+
+{{ .passwordResetURL }}
+
+If you have questions, please contact us at help@aptrust.org.
+
+The APTrust Team
+https://aptrust.org
+help@aptrust.org

@@ -441,9 +441,32 @@ func saveUserForm(c *gin.Context) {
 	}
 	req.TemplateData["form"] = form
 	if form.Save() {
+		// If we just created a new user, send them a welcome email.
+		if req.Auth.ResourceID == 0 {
+			err = createNewUserAlert(req, userToEdit)
+			if AbortIfError(c, err) {
+				return
+			}
+		}
 		c.Redirect(form.Status, form.PostSaveURL())
 	} else {
 		req.TemplateData["FormError"] = form.Error
 		c.HTML(form.Status, form.Template, req.TemplateData)
 	}
+}
+
+func createNewUserAlert(req *Request, newUser *pgmodels.User) error {
+	token := common.RandomToken()
+	encryptedToken, err := common.EncryptPassword(token)
+	if err != nil {
+		return err
+	}
+	newUser.ResetPasswordToken = encryptedToken
+	newUser.ForcePasswordUpdate = true
+	err = newUser.Save()
+	if err != nil {
+		return err
+	}
+	_, err = CreateNewAccountAlert(req, newUser, token)
+	return err
 }

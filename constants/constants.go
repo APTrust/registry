@@ -27,6 +27,7 @@ const (
 	AlertPasswordReset         = "Password Reset"
 	AlertRestorationCompleted  = "Restoration Completed"
 	AlertStalledItems          = "Stalled Work Items"
+	AlertWelcome               = "Welcome New User"
 	AlgMd5                     = "md5"
 	AlgSha1                    = "sha1"
 	AlgSha256                  = "sha256"
@@ -129,6 +130,7 @@ var AlertTypes = []string{
 	AlertPasswordChanged,
 	AlertPasswordReset,
 	AlertStalledItems,
+	AlertWelcome,
 }
 
 var CompletedStatusValues = []string{

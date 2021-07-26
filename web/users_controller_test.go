@@ -126,6 +126,17 @@ func TestUserCreateEditDeleteUndelete(t *testing.T) {
 	assert.Equal(t, formData["Role"], user.Role)
 	assert.NotEmpty(t, user.EncryptedPassword)
 
+	// Make sure we created a new user alert, so this person
+	// can get in and choose a password.
+	query := pgmodels.NewQuery().
+		Where("type", "=", constants.AlertWelcome).
+		Where("user_id", "=", user.ID).
+		Limit(1)
+	alertView, err := pgmodels.AlertViewGet(query)
+	require.Nil(t, err)
+	require.NotNil(t, alertView)
+	assert.Contains(t, alertView.Content, "?token=")
+
 	// Get the edit page for the new user
 	instAdminClient.GET("/users/edit/{id}", user.ID).
 		Expect().Status(http.StatusOK)
