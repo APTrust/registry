@@ -153,6 +153,34 @@ func TestWorkItemEditUpdate(t *testing.T) {
 
 func TestWorkItemRequeue(t *testing.T) {
 	initHTTPTests(t)
+
+	workItem := createWorkItem(t, "unit_test_bag2.tar")
+
+	// SysAdmin can requeue
+	sysAdminClient.PUT("/work_items/requeue/{id}", workItem.ID).
+		WithFormField("Stage", constants.StageReingestCheck).
+		Expect().Status(http.StatusOK)
+
+	// Make sure that worked. It should set not only the stage,
+	// but the other values noted below.
+	item, err := pgmodels.WorkItemByID(workItem.ID)
+	require.Nil(t, err)
+	require.NotNil(t, item)
+	assert.Equal(t, constants.StageReingestCheck, item.Stage)
+	assert.True(t, item.Retry)
+	assert.False(t, item.NeedsAdminReview)
+	assert.Empty(t, item.PID)
+	assert.Empty(t, item.Node)
+	assert.Equal(t, constants.StatusPending, item.Status)
+
+	// Make sure other roles cannot requeue
+	instAdminClient.PUT("/work_items/requeue/{id}", workItem.ID).
+		WithFormField("Stage", constants.StageReingestCheck).
+		Expect().Status(http.StatusForbidden)
+	instUserClient.PUT("/work_items/requeue/{id}", workItem.ID).
+		WithFormField("Stage", constants.StageReingestCheck).
+		Expect().Status(http.StatusForbidden)
+
 }
 
 func createWorkItem(t *testing.T, name string) *pgmodels.WorkItem {
