@@ -16,12 +16,13 @@ var safeMethods = []string{"GET", "HEAD", "OPTIONS", "TRACE"}
 
 func CSRF() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		cookieToken, err := GetCSRFCookieToken(c)
-		if err != nil {
-			abortWithError(c, err)
-		}
+		var cookieToken string
 		if !IsCSRFSafeMethod(c.Request.Method) && !ExemptFromAuth(c) {
-			err := AssertSameOrigin(c)
+			cookieToken, err := GetCSRFCookieToken(c)
+			if err != nil {
+				abortWithError(c, err)
+			}
+			err = AssertSameOrigin(c)
 			if err != nil {
 				abortWithError(c, err)
 			}
@@ -32,15 +33,25 @@ func CSRF() gin.HandlerFunc {
 			}
 		}
 		// Put an xor'ed csrf token into the context,
-		// so controllers can add it to forms.
-		AddTokenToContext(c, cookieToken)
+		// so controllers can add it to forms. We only do
+		// this if this request has a logged-in user.
+		// Otherwise, we get errors on path "/" and others
+		// that don't require login.
+		_, userLoggedIn := c.Get("CurrentUser")
+		if userLoggedIn && cookieToken != "" {
+			AddTokenToContext(c, cookieToken)
+		}
 		c.Next()
 	}
 }
 
 func abortWithError(c *gin.Context, err error) {
 	common.Context().Log.Error().Msgf("CSRF Error: %v", err)
-	templateVars := gin.H{"error": err.Error()}
+	templateVars := gin.H{
+		"error":           err.Error(),
+		"suppressSideNav": true,
+		"suppressTopNav":  false,
+	}
 	c.HTML(http.StatusUnauthorized, "errors/show.html", templateVars)
 	c.Abort()
 }
@@ -88,7 +99,7 @@ func CompareCSRFTokens(requestToken, cookieToken string) error {
 		return err
 	}
 	if decryptedRequestToken != cookieToken {
-		return common.ErrInvalidToken
+		return common.ErrInvalidCSRFToken
 	}
 	return nil
 }

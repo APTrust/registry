@@ -340,10 +340,6 @@ func UserCompletePasswordReset(c *gin.Context) {
 		return
 	}
 	c.Set("CurrentUser", user)
-	err = helpers.SetCSRFCookie(c)
-	if AbortIfError(c, err) {
-		return
-	}
 	pageURL := fmt.Sprintf("/users/change_password/%d", user.ID)
 	c.Redirect(http.StatusFound, pageURL)
 }
@@ -400,6 +396,10 @@ func SignInUser(c *gin.Context) (int, string, error) {
 	}
 	err = helpers.SetSessionCookie(c, user)
 	if err != nil {
+		return http.StatusInternalServerError, redirectTo, err
+	}
+	err = helpers.SetCSRFCookie(c)
+	if AbortIfError(c, err) {
 		return http.StatusInternalServerError, redirectTo, err
 	}
 	c.Set("CurrentUser", user)

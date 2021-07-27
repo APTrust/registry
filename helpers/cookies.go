@@ -73,6 +73,7 @@ func DeletePrefsCookie(c *gin.Context) {
 
 func SetCSRFCookie(c *gin.Context) error {
 	token := common.RandomToken()
+	common.ConsoleDebug("Setting CSRF token to %s", token)
 	return SetCookie(c, constants.CSRFCookieName, token)
 }
 

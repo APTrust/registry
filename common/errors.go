@@ -69,6 +69,10 @@ var ErrPendingWorkItems = errors.New("task cannot be completed because this obje
 // proceed with the requested action.
 var ErrInvalidToken = errors.New("invalid token")
 
+// ErrInvalidCSRFToken is specifically for POST/PUT/DELETE where we
+// have a missing or invalid CSRF token.
+var ErrInvalidCSRFToken = errors.New("invalid csrf token")
+
 // ErrMissingReferer means the request had no http referer header,
 // so we can't tell where it came from. We can't tell for sure if
 // it's a cross-origin attack, so we throw an error. This happens

@@ -210,9 +210,9 @@ func ToHumanSize(size, unit int64) string {
 // tests. We want to see these messages in the console when we're doing
 // interactive testing in the dev or test environments, but NOT when running
 // automated tests because they clutter the test output.
-func ConsoleDebug(message string) {
+func ConsoleDebug(message string, args ...interface{}) {
 	envName := Context().Config.EnvName
 	if !TestsAreRunning() && (envName == "dev" || envName == "test") {
-		fmt.Println(message)
+		fmt.Println(fmt.Sprintf(message, args))
 	}
 }

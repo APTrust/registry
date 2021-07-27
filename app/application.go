@@ -91,6 +91,7 @@ func initMiddleware(router *gin.Engine) {
 	// Then authentication and authorization middleware
 	router.Use(middleware.Authenticate())
 	router.Use(middleware.Authorize())
+	router.Use(middleware.CSRF())
 }
 
 // initRoutes maps URLs to handlers.
