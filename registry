@@ -104,7 +104,7 @@ kill $NSQ_PID
 
 if [[ $TRAVIS != "true" && $1 != "tests" ]]; then
     echo "Killing NSQ Admin pid $NSQ_ADMIN_PID"
-    kill $NSQ_PID
+    kill $NSQ_ADMIN_PID
 
     echo "Killing NSQ Lookup pid $NSQ_LOOKUPD_PID"
     kill $NSQ_LOOKUPD_PID
