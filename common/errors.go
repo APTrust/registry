@@ -69,6 +69,16 @@ var ErrPendingWorkItems = errors.New("task cannot be completed because this obje
 // proceed with the requested action.
 var ErrInvalidToken = errors.New("invalid token")
 
+// ErrMissingReferer means the request had no http referer header,
+// so we can't tell where it came from. We can't tell for sure if
+// it's a cross-origin attack, so we throw an error. This happens
+// only on unsafe methods (POST, PUT, DELETE). See the CSRF middleware.
+var ErrMissingReferer = errors.New("csrf error: missing http referer")
+
+// ErrMissingReferer means we got a cross-site request on an unsafe
+// methods such as POST, PUT, DELETE. See the CSRF middleware.
+var ErrCrossOriginReferer = errors.New("csrf error: cross origin request forbidden")
+
 // ErrPasswordReqs indicates that the password the user is trying to set
 // does not meet minimum requirements.
 var ErrPasswordReqs = errors.New("password does not meet minimum requirements")

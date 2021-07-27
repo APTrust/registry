@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/APTrust/registry/common"
+	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/gin-gonic/gin"
 )
@@ -68,6 +69,15 @@ func SetPrefsCookie(c *gin.Context, value string) error {
 func DeletePrefsCookie(c *gin.Context) {
 	ctx := common.Context()
 	DeleteCookie(c, ctx.Config.Cookies.PrefsCookie)
+}
+
+func SetCSRFCookie(c *gin.Context) error {
+	token := common.RandomToken()
+	return SetCookie(c, constants.CSRFCookieName, token)
+}
+
+func DeleteCSRFCookie(c *gin.Context) {
+	DeleteCookie(c, constants.CSRFCookieName)
 }
 
 func CurrentUser(c *gin.Context) *pgmodels.User {

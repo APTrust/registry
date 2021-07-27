@@ -10,7 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Authenticate eusures the current user is logged in for all requests other
+// Authenticate ensures the current user is logged in for all requests other
 // than those going to "/" or static resources.
 func Authenticate() gin.HandlerFunc {
 	return func(c *gin.Context) {

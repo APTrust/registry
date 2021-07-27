@@ -142,6 +142,7 @@ func UserSignOut(c *gin.Context) {
 		user.SignOut()
 	}
 	helpers.DeleteSessionCookie(c)
+	helpers.DeleteCSRFCookie(c)
 	c.HTML(http.StatusOK, "users/sign_in.html", gin.H{
 		"cover":             helpers.GetCover(),
 		"preFillTestLogins": common.Context().Config.EnvName == "test",
@@ -339,6 +340,10 @@ func UserCompletePasswordReset(c *gin.Context) {
 		return
 	}
 	c.Set("CurrentUser", user)
+	err = helpers.SetCSRFCookie(c)
+	if AbortIfError(c, err) {
+		return
+	}
 	pageURL := fmt.Sprintf("/users/change_password/%d", user.ID)
 	c.Redirect(http.StatusFound, pageURL)
 }
