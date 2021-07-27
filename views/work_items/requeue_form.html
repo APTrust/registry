@@ -12,6 +12,8 @@
         {{ end }}
 
         {{ template "forms/select.html" .form.Fields.Stage }}
+
+        {{ template "forms/csrf_token.html" . }}
       </td>
       <td>
         <input type="submit" value="Requeue">

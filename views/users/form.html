@@ -28,6 +28,8 @@
 
   {{ template "forms/select.html" .form.Fields.Role }}
 
+  {{ template "forms/csrf_token.html" . }}
+
   <div class="float-right">
     <input type="submit" value="Submit">
   </div>

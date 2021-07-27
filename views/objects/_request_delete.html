@@ -37,8 +37,8 @@
   </div>
 
   <form name="objDeleteForm" action="/objects/init_delete/{{ .object.ID }}" method="post">
-    <!-- TODO: CSRF -->
     <input type="hidden" name="id" value="{{ .object.ID }}" />
+    {{ template "forms/csrf_token.html" . }}
   </form>
 
 

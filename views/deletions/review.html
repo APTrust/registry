@@ -51,11 +51,13 @@
 <form method="post" id="deletionCancelForm" action="/deletions/cancel/{{ .deletionRequest.ID }}">
   <input type="hidden" name="id" value="{{ .deletionRequest.ID }}"/>
   <input type="hidden" name="token" value="{{ .token }}"/>
+  {{ template "forms/csrf_token.html" . }}
 </form>
 
 <form method="post" id="deletionApprovalForm" action="/deletions/approve/{{ .deletionRequest.ID }}">
   <input type="hidden" name="id" value="{{ .deletionRequest.ID }}"/>
   <input type="hidden" name="token" value="{{ .token }}"/>
+  {{ template "forms/csrf_token.html" . }}
 </form>
 
 {{ template "shared/_footer.html" .}}

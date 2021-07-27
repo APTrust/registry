@@ -26,6 +26,7 @@
 
   <form method="post" id="objRestoreForm" action="/objects/init_restore/{{ .object.ID }}">
     <input type="hidden" name="id" value="{{ .object.ID }}"/>
+    {{ template "forms/csrf_token.html" . }}
   </form>
 
 </div>

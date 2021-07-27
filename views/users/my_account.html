@@ -71,7 +71,7 @@
 
 <form name="apiKeyForm" action="/users/get_api_key/{{ .CurrentUser.ID }}" method="post">
   <input type="hidden" name="id" value="{{ .CurrentUser.ID }}">
-  <!-- TODO: Need CSRF token. -->
+  {{ template "forms/csrf_token.html" . }}
 </form>
 
 <script>
