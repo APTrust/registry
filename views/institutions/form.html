@@ -26,6 +26,8 @@
 
   {{ template "forms/text_input.html" .form.Fields.RestoreBucket }}
 
+  {{ template "forms/csrf_token.html" . }}
+
   <div class="float-right">
     <input type="submit" value="Submit">
   </div>

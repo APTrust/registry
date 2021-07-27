@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/APTrust/registry/common"
+	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/forms"
 	"github.com/APTrust/registry/helpers"
 	"github.com/APTrust/registry/middleware"
@@ -31,14 +32,16 @@ func NewRequest(c *gin.Context) *Request {
 	if c.Request.URL.RawQuery != "" {
 		pathAndQuery = c.Request.URL.Path + "?" + c.Request.URL.RawQuery
 	}
+	csrfToken, _ := c.Get(constants.CSRFTokenName)
 	req := &Request{
 		PathAndQuery: pathAndQuery,
 		CurrentUser:  currentUser,
 		GinContext:   c,
 		Auth:         auth.(*middleware.ResourceAuthorization),
 		TemplateData: gin.H{
-			"CurrentUser": currentUser,
-			"flash":       flash,
+			"CurrentUser":           currentUser,
+			"flash":                 flash,
+			constants.CSRFTokenName: csrfToken,
 		},
 	}
 	helpers.DeleteCookie(c, ctx.Config.Cookies.FlashCookie)

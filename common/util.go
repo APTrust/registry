@@ -213,6 +213,6 @@ func ToHumanSize(size, unit int64) string {
 func ConsoleDebug(message string, args ...interface{}) {
 	envName := Context().Config.EnvName
 	if !TestsAreRunning() && (envName == "dev" || envName == "test") {
-		fmt.Println(fmt.Sprintf(message, args))
+		fmt.Println(fmt.Sprintf(message, args...))
 	}
 }

@@ -1,28 +1,23 @@
 package middleware
 
 import (
-	"fmt"
 	"net/http"
 	"net/url"
-	"strings"
 
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/stew/slice"
+	"golang.org/x/crypto/bcrypt"
 )
 
 var safeMethods = []string{"GET", "HEAD", "OPTIONS", "TRACE"}
 
 func CSRF() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var cookieToken string
+		cookieToken, _ := GetCSRFCookieToken(c)
 		if !IsCSRFSafeMethod(c.Request.Method) && !ExemptFromAuth(c) {
-			cookieToken, err := GetCSRFCookieToken(c)
-			if err != nil {
-				abortWithError(c, err)
-			}
-			err = AssertSameOrigin(c)
+			err := AssertSameOrigin(c)
 			if err != nil {
 				abortWithError(c, err)
 			}
@@ -39,7 +34,10 @@ func CSRF() gin.HandlerFunc {
 		// that don't require login.
 		_, userLoggedIn := c.Get("CurrentUser")
 		if userLoggedIn && cookieToken != "" {
-			AddTokenToContext(c, cookieToken)
+			err := AddTokenToContext(c, cookieToken)
+			if err != nil {
+				abortWithError(c, err)
+			}
 		}
 		c.Next()
 	}
@@ -83,47 +81,31 @@ func GetCSRFCookieToken(c *gin.Context) (string, error) {
 	return value, nil
 }
 
-func AddTokenToContext(c *gin.Context, cookieToken string) {
-	xorSalt := common.RandomToken()
-	encToken := XorStrings(cookieToken, xorSalt)
-	xorToken := fmt.Sprintf("%s$%s", encToken, xorSalt)
-	c.Set("csrf_token", xorToken)
-}
-
-func CompareCSRFTokens(requestToken, cookieToken string) error {
-	// Split request token at $
-	// Xor with salt to decrypt
-	// Compare cookie token to decrypted request token
-	decryptedRequestToken, err := DecryptRequestToken(requestToken)
+// AddTokenToContext adds a bcrypted version of the CSRF token to
+// the context, so we can pass it into forms. We use a weak bcrypt
+// here, with a cost of 4, because all we really need is to create
+// enough entropy to thwart BREACH attacks.
+//
+// See http://breachattack.com/
+func AddTokenToContext(c *gin.Context, cookieToken string) error {
+	digest, err := bcrypt.GenerateFromPassword([]byte(cookieToken), 4)
 	if err != nil {
 		return err
 	}
-	if decryptedRequestToken != cookieToken {
-		return common.ErrInvalidCSRFToken
-	}
+	c.Set("csrf_token", string(digest))
 	return nil
 }
 
-// DecryptRequestToken converts the xor'ed request token back
-// to the plaintext version, which should match the csrf token
-// in the cookie.
-func DecryptRequestToken(requestToken string) (string, error) {
-	parts := strings.Split(requestToken, "$")
-	if len(parts) != 2 {
-		return "", common.ErrInvalidToken
+func CompareCSRFTokens(requestToken, cookieToken string) error {
+	err := bcrypt.CompareHashAndPassword(
+		[]byte(requestToken), []byte(cookieToken))
+	if err != nil {
+		// We want to log this, but we don't want to display this
+		// to the user.
+		common.Context().Log.Error().Msgf("bcrypt error csrf: %v", err)
+		return common.ErrInvalidCSRFToken
 	}
-	// First part is xor'ed token, second is salt/key
-	return XorStrings(parts[0], parts[1]), nil
-}
-
-// XorString lets us alter the csrf token on each request to
-// protect against BREACH attacks. See http://breachattack.com/
-func XorStrings(input, key string) string {
-	output := make([]byte, len(input))
-	for i := 0; i < len(input); i++ {
-		output[i] = input[i] ^ key[i%len(key)]
-	}
-	return fmt.Sprintf("%x", output)
+	return nil
 }
 
 func AssertSameOrigin(c *gin.Context) error {
