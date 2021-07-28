@@ -82,11 +82,12 @@ func GetCSRFCookieToken(c *gin.Context) (string, error) {
 
 // XorStrings scrambles the CSRF token that appears in the header
 // and in forms on each request. This is for BREACH attack prevention.
-func XorStrings(input, key string) (output string) {
+func XorStrings(input, key string) string {
+	output := make([]byte, len(input))
 	for i := 0; i < len(input); i++ {
-		output += string(input[i] ^ key[i%len(key)])
+		output[i] = input[i] ^ key[i%len(key)]
 	}
-	return output
+	return string(output)
 }
 
 // AddTokenToContext adds an xor'ed version of the CSRF token to
