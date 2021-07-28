@@ -1,14 +1,16 @@
 package middleware
 
 import (
+	"encoding/hex"
+	"fmt"
 	"net/http"
 	"net/url"
+	"strings"
 
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/stew/slice"
-	"golang.org/x/crypto/bcrypt"
 )
 
 var safeMethods = []string{"GET", "HEAD", "OPTIONS", "TRACE"}
@@ -34,10 +36,7 @@ func CSRF() gin.HandlerFunc {
 		// that don't require login.
 		_, userLoggedIn := c.Get("CurrentUser")
 		if userLoggedIn && cookieToken != "" {
-			err := AddTokenToContext(c, cookieToken)
-			if err != nil {
-				abortWithError(c, err)
-			}
+			AddTokenToContext(c, cookieToken)
 		}
 		c.Next()
 	}
@@ -81,28 +80,43 @@ func GetCSRFCookieToken(c *gin.Context) (string, error) {
 	return value, nil
 }
 
-// AddTokenToContext adds a bcrypted version of the CSRF token to
-// the context, so we can pass it into forms. We use a weak bcrypt
-// here, with a cost of 2, because all we really need is to create
-// enough entropy to thwart BREACH attacks.
+// XorStrings scrambles the CSRF token that appears in the header
+// and in forms on each request. This is for BREACH attack prevention.
+func XorStrings(input, key string) (output string) {
+	for i := 0; i < len(input); i++ {
+		output += string(input[i] ^ key[i%len(key)])
+	}
+	return output
+}
+
+// AddTokenToContext adds an xor'ed version of the CSRF token to
+// the context, so we can pass it into forms. This is to thwart
+// BREACH attacks.
 //
 // See http://breachattack.com/
-func AddTokenToContext(c *gin.Context, cookieToken string) error {
-	digest, err := bcrypt.GenerateFromPassword([]byte(cookieToken), 2)
-	if err != nil {
-		return err
-	}
-	c.Set("csrf_token", string(digest))
-	return nil
+func AddTokenToContext(c *gin.Context, cookieToken string) {
+	key := common.RandomToken()
+	xored := XorStrings(cookieToken, key)
+	requestToken := fmt.Sprintf("%s$%s", hex.EncodeToString([]byte(xored)), key)
+	c.Set("csrf_token", string(requestToken))
 }
 
 func CompareCSRFTokens(requestToken, cookieToken string) error {
-	err := bcrypt.CompareHashAndPassword(
-		[]byte(requestToken), []byte(cookieToken))
+	logErr := common.Context().Log.Error().Msgf
+	parts := strings.Split(requestToken, "$")
+	if len(parts) < 2 {
+		logErr("CSRF token is missing '$': %s", requestToken)
+		return common.ErrInvalidCSRFToken
+	}
+	token := parts[0]
+	key := parts[1]
+	deHexedReqToken, err := hex.DecodeString(token)
 	if err != nil {
-		// We want to log this, but we don't want to display this
-		// to the user.
-		common.Context().Log.Error().Msgf("bcrypt error csrf: %v", err)
+		logErr("Cannot hex decode CSRF token '%s': %v", requestToken, err)
+		return common.ErrInvalidCSRFToken
+	}
+	finalReqToken := XorStrings(string(deHexedReqToken), key)
+	if finalReqToken != cookieToken {
 		return common.ErrInvalidCSRFToken
 	}
 	return nil
