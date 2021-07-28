@@ -353,12 +353,37 @@ In general, high-level testing should be more useful than huge suites of low-lev
 Depositors and APTrust should be able to get reports on demand describing:
 
 * total current deposits
-* total deposits over time (i.e. end-of-month object, file and byte totals for each month of each year)
+    * file count
+    * object count
+    * byte count
+    * by institution
+    * totals for member + subaccounts
+* total deposits over time (end-of-month totals 2014 - present)
+    * file count
+    * object count
+    * byte count
+    * by institution
+    * totals for member + subaccounts
 * deposits by storage type (standard, glacier, glacier-deep, wasabi - this report can be use to calculate billing)
 * deposits by region and technology
 * show deleted objects/files/bytes and (ideally) when those items were deleted, and by whom
+* cost breakdown
+    * bytes per storage option
+    * minus 10TB (taken first from Standard, then from other options)
+* deposits by mime type (??)
+* fixity check counts
+    * per institution
+    * failed fixity checks
+    * drilldown?
+* work item summary (number of items in period)
+    * action (ingest, restoration, deletion)
+    * outcome
+    * drilldown?
+* stalled work items (??)
 
 The Web UI should show data and charts. The Admin API should provide reporting for all institutions, for APTrust's billing and reporting needs. The Member API should show information for the member's own institution, but not for other institutions.
+
+Count queries can be slow in Postgres. See the section on Index Only Scans and other options at https://www.citusdata.com/blog/2016/10/12/count-performance/.
 
 # Database Changes
 
