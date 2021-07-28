@@ -186,8 +186,9 @@ func initRoutes(router *gin.Engine) {
 		// Users
 		webRoutes.POST("/users/new", web.UserCreate)
 		webRoutes.DELETE("/users/delete/:id", web.UserDelete)
-		webRoutes.GET("/users/delete/:id", web.UserDelete)
-		webRoutes.GET("/users/undelete/:id", web.UserUndelete)
+		webRoutes.POST("/users/delete/:id", web.UserDelete)
+		webRoutes.POST("/users/undelete/:id", web.UserUndelete)
+		webRoutes.PUT("/users/undelete/:id", web.UserUndelete)
 		webRoutes.GET("/users", web.UserIndex)
 		webRoutes.GET("/users/new", web.UserNew)
 		webRoutes.GET("/users/show/:id", web.UserShow)

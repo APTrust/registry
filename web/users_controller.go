@@ -22,7 +22,7 @@ func UserCreate(c *gin.Context) {
 }
 
 // UserDelete deletes a user.
-// DELETE /users/delete/:id
+// DELETE or POST /users/delete/:id
 func UserDelete(c *gin.Context) {
 	req := NewRequest(c)
 	user, err := pgmodels.UserByID(req.Auth.ResourceID)
@@ -37,7 +37,7 @@ func UserDelete(c *gin.Context) {
 }
 
 // UserUndelete reactivates a user.
-// GET /users/undelete/:id
+// POST or PUT /users/undelete/:id
 func UserUndelete(c *gin.Context) {
 	req := NewRequest(c)
 	user, err := pgmodels.UserByID(req.Auth.ResourceID)

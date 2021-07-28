@@ -167,7 +167,9 @@ func TestUserCreateEditDeleteUndelete(t *testing.T) {
 		Expect().Status(http.StatusOK)
 
 	// Undelete the user. Again, we get a redirect ending with an OK.
-	instAdminClient.GET("/users/undelete/{id}", user.ID).
+	instAdminClient.POST("/users/undelete/{id}", user.ID).
+		WithHeader("Referer", baseURL).
+		WithHeader(constants.CSRFHeaderName, instAdminToken).
 		Expect().Status(http.StatusOK)
 
 }
