@@ -113,6 +113,8 @@ func TestUserCreateEditDeleteUndelete(t *testing.T) {
 	}
 
 	instAdminClient.POST("/users/new").
+		WithHeader("Referer", baseURL).
+		WithFormField(constants.CSRFTokenName, instAdminToken).
 		WithForm(formData).Expect().Status(http.StatusOK)
 
 	// Make sure the new user exists and has the correct info
@@ -145,6 +147,8 @@ func TestUserCreateEditDeleteUndelete(t *testing.T) {
 	formData["Name"] = "Unit Test User (edited)"
 	formData["PhoneNumber"] = "+15058981234"
 	instAdminClient.PUT("/users/edit/{id}", user.ID).
+		WithHeader("Referer", baseURL).
+		WithFormField(constants.CSRFTokenName, instAdminToken).
 		WithForm(formData).Expect().Status(http.StatusOK)
 
 	// Make sure the edits were saved
@@ -155,7 +159,11 @@ func TestUserCreateEditDeleteUndelete(t *testing.T) {
 	assert.Equal(t, formData["PhoneNumber"], user.PhoneNumber)
 
 	// Delete the user. This winds up with an OK because of redirect.
+	// Note that because it's a delete, there's no form, so we have
+	// to pass the CSRF token in the header.
 	instAdminClient.DELETE("/users/delete/{id}", user.ID).
+		WithHeader("Referer", baseURL).
+		WithHeader(constants.CSRFHeaderName, instAdminToken).
 		Expect().Status(http.StatusOK)
 
 	// Undelete the user. Again, we get a redirect ending with an OK.
@@ -174,6 +182,7 @@ func TestUserSignInSignOut(t *testing.T) {
 
 	// Make sure they can sign in and are redirected to dashboard
 	html := client.POST("/users/sign_in").
+		WithHeader("Referer", baseURL).
 		WithFormField("email", "user@inst1.edu").
 		WithFormField("password", "password").
 		Expect().Status(http.StatusOK).Body().Raw()
@@ -211,6 +220,8 @@ func TestUserChangePassword(t *testing.T) {
 	// Submit and test the password change.
 	// Password requirements: uppercase, lowercase, number, min 8 chars
 	instUserClient.POST("/users/change_password/{id}", inst1User.ID).
+		WithHeader("Referer", baseURL).
+		WithFormField(constants.CSRFTokenName, instUserToken).
 		WithFormField("NewPassword", "Password1234").
 		WithFormField("ConfirmNewPassword", "Password1234").
 		Expect().Status(http.StatusOK)
@@ -227,8 +238,10 @@ func TestUserChangePassword(t *testing.T) {
 	instAdminClient.GET("/users/change_password/{id}", inst1User.ID).
 		Expect().Status(http.StatusOK)
 	instAdminClient.POST("/users/change_password/{id}", inst1User.ID).
+		WithHeader("Referer", baseURL).
 		WithFormField("NewPassword", "Password5678").
 		WithFormField("ConfirmNewPassword", "Password5678").
+		WithFormField(constants.CSRFTokenName, instAdminToken).
 		Expect().Status(http.StatusOK)
 
 	user, err = pgmodels.UserByID(inst1User.ID)
@@ -240,8 +253,10 @@ func TestUserChangePassword(t *testing.T) {
 	instAdminClient.GET("/users/change_password/{id}", inst2Admin.ID).
 		Expect().Status(http.StatusForbidden)
 	instAdminClient.POST("/users/change_password/{id}", inst2Admin.ID).
+		WithHeader("Referer", baseURL).
 		WithFormField("NewPassword", "Password5678").
 		WithFormField("ConfirmNewPassword", "Password5678").
+		WithFormField(constants.CSRFTokenName, instAdminToken).
 		Expect().Status(http.StatusForbidden)
 
 	// Regular user cannot access anyone else's change password page
@@ -249,8 +264,10 @@ func TestUserChangePassword(t *testing.T) {
 	instUserClient.GET("/users/change_password/{id}", inst1Admin.ID).
 		Expect().Status(http.StatusForbidden)
 	instUserClient.POST("/users/change_password/{id}", inst1Admin.ID).
+		WithHeader("Referer", baseURL).
 		WithFormField("NewPassword", "Password5678").
 		WithFormField("ConfirmNewPassword", "Password5678").
+		WithFormField(constants.CSRFTokenName, instUserToken).
 		Expect().Status(http.StatusForbidden)
 }
 
@@ -324,16 +341,24 @@ func TestUserGetAPIKey(t *testing.T) {
 	// Any user can get their own API key
 	for _, client := range allClients {
 		html := client.POST("/users/get_api_key/{id}", userFor[client].ID).
+			WithHeader("Referer", baseURL).
+			WithFormField(constants.CSRFTokenName, tokenFor[client]).
 			Expect().Status(http.StatusOK).Body().Raw()
 		AssertMatchesAll(t, html, items)
 	}
 
 	// No user can get another user's API key
 	instAdminClient.POST("/users/get_api_key/{id}", inst1User.ID).
+		WithHeader("Referer", baseURL).
+		WithFormField(constants.CSRFTokenName, instAdminToken).
 		Expect().Status(http.StatusForbidden)
 	instUserClient.POST("/users/get_api_key/{id}", inst1Admin.ID).
+		WithHeader("Referer", baseURL).
+		WithFormField(constants.CSRFTokenName, instUserToken).
 		Expect().Status(http.StatusForbidden)
 	instAdminClient.POST("/users/get_api_key/{id}", inst2Admin.ID).
+		WithHeader("Referer", baseURL).
+		WithFormField(constants.CSRFTokenName, instAdminToken).
 		Expect().Status(http.StatusForbidden)
 
 }

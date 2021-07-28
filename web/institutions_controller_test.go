@@ -67,9 +67,13 @@ func TestInstitutionCreateEditDeleteUndelete(t *testing.T) {
 
 	// Only Sys Admin can create an institution
 	instUserClient.POST("/institutions/new").
+		WithHeader("Referer", baseURL).
+		WithFormField(constants.CSRFTokenName, instUserToken).
 		WithForm(institution).
 		Expect().Status(http.StatusForbidden)
 	instAdminClient.POST("/institutions/new").
+		WithHeader("Referer", baseURL).
+		WithFormField(constants.CSRFTokenName, instAdminToken).
 		WithForm(institution).
 		Expect().Status(http.StatusForbidden)
 
@@ -77,6 +81,8 @@ func TestInstitutionCreateEditDeleteUndelete(t *testing.T) {
 	// because the controller redirects to the "show"
 	// page of the newly created institution.
 	sysAdminClient.POST("/institutions/new").
+		WithHeader("Referer", baseURL).
+		WithFormField(constants.CSRFTokenName, sysAdminToken).
 		WithForm(institution).
 		Expect().Status(http.StatusOK)
 
@@ -90,15 +96,21 @@ func TestInstitutionCreateEditDeleteUndelete(t *testing.T) {
 	// save it, and make sure the save works.
 	institution.Name = "Springfield University"
 	sysAdminClient.PUT("/institutions/edit/{id}", institution.ID).
+		WithHeader("Referer", baseURL).
+		WithFormField(constants.CSRFTokenName, sysAdminToken).
 		WithForm(institution).
 		Expect().Status(http.StatusOK).
 		Body().Contains("Springfield University")
 
 	// Make sure non-sysadmins cannot update this other institution.
 	instUserClient.PUT("/institutions/edit/{id}", institution.ID).
+		WithHeader("Referer", baseURL).
+		WithFormField(constants.CSRFTokenName, instUserToken).
 		WithForm(institution).
 		Expect().Status(http.StatusForbidden)
 	instAdminClient.PUT("/institutions/edit/{id}", institution.ID).
+		WithHeader("Referer", baseURL).
+		WithFormField(constants.CSRFTokenName, instAdminToken).
 		WithForm(institution).
 		Expect().Status(http.StatusForbidden)
 

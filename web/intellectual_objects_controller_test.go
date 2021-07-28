@@ -158,7 +158,10 @@ func TestObjectInitDelete(t *testing.T) {
 
 	// User at inst 1 can initiate deletion of their own
 	// institution's object.
-	html := instUserClient.POST("/objects/init_delete/2").Expect().Status(http.StatusCreated).Body().Raw()
+	html := instUserClient.POST("/objects/init_delete/2").
+		WithHeader("Referer", baseURL).
+		WithFormField(constants.CSRFTokenName, instUserToken).
+		Expect().Status(http.StatusCreated).Body().Raw()
 	AssertMatchesAll(t, html, items)
 
 	// This should create a deletion request. The fixture data
@@ -194,7 +197,10 @@ func TestObjectInitDelete(t *testing.T) {
 	// The user should NOT be able to initiate deletion of an object
 	// that belongs to another institution. In fixture data, object
 	// 6 belongs to inst 2.
-	instUserClient.POST("/objects/init_delete/6").Expect().Status(http.StatusForbidden)
+	instUserClient.POST("/objects/init_delete/6").
+		WithHeader("Referer", baseURL).
+		WithFormField(constants.CSRFTokenName, instUserToken).
+		Expect().Status(http.StatusForbidden)
 
 }
 
@@ -239,6 +245,8 @@ func TestObjectInitRestore(t *testing.T) {
 	// User should see flash message saying object is queued for restoration.
 	// This means the work item was created and queued.
 	html := instUserClient.POST("/objects/init_restore/2").
+		WithHeader("Referer", baseURL).
+		WithFormField(constants.CSRFTokenName, instUserToken).
 		Expect().Status(http.StatusOK).Body().Raw()
 	AssertMatchesAll(t, html, items)
 
@@ -252,8 +260,12 @@ func TestObjectInitRestore(t *testing.T) {
 
 	// Users cannot restore objects belonging to other institutions.
 	instAdminClient.POST("/objects/init_restore/6").
+		WithHeader("Referer", baseURL).
+		WithFormField(constants.CSRFTokenName, instAdminToken).
 		Expect().Status(http.StatusForbidden)
 	instUserClient.POST("/objects/init_restore/6").
+		WithHeader("Referer", baseURL).
+		WithFormField(constants.CSRFTokenName, instUserToken).
 		Expect().Status(http.StatusForbidden)
 
 }

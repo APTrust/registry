@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="/static/css/milligram.css">
     <link rel="stylesheet" href="/static/css/registry.css">
 
+    <meta name="csrf_token" content="{{ .csrf_token }}">
+
     <!-- Use the CDN version on server. Local version is for offline development. -->
     <!-- script src="https://cdn.jsdelivr.net/npm/chart.js" rel="noreferrer"></script -->
     <script type="module" src="/static/js/chart-3.1.1.js"></script>

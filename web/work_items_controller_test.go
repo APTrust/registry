@@ -130,6 +130,8 @@ func TestWorkItemEditUpdate(t *testing.T) {
 
 	// SysAdmin should be able to PUT this
 	sysAdminClient.PUT("/work_items/edit/{id}", workItem.ID).
+		WithHeader("Referer", baseURL).
+		WithHeader(constants.CSRFHeaderName, sysAdminToken).
 		WithForm(workItem).Expect().Status(http.StatusOK)
 
 	// Make sure changes stuck.
@@ -146,8 +148,12 @@ func TestWorkItemEditUpdate(t *testing.T) {
 
 	// And make sure these roles cannot update work items
 	instAdminClient.PUT("/work_items/edit/{id}", workItem.ID).
+		WithHeader("Referer", baseURL).
+		WithHeader(constants.CSRFHeaderName, instAdminToken).
 		WithForm(workItem).Expect().Status(http.StatusForbidden)
-	instAdminClient.PUT("/work_items/edit/{id}", workItem.ID).
+	instUserClient.PUT("/work_items/edit/{id}", workItem.ID).
+		WithHeader("Referer", baseURL).
+		WithHeader(constants.CSRFHeaderName, instUserToken).
 		WithForm(workItem).Expect().Status(http.StatusForbidden)
 }
 
@@ -158,6 +164,8 @@ func TestWorkItemRequeue(t *testing.T) {
 
 	// SysAdmin can requeue
 	sysAdminClient.PUT("/work_items/requeue/{id}", workItem.ID).
+		WithHeader("Referer", baseURL).
+		WithHeader(constants.CSRFHeaderName, sysAdminToken).
 		WithFormField("Stage", constants.StageReingestCheck).
 		Expect().Status(http.StatusOK)
 
@@ -175,9 +183,13 @@ func TestWorkItemRequeue(t *testing.T) {
 
 	// Make sure other roles cannot requeue
 	instAdminClient.PUT("/work_items/requeue/{id}", workItem.ID).
+		WithHeader("Referer", baseURL).
+		WithHeader(constants.CSRFHeaderName, instAdminToken).
 		WithFormField("Stage", constants.StageReingestCheck).
 		Expect().Status(http.StatusForbidden)
 	instUserClient.PUT("/work_items/requeue/{id}", workItem.ID).
+		WithHeader("Referer", baseURL).
+		WithHeader(constants.CSRFHeaderName, instUserToken).
 		WithFormField("Stage", constants.StageReingestCheck).
 		Expect().Status(http.StatusForbidden)
 

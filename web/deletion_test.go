@@ -14,7 +14,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var baseURL = "https://example.com"
+var exampleURL = "https://example.com"
 
 // As documented in db/fixtures/README, this is the confirmation
 // token for all DeletionRequests in the fixture data.
@@ -40,7 +40,7 @@ func TestNewDeletionForFile(t *testing.T) {
 	require.Nil(t, err)
 	require.True(t, len(instAdmins) > 0)
 
-	del, err := web.NewDeletionForFile(gf.ID, instAdmins[0], baseURL)
+	del, err := web.NewDeletionForFile(gf.ID, instAdmins[0], exampleURL)
 	require.Nil(t, err)
 	require.NotNil(t, del)
 
@@ -72,7 +72,7 @@ func TestNewDeletionForFileWithPendingItems(t *testing.T) {
 
 	// The user param doesn't matter here, because we should get
 	// ErrPendingWorkItems before the function even looks at the user.
-	del, err := web.NewDeletionForFile(gf.ID, &pgmodels.User{}, baseURL)
+	del, err := web.NewDeletionForFile(gf.ID, &pgmodels.User{}, exampleURL)
 	assert.Nil(t, del)
 	assert.Equal(t, common.ErrPendingWorkItems, err)
 }
@@ -83,7 +83,7 @@ func TestNewDeletionBadToken(t *testing.T) {
 	require.Nil(t, err)
 	require.NotNil(t, admin)
 
-	del, err := web.NewDeletionForReview(1, admin, baseURL, "InvalidToken")
+	del, err := web.NewDeletionForReview(1, admin, exampleURL, "InvalidToken")
 	require.Nil(t, del)
 	assert.Equal(t, common.ErrInvalidToken, err)
 }
@@ -94,7 +94,7 @@ func TestNewDeletionForReview(t *testing.T) {
 	require.Nil(t, err)
 	require.NotNil(t, admin)
 
-	del, err := web.NewDeletionForReview(1, admin, baseURL, confToken)
+	del, err := web.NewDeletionForReview(1, admin, exampleURL, confToken)
 	require.Nil(t, err)
 	require.NotNil(t, del)
 

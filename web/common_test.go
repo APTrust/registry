@@ -19,6 +19,7 @@ import (
 )
 
 var appEngine *gin.Engine
+var baseURL = "http://localhost"
 var fixturesReloaded = false
 var sysAdminClient *httpexpect.Expect
 var instAdminClient *httpexpect.Expect
@@ -30,10 +31,15 @@ var inst1Admin *pgmodels.User
 var inst1User *pgmodels.User
 var inst2Admin *pgmodels.User
 
+var sysAdminToken string
+var instAdminToken string
+var instUserToken string
+
 var allInstNames []string
 var allUserNames []string
 
 var userFor map[*httpexpect.Expect]*pgmodels.User
+var tokenFor map[*httpexpect.Expect]string
 
 func initHTTPTests(t *testing.T) {
 	// Force fixture reload to get rid of any records
@@ -46,9 +52,9 @@ func initHTTPTests(t *testing.T) {
 	}
 	if appEngine == nil {
 		appEngine = app.InitAppEngine(true)
-		sysAdminClient = initClient(t, "system@aptrust.org")
-		instAdminClient = initClient(t, "admin@inst1.edu")
-		instUserClient = initClient(t, "user@inst1.edu")
+		sysAdminClient, sysAdminToken = initClient(t, "system@aptrust.org")
+		instAdminClient, instAdminToken = initClient(t, "admin@inst1.edu")
+		instUserClient, instUserToken = initClient(t, "user@inst1.edu")
 		allClients = []*httpexpect.Expect{
 			sysAdminClient,
 			instAdminClient,
@@ -64,10 +70,15 @@ func initHTTPTests(t *testing.T) {
 		userFor[sysAdminClient] = sysAdmin
 		userFor[instAdminClient] = inst1Admin
 		userFor[instUserClient] = inst1User
+
+		tokenFor = make(map[*httpexpect.Expect]string)
+		tokenFor[sysAdminClient] = sysAdminToken
+		tokenFor[instAdminClient] = instAdminToken
+		tokenFor[instUserClient] = instUserToken
 	}
 }
 
-func initClient(t *testing.T, email string) *httpexpect.Expect {
+func initClient(t *testing.T, email string) (*httpexpect.Expect, string) {
 	client := getAnonymousClient(t)
 
 	// In fixture data, password for all users is 'password'
@@ -79,15 +90,16 @@ func initClient(t *testing.T, email string) *httpexpect.Expect {
 	// Sign the user in, and be sure we got on OK.
 	// The client cookie jar will store the session
 	// cookie for this user.
-	client.POST("/users/sign_in").
-		WithForm(signInForm).Expect().Status(http.StatusOK)
+	html := client.POST("/users/sign_in").
+		WithForm(signInForm).Expect().Status(http.StatusOK).Body().Raw()
+	csrfToken := extractCSRFToken(t, html)
 
-	return client
+	return client, csrfToken
 }
 
 func getAnonymousClient(t *testing.T) *httpexpect.Expect {
 	client := httpexpect.WithConfig(httpexpect.Config{
-		BaseURL: "http://localhost",
+		BaseURL: baseURL,
 		Client: &http.Client{
 			Transport: httpexpect.NewBinder(appEngine),
 			Jar:       httpexpect.NewJar(),
@@ -108,6 +120,18 @@ func initUser(t *testing.T, email string) *pgmodels.User {
 	require.Nil(t, err)
 	require.NotNil(t, user)
 	return user
+}
+
+// Extract csrf token from http response, so we can include it
+// it POST and PUT requests.
+func extractCSRFToken(t *testing.T, html string) string {
+	re := regexp.MustCompile(`<meta name="csrf_token" content="(.+)">`)
+	m := re.FindAllStringSubmatch(html, 1)
+	require.True(t, len(m) > 0)
+	require.True(t, len(m[0]) > 0)
+	token := m[0][1]
+	require.NotEmpty(t, token)
+	return token
 }
 
 // OptionLabels returns the text labels from a list of HTML options.

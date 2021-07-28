@@ -149,7 +149,10 @@ func TestGenericFileInitDelete(t *testing.T) {
 
 	// User at inst 1 can initiate deletion of their own
 	// institution's file.
-	html := instUserClient.POST("/files/init_delete/4").Expect().Status(http.StatusCreated).Body().Raw()
+	html := instUserClient.POST("/files/init_delete/4").
+		WithHeader("Referer", baseURL).
+		WithFormField(constants.CSRFTokenName, instUserToken).
+		Expect().Status(http.StatusCreated).Body().Raw()
 	AssertMatchesAll(t, html, items)
 
 	// This should create a deletion request...
@@ -180,7 +183,10 @@ func TestGenericFileInitDelete(t *testing.T) {
 	// The user should NOT be able to initiate deletion of a file
 	// that belongs to another institution. In fixture data, file
 	// 34 belongs to inst 2.
-	instUserClient.POST("/files/init_delete/34").Expect().Status(http.StatusForbidden)
+	instUserClient.POST("/files/init_delete/34").
+		WithHeader("Referer", baseURL).
+		WithFormField(constants.CSRFTokenName, instUserToken).
+		Expect().Status(http.StatusForbidden)
 }
 
 func TestGenericFileRequestRestore(t *testing.T) {
@@ -224,6 +230,8 @@ func TestGenericFileInitRestore(t *testing.T) {
 	// User should see flash message saying item is queued for restoration.
 	// This means the work item was created and queued.
 	html := instUserClient.POST("/files/init_restore/2").
+		WithHeader("Referer", baseURL).
+		WithFormField(constants.CSRFTokenName, instUserToken).
 		Expect().Status(http.StatusOK).Body().Raw()
 	AssertMatchesAll(t, html, items)
 
@@ -237,7 +245,11 @@ func TestGenericFileInitRestore(t *testing.T) {
 
 	// Users cannot restore files belonging to other institutions.
 	instAdminClient.POST("/files/init_restore/18").
+		WithHeader("Referer", baseURL).
+		WithFormField(constants.CSRFTokenName, instAdminToken).
 		Expect().Status(http.StatusForbidden)
 	instUserClient.POST("/files/init_restore/18").
+		WithHeader("Referer", baseURL).
+		WithFormField(constants.CSRFTokenName, instUserToken).
 		Expect().Status(http.StatusForbidden)
 }

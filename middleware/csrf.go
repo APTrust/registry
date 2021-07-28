@@ -83,12 +83,12 @@ func GetCSRFCookieToken(c *gin.Context) (string, error) {
 
 // AddTokenToContext adds a bcrypted version of the CSRF token to
 // the context, so we can pass it into forms. We use a weak bcrypt
-// here, with a cost of 4, because all we really need is to create
+// here, with a cost of 2, because all we really need is to create
 // enough entropy to thwart BREACH attacks.
 //
 // See http://breachattack.com/
 func AddTokenToContext(c *gin.Context, cookieToken string) error {
-	digest, err := bcrypt.GenerateFromPassword([]byte(cookieToken), 4)
+	digest, err := bcrypt.GenerateFromPassword([]byte(cookieToken), 2)
 	if err != nil {
 		return err
 	}
