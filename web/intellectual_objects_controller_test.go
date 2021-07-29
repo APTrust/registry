@@ -103,11 +103,11 @@ func TestObjectList(t *testing.T) {
 		if client == sysAdminClient {
 			AssertMatchesAll(t, html, adminFilters)
 			AssertMatchesAll(t, html, inst2Links)
-			AssertMatchesResultCount(t, html, 8)
+			AssertMatchesResultCount(t, html, 13)
 		} else {
 			AssertMatchesNone(t, html, adminFilters)
 			AssertMatchesNone(t, html, inst2Links)
-			AssertMatchesResultCount(t, html, 3)
+			AssertMatchesResultCount(t, html, 6)
 		}
 	}
 

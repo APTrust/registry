@@ -72,10 +72,10 @@ func TestGenericFileIndex(t *testing.T) {
 		AssertMatchesAll(t, html, commonFilters)
 		if client == sysAdminClient {
 			AssertMatchesAll(t, html, adminFilters)
-			AssertMatchesResultCount(t, html, 49)
+			AssertMatchesResultCount(t, html, 61)
 		} else {
 			AssertMatchesNone(t, html, adminFilters)
-			AssertMatchesResultCount(t, html, 11)
+			AssertMatchesResultCount(t, html, 18)
 		}
 	}
 
@@ -87,10 +87,10 @@ func TestGenericFileIndex(t *testing.T) {
 			Expect().
 			Status(http.StatusOK).Body().Raw()
 		if client == sysAdminClient {
-			AssertMatchesResultCount(t, html, 34)
+			AssertMatchesResultCount(t, html, 42)
 		} else {
 			AssertMatchesNone(t, html, adminFilters)
-			AssertMatchesResultCount(t, html, 10)
+			AssertMatchesResultCount(t, html, 15)
 		}
 	}
 
