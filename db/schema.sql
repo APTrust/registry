@@ -571,6 +571,21 @@ create index index_alerts_premis_events_alert_id ON public.alerts_premis_events(
 create unique index index_alerts_premis_events_unique ON public.alerts_premis_events(alert_id, premis_event_id);
 
 
+-- storage_options contains info about storage options that we use
+-- to calculate monthly bills.
+create table public.storage_options (
+	id bigserial primary key,
+	"provider" varchar not null,
+    "service" varchar not null,
+    "region" varchar not null,
+    "name" varchar not null,
+    cost_gb_per_month decimal(12,8) not null,
+    "comment" varchar not null,
+	updated_at timestamp not null
+);
+create unique index index_storage_options_name ON public.storage_options ("name");
+
+
 
 -------------------------------------------------------------------------------
 -- Functions

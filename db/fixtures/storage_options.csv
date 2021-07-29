@@ -1,0 +1,13 @@
+id,provider,service,region,name,cost_gb_per_month,comment,updated_at
+1,AWS,S3 VA + Glacier OR,VA-OR,Standard,2.7,"Includes 1 S3 copy and 1 Glacier copy. Priced as of July 29, 2021",2021-07-29 13:59:25
+2,AWS,S3,VA,S3-VA,2.3,"Up to 450 TB as of July 29, 2021. This option is currently not available to depositors.",2021-07-29 13:59:25
+3,AWS,S3,OH,S3-OH,2.3,"Up to 450 TB as of July 29, 2021. This option is currently not available to depositors.",2021-07-29 13:59:25
+4,AWS,S3,OR,S3-OR,2.3,"Up to 450 TB as of July 29, 2021. This option is currently not available to depositors.",2021-07-29 13:59:25
+5,AWS,Glacier,VA,Glacier-VA,0.4,"Up to 450 TB as of July 29, 2021",2021-07-29 13:59:25
+6,AWS,Glacier,OH,Glacier-OH,0.4,"Up to 450 TB as of July 29, 2021",2021-07-29 13:59:25
+7,AWS,Glacier,OR,Glacier-OR,0.4,"Up to 450 TB as of July 29, 2021",2021-07-29 13:59:25
+8,AWS,Glacier-Deep,VA,Glacier-Deep-VA,0.099,"Up to 450 TB as of July 29, 2021",2021-07-29 13:59:25
+9,AWS,Glacier-Deep,OH,Glacier-Deep-OH,0.099,"Up to 450 TB as of July 29, 2021",2021-07-29 13:59:25
+10,AWS,Glacier-Deep,OR,Glacier-Deep-OR,0.099,"Up to 450 TB as of July 29, 2021",2021-07-29 13:59:25
+11,Wasabi,S3,VA,Wasabi-VA,0.59,"Pay as you go rate as of July 29, 2021",2021-07-29 13:59:25
+12,Wasabi,S3,OR,Wasabi-OR,0.59,"Pay as you go rate as of July 29, 2021",2021-07-29 13:59:25

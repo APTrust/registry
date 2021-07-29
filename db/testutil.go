@@ -27,6 +27,7 @@ var SafeEnvironments = []string{
 // LoadOrder lists the names of tables for which we have fixture data
 // (csv files) in the order they should be loaded.
 var LoadOrder = []string{
+	"storage_options",
 	"institutions",
 	"users",
 	"intellectual_objects",
@@ -91,6 +92,7 @@ var DropOrder = []string{
 	"users",
 	"institutions",
 	"roles",
+	"storage_options",
 }
 
 // LoadFixtures wipes out and resets the test database, loading
