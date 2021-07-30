@@ -26,8 +26,8 @@
   <li><a href="/deletions"><i class="fa fa-backspace"></i> Deletions</a></li>
   {{ end }}
 
-  {{ if userCan .CurrentUser "ReportRead" .CurrentUser.InstitutionID }}
-  <li><a href="/reports"><i class="fa fa-chart-line"></i> Reports</a></li>
+  {{ if userCan .CurrentUser "DepositReportShow" .CurrentUser.InstitutionID }}
+  <li><a href="/reports/deposits"><i class="fa fa-chart-line"></i> Reports</a></li>
   {{ end }}
 
   {{ if userCan .CurrentUser "AlertRead" .CurrentUser.InstitutionID }}

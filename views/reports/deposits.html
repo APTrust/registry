@@ -1,0 +1,38 @@
+{{ define "reports/deposits.html" }}
+
+{{ template "shared/_header.html" .}}
+
+<h1>Deposits</h1>
+
+{{ template "reports/_deposit_filters.html" . }}
+
+<table>
+  <thead>
+    <tr>
+      <th>Institution</th>
+      <th>Storage Option</th>
+      <th>Object Count</th>
+      <th>File Count</th>
+      <th>Total GB</th>
+      <th>Total TB</th>
+      <th>Monthly Cost</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{ range $index, $item := .deposits }}
+    <tr>
+      <td>{{ $item.InstitutionName }}</td>
+      <td>{{ $item.StorageOption }}</td>
+      <td>{{ $item.ObjectCount }}</td>
+      <td>{{ $item.FileCount }}</td>
+      <td>{{ formatFloat $item.TotalGB 3 }}</td>
+      <td>{{ formatFloat $item.TotalTB 3 }}</td>
+      <td>${{ formatFloat $item.MonthlyCost  2 }}</td>
+    </tr>
+    {{ end }}
+  </tbody>
+</table>
+
+{{ template "shared/_footer.html" .}}
+
+{{ end }}

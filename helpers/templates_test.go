@@ -145,3 +145,10 @@ func TestDefaultString(t *testing.T) {
 	assert.Equal(t, "---", helpers.DefaultString("  ", "---"))
 	assert.Equal(t, "birdy num num", helpers.DefaultString("birdy num num", "---"))
 }
+
+func TestFormatFloat(t *testing.T) {
+	f := float64(2137.9786534)
+	assert.Equal(t, "2137.98", helpers.FormatFloat(f, 2))
+	assert.Equal(t, "2137.979", helpers.FormatFloat(f, 3))
+	assert.Equal(t, "2137.9787", helpers.FormatFloat(f, 4))
+}

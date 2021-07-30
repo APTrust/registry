@@ -47,12 +47,14 @@ func InitAppEngine(discardStdOut bool) *gin.Engine {
 // parser will error out.
 func initTemplates(router *gin.Engine) {
 	router.SetFuncMap(template.FuncMap{
+		"dateISO":        helpers.DateISO,
 		"dateTimeISO":    helpers.DateTimeISO,
 		"dateUS":         helpers.DateUS,
 		"defaultString":  helpers.DefaultString,
 		"dict":           helpers.Dict,
 		"escapeAttr":     helpers.EscapeAttr,
 		"escapeHTML":     helpers.EscapeHTML,
+		"formatFloat":    helpers.FormatFloat,
 		"humanSize":      helpers.HumanSize,
 		"iconFor":        helpers.IconFor,
 		"replace":        strings.Replace,
@@ -64,7 +66,6 @@ func initTemplates(router *gin.Engine) {
 		"truncateStart":  helpers.TruncateStart,
 		"userCan":        helpers.UserCan,
 		"yesNo":          helpers.YesNo,
-		"dateISO":        helpers.DateISO,
 	})
 
 	// Load the view templates
@@ -138,6 +139,9 @@ func initRoutes(router *gin.Engine) {
 
 		// Dashboard
 		webRoutes.GET("/dashboard", web.DashboardShow)
+
+		// Deposit Report
+		webRoutes.GET("/reports/deposits", web.DepositReportShow)
 
 		// GenericFiles
 		webRoutes.GET("/files", web.GenericFileIndex)

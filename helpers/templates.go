@@ -171,3 +171,10 @@ func DefaultString(value, _default string) string {
 	}
 	return _default
 }
+
+// FormatFloat formats a floating point number to have scale
+// digits after the decimal point.
+func FormatFloat(value float64, scale int) string {
+	fmtString := fmt.Sprintf("%%.%df", scale)
+	return fmt.Sprintf(fmtString, value)
+}

@@ -28,6 +28,7 @@ const (
 	DeletionRequestApprove             = "DeletionRequestApprove"
 	DeletionRequestList                = "DeletionRequestList"
 	DeletionRequestShow                = "DeletionRequestShow"
+	DepositReportShow                  = "DepositReportShow"
 	EventCreate                        = "EventCreate"
 	EventRead                          = "EventRead"
 	EventUpdate                        = "EventUpdate"
@@ -85,6 +86,7 @@ var Permissions = []Permission{
 	DeletionRequestApprove,
 	DeletionRequestList,
 	DeletionRequestShow,
+	DepositReportShow,
 	EventCreate,
 	EventRead,
 	EventUpdate,
@@ -167,6 +169,7 @@ func initPermissions() {
 	instUser[DashboardShow] = true
 	instUser[DeletionRequestShow] = true
 	instUser[DeletionRequestList] = true
+	instUser[DepositReportShow] = true
 	instUser[EventRead] = true
 	instUser[FileRead] = true
 	instUser[FileRequestDelete] = true
@@ -190,6 +193,7 @@ func initPermissions() {
 	instAdmin[DeletionRequestApprove] = true
 	instAdmin[DeletionRequestShow] = true
 	instAdmin[DeletionRequestList] = true
+	instAdmin[DepositReportShow] = true
 	instAdmin[EventRead] = true
 	instAdmin[FileRead] = true
 	instAdmin[FileDelete] = true
@@ -224,6 +228,7 @@ func initPermissions() {
 	sysAdmin[DeletionRequestApprove] = true
 	sysAdmin[DeletionRequestShow] = true
 	sysAdmin[DeletionRequestList] = true
+	sysAdmin[DepositReportShow] = true
 	sysAdmin[EventCreate] = true
 	sysAdmin[EventRead] = true
 	sysAdmin[EventUpdate] = false // no one can do this
