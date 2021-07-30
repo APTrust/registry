@@ -17,7 +17,7 @@ func TestGenericFileShow(t *testing.T) {
 
 	items := []string{
 		"institution1.edu/photos/picture1",
-		"48771",
+		"243855000",
 		"image/jpeg",
 		"Standard",
 		"https://localhost:9899/preservation-va/25452f41-1b18-47b7-b334-751dfd5d011e",
@@ -82,12 +82,12 @@ func TestGenericFileIndex(t *testing.T) {
 	// Test some filters
 	for _, client := range allClients {
 		html := client.GET("/files").
-			WithQuery("size__gteq", 20000).
-			WithQuery("size__lteq", 5500000).
+			WithQuery("size__gteq", 100000000).
+			WithQuery("size__lteq", 35500000000).
 			Expect().
 			Status(http.StatusOK).Body().Raw()
 		if client == sysAdminClient {
-			AssertMatchesResultCount(t, html, 42)
+			AssertMatchesResultCount(t, html, 43)
 		} else {
 			AssertMatchesNone(t, html, adminFilters)
 			AssertMatchesResultCount(t, html, 15)

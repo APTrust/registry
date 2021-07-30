@@ -20,7 +20,7 @@ func TestObjectShow(t *testing.T) {
 		"First Object for Institution One",
 		"institution1.edu/photos",
 		"Standard",
-		"323.6 kB",
+		"1.5 GB",
 		"A bag of photos",
 		"/events/show_xhr/37", // link to ingest premis event
 		"/objects/request_delete/1",
@@ -120,7 +120,7 @@ func TestObjectRequestDelete(t *testing.T) {
 		"Are you sure you want to delete this object and its files?",
 		"institution1.edu/pdfs",
 		"pdf_docs_with_lots_of_words",
-		"3 files / 12.0 MB",
+		"3 files / 58.4 GB",
 		"Cancel",
 		"Confirm",
 	}
