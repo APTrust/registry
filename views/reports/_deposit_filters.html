@@ -1,5 +1,31 @@
 {{ define "reports/_deposit_filters.html" }}
 
-... Placeholder for deposit report filters ...
+<form id="depositReportFilterForm" method="get">
+
+  <div class="row">
+    <div class="column col-30">
+      {{ template "forms/select.html" .filterForm.Fields.storage_option }}
+    </div>
+    <div class="column col-30">
+      {{ template "forms/date.html" .filterForm.Fields.updated_at__lteq }}
+    </div>
+    <div class="column col-30">
+      {{ if .CurrentUser.IsAdmin }}
+      {{ template "forms/select.html" .filterForm.Fields.institution_id }}
+      {{ end }}
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="column col-30">
+    </div>
+    <div class="column col-30">
+    </div>
+    <div class="column col-30">
+      <input type="submit" value="Filter">
+    </div>
+  </div>
+
+</form>
 
 {{ end }}

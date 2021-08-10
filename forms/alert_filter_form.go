@@ -8,7 +8,7 @@ import (
 )
 
 // AlertFilterForm is the form that displays filtering options for
-// the work item list page.
+// the alert list page.
 type AlertFilterForm struct {
 	Form
 	FilterCollection  *pgmodels.FilterCollection

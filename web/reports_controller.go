@@ -1,12 +1,11 @@
 package web
 
 import (
-	//"fmt"
 	"net/http"
 	"strconv"
 	"time"
 
-	//"github.com/APTrust/registry/forms"
+	"github.com/APTrust/registry/forms"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/gin-gonic/gin"
 )
@@ -17,6 +16,16 @@ type DepositReportParams struct {
 	UpdatedBefore time.Time
 }
 
+// DepositReportShow shows the deposits report.
+//
+// Note that this does not follow the usual pattern for list/show
+// pages, where most of the work is done by Request or
+// Request.LoadResourceList because this is a reporting query that
+// is not running against a basic table or view. The query in
+// pgmodels.DepositStats is more complex, so we do a little more manual
+// work here.
+//
+// GET /reports/deposits
 func DepositReportShow(c *gin.Context) {
 	req := NewRequest(c)
 	template := "reports/deposits.html"
@@ -28,7 +37,12 @@ func DepositReportShow(c *gin.Context) {
 	if AbortIfError(c, err) {
 		return
 	}
+	filterForm, err := forms.NewDepositReportFilterForm(req.GetFilterCollection(), req.CurrentUser)
+	if AbortIfError(c, err) {
+		return
+	}
 	req.TemplateData["deposits"] = deposits
+	req.TemplateData["filterForm"] = filterForm
 	c.HTML(http.StatusOK, template, req.TemplateData)
 }
 

@@ -49,7 +49,7 @@ var AuthMap = map[string]AuthMetadata{
 	"DeletionRequestIndex":               {"DeletionRequest", constants.DeletionRequestList},
 	"DeletionRequestReview":              {"DeletionRequest", constants.DeletionRequestApprove},
 	"DeletionRequestShow":                {"DeletionRequest", constants.DeletionRequestShow},
-	"DepositReportShow":                  {"DepositReport", constants.DepositReportShow},
+	"DepositReportShow":                  {"DepositStats", constants.DepositReportShow},
 	"EventCreate":                        {"Event", constants.EventCreate},
 	"EventDelete":                        {"Event", constants.EventDelete},
 	"EventIndex":                         {"Event", constants.EventRead},

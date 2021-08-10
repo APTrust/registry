@@ -118,6 +118,7 @@ func initFilters() {
 	filters = make(map[string][]string)
 	filters["Alert"] = AlertFilters
 	filters["DeletionRequest"] = DeletionRequestFilters
+	filters["DepositStats"] = DepositStatsFilters
 	filters["GenericFile"] = GenericFileFilters
 	filters["IntellectualObject"] = IntellectualObjectFilters
 	filters["Institution"] = InstitutionFilters
