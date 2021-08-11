@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>APTrust Registry</title>
+    <link rel="icon" type="image/png" sizes="16x16" href="http://localhost:8080/static/img/favicon.png">
+    <link rel="stylesheet" href="Dashboard_files/font-awesome.css">
+    <link rel="stylesheet" href="Dashboard_files/milligram.css">
+    <link rel="stylesheet" href="Dashboard_files/registry.css">
+
+    <meta name="csrf_token" content="525e0f5c515700070f0205500a070850530d060b06520c07575201505457050c$188e21f17fdc33857929df84231adcd9">
+
+    
+    
+    <script type="module" src="Dashboard_files/chart-3.js"></script>
+    <script type="module" src="Dashboard_files/registry.js"></script>
+  </head>
+
+  <body class="container">
+
+    
+    <div class="row top-nav">
+      
+
+<div class="column column-20">
+  <img src="Dashboard_files/APTrustSquare.png">
+</div>
+
+<div class="column column-80">
+  <input type="text" placeholder="Search for objects, files, work items...">
+  <i class="fa fa-search"></i>
+</div>
+
+
+    </div>
+    
+
+    <div class="row">
+
+      <div class="column column-20 side-nav">
+        
+        
+
+<ul>
+
+  
+  <li><a href="http://localhost:8080/dashboard"><i class="fa fa-home"></i> Dashboard</a></li>
+  
+
+  
+  <li><a href="http://localhost:8080/objects"><i class="fa fa-archive"></i> Objects</a></li>
+  
+
+  
+  <li><a href="http://localhost:8080/files"><i class="fa fa-file"></i> Files</a></li>
+  
+
+  
+  <li><a href="http://localhost:8080/events"><i class="fab fa-elementor"></i> Events</a></li>
+  
+
+  
+  <li><a href="http://localhost:8080/work_items"><i class="fa fa-cog"></i> Work Items</a></li>
+  
+
+  
+  <li><a href="http://localhost:8080/deletions"><i class="fa fa-backspace"></i> Deletions</a></li>
+  
+
+  
+  <li><a href="http://localhost:8080/reports/deposits"><i class="fa fa-chart-line"></i> Reports</a></li>
+  
+
+  
+  <li><a href="http://localhost:8080/alerts"><i class="fa fa-bell"></i> Alerts</a></li>
+  
+
+  
+    <li><a href="http://localhost:8080/institutions"><i class="fa fa-landmark"></i> Institutions</a></li>
+  
+
+    
+    <li><a href="http://localhost:8080/users"><i class="fa fa-users"></i> Users</a></li>
+    
+
+
+  <li><a href="http://localhost:8080/users/my_account"><i class="far fa-user-circle"></i> My Account</a></li>
+  <li><a href="http://localhost:8080/users/sign_out"><i class="fas fa-sign-out-alt"></i> Sign Out</a></li>
+</ul>
+
+
+        
+      </div>
+
+      <div class="column column-80">
+
+        
+
+
+
+
+<div class="container">
+  <div class="row">
+
+    
+    <div class="column column-50 rounded-box">
+      
+
+<h2>Recent Work Items</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Action</th>
+      <th>Status</th>
+      <th>Date</th>
+    </tr>
+  </thead>
+  <tbody>
+    
+    <tr class="clickable" onclick="window.location.href='/work_items/show/35'">
+      <td>unit_test_bag2.tar</td>
+      <td>Ingest</td>
+      <td>Pending</td>
+      <td>Aug 10, 2021</td>
+    </tr>
+    
+    <tr class="clickable" onclick="window.location.href='/work_items/show/34'">
+      <td>unit_test_bag1.tar</td>
+      <td>Ingest</td>
+      <td>Pending</td>
+      <td>Aug 10, 2021</td>
+    </tr>
+    
+    <tr class="clickable" onclick="window.location.href='/work_items/show/33'">
+      <td>pdfs.tar</td>
+      <td>Restore Object</td>
+      <td>Pending</td>
+      <td>Aug 10, 2021</td>
+    </tr>
+    
+    <tr class="clickable" onclick="window.location.href='/work_items/show/1'">
+      <td>fake_bag_01.tar</td>
+      <td>Ingest</td>
+      <td>Pending</td>
+      <td>Aug 25, 2016</td>
+    </tr>
+    
+    <tr class="clickable" onclick="window.location.href='/work_items/show/2'">
+      <td>fake_bag_02.tar</td>
+      <td>Ingest</td>
+      <td>Pending</td>
+      <td>Aug 25, 2016</td>
+    </tr>
+    
+    <tr class="clickable" onclick="window.location.href='/work_items/show/3'">
+      <td>fake_bag_03.tar</td>
+      <td>Ingest</td>
+      <td>Pending</td>
+      <td>Aug 25, 2016</td>
+    </tr>
+    
+    <tr class="clickable" onclick="window.location.href='/work_items/show/4'">
+      <td>fake_bag_04.tar</td>
+      <td>Ingest</td>
+      <td>Pending</td>
+      <td>Aug 25, 2016</td>
+    </tr>
+    
+    <tr class="clickable" onclick="window.location.href='/work_items/show/5'">
+      <td>fake_bag_05.tar</td>
+      <td>Ingest</td>
+      <td>Pending</td>
+      <td>Aug 25, 2016</td>
+    </tr>
+    
+    <tr class="clickable" onclick="window.location.href='/work_items/show/6'">
+      <td>fake_bag_06.tar</td>
+      <td>Ingest</td>
+      <td>Pending</td>
+      <td>Aug 25, 2016</td>
+    </tr>
+    
+    <tr class="clickable" onclick="window.location.href='/work_items/show/7'">
+      <td>fake_bag_07.tar</td>
+      <td>Ingest</td>
+      <td>Pending</td>
+      <td>Aug 25, 2016</td>
+    </tr>
+    
+  </tbody>
+</table>
+
+
+    </div>
+
+    
+    <div class="column column-50">
+
+      
+      <div class="row">
+        <div class="column rounded-box">
+          
+
+<h2>Notifications</h2>
+<table>
+  <tbody>
+    
+    <tr class="clickable" onclick="window.location.href='/alerts/show/1'">
+      <td>Deletion Requested</td>
+      <td>May 13, 2021</td>
+    </tr>
+    
+    <tr class="clickable" onclick="window.location.href='/alerts/show/2'">
+      <td>Deletion Requested</td>
+      <td>May 13, 2021</td>
+    </tr>
+    
+    <tr class="clickable" onclick="window.location.href='/alerts/show/3'">
+      <td>Deletion Confirmed</td>
+      <td>May 13, 2021</td>
+    </tr>
+    
+    <tr class="clickable" onclick="window.location.href='/alerts/show/4'">
+      <td>Deletion Completed</td>
+      <td>May 13, 2021</td>
+    </tr>
+    
+    <tr class="clickable" onclick="window.location.href='/alerts/show/5'">
+      <td>Deletion Requested</td>
+      <td>May 13, 2021</td>
+    </tr>
+    
+    <tr class="clickable" onclick="window.location.href='/alerts/show/7'">
+      <td>Failed Fixity Check</td>
+      <td>May 13, 2021</td>
+    </tr>
+    
+  </tbody>
+</table>
+
+
+        </div>
+      </div>
+
+      
+      <div class="row">
+        <div class="column rounded-box">
+          
+
+<div class="row">
+  <div class="column column-100">
+    <h2>Deposits by Storage Option</h2>
+  </div>
+</div>
+
+<div class="row">
+  <div class="column column-100">
+
+    
+    <div class="row">
+      <canvas id="depositChart" style="display: block; box-sizing: border-box; height: 410px; width: 410px;" width="410" height="410"></canvas>
+    </div>
+
+    
+    <div class="row">
+      <table>
+        <thead>
+          <tr><th>Storage Option</th>
+          <th>Files</th>
+          <th>Size</th>
+        </tr></thead>
+        <tbody>
+          
+          
+            <tr class="total">
+          
+              <td>
+                
+                Total
+                
+              </td>
+              <td>59</td>
+              <td>1.7 TB</td>
+            </tr>
+            
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+
+
+<script>
+
+ var data = {
+     labels: [
+         'Standard',
+         'Glacier-VA',
+         'Wasabi-OR'
+     ],
+     datasets: [{
+         label: '',
+         data: [60, 10, 30],
+         backgroundColor: [
+             'rgb(255, 99, 132)',
+             'rgb(54, 162, 235)',
+             'rgb(255, 205, 86)'
+         ],
+         hoverOffset: 4
+     }]
+ };
+ function initChart(elementId, label) {
+     let ctx = document.getElementById(elementId);
+     let copyOfData = JSON.parse(JSON.stringify(data))
+     copyOfData.datasets[0].label = label
+     return new Chart(ctx, { type: 'doughnut', data: copyOfData })
+ }
+
+ window.addEventListener('load', (event) => {
+     initChart("depositChart", "Deposits")
+ });
+
+</script>
+
+
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+
+
+      </div> 
+    </div> 
+
+  <footer>
+    Copyright 2014-2021 APTrust
+  </footer>
+
+  <div class="modal" id="modal-one">
+    <div class="modal-bg modal-exit"></div>
+    <div class="modal-container">
+      <h1></h1> <a class="modal-close modal-exit"><i class="fas fa-window-close"></i></a>
+      <div class="modal-content"></div>
+    </div>
+  </div>
+
+
+
+
+
+</body></html>

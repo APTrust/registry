@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>APTrust Registry</title>
+    <link rel="icon" type="image/png" sizes="16x16" href="http://localhost:8080/static/img/favicon.png">
+    <link rel="stylesheet" href="UserNew_files/font-awesome.css">
+    <link rel="stylesheet" href="UserNew_files/milligram.css">
+    <link rel="stylesheet" href="UserNew_files/registry.css">
+
+    <meta name="csrf_token" content="0100525a00535f575d0203520d5100515d5004515a0d50055c04050408075407$bfecc59aefba4e049d0c89d69e558352">
+
+    
+    
+    <script type="module" src="UserNew_files/chart-3.js"></script>
+    <script type="module" src="UserNew_files/registry.js"></script>
+  </head>
+
+  <body class="container">
+
+    
+    <div class="row top-nav">
+      
+
+<div class="column column-20">
+  <img src="UserNew_files/APTrustSquare.png">
+</div>
+
+<div class="column column-80">
+  <input type="text" placeholder="Search for objects, files, work items...">
+  <i class="fa fa-search"></i>
+</div>
+
+
+    </div>
+    
+
+    <div class="row">
+
+      <div class="column column-20 side-nav">
+        
+        
+
+<ul>
+
+  
+  <li><a href="http://localhost:8080/dashboard"><i class="fa fa-home"></i> Dashboard</a></li>
+  
+
+  
+  <li><a href="http://localhost:8080/objects"><i class="fa fa-archive"></i> Objects</a></li>
+  
+
+  
+  <li><a href="http://localhost:8080/files"><i class="fa fa-file"></i> Files</a></li>
+  
+
+  
+  <li><a href="http://localhost:8080/events"><i class="fab fa-elementor"></i> Events</a></li>
+  
+
+  
+  <li><a href="http://localhost:8080/work_items"><i class="fa fa-cog"></i> Work Items</a></li>
+  
+
+  
+  <li><a href="http://localhost:8080/deletions"><i class="fa fa-backspace"></i> Deletions</a></li>
+  
+
+  
+  <li><a href="http://localhost:8080/reports/deposits"><i class="fa fa-chart-line"></i> Reports</a></li>
+  
+
+  
+  <li><a href="http://localhost:8080/alerts"><i class="fa fa-bell"></i> Alerts</a></li>
+  
+
+  
+    <li><a href="http://localhost:8080/institutions"><i class="fa fa-landmark"></i> Institutions</a></li>
+  
+
+    
+    <li><a href="http://localhost:8080/users"><i class="fa fa-users"></i> Users</a></li>
+    
+
+
+  <li><a href="http://localhost:8080/users/my_account"><i class="far fa-user-circle"></i> My Account</a></li>
+  <li><a href="http://localhost:8080/users/sign_out"><i class="fas fa-sign-out-alt"></i> Sign Out</a></li>
+</ul>
+
+
+        
+      </div>
+
+      <div class="column column-80">
+
+        
+
+
+
+
+<form action="/users/new" id="userForm" method="post">
+
+  
+
+  
+
+<label>Name
+<input type="text" name="Name" placeholder="Name" required="" oninvalid="this.setCustomValidity('Name must contain at least 2 characters.')" oninput="this.setCustomValidity('')">
+</label>
+
+
+
+
+
+  
+
+<label>Email Address
+  <input type="email" name="Email" placeholder="Email Address" required="" oninvalid="this.setCustomValidity('Email address is required.')" oninput="this.setCustomValidity('')">
+</label>
+
+
+
+
+
+  
+
+<label>Phone
+  <input type="tel" name="PhoneNumber" placeholder="Phone in format 212-555-1212" oninvalid="this.setCustomValidity('Please enter a phone number in format \u002b2125551212.')" oninput="this.setCustomValidity('')">
+</label>
+
+
+
+
+
+  
+
+
+
+<label>Require Two-Factor Auth
+<select name="OTPRequiredForLogin" required="" oninvalid="this.setCustomValidity('Please choose yes or no.')" oninput="this.setCustomValidity('')">
+    <option value="">Choose One</option>
+    
+    <option value="true">Yes</option>
+    
+    <option value="false" selected="selected">No</option>
+    
+</select>
+</label>
+
+
+
+
+
+  
+
+<label>Must enable two-factor auth by
+<input type="date" name="GracePeriod" placeholder="mm/dd/yyyy" max="2099-12-31" min="2021-01-01" oninvalid="this.setCustomValidity('Enter a date specifying when this user must enable two-factor authentication.')" oninput="this.setCustomValidity('')">
+</label>
+
+
+
+
+
+  
+    
+
+
+
+<label>Institution
+<select name="InstitutionID" required="" oninvalid="this.setCustomValidity('Please choose an institution.')" oninput="this.setCustomValidity('')">
+    <option value="" selected="selected">Choose One</option>
+    
+    <option value="1">APTrust</option>
+    
+    <option value="5">Example Institution (for integration tests)</option>
+    
+    <option value="2">Institution One</option>
+    
+    <option value="3">Institution Two</option>
+    
+    <option value="4">Test Institution (for integration tests)</option>
+    
+</select>
+</label>
+
+
+
+
+  
+
+  
+
+
+
+<label>Role
+<select name="Role" required="" oninvalid="this.setCustomValidity('Please choose a role for this user.')" oninput="this.setCustomValidity('')">
+    <option value="" selected="selected">Choose One</option>
+    
+    <option value="institutional_admin">Institutional Admin</option>
+    
+    <option value="institutional_user">Institutional User</option>
+    
+    <option value="admin">APTrust System Administrator</option>
+    
+</select>
+</label>
+
+
+
+
+
+  
+
+<input type="hidden" name="csrf_token" value="0100525a00535f575d0203520d5100515d5004515a0d50055c04050408075407$bfecc59aefba4e049d0c89d69e558352">
+
+
+
+  <div class="float-right">
+    <input type="submit" value="Submit">
+  </div>
+  <div class="float-left">
+    <a class="button button-outline" href="javascript:history.back()">Cancel</a>
+  </div>
+</form>
+
+<script>
+
+window.addEventListener('load', (event) => {
+     let otpList = document.forms['userForm'].elements.OTPRequiredForLogin
+     let graceDate = document.forms['userForm'].elements.GracePeriod
+     otpList.addEventListener('change', (e) => {
+         if (otpList.value == "true") {
+             let today = new Date()
+             let deadline = new Date(today.setDate(today.getDate() + 60))
+             graceDate.value = deadline.toISOString().substring(0,10)
+         } else if (otpList.value == "false") {
+             graceDate.value = ''
+         }
+     })
+});
+</script>
+
+
+
+
+      </div> 
+    </div> 
+
+  <footer>
+    Copyright 2014-2021 APTrust
+  </footer>
+
+  <div class="modal" id="modal-one">
+    <div class="modal-bg modal-exit"></div>
+    <div class="modal-container">
+      <h1></h1> <a class="modal-close modal-exit"><i class="fas fa-window-close"></i></a>
+      <div class="modal-content"></div>
+    </div>
+  </div>
+
+
+
+
+
+</body></html>

@@ -1,0 +1,1677 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>APTrust Registry</title>
+    <link rel="icon" type="image/png" sizes="16x16" href="http://localhost:8080/static/img/favicon.png">
+    <link rel="stylesheet" href="ObjectDetail_files/font-awesome.css">
+    <link rel="stylesheet" href="ObjectDetail_files/milligram.css">
+    <link rel="stylesheet" href="ObjectDetail_files/registry.css">
+
+    <meta name="csrf_token" content="0007060a5b535455010503050a510554070d05535103050053040509060c560d$ca13852c9ab63e51c91a37136e586878">
+
+    
+    
+    <script type="module" src="ObjectDetail_files/chart-3.js"></script>
+    <script type="module" src="ObjectDetail_files/registry.js"></script>
+  </head>
+
+  <body class="container">
+
+    
+    <div class="row top-nav">
+      
+
+<div class="column column-20">
+  <img src="ObjectDetail_files/APTrustSquare.png">
+</div>
+
+<div class="column column-80">
+  <input type="text" placeholder="Search for objects, files, work items...">
+  <i class="fa fa-search"></i>
+</div>
+
+
+    </div>
+    
+
+    <div class="row">
+
+      <div class="column column-20 side-nav">
+        
+        
+
+<ul>
+
+  
+  <li><a href="http://localhost:8080/dashboard"><i class="fa fa-home"></i> Dashboard</a></li>
+  
+
+  
+  <li><a href="http://localhost:8080/objects"><i class="fa fa-archive"></i> Objects</a></li>
+  
+
+  
+  <li><a href="http://localhost:8080/files"><i class="fa fa-file"></i> Files</a></li>
+  
+
+  
+  <li><a href="http://localhost:8080/events"><i class="fab fa-elementor"></i> Events</a></li>
+  
+
+  
+  <li><a href="http://localhost:8080/work_items"><i class="fa fa-cog"></i> Work Items</a></li>
+  
+
+  
+  <li><a href="http://localhost:8080/deletions"><i class="fa fa-backspace"></i> Deletions</a></li>
+  
+
+  
+  <li><a href="http://localhost:8080/reports/deposits"><i class="fa fa-chart-line"></i> Reports</a></li>
+  
+
+  
+  <li><a href="http://localhost:8080/alerts"><i class="fa fa-bell"></i> Alerts</a></li>
+  
+
+  
+    <li><a href="http://localhost:8080/institutions"><i class="fa fa-landmark"></i> Institutions</a></li>
+  
+
+    
+    <li><a href="http://localhost:8080/users"><i class="fa fa-users"></i> Users</a></li>
+    
+
+
+  <li><a href="http://localhost:8080/users/my_account"><i class="far fa-user-circle"></i> My Account</a></li>
+  <li><a href="http://localhost:8080/users/sign_out"><i class="fas fa-sign-out-alt"></i> Sign Out</a></li>
+</ul>
+
+
+        
+      </div>
+
+      <div class="column column-80">
+
+        
+
+
+
+
+<script>
+ function filterFiles(state) {
+     let filter = document.getElementById("fileFilter").value
+     let url = "/objects/files/6/?file_filter=" + encodeURIComponent(filter) + "&state=" + encodeURIComponent(state)
+     APT.loadIntoElement("get", url, "objFileList")
+ }
+</script>
+
+<h1>Object with 24 active files</h1>
+
+
+
+<div class="container object-detail">
+
+  
+  <div class="row">
+    
+    <div class="column column-67 rounded-box">
+      
+
+<div class="row">
+  <div class="column column-67">
+    <dl>
+      <dt>Identifier</dt>
+      <dd>institution2.edu/toads</dd>
+
+      <dt>Bag Group Identifier</dt>
+      <dd>---</dd>
+
+      <dt>Alt Identifier</dt>
+      <dd>not_frogs_toads</dd>
+
+      <dt>File Count</dt>
+      <dd>24</dd>
+
+      <dt>Size (Active Files)</dt>
+      <dd>204.4 GB</dd>
+    </dl>
+  </div>
+  <div class="column column-33">
+    <dl>
+      <dt>Created</dt>
+      <dd>Jan 12, 2021</dd>
+
+      <dt>Modified</dt>
+      <dd>Jan 12, 2021</dd>
+
+      <dt>Access</dt>
+      <dd>consortia</dd>
+
+      <dt>Storage Option</dt>
+      <dd>Standard</dd>
+    </dl>
+  </div>
+</div>
+<div class="row">
+  <div class="column column-100">
+
+    <dl>
+      <dt>Description</dt>
+      <dd>A bag of angry toads</dd>
+    </dl>
+
+  </div>
+</div>
+
+
+    </div>
+
+    
+    <div class="column column-33 rounded-box">
+      <div class="row">
+        
+
+<div class="column column-50">
+  
+  <button class="button button-outline" data-modal="modal-one" data-xhr-url="/objects/request_delete/6" data-initialized="true" data-modal-initialized="true">Delete</button>
+  
+</div>
+<div class="column column-50">
+  
+  <button class="button button-outline" data-modal="modal-one" data-xhr-url="/objects/request_restore/6" data-initialized="true" data-modal-initialized="true">Restore</button>
+  
+</div>
+
+
+      </div>
+      <div class="row">
+        
+
+<div class="column column-100" id="objEvents">
+  <div class="row">
+    <div class="column column-100">
+      <h2>Events History</h2>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="column column-100">
+      <table>
+        
+        <tbody><tr class="clickable" data-modal="modal-one" data-xhr-url="/events/show_xhr/53" data-initialized="true" data-modal-initialized="true">
+          <td><i class="fas fa-file-import"></i></td>
+          <td>ingestion</td>
+          <td>Sep  6, 2016</td>
+        </tr>
+        
+        <tr class="clickable" data-modal="modal-one" data-xhr-url="/events/show_xhr/52" data-initialized="true" data-modal-initialized="true">
+          <td><i class="fas fa-file-import"></i></td>
+          <td>ingestion</td>
+          <td>Sep  5, 2016</td>
+        </tr>
+        
+        <tr class="clickable" data-modal="modal-one" data-xhr-url="/events/show_xhr/51" data-initialized="true" data-modal-initialized="true">
+          <td><i class="fas fa-file-import"></i></td>
+          <td>ingestion</td>
+          <td>Sep  4, 2016</td>
+        </tr>
+        
+        <tr class="clickable" data-modal="modal-one" data-xhr-url="/events/show_xhr/50" data-initialized="true" data-modal-initialized="true">
+          <td><i class="fas fa-file-import"></i></td>
+          <td>ingestion</td>
+          <td>Sep  3, 2016</td>
+        </tr>
+        
+        <tr class="clickable" data-modal="modal-one" data-xhr-url="/events/show_xhr/49" data-initialized="true" data-modal-initialized="true">
+          <td><i class="fas fa-file-import"></i></td>
+          <td>ingestion</td>
+          <td>Sep  2, 2016</td>
+        </tr>
+        
+      </tbody></table>
+    </div>
+  </div>
+
+  
+
+<div class="row">
+  <div class="column column-100 center-text">
+    1 - 5 of 12
+  </div>
+</div>
+<div class="row">
+
+  
+
+
+  
+
+
+  
+    
+    <div class="column column-50"><button type="button" class="button button-outline clickable" data-xhr-url="/objects/events/6?page=2&amp;per_page=5" data-xhr-target="objEvents" data-xhr-initialized="true">&gt;</button></div>
+    
+  
+</div>
+
+
+
+</div>
+
+
+      </div>
+    </div>
+  </div>
+
+
+  
+  <div class="row">
+    <div class="column column-100 rounded-box">
+      
+
+<div class="row">
+  <div class="column column-100">
+    <h2>File Summary</h2>
+  </div>
+</div>
+
+<div class="row">
+  <div class="column column-50">
+    <table>
+      <thead>
+        <tr><th>Format</th>
+        <th>Count</th>
+        <th>Size</th>
+      </tr></thead>
+      <tbody>
+        
+          
+            <tr>
+          
+              <td>
+              
+              application/binary
+              
+              </td>
+              <td>1</td>
+              <td>34.4 GB</td>
+            </tr>
+        
+          
+            <tr>
+          
+              <td>
+              
+              audio/mp3
+              
+              </td>
+              <td>1</td>
+              <td>1021.4 MB</td>
+            </tr>
+        
+          
+            <tr>
+          
+              <td>
+              
+              text/plain
+              
+              </td>
+              <td>22</td>
+              <td>127.7 GB</td>
+            </tr>
+        
+          
+            <tr>
+          
+              <td>
+              
+              video/mp4
+              
+              </td>
+              <td>1</td>
+              <td>41.9 GB</td>
+            </tr>
+        
+          
+            <tr class="total">
+          
+              <td>
+              
+              Total
+              
+              </td>
+              <td>25</td>
+              <td>205.0 GB</td>
+            </tr>
+        
+      </tbody>
+    </table>
+  </div>
+
+  <div class="column column-25">
+    <canvas id="sizeChart" style="display: block; box-sizing: border-box; height: 182px; width: 182.5px;" width="182" height="182"></canvas>
+  </div>
+
+  <div class="column column-25">
+    <canvas id="countChart" style="display: block; box-sizing: border-box; height: 182px; width: 182.5px;" width="182" height="182"></canvas>
+  </div>
+
+</div>
+
+
+
+<script>
+
+ var data = {
+     labels: [
+         'PDF',
+         'Text',
+         'TIFF'
+     ],
+     datasets: [{
+         label: '',
+         data: [60, 10, 30],
+         backgroundColor: [
+             'rgb(255, 99, 132)',
+             'rgb(54, 162, 235)',
+             'rgb(255, 205, 86)'
+         ],
+         hoverOffset: 4
+     }]
+ };
+ function initChart(elementId, label) {
+     let ctx = document.getElementById(elementId);
+     let copyOfData = JSON.parse(JSON.stringify(data))
+     copyOfData.datasets[0].label = label
+     return new Chart(ctx, { type: 'doughnut', data: copyOfData })
+ }
+
+ window.addEventListener('load', (event) => {
+     initChart("sizeChart", "File Distribution by Size")
+     initChart("countChart", "File Distribution by Count")
+ });
+
+</script>
+
+
+    </div>
+  </div>
+
+
+  
+  <div class="row">
+    <div class="column column-100 rounded-box" id="objFileList">
+      
+
+
+
+  <div class="row">
+    <div class="column column-70">
+      <h2>Active Files</h2>
+    </div>
+    <div class="column column-30">
+      
+      <button type="button" class="button button-outline" data-xhr-url="/objects/files/6?state=D&amp;page=1&amp;per_page=10" data-xhr-target="objFileList" data-xhr-initialized="true">Show Deleted Files</button>
+      
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="column column-70">
+      <input type="text" placeholder="Filter by partial identifier or exact checksum" id="fileFilter">
+    </div>
+    <div class="column column-30">
+      <input type="button" value="Filter" onclick="filterFiles('A')">
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="column column-100">
+      <table>
+        <thead>
+          <tr><th></th>
+          <th>Identifier</th>
+          <th>Format</th>
+          <th>Size</th>
+          <th>Ingested</th>
+          <th>Modified</th>
+          <th>Last Fixity</th>
+        </tr></thead>
+        
+        <tbody><tr>
+          <td class="clickable" data-toggle="file-17" data-toggle-initialized="true">[+]</td>
+          <td>institution2.edu/toads/toad1</td>
+          <td>application/binary</td>
+          <td>34.4 GB</td>
+          <td>Jan 12, 2021</td>
+          <td>Jan 12, 2021</td>
+          <td>Jan  1, 2000</td>
+        </tr>
+        <tr>
+          <td colspan="7" style="border:none">
+            <div id="file-17" style="display:none;background-color:#eef;">
+              <table>
+                <tbody>
+                  <tr>
+                    <th>Identifier</th>
+                    <td>institution2.edu/toads/toad1</td>
+                  </tr>
+                  
+                  <tr>
+                    <th>URL</th>
+                    <td>https://localhost:9899/preservation-va/7c8daeb2-8a37-411e-91b7-f828c0e6f407</td>
+                  </tr>
+                  
+                  <tr>
+                    <th>URL</th>
+                    <td>https://localhost:9899/preservation-or/7c8daeb2-8a37-411e-91b7-f828c0e6f407</td>
+                  </tr>
+                  
+                </tbody>
+              </table>
+
+              <h3>Checksums</h3>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Algorithm</th>
+                    <th>Digest</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  
+                </tbody>
+              </table>
+              <p></p>
+
+              
+              <div class="float-left">
+                <button class="button button-outline" data-modal="modal-one" data-xhr-url="/files/request_delete/17" data-initialized="true" data-modal-initialized="true">Delete File</button>
+              </div>
+              
+
+              
+              <div class="float-right">
+                <button class="button button-outline" data-modal="modal-one" data-xhr-url="/files/request_restore/17" data-initialized="true" data-modal-initialized="true">Restore File</button>
+              </div>
+              
+
+            </div>
+          </td>
+        </tr>
+        
+        <tr>
+          <td class="clickable" data-toggle="file-18" data-toggle-initialized="true">[+]</td>
+          <td>institution2.edu/toads/toad2</td>
+          <td>video/mp4</td>
+          <td>41.9 GB</td>
+          <td>Jan 12, 2021</td>
+          <td>Jan 12, 2021</td>
+          <td>Jan  1, 2000</td>
+        </tr>
+        <tr>
+          <td colspan="7" style="border:none">
+            <div id="file-18" style="display:none;background-color:#eef;">
+              <table>
+                <tbody>
+                  <tr>
+                    <th>Identifier</th>
+                    <td>institution2.edu/toads/toad2</td>
+                  </tr>
+                  
+                  <tr>
+                    <th>URL</th>
+                    <td>https://localhost:9899/preservation-va/735c7f8b-1795-451d-9adc-2904c3096721</td>
+                  </tr>
+                  
+                  <tr>
+                    <th>URL</th>
+                    <td>https://localhost:9899/preservation-or/735c7f8b-1795-451d-9adc-2904c3096721</td>
+                  </tr>
+                  
+                </tbody>
+              </table>
+
+              <h3>Checksums</h3>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Algorithm</th>
+                    <th>Digest</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  
+                </tbody>
+              </table>
+              <p></p>
+
+              
+              <div class="float-left">
+                <button class="button button-outline" data-modal="modal-one" data-xhr-url="/files/request_delete/18" data-initialized="true" data-modal-initialized="true">Delete File</button>
+              </div>
+              
+
+              
+              <div class="float-right">
+                <button class="button button-outline" data-modal="modal-one" data-xhr-url="/files/request_restore/18" data-initialized="true" data-modal-initialized="true">Restore File</button>
+              </div>
+              
+
+            </div>
+          </td>
+        </tr>
+        
+        <tr>
+          <td class="clickable" data-toggle="file-19" data-toggle-initialized="true">[+]</td>
+          <td>...ution2.edu/toads/Prakash_ 39 Harv. J.L. &amp; Pub. Pol’y 341 .pdf</td>
+          <td>audio/mp3</td>
+          <td>1021.4 MB</td>
+          <td>Jan 12, 2021</td>
+          <td>Jan 12, 2021</td>
+          <td>Jan  1, 2000</td>
+        </tr>
+        <tr>
+          <td colspan="7" style="border:none">
+            <div id="file-19" style="display:none;background-color:#eef;">
+              <table>
+                <tbody>
+                  <tr>
+                    <th>Identifier</th>
+                    <td>institution2.edu/toads/Prakash_ 39 Harv. J.L. &amp; Pub. Pol’y 341 .pdf</td>
+                  </tr>
+                  
+                  <tr>
+                    <th>URL</th>
+                    <td>https://localhost:9899/preservation-va/507ba10f-eb98-409c-b95a-a03dbb323e97</td>
+                  </tr>
+                  
+                  <tr>
+                    <th>URL</th>
+                    <td>https://localhost:9899/preservation-or/507ba10f-eb98-409c-b95a-a03dbb323e97</td>
+                  </tr>
+                  
+                </tbody>
+              </table>
+
+              <h3>Checksums</h3>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Algorithm</th>
+                    <th>Digest</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  
+                </tbody>
+              </table>
+              <p></p>
+
+              
+              <div class="float-left">
+                <button class="button button-outline" data-modal="modal-one" data-xhr-url="/files/request_delete/19" data-initialized="true" data-modal-initialized="true">Delete File</button>
+              </div>
+              
+
+              
+              <div class="float-right">
+                <button class="button button-outline" data-modal="modal-one" data-xhr-url="/files/request_restore/19" data-initialized="true" data-modal-initialized="true">Restore File</button>
+              </div>
+              
+
+            </div>
+          </td>
+        </tr>
+        
+        <tr>
+          <td class="clickable" data-toggle="file-28" data-toggle-initialized="true">[+]</td>
+          <td>institution2.edu/toads/toad5</td>
+          <td>text/plain</td>
+          <td>63.3 MB</td>
+          <td>Jan 12, 2021</td>
+          <td>Jan 12, 2021</td>
+          <td>Jan  1, 2000</td>
+        </tr>
+        <tr>
+          <td colspan="7" style="border:none">
+            <div id="file-28" style="display:none;background-color:#eef;">
+              <table>
+                <tbody>
+                  <tr>
+                    <th>Identifier</th>
+                    <td>institution2.edu/toads/toad5</td>
+                  </tr>
+                  
+                  <tr>
+                    <th>URL</th>
+                    <td>https://localhost:9899/preservation-va/1186f292-7a85-45c3-9436-e42675e34711</td>
+                  </tr>
+                  
+                </tbody>
+              </table>
+
+              <h3>Checksums</h3>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Algorithm</th>
+                    <th>Digest</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  
+                </tbody>
+              </table>
+              <p></p>
+
+              
+              <div class="float-left">
+                <button class="button button-outline" data-modal="modal-one" data-xhr-url="/files/request_delete/28" data-initialized="true" data-modal-initialized="true">Delete File</button>
+              </div>
+              
+
+              
+              <div class="float-right">
+                <button class="button button-outline" data-modal="modal-one" data-xhr-url="/files/request_restore/28" data-initialized="true" data-modal-initialized="true">Restore File</button>
+              </div>
+              
+
+            </div>
+          </td>
+        </tr>
+        
+        <tr>
+          <td class="clickable" data-toggle="file-29" data-toggle-initialized="true">[+]</td>
+          <td>institution2.edu/toads/toad6</td>
+          <td>text/plain</td>
+          <td>347.6 MB</td>
+          <td>Jan 12, 2021</td>
+          <td>Jan 12, 2021</td>
+          <td>Jan  1, 2000</td>
+        </tr>
+        <tr>
+          <td colspan="7" style="border:none">
+            <div id="file-29" style="display:none;background-color:#eef;">
+              <table>
+                <tbody>
+                  <tr>
+                    <th>Identifier</th>
+                    <td>institution2.edu/toads/toad6</td>
+                  </tr>
+                  
+                  <tr>
+                    <th>URL</th>
+                    <td>https://localhost:9899/preservation-va/2286f292-7a85-45c3-9436-e42675e34722</td>
+                  </tr>
+                  
+                </tbody>
+              </table>
+
+              <h3>Checksums</h3>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Algorithm</th>
+                    <th>Digest</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  
+                </tbody>
+              </table>
+              <p></p>
+
+              
+              <div class="float-left">
+                <button class="button button-outline" data-modal="modal-one" data-xhr-url="/files/request_delete/29" data-initialized="true" data-modal-initialized="true">Delete File</button>
+              </div>
+              
+
+              
+              <div class="float-right">
+                <button class="button button-outline" data-modal="modal-one" data-xhr-url="/files/request_restore/29" data-initialized="true" data-modal-initialized="true">Restore File</button>
+              </div>
+              
+
+            </div>
+          </td>
+        </tr>
+        
+        <tr>
+          <td class="clickable" data-toggle="file-30" data-toggle-initialized="true">[+]</td>
+          <td>institution2.edu/toads/toad7</td>
+          <td>text/plain</td>
+          <td>29.5 GB</td>
+          <td>Jan 12, 2021</td>
+          <td>Jan 12, 2021</td>
+          <td>Jan  1, 2000</td>
+        </tr>
+        <tr>
+          <td colspan="7" style="border:none">
+            <div id="file-30" style="display:none;background-color:#eef;">
+              <table>
+                <tbody>
+                  <tr>
+                    <th>Identifier</th>
+                    <td>institution2.edu/toads/toad7</td>
+                  </tr>
+                  
+                  <tr>
+                    <th>URL</th>
+                    <td>https://localhost:9899/preservation-va/3386f292-7a85-45c3-9436-e42675e34733</td>
+                  </tr>
+                  
+                </tbody>
+              </table>
+
+              <h3>Checksums</h3>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Algorithm</th>
+                    <th>Digest</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  
+                </tbody>
+              </table>
+              <p></p>
+
+              
+              <div class="float-left">
+                <button class="button button-outline" data-modal="modal-one" data-xhr-url="/files/request_delete/30" data-initialized="true" data-modal-initialized="true">Delete File</button>
+              </div>
+              
+
+              
+              <div class="float-right">
+                <button class="button button-outline" data-modal="modal-one" data-xhr-url="/files/request_restore/30" data-initialized="true" data-modal-initialized="true">Restore File</button>
+              </div>
+              
+
+            </div>
+          </td>
+        </tr>
+        
+        <tr>
+          <td class="clickable" data-toggle="file-31" data-toggle-initialized="true">[+]</td>
+          <td>institution2.edu/toads/toad8</td>
+          <td>text/plain</td>
+          <td>259.0 MB</td>
+          <td>Jan 12, 2021</td>
+          <td>Jan 12, 2021</td>
+          <td>Jan  1, 2000</td>
+        </tr>
+        <tr>
+          <td colspan="7" style="border:none">
+            <div id="file-31" style="display:none;background-color:#eef;">
+              <table>
+                <tbody>
+                  <tr>
+                    <th>Identifier</th>
+                    <td>institution2.edu/toads/toad8</td>
+                  </tr>
+                  
+                  <tr>
+                    <th>URL</th>
+                    <td>https://localhost:9899/preservation-va/4486f292-7a85-45c3-9436-e42675e34744</td>
+                  </tr>
+                  
+                </tbody>
+              </table>
+
+              <h3>Checksums</h3>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Algorithm</th>
+                    <th>Digest</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  
+                </tbody>
+              </table>
+              <p></p>
+
+              
+              <div class="float-left">
+                <button class="button button-outline" data-modal="modal-one" data-xhr-url="/files/request_delete/31" data-initialized="true" data-modal-initialized="true">Delete File</button>
+              </div>
+              
+
+              
+              <div class="float-right">
+                <button class="button button-outline" data-modal="modal-one" data-xhr-url="/files/request_restore/31" data-initialized="true" data-modal-initialized="true">Restore File</button>
+              </div>
+              
+
+            </div>
+          </td>
+        </tr>
+        
+        <tr>
+          <td class="clickable" data-toggle="file-32" data-toggle-initialized="true">[+]</td>
+          <td>institution2.edu/toads/toad9</td>
+          <td>text/plain</td>
+          <td>385.3 MB</td>
+          <td>Jan 12, 2021</td>
+          <td>Jan 12, 2021</td>
+          <td>Jan  1, 2000</td>
+        </tr>
+        <tr>
+          <td colspan="7" style="border:none">
+            <div id="file-32" style="display:none;background-color:#eef;">
+              <table>
+                <tbody>
+                  <tr>
+                    <th>Identifier</th>
+                    <td>institution2.edu/toads/toad9</td>
+                  </tr>
+                  
+                  <tr>
+                    <th>URL</th>
+                    <td>https://localhost:9899/preservation-va/5586f292-7a85-45c3-9436-e42675e347155</td>
+                  </tr>
+                  
+                </tbody>
+              </table>
+
+              <h3>Checksums</h3>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Algorithm</th>
+                    <th>Digest</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  
+                </tbody>
+              </table>
+              <p></p>
+
+              
+              <div class="float-left">
+                <button class="button button-outline" data-modal="modal-one" data-xhr-url="/files/request_delete/32" data-initialized="true" data-modal-initialized="true">Delete File</button>
+              </div>
+              
+
+              
+              <div class="float-right">
+                <button class="button button-outline" data-modal="modal-one" data-xhr-url="/files/request_restore/32" data-initialized="true" data-modal-initialized="true">Restore File</button>
+              </div>
+              
+
+            </div>
+          </td>
+        </tr>
+        
+        <tr>
+          <td class="clickable" data-toggle="file-33" data-toggle-initialized="true">[+]</td>
+          <td>institution2.edu/toads/toad10</td>
+          <td>text/plain</td>
+          <td>105.8 MB</td>
+          <td>Jan 12, 2021</td>
+          <td>Jan 12, 2021</td>
+          <td>Jan  1, 2000</td>
+        </tr>
+        <tr>
+          <td colspan="7" style="border:none">
+            <div id="file-33" style="display:none;background-color:#eef;">
+              <table>
+                <tbody>
+                  <tr>
+                    <th>Identifier</th>
+                    <td>institution2.edu/toads/toad10</td>
+                  </tr>
+                  
+                  <tr>
+                    <th>URL</th>
+                    <td>https://localhost:9899/preservation-va/6686f292-7a85-45c3-9436-e42675e34766</td>
+                  </tr>
+                  
+                </tbody>
+              </table>
+
+              <h3>Checksums</h3>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Algorithm</th>
+                    <th>Digest</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  
+                </tbody>
+              </table>
+              <p></p>
+
+              
+              <div class="float-left">
+                <button class="button button-outline" data-modal="modal-one" data-xhr-url="/files/request_delete/33" data-initialized="true" data-modal-initialized="true">Delete File</button>
+              </div>
+              
+
+              
+              <div class="float-right">
+                <button class="button button-outline" data-modal="modal-one" data-xhr-url="/files/request_restore/33" data-initialized="true" data-modal-initialized="true">Restore File</button>
+              </div>
+              
+
+            </div>
+          </td>
+        </tr>
+        
+        <tr>
+          <td class="clickable" data-toggle="file-34" data-toggle-initialized="true">[+]</td>
+          <td>institution2.edu/toads/toad11</td>
+          <td>text/plain</td>
+          <td>2.1 GB</td>
+          <td>Jan 12, 2021</td>
+          <td>Jan 12, 2021</td>
+          <td>Jan  1, 2000</td>
+        </tr>
+        <tr>
+          <td colspan="7" style="border:none">
+            <div id="file-34" style="display:none;background-color:#eef;">
+              <table>
+                <tbody>
+                  <tr>
+                    <th>Identifier</th>
+                    <td>institution2.edu/toads/toad11</td>
+                  </tr>
+                  
+                  <tr>
+                    <th>URL</th>
+                    <td>https://localhost:9899/preservation-va/7786f292-7a85-45c3-9436-e42675e34777</td>
+                  </tr>
+                  
+                </tbody>
+              </table>
+
+              <h3>Checksums</h3>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Algorithm</th>
+                    <th>Digest</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  
+                </tbody>
+              </table>
+              <p></p>
+
+              
+              <div class="float-left">
+                <button class="button button-outline" data-modal="modal-one" data-xhr-url="/files/request_delete/34" data-initialized="true" data-modal-initialized="true">Delete File</button>
+              </div>
+              
+
+              
+              <div class="float-right">
+                <button class="button button-outline" data-modal="modal-one" data-xhr-url="/files/request_restore/34" data-initialized="true" data-modal-initialized="true">Restore File</button>
+              </div>
+              
+
+            </div>
+          </td>
+        </tr>
+        
+        <tr>
+          <td class="clickable" data-toggle="file-35" data-toggle-initialized="true">[+]</td>
+          <td>institution2.edu/toads/toad12</td>
+          <td>text/plain</td>
+          <td>42.3 GB</td>
+          <td>Jan 12, 2021</td>
+          <td>Jan 12, 2021</td>
+          <td>Jan  1, 2000</td>
+        </tr>
+        <tr>
+          <td colspan="7" style="border:none">
+            <div id="file-35" style="display:none;background-color:#eef;">
+              <table>
+                <tbody>
+                  <tr>
+                    <th>Identifier</th>
+                    <td>institution2.edu/toads/toad12</td>
+                  </tr>
+                  
+                  <tr>
+                    <th>URL</th>
+                    <td>https://localhost:9899/preservation-va/8886f292-7a85-45c3-9436-e42675e34788</td>
+                  </tr>
+                  
+                </tbody>
+              </table>
+
+              <h3>Checksums</h3>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Algorithm</th>
+                    <th>Digest</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  
+                </tbody>
+              </table>
+              <p></p>
+
+              
+              <div class="float-left">
+                <button class="button button-outline" data-modal="modal-one" data-xhr-url="/files/request_delete/35" data-initialized="true" data-modal-initialized="true">Delete File</button>
+              </div>
+              
+
+              
+              <div class="float-right">
+                <button class="button button-outline" data-modal="modal-one" data-xhr-url="/files/request_restore/35" data-initialized="true" data-modal-initialized="true">Restore File</button>
+              </div>
+              
+
+            </div>
+          </td>
+        </tr>
+        
+        <tr>
+          <td class="clickable" data-toggle="file-36" data-toggle-initialized="true">[+]</td>
+          <td>institution2.edu/toads/toad13</td>
+          <td>text/plain</td>
+          <td>42.4 MB</td>
+          <td>Jan 12, 2021</td>
+          <td>Jan 12, 2021</td>
+          <td>Jan  1, 2000</td>
+        </tr>
+        <tr>
+          <td colspan="7" style="border:none">
+            <div id="file-36" style="display:none;background-color:#eef;">
+              <table>
+                <tbody>
+                  <tr>
+                    <th>Identifier</th>
+                    <td>institution2.edu/toads/toad13</td>
+                  </tr>
+                  
+                  <tr>
+                    <th>URL</th>
+                    <td>https://localhost:9899/preservation-va/9986f292-7a85-45c3-9436-e42675e34799</td>
+                  </tr>
+                  
+                </tbody>
+              </table>
+
+              <h3>Checksums</h3>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Algorithm</th>
+                    <th>Digest</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  
+                </tbody>
+              </table>
+              <p></p>
+
+              
+              <div class="float-left">
+                <button class="button button-outline" data-modal="modal-one" data-xhr-url="/files/request_delete/36" data-initialized="true" data-modal-initialized="true">Delete File</button>
+              </div>
+              
+
+              
+              <div class="float-right">
+                <button class="button button-outline" data-modal="modal-one" data-xhr-url="/files/request_restore/36" data-initialized="true" data-modal-initialized="true">Restore File</button>
+              </div>
+              
+
+            </div>
+          </td>
+        </tr>
+        
+        <tr>
+          <td class="clickable" data-toggle="file-37" data-toggle-initialized="true">[+]</td>
+          <td>institution2.edu/toads/toad14</td>
+          <td>text/plain</td>
+          <td>289.0 MB</td>
+          <td>Jan 12, 2021</td>
+          <td>Jan 12, 2021</td>
+          <td>Jan  1, 2000</td>
+        </tr>
+        <tr>
+          <td colspan="7" style="border:none">
+            <div id="file-37" style="display:none;background-color:#eef;">
+              <table>
+                <tbody>
+                  <tr>
+                    <th>Identifier</th>
+                    <td>institution2.edu/toads/toad14</td>
+                  </tr>
+                  
+                  <tr>
+                    <th>URL</th>
+                    <td>https://localhost:9899/preservation-va/aa86f292-7a85-45c3-9436-e42675e347aa</td>
+                  </tr>
+                  
+                </tbody>
+              </table>
+
+              <h3>Checksums</h3>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Algorithm</th>
+                    <th>Digest</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  
+                </tbody>
+              </table>
+              <p></p>
+
+              
+              <div class="float-left">
+                <button class="button button-outline" data-modal="modal-one" data-xhr-url="/files/request_delete/37" data-initialized="true" data-modal-initialized="true">Delete File</button>
+              </div>
+              
+
+              
+              <div class="float-right">
+                <button class="button button-outline" data-modal="modal-one" data-xhr-url="/files/request_restore/37" data-initialized="true" data-modal-initialized="true">Restore File</button>
+              </div>
+              
+
+            </div>
+          </td>
+        </tr>
+        
+        <tr>
+          <td class="clickable" data-toggle="file-38" data-toggle-initialized="true">[+]</td>
+          <td>institution2.edu/toads/toad15</td>
+          <td>text/plain</td>
+          <td>43.2 MB</td>
+          <td>Jan 12, 2021</td>
+          <td>Jan 12, 2021</td>
+          <td>Jan  1, 2000</td>
+        </tr>
+        <tr>
+          <td colspan="7" style="border:none">
+            <div id="file-38" style="display:none;background-color:#eef;">
+              <table>
+                <tbody>
+                  <tr>
+                    <th>Identifier</th>
+                    <td>institution2.edu/toads/toad15</td>
+                  </tr>
+                  
+                  <tr>
+                    <th>URL</th>
+                    <td>https://localhost:9899/preservation-va/bb86f292-7a85-45c3-9436-e42675e347bb</td>
+                  </tr>
+                  
+                </tbody>
+              </table>
+
+              <h3>Checksums</h3>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Algorithm</th>
+                    <th>Digest</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  
+                </tbody>
+              </table>
+              <p></p>
+
+              
+              <div class="float-left">
+                <button class="button button-outline" data-modal="modal-one" data-xhr-url="/files/request_delete/38" data-initialized="true" data-modal-initialized="true">Delete File</button>
+              </div>
+              
+
+              
+              <div class="float-right">
+                <button class="button button-outline" data-modal="modal-one" data-xhr-url="/files/request_restore/38" data-initialized="true" data-modal-initialized="true">Restore File</button>
+              </div>
+              
+
+            </div>
+          </td>
+        </tr>
+        
+        <tr>
+          <td class="clickable" data-toggle="file-39" data-toggle-initialized="true">[+]</td>
+          <td>institution2.edu/toads/toad16</td>
+          <td>text/plain</td>
+          <td>690.9 MB</td>
+          <td>Jan 12, 2021</td>
+          <td>Jan 12, 2021</td>
+          <td>Jan  1, 2000</td>
+        </tr>
+        <tr>
+          <td colspan="7" style="border:none">
+            <div id="file-39" style="display:none;background-color:#eef;">
+              <table>
+                <tbody>
+                  <tr>
+                    <th>Identifier</th>
+                    <td>institution2.edu/toads/toad16</td>
+                  </tr>
+                  
+                  <tr>
+                    <th>URL</th>
+                    <td>https://localhost:9899/preservation-va/cc86f292-7a85-45c3-9436-e42675e347cc</td>
+                  </tr>
+                  
+                </tbody>
+              </table>
+
+              <h3>Checksums</h3>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Algorithm</th>
+                    <th>Digest</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  
+                </tbody>
+              </table>
+              <p></p>
+
+              
+              <div class="float-left">
+                <button class="button button-outline" data-modal="modal-one" data-xhr-url="/files/request_delete/39" data-initialized="true" data-modal-initialized="true">Delete File</button>
+              </div>
+              
+
+              
+              <div class="float-right">
+                <button class="button button-outline" data-modal="modal-one" data-xhr-url="/files/request_restore/39" data-initialized="true" data-modal-initialized="true">Restore File</button>
+              </div>
+              
+
+            </div>
+          </td>
+        </tr>
+        
+        <tr>
+          <td class="clickable" data-toggle="file-40" data-toggle-initialized="true">[+]</td>
+          <td>institution2.edu/toads/toad17</td>
+          <td>text/plain</td>
+          <td>1.6 GB</td>
+          <td>Jan 12, 2021</td>
+          <td>Jan 12, 2021</td>
+          <td>Jan  1, 2000</td>
+        </tr>
+        <tr>
+          <td colspan="7" style="border:none">
+            <div id="file-40" style="display:none;background-color:#eef;">
+              <table>
+                <tbody>
+                  <tr>
+                    <th>Identifier</th>
+                    <td>institution2.edu/toads/toad17</td>
+                  </tr>
+                  
+                  <tr>
+                    <th>URL</th>
+                    <td>https://localhost:9899/preservation-va/dd86f292-7a85-45c3-9436-e42675e347dd</td>
+                  </tr>
+                  
+                </tbody>
+              </table>
+
+              <h3>Checksums</h3>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Algorithm</th>
+                    <th>Digest</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  
+                </tbody>
+              </table>
+              <p></p>
+
+              
+              <div class="float-left">
+                <button class="button button-outline" data-modal="modal-one" data-xhr-url="/files/request_delete/40" data-initialized="true" data-modal-initialized="true">Delete File</button>
+              </div>
+              
+
+              
+              <div class="float-right">
+                <button class="button button-outline" data-modal="modal-one" data-xhr-url="/files/request_restore/40" data-initialized="true" data-modal-initialized="true">Restore File</button>
+              </div>
+              
+
+            </div>
+          </td>
+        </tr>
+        
+        <tr>
+          <td class="clickable" data-toggle="file-41" data-toggle-initialized="true">[+]</td>
+          <td>institution2.edu/toads/toad18</td>
+          <td>text/plain</td>
+          <td>2.5 GB</td>
+          <td>Jan 12, 2021</td>
+          <td>Jan 12, 2021</td>
+          <td>Jan  1, 2000</td>
+        </tr>
+        <tr>
+          <td colspan="7" style="border:none">
+            <div id="file-41" style="display:none;background-color:#eef;">
+              <table>
+                <tbody>
+                  <tr>
+                    <th>Identifier</th>
+                    <td>institution2.edu/toads/toad18</td>
+                  </tr>
+                  
+                  <tr>
+                    <th>URL</th>
+                    <td>https://localhost:9899/preservation-va/ee86f292-7a85-45c3-9436-e42675e347ee</td>
+                  </tr>
+                  
+                </tbody>
+              </table>
+
+              <h3>Checksums</h3>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Algorithm</th>
+                    <th>Digest</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  
+                </tbody>
+              </table>
+              <p></p>
+
+              
+              <div class="float-left">
+                <button class="button button-outline" data-modal="modal-one" data-xhr-url="/files/request_delete/41" data-initialized="true" data-modal-initialized="true">Delete File</button>
+              </div>
+              
+
+              
+              <div class="float-right">
+                <button class="button button-outline" data-modal="modal-one" data-xhr-url="/files/request_restore/41" data-initialized="true" data-modal-initialized="true">Restore File</button>
+              </div>
+              
+
+            </div>
+          </td>
+        </tr>
+        
+        <tr>
+          <td class="clickable" data-toggle="file-42" data-toggle-initialized="true">[+]</td>
+          <td>institution2.edu/toads/toad19</td>
+          <td>text/plain</td>
+          <td>3.6 GB</td>
+          <td>Jan 12, 2021</td>
+          <td>Jan 12, 2021</td>
+          <td>Jan  1, 2000</td>
+        </tr>
+        <tr>
+          <td colspan="7" style="border:none">
+            <div id="file-42" style="display:none;background-color:#eef;">
+              <table>
+                <tbody>
+                  <tr>
+                    <th>Identifier</th>
+                    <td>institution2.edu/toads/toad19</td>
+                  </tr>
+                  
+                  <tr>
+                    <th>URL</th>
+                    <td>https://localhost:9899/preservation-va/ff86f292-7a85-45c3-9436-e42675e347ff</td>
+                  </tr>
+                  
+                </tbody>
+              </table>
+
+              <h3>Checksums</h3>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Algorithm</th>
+                    <th>Digest</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  
+                </tbody>
+              </table>
+              <p></p>
+
+              
+              <div class="float-left">
+                <button class="button button-outline" data-modal="modal-one" data-xhr-url="/files/request_delete/42" data-initialized="true" data-modal-initialized="true">Delete File</button>
+              </div>
+              
+
+              
+              <div class="float-right">
+                <button class="button button-outline" data-modal="modal-one" data-xhr-url="/files/request_restore/42" data-initialized="true" data-modal-initialized="true">Restore File</button>
+              </div>
+              
+
+            </div>
+          </td>
+        </tr>
+        
+        <tr>
+          <td class="clickable" data-toggle="file-43" data-toggle-initialized="true">[+]</td>
+          <td>institution2.edu/toads/toad20</td>
+          <td>text/plain</td>
+          <td>11.0 MB</td>
+          <td>Jan 12, 2021</td>
+          <td>Jan 12, 2021</td>
+          <td>Jan  1, 2000</td>
+        </tr>
+        <tr>
+          <td colspan="7" style="border:none">
+            <div id="file-43" style="display:none;background-color:#eef;">
+              <table>
+                <tbody>
+                  <tr>
+                    <th>Identifier</th>
+                    <td>institution2.edu/toads/toad20</td>
+                  </tr>
+                  
+                  <tr>
+                    <th>URL</th>
+                    <td>https://localhost:9899/preservation-va/9a86f292-7a85-45c3-9436-e42675e3479a</td>
+                  </tr>
+                  
+                </tbody>
+              </table>
+
+              <h3>Checksums</h3>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Algorithm</th>
+                    <th>Digest</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  
+                </tbody>
+              </table>
+              <p></p>
+
+              
+              <div class="float-left">
+                <button class="button button-outline" data-modal="modal-one" data-xhr-url="/files/request_delete/43" data-initialized="true" data-modal-initialized="true">Delete File</button>
+              </div>
+              
+
+              
+              <div class="float-right">
+                <button class="button button-outline" data-modal="modal-one" data-xhr-url="/files/request_restore/43" data-initialized="true" data-modal-initialized="true">Restore File</button>
+              </div>
+              
+
+            </div>
+          </td>
+        </tr>
+        
+        <tr>
+          <td class="clickable" data-toggle="file-44" data-toggle-initialized="true">[+]</td>
+          <td>institution2.edu/toads/toad21</td>
+          <td>text/plain</td>
+          <td>1.1 GB</td>
+          <td>Jan 12, 2021</td>
+          <td>Jan 12, 2021</td>
+          <td>Jan  1, 2000</td>
+        </tr>
+        <tr>
+          <td colspan="7" style="border:none">
+            <div id="file-44" style="display:none;background-color:#eef;">
+              <table>
+                <tbody>
+                  <tr>
+                    <th>Identifier</th>
+                    <td>institution2.edu/toads/toad21</td>
+                  </tr>
+                  
+                  <tr>
+                    <th>URL</th>
+                    <td>https://localhost:9899/preservation-va/9b86f292-7a85-45c3-9436-e42675e3479b</td>
+                  </tr>
+                  
+                </tbody>
+              </table>
+
+              <h3>Checksums</h3>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Algorithm</th>
+                    <th>Digest</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  
+                </tbody>
+              </table>
+              <p></p>
+
+              
+              <div class="float-left">
+                <button class="button button-outline" data-modal="modal-one" data-xhr-url="/files/request_delete/44" data-initialized="true" data-modal-initialized="true">Delete File</button>
+              </div>
+              
+
+              
+              <div class="float-right">
+                <button class="button button-outline" data-modal="modal-one" data-xhr-url="/files/request_restore/44" data-initialized="true" data-modal-initialized="true">Restore File</button>
+              </div>
+              
+
+            </div>
+          </td>
+        </tr>
+        
+      </tbody></table>
+    </div>
+  </div>
+
+  
+
+<div class="row">
+  <div class="column column-100 center-text">
+    1 - 20 of 24
+  </div>
+</div>
+<div class="row">
+
+  
+
+
+  
+
+
+  
+    
+    <div class="column column-50"><button type="button" class="button button-outline clickable" data-xhr-url="/objects/show/6?page=2&amp;per_page=20" data-xhr-target="objFileList" data-xhr-initialized="true">&gt;</button></div>
+    
+  
+</div>
+
+
+
+
+
+    </div>
+  </div>
+
+
+</div> 
+
+
+
+
+      </div> 
+    </div> 
+
+  <footer>
+    Copyright 2014-2021 APTrust
+  </footer>
+
+  <div class="modal" id="modal-one">
+    <div class="modal-bg modal-exit"></div>
+    <div class="modal-container">
+      <h1></h1> <a class="modal-close modal-exit"><i class="fas fa-window-close"></i></a>
+      <div class="modal-content"></div>
+    </div>
+  </div>
+
+
+
+
+
+
+</body></html>

@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>APTrust Registry</title>
+    <link rel="icon" type="image/png" sizes="16x16" href="http://localhost:8080/static/img/favicon.png">
+    <link rel="stylesheet" href="UserList_files/font-awesome.css">
+    <link rel="stylesheet" href="UserList_files/milligram.css">
+    <link rel="stylesheet" href="UserList_files/registry.css">
+
+    <meta name="csrf_token" content="06560f080157530e0f0753575857035d07075656040152510303055508510206$e081b1587c2dac38c3bdf5fbfb5d8ec3">
+
+    
+    
+    <script type="module" src="UserList_files/chart-3.js"></script>
+    <script type="module" src="UserList_files/registry.js"></script>
+  </head>
+
+  <body class="container">
+
+    
+    <div class="row top-nav">
+      
+
+<div class="column column-20">
+  <img src="UserList_files/APTrustSquare.png">
+</div>
+
+<div class="column column-80">
+  <input type="text" placeholder="Search for objects, files, work items...">
+  <i class="fa fa-search"></i>
+</div>
+
+
+    </div>
+    
+
+    <div class="row">
+
+      <div class="column column-20 side-nav">
+        
+        
+
+<ul>
+
+  
+  <li><a href="http://localhost:8080/dashboard"><i class="fa fa-home"></i> Dashboard</a></li>
+  
+
+  
+  <li><a href="http://localhost:8080/objects"><i class="fa fa-archive"></i> Objects</a></li>
+  
+
+  
+  <li><a href="http://localhost:8080/files"><i class="fa fa-file"></i> Files</a></li>
+  
+
+  
+  <li><a href="http://localhost:8080/events"><i class="fab fa-elementor"></i> Events</a></li>
+  
+
+  
+  <li><a href="http://localhost:8080/work_items"><i class="fa fa-cog"></i> Work Items</a></li>
+  
+
+  
+  <li><a href="http://localhost:8080/deletions"><i class="fa fa-backspace"></i> Deletions</a></li>
+  
+
+  
+  <li><a href="http://localhost:8080/reports/deposits"><i class="fa fa-chart-line"></i> Reports</a></li>
+  
+
+  
+  <li><a href="http://localhost:8080/alerts"><i class="fa fa-bell"></i> Alerts</a></li>
+  
+
+  
+    <li><a href="http://localhost:8080/institutions"><i class="fa fa-landmark"></i> Institutions</a></li>
+  
+
+    
+    <li><a href="http://localhost:8080/users"><i class="fa fa-users"></i> Users</a></li>
+    
+
+
+  <li><a href="http://localhost:8080/users/my_account"><i class="far fa-user-circle"></i> My Account</a></li>
+  <li><a href="http://localhost:8080/users/sign_out"><i class="fas fa-sign-out-alt"></i> Sign Out</a></li>
+</ul>
+
+
+        
+      </div>
+
+      <div class="column column-80">
+
+        
+
+
+
+
+
+
+<div class="float-right"><a class="button" href="http://localhost:8080/users/new">New</a></div>
+
+
+<h1>Users</h1>
+
+
+
+
+<form id="userFilterForm" method="get">
+
+  <div class="row">
+    <div class="column col-30">
+      
+
+<label>Name Contains
+<input type="text" name="name__contains" placeholder="Name Contains">
+</label>
+
+
+
+
+    </div>
+    <div class="column col-30">
+      
+
+<label>Email Contains
+<input type="text" name="email__contains" placeholder="Email Contains">
+</label>
+
+
+
+
+    </div>
+    <div class="column col-30">
+
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="column col-30">
+      
+
+
+
+<label>Institution
+<select name="institution_id">
+    <option value="" selected="selected">Choose One</option>
+    
+    <option value="1">APTrust</option>
+    
+    <option value="5">Example Institution (for integration tests)</option>
+    
+    <option value="2">Institution One</option>
+    
+    <option value="3">Institution Two</option>
+    
+    <option value="4">Test Institution (for integration tests)</option>
+    
+</select>
+</label>
+
+
+
+
+    </div>
+    <div class="column col-30">
+      
+
+
+
+<label>Role
+<select name="role">
+    <option value="" selected="selected">Choose One</option>
+    
+    <option value="institutional_admin">Institutional Admin</option>
+    
+    <option value="institutional_user">Institutional User</option>
+    
+    <option value="admin">APTrust System Administrator</option>
+    
+</select>
+</label>
+
+
+
+
+    </div>
+    <div class="column col-30">
+      <input type="submit" value="Filter">
+    </div>
+  </div>
+
+</form>
+
+
+
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Institution</th>
+      <th>Role</th>
+      <th>Last Sign In</th>
+      <th>2FA</th>
+      <th>Disabled</th>
+    </tr>
+  </thead>
+  <tbody>
+    
+    
+      
+      
+    <tr class="clickable" onclick="window.location.href='/users/show/1'">
+      <td>APTrust System</td>
+      <td>system@aptrust.org</td>
+      <td>APTrust</td>
+      <td>SysAdmin</td>
+      <td></td>
+      <td>No</td>
+      <td></td>
+    </tr>
+    
+      
+      
+        
+      
+    <tr class="clickable row-disabled" onclick="window.location.href='/users/show/4'">
+      <td>Inactive User</td>
+      <td>inactive@inst1.edu</td>
+      <td>Institution One</td>
+      <td>none</td>
+      <td></td>
+      <td>No</td>
+      <td>Jan 15, 2021</td>
+    </tr>
+    
+      
+      
+    <tr class="clickable" onclick="window.location.href='/users/show/2'">
+      <td>Inst One Admin</td>
+      <td>admin@inst1.edu</td>
+      <td>Institution One</td>
+      <td>Admin</td>
+      <td></td>
+      <td>No</td>
+      <td></td>
+    </tr>
+    
+      
+      
+    <tr class="clickable" onclick="window.location.href='/users/show/3'">
+      <td>Inst One User</td>
+      <td>user@inst1.edu</td>
+      <td>Institution One</td>
+      <td>User</td>
+      <td></td>
+      <td>No</td>
+      <td></td>
+    </tr>
+    
+      
+      
+    <tr class="clickable" onclick="window.location.href='/users/show/5'">
+      <td>Inst Two Admin</td>
+      <td>admin@inst2.edu</td>
+      <td>Institution Two</td>
+      <td>Admin</td>
+      <td></td>
+      <td>No</td>
+      <td></td>
+    </tr>
+    
+      
+      
+    <tr class="clickable" onclick="window.location.href='/users/show/6'">
+      <td>Unit Test User (edited)</td>
+      <td>utest-user@inst1.edu</td>
+      <td>Institution One</td>
+      <td>User</td>
+      <td></td>
+      <td>No</td>
+      <td></td>
+    </tr>
+    
+  </tbody>
+</table>
+
+
+
+<div class="row">
+  <div class="column column-100 center-text">
+    1 - 6 of 6
+  </div>
+</div>
+<div class="row">
+
+  
+
+
+  
+
+
+  
+</div>
+
+
+
+
+
+      </div> 
+    </div> 
+
+  <footer>
+    Copyright 2014-2021 APTrust
+  </footer>
+
+  <div class="modal" id="modal-one">
+    <div class="modal-bg modal-exit"></div>
+    <div class="modal-container">
+      <h1></h1> <a class="modal-close modal-exit"><i class="fas fa-window-close"></i></a>
+      <div class="modal-content"></div>
+    </div>
+  </div>
+
+
+
+
+
+
+</body></html>
