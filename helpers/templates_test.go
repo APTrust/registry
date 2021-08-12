@@ -152,3 +152,19 @@ func TestFormatFloat(t *testing.T) {
 	assert.Equal(t, "2137.979", helpers.FormatFloat(f, 3))
 	assert.Equal(t, "2137.9787", helpers.FormatFloat(f, 4))
 }
+
+func TestChartColor(t *testing.T) {
+	assert.Equal(t, "rgba(255, 99, 132, 0.2)", helpers.ChartColor(0))
+	assert.Equal(t, "rgba(255, 159, 64, 0.2)", helpers.ChartColor(1))
+	assert.Equal(t, "rgba(255, 205, 86, 0.2)", helpers.ChartColor(2))
+	assert.Equal(t, "rgba(54, 162, 235, 0.2)", helpers.ChartColor(32))
+	assert.Equal(t, "rgba(201, 203, 207, 0.2)", helpers.ChartColor(34))
+}
+
+func TestChartBorder(t *testing.T) {
+	assert.Equal(t, "rgb(255, 99, 132)", helpers.ChartBorderColor(0))
+	assert.Equal(t, "rgb(255, 159, 64)", helpers.ChartBorderColor(1))
+	assert.Equal(t, "rgb(255, 205, 86)", helpers.ChartBorderColor(2))
+	assert.Equal(t, "rgb(54, 162, 235)", helpers.ChartBorderColor(32))
+	assert.Equal(t, "rgb(201, 203, 207)", helpers.ChartBorderColor(34))
+}

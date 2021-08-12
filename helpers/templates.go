@@ -178,3 +178,15 @@ func FormatFloat(value float64, scale int) string {
 	fmtString := fmt.Sprintf("%%.%df", scale)
 	return fmt.Sprintf(fmtString, value)
 }
+
+// ChartColor returns a color for a bar, pie slice, etc. in a
+// chart.js chart.
+func ChartColor(i int64) string {
+	return constants.ChartColors[i%int64(len(constants.ChartColors))]
+}
+
+// ChartBorderColor returns a border color for a bar, pie slice, etc.
+// in a chart.js chart.
+func ChartBorderColor(i int64) string {
+	return constants.ChartBorders[i%int64(len(constants.ChartBorders))]
+}
