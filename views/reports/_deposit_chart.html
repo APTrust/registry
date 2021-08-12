@@ -7,6 +7,13 @@
 
 <script>
  const depositData = {{ toJSON .deposits }};
+
+ // TODO: Move colors from Go to JS, so that when chart is redrawn,
+ // it can pick up new colors. Each redrawing will change the number
+ // of elements in the chart.
+ //
+ // See: helpers/template.go, template_test.go, and constants/charts.go.
+ // This stuff should probably go into static/js/modules/chart.js
  const data = {
      labels: [
          {{- range $index, $label := .chartLabels -}}
@@ -30,6 +37,8 @@
      }]
  };
 
+ // TODO: Allow re-initialization to chart different values.
+ // e.g. - GB or TB or Cost by institution or storage type.
  function initChart(elementId, label) {
      let ctx = document.getElementById(elementId);
      let copyOfData = JSON.parse(JSON.stringify(data))
