@@ -168,3 +168,15 @@ func TestChartBorder(t *testing.T) {
 	assert.Equal(t, "rgb(54, 162, 235)", helpers.ChartBorderColor(32))
 	assert.Equal(t, "rgb(201, 203, 207)", helpers.ChartBorderColor(34))
 }
+
+func TestToJSON(t *testing.T) {
+	x := struct {
+		Names   []string
+		Numbers []int
+	}{
+		Names:   []string{"Homer", "Marge"},
+		Numbers: []int{39, 38},
+	}
+	expected := template.JS(`{"Names":["Homer","Marge"],"Numbers":[39,38]}`)
+	assert.Equal(t, expected, helpers.ToJSON(x))
+}

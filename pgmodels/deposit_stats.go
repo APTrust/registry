@@ -42,9 +42,9 @@ func DepositStatsSelect(institutionID int64, storageOption string, updatedBefore
 // filters that may or may not be present.
 const depositStatsQuery = `
 		select
-		  stats.institution_name,
+		  coalesce(stats.institution_name, 'Total') as institution_name,
 		  i2.id as institution_id,
-		  stats.storage_option,
+		  coalesce(stats.storage_option, 'Total') as storage_option,
 		  stats.file_count,
 		  stats.object_count,
 		  stats.total_bytes,

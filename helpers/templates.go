@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"strings"
@@ -181,12 +182,18 @@ func FormatFloat(value float64, scale int) string {
 
 // ChartColor returns a color for a bar, pie slice, etc. in a
 // chart.js chart.
-func ChartColor(i int64) string {
-	return constants.ChartColors[i%int64(len(constants.ChartColors))]
+func ChartColor(i int) string {
+	return constants.ChartColors[i%len(constants.ChartColors)]
 }
 
 // ChartBorderColor returns a border color for a bar, pie slice, etc.
 // in a chart.js chart.
-func ChartBorderColor(i int64) string {
-	return constants.ChartBorders[i%int64(len(constants.ChartBorders))]
+func ChartBorderColor(i int) string {
+	return constants.ChartBorders[i%len(constants.ChartBorders)]
+}
+
+// ToJSON converts an interface to JSON.
+func ToJSON(v interface{}) template.JS {
+	jsonString, _ := json.Marshal(v)
+	return template.JS(jsonString)
 }

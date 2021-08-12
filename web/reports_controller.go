@@ -8,6 +8,7 @@ import (
 	"github.com/APTrust/registry/forms"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/gin-gonic/gin"
+	"github.com/stretchr/stew/slice"
 )
 
 type DepositReportParams struct {
@@ -41,9 +42,41 @@ func DepositReportShow(c *gin.Context) {
 	if AbortIfError(c, err) {
 		return
 	}
+
+	instList := depositInstList(deposits)
+	storageOptionsList := depositStorageOptions(deposits)
+
 	req.TemplateData["deposits"] = deposits
 	req.TemplateData["filterForm"] = filterForm
+	req.TemplateData["reportParams"] = params
+	req.TemplateData["depositInstitutions"] = instList
+	req.TemplateData["depositStorageOptions"] = storageOptionsList
+	if len(instList) > 1 {
+		req.TemplateData["chartLabels"] = instList
+	} else {
+		req.TemplateData["chartLabels"] = storageOptionsList
+	}
 	c.HTML(http.StatusOK, template, req.TemplateData)
+}
+
+func depositInstList(deposits []*pgmodels.DepositStats) []string {
+	instList := make([]string, 0)
+	for _, stats := range deposits {
+		if !slice.ContainsString(instList, stats.InstitutionName) {
+			instList = append(instList, stats.InstitutionName)
+		}
+	}
+	return instList
+}
+
+func depositStorageOptions(deposits []*pgmodels.DepositStats) []string {
+	list := make([]string, 0)
+	for _, stats := range deposits {
+		if !slice.ContainsString(list, stats.StorageOption) {
+			list = append(list, stats.StorageOption)
+		}
+	}
+	return list
 }
 
 // getDeositReportParams parses params from the query string for our
@@ -51,6 +84,9 @@ func DepositReportShow(c *gin.Context) {
 // institutionID because these fields can legitimately be empty.
 func getDepositReportParams(c *gin.Context) DepositReportParams {
 	updatedBefore, _ := time.Parse("2006-01-02", c.Query("updated_at__lteq"))
+	if updatedBefore.IsZero() {
+		updatedBefore = time.Now().UTC()
+	}
 	institutionID, _ := strconv.ParseInt(c.Query("institution_id"), 10, 64)
 	storageOption := c.Query("storage_option")
 	return DepositReportParams{
