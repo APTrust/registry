@@ -1,13 +1,19 @@
 // registry.js
-import { initXHR, loadIntoElement } from './modules/xhr.js';
-import { initModals } from './modules/modal.js';
-import { initToggles } from './modules/toggle.js';
+import { initXHR, loadIntoElement } from './modules/xhr.js'
+import { initModals } from './modules/modal.js'
+import { initToggles } from './modules/toggle.js'
+import { chartColors } from './modules/charts.js'
 
-window.APT = {}
-window.APT.loadIntoElement = loadIntoElement
+let APT = {}
+APT.loadIntoElement = loadIntoElement
+APT.chartColors = chartColors
 
 window.addEventListener('load', (event) => {
     initXHR()
     initModals();
     initToggles();
+    window.APT = APT;
+
+    // aptLoadEvent is defined in the head of the document.
+    window.dispatchEvent(aptLoadEvent);
 });

@@ -51,11 +51,6 @@ func DepositReportShow(c *gin.Context) {
 	req.TemplateData["reportParams"] = params
 	req.TemplateData["depositInstitutions"] = instList
 	req.TemplateData["depositStorageOptions"] = storageOptionsList
-	if len(instList) > 1 {
-		req.TemplateData["chartLabels"] = instList
-	} else {
-		req.TemplateData["chartLabels"] = storageOptionsList
-	}
 	c.HTML(http.StatusOK, template, req.TemplateData)
 }
 

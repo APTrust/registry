@@ -7,47 +7,61 @@
 
 <script>
  const depositData = {{ toJSON .deposits }};
+ const reportParams = {{ toJSON .reportParams }};
 
- // TODO: Move colors from Go to JS, so that when chart is redrawn,
- // it can pick up new colors. Each redrawing will change the number
- // of elements in the chart.
- //
- // See: helpers/template.go, template_test.go, and constants/charts.go.
- // This stuff should probably go into static/js/modules/chart.js
- const data = {
-     labels: [
-         {{- range $index, $label := .chartLabels -}}
-         "{{ $label }}",
-         {{- end -}}
-     ],
-     datasets: [{
-         label: 'Deposits as of {{ dateUS .reportParams.UpdatedBefore }}',
-         data: [65, 59, 80, 81, 56, 55, 40],
-         backgroundColor: [
-             {{- range $index, $label := .chartLabels -}}
-             "{{ chartColor $index }}",
-             {{- end -}}
-         ],
-         borderColor: [
-             {{- range $index, $label := .chartLabels -}}
-             "{{ chartBorderColor $index }}",
-             {{- end -}}
-         ],
-         borderWidth: 1
-     }]
- };
-
- // TODO: Allow re-initialization to chart different values.
- // e.g. - GB or TB or Cost by institution or storage type.
- function initChart(elementId, label) {
+ function renderChart(elementId, label) {
      let ctx = document.getElementById(elementId);
-     let copyOfData = JSON.parse(JSON.stringify(data))
-     copyOfData.datasets[0].label = label
-     return new Chart(ctx, { type: 'bar', data: copyOfData })
+     let data = buildChartData()
+     return new Chart(ctx, { type: 'bar', data: data })
  }
 
- window.addEventListener('load', (event) => {
-     initChart("depositChart", "Deposits")
+ function buildChartData() {
+     let labels = getLabels()
+     return {
+         labels: labels,
+         datasets: [{
+             label: 'Deposits as of {{ dateUS .reportParams.UpdatedBefore }}',
+             data: depositData.map(item => item.total_gb),
+             backgroundColor: window.APT.chartColors('bar', labels.length),
+             borderColor: window.APT.chartColors('border', labels.length),
+             borderWidth: 1
+         }]
+     }
+ }
+
+ function getLabels() {
+     let includeName = true
+     let includeStorageOption = true
+     let includeSumTotals = true
+     if (reportParams.InstitutionID > 0) {
+         includeName = false
+         includeSumTotals = false
+     }
+//     if (reportParams.StorageOption != "") {
+//         includeStorageOption = false
+//     }
+     let labels = []
+     for (let d of depositData) {
+         if (!includeSumTotals && d.institution_name == 'Total') {
+             continue
+         }
+         let label = [];
+         if (includeName) {
+             label.push(d.institution_name)
+         }
+         if (includeStorageOption) {
+             label.push(d.storage_option)
+         }
+         labels.push(label.join(' '))
+     }
+     // depositData.map(item => `${item.institution_name} ${item.storage_option}`)
+     return labels
+ }
+
+ // Render the chart after APTLoaded (aptLoadEvent) because it depends
+ // on APT.chartColors.
+ window.addEventListener('APTLoaded', (event) => {
+     renderChart("depositChart", "Deposits")
  });
 
 </script>
