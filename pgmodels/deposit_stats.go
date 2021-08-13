@@ -6,7 +6,9 @@ import (
 	"github.com/APTrust/registry/common"
 )
 
+// Note: chart_metric is ignored by backend. Used only in front-end.
 var DepositStatsFilters = []string{
+	"chart_metric",
 	"updated_at__lteq",
 	"institution_id",
 	"storage_option",

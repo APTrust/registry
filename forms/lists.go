@@ -21,6 +21,16 @@ var BagItProfileIdentifiers = []ListOption{
 	{constants.BTRProfileIdentifier, "BTR"},
 }
 
+// DepositChartMetrics come from names of pgmodels.DepositStats properties
+var DepositChartMetrics = []ListOption{
+	{"object_count", "Object Count"},
+	{"file_count", "File Count"},
+	{"total_bytes", "Total Bytes"},
+	{"total_gb", "Total Gigabytes"},
+	{"total_tb", "Total Terabytes"},
+	{"monthly_cost", "Monthly Cost"},
+}
+
 // InstRolesList is a list of user roles for institutions.
 var InstRolesList = []ListOption{
 	{constants.RoleInstAdmin, "Institutional Admin"},

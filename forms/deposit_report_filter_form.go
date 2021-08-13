@@ -52,6 +52,12 @@ func (f *DepositReportFilterForm) init() {
 		Placeholder: "Storage Option",
 		Options:     Options(constants.StorageOptions),
 	}
+	f.Fields["chart_metric"] = &Field{
+		Name:        "chart_metric",
+		Label:       "Chart Metric",
+		Placeholder: "Chart Metric",
+		Options:     DepositChartMetrics,
+	}
 }
 
 // setValues sets the form values to match the Institution values.

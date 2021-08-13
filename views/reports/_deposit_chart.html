@@ -6,22 +6,34 @@
 </div>
 
 <script>
+ var depositChart = null
  const depositData = {{ toJSON .deposits }};
  const reportParams = {{ toJSON .reportParams }};
 
- function renderChart(elementId, label) {
-     let ctx = document.getElementById(elementId);
-     let data = buildChartData()
-     return new Chart(ctx, { type: 'bar', data: data })
+ function renderChart() {
+     let metricSelect = document.forms["depositReportFilterForm"].elements["chart_metric"];
+     let label = metricSelect[metricSelect.selectedIndex].text
+     let metric = metricSelect.value
+     if (metric == "") {
+         metric = metricSelect.value = "total_gb"
+     }
+     let ctx = document.getElementById("depositChart");
+     let data = buildChartData(label, metric)
+     if (depositChart == null) {
+         depositChart = new Chart(ctx, { type: 'bar', data: data })
+     } else {
+         depositChart.data = data
+         depositChart.update()
+     }
  }
 
- function buildChartData() {
+ function buildChartData(label, metric) {
      let labels = getLabels()
      return {
          labels: labels,
          datasets: [{
-             label: 'Deposits as of {{ dateUS .reportParams.UpdatedBefore }}',
-             data: depositData.map(item => item.total_gb),
+             label: label + ' {{ dateUS .reportParams.UpdatedBefore }}',
+             data: getDepositData(metric),
              backgroundColor: window.APT.chartColors('bar', labels.length),
              borderColor: window.APT.chartColors('border', labels.length),
              borderWidth: 1
@@ -29,41 +41,44 @@
      }
  }
 
+ function getDepositData(metric) {
+     return depositData.map(item => item[metric])
+ }
+
  function getLabels() {
      let includeName = true
-     let includeStorageOption = true
-     let includeSumTotals = true
+     let includeOptionTotals = true
+     let includeInstTotals = true
      if (reportParams.InstitutionID > 0) {
          includeName = false
-         includeSumTotals = false
+         includeInstTotals = false
      }
-//     if (reportParams.StorageOption != "") {
-//         includeStorageOption = false
-//     }
+     if (reportParams.StorageOption != "") {
+         includeOptionTotals = false
+     }
      let labels = []
      for (let d of depositData) {
-         if (!includeSumTotals && d.institution_name == 'Total') {
+         if (!includeInstTotals && d.institution_name == 'Total') {
              continue
          }
-         let label = [];
-         if (includeName) {
-             label.push(d.institution_name)
+         if (!includeOptionTotals && d.storage_option == 'Total') {
+             continue
          }
-         if (includeStorageOption) {
-             label.push(d.storage_option)
-         }
-         labels.push(label.join(' '))
+         labels.push(`${d.institution_name} ${d.storage_option}`)
      }
-     // depositData.map(item => `${item.institution_name} ${item.storage_option}`)
      return labels
  }
 
  // Render the chart after APTLoaded (aptLoadEvent) because it depends
  // on APT.chartColors.
  window.addEventListener('APTLoaded', (event) => {
-     renderChart("depositChart", "Deposits")
+     renderChart()
+     document.forms["depositReportFilterForm"].elements["chart_metric"].addEventListener('change', (event) => {
+         renderChart()
+     });
  });
 
 </script>
+
 
 {{ end }}
