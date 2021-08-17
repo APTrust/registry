@@ -23,8 +23,8 @@
           <th>Size</th>
         </thead>
         <tbody>
-          {{ range $index, $stat := .stats }}
-          {{ if eq $stat.StorageOption "" }}
+          {{ range $index, $stat := .depositStats }}
+          {{ if eq $stat.StorageOption "Total" }}
             <tr class="total">
           {{ else }}
             <tr>
@@ -47,36 +47,49 @@
 
 </div>
 
-<!-- Dummy/placeholder charts -->
-<!-- https://www.chartjs.org/docs/latest/charts/doughnut.html -->
 <script>
 
- var data = {
-     labels: [
-         'Standard',
-         'Glacier-VA',
-         'Wasabi-OR'
-     ],
-     datasets: [{
-         label: '',
-         data: [60, 10, 30],
-         backgroundColor: [
-             'rgb(255, 99, 132)',
-             'rgb(54, 162, 235)',
-             'rgb(255, 205, 86)'
-         ],
-         hoverOffset: 4
-     }]
- };
- function initChart(elementId, label) {
-     let ctx = document.getElementById(elementId);
-     let copyOfData = JSON.parse(JSON.stringify(data))
-     copyOfData.datasets[0].label = label
-     return new Chart(ctx, { type: 'doughnut', data: copyOfData })
+ var depositChart = null
+ const depositData = {{ toJSON .depositStats }};
+
+ function renderChart() {
+     let ctx = document.getElementById("depositChart");
+     let data = buildChartData("Deposits by Storage Type")
+     if (depositChart == null) {
+         depositChart = new Chart(ctx, { type: 'doughnut', data: data })
+     } else {
+         depositChart.data = data
+         depositChart.update()
+     }
  }
 
- window.addEventListener('load', (event) => {
-     initChart("depositChart", "Deposits")
+ function buildChartData(label) {
+     let labels = getLabels()
+     return {
+         labels: labels,
+         datasets: [{
+             label: label,
+             data: getDepositData(),
+             backgroundColor: window.APT.chartColors('fill', labels.length),
+             borderColor: window.APT.chartColors('border', labels.length),
+             borderWidth: 1
+         }],
+         hoverOffset: 4
+     }
+ }
+
+ function getDepositData() {
+     return depositData.filter(item => item.storage_option != 'Total').map(item => item.total_gb);
+ }
+
+ function getLabels() {
+     return depositData.filter(item => item.storage_option != 'Total').map(item => item.storage_option);
+ }
+
+ // Render the chart after APTLoaded (aptLoadEvent) because it depends
+ // on APT.chartColors.
+ window.addEventListener('APTLoaded', (event) => {
+     renderChart()
  });
 
 </script>

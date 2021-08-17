@@ -141,11 +141,11 @@ func IntellectualObjectShow(c *gin.Context) {
 	if AbortIfError(c, err) {
 		return
 	}
-	stats, err := pgmodels.GetObjectStats(object.ID)
+	stats, err := pgmodels.DepositFormatStatsSelect(object.InstitutionID, object.ID)
 	if AbortIfError(c, err) {
 		return
 	}
-	req.TemplateData["stats"] = stats
+	req.TemplateData["depositFormatStats"] = stats
 	c.HTML(http.StatusOK, "objects/show.html", req.TemplateData)
 }
 

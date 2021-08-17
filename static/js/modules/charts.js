@@ -3,9 +3,9 @@
 // Utility functions for customizing and rendering charts.
 //
 
-// barColors are used in bar charts, pie charts, etc. rendered
+// fillColors are used in bar charts, pie charts, etc. rendered
 // by chart.js on the front end. Used by helpers/templates.go.
-const barColors = [
+const fillColors = [
 	"rgba(255, 99, 132, 0.2)",
 	"rgba(255, 159, 64, 0.2)",
 	"rgba(255, 205, 86, 0.2)",
@@ -13,6 +13,7 @@ const barColors = [
 	"rgba(54, 162, 235, 0.2)",
 	"rgba(153, 102, 255, 0.2)",
 	"rgba(201, 203, 207, 0.2)",
+	"rgba(100, 180, 255, 0.2)",
 ]
 
 // barBorders are used in bar charts, pie charts, etc. rendered
@@ -25,12 +26,13 @@ const barBorders = [
 	"rgb(54, 162, 235)",
 	"rgb(153, 102, 255)",
 	"rgb(201, 203, 207)",
+	"rgb(100, 180, 255)",
 ]
 
-// barColor returns a color for a bar, pie slice, etc. in a
+// fillColor returns a color for a bar, pie slice, etc. in a
 // chart.js chart.
-function barColor(i) {
-	return barColors[i % barColors.length]
+function fillColor(i) {
+	return fillColors[i % fillColors.length]
 }
 
 // borderColor returns a border color for a bar, pie slice, etc.
@@ -43,7 +45,7 @@ function borderColor(i) {
 // you ask for.
 export function chartColors(whatKind, howMany) {
     let colors = []
-    let fn = barColor
+    let fn = fillColor
     if (whatKind == 'border') {
         fn = borderColor
     }

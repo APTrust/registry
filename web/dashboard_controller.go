@@ -1,8 +1,9 @@
 package web
 
 import (
-	"github.com/APTrust/registry/pgmodels"
+	"time"
 
+	"github.com/APTrust/registry/pgmodels"
 	"github.com/gin-gonic/gin"
 )
 
@@ -52,16 +53,24 @@ func loadDashAlerts(r *Request) error {
 }
 
 func loadDashDeposits(r *Request) error {
-	query := pgmodels.NewQuery().OrderBy("institution_name asc").OrderBy("storage_option asc")
+	institutionID := r.Auth.CurrentUser().InstitutionID
 	if r.Auth.CurrentUser().IsAdmin() {
-		query.IsNull("institution_id")
-	} else {
-		query.Where("institution_id", "=", r.Auth.CurrentUser().InstitutionID)
+		institutionID = 0
 	}
-	stats, err := pgmodels.StorageOptionStatsSelect(query)
+	stats, err := pgmodels.DepositStatsSelect(institutionID, "", time.Now().UTC())
 	if err != nil {
 		return err
 	}
-	r.TemplateData["stats"] = stats
+
+	// This is a bit of a hack. We should add this to the query,
+	// but the query is already complex...
+	filteredStats := make([]*pgmodels.DepositStats, 0)
+	for _, stat := range stats {
+		if stat.InstitutionID == institutionID {
+			filteredStats = append(filteredStats, stat)
+		}
+	}
+
+	r.TemplateData["depositStats"] = filteredStats
 	return nil
 }

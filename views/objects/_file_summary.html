@@ -15,21 +15,15 @@
         <th>Size</th>
       </thead>
       <tbody>
-        {{ range $index, $stat := .stats }}
-          {{ if eq $stat.FileFormat "" }}
+        {{ range $index, $stat := .depositFormatStats }}
+          {{ if eq $stat.FileFormat "Total" }}
             <tr class="total">
           {{ else }}
             <tr>
           {{ end }}
-              <td>
-              {{ if eq $stat.FileFormat "" }}
-              Total
-              {{ else }}
-              {{ $stat.FileFormat }}
-              {{ end }}
-              </td>
+              <td>{{ $stat.FileFormat }}</td>
               <td>{{ $stat.FileCount }}</td>
-              <td>{{ humanSize $stat.FileSize }}</td>
+              <td>{{ humanSize $stat.TotalBytes }}</td>
             </tr>
         {{ end }}
       </tbody>
@@ -37,46 +31,56 @@
   </div>
 
   <div class="column column-25">
-    <canvas id="sizeChart" width="120" height="120"></canvas>
+    <p>Files by Size (GB)</p>
+    <canvas id="sizeChart"></canvas>
   </div>
 
   <div class="column column-25">
-    <canvas id="countChart" width="120" height="120"></canvas>
+    <p>Files by Count</p>
+    <canvas id="countChart"></canvas>
   </div>
 
 </div>
 
-<!-- Dummy/placeholder charts -->
-<!-- https://www.chartjs.org/docs/latest/charts/doughnut.html -->
+
 <script>
 
- var data = {
-     labels: [
-         'PDF',
-         'Text',
-         'TIFF'
-     ],
-     datasets: [{
-         label: '',
-         data: [60, 10, 30],
-         backgroundColor: [
-             'rgb(255, 99, 132)',
-             'rgb(54, 162, 235)',
-             'rgb(255, 205, 86)'
-         ],
-         hoverOffset: 4
-     }]
- };
- function initChart(elementId, label) {
-     let ctx = document.getElementById(elementId);
-     let copyOfData = JSON.parse(JSON.stringify(data))
-     copyOfData.datasets[0].label = label
-     return new Chart(ctx, { type: 'doughnut', data: copyOfData })
+ const depositData = {{ toJSON .depositFormatStats }};
+
+ function renderChart(elementID, metric, label) {
+     let ctx = document.getElementById(elementID);
+     let data = buildChartData(metric, label)
+     return new Chart(ctx, { type: 'doughnut', data: data })
  }
 
- window.addEventListener('load', (event) => {
-     initChart("sizeChart", "File Distribution by Size")
-     initChart("countChart", "File Distribution by Count")
+ function buildChartData(metric, label) {
+     let labels = getLabels()
+     return {
+         labels: labels,
+         datasets: [{
+             label: label,
+             data: getDepositData(metric),
+             backgroundColor: window.APT.chartColors('fill', labels.length),
+             borderColor: window.APT.chartColors('border', labels.length),
+             borderWidth: 1
+         }],
+         hoverOffset: 4
+     }
+ }
+
+ function getDepositData(metric) {
+     return depositData.filter(item => item.file_format != 'Total').map(item => item[metric]);
+ }
+
+ function getLabels() {
+     return depositData.filter(item => item.file_format != 'Total').map(item => item.file_format);
+ }
+
+ // Render the chart after APTLoaded (aptLoadEvent) because it depends
+ // on APT.chartColors.
+ window.addEventListener('APTLoaded', (event) => {
+     renderChart("sizeChart", "total_gb", "File Distribution by Size")
+     renderChart("countChart", "file_count", "File Distribution by Count")
  });
 
 </script>

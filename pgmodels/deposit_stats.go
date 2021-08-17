@@ -42,6 +42,8 @@ func DepositStatsSelect(institutionID int64, storageOption string, updatedBefore
 
 // Basic depost stats query. Use the "is null / or" trick to deal with
 // filters that may or may not be present.
+//
+// This is used on the deposits report page.
 const depositStatsQuery = `
 		select
 		  coalesce(stats.institution_name, 'Total') as institution_name,
