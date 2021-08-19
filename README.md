@@ -18,6 +18,29 @@ You will also need the following for some Admin operations:
 
 If you're running on Linux or OSX, you'll find the required Redis and NSQ binaries in this repo's .bin/linux and ./bin/osx directories. The registry script automatically starts them when it runs the server and tests.
 
+## Requirements for Two Factor Authentication
+
+As a developer, you generally won't need to send Authy or SMS messages for two-factor authentication. If you're running this in a demo or production environment, you will.
+
+The AWS SNS library, which sends two-factor auth codes via text/SMS, requires the following config files:
+
+* ~/.aws/credentials should contain the following:
+
+```
+[default]
+aws_access_key_id=<valid access key id>
+aws_secret_access_key=<valid secret key>
+```
+
+* ~/.aws/config should contain the following:
+
+```
+[default]
+region=us-east-2
+output=json
+```
+
+
 # Database Setup
 
 Run the following commands in postgres to create the user and databases:

@@ -51,12 +51,18 @@ type LoggingConfig struct {
 	LogToConsole bool
 }
 
+type TwoFactorConfig struct {
+	AuthyEnabled bool
+	SMSEnabled   bool
+}
+
 type Config struct {
-	Cookies *CookieConfig
-	DB      *DBConfig
-	EnvName string
-	Logging *LoggingConfig
-	NsqUrl  string
+	Cookies   *CookieConfig
+	DB        *DBConfig
+	EnvName   string
+	Logging   *LoggingConfig
+	NsqUrl    string
+	TwoFactor *TwoFactorConfig
 }
 
 // Returns a new config based on APT_ENV
@@ -139,6 +145,10 @@ func loadConfig() *Config {
 			PrefsCookie:   v.GetString("PREFS_COOKIE_NAME"),
 		},
 		NsqUrl: nsqUrl,
+		TwoFactor: &TwoFactorConfig{
+			AuthyEnabled: v.GetBool("ENABLE_TWO_FACTOR_AUTHY"),
+			SMSEnabled:   v.GetBool("ENABLE_TWO_FACTOR_SMS"),
+		},
 	}
 }
 
