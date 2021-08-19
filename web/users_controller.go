@@ -394,6 +394,16 @@ func SignInUser(c *gin.Context) (int, string, error) {
 		return http.StatusBadRequest, redirectTo, err
 	}
 
+	// TODO: Branch here based on two-factor type
+	//
+	// If two-factor is SMS, generate token, send SMS and redirect
+	// to a page where the user can enter the SMS OTP.
+	//
+	// If Authy, send approval request and wait for response.
+	// Show a spinner. Or just Rickroll the bastards.
+	//
+	// If no two factor, continue below...
+
 	err = helpers.SetSessionCookie(c, user)
 	if err != nil {
 		return http.StatusInternalServerError, redirectTo, err

@@ -349,9 +349,11 @@ Current Pharos users who have enabled two-factor authentication receive one-time
 
 Pharos uses the devise-authy gem to send OTP codes to Authy subscribers and the AWS SNS SDK (F***ing alphabet soup! What happened to English?) to send codes via text message.
 
-The [go-authy](https://github.com/dcu/go-authy) library seems to support both Authy and text/SMS messages.
+The [go-authy](https://github.com/dcu/go-authy) library seems to support both Authy and text/SMS messages. Also supports Authy user registration.
 
 Twilio officially recommends Verify over Authy. They point to the  [twilio-go](https://github.com/kevinburke/twilio-go) library, which also supports SMS, and looks more complex than go-authy.
+
+If these libraries don't work, consider [goth](https://github.com/markbates/goth), which does not support Authy, but supports lots of others.
 
 Twilio charges about 9 cents per Authy message. Both Amazon and Twilio charge negligible amounts for SMS messages (> 1 cent per message). Amazon SNS has the advantage of logging to CloudTrail, which has been useful in tracing problems.
 
