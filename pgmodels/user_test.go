@@ -313,3 +313,85 @@ func TestUserValidate(t *testing.T) {
 	err = user.Validate()
 	require.Nil(t, err)
 }
+
+func TestIsSMSUser(t *testing.T) {
+	user := &pgmodels.User{
+		EnabledTwoFactor:   true,
+		ConfirmedTwoFactor: true,
+		AuthyStatus:        constants.TwoFactorSMS,
+	}
+	assert.True(t, user.IsSMSUser())
+
+	user.AuthyStatus = ""
+	assert.True(t, user.IsSMSUser())
+
+	user.AuthyStatus = constants.TwoFactorAuthy
+	assert.False(t, user.IsSMSUser())
+
+	user.AuthyStatus = constants.TwoFactorSMS
+	user.ConfirmedTwoFactor = false
+	assert.False(t, user.IsSMSUser())
+
+	user.EnabledTwoFactor = false
+	assert.False(t, user.IsSMSUser())
+}
+
+func TestIsAuthyOneTouchUser(t *testing.T) {
+	user := &pgmodels.User{
+		EnabledTwoFactor:   true,
+		ConfirmedTwoFactor: true,
+		AuthyStatus:        constants.TwoFactorAuthy,
+	}
+	assert.True(t, user.IsAuthyOneTouchUser())
+
+	user.AuthyStatus = ""
+	assert.False(t, user.IsAuthyOneTouchUser())
+
+	user.AuthyStatus = constants.TwoFactorSMS
+	assert.False(t, user.IsAuthyOneTouchUser())
+
+	user.AuthyStatus = constants.TwoFactorAuthy
+	user.ConfirmedTwoFactor = false
+	assert.False(t, user.IsAuthyOneTouchUser())
+
+	user.EnabledTwoFactor = false
+	assert.False(t, user.IsAuthyOneTouchUser())
+}
+
+func TestIsTwoFactorUser(t *testing.T) {
+	user := &pgmodels.User{
+		EnabledTwoFactor:   true,
+		ConfirmedTwoFactor: true,
+	}
+	assert.True(t, user.IsTwoFactorUser())
+
+	user.ConfirmedTwoFactor = false
+	assert.False(t, user.IsTwoFactorUser())
+
+	user.EnabledTwoFactor = false
+	assert.False(t, user.IsTwoFactorUser())
+}
+
+func TestTwoFactorMethod(t *testing.T) {
+	user := &pgmodels.User{
+		EnabledTwoFactor:   true,
+		ConfirmedTwoFactor: true,
+		AuthyStatus:        constants.TwoFactorSMS,
+	}
+	assert.Equal(t, constants.TwoFactorSMS, user.TwoFactorMethod())
+
+	// Holdover from old system. A confirmed two-factor user
+	// with empty authy status is an SMS user.
+	user.AuthyStatus = ""
+	assert.Equal(t, constants.TwoFactorSMS, user.TwoFactorMethod())
+
+	user.AuthyStatus = constants.TwoFactorAuthy
+	assert.Equal(t, constants.TwoFactorAuthy, user.TwoFactorMethod())
+
+	user.EnabledTwoFactor = false
+	assert.Equal(t, constants.TwoFactorNone, user.TwoFactorMethod())
+
+	user.EnabledTwoFactor = true
+	user.ConfirmedTwoFactor = false
+	assert.Equal(t, constants.TwoFactorNone, user.TwoFactorMethod())
+}

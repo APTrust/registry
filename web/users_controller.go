@@ -376,12 +376,11 @@ func UserGetAPIKey(c *gin.Context) {
 // GET /users/my_account
 func UserMyAccount(c *gin.Context) {
 	req := NewRequest(c)
-
-	// TODO: Need CSRF token here!
-
 	c.HTML(http.StatusOK, "users/my_account.html", req.TemplateData)
 }
 
+// SignInUser signs the user in with email and password.
+// If user has two-factor auth, this is the first step of login.
 func SignInUser(c *gin.Context) (int, string, error) {
 	redirectTo := "/users/sign_in"
 	user, err := pgmodels.UserSignIn(
@@ -394,6 +393,7 @@ func SignInUser(c *gin.Context) (int, string, error) {
 		helpers.DeleteSessionCookie(c)
 		return http.StatusBadRequest, redirectTo, err
 	}
+
 	err = helpers.SetSessionCookie(c, user)
 	if err != nil {
 		return http.StatusInternalServerError, redirectTo, err

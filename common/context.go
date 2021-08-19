@@ -17,6 +17,7 @@ type APTContext struct {
 	DB        *pg.DB
 	Log       zerolog.Logger
 	NSQClient *network.NSQClient
+	SNSClient *network.SNSClient
 }
 
 // Context returns an APTContext object, which includes
@@ -48,6 +49,7 @@ func Context() *APTContext {
 			DB:        db,
 			Log:       logger,
 			NSQClient: network.NewNSQClient(config.NsqUrl, logger),
+			SNSClient: network.NewSNSClient(config.TwoFactor.SMSEnabled, logger),
 		}
 	}
 	return ctx

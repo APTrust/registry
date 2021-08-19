@@ -260,3 +260,39 @@ func (user *User) HasPermission(action constants.Permission, institutionID int64
 func (user *User) IsAdmin() bool {
 	return user.Role == constants.RoleSysAdmin
 }
+
+// IsSMSUser returns true if this user has enabled two-factor authentication
+// with SMS/text message.
+func (user *User) IsSMSUser() bool {
+	return user.IsTwoFactorUser() && (user.AuthyStatus == constants.TwoFactorSMS || user.AuthyStatus == "")
+}
+
+// IsAuthyOneTouchUser returns true if the user has enabled Authy one touch
+// for two-factor login.
+func (user *User) IsAuthyOneTouchUser() bool {
+	return user.IsTwoFactorUser() && (user.AuthyStatus == constants.TwoFactorAuthy)
+}
+
+// IsTwoFactorUser returns true if this user has enabled and confirmed
+// two factor authentication.
+func (user *User) IsTwoFactorUser() bool {
+	return user.EnabledTwoFactor && user.ConfirmedTwoFactor
+}
+
+// TwoFactorMethod returns one of the following:
+//
+// constants.TwoFactorNone if the user does not use two-factor auth.
+//
+// constants.TwoFactorAuthy if the user uses two-factor auth via Authy.
+//
+// constants.TwoFactorSMS if the user receives two-factor OTP code via
+// text/SMS
+func (user *User) TwoFactorMethod() string {
+	if !user.IsTwoFactorUser() {
+		return constants.TwoFactorNone
+	}
+	if user.IsSMSUser() {
+		return constants.TwoFactorSMS
+	}
+	return constants.TwoFactorAuthy
+}

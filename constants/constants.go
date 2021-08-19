@@ -115,6 +115,9 @@ const (
 	TopicFixity                = "fixity_check"
 	TopicGlacierRestore        = "restore_glacier"
 	TopicObjectRestore         = "restore_object"
+	TwoFactorAuthy             = "onetouch"
+	TwoFactorNone              = "none"
+	TwoFactorSMS               = "sms"
 )
 
 var AccessSettings = []string{
