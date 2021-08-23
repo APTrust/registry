@@ -66,6 +66,11 @@ const (
 	UserReadSelf                       = "UserReadSelf"
 	UserUpdateSelf                     = "UserUpdateSelf"
 	UserDeleteSelf                     = "UserDeleteSelf"
+	UserTwoFactorChoose                = "UserTwoFactorChoose"
+	UserTwoFactorEnter                 = "UserTwoFactorEnter"
+	UserTwoFactorPush                  = "UserTwoFactorPush"
+	UserTwoFactorResend                = "UserTwoFactorResend"
+	UserTwoFactorVerify                = "UserTwoFactorVerify"
 	WorkItemCreate                     = "WorkItemCreate"
 	WorkItemRead                       = "WorkItemRead"
 	WorkItemRequeue                    = "WorkItemRequeue"
@@ -119,6 +124,11 @@ var Permissions = []Permission{
 	UserRead,
 	UserSignIn,
 	UserSignOut,
+	UserTwoFactorChoose,
+	UserTwoFactorEnter,
+	UserTwoFactorPush,
+	UserTwoFactorResend,
+	UserTwoFactorVerify,
 	UserUpdate,
 	UserDelete,
 	UserReadSelf,
@@ -163,6 +173,7 @@ var sysAdmin = make(map[Permission]bool)
 var emptyList = make(map[Permission]bool)
 
 func initPermissions() {
+	// Institutional User Role
 	instUser[AlertRead] = true
 	instUser[AlertUpdate] = true
 	instUser[ChecksumRead] = true
@@ -183,9 +194,15 @@ func initPermissions() {
 	instUser[UserSignIn] = true
 	instUser[UserSignOut] = true
 	instUser[UserReadSelf] = true
+	instUser[UserTwoFactorChoose] = true
+	instUser[UserTwoFactorEnter] = true
+	instUser[UserTwoFactorPush] = true
+	instUser[UserTwoFactorResend] = true
+	instUser[UserTwoFactorVerify] = true
 	instUser[UserUpdateSelf] = true
 	instUser[WorkItemRead] = true
 
+	// Institutional Admin Role
 	instAdmin[AlertRead] = true
 	instAdmin[AlertUpdate] = true
 	instAdmin[ChecksumRead] = true
@@ -213,9 +230,15 @@ func initPermissions() {
 	instAdmin[UserUpdate] = true
 	instAdmin[UserDelete] = true
 	instAdmin[UserReadSelf] = true
+	instAdmin[UserTwoFactorChoose] = true
+	instAdmin[UserTwoFactorEnter] = true
+	instAdmin[UserTwoFactorPush] = true
+	instAdmin[UserTwoFactorResend] = true
+	instAdmin[UserTwoFactorVerify] = true
 	instAdmin[UserUpdateSelf] = true
 	instAdmin[WorkItemRead] = true
 
+	// Sys Admin Role
 	sysAdmin[AlertCreate] = true
 	sysAdmin[AlertRead] = true
 	sysAdmin[AlertUpdate] = true
@@ -261,6 +284,11 @@ func initPermissions() {
 	sysAdmin[UserRead] = true
 	sysAdmin[UserSignIn] = true
 	sysAdmin[UserSignOut] = true
+	sysAdmin[UserTwoFactorChoose] = true
+	sysAdmin[UserTwoFactorEnter] = true
+	sysAdmin[UserTwoFactorPush] = true
+	sysAdmin[UserTwoFactorResend] = true
+	sysAdmin[UserTwoFactorVerify] = true
 	sysAdmin[UserUpdate] = true
 	sysAdmin[UserDelete] = true
 	sysAdmin[UserDeleteSelf] = true

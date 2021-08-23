@@ -414,12 +414,12 @@ func SignInUser(c *gin.Context) (int, string, error) {
 	return http.StatusFound, redirectTo, nil
 }
 
-// ChooseSecondFactor shows a list of radio button options so a user
+// UserTwoFactorChoose shows a list of radio button options so a user
 // can choose their two-factor auth method (Authy, Backup Code, SMS).
 // We show this page only to users who have enabled two-factor auth.
 //
 // GET /users/2fa_choose/
-func TwoFactorChoose(c *gin.Context) {
+func UserTwoFactorChoose(c *gin.Context) {
 	// Present the two-factor choice form.
 	// Show only the options confirmed for current user
 	//   - (sms and/or authy, plus backup codes)
@@ -433,29 +433,40 @@ func TwoFactorChoose(c *gin.Context) {
 
 }
 
-// TwoFactorEnter shows a form with a single text input where a user
+// UserTwoFactorEnter shows a form with a single text input where a user
 // can enter an SMS verfication code or a backup code.
 //
 // GET /users/2fa_enter/
-func TwoFactorEnter(c *gin.Context) {
+func UserTwoFactorEnter(c *gin.Context) {
 	// Show a form where user can enter SMS code or backup code.
 	// Form should include the type user is entering (SMS/backup).
 }
 
-// TwoFactorResend resends the SMS two-factor auth code and then
+// UserTwoFactorPush initiates a push request to the user's authentication
+// app asking them to approve the login. This method waits for a response
+// from the authentication service. It's a POST to avoid GET spam.
+// POST form includes CSRF token.
+//
+// POST /users/2fa_push/
+func UserTwoFactorPush(c *gin.Context) {
+	// On approval, redirect to dashboard.
+	// On rejection or timeout, log user out and redirect to sign-in
+}
+
+// UserTwoFactorResend resends the SMS two-factor auth code and then
 // re-displays TwoFactorEnter. This is a post, because we don't want
 // hackers spamming us with GETs. The post form includes a CSRF token.
 //
 // POST /users/2fa_resend/
-func TwoFactorResend(c *gin.Context) {
+func UserTwoFactorResend(c *gin.Context) {
 
 }
 
-// TwoFactorVerify verifies the SMS or backup code that the user
+// UserTwoFactorVerify verifies the SMS or backup code that the user
 // entered on TwoFactorEnter.
 //
 // POST /users/2fa_verify/
-func TwoFactorVerify(c *gin.Context) {
+func UserTwoFactorVerify(c *gin.Context) {
 	// If SMS, verify that, else verify backup.
 	// Success redirects to dashboard.
 	// Failure redirects to TwoFactorEnter,
