@@ -414,7 +414,12 @@ func SignInUser(c *gin.Context) (int, string, error) {
 	return http.StatusFound, redirectTo, nil
 }
 
-func ChooseSecondFactor(c *gin.Context) {
+// ChooseSecondFactor shows a list of radio button options so a user
+// can choose their two-factor auth method (Authy, Backup Code, SMS).
+// We show this page only to users who have enabled two-factor auth.
+//
+// GET /users/2fa_choose/
+func TwoFactorChoose(c *gin.Context) {
 	// Present the two-factor choice form.
 	// Show only the options confirmed for current user
 	//   - (sms and/or authy, plus backup codes)
@@ -428,12 +433,33 @@ func ChooseSecondFactor(c *gin.Context) {
 
 }
 
-func SubmitSecondFactor(c *gin.Context) {
-	// Let user enter SMS code or backup code.
+// TwoFactorEnter shows a form with a single text input where a user
+// can enter an SMS verfication code or a backup code.
+//
+// GET /users/2fa_enter/
+func TwoFactorEnter(c *gin.Context) {
+	// Show a form where user can enter SMS code or backup code.
+	// Form should include the type user is entering (SMS/backup).
 }
 
-func VerifySecondFactor(c *gin.Context) {
+// TwoFactorResend resends the SMS two-factor auth code and then
+// re-displays TwoFactorEnter. This is a post, because we don't want
+// hackers spamming us with GETs. The post form includes a CSRF token.
+//
+// POST /users/2fa_resend/
+func TwoFactorResend(c *gin.Context) {
+
+}
+
+// TwoFactorVerify verifies the SMS or backup code that the user
+// entered on TwoFactorEnter.
+//
+// POST /users/2fa_verify/
+func TwoFactorVerify(c *gin.Context) {
 	// If SMS, verify that, else verify backup.
+	// Success redirects to dashboard.
+	// Failure redirects to TwoFactorEnter,
+	// incrementinf failed login attempt count
 }
 
 func getIndexQuery(c *gin.Context) (*pgmodels.Query, error) {

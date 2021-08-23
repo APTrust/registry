@@ -2,20 +2,17 @@ package forms
 
 import (
 	"github.com/APTrust/registry/constants"
-	"github.com/APTrust/registry/pgmodels"
 )
 
 // SecondFactorForm is the form that displays filtering options for
 // the alert list page.
 type SecondFactorForm struct {
 	Form
-	FilterCollection *pgmodels.FilterCollection
 }
 
-func NewSecondFactorForm(fc *pgmodels.FilterCollection) *SecondFactorForm {
+func NewSecondFactorForm() *SecondFactorForm {
 	f := &SecondFactorForm{
-		Form:             NewForm(nil, "users/choose_second_factor.html", "/users"),
-		FilterCollection: fc,
+		Form: NewForm(nil, "users/choose_second_factor.html", "/users"),
 	}
 	f.init()
 	f.SetValues()
@@ -28,10 +25,16 @@ func (f *SecondFactorForm) init() {
 		Label:       "Choose Second Factor",
 		Placeholder: "",
 		Options:     Options(constants.SecondFactorTypes),
+		Attrs: map[string]string{
+			"required": "",
+		},
 	}
 }
 
-// setValues sets the form values to match the Institution values.
+// SetValues sets the form values to match selected values.
+// The form must implement this to satisfy the Form interface,
+// but in this case, it's a no-op because we don't persist
+// this info in any way.
 func (f *SecondFactorForm) SetValues() {
-	f.Fields["SecondFactor"].Value = f.FilterCollection.ValueOf("SecondFactor")
+
 }

@@ -32,11 +32,17 @@ func Authenticate() gin.HandlerFunc {
 			}
 		}
 		if forceCompletionOfPasswordChange(c, user) {
+			logPasswordChangeIncomplete(c, user)
 			c.HTML(http.StatusUnauthorized, "errors/show.html", gin.H{
 				"suppressSideNav": true,
 				"suppressTopNav":  false,
 				"error":           "Please finish changing your password",
 			})
+			c.Abort()
+		}
+		if forceCompletionOfTwoFactorAuth(c, user) {
+			log2FAIncomplete(c, user)
+			c.Redirect(http.StatusFound, "/users/2fa_choose/")
 			c.Abort()
 		}
 		c.Next()
@@ -99,6 +105,26 @@ func forceCompletionOfPasswordChange(c *gin.Context, currentUser *pgmodels.User)
 	return currentUser.ResetPasswordToken != "" &&
 		!strings.HasPrefix(p, "/users/change_password/") &&
 		!strings.HasPrefix(p, "/errors/show/")
+}
+
+func logPasswordChangeIncomplete(c *gin.Context, currentUser *pgmodels.User) {
+	common.Context().Log.Warn().Msgf("Password change incomplete. User %s tried to access URL [%s]. Forcing user to complete password change.", currentUser.Email, c.Request.RequestURI)
+}
+
+func forceCompletionOfTwoFactorAuth(c *gin.Context, currentUser *pgmodels.User) bool {
+	if currentUser == nil {
+		return false // user isn't even signed in
+	}
+	p := c.FullPath()
+	return currentUser.AwaitingSecondFactor &&
+		!strings.HasPrefix(p, "/users/2fa_choose") &&
+		!strings.HasPrefix(p, "/users/2fa_enter") &&
+		!strings.HasPrefix(p, "/users/2fa_resend") &&
+		!strings.HasPrefix(p, "/users/2fa_verify")
+}
+
+func log2FAIncomplete(c *gin.Context, currentUser *pgmodels.User) {
+	common.Context().Log.Warn().Msgf("Two-factor auth incomplete. User %s tried to access URL [%s]. Forcing user to complete two-factor authentication.", currentUser.Email, c.Request.RequestURI)
 }
 
 func ExemptFromAuth(c *gin.Context) bool {

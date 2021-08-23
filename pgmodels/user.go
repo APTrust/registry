@@ -251,6 +251,7 @@ func (user *User) HasPermission(action constants.Permission, institutionID int64
 	if user.IsAdmin() {
 		return constants.CheckPermission(user.Role, action)
 	}
+
 	// Institutional user and admin permissions apply only within their
 	// own institutions.
 	return user.InstitutionID == institutionID && constants.CheckPermission(user.Role, action)
