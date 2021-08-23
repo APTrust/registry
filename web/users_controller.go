@@ -394,15 +394,8 @@ func SignInUser(c *gin.Context) (int, string, error) {
 		return http.StatusBadRequest, redirectTo, err
 	}
 
-	// TODO: Branch here based on two-factor type
-	//
-	// If two-factor is SMS, generate token, send SMS and redirect
-	// to a page where the user can enter the SMS OTP.
-	//
-	// If Authy, send approval request and wait for response.
-	// Show a spinner. Or just Rickroll the bastards.
-	//
-	// If no two factor, continue below...
+	// Set this flag for two factor users.
+	user.AwaitingSecondFactor = user.IsTwoFactorUser()
 
 	err = helpers.SetSessionCookie(c, user)
 	if err != nil {
@@ -413,7 +406,34 @@ func SignInUser(c *gin.Context) (int, string, error) {
 		return http.StatusInternalServerError, redirectTo, err
 	}
 	c.Set("CurrentUser", user)
-	return http.StatusFound, "/dashboard", nil
+
+	redirectTo = "/dashboard"
+	if user.IsTwoFactorUser() {
+		redirectTo = "/users/choose_second_factor"
+	}
+	return http.StatusFound, redirectTo, nil
+}
+
+func ChooseSecondFactor(c *gin.Context) {
+	// Present the two-factor choice form.
+	// Show only the options confirmed for current user
+	//   - (sms and/or authy, plus backup codes)
+
+	// If two-factor is SMS, generate token, send SMS and redirect
+	// to a page where the user can enter the SMS OTP.
+	//
+	// If Authy, send approval request and wait for response.
+	// Show a spinner. Or just Rickroll the bastards.
+	// Authy is one-touch. We don't use the time-based codes.
+
+}
+
+func SubmitSecondFactor(c *gin.Context) {
+	// Let user enter SMS code or backup code.
+}
+
+func VerifySecondFactor(c *gin.Context) {
+	// If SMS, verify that, else verify backup.
 }
 
 func getIndexQuery(c *gin.Context) (*pgmodels.Query, error) {

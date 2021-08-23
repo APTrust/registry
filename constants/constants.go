@@ -72,6 +72,9 @@ const (
 	RoleInstUser               = "institutional_user"
 	RoleNone                   = "none"
 	RoleSysAdmin               = "admin"
+	SecondFactorAuthy          = "Authy"
+	SecondFactorBackupCode     = "Backup Code"
+	SecondFactorSMS            = "SMS"
 	StageAvailableInS3         = "Available in S3"
 	StageCleanup               = "Cleanup"
 	StageCopyToStaging         = "Copy To Staging"
@@ -205,6 +208,12 @@ var Roles = []string{
 	RoleInstUser,
 	RoleNone,
 	RoleSysAdmin,
+}
+
+var SecondFactorTypes = []string{
+	SecondFactorAuthy,
+	SecondFactorBackupCode,
+	SecondFactorSMS,
 }
 
 var Stages = []string{

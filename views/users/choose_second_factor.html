@@ -1,0 +1,28 @@
+{{ define "users/choose_second_factor.html" }}
+
+{{ template "shared/_header.html" .}}
+
+<h1>{{ .CurrentUser.Name }}</h1>
+<h3>{{ roleName .CurrentUser.Role }} at {{ .CurrentUser.Institution.Name }}</h3>
+
+<form action="{{ .form.Action }}" id="twoFactorType" method="post">
+
+  {{ if .FormError }}
+  <div class="row form-error">
+    {{ .FormError }}
+  </div>
+  {{ end }}
+
+  {{ template "forms/text_input.html" .form.Fields.second_factor }}
+
+  {{ template "forms/csrf_token.html" . }}
+
+  <div class="float-right">
+    <input type="submit" value="Submit">
+  </div>
+</form>
+
+
+{{ template "shared/_footer.html" .}}
+
+{{ end }}
