@@ -429,8 +429,10 @@ func UserTwoFactorChoose(c *gin.Context) {
 	//
 	// If Authy, send approval request and wait for response.
 	// Show a spinner. Or just Rickroll the bastards.
-	// Authy is one-touch. We don't use the time-based codes.
+	// Authy is one-touch. We don't use time-based codes with Authy.
 
+	req := NewRequest(c)
+	c.HTML(http.StatusOK, "users/choose_second_factor.html", req.TemplateData)
 }
 
 // UserTwoFactorGenerateSMS generates an OTP and sends it via SMS

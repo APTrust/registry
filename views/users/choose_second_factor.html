@@ -2,26 +2,59 @@
 
 {{ template "shared/_header.html" .}}
 
-<h1>{{ .CurrentUser.Name }}</h1>
-<h3>{{ roleName .CurrentUser.Role }} at {{ .CurrentUser.Institution.Name }}</h3>
+<h1>Multi-Factor Authentication Required</h1>
 
-<form action="{{ .form.Action }}" id="twoFactorType" method="post">
+<p>How would you like to complete your login?</p>
 
-  {{ if .FormError }}
-  <div class="row form-error">
-    {{ .FormError }}
-  </div>
-  {{ end }}
+<div class="two-factor-option clickable" onclick="submitSecondFactor('authy')">
+  Authy
+</div>
+<div class="two-factor-option clickable" onclick="submitSecondFactor('sms')">
+  Text Message
+</div>
+<div class="two-factor-option clickable" onclick="submitSecondFactor('backup')">
+  Backup Code
+</div>
 
-  {{ template "forms/text_input.html" .form.Fields.second_factor }}
-
-  {{ template "forms/csrf_token.html" . }}
-
-  <div class="float-right">
-    <input type="submit" value="Submit">
-  </div>
+<form name="twoFactorChoiceForm" method="post" action="">
+  <input type="hidden" name="two_factor_method" value="" />
+  <!-- CSRF token is in script below -->
 </form>
 
+<script>
+ // Set everything explicitly on each click. If user uses
+ // back button to return to this page, we need to be sure
+ // csrf and form action are set correctly.
+ function submitSecondFactor(twoFactorMethod) {
+     let form = document.forms["twoFactorChoiceForm"]
+     let csrfToken = "{{ .csrf_token }}"
+     form["two_factor_method"].value = twoFactorMethod
+
+     if (twoFactorMethod == "backup") {
+         form["csrf_token"] = null
+         form.method = "get"
+         form.action = "/users/2fa_enter/"
+     } else if (twoFactorMethod == "authy") {
+         addCsrf(form, csrfToken)
+         form.method = "post"
+         form.action = "/users/2fa_push/"
+     } else if (twoFactorMethod == "sms") {
+         addCsrf(form, csrfToken)
+         form.method = "post"
+         form.action = "/users/2fa_sms/"
+     }
+     form.submit()
+ }
+ function addCsrf(form, token) {
+     if (form["csrf_token"] == null) {
+         let input = document.createElement("input");
+         input.setAttribute("type", "hidden");
+         input.setAttribute("name", "csrf_token");
+         input.setAttribute("value", token);
+         form.appendChild(input);
+     }
+ }
+</script>
 
 {{ template "shared/_footer.html" .}}
 
