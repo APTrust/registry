@@ -420,17 +420,6 @@ func SignInUser(c *gin.Context) (int, string, error) {
 //
 // GET /users/2fa_choose/
 func UserTwoFactorChoose(c *gin.Context) {
-	// Present the two-factor choice form.
-	// Show only the options confirmed for current user
-	//   - (sms and/or authy, plus backup codes)
-
-	// If two-factor is SMS, generate token, send SMS and redirect
-	// to a page where the user can enter the SMS OTP.
-	//
-	// If Authy, send approval request and wait for response.
-	// Show a spinner. Or just Rickroll the bastards.
-	// Authy is one-touch. We don't use time-based codes with Authy.
-
 	req := NewRequest(c)
 	c.HTML(http.StatusOK, "users/choose_second_factor.html", req.TemplateData)
 }
@@ -440,7 +429,8 @@ func UserTwoFactorChoose(c *gin.Context) {
 //
 // POST /users/2fa_sms
 func UserTwoFactorGenerateSMS(c *gin.Context) {
-
+	// Generate token, save to DB, send SMS and redirect
+	// to UserTwoFactorEnter.
 }
 
 // UserTwoFactorEnter shows a form with a single text input where a user
@@ -459,6 +449,7 @@ func UserTwoFactorEnter(c *gin.Context) {
 //
 // POST /users/2fa_push/
 func UserTwoFactorPush(c *gin.Context) {
+	// Send approval request and wait for response.
 	// On approval, redirect to dashboard.
 	// On rejection or timeout, log user out and redirect to sign-in
 }
@@ -469,7 +460,8 @@ func UserTwoFactorPush(c *gin.Context) {
 //
 // POST /users/2fa_resend/
 func UserTwoFactorResend(c *gin.Context) {
-
+	// This may re-send a push or SMS message.
+	// Need to track which option user selected.
 }
 
 // UserTwoFactorVerify verifies the SMS or backup code that the user
