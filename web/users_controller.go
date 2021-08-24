@@ -433,6 +433,14 @@ func UserTwoFactorChoose(c *gin.Context) {
 
 }
 
+// UserTwoFactorGenerateSMS generates an OTP and sends it via SMS
+// the user.
+//
+// POST /users/2fa_sms
+func UserTwoFactorGenerateSMS(c *gin.Context) {
+
+}
+
 // UserTwoFactorEnter shows a form with a single text input where a user
 // can enter an SMS verfication code or a backup code.
 //
@@ -470,7 +478,7 @@ func UserTwoFactorVerify(c *gin.Context) {
 	// If SMS, verify that, else verify backup.
 	// Success redirects to dashboard.
 	// Failure redirects to TwoFactorEnter,
-	// incrementinf failed login attempt count
+	// incrementing failed login attempt count
 }
 
 func getIndexQuery(c *gin.Context) (*pgmodels.Query, error) {
