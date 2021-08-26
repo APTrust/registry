@@ -57,6 +57,16 @@ begin
 end
 $$;
 
+-- Add
+do $$
+begin
+  if not exists (select 1 from information_schema.columns where table_schema='public' AND table_name='users' AND column_name='awaiting_second_factor') then
+ 	alter table users add column "awaiting_second_factor" boolean not null default false;
+  end if;
+end
+$$;
+
+
 -- The ingest_state columns were part of a proposed architecture we never
 -- implemented. They have never been used, and we don't need them.
 alter table intellectual_objects drop column if exists ingest_state;

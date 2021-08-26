@@ -474,8 +474,10 @@ func UserTwoFactorVerify(c *gin.Context) {
 	tokenIsValid := false
 	req.TemplateData["twoFactorMethod"] = method
 
+	user := req.CurrentUser
+
 	if method == constants.TwoFactorSMS {
-		tokenIsValid = common.ComparePasswords(req.CurrentUser.EncryptedOTPSecret, otp)
+		tokenIsValid = common.ComparePasswords(user.EncryptedOTPSecret, otp)
 	} else {
 		// Compare to backup code
 	}
@@ -485,7 +487,9 @@ func UserTwoFactorVerify(c *gin.Context) {
 		c.HTML(http.StatusOK, "users/enter_auth_token.html", req.TemplateData)
 	} else {
 		helpers.DeleteFlashCookie(c)
-		err := req.CurrentUser.ClearOTPSecret()
+		user.AwaitingSecondFactor = false
+		user.EncryptedOTPSecret = ""
+		err := user.Save()
 		if AbortIfError(c, err) {
 			return
 		}
