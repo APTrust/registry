@@ -207,7 +207,6 @@ func initRoutes(router *gin.Engine) {
 		webRoutes.GET("/users/complete_password_reset/:id", web.UserCompletePasswordReset)
 		webRoutes.POST("/users/get_api_key/:id", web.UserGetAPIKey)
 		webRoutes.GET("/users/2fa_choose", web.UserTwoFactorChoose)
-		webRoutes.GET("/users/2fa_enter", web.UserTwoFactorEnter)
 		webRoutes.POST("/users/2fa_sms", web.UserTwoFactorGenerateSMS)
 		webRoutes.POST("/users/2fa_push", web.UserTwoFactorPush)
 		webRoutes.POST("/users/2fa_resend", web.UserTwoFactorResend)

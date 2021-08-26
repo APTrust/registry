@@ -67,7 +67,6 @@ const (
 	UserUpdateSelf                     = "UserUpdateSelf"
 	UserDeleteSelf                     = "UserDeleteSelf"
 	UserTwoFactorChoose                = "UserTwoFactorChoose"
-	UserTwoFactorEnter                 = "UserTwoFactorEnter"
 	UserTwoFactorGenerateSMS           = "UserTwoFactorGenerateSMS"
 	UserTwoFactorPush                  = "UserTwoFactorPush"
 	UserTwoFactorResend                = "UserTwoFactorResend"
@@ -126,7 +125,6 @@ var Permissions = []Permission{
 	UserSignIn,
 	UserSignOut,
 	UserTwoFactorChoose,
-	UserTwoFactorEnter,
 	UserTwoFactorGenerateSMS,
 	UserTwoFactorPush,
 	UserTwoFactorResend,
@@ -197,7 +195,6 @@ func initPermissions() {
 	instUser[UserSignOut] = true
 	instUser[UserReadSelf] = true
 	instUser[UserTwoFactorChoose] = true
-	instUser[UserTwoFactorEnter] = true
 	instUser[UserTwoFactorGenerateSMS] = true
 	instUser[UserTwoFactorPush] = true
 	instUser[UserTwoFactorResend] = true
@@ -234,7 +231,6 @@ func initPermissions() {
 	instAdmin[UserDelete] = true
 	instAdmin[UserReadSelf] = true
 	instAdmin[UserTwoFactorChoose] = true
-	instAdmin[UserTwoFactorEnter] = true
 	instAdmin[UserTwoFactorGenerateSMS] = true
 	instAdmin[UserTwoFactorPush] = true
 	instAdmin[UserTwoFactorResend] = true
@@ -289,7 +285,6 @@ func initPermissions() {
 	sysAdmin[UserSignIn] = true
 	sysAdmin[UserSignOut] = true
 	sysAdmin[UserTwoFactorChoose] = true
-	sysAdmin[UserTwoFactorEnter] = true
 	sysAdmin[UserTwoFactorGenerateSMS] = true
 	sysAdmin[UserTwoFactorPush] = true
 	sysAdmin[UserTwoFactorResend] = true

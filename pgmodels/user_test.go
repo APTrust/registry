@@ -395,3 +395,31 @@ func TestTwoFactorMethod(t *testing.T) {
 	user.ConfirmedTwoFactor = false
 	assert.Equal(t, constants.TwoFactorNone, user.TwoFactorMethod())
 }
+
+func TestCreateOTPToken(t *testing.T) {
+	user, err := pgmodels.UserByEmail(InstUser)
+	require.Nil(t, err)
+	require.NotNil(t, user)
+
+	defer user.ClearOTPSecret()
+
+	// Start with empty OTP
+	user.ClearOTPSecret()
+
+	// Reload user to make sure OTP is empty
+	user, err = pgmodels.UserByEmail(InstUser)
+	require.Nil(t, err)
+	require.NotNil(t, user)
+	assert.Empty(t, user.EncryptedOTPSecret)
+
+	// Now generate a secret
+	token, err := user.CreateOTPToken()
+	require.Nil(t, err)
+	require.True(t, len(token) > 10)
+
+	// Reload user to make sure OTP is not empty
+	user, err = pgmodels.UserByEmail(InstUser)
+	require.Nil(t, err)
+	require.NotNil(t, user)
+	assert.True(t, len(user.EncryptedOTPSecret) > 10)
+}

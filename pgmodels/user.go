@@ -298,3 +298,27 @@ func (user *User) TwoFactorMethod() string {
 	}
 	return constants.TwoFactorAuthy
 }
+
+// CreateOTPToken creates a new one-time password token, typically
+// used for SMS-based two-factor authentication. It saves an
+// encrypted version of the token to the database and returns
+// the plaintext version of the token.
+func (user *User) CreateOTPToken() (string, error) {
+	token := common.RandomToken()
+	encryptedToken, err := common.EncryptPassword(token)
+	if err != nil {
+		return "", err
+	}
+	user.EncryptedOTPSecret = encryptedToken
+	err = user.Save()
+	if err != nil {
+		return "", err
+	}
+	return token, err
+}
+
+// ClearOTPSecret deletes the user's EncryptedOTPSecret.
+func (user *User) ClearOTPSecret() error {
+	user.EncryptedOTPSecret = ""
+	return user.Save()
+}

@@ -112,7 +112,6 @@ var AuthMap = map[string]AuthMetadata{
 	"UserShowChangePassword":             {"User", constants.UserUpdateSelf},
 	"UserUndelete":                       {"User", constants.UserUpdate},
 	"UserTwoFactorChoose":                {"User", constants.UserTwoFactorChoose},
-	"UserTwoFactorEnter":                 {"User", constants.UserTwoFactorEnter},
 	"UserTwoFactorGenerateSMS":           {"User", constants.UserTwoFactorGenerateSMS},
 	"UserTwoFactorPush":                  {"User", constants.UserTwoFactorPush},
 	"UserTwoFactorResend":                {"User", constants.UserTwoFactorResend},

@@ -429,17 +429,15 @@ func UserTwoFactorChoose(c *gin.Context) {
 //
 // POST /users/2fa_sms
 func UserTwoFactorGenerateSMS(c *gin.Context) {
-	// Generate token, save to DB, send SMS and redirect
-	// to UserTwoFactorEnter.
-}
-
-// UserTwoFactorEnter shows a form with a single text input where a user
-// can enter an SMS verfication code or a backup code.
-//
-// GET /users/2fa_enter/
-func UserTwoFactorEnter(c *gin.Context) {
-	// Show a form where user can enter SMS code or backup code.
-	// Form should include the type user is entering (SMS/backup).
+	req := NewRequest(c)
+	token, err := req.CurrentUser.CreateOTPToken()
+	if AbortIfError(c, err) {
+		return
+	}
+	req.TemplateData["twoFactorMethod"] = constants.TwoFactorSMS
+	// For dev, interactive debugging.
+	fmt.Println("OTP token:", token)
+	c.HTML(http.StatusOK, "users/enter_auth_token.html", req.TemplateData)
 }
 
 // UserTwoFactorPush initiates a push request to the user's authentication
@@ -469,10 +467,30 @@ func UserTwoFactorResend(c *gin.Context) {
 //
 // POST /users/2fa_verify/
 func UserTwoFactorVerify(c *gin.Context) {
-	// If SMS, verify that, else verify backup.
-	// Success redirects to dashboard.
-	// Failure redirects to TwoFactorEnter,
-	// incrementing failed login attempt count
+	req := NewRequest(c)
+	otp := c.PostForm("otp")
+	method := c.PostForm("two_factor_method")
+
+	tokenIsValid := false
+	req.TemplateData["twoFactorMethod"] = method
+
+	if method == constants.TwoFactorSMS {
+		tokenIsValid = common.ComparePasswords(req.CurrentUser.EncryptedOTPSecret, otp)
+	} else {
+		// Compare to backup code
+	}
+	if !tokenIsValid {
+		// increment failed login attempt count
+		req.TemplateData["flash"] = "One-time password is incorrect. Try again."
+		c.HTML(http.StatusOK, "users/enter_auth_token.html", req.TemplateData)
+	} else {
+		helpers.DeleteFlashCookie(c)
+		err := req.CurrentUser.ClearOTPSecret()
+		if AbortIfError(c, err) {
+			return
+		}
+		c.Redirect(http.StatusFound, "/dashboard")
+	}
 }
 
 func getIndexQuery(c *gin.Context) (*pgmodels.Query, error) {

@@ -1,0 +1,16 @@
+{{ define "users/enter_auth_token.html" }}
+
+{{ template "shared/_header.html" .}}
+
+<h1>Enter {{ .twoFactorMethod }}</h1>
+
+<form name="twoFactorTokenForm" method="post" action="/users/2fa_verify/">
+  <input type="text" name="otp"/>
+  <input type="hidden" name="two_factor_method" value="{{ .twoFactorMethod }}" />
+  {{ template "forms/csrf_token.html" . }}
+  <input type="submit" value="Submit">
+</form>
+
+{{ template "shared/_footer.html" .}}
+
+{{ end }}
