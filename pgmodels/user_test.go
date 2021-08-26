@@ -415,7 +415,7 @@ func TestCreateOTPToken(t *testing.T) {
 	// Now generate a secret
 	token, err := user.CreateOTPToken()
 	require.Nil(t, err)
-	require.True(t, len(token) > 10)
+	require.Equal(t, 6, len(token))
 
 	// Reload user to make sure OTP is not empty
 	user, err = pgmodels.UserByEmail(InstUser)

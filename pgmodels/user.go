@@ -302,9 +302,13 @@ func (user *User) TwoFactorMethod() string {
 // CreateOTPToken creates a new one-time password token, typically
 // used for SMS-based two-factor authentication. It saves an
 // encrypted version of the token to the database and returns
-// the plaintext version of the token.
+// the plaintext version of the token. For SMS, we use six-digit
+// tokens because they're easy for a user to type.
 func (user *User) CreateOTPToken() (string, error) {
-	token := common.RandomToken()
+	token, err := common.NewOTP()
+	if err != nil {
+		return "", err
+	}
 	encryptedToken, err := common.EncryptPassword(token)
 	if err != nil {
 		return "", err

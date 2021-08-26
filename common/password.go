@@ -1,7 +1,9 @@
 package common
 
 import (
+	"bytes"
 	"crypto/rand"
+	"encoding/binary"
 	"fmt"
 	"regexp"
 	"strings"
@@ -59,4 +61,20 @@ func LooksEncrypted(s string) bool {
 // minimum password requirements.
 func PasswordMeetsRequirements(pwd string) bool {
 	return len(pwd) >= 8 && reLower.MatchString(pwd) && reUpper.MatchString(pwd) && reNumeric.MatchString(pwd)
+}
+
+// NewOTP returns a six-digit code suitable for use as a one-time
+// password. We return this as a string because we need to store
+// a hashed version in the DB and then send a copy to the user.
+func NewOTP() (string, error) {
+	b := make([]byte, 8)
+	_, err := rand.Read(b)
+	if err != nil {
+		return "", err
+	}
+	var uintValue uint64
+	buf := bytes.NewBuffer(b)
+	binary.Read(buf, binary.BigEndian, &uintValue)
+	retValue := fmt.Sprintf("%06d", (uintValue % 1000000))
+	return retValue, nil
 }

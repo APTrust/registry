@@ -3,6 +3,7 @@ package common_test
 import (
 	"strings"
 	"testing"
+	"unicode"
 
 	"github.com/APTrust/registry/common"
 	"github.com/stretchr/testify/assert"
@@ -87,4 +88,18 @@ func TestPasswordMeetsRequirements(t *testing.T) {
 	// Goldilocks! Just right!
 	assert.True(t, common.PasswordMeetsRequirements("abc123XYZ"))
 	assert.True(t, common.PasswordMeetsRequirements("IAmOk110"))
+}
+
+func TestNewOTP(t *testing.T) {
+	seen := make(map[string]bool)
+	for i := 0; i < 5; i++ {
+		otp, err := common.NewOTP()
+		require.Nil(t, err)
+		assert.Equal(t, 6, len(otp))
+		assert.False(t, seen[otp])
+		for _, character := range otp {
+			assert.True(t, unicode.IsDigit(character))
+		}
+		seen[otp] = true
+	}
 }
