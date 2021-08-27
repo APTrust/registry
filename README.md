@@ -107,3 +107,42 @@ Note that Go does not rerun tests that passed on the prior run. If you want to f
 `go clean -testcache`
 
 This may be necessary if the tests passed on the prior run, but you want to force a reload of the schema or the fixtures.
+
+# External Services
+
+If you want to send two-factor OTP codes through SMS, or two-factor Authy push notifications, you'll need to enable these in the .env (or .env.test) file. Set the following:
+
+```
+ENABLE_TWO_FACTOR_SMS=true
+ENABLE_TWO_FACTOR_AUTHY=true
+```
+
+If these services are causing problems on your dev machine, you can turn them off by changing the settings to `false`. You can still log in with two-factor authentication when these services are turned off locally. The registry will print the OTP to the terminal console during development. You can cut and paste the OTP code from there.
+
+You'll have to manually set a test user's phone number and/or Authy ID to send OTP messages successfully.
+
+## AWS Credentials and Config Files
+
+The AWS SDK expects to find your AWS credentials in ~/.aws/credentials and other config settings in ~/.aws/config. The SDK will read credentials by default, but if you want it to read config settings as well, set the following environment variable:
+
+```
+AWS_SDK_LOAD_CONFIG=true
+```
+
+You'll notice the registry script sets AWS\_SDK\_LOAD\_CONFIG to true for environments other than Travis. If you get an error saying `MissingRegion: could not find region configuration` (especially when choosing the Text Message multi-factor option) it's because region is not specified in ~/.aws/config, or the config file is missing, or the environment variable AWS\_SDK\_LOAD\_CONFIG is not set to true.
+
+The file ~/.aws/config should contain the following:
+
+```
+[default]
+region=us-east-1
+output=json
+```
+
+The file ~/.aws/credentials should contain the following:
+
+```
+[default]
+aws_access_key_id=<your key id>
+aws_secret_access_key=<your secret key>
+```

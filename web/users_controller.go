@@ -435,8 +435,16 @@ func UserTwoFactorGenerateSMS(c *gin.Context) {
 		return
 	}
 	req.TemplateData["twoFactorMethod"] = constants.TwoFactorSMS
-	// For dev, interactive debugging.
+
+	// For dev work. You'll need this token to log in.
 	fmt.Println("OTP token:", token)
+
+	message := fmt.Sprintf("Your Registry one time password is: %s", token)
+	err = common.Context().SNSClient.SendSMS(req.CurrentUser.PhoneNumber, message)
+	if AbortIfError(c, err) {
+		return
+	}
+
 	c.HTML(http.StatusOK, "users/enter_auth_token.html", req.TemplateData)
 }
 
