@@ -49,7 +49,7 @@ func Context() *APTContext {
 			DB:        db,
 			Log:       logger,
 			NSQClient: network.NewNSQClient(config.NsqUrl, logger),
-			SNSClient: network.NewSNSClient(config.TwoFactor.SMSEnabled, logger),
+			SNSClient: network.NewSNSClient(config.TwoFactor.SMSEnabled, config.TwoFactor.AWSRegion, logger),
 		}
 	}
 	return ctx

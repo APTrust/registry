@@ -53,6 +53,8 @@ type LoggingConfig struct {
 
 type TwoFactorConfig struct {
 	AuthyEnabled bool
+	AuthyAPIKey  string `json:"-"`
+	AWSRegion    string
 	SMSEnabled   bool
 }
 
@@ -101,6 +103,7 @@ func loadConfig() *Config {
 	v.AddConfigPath(configDir)
 	v.SetConfigName(configFile)
 	v.SetConfigType("env")
+	v.AutomaticEnv() // override config file vars with ENV vars
 	err := v.ReadInConfig()
 	if err != nil {
 		PrintAndExit(fmt.Sprintf("Fatal error config file: %v \n", err))
@@ -146,7 +149,9 @@ func loadConfig() *Config {
 		},
 		NsqUrl: nsqUrl,
 		TwoFactor: &TwoFactorConfig{
+			AuthyAPIKey:  v.GetString("AUTHY_API_KEY"),
 			AuthyEnabled: v.GetBool("ENABLE_TWO_FACTOR_AUTHY"),
+			AWSRegion:    v.GetString("AWS_REGION"),
 			SMSEnabled:   v.GetBool("ENABLE_TWO_FACTOR_SMS"),
 		},
 	}

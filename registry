@@ -33,16 +33,11 @@ fi
 
 # ----------------------------------------------------------------------
 #
-# Figure out our environment and set AWS_SDK_LOAD_CONFIG
-# accordingly. In Travis, this will be false. Elsewhere,
-# it should be true. AWS_SDK_LOAD_CONFIG tells the AWS SDK
-# to load config settings from ~/.aws/config
+# Figure out our environment
 #
 # ----------------------------------------------------------------------
-AWS_SDK_LOAD_CONFIG=true
 if [[ $TRAVIS == "true" ]]; then
     APT_ENV=travis
-    AWS_SDK_LOAD_CONFIG=false
 elif [[ -z "${APT_ENV}" ]]; then
     APT_ENV=test
 fi

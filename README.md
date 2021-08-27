@@ -121,28 +121,16 @@ If these services are causing problems on your dev machine, you can turn them of
 
 You'll have to manually set a test user's phone number and/or Authy ID to send OTP messages successfully.
 
-## AWS Credentials and Config Files
+## AWS Environment Variables
 
-The AWS SDK expects to find your AWS credentials in ~/.aws/credentials and other config settings in ~/.aws/config. The SDK will read credentials by default, but if you want it to read config settings as well, set the following environment variable:
-
-```
-AWS_SDK_LOAD_CONFIG=true
-```
-
-You'll notice the registry script sets AWS\_SDK\_LOAD\_CONFIG to true for environments other than Travis. If you get an error saying `MissingRegion: could not find region configuration` (especially when choosing the Text Message multi-factor option) it's because region is not specified in ~/.aws/config, or the config file is missing, or the environment variable AWS\_SDK\_LOAD\_CONFIG is not set to true.
-
-The file ~/.aws/config should contain the following:
+Set the following environment variables to send OTP codes via text message through Amazon's SNS:
 
 ```
-[default]
-region=us-east-1
-output=json
+AWS_ACCESS_KEY_ID=<your key>
+AWS_SECRET_ACCESS_KEY=<your secret key>
+AWS_REGION="us-east-1"
 ```
 
-The file ~/.aws/credentials should contain the following:
+## Authy Environment Variables
 
-```
-[default]
-aws_access_key_id=<your key id>
-aws_secret_access_key=<your secret key>
-```
+To use Authy for OTP, set the `AUTHY_API_KEY` environment variable.
