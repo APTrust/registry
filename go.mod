@@ -5,10 +5,13 @@ go 1.13
 require (
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d
 	github.com/aws/aws-sdk-go v1.40.25 // indirect
+	github.com/dcu/go-authy v1.0.1 // indirect
 	github.com/gavv/httpexpect/v2 v2.3.1 // indirect
 	github.com/gin-contrib/logger v0.0.2
 	github.com/gin-gonic/gin v1.7.2
 	github.com/go-pg/pg/v10 v10.9.1
+	github.com/gojektech/heimdall v5.0.2+incompatible // indirect
+	github.com/gojektech/valkyrie v0.0.0-20190210220504-8f62c1e7ba45 // indirect
 	github.com/google/uuid v1.2.0
 	github.com/gorilla/securecookie v1.1.1
 	github.com/jinzhu/copier v0.3.0 // indirect

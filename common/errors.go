@@ -87,6 +87,10 @@ var ErrCrossOriginReferer = errors.New("csrf error: cross origin request forbidd
 // does not meet minimum requirements.
 var ErrPasswordReqs = errors.New("password does not meet minimum requirements")
 
+// ErrNoAuthyID occurs when a user requests two-factor login via Authy
+// but does not have an Authy ID.
+var ErrNoAuthyID = errors.New("user does not have an authy id")
+
 // ErrInternal is a runtime error that is not the user's fault, hence
 // probably the programmer's fault.
 var ErrInternal = errors.New("internal server error")

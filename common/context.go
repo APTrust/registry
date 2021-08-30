@@ -13,11 +13,12 @@ import (
 var ctx *APTContext
 
 type APTContext struct {
-	Config    *Config
-	DB        *pg.DB
-	Log       zerolog.Logger
-	NSQClient *network.NSQClient
-	SNSClient *network.SNSClient
+	Config      *Config
+	DB          *pg.DB
+	Log         zerolog.Logger
+	AuthyClient *network.AuthyClient
+	NSQClient   *network.NSQClient
+	SNSClient   *network.SNSClient
 }
 
 // Context returns an APTContext object, which includes
@@ -45,11 +46,12 @@ func Context() *APTContext {
 		queryLogger := NewQueryLogger(logger)
 		db.AddQueryHook(queryLogger)
 		ctx = &APTContext{
-			Config:    config,
-			DB:        db,
-			Log:       logger,
-			NSQClient: network.NewNSQClient(config.NsqUrl, logger),
-			SNSClient: network.NewSNSClient(config.TwoFactor.SMSEnabled, config.TwoFactor.AWSRegion, logger),
+			Config:      config,
+			DB:          db,
+			Log:         logger,
+			AuthyClient: network.NewAuthyClient(config.TwoFactor.AuthyEnabled, config.TwoFactor.AuthyAPIKey, logger),
+			NSQClient:   network.NewNSQClient(config.NsqUrl, logger),
+			SNSClient:   network.NewSNSClient(config.TwoFactor.SMSEnabled, config.TwoFactor.AWSRegion, logger),
 		}
 	}
 	return ctx

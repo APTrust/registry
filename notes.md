@@ -345,25 +345,9 @@ The term "items" below refers to Intellectual Objects, Generic Files, Checksums,
 
 # Two Factor Authentication
 
-Current Pharos users who have enabled two-factor authentication receive one-time passwords through SMS or Authy. These two methods were chosen after long discussion with depositors and we cannot change them without another long discussion. So for now, we're sticking with those two methods.
+Current Pharos users who have enabled two-factor authentication receive one-time passwords through SMS or push notifications through Authy OneTouch. These methods were chosen after long discussion with depositors and we cannot change them without another long discussion. So for now, we're sticking with these two.
 
-Pharos uses the devise-authy gem to send OTP codes to Authy subscribers and the AWS SNS SDK (F***ing alphabet soup! What happened to English?) to send codes via text message.
-
-The [go-authy](https://github.com/dcu/go-authy) library seems to support both Authy and text/SMS messages. Also supports Authy user registration.
-
-Twilio officially recommends Verify over Authy. They point to the  [twilio-go](https://github.com/kevinburke/twilio-go) library, which also supports SMS, and looks more complex than go-authy.
-
-If these libraries don't work, consider [goth](https://github.com/markbates/goth), which does not support Authy, but supports lots of others.
-
-Twilio charges about 9 cents per Authy message. Both Amazon and Twilio charge negligible amounts for SMS messages (> 1 cent per message). Amazon SNS has the advantage of logging to CloudTrail, which has been useful in tracing problems.
-
-In addition, the go-authy page notes that to be able to send SMS messages through Authy, "you need to have activated the SMS plugin for your Authy App." That probably means non-Authy users can't get an SMS message through the Authy API.
-
-So... that leads us back to Amazon's SNS and their horrid SDK, which looks like something Torquemada would have written if he was a Java developer. (All their Go code looks like it was written by Java developers.)
-
-Anyhoo, this gist provides a simple example of [how to send a text message](https://gist.github.com/BizarroDavid/40f644de19a93039de5e67439de704b4). The main SNS library, in all its horror, is [documented here](https://docs.aws.amazon.com/sdk-for-go/api/service/sns/).
-
-For logging purposes, see the documentation on [Publish](https://docs.aws.amazon.com/sdk-for-go/api/service/sns/#SNS.Publish) and [PublishOutput](https://docs.aws.amazon.com/sdk-for-go/api/service/sns/#PublishOutput). It would be nice if we could link the message ID of the publish output to the CloudTrail log entry that describes the message's disposition. that would simplify the process of tracing problematic texts.
+Notes on two-factor setup and workflow have grown large enoug to warrant their own document. See [Two Factor Notes](two_factor_notes.md).
 
 # Testing
 
