@@ -1,0 +1,23 @@
+{{ define "users/init_2fa_setup.html" }}
+
+{{ template "shared/_header.html" .}}
+
+<h1>Two-Factor Method</h1>
+
+<p></p>
+
+<form name="twoFactorSetupForm" method="post" action="">
+
+  {{ template "forms/tel.html" .form.Fields.PhoneNumber }}
+
+  {{ template "forms/radio.html" .form.Fields.Preferred2FAMethod }}
+
+  {{ template "forms/csrf_token.html" . }}
+
+  <input type="submit" value="Submit">
+
+</form>
+
+{{ template "shared/_footer.html" .}}
+
+{{ end }}

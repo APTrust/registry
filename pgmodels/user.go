@@ -110,7 +110,6 @@ type User struct {
 
 	// EncryptedOTPSecretSalt is a legacy field from Devise. Not used.
 	EncryptedOTPSecretSalt string `json:"-" form:"-" pg:"encrypted_otp_secret_salt"`
-
 	// ConsumedTimestep is a legacy field from Devise, which used it
 	// for time-based one-time passwords. Not used.
 	ConsumedTimestep int `json:"-" form:"-" pg:"consumed_timestep"`
@@ -133,7 +132,7 @@ type User struct {
 	DeactivatedAt time.Time `json:"deactivated_at" form:"-" pg:"deactivated_at"`
 
 	// EnabledTwoFactor indicates whether the user's account has
-	// enabled two factor authentication. See als ConfirmedTwoFactor.
+	// enabled two factor authentication. See also ConfirmedTwoFactor.
 	EnabledTwoFactor bool `json:"enabled_two_factor" form:"-" pg:"enabled_two_factor"`
 
 	// ConfirmedTwoFactor indicates that the system has confirmed this

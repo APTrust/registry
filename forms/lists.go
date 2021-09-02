@@ -59,6 +59,12 @@ var StorageOptionList = []ListOption{
 	{constants.StorageOptionWasabiVA, "Wasabi - Virginia"},
 }
 
+var TwoFactorMethodList = []ListOption{
+	{constants.TwoFactorNone, "None (Turn Off Two-Factor Authentication)"},
+	{constants.TwoFactorAuthy, "Authy OneTouch"},
+	{constants.TwoFactorSMS, "Text Message"},
+}
+
 var YesNoList = []ListOption{
 	{"true", "Yes"},
 	{"false", "No"},

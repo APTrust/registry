@@ -129,7 +129,10 @@ func UserTwoFactorVerify(c *gin.Context) {
 //
 // GET /users/2fa_setup
 func UserInit2FASetup(c *gin.Context) {
-
+	// Show form with user phone number and radios for preferred
+	// option: Text or Authy OneTouch.
+	//
+	// Use forms.TwoFactorSetupForm
 }
 
 // UserComplete2FASetup receives a form from UserInit2FASetup.
@@ -139,7 +142,17 @@ func UserInit2FASetup(c *gin.Context) {
 //
 // POST /users/2fa_setup
 func UserComplete2FASetup(c *gin.Context) {
-
+	// Save user phone number, if changed.
+	// Set EnabledTwoFactor to true.
+	// If user chose Authy:
+	//    set AuthyStatus to constants.TwoFactorAuthy
+	//    If user has not registered for Authy:
+	//        register user for Authy
+	//    Else
+	//        Send authy one touch and wait for confirmation
+	// Else
+	//    set AuthyStatus to constants.TwoFactorSMS
+	//    send SMS code and redirect to UserConfirmPhone
 }
 
 // UserConfirmPhone accepts the form from UserComplete2FASetup.
@@ -185,5 +198,7 @@ func UserAuthyRegister(c *gin.Context) {
 //
 // POST /users/backup_codes
 func UserGenerateBackupCodes(c *gin.Context) {
-
+	// Generate six backup codes
+	// Encrypt and save to DB
+	// Display to user
 }

@@ -1,0 +1,23 @@
+{{ define "users/confirm_phone.html" }}
+
+{{ template "shared/_header.html" .}}
+
+<h1>Confirm Your Phone Number</h1>
+
+<p>Enter the code we just texted you into the box below.</p>
+
+<form name="confirmPhoneForm" method="post" action="">
+  <input type="text" name="otp" value="" />
+  {{ template "forms/csrf_token.html" . }}
+  <input type="submit" value="Submit">
+</form>
+
+<script>
+ window.addEventListener('load', (event) => {
+     document.forms['confirmPhoneForm']['otp'].focus()
+ })
+</script>
+
+{{ template "shared/_footer.html" .}}
+
+{{ end }}
