@@ -16,6 +16,8 @@ import (
 	"runtime"
 	"strings"
 	"unicode"
+
+	"github.com/nyaruka/phonenumbers"
 )
 
 // ProjectRoot returns the project root.
@@ -215,4 +217,15 @@ func ConsoleDebug(message string, args ...interface{}) {
 	if !TestsAreRunning() && (envName == "dev" || envName == "test") {
 		fmt.Println(fmt.Sprintf(message, args...))
 	}
+}
+
+// CountryCodeAndPhone returns the country code and phone number for
+// a phoneNumber in format that begins with plus country code, e.g.
+// "+12125551212"
+func CountryCodeAndPhone(phoneNumber string) (int32, string, error) {
+	num, err := phonenumbers.Parse(phoneNumber, "")
+	if err != nil {
+		return 0, "", err
+	}
+	return *num.CountryCode, fmt.Sprintf("%d", *num.NationalNumber), nil
 }

@@ -40,7 +40,6 @@ func UserTwoFactorGenerateSMS(c *gin.Context) {
 	if AbortIfError(c, err) {
 		return
 	}
-
 	c.HTML(http.StatusOK, "users/enter_auth_token.html", req.TemplateData)
 }
 
@@ -153,13 +152,38 @@ func UserConfirmPhone(c *gin.Context) {
 }
 
 // UserRegisterWithAuthy registers a user with Authy.
-func UserRegisterWithAuthy(c *gin.Context) {
+//
+// POST /users/authy_register
+func UserAuthyRegister(c *gin.Context) {
 	// Make sure they don't already have an AuthyID.
 	// Set 2fa enabled when done
+	req := NewRequest(c)
+	user := req.CurrentUser
+	if user.AuthyID != "" {
+		AbortIfError(c, common.ErrAlreadyHasAuthyID)
+		return
+	}
+	countryCode, phone, err := user.CountryCodeAndPhone()
+	if AbortIfError(c, err) {
+		return
+	}
+	authyID, err := common.Context().AuthyClient.RegisterUser(
+		user.Email, int(countryCode), phone)
+	if AbortIfError(c, err) {
+		return
+	}
+	user.AuthyID = authyID
+	err = user.Save()
+	if AbortIfError(c, err) {
+		return
+	}
+	c.HTML(http.StatusOK, "users/authy_registration_complete.html", req.TemplateData)
 }
 
 // UserGenerateBackupCodes generates a set of five new, random backup
 // codes and displays them to the user.
+//
+// POST /users/backup_codes
 func UserGenerateBackupCodes(c *gin.Context) {
 
 }

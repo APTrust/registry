@@ -87,6 +87,10 @@ var ErrCrossOriginReferer = errors.New("csrf error: cross origin request forbidd
 // does not meet minimum requirements.
 var ErrPasswordReqs = errors.New("password does not meet minimum requirements")
 
+// ErrAlreadyHasAuthyID occurs when we try to register a user with Authy
+// and they already have an Authy ID.
+var ErrAlreadyHasAuthyID = errors.New("user is already registered with authy")
+
 // ErrNoAuthyID occurs when a user requests two-factor login via Authy
 // but does not have an Authy ID.
 var ErrNoAuthyID = errors.New("user does not have an authy id")

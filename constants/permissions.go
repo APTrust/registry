@@ -17,111 +17,124 @@ type Permission string
 
 const (
 	AlertCreate                        = "AlertCreate"
+	AlertDelete                        = "AlertDelete"
 	AlertRead                          = "AlertRead"
 	AlertUpdate                        = "AlertUpdate"
-	AlertDelete                        = "AlertDelete"
 	ChecksumCreate                     = "ChecksumCreate"
+	ChecksumDelete                     = "ChecksumDelete"
 	ChecksumRead                       = "ChecksumRead"
 	ChecksumUpdate                     = "ChecksumUpdate"
-	ChecksumDelete                     = "ChecksumDelete"
 	DashboardShow                      = "DashboardShow"
 	DeletionRequestApprove             = "DeletionRequestApprove"
 	DeletionRequestList                = "DeletionRequestList"
 	DeletionRequestShow                = "DeletionRequestShow"
 	DepositReportShow                  = "DepositReportShow"
 	EventCreate                        = "EventCreate"
+	EventDelete                        = "EventDelete"
 	EventRead                          = "EventRead"
 	EventUpdate                        = "EventUpdate"
-	EventDelete                        = "EventDelete"
 	FileCreate                         = "FileCreate"
-	FileRead                           = "FileRead"
-	FileUpdate                         = "FileUpdate"
 	FileDelete                         = "FileDelete"
-	FileRequestDelete                  = "FileRequestDelete"
 	FileFinishBulkDelete               = "FileFinishBulkDelete"
+	FileRead                           = "FileRead"
+	FileRequestDelete                  = "FileRequestDelete"
 	FileRestore                        = "FileRestore"
+	FileUpdate                         = "FileUpdate"
 	InstitutionCreate                  = "InstitutionCreate"
+	InstitutionDelete                  = "InstitutionDelete"
 	InstitutionList                    = "InstitutionList"
 	InstitutionRead                    = "InstitutionRead"
 	InstitutionUpdate                  = "InstitutionUpdate"
-	InstitutionDelete                  = "InstitutionDelete"
 	IntellectualObjectCreate           = "IntellectualObjectCreate"
-	IntellectualObjectRead             = "IntellectualObjectRead"
-	IntellectualObjectUpdate           = "IntellectualObjectUpdate"
 	IntellectualObjectDelete           = "IntellectualObjectDelete"
-	IntellectualObjectRequestDelete    = "IntellectualObjectRequestDelete"
 	IntellectualObjectFinishBulkDelete = "IntellectualObjectFinishBulkDelete"
+	IntellectualObjectRead             = "IntellectualObjectRead"
+	IntellectualObjectRequestDelete    = "IntellectualObjectRequestDelete"
 	IntellectualObjectRestore          = "IntellectualObjectRestore"
+	IntellectualObjectUpdate           = "IntellectualObjectUpdate"
 	ReportRead                         = "ReportRead"
 	StorageRecordCreate                = "StorageRecordCreate"
+	StorageRecordDelete                = "StorageRecordDelete"
 	StorageRecordRead                  = "StorageRecordRead"
 	StorageRecordUpdate                = "StorageRecordUpdate"
-	StorageRecordDelete                = "StorageRecordDelete"
+	UserAuthyRegister                  = "UserAuthyRegister"
+	UserComplete2FASetup               = "UserComplete2FASetup"
+	UserConfirmPhone                   = "UserConfirmPhone"
 	UserCreate                         = "UserCreate"
+	UserDelete                         = "UserDelete"
+	UserDeleteSelf                     = "UserDeleteSelf"
+	UserGenerateBackupCodes            = "UserGenerateBackupCodes"
+	UserInit2FASetup                   = "UserInit2FASetup"
 	UserRead                           = "UserRead"
+	UserReadSelf                       = "UserReadSelf"
 	UserSignIn                         = "UserSignIn"
 	UserSignOut                        = "UserSignOut"
-	UserUpdate                         = "UserUpdate"
-	UserDelete                         = "UserDelete"
-	UserReadSelf                       = "UserReadSelf"
-	UserUpdateSelf                     = "UserUpdateSelf"
-	UserDeleteSelf                     = "UserDeleteSelf"
 	UserTwoFactorChoose                = "UserTwoFactorChoose"
 	UserTwoFactorGenerateSMS           = "UserTwoFactorGenerateSMS"
 	UserTwoFactorPush                  = "UserTwoFactorPush"
 	UserTwoFactorResend                = "UserTwoFactorResend"
 	UserTwoFactorVerify                = "UserTwoFactorVerify"
+	UserUpdate                         = "UserUpdate"
+	UserUpdateSelf                     = "UserUpdateSelf"
 	WorkItemCreate                     = "WorkItemCreate"
+	WorkItemDelete                     = "WorkItemDelete"
 	WorkItemRead                       = "WorkItemRead"
 	WorkItemRequeue                    = "WorkItemRequeue"
 	WorkItemUpdate                     = "WorkItemUpdate"
-	WorkItemDelete                     = "WorkItemDelete"
 )
 
 var Permissions = []Permission{
 	AlertCreate,
+	AlertDelete,
 	AlertRead,
 	AlertUpdate,
-	AlertDelete,
 	ChecksumCreate,
+	ChecksumDelete,
 	ChecksumRead,
 	ChecksumUpdate,
-	ChecksumDelete,
 	DashboardShow,
 	DeletionRequestApprove,
 	DeletionRequestList,
 	DeletionRequestShow,
 	DepositReportShow,
 	EventCreate,
+	EventDelete,
 	EventRead,
 	EventUpdate,
-	EventDelete,
 	FileCreate,
-	FileRead,
-	FileUpdate,
 	FileDelete,
-	FileRequestDelete,
 	FileFinishBulkDelete,
+	FileRead,
+	FileRequestDelete,
 	FileRestore,
+	FileUpdate,
 	InstitutionCreate,
+	InstitutionDelete,
 	InstitutionList,
 	InstitutionRead,
 	InstitutionUpdate,
-	InstitutionDelete,
 	IntellectualObjectCreate,
-	IntellectualObjectRead,
-	IntellectualObjectUpdate,
 	IntellectualObjectDelete,
-	IntellectualObjectRequestDelete,
 	IntellectualObjectFinishBulkDelete,
+	IntellectualObjectRead,
+	IntellectualObjectRequestDelete,
 	IntellectualObjectRestore,
+	IntellectualObjectUpdate,
 	ReportRead,
 	StorageRecordCreate,
+	StorageRecordDelete,
 	StorageRecordRead,
 	StorageRecordUpdate,
-	StorageRecordDelete,
+	UserAuthyRegister,
+	UserComplete2FASetup,
+	UserConfirmPhone,
 	UserCreate,
+	UserDelete,
+	UserDeleteSelf,
+	UserGenerateBackupCodes,
+	UserInit2FASetup,
 	UserRead,
+	UserReadSelf,
 	UserSignIn,
 	UserSignOut,
 	UserTwoFactorChoose,
@@ -130,15 +143,12 @@ var Permissions = []Permission{
 	UserTwoFactorResend,
 	UserTwoFactorVerify,
 	UserUpdate,
-	UserDelete,
-	UserReadSelf,
 	UserUpdateSelf,
-	UserDeleteSelf,
 	WorkItemCreate,
+	WorkItemDelete,
 	WorkItemRead,
 	WorkItemRequeue,
 	WorkItemUpdate,
-	WorkItemDelete,
 }
 
 var ForbiddenToAll = []Permission{
@@ -156,9 +166,14 @@ var ForbiddenToAll = []Permission{
 // ResourceAuthorization.checkPermission to understand how this specific
 // set of permissions is used.
 var SelfAccountPermissions = []Permission{
+	UserAuthyRegister,
+	UserComplete2FASetup,
+	UserConfirmPhone,
+	UserDeleteSelf,
+	UserGenerateBackupCodes,
+	UserInit2FASetup,
 	UserReadSelf,
 	UserUpdateSelf,
-	UserDeleteSelf,
 }
 
 var permissionsInitialized = false
@@ -178,8 +193,8 @@ func initPermissions() {
 	instUser[AlertUpdate] = true
 	instUser[ChecksumRead] = true
 	instUser[DashboardShow] = true
-	instUser[DeletionRequestShow] = true
 	instUser[DeletionRequestList] = true
+	instUser[DeletionRequestShow] = true
 	instUser[DepositReportShow] = true
 	instUser[EventRead] = true
 	instUser[FileRead] = true
@@ -191,9 +206,14 @@ func initPermissions() {
 	instUser[IntellectualObjectRestore] = true
 	instUser[ReportRead] = true
 	instUser[StorageRecordRead] = true
+	instUser[UserAuthyRegister] = true
+	instUser[UserComplete2FASetup] = true
+	instUser[UserConfirmPhone] = true
+	instUser[UserGenerateBackupCodes] = true
+	instUser[UserInit2FASetup] = true
+	instUser[UserReadSelf] = true
 	instUser[UserSignIn] = true
 	instUser[UserSignOut] = true
-	instUser[UserReadSelf] = true
 	instUser[UserTwoFactorChoose] = true
 	instUser[UserTwoFactorGenerateSMS] = true
 	instUser[UserTwoFactorPush] = true
@@ -208,79 +228,92 @@ func initPermissions() {
 	instAdmin[ChecksumRead] = true
 	instAdmin[DashboardShow] = true
 	instAdmin[DeletionRequestApprove] = true
-	instAdmin[DeletionRequestShow] = true
 	instAdmin[DeletionRequestList] = true
+	instAdmin[DeletionRequestShow] = true
 	instAdmin[DepositReportShow] = true
 	instAdmin[EventRead] = true
-	instAdmin[FileRead] = true
 	instAdmin[FileDelete] = true
+	instAdmin[FileRead] = true
 	instAdmin[FileRequestDelete] = true
 	instAdmin[FileRestore] = true
 	instAdmin[InstitutionRead] = true
-	instAdmin[IntellectualObjectRead] = true
 	instAdmin[IntellectualObjectDelete] = true
+	instAdmin[IntellectualObjectRead] = true
 	instAdmin[IntellectualObjectRequestDelete] = true
 	instAdmin[IntellectualObjectRestore] = true
 	instAdmin[ReportRead] = true
 	instAdmin[StorageRecordRead] = true
+	instAdmin[UserAuthyRegister] = true
+	instAdmin[UserComplete2FASetup] = true
+	instAdmin[UserConfirmPhone] = true
 	instAdmin[UserCreate] = true
+	instAdmin[UserDelete] = true
+	instAdmin[UserGenerateBackupCodes] = true
+	instAdmin[UserInit2FASetup] = true
+	instAdmin[UserReadSelf] = true
 	instAdmin[UserRead] = true
 	instAdmin[UserSignIn] = true
 	instAdmin[UserSignOut] = true
-	instAdmin[UserUpdate] = true
-	instAdmin[UserDelete] = true
-	instAdmin[UserReadSelf] = true
 	instAdmin[UserTwoFactorChoose] = true
 	instAdmin[UserTwoFactorGenerateSMS] = true
 	instAdmin[UserTwoFactorPush] = true
 	instAdmin[UserTwoFactorResend] = true
 	instAdmin[UserTwoFactorVerify] = true
 	instAdmin[UserUpdateSelf] = true
+	instAdmin[UserUpdate] = true
 	instAdmin[WorkItemRead] = true
 
 	// Sys Admin Role
 	sysAdmin[AlertCreate] = true
+	sysAdmin[AlertDelete] = true
 	sysAdmin[AlertRead] = true
 	sysAdmin[AlertUpdate] = true
-	sysAdmin[AlertDelete] = true
 	sysAdmin[ChecksumCreate] = true
+	sysAdmin[ChecksumDelete] = false // no one can do this
 	sysAdmin[ChecksumRead] = true
 	sysAdmin[ChecksumUpdate] = false // no one can do this
-	sysAdmin[ChecksumDelete] = false // no one can do this
 	sysAdmin[DashboardShow] = true
 	sysAdmin[DeletionRequestApprove] = true
-	sysAdmin[DeletionRequestShow] = true
 	sysAdmin[DeletionRequestList] = true
+	sysAdmin[DeletionRequestShow] = true
 	sysAdmin[DepositReportShow] = true
 	sysAdmin[EventCreate] = true
+	sysAdmin[EventDelete] = false // no one can do this
 	sysAdmin[EventRead] = true
 	sysAdmin[EventUpdate] = false // no one can do this
-	sysAdmin[EventDelete] = false // no one can do this
 	sysAdmin[FileCreate] = true
-	sysAdmin[FileRead] = true
-	sysAdmin[FileUpdate] = true
 	sysAdmin[FileDelete] = true
-	sysAdmin[FileRequestDelete] = true
 	sysAdmin[FileFinishBulkDelete] = true
+	sysAdmin[FileRead] = true
+	sysAdmin[FileRequestDelete] = true
 	sysAdmin[FileRestore] = true
+	sysAdmin[FileUpdate] = true
 	sysAdmin[InstitutionCreate] = true
+	sysAdmin[InstitutionDelete] = true
 	sysAdmin[InstitutionList] = true
 	sysAdmin[InstitutionRead] = true
 	sysAdmin[InstitutionUpdate] = true
-	sysAdmin[InstitutionDelete] = true
 	sysAdmin[IntellectualObjectCreate] = true
-	sysAdmin[IntellectualObjectRead] = true
-	sysAdmin[IntellectualObjectUpdate] = true
 	sysAdmin[IntellectualObjectDelete] = true
-	sysAdmin[IntellectualObjectRequestDelete] = true
 	sysAdmin[IntellectualObjectFinishBulkDelete] = true
+	sysAdmin[IntellectualObjectRead] = true
+	sysAdmin[IntellectualObjectRequestDelete] = true
 	sysAdmin[IntellectualObjectRestore] = true
+	sysAdmin[IntellectualObjectUpdate] = true
 	sysAdmin[ReportRead] = true
 	sysAdmin[StorageRecordCreate] = true
+	sysAdmin[StorageRecordDelete] = true
 	sysAdmin[StorageRecordRead] = true
 	sysAdmin[StorageRecordUpdate] = true
-	sysAdmin[StorageRecordDelete] = true
+	sysAdmin[UserAuthyRegister] = true
+	sysAdmin[UserComplete2FASetup] = true
+	sysAdmin[UserConfirmPhone] = true
 	sysAdmin[UserCreate] = true
+	sysAdmin[UserDeleteSelf] = true
+	sysAdmin[UserDelete] = true
+	sysAdmin[UserGenerateBackupCodes] = true
+	sysAdmin[UserInit2FASetup] = true
+	sysAdmin[UserReadSelf] = true
 	sysAdmin[UserRead] = true
 	sysAdmin[UserSignIn] = true
 	sysAdmin[UserSignOut] = true
@@ -289,16 +322,13 @@ func initPermissions() {
 	sysAdmin[UserTwoFactorPush] = true
 	sysAdmin[UserTwoFactorResend] = true
 	sysAdmin[UserTwoFactorVerify] = true
-	sysAdmin[UserUpdate] = true
-	sysAdmin[UserDelete] = true
-	sysAdmin[UserDeleteSelf] = true
-	sysAdmin[UserReadSelf] = true
 	sysAdmin[UserUpdateSelf] = true
+	sysAdmin[UserUpdate] = true
 	sysAdmin[WorkItemCreate] = true
+	sysAdmin[WorkItemDelete] = true
 	sysAdmin[WorkItemRead] = true
 	sysAdmin[WorkItemRequeue] = true
 	sysAdmin[WorkItemUpdate] = true
-	sysAdmin[WorkItemDelete] = true
 
 	permissionsInitialized = true
 }

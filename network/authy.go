@@ -11,6 +11,10 @@ import (
 	"github.com/rs/zerolog"
 )
 
+// ErrAuthyDisabled means authy isn't enabled here. You can change that
+// in the .env file.
+var ErrAuthyDisabled = errors.New("authy is not enabled in this environment")
+
 var authyLoginMessage = "Log in to the APTrust registry."
 var authyTimeout = (45 * time.Second)
 
@@ -36,10 +40,13 @@ func NewAuthyClient(authyEnabled bool, authyAPIKey string, log zerolog.Logger) *
 // the user's response. Param authyID is the user's AuthyID. Param
 // userEmail is used for logging.
 //
+// This is a blocking request that waits up to 45 seconds for a user
+// to approve the one-touch push notification.
+//
 // If request is approved, this returns true. Otherwise, false.
 func (ac *AuthyClient) AwaitOneTouch(userEmail, authyID string) (bool, error) {
 	if !ac.enabled {
-		return false, errors.New("Cannot send OneTouch because Authy client is disabled.")
+		return false, ErrAuthyDisabled
 	}
 	details := authy.Details{}
 	req, err := ac.client.SendApprovalRequest(authyID, authyLoginMessage, details, url.Values{})
@@ -56,4 +63,24 @@ func (ac *AuthyClient) AwaitOneTouch(userEmail, authyID string) (bool, error) {
 		ac.log.Warn().Msgf("AuthyOneTouch %s for %s (%s)", status, userEmail, req.UUID)
 	}
 	return false, nil
+}
+
+// RegisterUser registers a user with Authy for this app. Note that
+// users need separate registrations for each environment (dev, demo,
+// prod, etc.).
+//
+// On success, this returns the user's new AuthyID. The caller is
+// responsible for attaching that ID to the user object and saving
+// it to the database.
+//
+// Use user.CountryCodeAndPhone() to get country code and phone number,
+// as these need to be separate. Do not pass user.PhoneNumber in format
+// "+<country_code><number>" because that won't work.
+func (ac *AuthyClient) RegisterUser(userEmail string, countryCode int, phone string) (string, error) {
+	authyUser, err := ac.client.RegisterUser(userEmail, countryCode, phone, url.Values{})
+	if err != nil {
+		ac.log.Error().Msgf("Can't register user %s (%d %s) with Authy: %v", userEmail, countryCode, phone, err)
+		return "", err
+	}
+	return authyUser.ID, err
 }

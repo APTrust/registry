@@ -99,3 +99,13 @@ func TestToHumanSize(t *testing.T) {
 	assert.Equal(t, "3.9 GB", common.ToHumanSize(3897784432, 1000))
 	assert.Equal(t, "3.6 GB", common.ToHumanSize(3897784432, 1024))
 }
+
+func TestCountryCodeAndPhone(t *testing.T) {
+	cc, phone, err := common.CountryCodeAndPhone("+12125551212")
+	require.Nil(t, err)
+	assert.Equal(t, int32(1), cc)
+	assert.Equal(t, "2125551212", phone)
+
+	_, _, err = common.CountryCodeAndPhone("invalid number")
+	assert.NotNil(t, err)
+}

@@ -16,6 +16,7 @@ require (
 	github.com/gorilla/securecookie v1.1.1
 	github.com/jinzhu/copier v0.3.0 // indirect
 	github.com/nsqio/nsq v1.2.0
+	github.com/nyaruka/phonenumbers v1.0.71 // indirect
 	github.com/rs/zerolog v1.20.0
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/stew v0.0.0-20130812190256-80ef0842b48b

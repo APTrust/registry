@@ -455,3 +455,8 @@ func (user *User) ClearOTPSecret() error {
 	user.EncryptedOTPSecret = ""
 	return user.Save()
 }
+
+// CountryCodeAndPhone returns this user's country code and phone number.
+func (user *User) CountryCodeAndPhone() (int32, string, error) {
+	return common.CountryCodeAndPhone(user.PhoneNumber)
+}
