@@ -4,19 +4,30 @@
 
 <h1>Two-Factor Method</h1>
 
-<p></p>
+<p>Please ensure your phone number is correct and choose your preferred method for two-factor authentication.</p>
 
-<form name="twoFactorSetupForm" method="post" action="">
+<form name="twoFactorSetupForm" method="post" onsubmit="confirmChange()" action="/users/2fa_setup">
 
   {{ template "forms/tel.html" .form.Fields.PhoneNumber }}
 
-  {{ template "forms/radio.html" .form.Fields.Preferred2FAMethod }}
+  {{ template "forms/radio.html" .form.Fields.AuthyStatus }}
 
   {{ template "forms/csrf_token.html" . }}
 
   <input type="submit" value="Submit">
 
 </form>
+
+<script>
+ let currentMethod = '{{ .CurrentUser.AuthyStatus }}'
+ function confirmChange() {
+     let selectedMethod = document.forms['twoFactorSetupForm']['AuthyStatus'].value
+     if (selectedMethod != currentMethod && selectedMethod.toLowerCase() == 'none') {
+         return confirm('Are you sure you want to turn off two-factor authentication?')
+     }
+     return true
+ }
+</script>
 
 {{ template "shared/_footer.html" .}}
 

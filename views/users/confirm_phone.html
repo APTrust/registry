@@ -6,7 +6,7 @@
 
 <p>Enter the code we just texted you into the box below.</p>
 
-<form name="confirmPhoneForm" method="post" action="">
+<form name="confirmPhoneForm" method="post" action="/users/confirm_phone">
   <input type="text" name="otp" value="" />
   {{ template "forms/csrf_token.html" . }}
   <input type="submit" value="Submit">

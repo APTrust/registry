@@ -18,8 +18,8 @@ func NewTwoFactorSetupForm(user *pgmodels.User) *TwoFactorSetupForm {
 }
 
 func (f *TwoFactorSetupForm) init() {
-	f.Fields["PreferredMethod"] = &Field{
-		Name:        "PreferredMethod",
+	f.Fields["AuthyStatus"] = &Field{
+		Name:        "AuthyStatus",
 		Label:       "Preferred Method for Two-Factor Auth",
 		Placeholder: "",
 		ErrMsg:      "Please choose your preferred method.",
@@ -32,6 +32,7 @@ func (f *TwoFactorSetupForm) init() {
 		Name:        "PhoneNumber",
 		Label:       "PhoneNumber",
 		Placeholder: "PhoneNumber",
+		ErrMsg:      pgmodels.ErrUserPhone,
 		Attrs: map[string]string{
 			"required": "",
 		},
@@ -42,4 +43,5 @@ func (f *TwoFactorSetupForm) init() {
 func (f *TwoFactorSetupForm) SetValues() {
 	user := f.Model.(*pgmodels.User)
 	f.Fields["PhoneNumber"].Value = user.PhoneNumber
+	f.Fields["AuthyStatus"].Value = user.AuthyStatus
 }

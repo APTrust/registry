@@ -1,10 +1,11 @@
 {{ define "forms/radio.html" }}
 
+{{ $field := . }}
 {{ $value := .Value }}
 
 {{ range $index, $option := .Options }}
-<label>{{ .Label }}
-  <input type="radio" name="{{ $option.Text }}" value="{{ $option.Value }}" {{ if strEq $option.Value $value }}checked{{ end }}  {{ template "forms/attrs.html" . }}>
+<label>
+  <input type="radio" name="{{ $field.Name }}" value="{{ $option.Value }}" {{ if strEq $option.Value $value }}checked{{ end }}  {{ template "forms/attrs.html" $field }}>{{ .Text }}
 </label>
 {{ end }}
 

@@ -44,7 +44,7 @@ func NewRequest(c *gin.Context) *Request {
 			constants.CSRFTokenName: csrfToken,
 		},
 	}
-	helpers.DeleteCookie(c, ctx.Config.Cookies.FlashCookie)
+	helpers.DeleteFlashCookie(c)
 	return req
 }
 
