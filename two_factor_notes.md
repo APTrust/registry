@@ -2,18 +2,19 @@
 
 ## Task List
 
-- [ ] Allow user to enable/disable 2FA
-- [ ] Allow user to choose SMS or Authy as primary 2FA method
-- [ ] Verify user phone number for SMS
-- [ ] Register Authy account for new users
+- [x] Allow user to enable/disable 2FA
+- [x] Allow user to choose SMS or Authy as primary 2FA method
+- [x] Verify user phone number for SMS
+- [x] Register Authy account for new users
 - [x] Choose 2FA method page (post-login)
 - [x] Generate and send OTP via SMS
 - [x] Verify/Reject SMS code
-- [ ] Send Authy OneTouch
-- [ ] Accept/Reject OneTouch response
-- [ ] Generate Backup Codes
-- [ ] Verify/Reject Backup Code
+- [x] Send Authy OneTouch
+- [x] Accept/Reject OneTouch response
+- [x] Generate Backup Codes
+- [x] Verify/Reject Backup Code
 - [x] Restrict access of users awaiting second factor
+- [ ] Allow resend of SMS messages and Authy OneTouch
 
 ## Login Workflows
 
