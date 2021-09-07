@@ -36,7 +36,7 @@ func UserTwoFactorGenerateSMS(c *gin.Context) {
 	// For dev work. You'll need this token to log in.
 	fmt.Println("OTP token:", token)
 
-	message := fmt.Sprintf("Your Registry one time password is: %s", token)
+	message := fmt.Sprintf("Your Registry one time password is %s", token)
 	err = common.Context().SNSClient.SendSMS(req.CurrentUser.PhoneNumber, message)
 	if AbortIfError(c, err) {
 		return
@@ -191,7 +191,7 @@ func UserComplete2FASetup(c *gin.Context) {
 		// Do nothing. Just redirect to My Account with flash
 		// message saying nothing changed.
 		helpers.SetFlashCookie(c, "Your two-factor preferences remain unchanged.")
-		c.HTML(http.StatusFound, "/users/my_account", req.TemplateData)
+		c.Redirect(http.StatusFound, "/users/my_account")
 		return
 	}
 
@@ -229,7 +229,7 @@ func UserComplete2FASetup(c *gin.Context) {
 		}
 		// For dev work. You'll need this token to log in.
 		fmt.Println("OTP token:", token)
-		message := fmt.Sprintf("Your Registry one time password is: %s", token)
+		message := fmt.Sprintf("Your Registry one time password is %s", token)
 		err = common.Context().SNSClient.SendSMS(req.CurrentUser.PhoneNumber, message)
 		if AbortIfError(c, err) {
 			return
