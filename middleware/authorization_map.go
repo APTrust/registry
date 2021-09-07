@@ -97,7 +97,6 @@ var AuthMap = map[string]AuthMetadata{
 	"StorageRecordNew":                   {"StorageRecord", constants.StorageRecordCreate},
 	"StorageRecordShow":                  {"StorageRecord", constants.StorageRecordRead},
 	"StorageRecordUpdate":                {"StorageRecord", constants.StorageRecordUpdate},
-	"UserAuthyRegister":                  {"User", constants.UserAuthyRegister},
 	"UserChangePassword":                 {"User", constants.UserUpdateSelf},
 	"UserComplete2FASetup":               {"User", constants.UserComplete2FASetup},
 	"UserConfirmPhone":                   {"User", constants.UserConfirmPhone},

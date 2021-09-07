@@ -215,12 +215,34 @@ func UserComplete2FASetup(c *gin.Context) {
 	}
 
 	if needsConfirmation && user.AuthyStatus == constants.TwoFactorAuthy {
-		// If user has no Authy ID, run UserAuthyRegister
-		//    then set user.ConfirmedTwoFactor
-		// If user has an Authy ID but it's not confirmed await OneTouch
-		//    then set user.ConfirmedTwoFactor
-		// If user has confirmed Authy ID, redirect to My Account with
-		// flash message confirming the change
+		// Register the user with Authy, if necessary
+		if user.AuthyID == "" {
+			err = UserAuthyRegister(req)
+			if AbortIfError(c, err) {
+				return
+			}
+		}
+		// Confirm the user with Authy, if necessary
+		if !user.ConfirmedTwoFactor {
+			ok, err := common.Context().AuthyClient.AwaitOneTouch(
+				req.CurrentUser.Email, req.CurrentUser.AuthyID)
+			if AbortIfError(c, err) {
+				return
+			}
+			if ok {
+				user.ConfirmedTwoFactor = true
+				err = user.Save()
+				if AbortIfError(c, err) {
+					return
+				}
+			}
+		}
+		if user.AuthyID != "" && user.ConfirmedTwoFactor {
+			helpers.SetFlashCookie(c, "Your two-factor setup is complete. Next time you log in, you'll receive a push notification from Authy to complete the sign-in process.")
+			c.Redirect(http.StatusFound, "/users/my_account")
+		} else {
+			// This should not be possible.
+		}
 	} else if needsConfirmation && user.AuthyStatus == constants.TwoFactorSMS {
 		// Send SMS code and redirect to UserConfirmPhone
 		token, err := req.CurrentUser.CreateOTPToken()
@@ -274,32 +296,26 @@ func UserConfirmPhone(c *gin.Context) {
 }
 
 // UserRegisterWithAuthy registers a user with Authy.
-//
-// POST /users/authy_register
-func UserAuthyRegister(c *gin.Context) {
-	// Make sure they don't already have an AuthyID.
-	// Set 2fa enabled when done
-	req := NewRequest(c)
+func UserAuthyRegister(req *Request) error {
 	user := req.CurrentUser
 	if user.AuthyID != "" {
-		AbortIfError(c, common.ErrAlreadyHasAuthyID)
-		return
+		return common.ErrAlreadyHasAuthyID
 	}
 	countryCode, phone, err := user.CountryCodeAndPhone()
-	if AbortIfError(c, err) {
-		return
+	if err != nil {
+		return err
 	}
 	authyID, err := common.Context().AuthyClient.RegisterUser(
 		user.Email, int(countryCode), phone)
-	if AbortIfError(c, err) {
-		return
+	if err != nil {
+		return err
 	}
 	user.AuthyID = authyID
 	err = user.Save()
-	if AbortIfError(c, err) {
-		return
+	if err != nil {
+		return err
 	}
-	c.HTML(http.StatusOK, "users/authy_registration_complete.html", req.TemplateData)
+	return nil
 }
 
 // UserGenerateBackupCodes generates a set of five new, random backup

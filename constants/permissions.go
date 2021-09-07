@@ -57,7 +57,6 @@ const (
 	StorageRecordDelete                = "StorageRecordDelete"
 	StorageRecordRead                  = "StorageRecordRead"
 	StorageRecordUpdate                = "StorageRecordUpdate"
-	UserAuthyRegister                  = "UserAuthyRegister"
 	UserComplete2FASetup               = "UserComplete2FASetup"
 	UserConfirmPhone                   = "UserConfirmPhone"
 	UserCreate                         = "UserCreate"
@@ -125,7 +124,6 @@ var Permissions = []Permission{
 	StorageRecordDelete,
 	StorageRecordRead,
 	StorageRecordUpdate,
-	UserAuthyRegister,
 	UserComplete2FASetup,
 	UserConfirmPhone,
 	UserCreate,
@@ -166,7 +164,6 @@ var ForbiddenToAll = []Permission{
 // ResourceAuthorization.checkPermission to understand how this specific
 // set of permissions is used.
 var SelfAccountPermissions = []Permission{
-	UserAuthyRegister,
 	UserComplete2FASetup,
 	UserConfirmPhone,
 	UserDeleteSelf,
@@ -206,7 +203,6 @@ func initPermissions() {
 	instUser[IntellectualObjectRestore] = true
 	instUser[ReportRead] = true
 	instUser[StorageRecordRead] = true
-	instUser[UserAuthyRegister] = true
 	instUser[UserComplete2FASetup] = true
 	instUser[UserConfirmPhone] = true
 	instUser[UserGenerateBackupCodes] = true
@@ -243,7 +239,6 @@ func initPermissions() {
 	instAdmin[IntellectualObjectRestore] = true
 	instAdmin[ReportRead] = true
 	instAdmin[StorageRecordRead] = true
-	instAdmin[UserAuthyRegister] = true
 	instAdmin[UserComplete2FASetup] = true
 	instAdmin[UserConfirmPhone] = true
 	instAdmin[UserCreate] = true
@@ -305,7 +300,6 @@ func initPermissions() {
 	sysAdmin[StorageRecordDelete] = true
 	sysAdmin[StorageRecordRead] = true
 	sysAdmin[StorageRecordUpdate] = true
-	sysAdmin[UserAuthyRegister] = true
 	sysAdmin[UserComplete2FASetup] = true
 	sysAdmin[UserConfirmPhone] = true
 	sysAdmin[UserCreate] = true

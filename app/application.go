@@ -211,7 +211,6 @@ func initRoutes(router *gin.Engine) {
 		webRoutes.GET("/users/2fa_setup", web.UserInit2FASetup)
 		webRoutes.POST("/users/2fa_setup", web.UserComplete2FASetup)
 		webRoutes.POST("/users/confirm_phone", web.UserConfirmPhone)
-		webRoutes.POST("/users/authy_register", web.UserAuthyRegister)
 		webRoutes.POST("/users/backup_codes", web.UserGenerateBackupCodes)
 
 		// User two-factor login

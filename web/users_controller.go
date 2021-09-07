@@ -192,7 +192,7 @@ func UserChangePassword(c *gin.Context) {
 	pwd := c.PostForm("NewPassword")
 	confirm := c.PostForm("ConfirmNewPassword")
 	if pwd != confirm {
-		err := fmt.Errorf("Passwords don't match.")
+		err := fmt.Errorf("passwords don't match")
 		AbortIfError(c, err)
 		return
 	}
