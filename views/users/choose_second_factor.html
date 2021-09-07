@@ -39,7 +39,7 @@
      if (twoFactorMethod == "backup") {
          form["csrf_token"] = null
          form.method = "get"
-         form.action = "/users/2fa_enter/"
+         form.action = "/users/2fa_backup/"
      } else if (twoFactorMethod == "authy") {
          addCsrf(form, csrfToken)
          form.method = "post"

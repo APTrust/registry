@@ -9,6 +9,7 @@ import (
 	"github.com/APTrust/registry/forms"
 	"github.com/APTrust/registry/helpers"
 	"github.com/gin-gonic/gin"
+	"github.com/stretchr/stew/slice"
 )
 
 // UserTwoFactorChoose shows a list of radio button options so a user
@@ -19,6 +20,16 @@ import (
 func UserTwoFactorChoose(c *gin.Context) {
 	req := NewRequest(c)
 	c.HTML(http.StatusOK, "users/choose_second_factor.html", req.TemplateData)
+}
+
+// UserTwoFactorBackup shows the form on which the user can enter a
+// backup code to complete two-factor authentication.
+//
+// GET /users/2fa_backup/
+func UserTwoFactorBackup(c *gin.Context) {
+	req := NewRequest(c)
+	req.TemplateData["twoFactorMethod"] = "Backup Code"
+	c.HTML(http.StatusOK, "users/enter_auth_token.html", req.TemplateData)
 }
 
 // UserTwoFactorGenerateSMS generates an OTP and sends it via SMS
@@ -106,7 +117,16 @@ func UserTwoFactorVerify(c *gin.Context) {
 	if method == constants.TwoFactorSMS {
 		tokenIsValid = common.ComparePasswords(user.EncryptedOTPSecret, otp)
 	} else {
-		// Compare to backup code
+		for _, encCode := range user.OTPBackupCodes {
+			if common.ComparePasswords(encCode, otp) {
+				user.OTPBackupCodes = slice.MinusStrings(user.OTPBackupCodes, []string{encCode})
+				err := user.Save()
+				if AbortIfError(c, err) {
+					return
+				}
+				tokenIsValid = true
+			}
+		}
 	}
 	if !tokenIsValid {
 		// TODO: increment failed login attempt count
@@ -325,15 +345,21 @@ func UserAuthyRegister(req *Request) error {
 func UserGenerateBackupCodes(c *gin.Context) {
 	req := NewRequest(c)
 	backupCodes := make([]string, 6)
+	encCodes := make([]string, 6)
 	for i := 0; i < 6; i++ {
+		var err error
 		code := common.RandomToken()
-		backupCodes[i] = code[4:11]
+		backupCodes[i] = code[4:14]
+		encCodes[i], err = common.EncryptPassword(backupCodes[i])
+		if AbortIfError(c, err) {
+			return
+		}
 	}
-	req.CurrentUser.OTPBackupCodes = backupCodes
+	req.CurrentUser.OTPBackupCodes = encCodes
 	err := req.CurrentUser.Save()
 	if AbortIfError(c, err) {
 		return
 	}
-	req.TemplateData["backupCodes"] = req.CurrentUser.OTPBackupCodes
+	req.TemplateData["backupCodes"] = backupCodes
 	c.HTML(http.StatusOK, "users/backup_codes.html", req.TemplateData)
 }
