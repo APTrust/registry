@@ -323,7 +323,17 @@ func UserAuthyRegister(req *Request) error {
 //
 // POST /users/backup_codes
 func UserGenerateBackupCodes(c *gin.Context) {
-	// Generate six backup codes
-	// Encrypt and save to DB
-	// Display to user
+	req := NewRequest(c)
+	backupCodes := make([]string, 6)
+	for i := 0; i < 6; i++ {
+		code := common.RandomToken()
+		backupCodes[i] = code[4:11]
+	}
+	req.CurrentUser.OTPBackupCodes = backupCodes
+	err := req.CurrentUser.Save()
+	if AbortIfError(c, err) {
+		return
+	}
+	req.TemplateData["backupCodes"] = req.CurrentUser.OTPBackupCodes
+	c.HTML(http.StatusOK, "users/backup_codes.html", req.TemplateData)
 }

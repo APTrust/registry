@@ -5,6 +5,7 @@
 {{ if userCan .CurrentUser "UserUpdateSelf" .CurrentUser.InstitutionID }}
   <div class="float-right"><a class="button" href="/users/change_password/{{ .CurrentUser.ID }}">Change Password</a></div>
   <div class="float-right"><a class="button" href="javascript:getAPIKey()">Get API Key</a></div>
+  <div class="float-right"><a class="button" href="javascript:generateBackupCodes()">Generate Backup Codes</a></div>
 {{ end }}
 
 
@@ -74,10 +75,20 @@
   {{ template "forms/csrf_token.html" . }}
 </form>
 
+<form name="backupCodeForm" action="/users/backup_codes" method="post">
+  <input type="hidden" name="id" value="{{ .CurrentUser.ID }}">
+  {{ template "forms/csrf_token.html" . }}
+</form>
+
 <script>
  function getAPIKey() {
      if (confirm("Do you want to get a new API key? This will invalidate your existing key if you have one.")) {
          document.forms["apiKeyForm"].submit()
+     }
+ }
+ function generateBackupCodes() {
+     if (confirm("Do you want to generate backup codes? This will invalidate your existing backup codes.")) {
+         document.forms["backupCodeForm"].submit()
      }
  }
 </script>
