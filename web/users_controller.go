@@ -409,7 +409,7 @@ func SignInUser(c *gin.Context) (int, string, error) {
 
 	redirectTo = "/dashboard"
 	if user.IsTwoFactorUser() {
-		redirectTo = "/users/choose_second_factor"
+		redirectTo = "/users/2fa_choose"
 	}
 	return http.StatusFound, redirectTo, nil
 }

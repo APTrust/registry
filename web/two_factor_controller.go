@@ -65,10 +65,6 @@ func UserTwoFactorGenerateSMS(c *gin.Context) {
 // POST /users/2fa_push/
 func UserTwoFactorPush(c *gin.Context) {
 	req := NewRequest(c)
-	if req.CurrentUser.AuthyID == "" {
-		AbortIfError(c, common.ErrNoAuthyID)
-		return
-	}
 	approved, err := userSendAuthyOneTouch(req)
 	if AbortIfError(c, err) {
 		return
@@ -117,7 +113,11 @@ func UserTwoFactorVerify(c *gin.Context) {
 		// TODO: increment failed login attempt count
 		// User model needs FailedLogins and LockoutUntil.
 		// Then we need logic to enforce the lockout.
-		req.TemplateData["flash"] = "One-time password is incorrect. Try again."
+		msg := "Backup code is incorrect. Try again."
+		if method == constants.TwoFactorSMS {
+			msg = "One-time password is incorrect. Try again."
+		}
+		req.TemplateData["flash"] = msg
 		c.HTML(http.StatusOK, "users/enter_auth_token.html", req.TemplateData)
 	} else {
 		user.AwaitingSecondFactor = false
@@ -174,7 +174,7 @@ func UserComplete2FASetup(c *gin.Context) {
 	if prefs.DoNotUseTwoFactor() {
 		user.EnabledTwoFactor = false
 		helpers.SetFlashCookie(c, "Two-factor authentication has been turned off for your account.")
-		c.HTML(http.StatusFound, "/users/my_account", req.TemplateData)
+		c.HTML(http.StatusFound, "users/my_account.html", req.TemplateData)
 		return
 	}
 
@@ -287,6 +287,9 @@ func UserGenerateBackupCodes(c *gin.Context) {
 // response. This returns a boolean indicating whether the
 // user approved the login.
 func userSendAuthyOneTouch(req *Request) (bool, error) {
+	if req.CurrentUser.AuthyID == "" {
+		return false, common.ErrNoAuthyID
+	}
 	ok, err := common.Context().AuthyClient.AwaitOneTouch(
 		req.CurrentUser.Email, req.CurrentUser.AuthyID)
 	if err != nil {

@@ -31,6 +31,9 @@ const (
 )
 
 // User is a person who can log in and do stuff.
+// Most of this model was inherited from the old Rails app. It includes
+// a number of obsolete fields that we should remove after we're stable
+// in production.
 type User struct {
 	// ID is user's unique ID in the database.
 	ID int64 `json:"id" form:"id" pg:"id"`
@@ -106,12 +109,15 @@ type User struct {
 	EncryptedOTPSecret string `json:"-" form:"-" pg:"encrypted_otp_secret"`
 
 	// EncryptedOTPSecretIV is a legacy field from Devise. Not used.
+	// TODO: Delete this.
 	EncryptedOTPSecretIV string `json:"-" form:"-" pg:"encrypted_otp_secret_iv"`
 
 	// EncryptedOTPSecretSalt is a legacy field from Devise. Not used.
 	EncryptedOTPSecretSalt string `json:"-" form:"-" pg:"encrypted_otp_secret_salt"`
+
 	// ConsumedTimestep is a legacy field from Devise, which used it
 	// for time-based one-time passwords. Not used.
+	// TODO: Delete this.
 	ConsumedTimestep int `json:"-" form:"-" pg:"consumed_timestep"`
 
 	// OTPRequiredForLogin indicates whether, as a matter of policy, the
