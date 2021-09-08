@@ -14,7 +14,9 @@ import (
 
 // UserTwoFactorChoose shows a list of radio button options so a user
 // can choose their two-factor auth method (Authy, Backup Code, SMS).
-// We show this page only to users who have enabled two-factor auth.
+// We show this page after a user has entered their email and password,
+// if they have two-factor enabled. This is part of the login process,
+// not part of the setup process.
 //
 // GET /users/2fa_choose/
 func UserTwoFactorChoose(c *gin.Context) {
@@ -62,32 +64,20 @@ func UserTwoFactorGenerateSMS(c *gin.Context) {
 //
 // POST /users/2fa_push/
 func UserTwoFactorPush(c *gin.Context) {
-	// Send approval request and wait for response.
-	// On approval, redirect to dashboard.
-	// On rejection or timeout, log user out and redirect to sign-in
 	req := NewRequest(c)
 	if req.CurrentUser.AuthyID == "" {
 		AbortIfError(c, common.ErrNoAuthyID)
 		return
 	}
-	ok, err := common.Context().AuthyClient.AwaitOneTouch(
-		req.CurrentUser.Email, req.CurrentUser.AuthyID)
+	approved, err := userSendAuthyOneTouch(req)
 	if AbortIfError(c, err) {
 		return
 	}
-	if ok {
-		// User approved login request
-		req.CurrentUser.AwaitingSecondFactor = false
-		req.CurrentUser.EncryptedOTPSecret = ""
-		err := req.CurrentUser.Save()
-		if AbortIfError(c, err) {
-			return
-		}
+	if approved {
 		c.Redirect(http.StatusFound, "/dashboard")
-	} else {
-		// Message expired or login request was rejected by user
-		c.Redirect(http.StatusFound, "/users/sign_out")
+		return
 	}
+	c.Redirect(http.StatusFound, "/users/sign_out")
 }
 
 // UserTwoFactorResend resends the SMS two-factor auth code and then
@@ -109,6 +99,7 @@ func UserTwoFactorVerify(c *gin.Context) {
 	otp := c.PostForm("otp")
 	method := c.PostForm("two_factor_method")
 
+	var err error
 	tokenIsValid := false
 	req.TemplateData["twoFactorMethod"] = method
 
@@ -117,16 +108,10 @@ func UserTwoFactorVerify(c *gin.Context) {
 	if method == constants.TwoFactorSMS {
 		tokenIsValid = common.ComparePasswords(user.EncryptedOTPSecret, otp)
 	} else {
-		for _, encCode := range user.OTPBackupCodes {
-			if common.ComparePasswords(encCode, otp) {
-				user.OTPBackupCodes = slice.MinusStrings(user.OTPBackupCodes, []string{encCode})
-				err := user.Save()
-				if AbortIfError(c, err) {
-					return
-				}
-				tokenIsValid = true
-			}
-		}
+		tokenIsValid, err = userVerifyBackupCode(req, otp)
+	}
+	if AbortIfError(c, err) {
+		return
 	}
 	if !tokenIsValid {
 		// TODO: increment failed login attempt count
@@ -150,10 +135,6 @@ func UserTwoFactorVerify(c *gin.Context) {
 //
 // GET /users/2fa_setup
 func UserInit2FASetup(c *gin.Context) {
-	// Show form with user phone number and radios for preferred
-	// option: Text or Authy OneTouch.
-	//
-	// Use forms.TwoFactorSetupForm
 	req := NewRequest(c)
 	req.TemplateData["form"] = forms.NewTwoFactorSetupForm(req.CurrentUser)
 	c.HTML(http.StatusOK, "users/init_2fa_setup.html", req.TemplateData)
@@ -166,113 +147,61 @@ func UserInit2FASetup(c *gin.Context) {
 //
 // POST /users/2fa_setup
 func UserComplete2FASetup(c *gin.Context) {
-	// Save user phone number, if changed.
-	// Set EnabledTwoFactor to true.
-	// If user chose Authy:
-	//    set AuthyStatus to constants.TwoFactorAuthy
-	//    If user has not registered for Authy:
-	//        register user for Authy
-	//    Else
-	//        Send authy one touch and wait for confirmation
-	// Else
-	//    set AuthyStatus to constants.TwoFactorSMS
-	//    send SMS code and redirect to UserConfirmPhone
-
-	// -----------------------------------------------------------------
-	//
-	// TODO: Break this up and refactor sections that are reused!
-	//
-	// -----------------------------------------------------------------
-
 	req := NewRequest(c)
 	user := req.CurrentUser
-
-	oldPhone := user.PhoneNumber
-	oldMethod := user.AuthyStatus
-	// Bind submitted form values in case we have to
-	// re-display the form with an error message.
-	c.ShouldBind(user)
-
-	// Make sure the phone number is valid.
-	// If not, send user back to the form.
-	valError := user.Validate()
-	if valError != nil && len(valError.Errors) > 0 {
-		common.Context().Log.Error().Msgf("User validation error while completing two-factor setup: %s", valError.Error())
-		req.TemplateData["form"] = forms.NewTwoFactorSetupForm(user)
-		c.HTML(http.StatusBadRequest, "users/init_2fa_setup.html", req.TemplateData)
+	prefs, err := NewTwoFactorPreferences(req)
+	if err != nil {
+		// errors.Is doesn't work here (???)
+		if _, ok := err.(*common.ValidationError); ok {
+			req.TemplateData["form"] = forms.NewTwoFactorSetupForm(user)
+			c.HTML(http.StatusBadRequest, "users/init_2fa_setup.html", req.TemplateData)
+		} else {
+			AbortIfError(c, err)
+		}
 		return
 	}
 
-	phoneChanged := !(user.PhoneNumber == oldPhone)
-	methodChanged := !(user.AuthyStatus == oldMethod)
-	needsConfirmation := phoneChanged || methodChanged
-
-	if !phoneChanged && !methodChanged {
-		// Do nothing. Just redirect to My Account with flash
-		// message saying nothing changed.
+	if prefs.NothingChanged() {
 		helpers.SetFlashCookie(c, "Your two-factor preferences remain unchanged.")
 		c.Redirect(http.StatusFound, "/users/my_account")
 		return
 	}
 
-	if phoneChanged {
+	if prefs.PhoneChanged() {
 		user.ConfirmedTwoFactor = false
 	}
 
-	if user.AuthyStatus == constants.TwoFactorNone {
-		// Turn off two-factor, but only clear out ConfirmedTwoFactor
-		// if the user changed their phone number.
+	if prefs.DoNotUseTwoFactor() {
 		user.EnabledTwoFactor = false
-		user.ConfirmedTwoFactor = !phoneChanged
 		helpers.SetFlashCookie(c, "Two-factor authentication has been turned off for your account.")
 		c.HTML(http.StatusFound, "/users/my_account", req.TemplateData)
 		return
 	}
 
-	err := user.Save()
+	err = user.Save()
 	if AbortIfError(c, err) {
 		return
 	}
 
-	if needsConfirmation && user.AuthyStatus == constants.TwoFactorAuthy {
-		// Register the user with Authy, if necessary
-		if user.AuthyID == "" {
-			err = UserAuthyRegister(req)
-			if AbortIfError(c, err) {
-				return
-			}
-		}
-		// Confirm the user with Authy, if necessary
-		if !user.ConfirmedTwoFactor {
-			ok, err := common.Context().AuthyClient.AwaitOneTouch(
-				req.CurrentUser.Email, req.CurrentUser.AuthyID)
-			if AbortIfError(c, err) {
-				return
-			}
-			if ok {
-				user.ConfirmedTwoFactor = true
-				err = user.Save()
-				if AbortIfError(c, err) {
-					return
-				}
-			}
-		}
-		if user.AuthyID != "" && user.ConfirmedTwoFactor {
-			helpers.SetFlashCookie(c, "Your two-factor setup is complete. Next time you log in, you'll receive a push notification from Authy to complete the sign-in process.")
-			c.Redirect(http.StatusFound, "/users/my_account")
-		} else {
-			// This should not be possible.
-		}
-	} else if needsConfirmation && user.AuthyStatus == constants.TwoFactorSMS {
-		// Send SMS code and redirect to UserConfirmPhone
-		token, err := req.CurrentUser.CreateOTPToken()
+	if prefs.UseAuthy() {
+		ok, err := userCompleteAuthySetup(req, prefs)
 		if AbortIfError(c, err) {
 			return
 		}
-		// For dev work. You'll need this token to log in.
-		fmt.Println("OTP token:", token)
-		message := fmt.Sprintf("Your Registry one time password is %s", token)
-		err = common.Context().SNSClient.SendSMS(req.CurrentUser.PhoneNumber, message)
+		if ok {
+			helpers.SetFlashCookie(c, "Your two-factor setup is complete. Next time you log in, you'll receive a push notification from Authy to complete the sign-in process.")
+			c.Redirect(http.StatusFound, "/users/my_account")
+			return
+		} else {
+			// User did not approve
+			c.Redirect(http.StatusFound, "/users/sign_out")
+			return
+		}
+	}
+
+	if prefs.NeedsSMSConfirmation() {
+		// Send SMS code and redirect to UserConfirmPhone
+		err = userCompleteSMSSetup(req, prefs)
 		if AbortIfError(c, err) {
 			return
 		}
@@ -285,16 +214,6 @@ func UserComplete2FASetup(c *gin.Context) {
 //
 // POST /users/confirm_phone
 func UserConfirmPhone(c *gin.Context) {
-	// If OTP is correct:
-	// Set 2fa enabled and confirmed when done
-	// If incorrect, show form. After three failures, lock for 5 min.
-
-	// -----------------------------------------------------------------
-	//
-	// TODO: Refactor duplicated token verification code
-	//
-	// -----------------------------------------------------------------
-
 	req := NewRequest(c)
 	otp := c.PostForm("otp")
 	user := req.CurrentUser
@@ -362,4 +281,85 @@ func UserGenerateBackupCodes(c *gin.Context) {
 	}
 	req.TemplateData["backupCodes"] = backupCodes
 	c.HTML(http.StatusOK, "users/backup_codes.html", req.TemplateData)
+}
+
+// Send an Authy OneTouch message to the user and await the
+// response. This returns a boolean indicating whether the
+// user approved the login.
+func userSendAuthyOneTouch(req *Request) (bool, error) {
+	ok, err := common.Context().AuthyClient.AwaitOneTouch(
+		req.CurrentUser.Email, req.CurrentUser.AuthyID)
+	if err != nil {
+		return false, err
+	}
+	if ok {
+		// User approved login request
+		req.CurrentUser.AwaitingSecondFactor = false
+		req.CurrentUser.EncryptedOTPSecret = ""
+		err := req.CurrentUser.Save()
+		if err != nil {
+			return false, err
+		}
+	}
+	return ok, err
+}
+
+// Send an Authy push message to the user so they can confirm
+// that Authy works.
+func userConfirmAuthy(req *Request) (bool, error) {
+	approved, err := userSendAuthyOneTouch(req)
+	if approved {
+		req.CurrentUser.ConfirmedTwoFactor = true
+		err = req.CurrentUser.Save()
+	}
+	if err == nil && approved == false {
+		common.Context().Log.Warn().Msgf("User %s rejected Authy confirmation", req.CurrentUser.Email)
+	}
+	return approved, err
+}
+
+// This compares the user-supplied one-time password against all of the
+// user's backup codes. If one matches, we delete that backup code and
+// return true.
+func userVerifyBackupCode(req *Request, otp string) (bool, error) {
+	var err error
+	tokenIsValid := false
+	user := req.CurrentUser
+	for _, encCode := range user.OTPBackupCodes {
+		if common.ComparePasswords(encCode, otp) {
+			user.OTPBackupCodes = slice.MinusStrings(user.OTPBackupCodes, []string{encCode})
+			err = user.Save()
+			tokenIsValid = true
+			break
+		}
+	}
+	return tokenIsValid, err
+}
+
+func userCompleteAuthySetup(req *Request, prefs *TwoFactorPreferences) (ok bool, err error) {
+	if prefs.NeedsAuthyRegistration() {
+		err = UserAuthyRegister(req)
+		if err != nil {
+			return false, err
+		}
+	}
+	if prefs.NeedsAuthyConfirmation() {
+		ok, err = userConfirmAuthy(req)
+		if err != nil {
+			return false, err
+		}
+	}
+	return ok, err
+}
+
+func userCompleteSMSSetup(req *Request, prefs *TwoFactorPreferences) error {
+	// Send SMS code and redirect to UserConfirmPhone
+	token, err := req.CurrentUser.CreateOTPToken()
+	if err != nil {
+		return err
+	}
+	// For dev work. You'll need this token to log in.
+	fmt.Println("OTP token:", token)
+	message := fmt.Sprintf("Your Registry one time password is %s", token)
+	return common.Context().SNSClient.SendSMS(req.CurrentUser.PhoneNumber, message)
 }
