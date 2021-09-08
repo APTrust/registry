@@ -14,7 +14,8 @@
 - [x] Generate Backup Codes
 - [x] Verify/Reject Backup Code
 - [x] Restrict access of users awaiting second factor
-- [ ] Allow resend of SMS messages and Authy OneTouch
+- [x] Allow resend of SMS messages
+- [ ] Set and check expiration time for SMS OTP
 
 ## Login Workflows
 
