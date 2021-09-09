@@ -214,7 +214,7 @@ func UserComplete2FASetup(c *gin.Context) {
 
 	if prefs.NeedsSMSConfirmation() {
 		// Send SMS code and redirect to UserConfirmPhone
-		err = userCompleteSMSSetup(req, prefs)
+		err = UserCompleteSMSSetup(req)
 		if AbortIfError(c, err) {
 			return
 		}
@@ -233,7 +233,7 @@ func UserConfirmPhone(c *gin.Context) {
 	if common.ComparePasswords(user.EncryptedOTPSecret, otp) {
 		user.EnabledTwoFactor = true
 		user.ConfirmedTwoFactor = true
-		err := user.Save()
+		err := user.ClearOTPSecret()
 		if AbortIfError(c, err) {
 			return
 		}
@@ -368,7 +368,7 @@ func userCompleteAuthySetup(req *Request, prefs *TwoFactorPreferences) (ok bool,
 	return ok, err
 }
 
-func userCompleteSMSSetup(req *Request, prefs *TwoFactorPreferences) error {
+func UserCompleteSMSSetup(req *Request) error {
 	// Send SMS code and redirect to UserConfirmPhone
 	user := req.CurrentUser
 	token, err := user.CreateOTPToken()

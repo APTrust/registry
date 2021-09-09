@@ -15,7 +15,8 @@
 - [x] Verify/Reject Backup Code
 - [x] Restrict access of users awaiting second factor
 - [x] Allow resend of SMS messages
-- [ ] Set and check expiration time for SMS OTP
+- [x] Set and check expiration time for SMS OTP
+- [ ] Basic tests
 
 ## Login Workflows
 
