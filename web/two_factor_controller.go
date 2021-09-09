@@ -3,6 +3,7 @@ package web
 import (
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
@@ -102,6 +103,11 @@ func UserTwoFactorVerify(c *gin.Context) {
 	user := req.CurrentUser
 
 	if method == constants.TwoFactorSMS {
+		if OTPTokenIsExpired(user.EncryptedOTPSentAt) {
+			helpers.SetFlashCookie(c, "Your one-time password expired. Please sign in again.")
+			c.Redirect(http.StatusFound, "/users/sign_out")
+			return
+		}
 		tokenIsValid = common.ComparePasswords(user.EncryptedOTPSecret, otp)
 	} else {
 		tokenIsValid, err = userVerifyBackupCode(req, otp)
@@ -365,4 +371,9 @@ func userCompleteSMSSetup(req *Request, prefs *TwoFactorPreferences) error {
 	fmt.Println("OTP token:", token)
 	message := fmt.Sprintf("Your Registry one time password is %s", token)
 	return common.Context().SNSClient.SendSMS(req.CurrentUser.PhoneNumber, message)
+}
+
+func OTPTokenIsExpired(tokenSentAt time.Time) bool {
+	expiration := tokenSentAt.Add(common.Context().Config.TwoFactor.OTPExpiration)
+	return time.Now().After(expiration)
 }

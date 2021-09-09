@@ -137,15 +137,16 @@ func UserSignIn(c *gin.Context) {
 // UserSignOut signs the user out.
 // GET /users/sign_out
 func UserSignOut(c *gin.Context) {
-	user := helpers.CurrentUser(c)
-	if user != nil {
-		user.SignOut()
+	req := NewRequest(c)
+	if req.CurrentUser != nil {
+		req.CurrentUser.SignOut()
 	}
 	helpers.DeleteSessionCookie(c)
 	helpers.DeleteCSRFCookie(c)
 	c.HTML(http.StatusOK, "users/sign_in.html", gin.H{
 		"cover":             helpers.GetCover(),
 		"preFillTestLogins": common.Context().Config.EnvName == "test",
+		"error":             req.TemplateData["flash"],
 	})
 }
 

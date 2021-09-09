@@ -7,6 +7,7 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/gorilla/securecookie"
@@ -52,10 +53,11 @@ type LoggingConfig struct {
 }
 
 type TwoFactorConfig struct {
-	AuthyEnabled bool
-	AuthyAPIKey  string `json:"-"`
-	AWSRegion    string
-	SMSEnabled   bool
+	AuthyEnabled  bool
+	AuthyAPIKey   string `json:"-"`
+	AWSRegion     string
+	SMSEnabled    bool
+	OTPExpiration time.Duration
 }
 
 type Config struct {
@@ -149,10 +151,11 @@ func loadConfig() *Config {
 		},
 		NsqUrl: nsqUrl,
 		TwoFactor: &TwoFactorConfig{
-			AuthyAPIKey:  v.GetString("AUTHY_API_KEY"),
-			AuthyEnabled: v.GetBool("ENABLE_TWO_FACTOR_AUTHY"),
-			AWSRegion:    v.GetString("AWS_REGION"),
-			SMSEnabled:   v.GetBool("ENABLE_TWO_FACTOR_SMS"),
+			AuthyAPIKey:   v.GetString("AUTHY_API_KEY"),
+			AuthyEnabled:  v.GetBool("ENABLE_TWO_FACTOR_AUTHY"),
+			AWSRegion:     v.GetString("AWS_REGION"),
+			SMSEnabled:    v.GetBool("ENABLE_TWO_FACTOR_SMS"),
+			OTPExpiration: v.GetDuration("OTP_EXPIRATION"),
 		},
 	}
 }
