@@ -460,6 +460,7 @@ CREATE TABLE public.users (
 	encrypted_otp_secret varchar NULL,
 	encrypted_otp_secret_iv varchar NULL,
 	encrypted_otp_secret_salt varchar NULL,
+    encrypted_otp_sent_at timestamp NULL,
 	consumed_timestep int4 NULL,
 	otp_required_for_login bool NULL,
 	deactivated_at timestamp NULL,

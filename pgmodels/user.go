@@ -115,6 +115,12 @@ type User struct {
 	// EncryptedOTPSecretSalt is a legacy field from Devise. Not used.
 	EncryptedOTPSecretSalt string `json:"-" form:"-" pg:"encrypted_otp_secret_salt"`
 
+	// EncryptedOTPSentAt describes when we sent a one-time password
+	// via text/SMS. We track this because these passwords should be
+	// valid only for a limited time. This field be empty except when
+	// we're waiting for a user to enter a text/SMS OTP.
+	EncryptedOTPSentAt time.Time `json:"-" form:"-" pg:"encrypted_otp_sent_at"`
+
 	// ConsumedTimestep is a legacy field from Devise, which used it
 	// for time-based one-time passwords. Not used.
 	// TODO: Delete this.

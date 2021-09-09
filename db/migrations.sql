@@ -57,11 +57,20 @@ begin
 end
 $$;
 
--- Add
+-- Add awaiting_second_factor
 do $$
 begin
   if not exists (select 1 from information_schema.columns where table_schema='public' AND table_name='users' AND column_name='awaiting_second_factor') then
  	alter table users add column "awaiting_second_factor" boolean not null default false;
+  end if;
+end
+$$;
+
+-- Add encrypted_otp_sent_at
+do $$
+begin
+  if not exists (select 1 from information_schema.columns where table_schema='public' AND table_name='users' AND column_name='encrypted_otp_sent_at') then
+ 	alter table users add column "encrypted_otp_sent_at" timestamp null;
   end if;
 end
 $$;
