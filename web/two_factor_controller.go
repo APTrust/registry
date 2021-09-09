@@ -50,8 +50,15 @@ func UserTwoFactorGenerateSMS(c *gin.Context) {
 	// For dev work. You'll need this token to log in.
 	fmt.Println("OTP token:", token)
 
+	user := req.CurrentUser
+
 	message := fmt.Sprintf("Your Registry one time password is %s", token)
-	err = common.Context().SNSClient.SendSMS(req.CurrentUser.PhoneNumber, message)
+	err = common.Context().SNSClient.SendSMS(user.PhoneNumber, message)
+	if AbortIfError(c, err) {
+		return
+	}
+	user.EncryptedOTPSentAt = time.Now().UTC()
+	err = user.Save()
 	if AbortIfError(c, err) {
 		return
 	}
@@ -363,14 +370,20 @@ func userCompleteAuthySetup(req *Request, prefs *TwoFactorPreferences) (ok bool,
 
 func userCompleteSMSSetup(req *Request, prefs *TwoFactorPreferences) error {
 	// Send SMS code and redirect to UserConfirmPhone
-	token, err := req.CurrentUser.CreateOTPToken()
+	user := req.CurrentUser
+	token, err := user.CreateOTPToken()
 	if err != nil {
 		return err
 	}
 	// For dev work. You'll need this token to log in.
 	fmt.Println("OTP token:", token)
 	message := fmt.Sprintf("Your Registry one time password is %s", token)
-	return common.Context().SNSClient.SendSMS(req.CurrentUser.PhoneNumber, message)
+	err = common.Context().SNSClient.SendSMS(user.PhoneNumber, message)
+	if err != nil {
+		return err
+	}
+	user.EncryptedOTPSentAt = time.Now().UTC()
+	return user.Save()
 }
 
 func OTPTokenIsExpired(tokenSentAt time.Time) bool {

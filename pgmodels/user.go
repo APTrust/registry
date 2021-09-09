@@ -280,7 +280,7 @@ func (user *User) SignOut() error {
 	}
 	user.CurrentSignInIP = ""
 	user.CurrentSignInAt = time.Time{}
-	return user.Save()
+	return user.ClearOTPSecret()
 }
 
 func (user *User) Save() error {
@@ -464,6 +464,7 @@ func (user *User) CreateOTPToken() (string, error) {
 // ClearOTPSecret deletes the user's EncryptedOTPSecret.
 func (user *User) ClearOTPSecret() error {
 	user.EncryptedOTPSecret = ""
+	user.EncryptedOTPSentAt = time.Time{}
 	return user.Save()
 }
 
