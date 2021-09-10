@@ -23,7 +23,10 @@ func TestOTPTokenIsExpired(t *testing.T) {
 }
 
 func TestUserCompleteSMSSetup(t *testing.T) {
-	defer func() { inst1User.ClearOTPSecret() }()
+	defer func() {
+		inst1User.AwaitingSecondFactor = false
+		inst1User.ClearOTPSecret()
+	}()
 
 	req := &web.Request{
 		CurrentUser: inst1User,
@@ -152,11 +155,29 @@ func TestUserTwoFactorVerify(t *testing.T) {
 }
 
 func TestUserTwoInit2FASetup(t *testing.T) {
-
+	initHTTPTests(t)
+	expected := []string{
+		`name="PhoneNumber"`,
+		`name="AuthyStatus"`,
+		"confirmChange()",
+	}
+	html := instUserClient.GET("/users/2fa_setup").
+		Expect().Status(http.StatusOK).Body().Raw()
+	AssertMatchesAll(t, html, expected)
 }
 
 func TestUserTwoComplete2FASetup(t *testing.T) {
-
+	// There are many success/failure paths here to test.
+	// Each leaves the user in an altered state, so best
+	// to use a throwaway user, or ensure we can revert user
+	// to known state expected by other tests.
+	//
+	// - Changing to Authy (can't test fully unless we mock Authy)
+	// - Changing to SMS   (partially tested above in TestCompleteSMSSetup)
+	// - Changing to None
+	//
+	// These have been manually tested. Need time to write the
+	// automated tests.
 }
 
 func TestUserConfirmPhone(t *testing.T) {
