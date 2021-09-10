@@ -41,10 +41,67 @@ func TestUserCompleteSMSSetup(t *testing.T) {
 
 func TestUserTwoFactorChoose(t *testing.T) {
 	// Sign in as two-factor user and make sure we get the choice page.
+	wasEnabled := smsUser.EnabledTwoFactor
+	wasConfirmed := smsUser.ConfirmedTwoFactor
+	oldMethod := smsUser.AuthyStatus
+	defer func() {
+		smsUser.EnabledTwoFactor = wasEnabled
+		smsUser.ConfirmedTwoFactor = wasConfirmed
+		smsUser.AuthyStatus = oldMethod
+		smsUser.Save()
+	}()
+
+	smsUser.EnabledTwoFactor = true
+	smsUser.ConfirmedTwoFactor = true
+	smsUser.AuthyStatus = constants.TwoFactorSMS
+	require.Nil(t, smsUser.Save())
+
+	signInForm := map[string]string{
+		"email":    smsUser.Email,
+		"password": "password",
+	}
+
+	client := getAnonymousClient(t)
+	resp := client.POST("/users/sign_in").WithForm(signInForm).Expect()
+	assert.Equal(t, http.StatusOK, resp.Raw().StatusCode)
+
+	itemsOnChoosePage := []string{
+		"csrf_token",
+		"submitSecondFactor('authy')",
+		"submitSecondFactor('sms')",
+		"submitSecondFactor('backup')",
+	}
+
+	html := resp.Body().Raw()
+	AssertMatchesAll(t, html, itemsOnChoosePage)
+
+	// A user without 2FA turned on should see the dashboard,
+	// not the 2fa_choose page. Not sure how to test the url
+	// to which we're redirected using httpexpect.  ??
+	signInForm["email"] = inst1User.Email
+	client = getAnonymousClient(t)
+	resp = client.POST("/users/sign_in").WithForm(signInForm).Expect()
+	assert.Equal(t, http.StatusOK, resp.Raw().StatusCode)
+
+	itemsOnDashboard := []string{
+		"Recent Work Items",
+		"Notifications",
+	}
+	html = resp.Body().Raw()
+	AssertMatchesAll(t, html, itemsOnDashboard)
 }
 
 func TestUserTwoFactorBackup(t *testing.T) {
+	initHTTPTests(t)
 
+	expected := []string{
+		"two_factor_method",
+		"Backup Code",
+	}
+
+	html := instUserClient.GET("/users/2fa_backup").
+		Expect().Status(http.StatusOK).Body().Raw()
+	AssertMatchesAll(t, html, expected)
 }
 
 func TestUserTwoFactorGenerateSMS(t *testing.T) {
