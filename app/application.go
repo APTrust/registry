@@ -218,7 +218,6 @@ func initRoutes(router *gin.Engine) {
 		webRoutes.GET("/users/2fa_choose", web.UserTwoFactorChoose)
 		webRoutes.POST("/users/2fa_sms", web.UserTwoFactorGenerateSMS)
 		webRoutes.POST("/users/2fa_push", web.UserTwoFactorPush)
-		webRoutes.POST("/users/2fa_resend", web.UserTwoFactorResend)
 		webRoutes.POST("/users/2fa_verify", web.UserTwoFactorVerify)
 
 		// User Sign In

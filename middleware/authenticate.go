@@ -119,7 +119,6 @@ func forceCompletionOfTwoFactorAuth(c *gin.Context, currentUser *pgmodels.User) 
 	return currentUser.AwaitingSecondFactor &&
 		!strings.HasPrefix(p, "/users/2fa_backup") &&
 		!strings.HasPrefix(p, "/users/2fa_choose") &&
-		!strings.HasPrefix(p, "/users/2fa_resend") &&
 		!strings.HasPrefix(p, "/users/2fa_sms") &&
 		!strings.HasPrefix(p, "/users/2fa_verify")
 }

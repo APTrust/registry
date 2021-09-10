@@ -84,16 +84,6 @@ func UserTwoFactorPush(c *gin.Context) {
 	c.Redirect(http.StatusFound, "/users/sign_out")
 }
 
-// UserTwoFactorResend resends the SMS two-factor auth code and then
-// re-displays TwoFactorEnter. This is a post, because we don't want
-// hackers spamming us with GETs. The post form includes a CSRF token.
-//
-// POST /users/2fa_resend/
-func UserTwoFactorResend(c *gin.Context) {
-	// This may re-send a push or SMS message.
-	// Need to track which option user selected.
-}
-
 // UserTwoFactorVerify verifies the SMS or backup code that the user
 // entered on TwoFactorEnter.
 //
