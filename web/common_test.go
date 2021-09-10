@@ -24,16 +24,19 @@ var fixturesReloaded = false
 var sysAdminClient *httpexpect.Expect
 var instAdminClient *httpexpect.Expect
 var instUserClient *httpexpect.Expect
+var smsUserClient *httpexpect.Expect
 var allClients []*httpexpect.Expect
 
 var sysAdmin *pgmodels.User
 var inst1Admin *pgmodels.User
 var inst1User *pgmodels.User
 var inst2Admin *pgmodels.User
+var smsUser *pgmodels.User
 
 var sysAdminToken string
 var instAdminToken string
 var instUserToken string
+var smsUserToken string
 
 var allInstNames []string
 var allUserNames []string
@@ -55,6 +58,7 @@ func initHTTPTests(t *testing.T) {
 		sysAdminClient, sysAdminToken = initClient(t, "system@aptrust.org")
 		instAdminClient, instAdminToken = initClient(t, "admin@inst1.edu")
 		instUserClient, instUserToken = initClient(t, "user@inst1.edu")
+		smsUserClient, smsUserToken = initClient(t, "sms_user@example.com")
 		allClients = []*httpexpect.Expect{
 			sysAdminClient,
 			instAdminClient,
@@ -65,16 +69,19 @@ func initHTTPTests(t *testing.T) {
 		inst1Admin = initUser(t, "admin@inst1.edu")
 		inst1User = initUser(t, "user@inst1.edu")
 		inst2Admin = initUser(t, "admin@inst2.edu")
+		smsUser = initUser(t, "sms_user@example.com")
 
 		userFor = make(map[*httpexpect.Expect]*pgmodels.User)
 		userFor[sysAdminClient] = sysAdmin
 		userFor[instAdminClient] = inst1Admin
 		userFor[instUserClient] = inst1User
+		userFor[smsUserClient] = smsUser
 
 		tokenFor = make(map[*httpexpect.Expect]string)
 		tokenFor[sysAdminClient] = sysAdminToken
 		tokenFor[instAdminClient] = instAdminToken
 		tokenFor[instUserClient] = instUserToken
+		tokenFor[smsUserClient] = smsUserToken
 	}
 }
 

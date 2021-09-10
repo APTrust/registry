@@ -81,7 +81,7 @@ func TestUserIndex(t *testing.T) {
 	AssertMatchesAll(t, html, instUserLinks)
 	AssertMatchesAll(t, html, nonInst1Links)
 	AssertMatchesAll(t, html, adminFilters)
-	AssertMatchesResultCount(t, html, 5)
+	AssertMatchesResultCount(t, html, 6)
 
 	html = instAdminClient.GET("/users").Expect().
 		Status(http.StatusOK).Body().Raw()
@@ -89,7 +89,7 @@ func TestUserIndex(t *testing.T) {
 	AssertMatchesAll(t, html, instUserLinks)
 	AssertMatchesNone(t, html, nonInst1Links)
 	AssertMatchesNone(t, html, adminFilters)
-	AssertMatchesResultCount(t, html, 3)
+	AssertMatchesResultCount(t, html, 4)
 
 	// Regular user cannot view the user list page
 	instUserClient.GET("/users").Expect().Status(http.StatusForbidden)
