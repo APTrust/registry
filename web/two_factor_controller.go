@@ -232,7 +232,7 @@ func UserConfirmPhone(c *gin.Context) {
 	} else {
 		// Try again
 		helpers.SetFlashCookie(c, "Oops! That wasn't the right code. Try again.")
-		c.HTML(http.StatusOK, "users/confirm_phone.html", req.TemplateData)
+		c.HTML(http.StatusBadRequest, "users/confirm_phone.html", req.TemplateData)
 	}
 }
 
