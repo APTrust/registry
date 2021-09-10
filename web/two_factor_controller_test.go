@@ -105,15 +105,100 @@ func TestUserTwoFactorBackup(t *testing.T) {
 }
 
 func TestUserTwoFactorGenerateSMS(t *testing.T) {
+	initHTTPTests(t)
+	oldToken := inst1User.EncryptedOTPSecret
+	oldTimestamp := inst1User.EncryptedOTPSentAt
+	defer func() {
+		inst1User.AwaitingSecondFactor = false
+		inst1User.ClearOTPSecret()
+	}()
 
+	html := instUserClient.POST("/users/2fa_sms").
+		WithHeader("Referer", baseURL).
+		WithFormField(constants.CSRFTokenName, instUserToken).
+		Expect().Status(http.StatusOK).Body().Raw()
+
+	expectedStrings := []string{
+		`type="hidden" name="two_factor_method" value="sms"`,
+		"SMS Code",
+		"csrf_token",
+	}
+	AssertMatchesAll(t, html, expectedStrings)
+
+	reloadedUser, err := pgmodels.UserByEmail(inst1User.Email)
+	require.Nil(t, err)
+	assert.NotEqual(t, oldToken, reloadedUser.EncryptedOTPSecret)
+	assert.NotEqual(t, oldTimestamp, reloadedUser.EncryptedOTPSentAt)
 }
 
 func TestUserTwoFactorPush(t *testing.T) {
-
+	// We can't test this without an Authy API key
+	// and Authy user id AND a user with a phone to
+	// respond to the push.
 }
 
 func TestUserTwoFactorVerify(t *testing.T) {
+	// Note that we test the verification of backup codes
+	// in TestUserBackupCodes below. So here, we're just
+	// testing SMS code verification.
+	initHTTPTests(t)
+	defer func() {
+		inst1User.AwaitingSecondFactor = false
+		inst1User.ClearOTPSecret()
+	}()
+	otp, err := inst1User.CreateOTPToken()
+	require.Nil(t, err)
 
+	// Normally, the controller sets this after it knows
+	// the OTP was sent successfully. For testing, we have
+	// to set it manually.
+	inst1User.EncryptedOTPSentAt = time.Now()
+	require.Nil(t, inst1User.Save())
+
+	// Bad token should be rejected. This user will be signed out,
+	// so don't use one of our reusable clients.
+	client, csrfToken := initClient(t, "user@inst1.edu")
+	html := client.POST("/users/2fa_verify").
+		WithHeader("Referer", baseURL).
+		WithFormField(constants.CSRFTokenName, csrfToken).
+		WithFormField("otp", "this token is not valid").
+		WithFormField("two_factor_method", constants.TwoFactorSMS).
+		Expect().Status(http.StatusBadRequest).Body().Raw()
+	expectedErrMsg := []string{
+		"One-time password is incorrect",
+	}
+	AssertMatchesAll(t, html, expectedErrMsg)
+
+	// Try again with a good token.
+	otp, err = inst1User.CreateOTPToken()
+	require.Nil(t, err)
+	inst1User.EncryptedOTPSentAt = time.Now()
+	require.Nil(t, inst1User.Save())
+
+	// We need to log this user back in...
+	// Good token should be accepted.
+	client, csrfToken = initClient(t, "user@inst1.edu")
+	html = client.POST("/users/2fa_verify").
+		WithHeader("Referer", baseURL).
+		WithFormField(constants.CSRFTokenName, csrfToken).
+		WithFormField("otp", otp).
+		WithFormField("two_factor_method", constants.TwoFactorSMS).
+		Expect().Status(http.StatusOK).Body().Raw()
+
+	// Valid code should redirect to dashboard
+	itemsOnDashboard := []string{
+		"Recent Work Items",
+		"Notifications",
+	}
+	AssertMatchesAll(t, html, itemsOnDashboard)
+
+	// These fields should be cleared after successful
+	// two-factor auth.
+	reloadedUser, err := pgmodels.UserByEmail(inst1User.Email)
+	require.Nil(t, err)
+	assert.Empty(t, reloadedUser.EncryptedOTPSecret)
+	assert.Empty(t, reloadedUser.EncryptedOTPSentAt)
+	assert.False(t, reloadedUser.AwaitingSecondFactor)
 }
 
 func TestUserTwoInit2FASetup(t *testing.T) {
@@ -129,10 +214,13 @@ func TestUserConfirmPhone(t *testing.T) {
 }
 
 func TestUserAuthyRegister(t *testing.T) {
-
+	// We can't test this without an Authy API key
+	// and Authy user id AND a user with a phone to
+	// respond to the push.
 }
 
-func TestUserGenerateBackupCodes(t *testing.T) {
+// This tests both backup code generation and verification.
+func TestUserBackupCodes(t *testing.T) {
 	initHTTPTests(t)
 	inst1User.OTPBackupCodes = []string{}
 	require.Nil(t, inst1User.Save())

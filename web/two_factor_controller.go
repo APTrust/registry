@@ -121,11 +121,10 @@ func UserTwoFactorVerify(c *gin.Context) {
 			msg = "One-time password is incorrect. Try again."
 		}
 		req.TemplateData["flash"] = msg
-		c.HTML(http.StatusOK, "users/enter_auth_token.html", req.TemplateData)
+		c.HTML(http.StatusBadRequest, "users/enter_auth_token.html", req.TemplateData)
 	} else {
 		user.AwaitingSecondFactor = false
-		user.EncryptedOTPSecret = ""
-		err := user.Save()
+		err := user.ClearOTPSecret()
 		if AbortIfError(c, err) {
 			return
 		}
