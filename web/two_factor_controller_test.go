@@ -2,6 +2,7 @@ package web_test
 
 import (
 	"net/http"
+	"regexp"
 	"testing"
 	"time"
 
@@ -83,12 +84,41 @@ func TestUserGenerateBackupCodes(t *testing.T) {
 	require.Nil(t, err)
 	assert.Empty(t, reloadedUser.OTPBackupCodes)
 
-	instUserClient.POST("/users/backup_codes").
+	// Generate backup codes
+	html := instUserClient.POST("/users/backup_codes").
 		WithHeader("Referer", baseURL).
 		WithFormField(constants.CSRFTokenName, instUserToken).
-		Expect().Status(http.StatusOK)
+		Expect().Status(http.StatusOK).Body().Raw()
 
+	backupCodes := extractBackupCodes(t, html)
+
+	// Make sure they were generated
 	reloadedUser, err = pgmodels.UserByEmail(inst1User.Email)
 	require.Nil(t, err)
 	assert.Equal(t, 6, len(reloadedUser.OTPBackupCodes))
+
+	// Make sure backup code can be verified
+	instUserClient.POST("/users/2fa_verify").
+		WithHeader("Referer", baseURL).
+		WithFormField(constants.CSRFTokenName, instUserToken).
+		WithFormField("two_factor_method", "Backup Code").
+		WithFormField("otp", backupCodes[0]).
+		Expect().Status(http.StatusOK)
+
+	// Backup code should be deleted after use
+	reloadedUser, err = pgmodels.UserByEmail(inst1User.Email)
+	require.Nil(t, err)
+	assert.Equal(t, 5, len(reloadedUser.OTPBackupCodes))
+}
+
+func extractBackupCodes(t *testing.T, html string) []string {
+	re := regexp.MustCompile(`<span class="backup-code">(\w+)</span>`)
+	m := re.FindAllStringSubmatch(html, -1)
+	require.True(t, len(m) > 0)
+	require.True(t, len(m[0]) > 0)
+	codes := make([]string, 6)
+	for i, match := range m {
+		codes[i] = match[1]
+	}
+	return codes
 }
