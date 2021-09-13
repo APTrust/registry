@@ -14,7 +14,7 @@ import (
 // user. Note that the AlertView table contains multiple entries for each
 // Alert ID. But each alert goes only once to each recipient, so the
 // combination of AlertID + UserID (recipient) is unique.
-// GET /member-api/v3/alerts/show/:id
+// GET /member-api/v3/alerts/show/:id/:user_id
 func AlertShow(c *gin.Context) {
 	req := core.NewRequest(c)
 	alertView, err := alertLoad(req)

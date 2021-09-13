@@ -239,5 +239,10 @@ func initRoutes(router *gin.Engine) {
 		// Alerts
 		memberAPI.GET("/alerts", memberapi.AlertIndex)
 		memberAPI.GET("/alerts/show/:id/:user_id", memberapi.AlertShow)
+
+		// Deletions
+		memberAPI.GET("/deletions/show/:id", memberapi.DeletionRequestShow)
+		memberAPI.GET("/deletions/", memberapi.DeletionRequestIndex)
+
 	}
 }
