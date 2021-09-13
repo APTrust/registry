@@ -41,9 +41,9 @@ type GenericFile struct {
 
 	Institution        *Institution        `json:"-" pg:"rel:has-one"`
 	IntellectualObject *IntellectualObject `json:"-" pg:"rel:has-one"`
-	PremisEvents       []*PremisEvent      `json:"premis_events" pg:"rel:has-many"`
-	Checksums          []*Checksum         `json:"checksums" pg:"rel:has-many"`
-	StorageRecords     []*StorageRecord    `json:"storage_records" pg:"rel:has-many"`
+	PremisEvents       []*PremisEvent      `json:"premis_events,omitempty" pg:"rel:has-many"`
+	Checksums          []*Checksum         `json:"checksums,omitempty" pg:"rel:has-many"`
+	StorageRecords     []*StorageRecord    `json:"storage_records,omitempty" pg:"rel:has-many"`
 }
 
 // TODO: When selecting relations, order by UpdatedAt asc.

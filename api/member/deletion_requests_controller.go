@@ -27,7 +27,7 @@ func DeletionRequestShow(c *gin.Context) {
 	if core.AbortIfError(c, err) {
 		return
 	}
-	c.JSON(http.StatusOK, deletionRequest)
+	c.JSON(http.StatusOK, deletionRequest.ToMin())
 }
 
 // DeletionRequestIndex shows list of deletion requests.
