@@ -1,4 +1,4 @@
-package web_test
+package common_test
 
 import (
 	"net/http"
@@ -6,19 +6,19 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/APTrust/registry/web"
+	"github.com/APTrust/registry/common"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func getPager(t *testing.T) *web.Pager {
+func getPager(t *testing.T) *common.Pager {
 	var err error
 	var _url = "http://example.com/objects?page=4&per_page=10"
 	c, _ := gin.CreateTestContext(httptest.NewRecorder())
 	c.Request = &http.Request{}
 	c.Request.URL, err = url.Parse(_url)
-	pager, err := web.NewPager(c, _url, 10)
+	pager, err := common.NewPager(c, _url, 10)
 	require.Nil(t, err)
 	return pager
 }

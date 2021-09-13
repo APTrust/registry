@@ -5,6 +5,7 @@ import (
 	"io"
 	"strings"
 
+	"github.com/APTrust/registry/api/member"
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/helpers"
 	"github.com/APTrust/registry/middleware"
@@ -232,4 +233,11 @@ func initRoutes(router *gin.Engine) {
 
 	// Root goes to sign-in page
 	router.GET("/", web.UserSignInShow)
+
+	memberAPI := router.Group("/member-api/v3")
+	{
+		// Alerts
+		memberAPI.GET("/alerts", memberapi.AlertIndex)
+		memberAPI.GET("/alerts/show/:id/:user_id", memberapi.AlertShow)
+	}
 }

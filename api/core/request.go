@@ -1,4 +1,4 @@
-package web
+package core
 
 import (
 	"fmt"
@@ -6,8 +6,6 @@ import (
 	"strings"
 
 	"github.com/APTrust/registry/common"
-	"github.com/APTrust/registry/constants"
-	"github.com/APTrust/registry/forms"
 	"github.com/APTrust/registry/helpers"
 	"github.com/APTrust/registry/middleware"
 	"github.com/APTrust/registry/pgmodels"
@@ -19,32 +17,22 @@ type Request struct {
 	CurrentUser  *pgmodels.User
 	GinContext   *gin.Context
 	Auth         *middleware.ResourceAuthorization
-	TemplateData gin.H
 	Error        error
 }
 
 func NewRequest(c *gin.Context) *Request {
-	ctx := common.Context()
-	flash, _ := c.Get(ctx.Config.Cookies.FlashCookie)
 	currentUser := helpers.CurrentUser(c)
 	auth, _ := c.Get("ResourceAuthorization")
 	pathAndQuery := c.Request.URL.Path
 	if c.Request.URL.RawQuery != "" {
 		pathAndQuery = c.Request.URL.Path + "?" + c.Request.URL.RawQuery
 	}
-	csrfToken, _ := c.Get(constants.CSRFTokenName)
 	req := &Request{
 		PathAndQuery: pathAndQuery,
 		CurrentUser:  currentUser,
 		GinContext:   c,
 		Auth:         auth.(*middleware.ResourceAuthorization),
-		TemplateData: gin.H{
-			"CurrentUser":           currentUser,
-			"flash":                 flash,
-			constants.CSRFTokenName: csrfToken,
-		},
 	}
-	helpers.DeleteFlashCookie(c)
 	return req
 }
 
@@ -70,18 +58,18 @@ func (req *Request) BaseURL() string {
 	return fmt.Sprintf("%s://%s", scheme, host)
 }
 
-func (req *Request) LoadResourceList(items interface{}, orderBy string, ffConstructor forms.FilterFormConstructor) error {
+func (req *Request) LoadResourceList(items interface{}, orderBy string) (*common.Pager, error) {
 	// Ensure that items is a pointer to a slice of pointers, so we don't
 	// get a panic in call to Elem() below.
 	if items == nil || !strings.HasPrefix(reflect.TypeOf(items).String(), "*[]*pgmodels.") {
 		common.Context().Log.Error().Msgf("Request.LoadResourceList: Param items should be pointer to slice of pointers.")
-		return common.ErrInvalidParam
+		return nil, common.ErrInvalidParam
 	}
 
 	filterCollection := req.GetFilterCollection()
 	query, err := filterCollection.ToQuery()
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if !req.CurrentUser.IsAdmin() {
 		query.Where("institution_id", "=", req.CurrentUser.InstitutionID)
@@ -92,24 +80,17 @@ func (req *Request) LoadResourceList(items interface{}, orderBy string, ffConstr
 	query.OrderBy(orderBy)
 	pager, err := common.NewPager(req.GinContext, req.PathAndQuery, 20)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	query.Offset(pager.QueryOffset).Limit(pager.PerPage)
 	err = query.Select(items)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	count, err := query.Count(items)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	pager.SetCounts(count, reflect.ValueOf(items).Elem().Len())
-
-	form, err := ffConstructor(filterCollection, req.CurrentUser)
-
-	req.TemplateData["items"] = items
-	req.TemplateData["pager"] = pager
-	req.TemplateData["filterForm"] = form
-
-	return err
+	return pager, err
 }

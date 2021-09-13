@@ -177,7 +177,7 @@ func IntellectualObjectFiles(c *gin.Context) {
 // we definitely don't want that many results. Let the user page through.
 func loadFiles(req *Request, objID int64) error {
 	baseURL := req.GinContext.Request.URL.Path + "?" + req.GinContext.Request.URL.RawQuery
-	pager, err := NewPager(req.GinContext, baseURL, 20)
+	pager, err := common.NewPager(req.GinContext, baseURL, 20)
 	if err != nil {
 		return err
 	}
@@ -220,7 +220,7 @@ func loadFiles(req *Request, objID int64) error {
 // user page through from there.
 func loadEvents(req *Request, objID int64) error {
 	baseURL := fmt.Sprintf("/objects/events/%d", objID)
-	pager, err := NewPager(req.GinContext, baseURL, 5)
+	pager, err := common.NewPager(req.GinContext, baseURL, 5)
 	if err != nil {
 		return err
 	}
