@@ -13,6 +13,10 @@ var ErrNotSignedIn = errors.New("user is not signed in")
 // or password while trying to sign in.
 var ErrInvalidLogin = errors.New("invalid login or password")
 
+// ErrInvalidAPICredentials means the user supplied the wrong email
+// or API token while trying to access a REST API endpoint.
+var ErrInvalidAPICredentials = errors.New("invalid api credentials")
+
 // ErrAccountDeactivated means the user logged in to a deactivated
 // account.
 var ErrAccountDeactivated = errors.New("account deactivated")

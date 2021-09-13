@@ -32,6 +32,8 @@ const (
 	AlgSha1                    = "sha1"
 	AlgSha256                  = "sha256"
 	AlgSha512                  = "sha512"
+	APIUserHeader              = "X-Pharos-API-User"
+	APIKeyHeader               = "X-Pharos-API-Key"
 	BTRProfileIdentifier       = "https://github.com/dpscollaborative/btr_bagit_profile/releases/download/1.0/btr-bagit-profile.json"
 	CSRFCookieName             = "csrf_token"
 	CSRFHeaderName             = "X-CSRF-Token"

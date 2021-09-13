@@ -6,6 +6,8 @@ import (
 	"strings"
 
 	"github.com/APTrust/registry/common"
+	"github.com/APTrust/registry/constants"
+	"github.com/APTrust/registry/helpers"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/gin-gonic/gin"
 )
@@ -18,7 +20,7 @@ func Authenticate() gin.HandlerFunc {
 		var user *pgmodels.User
 		var err error
 		if !ExemptFromAuth(c) {
-			user, err = GetUserFromSession(c)
+			user, err = GetUser(c)
 			if err != nil {
 				c.HTML(http.StatusUnauthorized, "errors/show.html", gin.H{
 					"suppressSideNav": true,
@@ -49,6 +51,15 @@ func Authenticate() gin.HandlerFunc {
 	}
 }
 
+func GetUser(c *gin.Context) (user *pgmodels.User, err error) {
+	apiUserEmail := c.Request.Header.Get(constants.APIUserHeader)
+	apiUserKey := c.Request.Header.Get(constants.APIKeyHeader)
+	if apiUserEmail != "" && apiUserKey != "" {
+		return GetUserFromAPIHeaders(c)
+	}
+	return GetUserFromSession(c)
+}
+
 // GetUserFromSession returns the User for the current session.
 func GetUserFromSession(c *gin.Context) (user *pgmodels.User, err error) {
 	ctx := common.Context()
@@ -65,6 +76,23 @@ func GetUserFromSession(c *gin.Context) (user *pgmodels.User, err error) {
 		user, err = pgmodels.UserByID(userID)
 	}
 	return user, err
+}
+
+// GetUserFromAPIHeaders returns the current user based on the API
+// auth headers.
+func GetUserFromAPIHeaders(c *gin.Context) (user *pgmodels.User, err error) {
+	apiUserEmail := c.Request.Header.Get(constants.APIUserHeader)
+	apiUserKey := c.Request.Header.Get(constants.APIKeyHeader)
+	user, err = pgmodels.UserByEmail(apiUserEmail)
+	if err != nil {
+		return nil, err
+	}
+	if common.ComparePasswords(user.EncryptedAPISecretKey, apiUserKey) {
+		return user, nil
+	}
+	common.Context().Log.Warn().Msgf("Invalid API token from user %s at %s.", apiUserEmail, c.Request.RemoteAddr)
+	helpers.DeleteSessionCookie(c) // just to be extra safe
+	return nil, common.ErrInvalidAPICredentials
 }
 
 // LoadCookies loads the user's flash and preference cookes into
