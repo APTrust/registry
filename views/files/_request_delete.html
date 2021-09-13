@@ -37,6 +37,7 @@
 
   <form method="post" id="fileDeleteForm" action="/files/init_delete/{{ .file.ID }}">
     <input type="hidden" name="id" value="{{ .file.ID }}"/>
+    {{ template "forms/csrf_token.html" . }}
   </form>
 
 

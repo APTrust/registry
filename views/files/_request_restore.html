@@ -26,6 +26,7 @@
 
   <form method="post" id="fileRestoreForm" action="/files/init_restore/{{ .file.ID }}">
     <input type="hidden" name="id" value="{{ .file.ID }}"/>
+    {{ template "forms/csrf_token.html" . }}
   </form>
 
 
