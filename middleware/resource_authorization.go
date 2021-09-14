@@ -136,10 +136,10 @@ func (r *ResourceAuthorization) idFromIdentifier(identifier string) (int64, erro
 	switch r.ResourceType {
 	case "Institution":
 		return pgmodels.IdForInstIdentifier(identifier)
-		// case "IntellectualObject":
-		// 	return pgmodels.IdForObjIdentifier(identifier)
-		// case "GenericFile":
-		// 	return pgmodels.IdForFileIdentifier(identifier)
+	case "IntellectualObject":
+		return pgmodels.IdForObjIdentifier(identifier)
+	case "GenericFile":
+		return pgmodels.IdForFileIdentifier(identifier)
 		// case "PremisEvent":
 		// 	return pgmodels.IdForEventIdentifier(identifier)
 	}

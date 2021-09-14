@@ -142,6 +142,7 @@ func TestInstitutionDeleteUndelete(t *testing.T) {
 }
 
 func TestIdForInstIdentifier(t *testing.T) {
+	db.LoadFixtures()
 	id, err := pgmodels.IdForInstIdentifier("institution1.edu")
 	require.Nil(t, err)
 	assert.Equal(t, int64(2), id)

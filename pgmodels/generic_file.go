@@ -62,6 +62,15 @@ func GenericFileByIdentifier(identifier string) (*GenericFile, error) {
 	return GenericFileGet(query)
 }
 
+// IdForFileIdentifier returns the ID of the GenericFile having the
+// specified identifier.
+func IdForFileIdentifier(identifier string) (int64, error) {
+	query := NewQuery().Columns("id").Where(`"generic_file"."identifier"`, "=", identifier)
+	var gf GenericFile
+	err := query.Select(&gf)
+	return gf.ID, err
+}
+
 // GenericFileGet returns the first file matching the query.
 func GenericFileGet(query *Query) (*GenericFile, error) {
 	var gf GenericFile

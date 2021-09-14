@@ -48,6 +48,15 @@ func IntellectualObjectByIdentifier(identifier string) (*IntellectualObject, err
 	return IntellectualObjectGet(query)
 }
 
+// IdForFileIdentifier returns the ID of the IntellectualObject
+// having the specified identifier.
+func IdForObjIdentifier(identifier string) (int64, error) {
+	query := NewQuery().Columns("id").Where(`"intellectual_object"."identifier"`, "=", identifier)
+	var object IntellectualObject
+	err := query.Select(&object)
+	return object.ID, err
+}
+
 // IntellectualObjectGet returns the first object matching the query.
 func IntellectualObjectGet(query *Query) (*IntellectualObject, error) {
 	var object IntellectualObject
