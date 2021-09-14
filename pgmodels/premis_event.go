@@ -39,6 +39,15 @@ func PremisEventByIdentifier(identifier string) (*PremisEvent, error) {
 	return PremisEventGet(query)
 }
 
+// IdForEventIdentifier returns the ID of the PremisEvent having
+// the specified identifier. These identifiers are UUID strings.
+func IdForEventIdentifier(identifier string) (int64, error) {
+	query := NewQuery().Columns("id").Where(`"premis_event"."identifier"`, "=", identifier)
+	var event PremisEvent
+	err := query.Select(&event)
+	return event.ID, err
+}
+
 // PremisEventGet returns the first event matching the query.
 func PremisEventGet(query *Query) (*PremisEvent, error) {
 	var event PremisEvent

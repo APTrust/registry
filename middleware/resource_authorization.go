@@ -87,6 +87,7 @@ func (r *ResourceAuthorization) readRequestIds() {
 	r.ResourceID = r.idFromRequest("id")
 	// id may be an identifier
 	if r.ResourceID == 0 && r.ginCtx.Param("id") != "" {
+		r.ResourceIdentifier = r.ginCtx.Param("id")
 		r.ResourceID, r.Error = r.idFromIdentifier(r.ginCtx.Param("id"))
 	}
 	r.ResourceInstID = r.idFromRequest("institution_id")
@@ -140,8 +141,8 @@ func (r *ResourceAuthorization) idFromIdentifier(identifier string) (int64, erro
 		return pgmodels.IdForObjIdentifier(identifier)
 	case "GenericFile":
 		return pgmodels.IdForFileIdentifier(identifier)
-		// case "PremisEvent":
-		// 	return pgmodels.IdForEventIdentifier(identifier)
+	case "PremisEvent":
+		return pgmodels.IdForEventIdentifier(identifier)
 	}
 	common.Context().Log.Error().Msgf("Resource auth middleware cannot look up id for identifier '%s' on resource type '%s'", identifier, r.ResourceType)
 	return 0, common.ErrInvalidParam
@@ -176,5 +177,5 @@ func (r *ResourceAuthorization) String() string {
 	if r.Error != nil {
 		errMsg = r.Error.Error()
 	}
-	return fmt.Sprintf("User %s, Remote IP: %s, Handler: %s, ResourceType: %s, ResourceID: %d, InstID: %d, Path: %s, Permission: %s, Error: %s", email, r.ginCtx.Request.RemoteAddr, r.ginCtx.HandlerName(), r.ResourceType, r.ResourceID, r.ResourceInstID, r.ginCtx.FullPath(), r.Permission, errMsg)
+	return fmt.Sprintf("User %s, Remote IP: %s, Handler: %s, ResourceType: %s, ResourceID: %d, InstID: %d, Path: %s, Permission: %s, ResourceIdentifier: %s, Error: %s", email, r.ginCtx.Request.RemoteAddr, r.ginCtx.HandlerName(), r.ResourceType, r.ResourceID, r.ResourceInstID, r.ginCtx.FullPath(), r.Permission, r.ResourceIdentifier, errMsg)
 }

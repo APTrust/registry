@@ -21,3 +21,17 @@ func TestObjectEventCount(t *testing.T) {
 	assert.Equal(t, 0, count)
 
 }
+
+func TestIdForEventIdentifier(t *testing.T) {
+	db.LoadFixtures()
+	id, err := pgmodels.IdForEventIdentifier("77e16041-8887-4739-af04-9d35e5cab4dc")
+	require.Nil(t, err)
+	assert.Equal(t, int64(49), id)
+
+	id, err = pgmodels.IdForEventIdentifier("274e230a-dc6b-48a1-a96c-709e5728632b")
+	require.Nil(t, err)
+	assert.Equal(t, int64(35), id)
+
+	id, err = pgmodels.IdForEventIdentifier("bad identifier")
+	require.NotNil(t, err)
+}
