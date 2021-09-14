@@ -57,6 +57,15 @@ func InstitutionByIdentifier(identifier string) (*Institution, error) {
 	return InstitutionGet(query)
 }
 
+// IdForInstIdentifier returns the id of the insitution with
+// the given identifier, or an error if no matching record exists.
+func IdForInstIdentifier(identifier string) (int64, error) {
+	query := NewQuery().Columns("id").Where("identifier", "=", identifier)
+	var inst Institution
+	err := query.Select(&inst)
+	return inst.ID, err
+}
+
 // InstitutionGet returns the first institution matching the query.
 func InstitutionGet(query *Query) (*Institution, error) {
 	var institution Institution

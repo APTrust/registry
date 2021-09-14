@@ -140,3 +140,16 @@ func TestInstitutionDeleteUndelete(t *testing.T) {
 	assert.Equal(t, constants.StateActive, inst.State)
 	assert.Empty(t, inst.DeactivatedAt)
 }
+
+func TestIdForInstIdentifier(t *testing.T) {
+	id, err := pgmodels.IdForInstIdentifier("institution1.edu")
+	require.Nil(t, err)
+	assert.Equal(t, int64(2), id)
+
+	id, err = pgmodels.IdForInstIdentifier("institution2.edu")
+	require.Nil(t, err)
+	assert.Equal(t, int64(3), id)
+
+	id, err = pgmodels.IdForInstIdentifier("bad identifier")
+	require.NotNil(t, err)
+}

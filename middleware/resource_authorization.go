@@ -15,15 +15,16 @@ import (
 // handler, the resource and action being requested, and whether the
 // current user is authorized to do what they're trying to do.
 type ResourceAuthorization struct {
-	ginCtx         *gin.Context
-	Handler        string
-	ResourceID     int64
-	ResourceInstID int64
-	ResourceType   string
-	Permission     constants.Permission
-	Checked        bool
-	Approved       bool
-	Error          error
+	ginCtx             *gin.Context
+	Handler            string
+	ResourceID         int64
+	ResourceIdentifier string
+	ResourceInstID     int64
+	ResourceType       string
+	Permission         constants.Permission
+	Checked            bool
+	Approved           bool
+	Error              error
 }
 
 // AuthorizeResource returns a ResourceAuthorization struct
@@ -84,6 +85,10 @@ func (r *ResourceAuthorization) checkPermission() {
 
 func (r *ResourceAuthorization) readRequestIds() {
 	r.ResourceID = r.idFromRequest("id")
+	// id may be an identifier
+	if r.ResourceID == 0 && r.ginCtx.Param("id") != "" {
+		r.ResourceID, r.Error = r.idFromIdentifier(r.ginCtx.Param("id"))
+	}
 	r.ResourceInstID = r.idFromRequest("institution_id")
 	if r.ResourceInstID == 0 {
 		r.ResourceInstID = r.idFromRequest("InstitutionID")
@@ -117,6 +122,29 @@ func (r *ResourceAuthorization) idFromRequest(name string) int64 {
 	}
 	idAsInt, _ := strconv.ParseInt(id, 10, 64)
 	return idAsInt
+}
+
+// To be compatible with the old Pharos API, we need to allow
+// users to look up institutions, objects, files and events
+// by identifier. For events, identifier is a UUID string. For
+// the others, it's a semantic string identifier.
+//
+// Institution identifiers are domain names. E.g. ncsu.edu.
+// Object identifiers follow the pattern domain.edu/object_name
+// File identifiers use pattern domain.edu/object_name/path/to/file/in/bag
+func (r *ResourceAuthorization) idFromIdentifier(identifier string) (int64, error) {
+	switch r.ResourceType {
+	case "Institution":
+		return pgmodels.IdForInstIdentifier(identifier)
+		// case "IntellectualObject":
+		// 	return pgmodels.IdForObjIdentifier(identifier)
+		// case "GenericFile":
+		// 	return pgmodels.IdForFileIdentifier(identifier)
+		// case "PremisEvent":
+		// 	return pgmodels.IdForEventIdentifier(identifier)
+	}
+	common.Context().Log.Error().Msgf("Resource auth middleware cannot look up id for identifier '%s' on resource type '%s'", identifier, r.ResourceType)
+	return 0, common.ErrInvalidParam
 }
 
 func (r *ResourceAuthorization) CurrentUser() *pgmodels.User {
