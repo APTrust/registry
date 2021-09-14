@@ -123,6 +123,7 @@ func TestNewDeletionForReview(t *testing.T) {
 
 	expectedWorkItemURL := fmt.Sprintf("https://example.com/work_items/show/%d", del.DeletionRequest.WorkItemID)
 	actualWorkItemURL, err := del.WorkItemURL()
+	require.Nil(t, err)
 	assert.Equal(t, expectedWorkItemURL, actualWorkItemURL)
 }
 

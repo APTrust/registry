@@ -69,7 +69,8 @@ func GetUserFromSession(c *gin.Context) (user *pgmodels.User, err error) {
 		if err = ctx.Config.Cookies.Secure.Decode(ctx.Config.Cookies.SessionCookie, cookie, &value); err != nil {
 			return nil, common.ErrDecodeCookie
 		}
-		userID, err := strconv.ParseInt(value, 10, 64)
+		var userID int64
+		userID, err = strconv.ParseInt(value, 10, 64)
 		if err != nil {
 			return nil, common.ErrWrongDataType
 		}

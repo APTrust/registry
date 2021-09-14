@@ -231,18 +231,43 @@ func initRoutes(router *gin.Engine) {
 
 	}
 
-	// Root goes to sign-in page
+	// Root goes to sign-in page, which is a web route,
+	// not an API route.
 	router.GET("/", web.UserSignInShow)
 
+	// Member API routes. Note that the show routes for
+	// GenericFiles, Institutions, IntellectualObjects and
+	// PremisEvents end with *id instead of :id. This tells
+	// julienschmidt/httprouter to cram everything after the
+	// slash into the "id" parameter, which allows us to serve
+	// files, institutions, objects and events by id or identifier.
+	//
+	// For example, assuming file with id 99 has identifier
+	// "school.edu/bag_name/data/image.jpg", the following routes
+	// return the same thing:
+	//
+	// /member-api/v3/files/99
+	// /member-api/v3/files/school.edu/bag_name/data/image.jpg
+	// /member-api/v3/files/school.edu%2Fbag_name%2Fdata%2Fimage.jpg
+	//
+	// If file identifier contains a question mark, it MUST be
+	// url-encoded, or the router will interpret the ? as the
+	// beginning of the query string. To be safe, we should always
+	// url-encode the identifier. Many of them contain backticks,
+	// quotes, parentheses, spaces, and all kinds of other garbage.
 	memberAPI := router.Group("/member-api/v3")
 	{
 		// Alerts
 		memberAPI.GET("/alerts", memberapi.AlertIndex)
 		memberAPI.GET("/alerts/show/:id/:user_id", memberapi.AlertShow)
 
-		// Deletions
+		// Deletion Requests
 		memberAPI.GET("/deletions/show/:id", memberapi.DeletionRequestShow)
 		memberAPI.GET("/deletions/", memberapi.DeletionRequestIndex)
+
+		// Generic Files
+		memberAPI.GET("/files/show/*id", memberapi.GenericFileShow)
+		memberAPI.GET("/files/", memberapi.GenericFileIndex)
 
 	}
 }

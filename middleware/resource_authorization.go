@@ -48,7 +48,9 @@ func (r *ResourceAuthorization) init() {
 		return
 	}
 	r.getPermissionType()
-	r.readRequestIds()
+	if r.Error == nil {
+		r.readRequestIds()
+	}
 	if r.Error == nil {
 		r.checkPermission()
 	}
@@ -84,11 +86,13 @@ func (r *ResourceAuthorization) checkPermission() {
 }
 
 func (r *ResourceAuthorization) readRequestIds() {
-	r.ResourceID = r.idFromRequest("id")
-	// id may be an identifier
+	id := r.idFromRequest("id")
+	r.ResourceID = id
+	// id may be an identifier in the URL (not in post body or query string)
 	if r.ResourceID == 0 && r.ginCtx.Param("id") != "" {
-		r.ResourceIdentifier = r.ginCtx.Param("id")
-		r.ResourceID, r.Error = r.idFromIdentifier(r.ginCtx.Param("id"))
+		idStr := r.ginCtx.Param("id")
+		r.ResourceIdentifier = idStr[1:] // remove leading slash
+		r.ResourceID, r.Error = r.idFromIdentifier()
 	}
 	r.ResourceInstID = r.idFromRequest("institution_id")
 	if r.ResourceInstID == 0 {
@@ -121,6 +125,13 @@ func (r *ResourceAuthorization) idFromRequest(name string) int64 {
 	if id == "" {
 		id = r.ginCtx.PostForm(name)
 	}
+	// In routes with *id glob patterns, the router picks up
+	// the leading slash in addition to the id. We need to get
+	// rid of that to parse the id as an int. This affects API
+	// routes only. The drawback to the speedy julienschmidt/httprouter
+	// is that you have to inject slow code like this to handle
+	// common cases.
+	id = strings.TrimPrefix(id, "/")
 	idAsInt, _ := strconv.ParseInt(id, 10, 64)
 	return idAsInt
 }
@@ -133,18 +144,18 @@ func (r *ResourceAuthorization) idFromRequest(name string) int64 {
 // Institution identifiers are domain names. E.g. ncsu.edu.
 // Object identifiers follow the pattern domain.edu/object_name
 // File identifiers use pattern domain.edu/object_name/path/to/file/in/bag
-func (r *ResourceAuthorization) idFromIdentifier(identifier string) (int64, error) {
+func (r *ResourceAuthorization) idFromIdentifier() (int64, error) {
 	switch r.ResourceType {
 	case "Institution":
-		return pgmodels.IdForInstIdentifier(identifier)
+		return pgmodels.IdForInstIdentifier(r.ResourceIdentifier)
 	case "IntellectualObject":
-		return pgmodels.IdForObjIdentifier(identifier)
+		return pgmodels.IdForObjIdentifier(r.ResourceIdentifier)
 	case "GenericFile":
-		return pgmodels.IdForFileIdentifier(identifier)
+		return pgmodels.IdForFileIdentifier(r.ResourceIdentifier)
 	case "PremisEvent":
-		return pgmodels.IdForEventIdentifier(identifier)
+		return pgmodels.IdForEventIdentifier(r.ResourceIdentifier)
 	}
-	common.Context().Log.Error().Msgf("Resource auth middleware cannot look up id for identifier '%s' on resource type '%s'", identifier, r.ResourceType)
+	common.Context().Log.Error().Msgf("Resource auth middleware cannot look up id for identifier '%s' on resource type '%s'", r.ResourceIdentifier, r.ResourceType)
 	return 0, common.ErrInvalidParam
 }
 
