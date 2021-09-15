@@ -17,6 +17,7 @@ type JsonList struct {
 	Results interface{} `json:"results"`
 }
 
+// NewJsonList creates a new json list response structure.
 func NewJsonList(items interface{}, pager *common.Pager) *JsonList {
 	return &JsonList{
 		Count:    pager.TotalItems,

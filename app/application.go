@@ -74,11 +74,14 @@ func initTemplates(router *gin.Engine) {
 	// If we're running from main, templates will come
 	// from ./views. When running tests, templates come
 	// from ../../views because http tests run from web
+	// from ../../../views for member api and admin api
 	// sub directory.
 	if common.FileExists("./views") {
 		router.LoadHTMLGlob("./views/**/*.html")
-	} else {
+	} else if common.FileExists("../../views") {
 		router.LoadHTMLGlob("../../views/**/*.html")
+	} else {
+		router.LoadHTMLGlob("../../../views/**/*.html")
 	}
 }
 
