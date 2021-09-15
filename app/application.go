@@ -5,11 +5,11 @@ import (
 	"io"
 	"strings"
 
-	"github.com/APTrust/registry/api/member"
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/helpers"
 	"github.com/APTrust/registry/middleware"
-	"github.com/APTrust/registry/web"
+	"github.com/APTrust/registry/web/api/member_api"
+	"github.com/APTrust/registry/web/webui"
 	"github.com/gin-contrib/logger"
 	"github.com/gin-gonic/gin"
 )
@@ -73,12 +73,12 @@ func initTemplates(router *gin.Engine) {
 	// Load the view templates
 	// If we're running from main, templates will come
 	// from ./views. When running tests, templates come
-	// from ../views because http tests run from web
+	// from ../../views because http tests run from web
 	// sub directory.
 	if common.FileExists("./views") {
 		router.LoadHTMLGlob("./views/**/*.html")
 	} else {
-		router.LoadHTMLGlob("../views/**/*.html")
+		router.LoadHTMLGlob("../../views/**/*.html")
 	}
 }
 
@@ -126,114 +126,114 @@ func initRoutes(router *gin.Engine) {
 	webRoutes := router.Group("/")
 	{
 		// Alerts
-		webRoutes.GET("/alerts", web.AlertIndex)
-		webRoutes.GET("/alerts/show/:id/:user_id", web.AlertShow)
+		webRoutes.GET("/alerts", webui.AlertIndex)
+		webRoutes.GET("/alerts/show/:id/:user_id", webui.AlertShow)
 
 		// Deletion Requests
 		// Note that these routes are for read-only views.
 		// Routes for initiating, approving and rejecting deletions
 		// are in the GenericFiles and IntellectualObjects controllers.
-		webRoutes.GET("/deletions/show/:id", web.DeletionRequestShow)
-		webRoutes.GET("/deletions/review/:id", web.DeletionRequestReview)
-		webRoutes.POST("/deletions/approve/:id", web.DeletionRequestApprove)
-		webRoutes.POST("/deletions/cancel/:id", web.DeletionRequestCancel)
-		webRoutes.GET("/deletions/", web.DeletionRequestIndex)
+		webRoutes.GET("/deletions/show/:id", webui.DeletionRequestShow)
+		webRoutes.GET("/deletions/review/:id", webui.DeletionRequestReview)
+		webRoutes.POST("/deletions/approve/:id", webui.DeletionRequestApprove)
+		webRoutes.POST("/deletions/cancel/:id", webui.DeletionRequestCancel)
+		webRoutes.GET("/deletions/", webui.DeletionRequestIndex)
 
 		// Dashboard
-		webRoutes.GET("/dashboard", web.DashboardShow)
+		webRoutes.GET("/dashboard", webui.DashboardShow)
 
 		// Deposit Report
-		webRoutes.GET("/reports/deposits", web.DepositReportShow)
+		webRoutes.GET("/reports/deposits", webui.DepositReportShow)
 
 		// GenericFiles
-		webRoutes.GET("/files", web.GenericFileIndex)
-		webRoutes.GET("/files/show/:id", web.GenericFileShow)
-		webRoutes.GET("/files/request_delete/:id", web.GenericFileRequestDelete)
-		webRoutes.GET("/files/request_restore/:id", web.GenericFileRequestRestore)
-		webRoutes.POST("/files/init_delete/:id", web.GenericFileInitDelete)
-		webRoutes.POST("/files/init_restore/:id", web.GenericFileInitRestore)
+		webRoutes.GET("/files", webui.GenericFileIndex)
+		webRoutes.GET("/files/show/:id", webui.GenericFileShow)
+		webRoutes.GET("/files/request_delete/:id", webui.GenericFileRequestDelete)
+		webRoutes.GET("/files/request_restore/:id", webui.GenericFileRequestRestore)
+		webRoutes.POST("/files/init_delete/:id", webui.GenericFileInitDelete)
+		webRoutes.POST("/files/init_restore/:id", webui.GenericFileInitRestore)
 
 		// Institutions
-		webRoutes.POST("/institutions/new", web.InstitutionCreate)
-		webRoutes.DELETE("/institutions/delete/:id", web.InstitutionDelete)
-		webRoutes.GET("/institutions/delete/:id", web.InstitutionDelete)
-		webRoutes.GET("/institutions/undelete/:id", web.InstitutionUndelete)
-		webRoutes.GET("/institutions", web.InstitutionIndex)
-		webRoutes.GET("/institutions/new", web.InstitutionNew)
-		webRoutes.GET("/institutions/show/:id", web.InstitutionShow)
-		webRoutes.GET("/institutions/edit/:id", web.InstitutionEdit)
-		webRoutes.PUT("/institutions/edit/:id", web.InstitutionUpdate)
-		webRoutes.POST("/institutions/edit/:id", web.InstitutionUpdate)
+		webRoutes.POST("/institutions/new", webui.InstitutionCreate)
+		webRoutes.DELETE("/institutions/delete/:id", webui.InstitutionDelete)
+		webRoutes.GET("/institutions/delete/:id", webui.InstitutionDelete)
+		webRoutes.GET("/institutions/undelete/:id", webui.InstitutionUndelete)
+		webRoutes.GET("/institutions", webui.InstitutionIndex)
+		webRoutes.GET("/institutions/new", webui.InstitutionNew)
+		webRoutes.GET("/institutions/show/:id", webui.InstitutionShow)
+		webRoutes.GET("/institutions/edit/:id", webui.InstitutionEdit)
+		webRoutes.PUT("/institutions/edit/:id", webui.InstitutionUpdate)
+		webRoutes.POST("/institutions/edit/:id", webui.InstitutionUpdate)
 
 		// IntellectualObjects
-		webRoutes.GET("/objects", web.IntellectualObjectIndex)
-		webRoutes.GET("/objects/show/:id", web.IntellectualObjectShow)
-		webRoutes.GET("/objects/request_delete/:id", web.IntellectualObjectRequestDelete)
-		webRoutes.POST("/objects/init_delete/:id", web.IntellectualObjectInitDelete)
-		webRoutes.GET("/objects/request_restore/:id", web.IntellectualObjectRequestRestore)
-		webRoutes.POST("/objects/init_restore/:id", web.IntellectualObjectInitRestore)
-		webRoutes.GET("/objects/events/:id", web.IntellectualObjectEvents)
-		webRoutes.GET("/objects/files/:id", web.IntellectualObjectFiles)
+		webRoutes.GET("/objects", webui.IntellectualObjectIndex)
+		webRoutes.GET("/objects/show/:id", webui.IntellectualObjectShow)
+		webRoutes.GET("/objects/request_delete/:id", webui.IntellectualObjectRequestDelete)
+		webRoutes.POST("/objects/init_delete/:id", webui.IntellectualObjectInitDelete)
+		webRoutes.GET("/objects/request_restore/:id", webui.IntellectualObjectRequestRestore)
+		webRoutes.POST("/objects/init_restore/:id", webui.IntellectualObjectInitRestore)
+		webRoutes.GET("/objects/events/:id", webui.IntellectualObjectEvents)
+		webRoutes.GET("/objects/files/:id", webui.IntellectualObjectFiles)
 
 		// PremisEvents
-		webRoutes.GET("/events", web.PremisEventIndex)
-		webRoutes.GET("/events/show/:id", web.PremisEventShow)
-		webRoutes.GET("/events/show_xhr/:id", web.PremisEventShowXHR)
+		webRoutes.GET("/events", webui.PremisEventIndex)
+		webRoutes.GET("/events/show/:id", webui.PremisEventShow)
+		webRoutes.GET("/events/show_xhr/:id", webui.PremisEventShowXHR)
 
 		// WorkItems - Web UI allows only list, show, and limited editing for admin only
-		webRoutes.GET("/work_items", web.WorkItemIndex)
-		webRoutes.GET("/work_items/show/:id", web.WorkItemShow)
-		webRoutes.GET("/work_items/edit/:id", web.WorkItemEdit)
-		webRoutes.PUT("/work_items/edit/:id", web.WorkItemUpdate)
-		webRoutes.POST("/work_items/edit/:id", web.WorkItemUpdate)
-		webRoutes.PUT("/work_items/requeue/:id", web.WorkItemRequeue)
-		webRoutes.POST("/work_items/requeue/:id", web.WorkItemRequeue)
+		webRoutes.GET("/work_items", webui.WorkItemIndex)
+		webRoutes.GET("/work_items/show/:id", webui.WorkItemShow)
+		webRoutes.GET("/work_items/edit/:id", webui.WorkItemEdit)
+		webRoutes.PUT("/work_items/edit/:id", webui.WorkItemUpdate)
+		webRoutes.POST("/work_items/edit/:id", webui.WorkItemUpdate)
+		webRoutes.PUT("/work_items/requeue/:id", webui.WorkItemRequeue)
+		webRoutes.POST("/work_items/requeue/:id", webui.WorkItemRequeue)
 
 		// Users
-		webRoutes.POST("/users/new", web.UserCreate)
-		webRoutes.DELETE("/users/delete/:id", web.UserDelete)
-		webRoutes.POST("/users/delete/:id", web.UserDelete)
-		webRoutes.POST("/users/undelete/:id", web.UserUndelete)
-		webRoutes.PUT("/users/undelete/:id", web.UserUndelete)
-		webRoutes.GET("/users", web.UserIndex)
-		webRoutes.GET("/users/new", web.UserNew)
-		webRoutes.GET("/users/show/:id", web.UserShow)
-		webRoutes.GET("/users/edit/:id", web.UserEdit)
-		webRoutes.PUT("/users/edit/:id", web.UserUpdate)
-		webRoutes.POST("/users/edit/:id", web.UserUpdate)
-		webRoutes.GET("/users/my_account", web.UserMyAccount)
-		webRoutes.GET("/users/change_password/:id", web.UserShowChangePassword)
-		webRoutes.POST("/users/change_password/:id", web.UserChangePassword)
-		webRoutes.GET("/users/init_password_reset/:id", web.UserInitPasswordReset)
-		webRoutes.GET("/users/complete_password_reset/:id", web.UserCompletePasswordReset)
-		webRoutes.POST("/users/get_api_key/:id", web.UserGetAPIKey)
+		webRoutes.POST("/users/new", webui.UserCreate)
+		webRoutes.DELETE("/users/delete/:id", webui.UserDelete)
+		webRoutes.POST("/users/delete/:id", webui.UserDelete)
+		webRoutes.POST("/users/undelete/:id", webui.UserUndelete)
+		webRoutes.PUT("/users/undelete/:id", webui.UserUndelete)
+		webRoutes.GET("/users", webui.UserIndex)
+		webRoutes.GET("/users/new", webui.UserNew)
+		webRoutes.GET("/users/show/:id", webui.UserShow)
+		webRoutes.GET("/users/edit/:id", webui.UserEdit)
+		webRoutes.PUT("/users/edit/:id", webui.UserUpdate)
+		webRoutes.POST("/users/edit/:id", webui.UserUpdate)
+		webRoutes.GET("/users/my_account", webui.UserMyAccount)
+		webRoutes.GET("/users/change_password/:id", webui.UserShowChangePassword)
+		webRoutes.POST("/users/change_password/:id", webui.UserChangePassword)
+		webRoutes.GET("/users/init_password_reset/:id", webui.UserInitPasswordReset)
+		webRoutes.GET("/users/complete_password_reset/:id", webui.UserCompletePasswordReset)
+		webRoutes.POST("/users/get_api_key/:id", webui.UserGetAPIKey)
 
 		// User two-factor setup
-		webRoutes.GET("/users/2fa_setup", web.UserInit2FASetup)
-		webRoutes.POST("/users/2fa_setup", web.UserComplete2FASetup)
-		webRoutes.POST("/users/confirm_phone", web.UserConfirmPhone)
-		webRoutes.POST("/users/backup_codes", web.UserGenerateBackupCodes)
+		webRoutes.GET("/users/2fa_setup", webui.UserInit2FASetup)
+		webRoutes.POST("/users/2fa_setup", webui.UserComplete2FASetup)
+		webRoutes.POST("/users/confirm_phone", webui.UserConfirmPhone)
+		webRoutes.POST("/users/backup_codes", webui.UserGenerateBackupCodes)
 
 		// User two-factor login
-		webRoutes.GET("/users/2fa_backup", web.UserTwoFactorBackup)
-		webRoutes.GET("/users/2fa_choose", web.UserTwoFactorChoose)
-		webRoutes.POST("/users/2fa_sms", web.UserTwoFactorGenerateSMS)
-		webRoutes.POST("/users/2fa_push", web.UserTwoFactorPush)
-		webRoutes.POST("/users/2fa_verify", web.UserTwoFactorVerify)
+		webRoutes.GET("/users/2fa_backup", webui.UserTwoFactorBackup)
+		webRoutes.GET("/users/2fa_choose", webui.UserTwoFactorChoose)
+		webRoutes.POST("/users/2fa_sms", webui.UserTwoFactorGenerateSMS)
+		webRoutes.POST("/users/2fa_push", webui.UserTwoFactorPush)
+		webRoutes.POST("/users/2fa_verify", webui.UserTwoFactorVerify)
 
 		// User Sign In
-		webRoutes.GET("/users/sign_in", web.UserSignInShow)
-		webRoutes.POST("/users/sign_in", web.UserSignIn)
-		webRoutes.GET("/users/sign_out", web.UserSignOut) // should be delete?
+		webRoutes.GET("/users/sign_in", webui.UserSignInShow)
+		webRoutes.POST("/users/sign_in", webui.UserSignIn)
+		webRoutes.GET("/users/sign_out", webui.UserSignOut) // should be delete?
 
 		// Error page
-		webRoutes.GET("/error", web.ErrorShow)
+		webRoutes.GET("/error", webui.ErrorShow)
 
 	}
 
 	// Root goes to sign-in page, which is a web route,
 	// not an API route.
-	router.GET("/", web.UserSignInShow)
+	router.GET("/", webui.UserSignInShow)
 
 	// Member API routes. Note that the show routes for
 	// GenericFiles, Institutions, IntellectualObjects and

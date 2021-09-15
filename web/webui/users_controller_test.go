@@ -1,0 +1,390 @@
+package webui_test
+
+import (
+	"net/http"
+	"regexp"
+	"testing"
+
+	"github.com/APTrust/registry/common"
+	"github.com/APTrust/registry/constants"
+	"github.com/APTrust/registry/pgmodels"
+	"github.com/APTrust/registry/web/testutil"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+)
+
+func TestUserShow(t *testing.T) {
+	testutil.InitHTTPTests(t)
+
+	items := []string{
+		"Force Password Reset",
+		"Change Password",
+		"Deactivate",
+		"Edit",
+		"Inst One User",
+		"User at Institution One",
+		"user@inst1.edu",
+		"14345551212",
+	}
+
+	// Sys Admin can see any user
+	html := testutil.SysAdminClient.GET("/users/show/3").Expect().
+		Status(http.StatusOK).Body().Raw()
+	testutil.AssertMatchesAll(t, html, items)
+
+	// Inst admin can see users at their own institution
+	html = testutil.InstAdminClient.GET("/users/show/3").Expect().
+		Status(http.StatusOK).Body().Raw()
+	testutil.AssertMatchesAll(t, html, items)
+
+	// Inst admin cannot view the user belonging to other institution
+	testutil.InstUserClient.GET("/users/show/1").Expect().Status(http.StatusForbidden)
+
+	// Regular user cannot view the user show page, even their own
+	testutil.InstUserClient.GET("/users/show/3").Expect().Status(http.StatusForbidden)
+
+}
+
+func TestUserIndex(t *testing.T) {
+	testutil.InitHTTPTests(t)
+
+	items := []string{
+		"New",
+		"Name",
+		"Email",
+	}
+
+	instUserLinks := []string{
+		"/users/show/2",
+		"/users/show/3",
+		"/users/show/4",
+	}
+
+	nonInst1Links := []string{
+		"/users/show/1",
+		"/users/show/5",
+	}
+
+	// Sys Admin sees filters because list of all users is long.
+	// Inst admin does not see filters, because most institutions
+	// have only 4-6 users.
+	adminFilters := []string{
+		`type="text" name="name__contains"`,
+		`type="text" name="email__contains"`,
+		`select name="role"`,
+		`select name="institution_id"`,
+		"Filter",
+	}
+
+	html := testutil.SysAdminClient.GET("/users").Expect().
+		Status(http.StatusOK).Body().Raw()
+	testutil.AssertMatchesAll(t, html, items)
+	testutil.AssertMatchesAll(t, html, instUserLinks)
+	testutil.AssertMatchesAll(t, html, nonInst1Links)
+	testutil.AssertMatchesAll(t, html, adminFilters)
+	testutil.AssertMatchesResultCount(t, html, 6)
+
+	html = testutil.InstAdminClient.GET("/users").Expect().
+		Status(http.StatusOK).Body().Raw()
+	testutil.AssertMatchesAll(t, html, items)
+	testutil.AssertMatchesAll(t, html, instUserLinks)
+	testutil.AssertMatchesNone(t, html, nonInst1Links)
+	testutil.AssertMatchesNone(t, html, adminFilters)
+	testutil.AssertMatchesResultCount(t, html, 4)
+
+	// Regular user cannot view the user list page
+	testutil.InstUserClient.GET("/users").Expect().Status(http.StatusForbidden)
+
+}
+
+func TestUserCreateEditDeleteUndelete(t *testing.T) {
+	testutil.InitHTTPTests(t)
+
+	// Make sure admins can get to this page and regular users cannot.
+	testutil.SysAdminClient.GET("/users/new").Expect().Status(http.StatusOK)
+	testutil.InstAdminClient.GET("/users/new").Expect().Status(http.StatusOK)
+	testutil.InstUserClient.GET("/users/new").Expect().Status(http.StatusForbidden)
+
+	formData := map[string]interface{}{
+		"Name":           "Unit Test User",
+		"Email":          "utest-user@inst1.edu",
+		"PhoneNumber":    "+12025559815",
+		"institution_id": testutil.Inst1Admin.InstitutionID,
+		"Role":           constants.RoleInstUser,
+	}
+
+	testutil.InstAdminClient.POST("/users/new").
+		WithHeader("Referer", testutil.BaseURL).
+		WithFormField(constants.CSRFTokenName, testutil.InstAdminToken).
+		WithForm(formData).Expect().Status(http.StatusOK)
+
+	// Make sure the new user exists and has the correct info
+	user, err := pgmodels.UserByEmail("utest-user@inst1.edu")
+	require.Nil(t, err)
+	require.NotNil(t, user)
+	assert.Equal(t, formData["Name"], user.Name)
+	assert.Equal(t, formData["Email"], user.Email)
+	assert.Equal(t, formData["PhoneNumber"], user.PhoneNumber)
+	assert.Equal(t, formData["institution_id"], user.InstitutionID)
+	assert.Equal(t, formData["Role"], user.Role)
+	assert.NotEmpty(t, user.EncryptedPassword)
+
+	// Make sure we created a new user alert, so this person
+	// can get in and choose a password.
+	query := pgmodels.NewQuery().
+		Where("type", "=", constants.AlertWelcome).
+		Where("user_id", "=", user.ID).
+		Limit(1)
+	alertView, err := pgmodels.AlertViewGet(query)
+	require.Nil(t, err)
+	require.NotNil(t, alertView)
+	assert.Contains(t, alertView.Content, "?token=")
+
+	// Get the edit page for the new user
+	testutil.InstAdminClient.GET("/users/edit/{id}", user.ID).
+		Expect().Status(http.StatusOK)
+
+	// Update the user
+	formData["Name"] = "Unit Test User (edited)"
+	formData["PhoneNumber"] = "+15058981234"
+	testutil.InstAdminClient.PUT("/users/edit/{id}", user.ID).
+		WithHeader("Referer", testutil.BaseURL).
+		WithFormField(constants.CSRFTokenName, testutil.InstAdminToken).
+		WithForm(formData).Expect().Status(http.StatusOK)
+
+	// Make sure the edits were saved
+	user, err = pgmodels.UserByEmail("utest-user@inst1.edu")
+	require.Nil(t, err)
+	require.NotNil(t, user)
+	assert.Equal(t, formData["Name"], user.Name)
+	assert.Equal(t, formData["PhoneNumber"], user.PhoneNumber)
+
+	// Delete the user. This winds up with an OK because of redirect.
+	// Note that because it's a delete, there's no form, so we have
+	// to pass the CSRF token in the header.
+	testutil.InstAdminClient.DELETE("/users/delete/{id}", user.ID).
+		WithHeader("Referer", testutil.BaseURL).
+		WithHeader(constants.CSRFHeaderName, testutil.InstAdminToken).
+		Expect().Status(http.StatusOK)
+
+	// Undelete the user. Again, we get a redirect ending with an OK.
+	testutil.InstAdminClient.POST("/users/undelete/{id}", user.ID).
+		WithHeader("Referer", testutil.BaseURL).
+		WithHeader(constants.CSRFHeaderName, testutil.InstAdminToken).
+		Expect().Status(http.StatusOK)
+
+}
+
+func TestUserSignInSignOut(t *testing.T) {
+	testutil.InitHTTPTests(t)
+
+	client := testutil.GetAnonymousClient(t)
+
+	// Make sure anonymous client can access the sign-in page
+	client.GET("/").Expect().Status(http.StatusOK)
+
+	// Make sure they can sign in and are redirected to dashboard
+	html := client.POST("/users/sign_in").
+		WithHeader("Referer", testutil.BaseURL).
+		WithFormField("email", "user@inst1.edu").
+		WithFormField("password", "password").
+		Expect().Status(http.StatusOK).Body().Raw()
+
+	dashboardItems := []string{
+		"Recent Work Items",
+		"Notifications",
+		"Deposits by Storage Option",
+	}
+	testutil.AssertMatchesAll(t, html, dashboardItems)
+
+	// Make sure user can sign out.
+	client.GET("/users/sign_out").Expect().Status(http.StatusOK)
+
+	// After signout, attempts to access valid pages should return
+	// unauthorized.
+	client.GET("/dashboard").Expect().Status(http.StatusUnauthorized)
+}
+
+func TestUserChangePassword(t *testing.T) {
+	testutil.InitHTTPTests(t)
+
+	// After tests, restore inst1User's password so that we
+	// run interactive tests in browser afterward, we can log
+	// in with the usual password.
+	defer restorePassword(t, testutil.Inst1User)
+
+	originalEncrypedPwd := testutil.Inst1User.EncryptedPassword
+
+	// Make sure user can get to the change password page
+	// to change their own password.
+	testutil.InstUserClient.GET("/users/change_password/{id}", testutil.Inst1User.ID).
+		Expect().Status(http.StatusOK)
+
+	// Submit and test the password change.
+	// Password requirements: uppercase, lowercase, number, min 8 chars
+	testutil.InstUserClient.POST("/users/change_password/{id}", testutil.Inst1User.ID).
+		WithHeader("Referer", testutil.BaseURL).
+		WithFormField(constants.CSRFTokenName, testutil.InstUserToken).
+		WithFormField("NewPassword", "Password1234").
+		WithFormField("ConfirmNewPassword", "Password1234").
+		Expect().Status(http.StatusOK)
+
+	user, err := pgmodels.UserByID(testutil.Inst1User.ID)
+	require.Nil(t, err)
+	require.NotNil(t, user)
+	assert.NotEqual(t, originalEncrypedPwd, user.EncryptedPassword)
+
+	secondPwd := user.EncryptedPassword
+
+	// Institutional admin can change another user's password,
+	// as long as that user is at their institution.
+	testutil.InstAdminClient.GET("/users/change_password/{id}", testutil.Inst1User.ID).
+		Expect().Status(http.StatusOK)
+	testutil.InstAdminClient.POST("/users/change_password/{id}", testutil.Inst1User.ID).
+		WithHeader("Referer", testutil.BaseURL).
+		WithFormField("NewPassword", "Password5678").
+		WithFormField("ConfirmNewPassword", "Password5678").
+		WithFormField(constants.CSRFTokenName, testutil.InstAdminToken).
+		Expect().Status(http.StatusOK)
+
+	user, err = pgmodels.UserByID(testutil.Inst1User.ID)
+	require.Nil(t, err)
+	require.NotNil(t, user)
+	assert.NotEqual(t, secondPwd, user.EncryptedPassword)
+
+	// inst1Admin cannot change password for anyone at inst2
+	testutil.InstAdminClient.GET("/users/change_password/{id}", testutil.Inst2Admin.ID).
+		Expect().Status(http.StatusForbidden)
+	testutil.InstAdminClient.POST("/users/change_password/{id}", testutil.Inst2Admin.ID).
+		WithHeader("Referer", testutil.BaseURL).
+		WithFormField("NewPassword", "Password5678").
+		WithFormField("ConfirmNewPassword", "Password5678").
+		WithFormField(constants.CSRFTokenName, testutil.InstAdminToken).
+		Expect().Status(http.StatusForbidden)
+
+	// Regular user cannot access anyone else's change password page
+	// In this case, inst1User is trying to change inst1Admin
+	testutil.InstUserClient.GET("/users/change_password/{id}", testutil.Inst1Admin.ID).
+		Expect().Status(http.StatusForbidden)
+	testutil.InstUserClient.POST("/users/change_password/{id}", testutil.Inst1Admin.ID).
+		WithHeader("Referer", testutil.BaseURL).
+		WithFormField("NewPassword", "Password5678").
+		WithFormField("ConfirmNewPassword", "Password5678").
+		WithFormField(constants.CSRFTokenName, testutil.InstUserToken).
+		Expect().Status(http.StatusForbidden)
+}
+
+func TestUserForcePasswordReset(t *testing.T) {
+	testutil.InitHTTPTests(t)
+
+	defer restorePassword(t, testutil.Inst1User)
+
+	testutil.InstAdminClient.GET("/users/init_password_reset/{id}", testutil.Inst1User.ID).
+		Expect().Status(http.StatusOK)
+
+	// This should create an alert for the user.
+	query := pgmodels.NewQuery().
+		Where("type", "=", constants.AlertPasswordReset).
+		Where("user_id", "=", testutil.Inst1User.ID)
+	alertView, err := pgmodels.AlertViewGet(query)
+	require.Nil(t, err)
+	require.NotNil(t, alertView)
+
+	// It should also set a password reset token
+	user, err := pgmodels.UserByID(testutil.Inst1User.ID)
+	require.Nil(t, err)
+	require.NotNil(t, user)
+	require.NotEmpty(t, user.ResetPasswordToken)
+
+	// Extract unencrypted reset token from the URL in the alert message
+	re := regexp.MustCompile(`token=([^\n]+)`)
+	m := re.FindAllStringSubmatch(alertView.Content, 1)
+	require.True(t, len(m) > 0, "Token is missing from alert")
+	require.True(t, len(m[0]) > 1, "Token is missing from alert")
+	unencryptedToken := m[0][1]
+
+	// inst1user should be able to use this token to reset
+	// their password. Note that the user will arrive without
+	// logging in (because they don't have their password).
+	client := testutil.GetAnonymousClient(t)
+
+	// First: Bad token should result in error
+	client.GET("/users/complete_password_reset/{id}", testutil.Inst1User.ID).
+		WithQuery("token", "BAD_TOKEN").
+		Expect().Status(http.StatusInternalServerError)
+
+	// Good token should succeed.
+	client.GET("/users/complete_password_reset/{id}", testutil.Inst1User.ID).
+		WithQuery("token", unencryptedToken).
+		Expect().Status(http.StatusOK)
+
+	// Need to clear this token for the next two tests, so inst1User
+	// isn't being forced to complete their own password reset.
+	testutil.Inst1User.ResetPasswordToken = ""
+	require.Nil(t, testutil.Inst1User.Save())
+
+	// Regular user cannot reset other user's password.
+	testutil.InstUserClient.GET("/users/init_password_reset/{id}", testutil.Inst1Admin.ID).
+		Expect().Status(http.StatusForbidden)
+	testutil.InstUserClient.GET("/users/init_password_reset/{id}", testutil.Inst2Admin.ID).
+		Expect().Status(http.StatusForbidden)
+
+	// Admin cannot reset password of anyone at other institution
+	testutil.InstAdminClient.GET("/users/init_password_reset/{id}", testutil.Inst2Admin.ID).
+		Expect().Status(http.StatusForbidden)
+}
+
+func TestUserGetAPIKey(t *testing.T) {
+	testutil.InitHTTPTests(t)
+
+	items := []string{
+		"Your new API key is",
+	}
+
+	// Any user can get their own API key
+	for _, client := range testutil.AllClients {
+		html := client.POST("/users/get_api_key/{id}", testutil.UserFor[client].ID).
+			WithHeader("Referer", testutil.BaseURL).
+			WithFormField(constants.CSRFTokenName, testutil.TokenFor[client]).
+			Expect().Status(http.StatusOK).Body().Raw()
+		testutil.AssertMatchesAll(t, html, items)
+	}
+
+	// No user can get another user's API key
+	testutil.InstAdminClient.POST("/users/get_api_key/{id}", testutil.Inst1User.ID).
+		WithHeader("Referer", testutil.BaseURL).
+		WithFormField(constants.CSRFTokenName, testutil.InstAdminToken).
+		Expect().Status(http.StatusForbidden)
+	testutil.InstUserClient.POST("/users/get_api_key/{id}", testutil.Inst1Admin.ID).
+		WithHeader("Referer", testutil.BaseURL).
+		WithFormField(constants.CSRFTokenName, testutil.InstUserToken).
+		Expect().Status(http.StatusForbidden)
+	testutil.InstAdminClient.POST("/users/get_api_key/{id}", testutil.Inst2Admin.ID).
+		WithHeader("Referer", testutil.BaseURL).
+		WithFormField(constants.CSRFTokenName, testutil.InstAdminToken).
+		Expect().Status(http.StatusForbidden)
+
+}
+
+func TestUserMyAccount(t *testing.T) {
+	testutil.InitHTTPTests(t)
+
+	items := []string{
+		"Get API Key",
+		"Change Password",
+	}
+
+	for _, client := range testutil.AllClients {
+		html := client.GET("/users/my_account").
+			Expect().Status(http.StatusOK).Body().Raw()
+		testutil.AssertMatchesAll(t, html, items)
+	}
+}
+
+func restorePassword(t *testing.T, user *pgmodels.User) {
+	encPwd, err := common.EncryptPassword("password")
+	require.Nil(t, err, "After tests, error restoring password for user %s", user.Name)
+	user.EncryptedPassword = encPwd
+	err = user.Save()
+	assert.Nil(t, err, "After tests, error restoring password for user %s", user.Name)
+}
