@@ -96,6 +96,16 @@ func TestAlertIndex(t *testing.T) {
 		WithQuery("institution_id", tu.Inst2Admin.InstitutionID).
 		Expect().Status(http.StatusForbidden)
 
+	// Inst admin cannot see results for other users. Technically,
+	// this should return 403. For now, it returns OK with zero results.
+	resp = tu.InstAdminClient.GET("/member-api/v3/alerts").
+		WithQuery("user_id", tu.Inst1User.ID).
+		Expect().Status(http.StatusOK)
+	err = json.Unmarshal([]byte(resp.Body().Raw()), &list)
+	require.Nil(t, err)
+	assert.Equal(t, 0, list.Count)
+	assert.Equal(t, 0, len(list.Results))
+
 	// Inst user should see only his own alerts.
 	resp = tu.InstUserClient.GET("/member-api/v3/alerts").
 		WithQuery("institution_id", tu.Inst1User.InstitutionID).
@@ -116,4 +126,13 @@ func TestAlertIndex(t *testing.T) {
 		WithQuery("institution_id", tu.Inst2Admin.InstitutionID).
 		Expect().Status(http.StatusForbidden)
 
+	// Inst user cannot see results for other users. Technically,
+	// this should return 403. For now, it returns OK with zero results.
+	resp = tu.InstUserClient.GET("/member-api/v3/alerts").
+		WithQuery("user_id", tu.Inst1Admin.ID).
+		Expect().Status(http.StatusOK)
+	err = json.Unmarshal([]byte(resp.Body().Raw()), &list)
+	require.Nil(t, err)
+	assert.Equal(t, 0, list.Count)
+	assert.Equal(t, 0, len(list.Results))
 }
