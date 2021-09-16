@@ -33,15 +33,15 @@ func TestUserShow(t *testing.T) {
 	testutil.AssertMatchesAll(t, html, items)
 
 	// Inst admin can see users at their own institution
-	html = testutil.InstAdminClient.GET("/users/show/3").Expect().
+	html = testutil.Inst1AdminClient.GET("/users/show/3").Expect().
 		Status(http.StatusOK).Body().Raw()
 	testutil.AssertMatchesAll(t, html, items)
 
 	// Inst admin cannot view the user belonging to other institution
-	testutil.InstUserClient.GET("/users/show/1").Expect().Status(http.StatusForbidden)
+	testutil.Inst1UserClient.GET("/users/show/1").Expect().Status(http.StatusForbidden)
 
 	// Regular user cannot view the user show page, even their own
-	testutil.InstUserClient.GET("/users/show/3").Expect().Status(http.StatusForbidden)
+	testutil.Inst1UserClient.GET("/users/show/3").Expect().Status(http.StatusForbidden)
 
 }
 
@@ -82,9 +82,9 @@ func TestUserIndex(t *testing.T) {
 	testutil.AssertMatchesAll(t, html, instUserLinks)
 	testutil.AssertMatchesAll(t, html, nonInst1Links)
 	testutil.AssertMatchesAll(t, html, adminFilters)
-	testutil.AssertMatchesResultCount(t, html, 6)
+	testutil.AssertMatchesResultCount(t, html, 7)
 
-	html = testutil.InstAdminClient.GET("/users").Expect().
+	html = testutil.Inst1AdminClient.GET("/users").Expect().
 		Status(http.StatusOK).Body().Raw()
 	testutil.AssertMatchesAll(t, html, items)
 	testutil.AssertMatchesAll(t, html, instUserLinks)
@@ -93,7 +93,7 @@ func TestUserIndex(t *testing.T) {
 	testutil.AssertMatchesResultCount(t, html, 4)
 
 	// Regular user cannot view the user list page
-	testutil.InstUserClient.GET("/users").Expect().Status(http.StatusForbidden)
+	testutil.Inst1UserClient.GET("/users").Expect().Status(http.StatusForbidden)
 
 }
 
@@ -102,8 +102,8 @@ func TestUserCreateEditDeleteUndelete(t *testing.T) {
 
 	// Make sure admins can get to this page and regular users cannot.
 	testutil.SysAdminClient.GET("/users/new").Expect().Status(http.StatusOK)
-	testutil.InstAdminClient.GET("/users/new").Expect().Status(http.StatusOK)
-	testutil.InstUserClient.GET("/users/new").Expect().Status(http.StatusForbidden)
+	testutil.Inst1AdminClient.GET("/users/new").Expect().Status(http.StatusOK)
+	testutil.Inst1UserClient.GET("/users/new").Expect().Status(http.StatusForbidden)
 
 	formData := map[string]interface{}{
 		"Name":           "Unit Test User",
@@ -113,9 +113,9 @@ func TestUserCreateEditDeleteUndelete(t *testing.T) {
 		"Role":           constants.RoleInstUser,
 	}
 
-	testutil.InstAdminClient.POST("/users/new").
+	testutil.Inst1AdminClient.POST("/users/new").
 		WithHeader("Referer", testutil.BaseURL).
-		WithFormField(constants.CSRFTokenName, testutil.InstAdminToken).
+		WithFormField(constants.CSRFTokenName, testutil.Inst1AdminToken).
 		WithForm(formData).Expect().Status(http.StatusOK)
 
 	// Make sure the new user exists and has the correct info
@@ -141,15 +141,15 @@ func TestUserCreateEditDeleteUndelete(t *testing.T) {
 	assert.Contains(t, alertView.Content, "?token=")
 
 	// Get the edit page for the new user
-	testutil.InstAdminClient.GET("/users/edit/{id}", user.ID).
+	testutil.Inst1AdminClient.GET("/users/edit/{id}", user.ID).
 		Expect().Status(http.StatusOK)
 
 	// Update the user
 	formData["Name"] = "Unit Test User (edited)"
 	formData["PhoneNumber"] = "+15058981234"
-	testutil.InstAdminClient.PUT("/users/edit/{id}", user.ID).
+	testutil.Inst1AdminClient.PUT("/users/edit/{id}", user.ID).
 		WithHeader("Referer", testutil.BaseURL).
-		WithFormField(constants.CSRFTokenName, testutil.InstAdminToken).
+		WithFormField(constants.CSRFTokenName, testutil.Inst1AdminToken).
 		WithForm(formData).Expect().Status(http.StatusOK)
 
 	// Make sure the edits were saved
@@ -162,15 +162,15 @@ func TestUserCreateEditDeleteUndelete(t *testing.T) {
 	// Delete the user. This winds up with an OK because of redirect.
 	// Note that because it's a delete, there's no form, so we have
 	// to pass the CSRF token in the header.
-	testutil.InstAdminClient.DELETE("/users/delete/{id}", user.ID).
+	testutil.Inst1AdminClient.DELETE("/users/delete/{id}", user.ID).
 		WithHeader("Referer", testutil.BaseURL).
-		WithHeader(constants.CSRFHeaderName, testutil.InstAdminToken).
+		WithHeader(constants.CSRFHeaderName, testutil.Inst1AdminToken).
 		Expect().Status(http.StatusOK)
 
 	// Undelete the user. Again, we get a redirect ending with an OK.
-	testutil.InstAdminClient.POST("/users/undelete/{id}", user.ID).
+	testutil.Inst1AdminClient.POST("/users/undelete/{id}", user.ID).
 		WithHeader("Referer", testutil.BaseURL).
-		WithHeader(constants.CSRFHeaderName, testutil.InstAdminToken).
+		WithHeader(constants.CSRFHeaderName, testutil.Inst1AdminToken).
 		Expect().Status(http.StatusOK)
 
 }
@@ -217,14 +217,14 @@ func TestUserChangePassword(t *testing.T) {
 
 	// Make sure user can get to the change password page
 	// to change their own password.
-	testutil.InstUserClient.GET("/users/change_password/{id}", testutil.Inst1User.ID).
+	testutil.Inst1UserClient.GET("/users/change_password/{id}", testutil.Inst1User.ID).
 		Expect().Status(http.StatusOK)
 
 	// Submit and test the password change.
 	// Password requirements: uppercase, lowercase, number, min 8 chars
-	testutil.InstUserClient.POST("/users/change_password/{id}", testutil.Inst1User.ID).
+	testutil.Inst1UserClient.POST("/users/change_password/{id}", testutil.Inst1User.ID).
 		WithHeader("Referer", testutil.BaseURL).
-		WithFormField(constants.CSRFTokenName, testutil.InstUserToken).
+		WithFormField(constants.CSRFTokenName, testutil.Inst1UserToken).
 		WithFormField("NewPassword", "Password1234").
 		WithFormField("ConfirmNewPassword", "Password1234").
 		Expect().Status(http.StatusOK)
@@ -238,13 +238,13 @@ func TestUserChangePassword(t *testing.T) {
 
 	// Institutional admin can change another user's password,
 	// as long as that user is at their institution.
-	testutil.InstAdminClient.GET("/users/change_password/{id}", testutil.Inst1User.ID).
+	testutil.Inst1AdminClient.GET("/users/change_password/{id}", testutil.Inst1User.ID).
 		Expect().Status(http.StatusOK)
-	testutil.InstAdminClient.POST("/users/change_password/{id}", testutil.Inst1User.ID).
+	testutil.Inst1AdminClient.POST("/users/change_password/{id}", testutil.Inst1User.ID).
 		WithHeader("Referer", testutil.BaseURL).
 		WithFormField("NewPassword", "Password5678").
 		WithFormField("ConfirmNewPassword", "Password5678").
-		WithFormField(constants.CSRFTokenName, testutil.InstAdminToken).
+		WithFormField(constants.CSRFTokenName, testutil.Inst1AdminToken).
 		Expect().Status(http.StatusOK)
 
 	user, err = pgmodels.UserByID(testutil.Inst1User.ID)
@@ -253,24 +253,24 @@ func TestUserChangePassword(t *testing.T) {
 	assert.NotEqual(t, secondPwd, user.EncryptedPassword)
 
 	// inst1Admin cannot change password for anyone at inst2
-	testutil.InstAdminClient.GET("/users/change_password/{id}", testutil.Inst2Admin.ID).
+	testutil.Inst1AdminClient.GET("/users/change_password/{id}", testutil.Inst2Admin.ID).
 		Expect().Status(http.StatusForbidden)
-	testutil.InstAdminClient.POST("/users/change_password/{id}", testutil.Inst2Admin.ID).
+	testutil.Inst1AdminClient.POST("/users/change_password/{id}", testutil.Inst2Admin.ID).
 		WithHeader("Referer", testutil.BaseURL).
 		WithFormField("NewPassword", "Password5678").
 		WithFormField("ConfirmNewPassword", "Password5678").
-		WithFormField(constants.CSRFTokenName, testutil.InstAdminToken).
+		WithFormField(constants.CSRFTokenName, testutil.Inst1AdminToken).
 		Expect().Status(http.StatusForbidden)
 
 	// Regular user cannot access anyone else's change password page
 	// In this case, inst1User is trying to change inst1Admin
-	testutil.InstUserClient.GET("/users/change_password/{id}", testutil.Inst1Admin.ID).
+	testutil.Inst1UserClient.GET("/users/change_password/{id}", testutil.Inst1Admin.ID).
 		Expect().Status(http.StatusForbidden)
-	testutil.InstUserClient.POST("/users/change_password/{id}", testutil.Inst1Admin.ID).
+	testutil.Inst1UserClient.POST("/users/change_password/{id}", testutil.Inst1Admin.ID).
 		WithHeader("Referer", testutil.BaseURL).
 		WithFormField("NewPassword", "Password5678").
 		WithFormField("ConfirmNewPassword", "Password5678").
-		WithFormField(constants.CSRFTokenName, testutil.InstUserToken).
+		WithFormField(constants.CSRFTokenName, testutil.Inst1UserToken).
 		Expect().Status(http.StatusForbidden)
 }
 
@@ -279,7 +279,7 @@ func TestUserForcePasswordReset(t *testing.T) {
 
 	defer restorePassword(t, testutil.Inst1User)
 
-	testutil.InstAdminClient.GET("/users/init_password_reset/{id}", testutil.Inst1User.ID).
+	testutil.Inst1AdminClient.GET("/users/init_password_reset/{id}", testutil.Inst1User.ID).
 		Expect().Status(http.StatusOK)
 
 	// This should create an alert for the user.
@@ -324,13 +324,13 @@ func TestUserForcePasswordReset(t *testing.T) {
 	require.Nil(t, testutil.Inst1User.Save())
 
 	// Regular user cannot reset other user's password.
-	testutil.InstUserClient.GET("/users/init_password_reset/{id}", testutil.Inst1Admin.ID).
+	testutil.Inst1UserClient.GET("/users/init_password_reset/{id}", testutil.Inst1Admin.ID).
 		Expect().Status(http.StatusForbidden)
-	testutil.InstUserClient.GET("/users/init_password_reset/{id}", testutil.Inst2Admin.ID).
+	testutil.Inst1UserClient.GET("/users/init_password_reset/{id}", testutil.Inst2Admin.ID).
 		Expect().Status(http.StatusForbidden)
 
 	// Admin cannot reset password of anyone at other institution
-	testutil.InstAdminClient.GET("/users/init_password_reset/{id}", testutil.Inst2Admin.ID).
+	testutil.Inst1AdminClient.GET("/users/init_password_reset/{id}", testutil.Inst2Admin.ID).
 		Expect().Status(http.StatusForbidden)
 }
 
@@ -351,17 +351,17 @@ func TestUserGetAPIKey(t *testing.T) {
 	}
 
 	// No user can get another user's API key
-	testutil.InstAdminClient.POST("/users/get_api_key/{id}", testutil.Inst1User.ID).
+	testutil.Inst1AdminClient.POST("/users/get_api_key/{id}", testutil.Inst1User.ID).
 		WithHeader("Referer", testutil.BaseURL).
-		WithFormField(constants.CSRFTokenName, testutil.InstAdminToken).
+		WithFormField(constants.CSRFTokenName, testutil.Inst1AdminToken).
 		Expect().Status(http.StatusForbidden)
-	testutil.InstUserClient.POST("/users/get_api_key/{id}", testutil.Inst1Admin.ID).
+	testutil.Inst1UserClient.POST("/users/get_api_key/{id}", testutil.Inst1Admin.ID).
 		WithHeader("Referer", testutil.BaseURL).
-		WithFormField(constants.CSRFTokenName, testutil.InstUserToken).
+		WithFormField(constants.CSRFTokenName, testutil.Inst1UserToken).
 		Expect().Status(http.StatusForbidden)
-	testutil.InstAdminClient.POST("/users/get_api_key/{id}", testutil.Inst2Admin.ID).
+	testutil.Inst1AdminClient.POST("/users/get_api_key/{id}", testutil.Inst2Admin.ID).
 		WithHeader("Referer", testutil.BaseURL).
-		WithFormField(constants.CSRFTokenName, testutil.InstAdminToken).
+		WithFormField(constants.CSRFTokenName, testutil.Inst1AdminToken).
 		Expect().Status(http.StatusForbidden)
 
 }

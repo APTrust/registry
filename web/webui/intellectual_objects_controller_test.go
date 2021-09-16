@@ -51,9 +51,9 @@ func TestObjectShow(t *testing.T) {
 	}
 
 	// inst 1 users cannot see objects belonging to inst 2
-	testutil.InstAdminClient.GET("/objects/show/6").
+	testutil.Inst1AdminClient.GET("/objects/show/6").
 		Expect().Status(http.StatusForbidden)
-	testutil.InstUserClient.GET("/objects/show/6").
+	testutil.Inst1UserClient.GET("/objects/show/6").
 		Expect().Status(http.StatusForbidden)
 
 }
@@ -138,9 +138,9 @@ func TestObjectRequestDelete(t *testing.T) {
 	// Object 6 from fixtures belongs to Inst2
 	testutil.SysAdminClient.GET("/objects/request_delete/6").
 		Expect().Status(http.StatusOK)
-	testutil.InstAdminClient.GET("/objects/request_delete/6").
+	testutil.Inst1AdminClient.GET("/objects/request_delete/6").
 		Expect().Status(http.StatusForbidden)
-	testutil.InstUserClient.GET("/objects/request_delete/6").
+	testutil.Inst1UserClient.GET("/objects/request_delete/6").
 		Expect().Status(http.StatusForbidden)
 
 }
@@ -159,9 +159,9 @@ func TestObjectInitDelete(t *testing.T) {
 
 	// User at inst 1 can initiate deletion of their own
 	// institution's object.
-	html := testutil.InstUserClient.POST("/objects/init_delete/2").
+	html := testutil.Inst1UserClient.POST("/objects/init_delete/2").
 		WithHeader("Referer", testutil.BaseURL).
-		WithFormField(constants.CSRFTokenName, testutil.InstUserToken).
+		WithFormField(constants.CSRFTokenName, testutil.Inst1UserToken).
 		Expect().Status(http.StatusCreated).Body().Raw()
 	testutil.AssertMatchesAll(t, html, items)
 
@@ -198,9 +198,9 @@ func TestObjectInitDelete(t *testing.T) {
 	// The user should NOT be able to initiate deletion of an object
 	// that belongs to another institution. In fixture data, object
 	// 6 belongs to inst 2.
-	testutil.InstUserClient.POST("/objects/init_delete/6").
+	testutil.Inst1UserClient.POST("/objects/init_delete/6").
 		WithHeader("Referer", testutil.BaseURL).
-		WithFormField(constants.CSRFTokenName, testutil.InstUserToken).
+		WithFormField(constants.CSRFTokenName, testutil.Inst1UserToken).
 		Expect().Status(http.StatusForbidden)
 
 }
@@ -226,9 +226,9 @@ func TestObjectRequestRestore(t *testing.T) {
 	// Object 6 from fixtures belongs to Inst2
 	testutil.SysAdminClient.GET("/objects/request_restore/6").
 		Expect().Status(http.StatusOK)
-	testutil.InstAdminClient.GET("/objects/request_restore/6").
+	testutil.Inst1AdminClient.GET("/objects/request_restore/6").
 		Expect().Status(http.StatusForbidden)
-	testutil.InstUserClient.GET("/objects/request_restore/6").
+	testutil.Inst1UserClient.GET("/objects/request_restore/6").
 		Expect().Status(http.StatusForbidden)
 }
 
@@ -245,9 +245,9 @@ func TestObjectInitRestore(t *testing.T) {
 
 	// User should see flash message saying object is queued for restoration.
 	// This means the work item was created and queued.
-	html := testutil.InstUserClient.POST("/objects/init_restore/2").
+	html := testutil.Inst1UserClient.POST("/objects/init_restore/2").
 		WithHeader("Referer", testutil.BaseURL).
-		WithFormField(constants.CSRFTokenName, testutil.InstUserToken).
+		WithFormField(constants.CSRFTokenName, testutil.Inst1UserToken).
 		Expect().Status(http.StatusOK).Body().Raw()
 	testutil.AssertMatchesAll(t, html, items)
 
@@ -260,13 +260,13 @@ func TestObjectInitRestore(t *testing.T) {
 	require.NotNil(t, workItem)
 
 	// Users cannot restore objects belonging to other institutions.
-	testutil.InstAdminClient.POST("/objects/init_restore/6").
+	testutil.Inst1AdminClient.POST("/objects/init_restore/6").
 		WithHeader("Referer", testutil.BaseURL).
-		WithFormField(constants.CSRFTokenName, testutil.InstAdminToken).
+		WithFormField(constants.CSRFTokenName, testutil.Inst1AdminToken).
 		Expect().Status(http.StatusForbidden)
-	testutil.InstUserClient.POST("/objects/init_restore/6").
+	testutil.Inst1UserClient.POST("/objects/init_restore/6").
 		WithHeader("Referer", testutil.BaseURL).
-		WithFormField(constants.CSRFTokenName, testutil.InstUserToken).
+		WithFormField(constants.CSRFTokenName, testutil.Inst1UserToken).
 		Expect().Status(http.StatusForbidden)
 
 }

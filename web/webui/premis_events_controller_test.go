@@ -31,9 +31,9 @@ func TestEventShow(t *testing.T) {
 	}
 
 	// Inst 1 users cannot see event belonging to inst 2
-	testutil.InstAdminClient.GET("/events/show/42").
+	testutil.Inst1AdminClient.GET("/events/show/42").
 		Expect().Status(http.StatusForbidden)
-	testutil.InstUserClient.GET("/events/show/42").
+	testutil.Inst1UserClient.GET("/events/show/42").
 		Expect().Status(http.StatusForbidden)
 }
 
@@ -107,8 +107,8 @@ func TestEventShowXHR(t *testing.T) {
 	}
 
 	// Inst 1 users cannot see event belonging to inst 2
-	testutil.InstAdminClient.GET("/events/show_xhr/42").
+	testutil.Inst1AdminClient.GET("/events/show_xhr/42").
 		Expect().Status(http.StatusForbidden)
-	testutil.InstUserClient.GET("/events/show_xhr/42").
+	testutil.Inst1UserClient.GET("/events/show_xhr/42").
 		Expect().Status(http.StatusForbidden)
 }

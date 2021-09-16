@@ -46,3 +46,12 @@ type AlertViewList struct {
 	Previous string                `json:"previous"`
 	Results  []*pgmodels.AlertView `json:"results"`
 }
+
+// DeletionRequestViewList is used into testing to covert a generic
+// JsonList into a typed list that we can test with assertions.
+type DeletionRequestViewList struct {
+	Count    int                             `json:"count"`
+	Next     string                          `json:"next"`
+	Previous string                          `json:"previous"`
+	Results  []*pgmodels.DeletionRequestView `json:"results"`
+}

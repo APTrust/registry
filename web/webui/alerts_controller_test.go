@@ -32,17 +32,17 @@ func TestAlertShow(t *testing.T) {
 		Status(http.StatusOK).Body().Contains(alert1.Content)
 
 	// Inst admin can read own alert
-	testutil.InstAdminClient.GET("/alerts/show/{id}/{user_id}", alert1.ID, testutil.Inst1Admin.ID).
+	testutil.Inst1AdminClient.GET("/alerts/show/{id}/{user_id}", alert1.ID, testutil.Inst1Admin.ID).
 		Expect().
 		Status(http.StatusOK).Body().Contains(alert1.Content)
 
 	// Inst admin CANNOT read sys admin's copy of alert
-	testutil.InstAdminClient.GET("/alerts/show/{id}/{user_id}", alert1.ID, testutil.SysAdmin.ID).
+	testutil.Inst1AdminClient.GET("/alerts/show/{id}/{user_id}", alert1.ID, testutil.SysAdmin.ID).
 		Expect().
 		Status(http.StatusForbidden)
 
 	// Inst user CANNOT read inst admin's alert
-	testutil.InstUserClient.GET("/alerts/show/{id}/{user_id}", alert1.ID, testutil.Inst1Admin.ID).
+	testutil.Inst1UserClient.GET("/alerts/show/{id}/{user_id}", alert1.ID, testutil.Inst1Admin.ID).
 		Expect().
 		Status(http.StatusForbidden)
 }
@@ -84,7 +84,7 @@ func TestAlertIndex(t *testing.T) {
 
 	// Inst admin should see only his own alerts and the
 	// alert type and date filters
-	resp = testutil.InstAdminClient.GET("/alerts").
+	resp = testutil.Inst1AdminClient.GET("/alerts").
 		WithQuery("institution_id", testutil.Inst1Admin.InstitutionID).
 		WithQuery("user_id", testutil.Inst1Admin.ID).
 		Expect().Status(http.StatusOK)
@@ -96,7 +96,7 @@ func TestAlertIndex(t *testing.T) {
 
 	// Inst user should see only his own alerts and the
 	// alert type and date filters
-	resp = testutil.InstUserClient.GET("/alerts").
+	resp = testutil.Inst1UserClient.GET("/alerts").
 		WithQuery("institution_id", testutil.Inst1User.InstitutionID).
 		WithQuery("user_id", testutil.Inst1User.ID).
 		Expect().Status(http.StatusOK)

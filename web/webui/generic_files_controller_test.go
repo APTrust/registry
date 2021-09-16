@@ -34,8 +34,8 @@ func TestGenericFileShow(t *testing.T) {
 	// This file belongs to institution 2, so sys admin
 	// can see it, but inst 1 users cannot.
 	testutil.SysAdminClient.GET("/files/show/17").Expect().Status(http.StatusOK)
-	testutil.InstAdminClient.GET("/files/show/17").Expect().Status(http.StatusForbidden)
-	testutil.InstUserClient.GET("/files/show/17").Expect().Status(http.StatusForbidden)
+	testutil.Inst1AdminClient.GET("/files/show/17").Expect().Status(http.StatusForbidden)
+	testutil.Inst1UserClient.GET("/files/show/17").Expect().Status(http.StatusForbidden)
 }
 
 func TestGenericFileIndex(t *testing.T) {
@@ -100,10 +100,10 @@ func TestGenericFileIndex(t *testing.T) {
 	testutil.SysAdminClient.GET("/files").
 		WithQuery("institution_id", "3").
 		Expect().Status(http.StatusOK)
-	testutil.InstAdminClient.GET("/files").
+	testutil.Inst1AdminClient.GET("/files").
 		WithQuery("institution_id", "3").
 		Expect().Status(http.StatusForbidden)
-	testutil.InstUserClient.GET("/files").
+	testutil.Inst1UserClient.GET("/files").
 		WithQuery("institution_id", "3").
 		Expect().Status(http.StatusForbidden)
 }
@@ -130,9 +130,9 @@ func TestGenericFileRequestDelete(t *testing.T) {
 	// File 18 from fixtures belongs to Inst2
 	testutil.SysAdminClient.GET("/files/request_delete/18").
 		Expect().Status(http.StatusOK)
-	testutil.InstAdminClient.GET("/files/request_delete/18").
+	testutil.Inst1AdminClient.GET("/files/request_delete/18").
 		Expect().Status(http.StatusForbidden)
-	testutil.InstUserClient.GET("/files/request_delete/18").
+	testutil.Inst1UserClient.GET("/files/request_delete/18").
 		Expect().Status(http.StatusForbidden)
 }
 
@@ -150,9 +150,9 @@ func TestGenericFileInitDelete(t *testing.T) {
 
 	// User at inst 1 can initiate deletion of their own
 	// institution's file.
-	html := testutil.InstUserClient.POST("/files/init_delete/4").
+	html := testutil.Inst1UserClient.POST("/files/init_delete/4").
 		WithHeader("Referer", testutil.BaseURL).
-		WithFormField(constants.CSRFTokenName, testutil.InstUserToken).
+		WithFormField(constants.CSRFTokenName, testutil.Inst1UserToken).
 		Expect().Status(http.StatusCreated).Body().Raw()
 	testutil.AssertMatchesAll(t, html, items)
 
@@ -184,9 +184,9 @@ func TestGenericFileInitDelete(t *testing.T) {
 	// The user should NOT be able to initiate deletion of a file
 	// that belongs to another institution. In fixture data, file
 	// 34 belongs to inst 2.
-	testutil.InstUserClient.POST("/files/init_delete/34").
+	testutil.Inst1UserClient.POST("/files/init_delete/34").
 		WithHeader("Referer", testutil.BaseURL).
-		WithFormField(constants.CSRFTokenName, testutil.InstUserToken).
+		WithFormField(constants.CSRFTokenName, testutil.Inst1UserToken).
 		Expect().Status(http.StatusForbidden)
 }
 
@@ -211,9 +211,9 @@ func TestGenericFileRequestRestore(t *testing.T) {
 	// File 18 from fixtures belongs to Inst2
 	testutil.SysAdminClient.GET("/files/request_restore/18").
 		Expect().Status(http.StatusOK)
-	testutil.InstAdminClient.GET("/files/request_restore/18").
+	testutil.Inst1AdminClient.GET("/files/request_restore/18").
 		Expect().Status(http.StatusForbidden)
-	testutil.InstUserClient.GET("/files/request_restore/18").
+	testutil.Inst1UserClient.GET("/files/request_restore/18").
 		Expect().Status(http.StatusForbidden)
 }
 
@@ -230,9 +230,9 @@ func TestGenericFileInitRestore(t *testing.T) {
 
 	// User should see flash message saying item is queued for restoration.
 	// This means the work item was created and queued.
-	html := testutil.InstUserClient.POST("/files/init_restore/2").
+	html := testutil.Inst1UserClient.POST("/files/init_restore/2").
 		WithHeader("Referer", testutil.BaseURL).
-		WithFormField(constants.CSRFTokenName, testutil.InstUserToken).
+		WithFormField(constants.CSRFTokenName, testutil.Inst1UserToken).
 		Expect().Status(http.StatusOK).Body().Raw()
 	testutil.AssertMatchesAll(t, html, items)
 
@@ -245,12 +245,12 @@ func TestGenericFileInitRestore(t *testing.T) {
 	require.NotNil(t, workItem)
 
 	// Users cannot restore files belonging to other institutions.
-	testutil.InstAdminClient.POST("/files/init_restore/18").
+	testutil.Inst1AdminClient.POST("/files/init_restore/18").
 		WithHeader("Referer", testutil.BaseURL).
-		WithFormField(constants.CSRFTokenName, testutil.InstAdminToken).
+		WithFormField(constants.CSRFTokenName, testutil.Inst1AdminToken).
 		Expect().Status(http.StatusForbidden)
-	testutil.InstUserClient.POST("/files/init_restore/18").
+	testutil.Inst1UserClient.POST("/files/init_restore/18").
 		WithHeader("Referer", testutil.BaseURL).
-		WithFormField(constants.CSRFTokenName, testutil.InstUserToken).
+		WithFormField(constants.CSRFTokenName, testutil.Inst1UserToken).
 		Expect().Status(http.StatusForbidden)
 }

@@ -35,7 +35,7 @@ func TestInstitutionShow(t *testing.T) {
 
 		// Admins should see links to the institution's users,
 		// regular users should not see these links.
-		if client == testutil.SysAdminClient || client == testutil.InstAdminClient {
+		if client == testutil.SysAdminClient || client == testutil.Inst1AdminClient {
 			testutil.AssertMatchesAll(t, html, userLinks)
 		} else {
 			testutil.AssertMatchesNone(t, html, userLinks)
@@ -45,8 +45,8 @@ func TestInstitutionShow(t *testing.T) {
 	// SysAdmin can see any institution.
 	// Others can see only their own institution
 	testutil.SysAdminClient.GET("/institutions/show/3").Expect().Status(http.StatusOK)
-	testutil.InstAdminClient.GET("/institutions/show/3").Expect().Status(http.StatusForbidden)
-	testutil.InstUserClient.GET("/institutions/show/3").Expect().Status(http.StatusForbidden)
+	testutil.Inst1AdminClient.GET("/institutions/show/3").Expect().Status(http.StatusForbidden)
+	testutil.Inst1UserClient.GET("/institutions/show/3").Expect().Status(http.StatusForbidden)
 
 }
 
@@ -55,8 +55,8 @@ func TestInstitutionCreateEditDeleteUndelete(t *testing.T) {
 
 	// SysAdmin can get the new institution form. Others cannot.
 	testutil.SysAdminClient.GET("/institutions/new").Expect().Status(http.StatusOK)
-	testutil.InstAdminClient.GET("/institutions/new").Expect().Status(http.StatusForbidden)
-	testutil.InstUserClient.GET("/institutions/new").Expect().Status(http.StatusForbidden)
+	testutil.Inst1AdminClient.GET("/institutions/new").Expect().Status(http.StatusForbidden)
+	testutil.Inst1UserClient.GET("/institutions/new").Expect().Status(http.StatusForbidden)
 
 	institution := &pgmodels.Institution{
 		Name:            "Springfield Yooniversity",
@@ -67,14 +67,14 @@ func TestInstitutionCreateEditDeleteUndelete(t *testing.T) {
 	}
 
 	// Only Sys Admin can create an institution
-	testutil.InstUserClient.POST("/institutions/new").
+	testutil.Inst1UserClient.POST("/institutions/new").
 		WithHeader("Referer", testutil.BaseURL).
-		WithFormField(constants.CSRFTokenName, testutil.InstUserToken).
+		WithFormField(constants.CSRFTokenName, testutil.Inst1UserToken).
 		WithForm(institution).
 		Expect().Status(http.StatusForbidden)
-	testutil.InstAdminClient.POST("/institutions/new").
+	testutil.Inst1AdminClient.POST("/institutions/new").
 		WithHeader("Referer", testutil.BaseURL).
-		WithFormField(constants.CSRFTokenName, testutil.InstAdminToken).
+		WithFormField(constants.CSRFTokenName, testutil.Inst1AdminToken).
 		WithForm(institution).
 		Expect().Status(http.StatusForbidden)
 
@@ -104,14 +104,14 @@ func TestInstitutionCreateEditDeleteUndelete(t *testing.T) {
 		Body().Contains("Springfield University")
 
 	// Make sure non-sysadmins cannot update this other institution.
-	testutil.InstUserClient.PUT("/institutions/edit/{id}", institution.ID).
+	testutil.Inst1UserClient.PUT("/institutions/edit/{id}", institution.ID).
 		WithHeader("Referer", testutil.BaseURL).
-		WithFormField(constants.CSRFTokenName, testutil.InstUserToken).
+		WithFormField(constants.CSRFTokenName, testutil.Inst1UserToken).
 		WithForm(institution).
 		Expect().Status(http.StatusForbidden)
-	testutil.InstAdminClient.PUT("/institutions/edit/{id}", institution.ID).
+	testutil.Inst1AdminClient.PUT("/institutions/edit/{id}", institution.ID).
 		WithHeader("Referer", testutil.BaseURL).
-		WithFormField(constants.CSRFTokenName, testutil.InstAdminToken).
+		WithFormField(constants.CSRFTokenName, testutil.Inst1AdminToken).
 		WithForm(institution).
 		Expect().Status(http.StatusForbidden)
 
@@ -126,13 +126,13 @@ func TestInstitutionCreateEditDeleteUndelete(t *testing.T) {
 		Expect().Status(http.StatusOK)
 
 	// Other users cannot delete or undelete, even their own instituion
-	testutil.InstUserClient.GET("/institutions/delete/{id}", testutil.Inst1User.InstitutionID).
+	testutil.Inst1UserClient.GET("/institutions/delete/{id}", testutil.Inst1User.InstitutionID).
 		Expect().Status(http.StatusForbidden)
-	testutil.InstAdminClient.GET("/institutions/delete/{id}", testutil.Inst1Admin.InstitutionID).
+	testutil.Inst1AdminClient.GET("/institutions/delete/{id}", testutil.Inst1Admin.InstitutionID).
 		Expect().Status(http.StatusForbidden)
-	testutil.InstUserClient.GET("/institutions/undelete/{id}", testutil.Inst1User.InstitutionID).
+	testutil.Inst1UserClient.GET("/institutions/undelete/{id}", testutil.Inst1User.InstitutionID).
 		Expect().Status(http.StatusForbidden)
-	testutil.InstAdminClient.GET("/institutions/undelete/{id}", testutil.Inst1Admin.InstitutionID).
+	testutil.Inst1AdminClient.GET("/institutions/undelete/{id}", testutil.Inst1Admin.InstitutionID).
 		WithForm(institution).
 		Expect().Status(http.StatusForbidden)
 
@@ -154,6 +154,6 @@ func TestInstitutionIndex(t *testing.T) {
 	testutil.AssertMatchesAll(t, html, instLinks)
 
 	// No other roles can see this page.
-	testutil.InstAdminClient.GET("/institutions").Expect().Status(http.StatusForbidden)
-	testutil.InstUserClient.GET("/institutions").Expect().Status(http.StatusForbidden)
+	testutil.Inst1AdminClient.GET("/institutions").Expect().Status(http.StatusForbidden)
+	testutil.Inst1UserClient.GET("/institutions").Expect().Status(http.StatusForbidden)
 }

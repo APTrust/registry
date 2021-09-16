@@ -103,7 +103,7 @@ func TestUserTwoFactorBackup(t *testing.T) {
 		"Backup Code",
 	}
 
-	html := testutil.InstUserClient.GET("/users/2fa_backup").
+	html := testutil.Inst1UserClient.GET("/users/2fa_backup").
 		Expect().Status(http.StatusOK).Body().Raw()
 	testutil.AssertMatchesAll(t, html, expected)
 }
@@ -117,9 +117,9 @@ func TestUserTwoFactorGenerateSMS(t *testing.T) {
 		testutil.Inst1User.ClearOTPSecret()
 	}()
 
-	html := testutil.InstUserClient.POST("/users/2fa_sms").
+	html := testutil.Inst1UserClient.POST("/users/2fa_sms").
 		WithHeader("Referer", testutil.BaseURL).
-		WithFormField(constants.CSRFTokenName, testutil.InstUserToken).
+		WithFormField(constants.CSRFTokenName, testutil.Inst1UserToken).
 		Expect().Status(http.StatusOK).Body().Raw()
 
 	expectedStrings := []string{
@@ -162,7 +162,7 @@ func TestUserTwoInit2FASetup(t *testing.T) {
 		`name="AuthyStatus"`,
 		"confirmChange()",
 	}
-	html := testutil.InstUserClient.GET("/users/2fa_setup").
+	html := testutil.Inst1UserClient.GET("/users/2fa_setup").
 		Expect().Status(http.StatusOK).Body().Raw()
 	testutil.AssertMatchesAll(t, html, expected)
 }
@@ -212,9 +212,9 @@ func TestUserBackupCodes(t *testing.T) {
 	assert.Empty(t, reloadedUser.OTPBackupCodes)
 
 	// Generate backup codes
-	html := testutil.InstUserClient.POST("/users/backup_codes").
+	html := testutil.Inst1UserClient.POST("/users/backup_codes").
 		WithHeader("Referer", testutil.BaseURL).
-		WithFormField(constants.CSRFTokenName, testutil.InstUserToken).
+		WithFormField(constants.CSRFTokenName, testutil.Inst1UserToken).
 		Expect().Status(http.StatusOK).Body().Raw()
 
 	backupCodes := extractBackupCodes(t, html)
@@ -225,9 +225,9 @@ func TestUserBackupCodes(t *testing.T) {
 	assert.Equal(t, 6, len(reloadedUser.OTPBackupCodes))
 
 	// Make sure backup code can be verified
-	testutil.InstUserClient.POST("/users/2fa_verify").
+	testutil.Inst1UserClient.POST("/users/2fa_verify").
 		WithHeader("Referer", testutil.BaseURL).
-		WithFormField(constants.CSRFTokenName, testutil.InstUserToken).
+		WithFormField(constants.CSRFTokenName, testutil.Inst1UserToken).
 		WithFormField("two_factor_method", "Backup Code").
 		WithFormField("otp", backupCodes[0]).
 		Expect().Status(http.StatusOK)

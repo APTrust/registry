@@ -115,9 +115,9 @@ func TestWorkItemEditUpdate(t *testing.T) {
 		Expect().Status(http.StatusOK)
 
 	// InstAdmin and InstUser cannot edit work items
-	testutil.InstAdminClient.GET("/work_items/edit/{id}", workItem.ID).
+	testutil.Inst1AdminClient.GET("/work_items/edit/{id}", workItem.ID).
 		Expect().Status(http.StatusForbidden)
-	testutil.InstUserClient.GET("/work_items/edit/{id}", workItem.ID).
+	testutil.Inst1UserClient.GET("/work_items/edit/{id}", workItem.ID).
 		Expect().Status(http.StatusForbidden)
 
 	// Change some values
@@ -148,13 +148,13 @@ func TestWorkItemEditUpdate(t *testing.T) {
 	assert.Equal(t, workItem.PID, item.PID)
 
 	// And make sure these roles cannot update work items
-	testutil.InstAdminClient.PUT("/work_items/edit/{id}", workItem.ID).
+	testutil.Inst1AdminClient.PUT("/work_items/edit/{id}", workItem.ID).
 		WithHeader("Referer", testutil.BaseURL).
-		WithHeader(constants.CSRFHeaderName, testutil.InstAdminToken).
+		WithHeader(constants.CSRFHeaderName, testutil.Inst1AdminToken).
 		WithForm(workItem).Expect().Status(http.StatusForbidden)
-	testutil.InstUserClient.PUT("/work_items/edit/{id}", workItem.ID).
+	testutil.Inst1UserClient.PUT("/work_items/edit/{id}", workItem.ID).
 		WithHeader("Referer", testutil.BaseURL).
-		WithHeader(constants.CSRFHeaderName, testutil.InstUserToken).
+		WithHeader(constants.CSRFHeaderName, testutil.Inst1UserToken).
 		WithForm(workItem).Expect().Status(http.StatusForbidden)
 }
 
@@ -183,14 +183,14 @@ func TestWorkItemRequeue(t *testing.T) {
 	assert.Equal(t, constants.StatusPending, item.Status)
 
 	// Make sure other roles cannot requeue
-	testutil.InstAdminClient.PUT("/work_items/requeue/{id}", workItem.ID).
+	testutil.Inst1AdminClient.PUT("/work_items/requeue/{id}", workItem.ID).
 		WithHeader("Referer", testutil.BaseURL).
-		WithHeader(constants.CSRFHeaderName, testutil.InstAdminToken).
+		WithHeader(constants.CSRFHeaderName, testutil.Inst1AdminToken).
 		WithFormField("Stage", constants.StageReingestCheck).
 		Expect().Status(http.StatusForbidden)
-	testutil.InstUserClient.PUT("/work_items/requeue/{id}", workItem.ID).
+	testutil.Inst1UserClient.PUT("/work_items/requeue/{id}", workItem.ID).
 		WithHeader("Referer", testutil.BaseURL).
-		WithHeader(constants.CSRFHeaderName, testutil.InstUserToken).
+		WithHeader(constants.CSRFHeaderName, testutil.Inst1UserToken).
 		WithFormField("Stage", constants.StageReingestCheck).
 		Expect().Status(http.StatusForbidden)
 
