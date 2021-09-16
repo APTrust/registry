@@ -55,3 +55,12 @@ type DeletionRequestViewList struct {
 	Previous string                          `json:"previous"`
 	Results  []*pgmodels.DeletionRequestView `json:"results"`
 }
+
+// GenericFileList is used into testing to covert a generic
+// JsonList into a typed list that we can test with assertions.
+type GenericFileList struct {
+	Count    int                     `json:"count"`
+	Next     string                  `json:"next"`
+	Previous string                  `json:"previous"`
+	Results  []*pgmodels.GenericFile `json:"results"`
+}
