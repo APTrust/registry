@@ -1,12 +1,13 @@
 package memberapi_test
 
 import (
-	"fmt"
+	"encoding/json"
 	"net/http"
 	"testing"
 
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/pgmodels"
+	"github.com/APTrust/registry/web/api"
 	tu "github.com/APTrust/registry/web/testutil"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -45,16 +46,6 @@ func TestAlertShow(t *testing.T) {
 		Status(http.StatusForbidden)
 }
 
-// ---------------------------------------------------------------------
-//
-// TODO: Find clean way of testing JSON data with httpexpect.
-//
-// Built-in methods don't work well for nested JSON and when
-// tests fail, httpexpect panics and does not report actual vs.
-// expected results. assert and require behave much better.
-//
-// ---------------------------------------------------------------------
-
 func TestAlertIndex(t *testing.T) {
 	tu.InitHTTPTests(t)
 
@@ -63,35 +54,66 @@ func TestAlertIndex(t *testing.T) {
 		WithQuery("page", 2).
 		WithQuery("per_page", 5).
 		Expect().Status(http.StatusOK)
-	fmt.Println(resp.Body().Raw())
-	resp.JSON().Object().ValueEqual("count", 15)
-	resp.JSON().Object().ValueEqual("next", "/member-api/v3/alerts?page=3&per_page=5")
-	//resp.JSON().Object().ValueEqual("previous", "/member-api/v1/alerts?page=1&per_page=5")
-	assert.Equal(t, "/member-api/v3/alerts?page=1&per_page=5", resp.JSON().Object().Value("previous").String().Raw())
 
-	//assert.Equal(t, "Deletion Confirmed",
+	list := api.AlertViewList{}
+	err := json.Unmarshal([]byte(resp.Body().Raw()), &list)
+	require.Nil(t, err)
+	assert.Equal(t, 15, list.Count)
+	assert.Equal(t, "/member-api/v3/alerts?page=3&per_page=5", list.Next)
+	assert.Equal(t, "/member-api/v3/alerts?page=1&per_page=5", list.Previous)
+	assert.Equal(t, "Deletion Confirmed", list.Results[0].Subject)
 
-	// Make sure filters work. Should be 1 deletion confirmed
+	// Make sure filters work. Should be 3 deletion requested
 	// alerts for the inst 1 admin.
 	resp = tu.SysAdminClient.GET("/member-api/v3/alerts").
 		WithQuery("user_id", tu.Inst1Admin.ID).
-		WithQuery("type", constants.AlertDeletionConfirmed).
+		WithQuery("type", constants.AlertDeletionRequested).
 		Expect().Status(http.StatusOK)
-	//html = resp.Body().Raw()
 
-	// Inst admin should see only his own alerts and the
-	// alert type and date filters
+	err = json.Unmarshal([]byte(resp.Body().Raw()), &list)
+	require.Nil(t, err)
+	assert.Equal(t, 3, list.Count)
+	assert.Equal(t, "", list.Next)
+	assert.Equal(t, "", list.Previous)
+	assert.Equal(t, 3, len(list.Results))
+	assert.Equal(t, "Deletion Requested", list.Results[0].Subject)
+
+	// Inst admin should see only his own alerts.
 	resp = tu.InstAdminClient.GET("/member-api/v3/alerts").
-		WithQuery("institution_id", tu.Inst1Admin.InstitutionID).
-		WithQuery("user_id", tu.Inst1Admin.ID).
 		Expect().Status(http.StatusOK)
-	//html = resp.Body().Raw()
+	err = json.Unmarshal([]byte(resp.Body().Raw()), &list)
+	require.Nil(t, err)
+	assert.Equal(t, 6, list.Count)
+	assert.Equal(t, "", list.Next)
+	assert.Equal(t, "", list.Previous)
+	assert.Equal(t, 6, len(list.Results))
+	for _, alert := range list.Results {
+		assert.Equal(t, tu.Inst1Admin.ID, alert.UserID)
+	}
 
-	// Inst user should see only his own alerts and the
-	// alert type and date filters
+	// Inst admin cannot see results for other insitutions.
+	resp = tu.InstAdminClient.GET("/member-api/v3/alerts").
+		WithQuery("institution_id", tu.Inst2Admin.InstitutionID).
+		Expect().Status(http.StatusForbidden)
+
+	// Inst user should see only his own alerts.
 	resp = tu.InstUserClient.GET("/member-api/v3/alerts").
 		WithQuery("institution_id", tu.Inst1User.InstitutionID).
 		WithQuery("user_id", tu.Inst1User.ID).
 		Expect().Status(http.StatusOK)
-	// html = resp.Body().Raw()
+	err = json.Unmarshal([]byte(resp.Body().Raw()), &list)
+	require.Nil(t, err)
+	assert.Equal(t, 2, list.Count)
+	assert.Equal(t, "", list.Next)
+	assert.Equal(t, "", list.Previous)
+	assert.Equal(t, 2, len(list.Results))
+	for _, alert := range list.Results {
+		assert.Equal(t, tu.Inst1User.ID, alert.UserID)
+	}
+
+	// Inst user cannot see other institution's alerts.
+	resp = tu.InstUserClient.GET("/member-api/v3/alerts").
+		WithQuery("institution_id", tu.Inst2Admin.InstitutionID).
+		Expect().Status(http.StatusForbidden)
+
 }

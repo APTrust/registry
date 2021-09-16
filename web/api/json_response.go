@@ -1,7 +1,10 @@
 package api
 
 import (
+	"encoding/json"
+
 	"github.com/APTrust/registry/common"
+	"github.com/APTrust/registry/pgmodels"
 )
 
 // JsonList provides the structure for an API response
@@ -25,4 +28,21 @@ func NewJsonList(items interface{}, pager *common.Pager) *JsonList {
 		Previous: pager.PreviousLink,
 		Results:  items,
 	}
+}
+
+// NewListFromJson converts a json string to a JsonList object.
+// This is used primarily in API testing.
+func NewListFromJson(jsonStr string) (*JsonList, error) {
+	jsonList := &JsonList{}
+	err := json.Unmarshal([]byte(jsonStr), jsonList)
+	return jsonList, err
+}
+
+// AlertViewList is used into testing to covert a generic
+// JsonList into a typed list that we can test with assertions.
+type AlertViewList struct {
+	Count    int                   `json:"count"`
+	Next     string                `json:"next"`
+	Previous string                `json:"previous"`
+	Results  []*pgmodels.AlertView `json:"results"`
 }
