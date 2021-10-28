@@ -94,7 +94,7 @@ elif [[ $1 == "serve-ssl" ]]; then
     echo "Building registry-ssl"
     go build -o registry-ssl
     echo "Starting registry-ssl"
-    APT_ENV=$APT_ENV registry-ssl
+    APT_ENV=$APT_ENV ./registry-ssl
 fi
 
 EXIT_CODE=$?
