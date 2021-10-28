@@ -1,9 +1,11 @@
 package app
 
 import (
+	"fmt"
 	"html/template"
 	"io"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/APTrust/registry/common"
@@ -22,7 +24,10 @@ func Run() {
 	r := InitAppEngine(false)
 	ctx := common.Context()
 	if ctx.Config.Cookies.HTTPSOnly && ctx.Config.Cookies.Domain != "localhost" {
-		http.Serve(autocert.NewListener(ctx.Config.Cookies.Domain), r)
+		err := http.Serve(autocert.NewListener(ctx.Config.Cookies.Domain), r)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err.Error())
+		}
 	} else {
 		r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 	}
