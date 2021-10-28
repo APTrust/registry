@@ -3,6 +3,7 @@ package app
 import (
 	"html/template"
 	"io"
+	"net/http"
 	"strings"
 
 	"github.com/APTrust/registry/common"
@@ -12,13 +13,19 @@ import (
 	"github.com/APTrust/registry/web/webui"
 	"github.com/gin-contrib/logger"
 	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/acme/autocert"
 )
 
 // Run runs the Registry application. This is called from main() to start
 // the app.
 func Run() {
 	r := InitAppEngine(false)
-	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
+	ctx := common.Context()
+	if ctx.Config.Cookies.HTTPSOnly && ctx.Config.Cookies.Domain != "localhost" {
+		http.Serve(autocert.NewListener(ctx.Config.Cookies.Domain), r)
+	} else {
+		r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
+	}
 }
 
 // InitAppEngine sets up the whole Gin application, loading templates and
