@@ -89,6 +89,11 @@ if [[ $1 == "test" ]]; then
 elif [[ $1 == "serve" ]]; then
     echo "Starting registry app..."
     APT_ENV=$APT_ENV go run registry.go
+elif [[ $1 == "serve-ssl" ]]; then
+    echo "Building registry-ssl"
+    go build -o registry-ssl
+    echo "Starting registry-ssl"
+    APT_ENV=$APT_ENV registry-ssl
 fi
 
 EXIT_CODE=$?
