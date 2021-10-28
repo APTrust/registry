@@ -76,7 +76,7 @@ if [[ $TRAVIS != "true" && $1 != "tests" ]]; then
 fi
 
 echo "Starting Redis"
-eval "$DIR/redis-server --save "" --appendonly no > /dev/null 2>&1 &"
+eval "$DIR/redis-server --save --bind 127.0.0.1 --appendonly no > /dev/null 2>&1 &"
 REDIS_PID=$!
 
 # ----------------------------------------------------------------------
