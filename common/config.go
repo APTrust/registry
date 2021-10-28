@@ -23,6 +23,7 @@ var allowedConfigs = []string{
 	"staging",
 	"test",
 	"travis",
+	"uidemo",
 }
 
 type DBConfig struct {
