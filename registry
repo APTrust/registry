@@ -62,16 +62,16 @@ rm $NSQ_DATA_FILES > /dev/null 2>&1
 #
 # ----------------------------------------------------------------------
 echo "Starting NSQ"
-eval "$DIR/nsqd --data-path=$TMPDIR > /dev/null 2>&1 &"
+eval "$DIR/nsqd -http-address 127.0.0.1:4151 --data-path=$TMPDIR > /dev/null 2>&1 &"
 NSQ_PID=$!
 
 if [[ $TRAVIS != "true" && $1 != "tests" ]]; then
     echo "Starting NSQ Lookup daemon"
-    eval "$DIR/nsqlookupd &"
+    eval "$DIR/nsqlookupd -http-address=127.0.0.1:4161 &"
     NSQ_LOOKUPD_PID=$!
 
     echo "Starting NSQ Admin service"
-    eval "$DIR/nsqadmin --nsqd-http-address=127.0.0.1:4151 &"
+    eval "$DIR/nsqadmin --nsqd-http-address=127.0.0.1:4151 -http-address=127.0.0.1:4171 &"
     NSQ_ADMIN_PID=$!
 fi
 
