@@ -239,7 +239,6 @@ left join users u on au.user_id = u.id
 left join institutions i on a.institution_id = i.id;
 
 -- storage_option_stats
-
 create or replace view storage_option_stats as
 with stats as (
 	select
@@ -260,3 +259,29 @@ select
 	i.identifier as institution_identifier
 from stats s
 left join institutions i on s.institution_id = i.id;
+
+create or replace view generic_files_view as
+select
+	gf.id,
+	gf.file_format,
+	gf."size",
+	gf.identifier,
+	gf.intellectual_object_id,
+	io.identifier as object_identifier,
+	io."access",
+	gf.state,
+	gf.last_fixity_check,
+	gf.institution_id,
+	i."name" as institution_name,
+	i.identifier as institution_identifier,
+	gf.storage_option,
+	gf.uuid,
+	(select digest from checksums where generic_file_id = gf.id and algorithm='md5' order by created_at desc limit 1) as "md5",
+	(select digest from checksums where generic_file_id = gf.id and algorithm='sha1' order by created_at desc limit 1) as "sha1",
+	(select digest from checksums where generic_file_id = gf.id and algorithm='sha256' order by created_at desc limit 1) as "sha256",
+	(select digest from checksums where generic_file_id = gf.id and algorithm='sha512' order by created_at desc limit 1) as "sha512",
+	gf.created_at,
+	gf.updated_at
+from generic_files gf
+left join intellectual_objects io on io.id = gf.intellectual_object_id
+left join institutions i on i.id = gf.institution_id;

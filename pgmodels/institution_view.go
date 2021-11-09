@@ -35,10 +35,10 @@ func InstitutionViewByID(id int64) (*InstitutionView, error) {
 	return InstitutionViewGet(query)
 }
 
-// InstitutionViewByEmail returns the InstitutionView record with the
-// specified email address. Returns pg.ErrNoRows if there is no match.
-func InstitutionViewByEmail(email string) (*InstitutionView, error) {
-	query := NewQuery().Where("email", "=", email)
+// InstitutionViewByIdentifier returns the InstitutionView record with the
+// specified identifier (domain name). Returns pg.ErrNoRows if there is no match.
+func InstitutionViewByIdentifier(identifier string) (*InstitutionView, error) {
+	query := NewQuery().Where("identifier", "=", identifier)
 	return InstitutionViewGet(query)
 }
 

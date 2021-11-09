@@ -38,7 +38,7 @@ func NewListFromJson(jsonStr string) (*JsonList, error) {
 	return jsonList, err
 }
 
-// AlertViewList is used into testing to covert a generic
+// AlertViewList is used in testing to covert a generic
 // JsonList into a typed list that we can test with assertions.
 type AlertViewList struct {
 	Count    int                   `json:"count"`
@@ -47,7 +47,7 @@ type AlertViewList struct {
 	Results  []*pgmodels.AlertView `json:"results"`
 }
 
-// DeletionRequestViewList is used into testing to covert a generic
+// DeletionRequestViewList is used in testing to covert a generic
 // JsonList into a typed list that we can test with assertions.
 type DeletionRequestViewList struct {
 	Count    int                             `json:"count"`
@@ -56,7 +56,7 @@ type DeletionRequestViewList struct {
 	Results  []*pgmodels.DeletionRequestView `json:"results"`
 }
 
-// GenericFileList is used into testing to covert a generic
+// GenericFileList is used in testing to covert a generic
 // JsonList into a typed list that we can test with assertions.
 type GenericFileList struct {
 	Count    int                     `json:"count"`
@@ -65,7 +65,16 @@ type GenericFileList struct {
 	Results  []*pgmodels.GenericFile `json:"results"`
 }
 
-// IntellectualObjectList is used into testing to covert a generic
+// GenericFileViewList is used in testing to covert a generic
+// JsonList into a typed list that we can test with assertions.
+type GenericFileViewList struct {
+	Count    int                         `json:"count"`
+	Next     string                      `json:"next"`
+	Previous string                      `json:"previous"`
+	Results  []*pgmodels.GenericFileView `json:"results"`
+}
+
+// IntellectualObjectList is used in testing to covert a generic
 // JsonList into a typed list that we can test with assertions.
 type IntellectualObjectList struct {
 	Count    int                                `json:"count"`

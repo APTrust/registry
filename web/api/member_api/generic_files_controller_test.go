@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/APTrust/registry/web/api"
 	tu "github.com/APTrust/registry/web/testutil"
@@ -62,7 +63,7 @@ func TestGenericFileIndex(t *testing.T) {
 		WithQuery("per_page", 5).
 		Expect().Status(http.StatusOK)
 
-	list := api.GenericFileList{}
+	list := api.GenericFileViewList{}
 	err := json.Unmarshal([]byte(resp.Body().Raw()), &list)
 	require.Nil(t, err)
 	assert.Equal(t, 61, list.Count)
@@ -76,14 +77,18 @@ func TestGenericFileIndex(t *testing.T) {
 		WithQuery("state", "A").
 		Expect().Status(http.StatusOK)
 
-	list = api.GenericFileList{}
+	list = api.GenericFileViewList{}
 	err = json.Unmarshal([]byte(resp.Body().Raw()), &list)
 	require.Nil(t, err)
 	assert.Equal(t, 4, list.Count)
 	assert.Equal(t, 4, len(list.Results))
 	for _, file := range list.Results {
 		assert.Equal(t, int64(3), file.IntellectualObjectID)
+		assert.Equal(t, "institution1.edu/glass", file.ObjectIdentifier)
+		assert.Equal(t, "institution1.edu", file.InstitutionIdentifier)
+		assert.Equal(t, constants.AccessConsortia, file.Access)
 		assert.Equal(t, "A", file.State)
+		assert.True(t, file.Size > 0)
 	}
 
 	// Inst admin should see only his own institution's files.
