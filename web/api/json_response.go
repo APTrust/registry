@@ -64,3 +64,12 @@ type GenericFileList struct {
 	Previous string                  `json:"previous"`
 	Results  []*pgmodels.GenericFile `json:"results"`
 }
+
+// IntellectualObjectList is used into testing to covert a generic
+// JsonList into a typed list that we can test with assertions.
+type IntellectualObjectList struct {
+	Count    int                                `json:"count"`
+	Next     string                             `json:"next"`
+	Previous string                             `json:"previous"`
+	Results  []*pgmodels.IntellectualObjectView `json:"results"`
+}

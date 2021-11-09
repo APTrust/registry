@@ -284,5 +284,9 @@ func initRoutes(router *gin.Engine) {
 		memberAPI.GET("/files/show/*id", memberapi.GenericFileShow)
 		memberAPI.GET("/files/", memberapi.GenericFileIndex)
 
+		// Intellectual Objects
+		memberAPI.GET("/objects/show/*id", memberapi.IntellectualObjectShow)
+		memberAPI.GET("/objects/", memberapi.IntellectualObjectIndex)
+
 	}
 }
