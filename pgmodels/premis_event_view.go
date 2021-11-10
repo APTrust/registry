@@ -8,9 +8,11 @@ var PremisEventFilters = []string{
 	"date_time__gteq",
 	"date_time__lteq",
 	"event_type",
+	"generic_file_id",
 	"generic_file_identifier",
 	"identifier",
 	"institution_id",
+	"intellectual_object_id",
 	"intellectual_object_identifier",
 	"outcome",
 }

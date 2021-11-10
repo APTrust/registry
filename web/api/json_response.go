@@ -82,3 +82,12 @@ type IntellectualObjectList struct {
 	Previous string                             `json:"previous"`
 	Results  []*pgmodels.IntellectualObjectView `json:"results"`
 }
+
+// PremisEventViewList is used in testing to covert a generic
+// JsonList into a typed list that we can test with assertions.
+type PremisEventViewList struct {
+	Count    int                         `json:"count"`
+	Next     string                      `json:"next"`
+	Previous string                      `json:"previous"`
+	Results  []*pgmodels.PremisEventView `json:"results"`
+}

@@ -78,7 +78,7 @@ func TestEventList(t *testing.T) {
 		} else {
 			testutil.AssertMatchesNone(t, html, adminFilters)
 			testutil.AssertMatchesNone(t, html, inst2Links)
-			testutil.AssertMatchesResultCount(t, html, 26)
+			testutil.AssertMatchesResultCount(t, html, 27)
 		}
 	}
 }

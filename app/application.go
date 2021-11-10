@@ -288,5 +288,9 @@ func initRoutes(router *gin.Engine) {
 		memberAPI.GET("/objects/show/*id", memberapi.IntellectualObjectShow)
 		memberAPI.GET("/objects/", memberapi.IntellectualObjectIndex)
 
+		// Premis Events
+		memberAPI.GET("/events/show/*id", memberapi.PremisEventShow)
+		memberAPI.GET("/events/", memberapi.PremisEventIndex)
+
 	}
 }
