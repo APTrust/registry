@@ -91,3 +91,12 @@ type PremisEventViewList struct {
 	Previous string                      `json:"previous"`
 	Results  []*pgmodels.PremisEventView `json:"results"`
 }
+
+// WorkItemViewList is used in testing to covert a generic
+// JsonList into a typed list that we can test with assertions.
+type WorkItemViewList struct {
+	Count    int                      `json:"count"`
+	Next     string                   `json:"next"`
+	Previous string                   `json:"previous"`
+	Results  []*pgmodels.WorkItemView `json:"results"`
+}
