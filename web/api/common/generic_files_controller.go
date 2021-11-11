@@ -1,4 +1,4 @@
-package memberapi
+package common_api
 
 import (
 	"net/http"
@@ -9,7 +9,9 @@ import (
 )
 
 // GenericFileIndex shows list of objects.
+//
 // GET /member-api/v3/files
+// GET /admin-api/v3/files
 func GenericFileIndex(c *gin.Context) {
 	req := api.NewRequest(c)
 	var files []*pgmodels.GenericFileView
@@ -21,7 +23,9 @@ func GenericFileIndex(c *gin.Context) {
 }
 
 // GenericFileShow returns the object with the specified id.
+//
 // GET /member-api/v3/files/show/:id
+// GET /admin-api/v3/files/show/:id
 func GenericFileShow(c *gin.Context) {
 	req := api.NewRequest(c)
 	gf, err := pgmodels.GenericFileByID(req.Auth.ResourceID)

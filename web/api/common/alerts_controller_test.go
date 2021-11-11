@@ -1,4 +1,4 @@
-package memberapi_test
+package common_api_test
 
 import (
 	"encoding/json"
@@ -92,7 +92,7 @@ func TestAlertIndex(t *testing.T) {
 	}
 
 	// Inst admin cannot see results for other insitutions.
-	resp = tu.Inst1AdminClient.GET("/member-api/v3/alerts").
+	tu.Inst1AdminClient.GET("/member-api/v3/alerts").
 		WithQuery("institution_id", tu.Inst2Admin.InstitutionID).
 		Expect().Status(http.StatusForbidden)
 
@@ -122,7 +122,7 @@ func TestAlertIndex(t *testing.T) {
 	}
 
 	// Inst user cannot see other institution's alerts.
-	resp = tu.Inst1UserClient.GET("/member-api/v3/alerts").
+	tu.Inst1UserClient.GET("/member-api/v3/alerts").
 		WithQuery("institution_id", tu.Inst2Admin.InstitutionID).
 		Expect().Status(http.StatusForbidden)
 

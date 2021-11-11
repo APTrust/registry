@@ -11,7 +11,7 @@ import (
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/helpers"
 	"github.com/APTrust/registry/middleware"
-	"github.com/APTrust/registry/web/api/member_api"
+	common_api "github.com/APTrust/registry/web/api/common"
 	"github.com/APTrust/registry/web/webui"
 	"github.com/gin-contrib/logger"
 	"github.com/gin-gonic/gin"
@@ -273,28 +273,66 @@ func initRoutes(router *gin.Engine) {
 	memberAPI := router.Group("/member-api/v3")
 	{
 		// Alerts
-		memberAPI.GET("/alerts", memberapi.AlertIndex)
-		memberAPI.GET("/alerts/show/:id/:user_id", memberapi.AlertShow)
+		memberAPI.GET("/alerts", common_api.AlertIndex)
+		memberAPI.GET("/alerts/show/:id/:user_id", common_api.AlertShow)
 
 		// Deletion Requests
-		memberAPI.GET("/deletions/show/:id", memberapi.DeletionRequestShow)
-		memberAPI.GET("/deletions/", memberapi.DeletionRequestIndex)
+		memberAPI.GET("/deletions/show/:id", common_api.DeletionRequestShow)
+		memberAPI.GET("/deletions/", common_api.DeletionRequestIndex)
 
 		// Generic Files
-		memberAPI.GET("/files/show/*id", memberapi.GenericFileShow)
-		memberAPI.GET("/files/", memberapi.GenericFileIndex)
+		memberAPI.GET("/files/show/*id", common_api.GenericFileShow)
+		memberAPI.GET("/files/", common_api.GenericFileIndex)
 
 		// Intellectual Objects
-		memberAPI.GET("/objects/show/*id", memberapi.IntellectualObjectShow)
-		memberAPI.GET("/objects/", memberapi.IntellectualObjectIndex)
+		memberAPI.GET("/objects/show/*id", common_api.IntellectualObjectShow)
+		memberAPI.GET("/objects/", common_api.IntellectualObjectIndex)
 
 		// Premis Events
-		memberAPI.GET("/events/show/*id", memberapi.PremisEventShow)
-		memberAPI.GET("/events/", memberapi.PremisEventIndex)
+		memberAPI.GET("/events/show/*id", common_api.PremisEventShow)
+		memberAPI.GET("/events/", common_api.PremisEventIndex)
 
 		// Work Items
-		memberAPI.GET("/items/show/:id", memberapi.WorkItemShow)
-		memberAPI.GET("/items/", memberapi.WorkItemIndex)
+		memberAPI.GET("/items/show/:id", common_api.WorkItemShow)
+		memberAPI.GET("/items/", common_api.WorkItemIndex)
+
+	}
+
+	// Admin API is used by preservation-services.
+	// Note that this group uses the same handlers
+	// as the member API for some show and index routes.
+	adminAPI := router.Group("/admin-api/v3")
+	{
+
+		// Alerts
+		adminAPI.GET("/alerts", common_api.AlertIndex)
+		adminAPI.GET("/alerts/show/:id/:user_id", common_api.AlertShow)
+
+		// Deletion Requests
+		adminAPI.GET("/deletions/show/:id", common_api.DeletionRequestShow)
+		adminAPI.GET("/deletions/", common_api.DeletionRequestIndex)
+
+		// Generic Files
+		// TODO: Add Create, Update, Delete. Support bulk insert/update with transactions.
+		adminAPI.GET("/files/show/*id", common_api.GenericFileShow)
+		adminAPI.GET("/files/", common_api.GenericFileIndex)
+
+		// TODO: Institutions (Index, Show)
+
+		// Intellectual Objects
+		// TODO: Add Create, Update, Delete
+		adminAPI.GET("/objects/show/*id", common_api.IntellectualObjectShow)
+		adminAPI.GET("/objects/", common_api.IntellectualObjectIndex)
+
+		// Premis Events
+		// TODO: Add Create (no update or delete for premis events)
+		adminAPI.GET("/events/show/*id", common_api.PremisEventShow)
+		adminAPI.GET("/events/", common_api.PremisEventIndex)
+
+		// Work Items
+		// TODO: Add Create & Update
+		adminAPI.GET("/items/show/:id", common_api.WorkItemShow)
+		adminAPI.GET("/items/", common_api.WorkItemIndex)
 
 	}
 }

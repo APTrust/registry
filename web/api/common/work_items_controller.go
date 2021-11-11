@@ -1,4 +1,4 @@
-package memberapi
+package common_api
 
 import (
 	"net/http"
@@ -9,7 +9,9 @@ import (
 )
 
 // WorkItemIndex shows list of objects.
+//
 // GET /member-api/v3/items
+// GET /admin-api/v3/items
 func WorkItemIndex(c *gin.Context) {
 	req := api.NewRequest(c)
 	var items []*pgmodels.WorkItemView
@@ -21,7 +23,9 @@ func WorkItemIndex(c *gin.Context) {
 }
 
 // WorkItemShow returns the object with the specified id.
+//
 // GET /member-api/v3/items/show/:id
+// GET /admin-api/v3/items/show/:id
 func WorkItemShow(c *gin.Context) {
 	req := api.NewRequest(c)
 	item, err := pgmodels.WorkItemViewByID(req.Auth.ResourceID)

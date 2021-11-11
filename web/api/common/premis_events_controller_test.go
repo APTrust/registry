@@ -1,4 +1,4 @@
-package memberapi_test
+package common_api_test
 
 import (
 	"encoding/json"
@@ -101,7 +101,7 @@ func TestPremisEventIndex(t *testing.T) {
 	}
 
 	// Inst admin cannot see events belonging to other insitutions.
-	resp = tu.Inst2AdminClient.GET("/member-api/v3/events").
+	tu.Inst2AdminClient.GET("/member-api/v3/events").
 		WithQuery("institution_id", tu.Inst1Admin.InstitutionID).
 		Expect().Status(http.StatusForbidden)
 
@@ -119,7 +119,7 @@ func TestPremisEventIndex(t *testing.T) {
 	}
 
 	// Inst user cannot see other institution's events.
-	resp = tu.Inst2UserClient.GET("/member-api/v3/events").
+	tu.Inst2UserClient.GET("/member-api/v3/events").
 		WithQuery("institution_id", tu.Inst1Admin.InstitutionID).
 		Expect().Status(http.StatusForbidden)
 

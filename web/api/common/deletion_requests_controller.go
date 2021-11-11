@@ -1,4 +1,4 @@
-package memberapi
+package common_api
 
 import (
 	"net/http"
@@ -21,6 +21,7 @@ import (
 // (for objects).
 //
 // GET /member-api/v3/deletions/show/:id
+// GET /admin-api/v3/deletions/show/:id
 func DeletionRequestShow(c *gin.Context) {
 	req := api.NewRequest(c)
 	deletionRequest, err := pgmodels.DeletionRequestByID(req.Auth.ResourceID)
@@ -31,7 +32,9 @@ func DeletionRequestShow(c *gin.Context) {
 }
 
 // DeletionRequestIndex shows list of deletion requests.
+//
 // GET /member-api/v3/deletions
+// GET /admin-api/v3/deletions
 func DeletionRequestIndex(c *gin.Context) {
 	req := api.NewRequest(c)
 	var deletions []*pgmodels.DeletionRequestView

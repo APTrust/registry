@@ -1,4 +1,4 @@
-package memberapi_test
+package common_api_test
 
 import (
 	"encoding/json"
@@ -100,7 +100,7 @@ func TestWorkItemIndex(t *testing.T) {
 	}
 
 	// Inst admin cannot see items belonging to other insitutions.
-	resp = tu.Inst2AdminClient.GET("/member-api/v3/items").
+	tu.Inst2AdminClient.GET("/member-api/v3/items").
 		WithQuery("institution_id", tu.Inst1Admin.InstitutionID).
 		Expect().Status(http.StatusForbidden)
 
@@ -118,7 +118,7 @@ func TestWorkItemIndex(t *testing.T) {
 	}
 
 	// Inst user cannot see other institution's items.
-	resp = tu.Inst2UserClient.GET("/member-api/v3/items").
+	tu.Inst2UserClient.GET("/member-api/v3/items").
 		WithQuery("institution_id", tu.Inst1Admin.InstitutionID).
 		Expect().Status(http.StatusForbidden)
 

@@ -1,4 +1,4 @@
-package memberapi_test
+package common_api_test
 
 import (
 	"encoding/json"
@@ -100,7 +100,7 @@ func TestIntellectualObjectIndex(t *testing.T) {
 	}
 
 	// Inst admin cannot see objects belonging to other insitutions.
-	resp = tu.Inst2AdminClient.GET("/member-api/v3/objects").
+	tu.Inst2AdminClient.GET("/member-api/v3/objects").
 		WithQuery("institution_id", tu.Inst1Admin.InstitutionID).
 		Expect().Status(http.StatusForbidden)
 
@@ -118,7 +118,7 @@ func TestIntellectualObjectIndex(t *testing.T) {
 	}
 
 	// Inst user cannot see other institution's objects.
-	resp = tu.Inst2UserClient.GET("/member-api/v3/objects").
+	tu.Inst2UserClient.GET("/member-api/v3/objects").
 		WithQuery("institution_id", tu.Inst1Admin.InstitutionID).
 		Expect().Status(http.StatusForbidden)
 

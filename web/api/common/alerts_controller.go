@@ -1,4 +1,4 @@
-package memberapi
+package common_api
 
 import (
 	"net/http"
@@ -14,7 +14,9 @@ import (
 // user. Note that the AlertView table contains multiple entries for each
 // Alert ID. But each alert goes only once to each recipient, so the
 // combination of AlertID + UserID (recipient) is unique.
+//
 // GET /member-api/v3/alerts/show/:id/:user_id
+// GET /admin-api/v3/alerts/show/:id/:user_id
 func AlertShow(c *gin.Context) {
 	req := api.NewRequest(c)
 	alertView, err := alertLoad(req)
@@ -26,7 +28,9 @@ func AlertShow(c *gin.Context) {
 
 // AlertIndex shows list of alerts for the logged-in user, unless
 // that user is sys admin, who can see all alerts.
+//
 // GET /member-api/v3/alerts
+// GET /admin-api/v3/alerts
 func AlertIndex(c *gin.Context) {
 	req := api.NewRequest(c)
 	var alerts []*pgmodels.AlertView

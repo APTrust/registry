@@ -1,4 +1,4 @@
-package memberapi_test
+package common_api_test
 
 import (
 	"encoding/json"
@@ -84,7 +84,7 @@ func TestDeletionRequestIndex(t *testing.T) {
 	}
 
 	// Inst admin cannot see results for other insitutions.
-	resp = tu.Inst2AdminClient.GET("/member-api/v3/deletions").
+	tu.Inst2AdminClient.GET("/member-api/v3/deletions").
 		WithQuery("institution_id", tu.Inst1Admin.InstitutionID).
 		Expect().Status(http.StatusForbidden)
 
@@ -102,7 +102,7 @@ func TestDeletionRequestIndex(t *testing.T) {
 	}
 
 	// Inst user cannot see other institution's deletions.
-	resp = tu.Inst2UserClient.GET("/member-api/v3/deletions").
+	tu.Inst2UserClient.GET("/member-api/v3/deletions").
 		WithQuery("institution_id", tu.Inst1Admin.InstitutionID).
 		Expect().Status(http.StatusForbidden)
 

@@ -1,4 +1,4 @@
-package memberapi_test
+package common_api_test
 
 import (
 	"encoding/json"
@@ -105,7 +105,7 @@ func TestGenericFileIndex(t *testing.T) {
 	}
 
 	// Inst admin cannot see files belonging to other insitutions.
-	resp = tu.Inst2AdminClient.GET("/member-api/v3/files").
+	tu.Inst2AdminClient.GET("/member-api/v3/files").
 		WithQuery("institution_id", tu.Inst1Admin.InstitutionID).
 		Expect().Status(http.StatusForbidden)
 
@@ -123,7 +123,7 @@ func TestGenericFileIndex(t *testing.T) {
 	}
 
 	// Inst user cannot see other institution's files.
-	resp = tu.Inst2UserClient.GET("/member-api/v3/files").
+	tu.Inst2UserClient.GET("/member-api/v3/files").
 		WithQuery("institution_id", tu.Inst1Admin.InstitutionID).
 		Expect().Status(http.StatusForbidden)
 
