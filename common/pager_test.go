@@ -18,6 +18,7 @@ func getPager(t *testing.T) *common.Pager {
 	c, _ := gin.CreateTestContext(httptest.NewRecorder())
 	c.Request = &http.Request{}
 	c.Request.URL, err = url.Parse(_url)
+	require.Nil(t, err)
 	pager, err := common.NewPager(c, _url, 10)
 	require.Nil(t, err)
 	return pager

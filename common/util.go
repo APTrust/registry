@@ -59,7 +59,7 @@ func PrintAndExit(message string) {
 // user's home directory. For example, on Linux, ~/data
 // would expand to something like /home/josie/data
 func ExpandTilde(filePath string) (string, error) {
-	if strings.Index(filePath, "~") < 0 {
+	if !strings.Contains(filePath, "~") {
 		return filePath, nil
 	}
 	usr, err := user.Current()
@@ -117,7 +117,7 @@ func DecryptAES(key []byte, hexCipher string) (string, error) {
 
 	nonceSize := gcmDecrypt.NonceSize()
 	if len(ciphertext) < nonceSize {
-		return "", fmt.Errorf("Wrong nonce size")
+		return "", fmt.Errorf("wrong nonce size")
 	}
 	nonce, encryptedMessage := ciphertext[:nonceSize], ciphertext[nonceSize:]
 	plaintext, err := gcmDecrypt.Open(nil, nonce, encryptedMessage, nil)
@@ -151,7 +151,7 @@ func FileExists(path string) bool {
 // elements, or if all the elements are empty strings.
 func ListIsEmpty(list []string) bool {
 	isEmpty := true
-	if list == nil || len(list) == 0 {
+	if len(list) == 0 {
 		return isEmpty
 	}
 	for _, item := range list {

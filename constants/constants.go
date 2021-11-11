@@ -34,6 +34,8 @@ const (
 	AlgSha512                  = "sha512"
 	APIUserHeader              = "X-Pharos-API-User"
 	APIKeyHeader               = "X-Pharos-API-Key"
+	APIPrefixAdmin             = "/admin-api/"
+	APIPrefixMember            = "/member-api/"
 	BTRProfileIdentifier       = "https://github.com/dpscollaborative/btr_bagit_profile/releases/download/1.0/btr-bagit-profile.json"
 	CSRFCookieName             = "csrf_token"
 	CSRFHeaderName             = "X-CSRF-Token"
@@ -142,6 +144,11 @@ var AlertTypes = []string{
 	AlertPasswordReset,
 	AlertStalledItems,
 	AlertWelcome,
+}
+
+var APIPrefixes = []string{
+	APIPrefixAdmin,
+	APIPrefixMember,
 }
 
 var CompletedStatusValues = []string{

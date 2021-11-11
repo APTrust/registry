@@ -3,8 +3,10 @@ package middleware
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/APTrust/registry/common"
+	"github.com/APTrust/registry/constants"
 	"github.com/gin-gonic/gin"
 )
 
@@ -35,20 +37,46 @@ func Authorize() gin.HandlerFunc {
 	}
 }
 
+func isAPIRequest(path string) bool {
+	for _, prefix := range constants.APIPrefixes {
+		if strings.HasPrefix(path, prefix) {
+			return true
+		}
+	}
+	return false
+}
+
 func showNotCheckedError(c *gin.Context, auth *ResourceAuthorization) {
 	common.Context().Log.Error().Msgf(auth.GetError())
-	c.HTML(http.StatusInternalServerError, "errors/show.html", gin.H{
-		"suppressSideNav": true,
-		"suppressTopNav":  false,
-		"error":           fmt.Sprintf("Missing authorization check for %s", c.FullPath()),
-	})
+	errMsg := fmt.Sprintf("Missing authorization check for %s", c.FullPath())
+	if isAPIRequest(c.Request.URL.Path) {
+		c.JSON(http.StatusInternalServerError, map[string]string{
+			"error": errMsg,
+		})
+	} else {
+		c.HTML(http.StatusInternalServerError, "errors/show.html", gin.H{
+			"suppressSideNav": true,
+			"suppressTopNav":  false,
+			"error":           errMsg,
+		})
+	}
 }
 
 func showAuthFailedError(c *gin.Context, auth *ResourceAuthorization) {
 	common.Context().Log.Error().Msgf(auth.GetNotAuthorizedMessage())
-	c.HTML(http.StatusForbidden, "errors/show.html", gin.H{
-		"suppressSideNav": true,
-		"suppressTopNav":  false,
-		"error":           fmt.Sprintf("Permission denied for %s (institution %d).", c.FullPath(), auth.ResourceInstID),
-	})
+	errMsg := fmt.Sprintf("Permission denied for %s (institution %d).", c.FullPath(), auth.ResourceInstID)
+	if auth.Error != nil {
+		errMsg = fmt.Sprintf("%s %s", errMsg, auth.Error.Error())
+	}
+	if isAPIRequest(c.Request.URL.Path) {
+		c.JSON(http.StatusForbidden, map[string]string{
+			"error": errMsg,
+		})
+	} else {
+		c.HTML(http.StatusForbidden, "errors/show.html", gin.H{
+			"suppressSideNav": true,
+			"suppressTopNav":  false,
+			"error":           errMsg,
+		})
+	}
 }

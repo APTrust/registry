@@ -47,6 +47,14 @@ func (r *ResourceAuthorization) init() {
 		r.Approved = true
 		return
 	}
+	if r.NonAdminIsRequestingAdminAPI() {
+		r.Handler = "AdminAPI"
+		r.ResourceType = "Forbidden"
+		r.Checked = true
+		r.Approved = false
+		r.Error = common.ErrWrongAPI
+		return
+	}
 	r.getPermissionType()
 	if r.Error == nil {
 		r.readRequestIds()
@@ -178,6 +186,18 @@ func (r *ResourceAuthorization) GetNotAuthorizedMessage() string {
 	return fmt.Sprintf("Not Authorized: %s", r.String())
 }
 
+// NonAdminIsRequestingAdminAPI returns true if a non-admin user is requesting
+// a resource from the admin API. Although the admin and member APIs share
+// some common handlers, we want to force members to access features through
+// member-api endpoints.
+//
+// This test is a shortcut that allows us to skip more complicated checks.
+func (r *ResourceAuthorization) NonAdminIsRequestingAdminAPI() bool {
+	currentUser := r.CurrentUser()
+	return strings.HasPrefix(r.ginCtx.Request.URL.Path, constants.APIPrefixAdmin) && (currentUser == nil || !currentUser.IsAdmin())
+}
+
+// String returns this object in string format, suitable for debugging.
 func (r *ResourceAuthorization) String() string {
 	user, exists := r.ginCtx.Get("CurrentUser")
 	email := "<user not signed in>"

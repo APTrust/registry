@@ -99,6 +99,13 @@ var ErrAlreadyHasAuthyID = errors.New("user is already registered with authy")
 // but does not have an Authy ID.
 var ErrNoAuthyID = errors.New("user does not have an authy id")
 
+// ErrWrongAPI occurs when a non-admin user tries to access the admin API.
+// While the member and admin APIs share some common handlers, and members
+// do technically have access to a number of read-only operations in both
+// APIs, we don't want members to get in the habit of accessing the wrong
+// endpoints.
+var ErrWrongAPI = errors.New("non-admins must use the member api")
+
 // ErrInternal is a runtime error that is not the user's fault, hence
 // probably the programmer's fault.
 var ErrInternal = errors.New("internal server error")

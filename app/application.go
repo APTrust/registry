@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/APTrust/registry/common"
+	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/helpers"
 	"github.com/APTrust/registry/middleware"
 	common_api "github.com/APTrust/registry/web/api/common"
@@ -270,7 +271,9 @@ func initRoutes(router *gin.Engine) {
 	// beginning of the query string. To be safe, we should always
 	// url-encode the identifier. Many of them contain backticks,
 	// quotes, parentheses, spaces, and all kinds of other garbage.
-	memberAPI := router.Group("/member-api/v3")
+	//
+	// Routes start with /member-api/v3
+	memberAPI := router.Group(fmt.Sprintf("%sv3", constants.APIPrefixMember))
 	{
 		// Alerts
 		memberAPI.GET("/alerts", common_api.AlertIndex)
@@ -301,7 +304,9 @@ func initRoutes(router *gin.Engine) {
 	// Admin API is used by preservation-services.
 	// Note that this group uses the same handlers
 	// as the member API for some show and index routes.
-	adminAPI := router.Group("/admin-api/v3")
+	//
+	// Routes start with /admin-api/v3
+	adminAPI := router.Group(fmt.Sprintf("%sv3", constants.APIPrefixAdmin))
 	{
 
 		// Alerts
