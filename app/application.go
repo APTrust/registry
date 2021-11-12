@@ -12,6 +12,7 @@ import (
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/helpers"
 	"github.com/APTrust/registry/middleware"
+	admin_api "github.com/APTrust/registry/web/api/admin"
 	common_api "github.com/APTrust/registry/web/api/common"
 	"github.com/APTrust/registry/web/webui"
 	"github.com/gin-contrib/logger"
@@ -322,7 +323,9 @@ func initRoutes(router *gin.Engine) {
 		adminAPI.GET("/files/show/*id", common_api.GenericFileShow)
 		adminAPI.GET("/files/", common_api.GenericFileIndex)
 
-		// TODO: Institutions (Index, Show)
+		// Institutions
+		adminAPI.GET("/institutions", admin_api.InstitutionIndex)
+		adminAPI.GET("/institutions/show/:id", admin_api.InstitutionShow)
 
 		// Intellectual Objects
 		// TODO: Add Create, Update, Delete

@@ -100,3 +100,12 @@ type WorkItemViewList struct {
 	Previous string                   `json:"previous"`
 	Results  []*pgmodels.WorkItemView `json:"results"`
 }
+
+// InstitutionViewList is used in testing to covert a generic
+// JsonList into a typed list that we can test with assertions.
+type InstitutionViewList struct {
+	Count    int                         `json:"count"`
+	Next     string                      `json:"next"`
+	Previous string                      `json:"previous"`
+	Results  []*pgmodels.InstitutionView `json:"results"`
+}
