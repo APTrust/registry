@@ -334,6 +334,9 @@ func initRoutes(router *gin.Engine) {
 		// TODO: Add Create, Update, Delete
 		adminAPI.GET("/objects/show/*id", common_api.IntellectualObjectShow)
 		adminAPI.GET("/objects", common_api.IntellectualObjectIndex)
+		adminAPI.POST("/objects/create/:institution_id", admin_api.IntellectualObjectCreate)
+		adminAPI.PUT("/objects/update/:id", admin_api.IntellectualObjectUpdate)
+		adminAPI.PUT("/objects/delete/:id", admin_api.IntellectualObjectDelete)
 
 		// Premis Events
 		// TODO: Add Create (no update or delete for premis events)
