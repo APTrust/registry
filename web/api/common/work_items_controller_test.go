@@ -66,8 +66,8 @@ func TestWorkItemIndex(t *testing.T) {
 	err := json.Unmarshal([]byte(resp.Body().Raw()), &list)
 	require.Nil(t, err)
 	assert.Equal(t, 32, list.Count)
-	assert.Equal(t, "/member-api/v3/items/?page=3&per_page=5", list.Next)
-	assert.Equal(t, "/member-api/v3/items/?page=1&per_page=5", list.Previous)
+	assert.Equal(t, "/member-api/v3/items?page=3&per_page=5", list.Next)
+	assert.Equal(t, "/member-api/v3/items?page=1&per_page=5", list.Previous)
 	assert.Equal(t, tu.Inst2User.InstitutionID, list.Results[0].InstitutionID)
 
 	// Test some filters. This object has 1 deleted, 4 active items.

@@ -277,28 +277,30 @@ func initRoutes(router *gin.Engine) {
 	memberAPI := router.Group(fmt.Sprintf("%sv3", constants.APIPrefixMember))
 	{
 		// Alerts
+		// TODO: Delete this? Is there even a use case?
 		memberAPI.GET("/alerts", common_api.AlertIndex)
 		memberAPI.GET("/alerts/show/:id/:user_id", common_api.AlertShow)
 
 		// Deletion Requests
+		// TODO: Should we really expose this through the API?
 		memberAPI.GET("/deletions/show/:id", common_api.DeletionRequestShow)
-		memberAPI.GET("/deletions/", common_api.DeletionRequestIndex)
+		memberAPI.GET("/deletions", common_api.DeletionRequestIndex)
 
 		// Generic Files
 		memberAPI.GET("/files/show/*id", common_api.GenericFileShow)
-		memberAPI.GET("/files/", common_api.GenericFileIndex)
+		memberAPI.GET("/files", common_api.GenericFileIndex)
 
 		// Intellectual Objects
 		memberAPI.GET("/objects/show/*id", common_api.IntellectualObjectShow)
-		memberAPI.GET("/objects/", common_api.IntellectualObjectIndex)
+		memberAPI.GET("/objects", common_api.IntellectualObjectIndex)
 
 		// Premis Events
 		memberAPI.GET("/events/show/*id", common_api.PremisEventShow)
-		memberAPI.GET("/events/", common_api.PremisEventIndex)
+		memberAPI.GET("/events", common_api.PremisEventIndex)
 
 		// Work Items
 		memberAPI.GET("/items/show/:id", common_api.WorkItemShow)
-		memberAPI.GET("/items/", common_api.WorkItemIndex)
+		memberAPI.GET("/items", common_api.WorkItemIndex)
 
 	}
 
@@ -309,19 +311,20 @@ func initRoutes(router *gin.Engine) {
 	// Routes start with /admin-api/v3
 	adminAPI := router.Group(fmt.Sprintf("%sv3", constants.APIPrefixAdmin))
 	{
-
 		// Alerts
+		// TODO: Delete this? Admin API doesn't really need it.
 		adminAPI.GET("/alerts", common_api.AlertIndex)
 		adminAPI.GET("/alerts/show/:id/:user_id", common_api.AlertShow)
 
 		// Deletion Requests
+		// TODO: Does Admin API really need this?
 		adminAPI.GET("/deletions/show/:id", common_api.DeletionRequestShow)
-		adminAPI.GET("/deletions/", common_api.DeletionRequestIndex)
+		adminAPI.GET("/deletions", common_api.DeletionRequestIndex)
 
 		// Generic Files
 		// TODO: Add Create, Update, Delete. Support bulk insert/update with transactions.
 		adminAPI.GET("/files/show/*id", common_api.GenericFileShow)
-		adminAPI.GET("/files/", common_api.GenericFileIndex)
+		adminAPI.GET("/files", common_api.GenericFileIndex)
 
 		// Institutions
 		adminAPI.GET("/institutions", admin_api.InstitutionIndex)
@@ -330,17 +333,17 @@ func initRoutes(router *gin.Engine) {
 		// Intellectual Objects
 		// TODO: Add Create, Update, Delete
 		adminAPI.GET("/objects/show/*id", common_api.IntellectualObjectShow)
-		adminAPI.GET("/objects/", common_api.IntellectualObjectIndex)
+		adminAPI.GET("/objects", common_api.IntellectualObjectIndex)
 
 		// Premis Events
 		// TODO: Add Create (no update or delete for premis events)
 		adminAPI.GET("/events/show/*id", common_api.PremisEventShow)
-		adminAPI.GET("/events/", common_api.PremisEventIndex)
+		adminAPI.GET("/events", common_api.PremisEventIndex)
 
 		// Work Items
 		// TODO: Add Create & Update
 		adminAPI.GET("/items/show/:id", common_api.WorkItemShow)
-		adminAPI.GET("/items/", common_api.WorkItemIndex)
+		adminAPI.GET("/items", common_api.WorkItemIndex)
 
 	}
 }

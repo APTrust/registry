@@ -66,8 +66,8 @@ func TestDeletionRequestIndex(t *testing.T) {
 	err := json.Unmarshal([]byte(resp.Body().Raw()), &list)
 	require.Nil(t, err)
 	assert.Equal(t, 3, list.Count)
-	assert.Equal(t, "/member-api/v3/deletions/?page=3&per_page=1", list.Next)
-	assert.Equal(t, "/member-api/v3/deletions/?page=1&per_page=1", list.Previous)
+	assert.Equal(t, "/member-api/v3/deletions?page=3&per_page=1", list.Next)
+	assert.Equal(t, "/member-api/v3/deletions?page=1&per_page=1", list.Previous)
 	assert.Equal(t, tu.Inst1User.ID, list.Results[0].RequestedByID)
 
 	// Inst admin should see only his own institution's deletions.

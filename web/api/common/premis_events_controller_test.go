@@ -67,8 +67,8 @@ func TestPremisEventIndex(t *testing.T) {
 	err := json.Unmarshal([]byte(resp.Body().Raw()), &list)
 	require.Nil(t, err)
 	assert.Equal(t, 53, list.Count)
-	assert.Equal(t, "/member-api/v3/events/?page=3&per_page=5", list.Next)
-	assert.Equal(t, "/member-api/v3/events/?page=1&per_page=5", list.Previous)
+	assert.Equal(t, "/member-api/v3/events?page=3&per_page=5", list.Next)
+	assert.Equal(t, "/member-api/v3/events?page=1&per_page=5", list.Previous)
 	assert.Equal(t, tu.Inst2User.InstitutionID, list.Results[0].InstitutionID)
 
 	// Test some filters. This object has 1 deleted, 4 active events.
@@ -93,7 +93,7 @@ func TestPremisEventIndex(t *testing.T) {
 	err = json.Unmarshal([]byte(resp.Body().Raw()), &list)
 	require.Nil(t, err)
 	assert.Equal(t, 27, list.Count)
-	assert.Equal(t, "/member-api/v3/events/?page=2&per_page=20", list.Next)
+	assert.Equal(t, "/member-api/v3/events?page=2&per_page=20", list.Next)
 	assert.Equal(t, "", list.Previous)
 	assert.Equal(t, 20, len(list.Results))
 	for _, event := range list.Results {
@@ -111,7 +111,7 @@ func TestPremisEventIndex(t *testing.T) {
 	err = json.Unmarshal([]byte(resp.Body().Raw()), &list)
 	require.Nil(t, err)
 	assert.Equal(t, 27, list.Count)
-	assert.Equal(t, "/member-api/v3/events/?page=2&per_page=20", list.Next)
+	assert.Equal(t, "/member-api/v3/events?page=2&per_page=20", list.Next)
 	assert.Equal(t, "", list.Previous)
 	assert.Equal(t, 20, len(list.Results))
 	for _, event := range list.Results {
