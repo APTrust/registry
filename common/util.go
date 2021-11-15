@@ -229,3 +229,12 @@ func CountryCodeAndPhone(phoneNumber string) (int32, string, error) {
 	}
 	return *num.CountryCode, fmt.Sprintf("%d", *num.NationalNumber), nil
 }
+
+// NonZeroAndUnequalInt64 returns true if both a and b are non-zero
+// and a does not equal b.
+func NonZeroAndUnequalInt64(a, b int64) bool {
+	if a == 0 && b == 0 {
+		return false
+	}
+	return a != b
+}

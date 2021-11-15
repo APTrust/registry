@@ -46,7 +46,7 @@ func StatusCodeForError(err error) (status int) {
 		status = http.StatusForbidden
 	case common.ErrParentRecordNotFound:
 		status = http.StatusNotFound
-	case common.ErrWrongDataType:
+	case common.ErrWrongDataType, common.ErrIDMismatch, common.ErrInstIDChange, common.ErrIdentifierChange:
 		status = http.StatusBadRequest
 	case common.ErrDecodeCookie:
 		status = http.StatusBadRequest

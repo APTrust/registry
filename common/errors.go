@@ -106,6 +106,20 @@ var ErrNoAuthyID = errors.New("user does not have an authy id")
 // endpoints.
 var ErrWrongAPI = errors.New("non-admins must use the member api")
 
+// ErrIDMismatch can indicate that the specified resource does not belong to
+// the specified institition, or (more likely) that resource/institution IDs
+// in a URL do not match resource/institution IDs submitted in the PUT/POST
+// body of an HTML request.
+var ErrIDMismatch = errors.New("resource or institution id mismatch")
+
+// ErrInstIDChange occurs when someone tries to change the institution id
+// of a resource.
+var ErrInstIDChange = errors.New("institution id cannot change")
+
+// ErrInstIDChange occurs when someone tries to change the identifier
+// of a resource.
+var ErrIdentifierChange = errors.New("identifier cannot change")
+
 // ErrInternal is a runtime error that is not the user's fault, hence
 // probably the programmer's fault.
 var ErrInternal = errors.New("internal server error")

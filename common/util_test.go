@@ -109,3 +109,11 @@ func TestCountryCodeAndPhone(t *testing.T) {
 	_, _, err = common.CountryCodeAndPhone("invalid number")
 	assert.NotNil(t, err)
 }
+
+func TestNonZeroAndUnequalInt64(t *testing.T) {
+	assert.False(t, common.NonZeroAndUnequalInt64(0, 0))
+	assert.False(t, common.NonZeroAndUnequalInt64(2, 2))
+	assert.True(t, common.NonZeroAndUnequalInt64(0, 2))
+	assert.True(t, common.NonZeroAndUnequalInt64(2, 0))
+	assert.True(t, common.NonZeroAndUnequalInt64(2, 4))
+}

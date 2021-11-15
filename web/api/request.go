@@ -94,3 +94,23 @@ func (req *Request) LoadResourceList(items interface{}, orderBy string) (*common
 	pager.SetCounts(count, reflect.ValueOf(items).Elem().Len())
 	return pager, err
 }
+
+// AssertValidIDs returns an error if resource or institution ID in an
+// endpoint's URL params don't match the resource/institution ID in the
+// JSON of the request body. This is for security. E.g. We don't want
+// someone posting to a URL that purports to update one object when
+// in fact the JSON will be updating a different object.
+func (req *Request) AssertValidIDs(resourceID, instID int64) error {
+	msg := ""
+	if common.NonZeroAndUnequalInt64(req.Auth.ResourceID, resourceID) {
+		msg += fmt.Sprintf("URL says resource ID %d, but JSON says %d. ", req.Auth.ResourceID, resourceID)
+	}
+	if common.NonZeroAndUnequalInt64(req.Auth.ResourceInstID, instID) {
+		msg += fmt.Sprintf("URL says institution ID %d, but JSON says %d. ", req.Auth.ResourceID, resourceID)
+	}
+	if len(msg) > 0 {
+		common.Context().Log.Error().Msgf("Illegal update. User %s, %s:  %s", req.CurrentUser.Email, req.GinContext.FullPath(), msg)
+		return common.ErrIDMismatch
+	}
+	return nil
+}
