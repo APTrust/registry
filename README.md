@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.com/APTrust/registry.svg?branch=master)](https://travis-ci.org/APTrust/registry)
 [![Maintainability](https://api.codeclimate.com/v1/badges/e4c7cfd351d6bae759e3/maintainability)](https://codeclimate.com/github/APTrust/registry/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/e4c7cfd351d6bae759e3/test_coverage)](https://codeclimate.com/github/APTrust/registry/test_coverage)
 
