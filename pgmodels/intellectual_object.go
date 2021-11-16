@@ -2,6 +2,7 @@ package pgmodels
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/APTrust/registry/common"
@@ -103,6 +104,38 @@ func (obj *IntellectualObject) Delete() error {
 	// TODO: Create PremisEvents, update WorkItem
 
 	return update(obj)
+}
+
+// HasActiveFiles returns true if this object has any active (non-deleted)
+// files. We need to check this before marking an object as deleted.
+// Do not mark deleted until all files have been marked deleted.
+func (obj *IntellectualObject) HasActiveFiles() (bool, error) {
+	db := common.Context().DB
+	return db.Model((*GenericFile)(nil)).Where("intellectual_object_id = ? and state = ?", obj.ID, constants.StateActive).Exists()
+}
+
+// LastIngestEvent returns the latest ingest event for this object.
+// This should never be nil.
+func (obj *IntellectualObject) LastIngestEvent() (*PremisEvent, error) {
+	return obj.lastEvent(constants.EventIngestion)
+}
+
+// LastDeleationEvent returns the latest deletion event for this object,
+// which may be nil.
+func (obj *IntellectualObject) LastDeletionEvent() (*PremisEvent, error) {
+	return obj.lastEvent(constants.EventDeletion)
+}
+
+func (obj *IntellectualObject) lastEvent(eventType string) (*PremisEvent, error) {
+	query := NewQuery().
+		Where("intellectual_object_id", "=", obj.ID).
+		Where("event_type", "=", eventType).
+		IsNull("generic_file_id").
+		OrderBy("created_at desc").
+		Offset(0).
+		Limit(1)
+	fmt.Println(query.WhereClause(), query.GetOrderBy(), query.GetOffset(), query.Params())
+	return PremisEventGet(query)
 }
 
 func isGlacierOnly(storageOption string) bool {

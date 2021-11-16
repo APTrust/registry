@@ -17,7 +17,7 @@ func IntellectualObjectCreate(c *gin.Context) {
 	// Ensure the inst id in the JSON matches what's in the URL
 	// Create the object.
 	// Return the full object record.
-	c.JSON(http.StatusOK, nil)
+	c.JSON(http.StatusCreated, nil)
 }
 
 // IntellectualObjectUpdate updates an existing intellectual
@@ -55,6 +55,26 @@ func IntellectualObjectDelete(c *gin.Context) {
 	// registry's responsibility.
 	//
 	// Return the full object record.
+	//
+	// See https://github.com/APTrust/pharos/blob/03dda1f57a499c214691f6a739c22884ea2d2f4b/app/controllers/intellectual_objects_controller.rb#L171-L202
+	//
+	// And https://github.com/APTrust/pharos/blob/03dda1f57a499c214691f6a739c22884ea2d2f4b/app/models/intellectual_object.rb#L110-L127
+	//
+	req := api.NewRequest(c)
+	obj, err := IntellectualObjectFromJson(req)
+	if api.AbortIfError(c, err) {
+		return
+	}
+
+	// Ensure all files have been deleted...
+
+	err = obj.Delete()
+	if api.AbortIfError(c, err) {
+		return
+	}
+
+	// Record Premis Event...
+
 	c.JSON(http.StatusOK, nil)
 }
 

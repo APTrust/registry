@@ -202,6 +202,7 @@ func (q *Query) GetOrderBy() []string {
 	return q.orderBy
 }
 
+// TODO: limit direction to asc/desc to prevent sql injection.
 func (q *Query) OrderBy(colAndDirection string) *Query {
 	if q.orderBy == nil {
 		q.orderBy = make([]string, 0)
