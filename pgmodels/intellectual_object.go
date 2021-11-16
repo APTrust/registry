@@ -1,10 +1,13 @@
 package pgmodels
 
 import (
+	"context"
 	"time"
 
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
+	v "github.com/asaskevich/govalidator"
+	"github.com/go-pg/pg/v10"
 	"github.com/stretchr/stew/slice"
 )
 
@@ -106,6 +109,38 @@ func isGlacierOnly(storageOption string) bool {
 	return slice.Contains(constants.GlacierOnlyOptions, storageOption)
 }
 
+func (obj *IntellectualObject) Validate() *common.ValidationError {
+	errors := make(map[string]string)
+	if common.IsEmptyString(obj.Title) {
+		errors["Title"] = "Title is required"
+	}
+	if common.IsEmptyString(obj.Identifier) {
+		errors["Identifier"] = "Identifier is required"
+	}
+	if !v.IsIn(obj.State, constants.States...) {
+		errors["State"] = ErrInstState
+	}
+	if !v.IsIn(obj.Access, constants.AccessSettings...) {
+		errors["Access"] = "Invalid access value"
+	}
+	if obj.InstitutionID < 1 {
+		errors["InstitutionID"] = "Invalid institution id"
+	}
+	if !v.IsIn(obj.StorageOption, constants.StorageOptions...) {
+		errors["StorageOption"] = "Invalid storage option"
+	}
+	if common.IsEmptyString(obj.BagItProfileIdentifier) {
+		errors["BagItProfileIdentifier"] = "BagItProfileIdentifier is required"
+	}
+	if common.IsEmptyString(obj.SourceOrganization) {
+		errors["SourceOrganization"] = "SourceOrganization is required"
+	}
+	if len(errors) > 0 {
+		return &common.ValidationError{Errors: errors}
+	}
+	return nil
+}
+
 func (obj *IntellectualObject) ValidateChanges(updatedObj *IntellectualObject) error {
 	if obj.ID != updatedObj.ID {
 		return common.ErrIDMismatch
@@ -122,4 +157,35 @@ func (obj *IntellectualObject) ValidateChanges(updatedObj *IntellectualObject) e
 		return common.ErrStorageOptionChange
 	}
 	return nil
+}
+
+// The following statements have no effect other than to force a compile-time
+// check that ensures our IntellectualObject model properly implements these hook
+// interfaces.
+var (
+	_ pg.BeforeInsertHook = (*IntellectualObject)(nil)
+	_ pg.BeforeUpdateHook = (*IntellectualObject)(nil)
+)
+
+// BeforeInsert sets timestamps and bucket names on creation.
+func (obj *IntellectualObject) BeforeInsert(c context.Context) (context.Context, error) {
+	now := time.Now().UTC()
+	obj.CreatedAt = now
+	obj.UpdatedAt = now
+
+	err := obj.Validate()
+	if err == nil {
+		return c, nil
+	}
+	return c, err
+}
+
+// BeforeUpdate sets the UpdatedAt timestamp.
+func (obj *IntellectualObject) BeforeUpdate(c context.Context) (context.Context, error) {
+	err := obj.Validate()
+	obj.UpdatedAt = time.Now().UTC()
+	if err == nil {
+		return c, nil
+	}
+	return c, err
 }

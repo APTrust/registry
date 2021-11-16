@@ -2,7 +2,6 @@ package pgmodels
 
 import (
 	"context"
-	"strings"
 	"time"
 
 	"github.com/APTrust/registry/common"
@@ -193,7 +192,7 @@ func (alert *Alert) Validate() *common.ValidationError {
 	if !slice.Contains(constants.AlertTypes, alert.Type) {
 		errors["Type"] = ErrAlertType
 	}
-	if strings.TrimSpace(alert.Content) == "" {
+	if common.IsEmptyString(alert.Content) {
 		errors["Content"] = ErrAlertContent
 	}
 

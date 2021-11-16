@@ -25,13 +25,16 @@ func IntellectualObjectCreate(c *gin.Context) {
 //
 // PUT /admin-api/v3/objects/update/:id
 func IntellectualObjectUpdate(c *gin.Context) {
-	// Ensure the inst id in the JSON matches what's in the URL
-	// Update the object, ensuring:
-	//  - institution id can't change
-	//  - storage option can't change
-	// Return the full object record.
-
-	c.JSON(http.StatusOK, nil)
+	req := api.NewRequest(c)
+	obj, err := IntellectualObjectFromJson(req)
+	if api.AbortIfError(c, err) {
+		return
+	}
+	err = obj.Save()
+	if api.AbortIfError(c, err) {
+		return
+	}
+	c.JSON(http.StatusOK, obj)
 }
 
 // IntellectualObjectDelete marks an object record as deleted.
@@ -60,23 +63,25 @@ func IntellectualObjectDelete(c *gin.Context) {
 // the database (if there is one). It returns an error if the JSON
 // can't be parsed, if the existing object can't be found, or if
 // changes made to the existing object are not allowed.
-func IntellectualObjectFromJson(req api.Request) (existingObject *pgmodels.IntellectualObject, submittedObject *pgmodels.IntellectualObject, err error) {
-	err = req.GinContext.BindJSON(submittedObject)
+func IntellectualObjectFromJson(req *api.Request) (*pgmodels.IntellectualObject, error) {
+	submittedObject := &pgmodels.IntellectualObject{}
+	err := req.GinContext.BindJSON(submittedObject)
 	if err != nil {
-		return existingObject, submittedObject, err
+		return submittedObject, err
+	}
+	err = req.AssertValidIDs(submittedObject.ID, submittedObject.InstitutionID)
+	if err != nil {
+		return submittedObject, err
 	}
 	if req.Auth.ResourceID > 0 {
-		existingObject, err = pgmodels.IntellectualObjectByID(req.Auth.ResourceID)
+		existingObject, err := pgmodels.IntellectualObjectByID(req.Auth.ResourceID)
 		if err != nil {
-			return existingObject, submittedObject, err
+			return submittedObject, err
 		}
 		CoerceObjectStorageOption(existingObject, submittedObject)
 		err = existingObject.ValidateChanges(submittedObject)
 	}
-	if err != nil {
-		return existingObject, submittedObject, err
-	}
-	return existingObject, submittedObject, req.AssertValidIDs(submittedObject.ID, submittedObject.InstitutionID)
+	return submittedObject, err
 }
 
 // CoerceObjectStorageOption forces submittedObject.StorageOption to match

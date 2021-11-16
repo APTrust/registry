@@ -37,6 +37,10 @@ func AbortIfError(c *gin.Context, err error) bool {
 // error. If the error doesn't map to a code, this returns 500 by
 // default.
 func StatusCodeForError(err error) (status int) {
+	if _, ok := err.(*common.ValidationError); ok {
+		return http.StatusBadRequest
+	}
+
 	switch err {
 	case common.ErrInvalidLogin:
 		status = http.StatusUnauthorized

@@ -2,7 +2,6 @@ package pgmodels
 
 import (
 	"context"
-	"strings"
 	"time"
 
 	"github.com/APTrust/registry/common"
@@ -106,22 +105,22 @@ func (option *StorageOption) BeforeUpdate(c context.Context) (context.Context, e
 // and update.
 func (option *StorageOption) Validate() *common.ValidationError {
 	errors := make(map[string]string)
-	if strings.TrimSpace(option.Provider) == "" {
+	if common.IsEmptyString(option.Provider) {
 		errors["Provider"] = ErrStorageOptionProvider
 	}
-	if strings.TrimSpace(option.Service) == "" {
+	if common.IsEmptyString(option.Service) {
 		errors["Service"] = ErrStorageOptionService
 	}
-	if strings.TrimSpace(option.Region) == "" {
+	if common.IsEmptyString(option.Region) {
 		errors["Region"] = ErrStorageOptionRegion
 	}
-	if strings.TrimSpace(option.Name) == "" {
+	if common.IsEmptyString(option.Name) {
 		errors["Name"] = ErrStorageOptionName
 	}
 	if option.CostGBPerMonth <= 0.0 {
 		errors["CostGBPerMonth"] = ErrStorageOptionCost
 	}
-	if strings.TrimSpace(option.Comment) == "" {
+	if common.IsEmptyString(option.Comment) {
 		errors["Comment"] = ErrStorageOptionComment
 	}
 	if len(errors) > 0 {

@@ -117,3 +117,11 @@ func TestNonZeroAndUnequalInt64(t *testing.T) {
 	assert.True(t, common.NonZeroAndUnequalInt64(2, 0))
 	assert.True(t, common.NonZeroAndUnequalInt64(2, 4))
 }
+
+func TestIsEmptyString(t *testing.T) {
+	assert.True(t, common.IsEmptyString(""))
+	assert.True(t, common.IsEmptyString("   "))
+	assert.True(t, common.IsEmptyString(" \t \n "))
+	assert.False(t, common.IsEmptyString("not empty"))
+	assert.False(t, common.IsEmptyString("  not empty  "))
+}

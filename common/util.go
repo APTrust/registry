@@ -75,6 +75,9 @@ func ExpandTilde(filePath string) (string, error) {
 // be decrypted. This is suitable for encrypting passwords,
 // reset-tokens, etc. The combined use of md5 plus plaintext salt
 // plus sha256 provides some protection against rainbow tables.
+//
+// TODO: Delete this if we're not using it. Looks like we're
+// actually using bcrypt in common/password.go
 func Hash(plaintext string) string {
 	plain := []byte(plaintext)
 	md5Digest := []byte(fmt.Sprintf("%x", md5.Sum(plain)))
@@ -237,4 +240,10 @@ func NonZeroAndUnequalInt64(a, b int64) bool {
 		return false
 	}
 	return a != b
+}
+
+// IsEmptyString returns true if str, stripped of leading and
+// trailing whitespace, is empty.
+func IsEmptyString(str string) bool {
+	return strings.TrimSpace(str) == ""
 }
