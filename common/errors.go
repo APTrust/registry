@@ -116,9 +116,14 @@ var ErrIDMismatch = errors.New("resource or institution id mismatch")
 // of a resource.
 var ErrInstIDChange = errors.New("institution id cannot change")
 
-// ErrInstIDChange occurs when someone tries to change the identifier
+// ErrIdentifierChange occurs when someone tries to change the identifier
 // of a resource.
 var ErrIdentifierChange = errors.New("identifier cannot change")
+
+// ErrStorageOptionChange indicates someone tried to change the storage
+// option on an active object. (It's OK to change storage option on a
+// deleted object that you are re-depositing.)
+var ErrStorageOptionChange = errors.New("cannot change storage option on active object")
 
 // ErrInternal is a runtime error that is not the user's fault, hence
 // probably the programmer's fault.

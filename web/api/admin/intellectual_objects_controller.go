@@ -55,11 +55,11 @@ func IntellectualObjectDelete(c *gin.Context) {
 	c.JSON(http.StatusOK, nil)
 }
 
-// GetObject returns the IntellectualObject from the
+// IntellectualObjectFromJson returns the IntellectualObject from the
 // JSON in the request body and the existing object record from
-// the database. It will return an error if the JSON
-// can't be parsed, or if there's an ID mismatch, or if the
-// existing object can't be found.
+// the database (if there is one). It returns an error if the JSON
+// can't be parsed, if the existing object can't be found, or if
+// changes made to the existing object are not allowed.
 func IntellectualObjectFromJson(req api.Request) (existingObject *pgmodels.IntellectualObject, submittedObject *pgmodels.IntellectualObject, err error) {
 	err = req.GinContext.BindJSON(submittedObject)
 	if err != nil {
@@ -71,29 +71,22 @@ func IntellectualObjectFromJson(req api.Request) (existingObject *pgmodels.Intel
 			return existingObject, submittedObject, err
 		}
 		CoerceObjectStorageOption(existingObject, submittedObject)
-		err = ValidateObjectChanges(existingObject, submittedObject)
+		err = existingObject.ValidateChanges(submittedObject)
+	}
+	if err != nil {
+		return existingObject, submittedObject, err
 	}
 	return existingObject, submittedObject, req.AssertValidIDs(submittedObject.ID, submittedObject.InstitutionID)
 }
 
-// TODO: Need to validate identifier. No control chars. Check how preservation services does it.
-// TODO: Move all this "change validation" down into the object model in pgmodels. E.g. ValidateChanges(existingObject, editedObject)
-
+// CoerceObjectStorageOption forces submittedObject.StorageOption to match
+// existingObject.StorageOption if existingObject.State is Active. The reason
+// for this is documented in the special note under allowed storage option
+// values at
+// https://aptrust.github.io/userguide/bagging/#allowed-storage-option-values
 func CoerceObjectStorageOption(existingObject, submittedObject *pgmodels.IntellectualObject) {
 	if existingObject != nil && existingObject.State == constants.StateActive && existingObject.StorageOption != submittedObject.StorageOption {
 		common.Context().Log.Warn().Msgf("Forcing storage option back to '%s' on IntellectualObject %d (%s)", existingObject.StorageOption, submittedObject.ID, submittedObject.Identifier)
 		submittedObject.StorageOption = existingObject.StorageOption
 	}
-}
-
-func ValidateObjectChanges(existingObject, submittedObject *pgmodels.IntellectualObject) error {
-	if existingObject != nil {
-		if existingObject.InstitutionID != submittedObject.InstitutionID {
-			return common.ErrInstIDChange
-		}
-		if existingObject.Identifier != submittedObject.Identifier {
-			return common.ErrIdentifierChange
-		}
-	}
-	return nil
 }

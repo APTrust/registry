@@ -3,6 +3,7 @@ package pgmodels
 import (
 	"time"
 
+	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
 	"github.com/stretchr/stew/slice"
 )
@@ -103,4 +104,22 @@ func (obj *IntellectualObject) Delete() error {
 
 func isGlacierOnly(storageOption string) bool {
 	return slice.Contains(constants.GlacierOnlyOptions, storageOption)
+}
+
+func (obj *IntellectualObject) ValidateChanges(updatedObj *IntellectualObject) error {
+	if obj.ID != updatedObj.ID {
+		return common.ErrIDMismatch
+	}
+	if obj.InstitutionID != updatedObj.InstitutionID {
+		return common.ErrInstIDChange
+	}
+	if obj.Identifier != updatedObj.Identifier {
+		return common.ErrIdentifierChange
+	}
+	// Caller should force storage option of updated object to
+	// match existing object before calling this validation function.
+	if obj.State == constants.StateActive && obj.StorageOption != updatedObj.StorageOption {
+		return common.ErrStorageOptionChange
+	}
+	return nil
 }
