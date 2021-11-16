@@ -1,3 +1,6 @@
+[![Maintainability](https://api.codeclimate.com/v1/badges/e4c7cfd351d6bae759e3/maintainability)](https://codeclimate.com/github/APTrust/registry/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/e4c7cfd351d6bae759e3/test_coverage)](https://codeclimate.com/github/APTrust/registry/test_coverage)
+
 # Registry
 
 APTrust's registry contains metadata about the millions of items we hold on behalf of our depositors in preservation storage. The registry provides web-based and API-based access to the metadata and to information about items currently undergoing ingest and restoration.
