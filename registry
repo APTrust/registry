@@ -91,6 +91,8 @@ if [[ $1 == "test" ]]; then
 elif [[ $1 == "cover" ]]; then
     echo "Generating test coverage report..."
     APT_ENV=$APT_ENV go test -p 1 ./... -coverprofile cover.out
+    echo "To generate HTML report:"
+    echo "> go tool cover -html=coverage.out"
 elif [[ $1 == "serve" ]]; then
     echo "Starting registry app..."
     APT_ENV=$APT_ENV go run registry.go
