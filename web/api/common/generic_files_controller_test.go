@@ -66,7 +66,7 @@ func TestGenericFileIndex(t *testing.T) {
 	list := api.GenericFileViewList{}
 	err := json.Unmarshal([]byte(resp.Body().Raw()), &list)
 	require.Nil(t, err)
-	assert.Equal(t, 61, list.Count)
+	assert.Equal(t, 62, list.Count)
 	assert.Equal(t, "/member-api/v3/files?page=3&per_page=5", list.Next)
 	assert.Equal(t, "/member-api/v3/files?page=1&per_page=5", list.Previous)
 	assert.Equal(t, tu.Inst1User.InstitutionID, list.Results[0].InstitutionID)

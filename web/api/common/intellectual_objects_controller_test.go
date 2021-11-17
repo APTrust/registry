@@ -66,7 +66,7 @@ func TestIntellectualObjectIndex(t *testing.T) {
 	list := api.IntellectualObjectList{}
 	err := json.Unmarshal([]byte(resp.Body().Raw()), &list)
 	require.Nil(t, err)
-	assert.Equal(t, 13, list.Count)
+	assert.Equal(t, 14, list.Count)
 	assert.Equal(t, "/member-api/v3/objects?page=3&per_page=5", list.Next)
 	assert.Equal(t, "/member-api/v3/objects?page=1&per_page=5", list.Previous)
 	assert.Equal(t, tu.Inst2User.InstitutionID, list.Results[0].InstitutionID)

@@ -73,7 +73,7 @@ func TestGenericFileIndex(t *testing.T) {
 		testutil.AssertMatchesAll(t, html, commonFilters)
 		if client == testutil.SysAdminClient {
 			testutil.AssertMatchesAll(t, html, adminFilters)
-			testutil.AssertMatchesResultCount(t, html, 61)
+			testutil.AssertMatchesResultCount(t, html, 62)
 		} else {
 			testutil.AssertMatchesNone(t, html, adminFilters)
 			testutil.AssertMatchesResultCount(t, html, 18)

@@ -104,7 +104,7 @@ func TestObjectList(t *testing.T) {
 		if client == testutil.SysAdminClient {
 			testutil.AssertMatchesAll(t, html, adminFilters)
 			testutil.AssertMatchesAll(t, html, inst2Links)
-			testutil.AssertMatchesResultCount(t, html, 13)
+			testutil.AssertMatchesResultCount(t, html, 14)
 		} else {
 			testutil.AssertMatchesNone(t, html, adminFilters)
 			testutil.AssertMatchesNone(t, html, inst2Links)

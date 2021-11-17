@@ -2,7 +2,6 @@ package pgmodels
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/APTrust/registry/common"
@@ -134,7 +133,6 @@ func (obj *IntellectualObject) lastEvent(eventType string) (*PremisEvent, error)
 		OrderBy("created_at desc").
 		Offset(0).
 		Limit(1)
-	fmt.Println(query.WhereClause(), query.GetOrderBy(), query.GetOffset(), query.Params())
 	return PremisEventGet(query)
 }
 
