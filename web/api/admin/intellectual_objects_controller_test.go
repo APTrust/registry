@@ -74,14 +74,17 @@ func TestObjectIndex(t *testing.T) {
 func TestObjectCreate(t *testing.T) {
 	tu.InitHTTPTests(t)
 
+	// TODO: Finish test
 }
 
 func TestObjectUpdate(t *testing.T) {
 	tu.InitHTTPTests(t)
 
+	// TODO: Finish test
 }
 
 func TestObjectDelete(t *testing.T) {
 	tu.InitHTTPTests(t)
 
+	// TODO: Finish test
 }
