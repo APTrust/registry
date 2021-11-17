@@ -6,7 +6,7 @@ go:
   - 1.16.2
   - tip
 env:
-  - APT_ENV=travis GIT_COMMIT_SHA=$TRAVIS_COMMIT GIT_BRANCH=$TRAVIS_BRANCH
+  - APT_ENV=travis
 services:
   - postgresql
 before_script:
