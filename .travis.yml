@@ -1,14 +1,12 @@
+# Note: Define CC_TEST_REPORTER_ID in Travis env vars.
+# This is available from the Test Coverage settings page in CodeClimate
 os: linux
 language: go
 go:
   - 1.16.2
-
-# Note: Define CC_TEST_REPORTER_ID in Travis env vars.
-# This is available from the Test Coverage settings page in CodeClimate
+  - tip
 env:
-  - APT_ENV=travis
-  - GIT_COMMIT_SHA=$TRAVIS_COMMIT
-  - GIT_BRANCH=$TRAVIS_BRANCH
+  - APT_ENV=travis GIT_COMMIT_SHA=$TRAVIS_COMMIT GIT_BRANCH=$TRAVIS_BRANCH
 services:
   - postgresql
 before_script:
