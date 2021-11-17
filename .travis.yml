@@ -1,16 +1,24 @@
 os: linux
 language: go
 go:
-- 1.16.2
+  - 1.16.2
+
+# Note: Define CC_TEST_REPORTER_ID in Travis env vars.
+# This is available from the Test Coverage settings page in CodeClimate
 env:
   - APT_ENV=travis
+  - GIT_COMMIT_SHA=$TRAVIS_COMMIT
+  - GIT_BRANCH=$TRAVIS_BRANCH
 services:
   - postgresql
 before_script:
   - psql -c 'create database apt_registry_travis;' -U postgres
   - psql -U postgres -d apt_registry_travis -a -f ./db/schema.sql
+  - ./bin/linux/cc-test-reporter before-build
 script:
-  - ./registry test
+  - ./registry cover
+after_script:
+  - ./bin/linux/cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
 notifications:
   slack:
     secure: WCxwC+x+tnd1nYDzLanlx4x5WX79NBkGkcwdAH+1kMNTo9BhUi6vWHlIOOtYaRcegoC7LLh5rcoKghBuJLZILERFsUo0KZWTPA1S5KE4YeWs9SLqXtaUU8NH2fmHV3QvcnfuouGNmZn6p6oLx8bxl+JdBvXiEZSLDUE0MUyCDEWw5vFqVfsWv1lreoEr3B2wnmv7cg6/lm1A1aEe2RxXPb/0nVqJUg86d3DrNkhGbOzP5uppPRPnUmv/FyDZ389sC9ZJ3Qlb+ru5+9u3gXf5O11n03un8s0arsWzK4+EHwxlNes6U3oa6sKCghkj1L+X4Qe2Bj0tz4s8KHufZtuxu+/Gvq2qt3yq9YLneyhc7DPdk3IrG8mtx+lh5Ozb3YXDAe+QCoOdwp/u89VFT8+Xta6ukLeHKJKmqec3VLj1RHg/ZvfrXSHJGCTjxn1niNyzjf13x3wj7z7NiP9PBLGtTFR+/1P+3esjBd0W97eNLB4OXOU+JB52f1GXyQEC8me1YkzGsIqujVoJc7TT0aO1Z1SOiDt4nS/5fTzmUkH4sU3+ESdh2bQc6NNvhKkTdMp/qq/p9xgSGU9V2FvnSgZdICB7Njw2irMnDFOO9hLMEHgNHy5h6+2PDGIZnZrf4RB5RR2ory5ynWnWTU7umxrY4BvBxALpLMtNkrpuAjpfzoQ=
