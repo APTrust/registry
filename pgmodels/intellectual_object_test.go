@@ -87,30 +87,8 @@ func TestObjLastDeletionEvent(t *testing.T) {
 	assert.Equal(t, int64(54), event.ID)
 }
 
-// getTestObject returns an IntellectualObject with valid settings
-// that can be altered per-test.
-func getTestObject() *pgmodels.IntellectualObject {
-	return &pgmodels.IntellectualObject{
-		Title:                     "TestObject999",
-		Description:               "Obj Created by Test",
-		Identifier:                "test.edu/obj1",
-		AltIdentifier:             "Yadda-Yadda-Yo",
-		Access:                    constants.AccessInstitution,
-		State:                     constants.StateActive,
-		BagName:                   "TestObject999.tar",
-		ETag:                      "12345678-9",
-		InstitutionID:             4,
-		StorageOption:             constants.StorageOptionStandard,
-		BagItProfileIdentifier:    "https://example.com/profile.json",
-		SourceOrganization:        "Willy Wonka's Chocolate Factory",
-		BagGroupIdentifier:        "group-999",
-		InternalSenderIdentifier:  "yadda-999",
-		InternalSenderDescription: "Created by intel obj test",
-	}
-}
-
 func TestObjValidate(t *testing.T) {
-	obj1 := getTestObject()
+	obj1 := GetTestObject()
 	assert.Nil(t, obj1.Validate())
 
 	obj1.Title = " "
@@ -142,8 +120,8 @@ func TestObjValidate(t *testing.T) {
 }
 
 func TestObjValidateChanges(t *testing.T) {
-	obj1 := getTestObject()
-	obj2 := getTestObject()
+	obj1 := GetTestObject()
+	obj2 := GetTestObject()
 
 	assert.Nil(t, obj1.ValidateChanges(obj2))
 
@@ -170,7 +148,7 @@ func TestObjValidateChanges(t *testing.T) {
 
 func TestObjInsertAndUpdate(t *testing.T) {
 	// Insert
-	obj := getTestObject()
+	obj := GetTestObject()
 	err := obj.Save()
 	assert.Nil(t, err)
 	assert.NotEmpty(t, obj.CreatedAt)
