@@ -14,10 +14,11 @@ import (
 //
 // POST /admin-api/v3/objects/create/:institution_id
 func IntellectualObjectCreate(c *gin.Context) {
-	// Ensure the inst id in the JSON matches what's in the URL
-	// Create the object.
-	// Return the full object record.
-	c.JSON(http.StatusCreated, nil)
+	obj, err := CreateOrUpdateObject(c)
+	if api.AbortIfError(c, err) {
+		return
+	}
+	c.JSON(http.StatusCreated, obj)
 }
 
 // IntellectualObjectUpdate updates an existing intellectual
@@ -25,12 +26,7 @@ func IntellectualObjectCreate(c *gin.Context) {
 //
 // PUT /admin-api/v3/objects/update/:id
 func IntellectualObjectUpdate(c *gin.Context) {
-	req := api.NewRequest(c)
-	obj, err := IntellectualObjectFromJson(req)
-	if api.AbortIfError(c, err) {
-		return
-	}
-	err = obj.Save()
+	obj, err := CreateOrUpdateObject(c)
 	if api.AbortIfError(c, err) {
 		return
 	}
@@ -76,6 +72,16 @@ func IntellectualObjectDelete(c *gin.Context) {
 	// Record Premis Event...
 
 	c.JSON(http.StatusOK, nil)
+}
+
+func CreateOrUpdateObject(c *gin.Context) (*pgmodels.IntellectualObject, error) {
+	req := api.NewRequest(c)
+	obj, err := IntellectualObjectFromJson(req)
+	if err != nil {
+		return nil, err
+	}
+	err = obj.Save()
+	return obj, err
 }
 
 // IntellectualObjectFromJson returns the IntellectualObject from the

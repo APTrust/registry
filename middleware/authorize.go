@@ -37,7 +37,7 @@ func Authorize() gin.HandlerFunc {
 	}
 }
 
-func isAPIRequest(path string) bool {
+func IsAPIRequest(path string) bool {
 	for _, prefix := range constants.APIPrefixes {
 		if strings.HasPrefix(path, prefix) {
 			return true
@@ -49,7 +49,7 @@ func isAPIRequest(path string) bool {
 func showNotCheckedError(c *gin.Context, auth *ResourceAuthorization) {
 	common.Context().Log.Error().Msgf(auth.GetError())
 	errMsg := fmt.Sprintf("Missing authorization check for %s", c.FullPath())
-	if isAPIRequest(c.Request.URL.Path) {
+	if IsAPIRequest(c.Request.URL.Path) {
 		c.JSON(http.StatusInternalServerError, map[string]string{
 			"error": errMsg,
 		})
@@ -68,7 +68,7 @@ func showAuthFailedError(c *gin.Context, auth *ResourceAuthorization) {
 	if auth.Error != nil {
 		errMsg = fmt.Sprintf("%s %s", errMsg, auth.Error.Error())
 	}
-	if isAPIRequest(c.Request.URL.Path) {
+	if IsAPIRequest(c.Request.URL.Path) {
 		c.JSON(http.StatusForbidden, map[string]string{
 			"error": errMsg,
 		})

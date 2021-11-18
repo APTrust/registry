@@ -88,7 +88,7 @@ func TestObjLastDeletionEvent(t *testing.T) {
 }
 
 func TestObjValidate(t *testing.T) {
-	obj1 := GetTestObject()
+	obj1 := pgmodels.GetTestObject()
 	assert.Nil(t, obj1.Validate())
 
 	obj1.Title = " "
@@ -120,8 +120,8 @@ func TestObjValidate(t *testing.T) {
 }
 
 func TestObjValidateChanges(t *testing.T) {
-	obj1 := GetTestObject()
-	obj2 := GetTestObject()
+	obj1 := pgmodels.GetTestObject()
+	obj2 := pgmodels.GetTestObject()
 
 	assert.Nil(t, obj1.ValidateChanges(obj2))
 
@@ -148,7 +148,7 @@ func TestObjValidateChanges(t *testing.T) {
 
 func TestObjInsertAndUpdate(t *testing.T) {
 	// Insert
-	obj := GetTestObject()
+	obj := pgmodels.GetTestObject()
 	err := obj.Save()
 	assert.Nil(t, err)
 	assert.NotEmpty(t, obj.CreatedAt)

@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	// "github.com/APTrust/registry/constants"
+	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/APTrust/registry/web/api"
 	tu "github.com/APTrust/registry/web/testutil"
@@ -71,20 +72,91 @@ func TestObjectIndex(t *testing.T) {
 	assert.Equal(t, `{"error":"Permission denied for /admin-api/v3/objects (institution 0). non-admins must use the member api"}`, resp.Body().Raw())
 }
 
-func TestObjectCreate(t *testing.T) {
+func TestObjectCreateUpdateDelete(t *testing.T) {
 	tu.InitHTTPTests(t)
 
-	// TODO: Finish test
+	// TODO: Split into three sub-tests
+
+	// Random objects use inst id 4 -> test.edu
+	obj := pgmodels.RandomObject()
+	resp := tu.SysAdminClient.POST("/admin-api/v3/objects/create/{id}", obj.InstitutionID).WithJSON(obj).Expect()
+	resp.Status(http.StatusCreated)
+
+	savedObj := &pgmodels.IntellectualObject{}
+	err := json.Unmarshal([]byte(resp.Body().Raw()), savedObj)
+	require.Nil(t, err)
+	assert.True(t, savedObj.ID > int64(0))
+	assert.Equal(t, obj.Identifier, savedObj.Identifier)
+	assert.Equal(t, obj.InstitutionID, savedObj.InstitutionID)
+	assert.Equal(t, obj.BagName, savedObj.BagName)
+	assert.Equal(t, obj.ETag, savedObj.ETag)
+	assert.Equal(t, obj.StorageOption, savedObj.StorageOption)
+	assert.NotEmpty(t, savedObj.CreatedAt)
+	assert.NotEmpty(t, savedObj.UpdatedAt)
+
+	origUpdatedAt := savedObj.UpdatedAt
+
+	copyOfSaved := savedObj
+	copyOfSaved.Access = constants.AccessConsortia
+	copyOfSaved.Title = "Updated Title"
+	copyOfSaved.ETag = "UpdatedETag"
+	resp = tu.SysAdminClient.PUT("/admin-api/v3/objects/update/{id}", savedObj.ID).WithJSON(copyOfSaved).Expect()
+	resp.Status(http.StatusOK)
+
+	updatedObj := &pgmodels.IntellectualObject{}
+	err = json.Unmarshal([]byte(resp.Body().Raw()), updatedObj)
+	require.Nil(t, err)
+
+	assert.Equal(t, copyOfSaved.Access, updatedObj.Access)
+	assert.Equal(t, copyOfSaved.Title, updatedObj.Title)
+	assert.Equal(t, copyOfSaved.ETag, updatedObj.ETag)
+	assert.Equal(t, savedObj.CreatedAt, updatedObj.CreatedAt)
+	assert.True(t, updatedObj.UpdatedAt.After(origUpdatedAt))
+
+	// TODO: Test deletion
 }
 
-func TestObjectUpdate(t *testing.T) {
+func TestObjectCreateUnauthorized(t *testing.T) {
 	tu.InitHTTPTests(t)
 
-	// TODO: Finish test
+	// Non sysadmins cannot create objects, even for their
+	// own institutions.
+	obj := pgmodels.RandomObject()
+	obj.InstitutionID = tu.Inst1Admin.InstitutionID
+
+	resp := tu.Inst1AdminClient.POST("/admin-api/v3/objects/create/{id}", obj.InstitutionID).WithJSON(obj).Expect()
+	resp.Status(http.StatusForbidden)
+
+	resp = tu.Inst1UserClient.POST("/admin-api/v3/objects/create/{id}", obj.InstitutionID).WithJSON(obj).Expect()
+	resp.Status(http.StatusForbidden)
 }
 
-func TestObjectDelete(t *testing.T) {
+func TestObjectUpdateUnauthorized(t *testing.T) {
 	tu.InitHTTPTests(t)
 
-	// TODO: Finish test
+	// Non sysadmins cannot update objects, even for their
+	// own institutions.
+	obj, err := pgmodels.IntellectualObjectByID(1)
+	require.Nil(t, err)
+
+	resp := tu.Inst1AdminClient.POST("/admin-api/v3/objects/update/{id}", obj.ID).WithJSON(obj).Expect()
+	resp.Status(http.StatusForbidden)
+
+	resp = tu.Inst1UserClient.POST("/admin-api/v3/objects/update/{id}", obj.ID).WithJSON(obj).Expect()
+	resp.Status(http.StatusForbidden)
+}
+
+func TestObjectDeleteUpdateUnauthorized(t *testing.T) {
+	tu.InitHTTPTests(t)
+
+	// Non sysadmins cannot delete objects, even for their
+	// own institutions.
+	obj, err := pgmodels.IntellectualObjectByID(1)
+	require.Nil(t, err)
+
+	resp := tu.Inst1AdminClient.POST("/admin-api/v3/objects/delete/{id}", obj.ID).WithJSON(obj).Expect()
+	resp.Status(http.StatusForbidden)
+
+	resp = tu.Inst1UserClient.POST("/admin-api/v3/objects/delete/{id}", obj.ID).WithJSON(obj).Expect()
+	resp.Status(http.StatusForbidden)
 }

@@ -102,11 +102,11 @@ func (req *Request) LoadResourceList(items interface{}, orderBy string) (*common
 // in fact the JSON will be updating a different object.
 func (req *Request) AssertValidIDs(resourceID, instID int64) error {
 	msg := ""
-	if common.NonZeroAndUnequalInt64(req.Auth.ResourceID, resourceID) {
+	if req.Auth.ResourceID != resourceID {
 		msg += fmt.Sprintf("URL says resource ID %d, but JSON says %d. ", req.Auth.ResourceID, resourceID)
 	}
-	if common.NonZeroAndUnequalInt64(req.Auth.ResourceInstID, instID) {
-		msg += fmt.Sprintf("URL says institution ID %d, but JSON says %d. ", req.Auth.ResourceID, resourceID)
+	if req.Auth.ResourceInstID != instID {
+		msg += fmt.Sprintf("URL says institution ID %d, but JSON says %d. ", req.Auth.ResourceInstID, instID)
 	}
 	if len(msg) > 0 {
 		common.Context().Log.Error().Msgf("Illegal update. User %s, %s:  %s", req.CurrentUser.Email, req.GinContext.FullPath(), msg)
