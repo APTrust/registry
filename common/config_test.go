@@ -43,6 +43,7 @@ func TestNewConfig(t *testing.T) {
 	assert.Equal(t, 43200, config.Cookies.MaxAge)
 	assert.Equal(t, "aptrust_session", config.Cookies.SessionCookie)
 	assert.False(t, config.Cookies.HTTPSOnly)
+	assert.NotEmpty(t, config.ToJSON())
 }
 
 func TestConfigBucketQualifier(t *testing.T) {
