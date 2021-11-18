@@ -73,9 +73,12 @@ func TestObjectIndex(t *testing.T) {
 
 func TestObjectCreateUpdateDelete(t *testing.T) {
 	tu.InitHTTPTests(t)
+	obj := testObjectCreate(t)
+	updatedObj := testObjectUpdate(t, obj)
+	testObjectDelete(t, updatedObj)
+}
 
-	// TODO: Split into three sub-tests
-
+func testObjectCreate(t *testing.T) *pgmodels.IntellectualObject {
 	// Random objects use inst id 4 -> test.edu
 	obj := pgmodels.RandomObject()
 	resp := tu.SysAdminClient.POST("/admin-api/v3/objects/create/{id}", obj.InstitutionID).WithJSON(obj).Expect()
@@ -92,35 +95,42 @@ func TestObjectCreateUpdateDelete(t *testing.T) {
 	assert.Equal(t, obj.StorageOption, savedObj.StorageOption)
 	assert.NotEmpty(t, savedObj.CreatedAt)
 	assert.NotEmpty(t, savedObj.UpdatedAt)
+	return savedObj
+}
 
-	origUpdatedAt := savedObj.UpdatedAt
+func testObjectUpdate(t *testing.T, obj *pgmodels.IntellectualObject) *pgmodels.IntellectualObject {
+	origUpdatedAt := obj.UpdatedAt
+	copyOfObj := obj
+	copyOfObj.Access = constants.AccessConsortia
+	copyOfObj.Title = "Updated Title"
+	copyOfObj.ETag = "UpdatedETag"
 
-	copyOfSaved := savedObj
-	copyOfSaved.Access = constants.AccessConsortia
-	copyOfSaved.Title = "Updated Title"
-	copyOfSaved.ETag = "UpdatedETag"
-	resp = tu.SysAdminClient.PUT("/admin-api/v3/objects/update/{id}", savedObj.ID).WithJSON(copyOfSaved).Expect()
+	resp := tu.SysAdminClient.PUT("/admin-api/v3/objects/update/{id}", obj.ID).WithJSON(copyOfObj).Expect()
 	resp.Status(http.StatusOK)
 
 	updatedObj := &pgmodels.IntellectualObject{}
-	err = json.Unmarshal([]byte(resp.Body().Raw()), updatedObj)
+	err := json.Unmarshal([]byte(resp.Body().Raw()), updatedObj)
 	require.Nil(t, err)
 
-	assert.Equal(t, copyOfSaved.Access, updatedObj.Access)
-	assert.Equal(t, copyOfSaved.Title, updatedObj.Title)
-	assert.Equal(t, copyOfSaved.ETag, updatedObj.ETag)
-	assert.Equal(t, savedObj.CreatedAt, updatedObj.CreatedAt)
+	assert.Equal(t, copyOfObj.Access, updatedObj.Access)
+	assert.Equal(t, copyOfObj.Title, updatedObj.Title)
+	assert.Equal(t, copyOfObj.ETag, updatedObj.ETag)
+	assert.Equal(t, obj.CreatedAt, updatedObj.CreatedAt)
 	assert.True(t, updatedObj.UpdatedAt.After(origUpdatedAt))
 
-	resp = tu.SysAdminClient.DELETE("/admin-api/v3/objects/delete/{id}", savedObj.ID).Expect()
+	return updatedObj
+}
+
+func testObjectDelete(t *testing.T, obj *pgmodels.IntellectualObject) {
+	resp := tu.SysAdminClient.DELETE("/admin-api/v3/objects/delete/{id}", obj.ID).Expect()
 	fmt.Println(resp.Body())
 	resp.Status(http.StatusOK)
 
 	deletedObj := &pgmodels.IntellectualObject{}
-	err = json.Unmarshal([]byte(resp.Body().Raw()), deletedObj)
+	err := json.Unmarshal([]byte(resp.Body().Raw()), deletedObj)
 	require.Nil(t, err)
 
-	assert.Equal(t, savedObj.ID, deletedObj.ID)
+	assert.Equal(t, obj.ID, deletedObj.ID)
 	assert.Equal(t, constants.StateDeleted, deletedObj.State)
 }
 
