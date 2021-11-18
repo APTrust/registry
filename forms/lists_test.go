@@ -1,6 +1,7 @@
 package forms_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/APTrust/registry/constants"
@@ -36,5 +37,22 @@ func TestOptions(t *testing.T) {
 	for i, option := range options {
 		assert.Equal(t, constants.AccessSettings[i], option.Value)
 		assert.Equal(t, constants.AccessSettings[i], option.Text)
+	}
+}
+
+func TestListUsers(t *testing.T) {
+	db.LoadFixtures()
+	options, err := forms.ListUsers(3)
+	require.Nil(t, err)
+	require.NotEmpty(t, options)
+	assert.Equal(t, 2, len(options))
+	expected := []forms.ListOption{
+		{"5", "Inst Two Admin"},
+		{"7", "Inst Two User"},
+	}
+	fmt.Println(options)
+	for i, option := range options {
+		assert.Equal(t, expected[i].Value, option.Value)
+		assert.Equal(t, expected[i].Text, option.Text)
 	}
 }

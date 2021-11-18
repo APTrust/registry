@@ -16,6 +16,7 @@ type FilterFormConstructor func(*pgmodels.FilterCollection, *pgmodels.User) (Fil
 
 type FilterForm interface {
 	SetValues()
+	GetFields() map[string]*Field
 }
 
 type Form struct {
@@ -81,6 +82,12 @@ func (f *Form) HandleError(err error) {
 			f.Status = http.StatusInternalServerError
 		}
 	}
+}
+
+// GetFields returns a slice of all of the form's fields.
+// This is used primarily in testing.
+func (f *Form) GetFields() map[string]*Field {
+	return f.Fields
 }
 
 func (f *Form) SetValues() {
