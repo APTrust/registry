@@ -2,11 +2,8 @@ package common
 
 import (
 	"bytes"
-	"crypto/aes"
-	"crypto/cipher"
 	"crypto/md5"
 	"crypto/sha256"
-	"encoding/hex"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -82,52 +79,6 @@ func Hash(plaintext string) string {
 	plain := []byte(plaintext)
 	md5Digest := []byte(fmt.Sprintf("%x", md5.Sum(plain)))
 	return fmt.Sprintf("%x", sha256.Sum256(append(md5Digest, plain...)))
-}
-
-// EncryptAES encrypts plaintext using key.
-func EncryptAES(key []byte, plaintext string) (string, error) {
-	c, err := aes.NewCipher(key)
-	if err != nil {
-		return "", err
-	}
-	gcm, err := cipher.NewGCM(c)
-	if err != nil {
-		return "", err
-	}
-	nonce := make([]byte, gcm.NonceSize())
-	if err != nil {
-		return "", err
-	}
-
-	encrypted := gcm.Seal(nonce, nonce, []byte(plaintext), nil)
-	return hex.EncodeToString(encrypted), nil
-}
-
-// DecryptAES decrypts hex-encoded ciphertext using key.
-func DecryptAES(key []byte, hexCipher string) (string, error) {
-	ciphertext, err := hex.DecodeString(hexCipher)
-	if err != nil {
-		return "", err
-	}
-	c, err := aes.NewCipher(key)
-	if err != nil {
-		return "", err
-	}
-	gcmDecrypt, err := cipher.NewGCM(c)
-	if err != nil {
-		return "", err
-	}
-
-	nonceSize := gcmDecrypt.NonceSize()
-	if len(ciphertext) < nonceSize {
-		return "", fmt.Errorf("wrong nonce size")
-	}
-	nonce, encryptedMessage := ciphertext[:nonceSize], ciphertext[nonceSize:]
-	plaintext, err := gcmDecrypt.Open(nil, nonce, encryptedMessage, nil)
-	if err != nil {
-		return "", err
-	}
-	return string(plaintext), nil
 }
 
 // CopyFile copies the file at src path to dst path. It applies
@@ -232,15 +183,6 @@ func CountryCodeAndPhone(phoneNumber string) (int32, string, error) {
 	}
 	return *num.CountryCode, fmt.Sprintf("%d", *num.NationalNumber), nil
 }
-
-// // NonZeroAndUnequalInt64 returns true if both a and b are non-zero
-// // and a does not equal b.
-// func NonZeroAndUnequalInt64(a, b int64) bool {
-// 	if a == 0 && b == 0 {
-// 		return false
-// 	}
-// 	return a != b
-// }
 
 // IsEmptyString returns true if str, stripped of leading and
 // trailing whitespace, is empty.
