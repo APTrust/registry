@@ -97,10 +97,18 @@ func (obj *IntellectualObject) IsGlacierOnly() bool {
 // Delete soft-deletes this object by setting State to 'D' and
 // the DeletedAt timestamp to now. You can undo this with Undelete.
 func (obj *IntellectualObject) Delete() error {
+	hasFiles, err := obj.HasActiveFiles()
+	if err != nil {
+		return err
+	} else if hasFiles {
+		return common.ErrActiveFiles
+	}
 	obj.State = constants.StateDeleted
 	obj.UpdatedAt = time.Now().UTC()
 
-	// TODO: Create PremisEvents, update WorkItem
+	// TODO: Create PremisEvents, update WorkItem. Here? Or Elsewhere?
+	// TODO: Wrap obj deletion, event creation into single transaction.
+	//       Event will have to get deletion details from WorkItem.
 
 	return update(obj)
 }

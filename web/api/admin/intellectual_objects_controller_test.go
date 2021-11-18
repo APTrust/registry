@@ -2,11 +2,10 @@ package admin_api_test
 
 import (
 	"encoding/json"
-	//"fmt"
+	"fmt"
 	"net/http"
 	"testing"
 
-	// "github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/APTrust/registry/web/api"
@@ -113,7 +112,16 @@ func TestObjectCreateUpdateDelete(t *testing.T) {
 	assert.Equal(t, savedObj.CreatedAt, updatedObj.CreatedAt)
 	assert.True(t, updatedObj.UpdatedAt.After(origUpdatedAt))
 
-	// TODO: Test deletion
+	resp = tu.SysAdminClient.DELETE("/admin-api/v3/objects/delete/{id}", savedObj.ID).Expect()
+	fmt.Println(resp.Body())
+	resp.Status(http.StatusOK)
+
+	deletedObj := &pgmodels.IntellectualObject{}
+	err = json.Unmarshal([]byte(resp.Body().Raw()), deletedObj)
+	require.Nil(t, err)
+
+	assert.Equal(t, savedObj.ID, deletedObj.ID)
+	assert.Equal(t, constants.StateDeleted, deletedObj.State)
 }
 
 func TestObjectCreateUnauthorized(t *testing.T) {
@@ -150,7 +158,7 @@ func TestObjectDeleteUpdateUnauthorized(t *testing.T) {
 	tu.InitHTTPTests(t)
 
 	// Non sysadmins cannot delete objects, even for their
-	// own institutions.
+	// own institutions. (Not through the API anyway.)
 	obj, err := pgmodels.IntellectualObjectByID(1)
 	require.Nil(t, err)
 

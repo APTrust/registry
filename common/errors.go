@@ -125,6 +125,11 @@ var ErrIdentifierChange = errors.New("identifier cannot change")
 // deleted object that you are re-depositing.)
 var ErrStorageOptionChange = errors.New("cannot change storage option on active object")
 
+// ErrActiveFiles occurs when we try to delete an IntellectualObject
+// that has active files. All of the object's files should first be
+// deleted (set to State = "D").
+var ErrActiveFiles = errors.New("cannot delete object with active files")
+
 // ErrInternal is a runtime error that is not the user's fault, hence
 // probably the programmer's fault.
 var ErrInternal = errors.New("internal server error")

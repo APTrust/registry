@@ -46,8 +46,6 @@ fi
 echo "APT_ENV is $APT_ENV"
 
 
-
-
 # ----------------------------------------------------------------------
 #
 # Get rid of NSQ data lingering from prior test runs
@@ -56,6 +54,19 @@ echo "APT_ENV is $APT_ENV"
 rm "$TMPDIR/nsqd.dat" > /dev/null 2>&1
 NSQ_DATA_FILES="$TMPDIR*diskqueue*dat"
 rm $NSQ_DATA_FILES > /dev/null 2>&1
+
+# ----------------------------------------------------------------------
+#
+# Get rid of log data lingering from prior test runs.
+# We need a better way of synching the log file setting
+# between here and .env.test. For now, we're assuming
+# ~/tmp/logs/registry_test.log
+#
+# ----------------------------------------------------------------------
+if [[ "$APT_ENV" == "test" ]]; then
+    echo "Deleting old test log"
+    rm ~/tmp/logs/registry_test.log
+fi
 
 # ----------------------------------------------------------------------
 #

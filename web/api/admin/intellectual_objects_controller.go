@@ -57,21 +57,15 @@ func IntellectualObjectDelete(c *gin.Context) {
 	// And https://github.com/APTrust/pharos/blob/03dda1f57a499c214691f6a739c22884ea2d2f4b/app/models/intellectual_object.rb#L110-L127
 	//
 	req := api.NewRequest(c)
-	obj, err := IntellectualObjectFromJson(req)
+	obj, err := pgmodels.IntellectualObjectByID(req.Auth.ResourceID)
 	if api.AbortIfError(c, err) {
 		return
 	}
-
-	// Ensure all files have been deleted...
-
 	err = obj.Delete()
 	if api.AbortIfError(c, err) {
 		return
 	}
-
-	// Record Premis Event...
-
-	c.JSON(http.StatusOK, nil)
+	c.JSON(http.StatusOK, obj)
 }
 
 func CreateOrUpdateObject(c *gin.Context) (*pgmodels.IntellectualObject, error) {
