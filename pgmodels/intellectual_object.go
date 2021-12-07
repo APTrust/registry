@@ -2,12 +2,14 @@ package pgmodels
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
 	v "github.com/asaskevich/govalidator"
 	"github.com/go-pg/pg/v10"
+	"github.com/google/uuid"
 	"github.com/stretchr/stew/slice"
 )
 
@@ -97,12 +99,12 @@ func (obj *IntellectualObject) IsGlacierOnly() bool {
 // Delete soft-deletes this object by setting State to 'D' and
 // the DeletedAt timestamp to now. You can undo this with Undelete.
 func (obj *IntellectualObject) Delete() error {
-	hasFiles, err := obj.HasActiveFiles()
+
+	err := obj.AssertDeletionPreconditions()
 	if err != nil {
 		return err
-	} else if hasFiles {
-		return common.ErrActiveFiles
 	}
+
 	obj.State = constants.StateDeleted
 	obj.UpdatedAt = time.Now().UTC()
 
@@ -229,7 +231,7 @@ func (obj *IntellectualObject) BeforeUpdate(c context.Context) (context.Context,
 	return c, err
 }
 
-func (obj *IntellectualObject) DeletionItem() (*WorkItem, error) {
+func (obj *IntellectualObject) LatestDeletionWorkItem() (*WorkItem, error) {
 	query := NewQuery().
 		Where("intellectual_object_id", "=", obj.ID).
 		IsNull("generic_file_id").
@@ -238,4 +240,117 @@ func (obj *IntellectualObject) DeletionItem() (*WorkItem, error) {
 		OrderBy("updated_at", "desc").
 		Limit(1)
 	return WorkItemGet(query)
+}
+
+func (obj *IntellectualObject) DeletionRequest(workItemID int64) (*DeletionRequestView, error) {
+	// web/webui/deletion_request_controller.go method DeletionRequestApprove
+	// creates a WorkItem when deletion request is approved. This is a
+	// one-to-one relationship. If we can't find the deletion request view
+	// for a valid deletion WorkItem, something is wrong!
+	query := NewQuery().Where("work_item_id", "=", workItemID)
+	return DeletionRequestViewGet(query)
+}
+
+func (obj *IntellectualObject) AssertDeletionPreconditions() error {
+	err := obj.assertNoActiveFiles()
+	if err == nil {
+		err = obj.assertNotAlreadyDeleted()
+	}
+	if err == nil {
+		err = obj.assertDeletionApproved()
+	}
+	return err
+}
+
+func (obj *IntellectualObject) assertNoActiveFiles() error {
+	hasFiles, err := obj.HasActiveFiles()
+	if err != nil {
+		return fmt.Errorf("Error checking for active files: %v", err)
+	} else if hasFiles {
+		return common.ErrActiveFiles
+	}
+}
+
+func (obj *IntellectualObject) assertNotAlreadyDeleted() error {
+	var err error
+	var lastIngestEvent *PremisEvent
+
+	if obj.State == constants.StateDeleted {
+		err = fmt.Errorf("Object is already in deleted state")
+	}
+
+	if err == nil {
+		lastIngestEvent, err = obj.LastIngestEvent()
+		if err != nil {
+			err = fmt.Errorf("Error checking for last ingest event: %v", err)
+		} else if lastIngestEvent == nil {
+			err = fmt.Errorf("Can't find last ingest event")
+		}
+	}
+
+	if err == nil {
+		lastDeletionEvent, err := obj.LastDeletionEvent()
+		if err != nil {
+			err = fmt.Errorf("Error checking for last deletion event: %v", err)
+		}
+		if lastDeletionEvent != nil && lastDeletionEvent.CreatedAt.After(lastIngestEvent.CreatedAt) {
+			err = fmt.Errorf("Object has already been deleted since last ingest")
+		}
+	}
+	return err
+}
+
+func (obj *IntellectualObject) assertDeletionApproved() error {
+	workItem, err := obj.LatestDeletionWorkItem()
+	if err != nil {
+		return fmt.Errorf("Error getting deletion request work item: %v", err)
+	}
+	if workItem == nil {
+		return fmt.Errorf("Missing deletion request work item: %v")
+	}
+	if common.IsEmptyString(workItem.InstApprover) {
+		return fmt.Errorf("Deletion work item is missing institutional approver")
+	}
+	return nil
+}
+
+func (obj *IntellectualObject) NewDeletionEvent() (*PremisEvent, error) {
+	workItem, err := obj.LatestDeletionWorkItem()
+	if err != nil {
+		return nil, fmt.Errorf("Error getting deletion request work item: %v", err)
+	}
+	if workItem == nil {
+		return nil, fmt.Errorf("Missing deletion request work item")
+	}
+	deletionRequest, err := obj.DeletionRequest(workItem.ID)
+	if err != nil {
+		return nil, fmt.Errorf("Error getting deletion request: %v", err)
+	}
+	if deletionRequest == nil {
+		return nil, fmt.Errorf("No deletion request for work item %d", workItem.ID)
+	}
+
+	if deletionRequest.RequestedByID == 0 {
+		return nil, fmt.Errorf("Deletion request %d has no requestor", deletionRequest.ID)
+	}
+	if deletionRequest.ConfirmedByID == 0 {
+		return nil, fmt.Errorf("Deletion request %d has no approver", deletionRequest.ID)
+	}
+
+	now := time.Now().UTC()
+	return &PremisEvent{
+		Agent:                "APTrust preservation services",
+		CreatedAt:            now,
+		DateTime:             now,
+		Detail:               "Object deleted from preservation storage",
+		EventType:            constants.EventDeletion,
+		Identifier:           uuid.NewString(),
+		InstitutionID:        obj.InstitutionID,
+		IntellectualObjectID: obj.ID,
+		Object:               "Minio S3 library",
+		Outcome:              constants.OutcomeSuccess,
+		OutcomeDetail:        deletionRequest.RequestedByEmail,
+		OutcomeInformation:   fmt.Sprintf("Object deleted at the request of %s. Institutional approver: %s.", deletionRequest.RequestedByEmail, deletionRequest.ConfirmedByEmail),
+		UpdatedAt:            now,
+	}, nil
 }
