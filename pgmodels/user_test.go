@@ -232,7 +232,7 @@ func TestUserSaveDeleteUndelete(t *testing.T) {
 
 func TestUserSelect(t *testing.T) {
 	db.LoadFixtures()
-	query := pgmodels.NewQuery().Where("institution_id", "=", int64(2)).OrderBy("email asc")
+	query := pgmodels.NewQuery().Where("institution_id", "=", int64(2)).OrderBy("email", "asc")
 	users, err := pgmodels.UserSelect(query)
 	require.Nil(t, err)
 	require.NotEmpty(t, users)

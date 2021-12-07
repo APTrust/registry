@@ -117,3 +117,8 @@ func TestIsEmptyString(t *testing.T) {
 	assert.False(t, common.IsEmptyString("not empty"))
 	assert.False(t, common.IsEmptyString("  not empty  "))
 }
+
+func TestSanitizeIdentifier(t *testing.T) {
+	assert.Equal(t, "this_34_xxyadda.yadda", common.SanitizeIdentifier("this_34_!;-xx{yadda.yadda}"))
+	assert.Equal(t, `"users"."email"`, common.SanitizeIdentifier(`"users"."email"`))
+}

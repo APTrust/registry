@@ -5,7 +5,7 @@ go 1.13
 require (
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d
 	github.com/aws/aws-sdk-go v1.40.25
-	github.com/brianvoe/gofakeit/v6 v6.9.0 // indirect
+	github.com/brianvoe/gofakeit/v6 v6.9.0
 	github.com/dcu/go-authy v1.0.1
 	github.com/gavv/httpexpect/v2 v2.3.1
 	github.com/gin-contrib/logger v0.0.2

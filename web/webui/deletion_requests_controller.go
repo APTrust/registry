@@ -37,7 +37,7 @@ func DeletionRequestShow(c *gin.Context) {
 func DeletionRequestIndex(c *gin.Context) {
 	req := NewRequest(c)
 	var deletions []*pgmodels.DeletionRequestView
-	err := req.LoadResourceList(&deletions, "requested_at desc", forms.NewDeletionRequestFilterForm)
+	err := req.LoadResourceList(&deletions, "requested_at", "desc", forms.NewDeletionRequestFilterForm)
 	if AbortIfError(c, err) {
 		return
 	}

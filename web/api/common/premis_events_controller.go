@@ -15,7 +15,7 @@ import (
 func PremisEventIndex(c *gin.Context) {
 	req := api.NewRequest(c)
 	var events []*pgmodels.PremisEventView
-	pager, err := req.LoadResourceList(&events, "updated_at desc")
+	pager, err := req.LoadResourceList(&events, "updated_at", "desc")
 	if api.AbortIfError(c, err) {
 		return
 	}

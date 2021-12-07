@@ -38,7 +38,7 @@ func DeletionRequestShow(c *gin.Context) {
 func DeletionRequestIndex(c *gin.Context) {
 	req := api.NewRequest(c)
 	var deletions []*pgmodels.DeletionRequestView
-	pager, err := req.LoadResourceList(&deletions, "requested_at desc")
+	pager, err := req.LoadResourceList(&deletions, "requested_at", "desc")
 	if api.AbortIfError(c, err) {
 		return
 	}

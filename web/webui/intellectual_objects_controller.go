@@ -117,7 +117,7 @@ func IntellectualObjectIndex(c *gin.Context) {
 	req := NewRequest(c)
 	template := "objects/index.html"
 	var objects []*pgmodels.IntellectualObjectView
-	err := req.LoadResourceList(&objects, "updated_at desc", forms.NewObjectFilterForm)
+	err := req.LoadResourceList(&objects, "updated_at", "desc", forms.NewObjectFilterForm)
 	if AbortIfError(c, err) {
 		return
 	}
@@ -227,7 +227,7 @@ func loadEvents(req *Request, objID int64) error {
 	eventQuery := pgmodels.NewQuery().
 		Where("intellectual_object_id", "=", objID).
 		IsNull("generic_file_id").
-		OrderBy("created_at desc").
+		OrderBy("created_at", "desc").
 		Limit(pager.PerPage).
 		Offset(pager.QueryOffset)
 	events, err := pgmodels.PremisEventSelect(eventQuery)

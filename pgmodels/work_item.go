@@ -98,7 +98,7 @@ func WorkItemsPendingForObject(instID int64, bagName string) ([]*WorkItem, error
 	query := NewQuery().Where("institution_id", "=", instID).
 		Where("name", "=", bagName).
 		WhereNotIn("status", completed...).
-		OrderBy(`date_processed desc`)
+		OrderBy("date_processed", "desc")
 	return WorkItemSelect(query)
 }
 
@@ -108,7 +108,7 @@ func WorkItemsPendingForFile(fileID int64) ([]*WorkItem, error) {
 	completed := common.InterfaceList(constants.CompletedStatusValues)
 	query := NewQuery().Where("generic_file_id", "=", fileID).
 		WhereNotIn("status", completed...).
-		OrderBy(`date_processed desc`)
+		OrderBy("date_processed", "desc")
 	return WorkItemSelect(query)
 }
 
@@ -231,7 +231,7 @@ func LastSuccessfulIngest(objID int64) (*WorkItem, error) {
 		Where("intellectual_object_id", "=", objID).
 		Where("status", "=", constants.StatusSuccess).
 		WhereIn("stage", constants.StageRecord, constants.StageCleanup).
-		OrderBy("date_processed desc").
+		OrderBy("date_processed", "desc").
 		Limit(1)
 	items, err := WorkItemSelect(query)
 	if len(items) > 0 {

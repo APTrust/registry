@@ -15,7 +15,7 @@ import (
 func GenericFileIndex(c *gin.Context) {
 	req := api.NewRequest(c)
 	var files []*pgmodels.GenericFileView
-	pager, err := req.LoadResourceList(&files, "updated_at desc")
+	pager, err := req.LoadResourceList(&files, "updated_at", "desc")
 	if api.AbortIfError(c, err) {
 		return
 	}

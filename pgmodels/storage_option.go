@@ -50,7 +50,7 @@ func StorageOptionGet(query *Query) (*StorageOption, error) {
 }
 
 func StorageOptionGetAll() ([]*StorageOption, error) {
-	query := NewQuery().OrderBy("name")
+	query := NewQuery().OrderBy("name", "asc")
 	return StorageOptionSelect(query)
 }
 

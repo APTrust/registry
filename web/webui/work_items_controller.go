@@ -17,7 +17,7 @@ import (
 func WorkItemIndex(c *gin.Context) {
 	req := NewRequest(c)
 	var items []*pgmodels.WorkItemView
-	err := req.LoadResourceList(&items, "updated_at desc", forms.NewWorkItemFilterForm)
+	err := req.LoadResourceList(&items, "updated_at", "desc", forms.NewWorkItemFilterForm)
 	if AbortIfError(c, err) {
 		return
 	}

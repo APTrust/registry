@@ -14,7 +14,7 @@ import (
 func InstitutionIndex(c *gin.Context) {
 	req := api.NewRequest(c)
 	var institutions []*pgmodels.InstitutionView
-	pager, err := req.LoadResourceList(&institutions, "name")
+	pager, err := req.LoadResourceList(&institutions, "name", "asc")
 	if api.AbortIfError(c, err) {
 		return
 	}

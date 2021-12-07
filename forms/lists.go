@@ -71,7 +71,7 @@ var YesNoList = []ListOption{
 }
 
 func ListInstitutions(membersOnly bool) ([]ListOption, error) {
-	instQuery := pgmodels.NewQuery().Columns("id", "name").OrderBy("name asc").Limit(100).Offset(0)
+	instQuery := pgmodels.NewQuery().Columns("id", "name").OrderBy("name", "asc").Limit(100).Offset(0)
 	if membersOnly {
 		instQuery.Where("type", "=", constants.InstTypeMember)
 	}
@@ -87,7 +87,7 @@ func ListInstitutions(membersOnly bool) ([]ListOption, error) {
 }
 
 func ListUsers(institutionID int64) ([]ListOption, error) {
-	query := pgmodels.NewQuery().Columns("id", "name").OrderBy("name asc").Limit(200).Offset(0)
+	query := pgmodels.NewQuery().Columns("id", "name").OrderBy("name", "asc").Limit(200).Offset(0)
 	if institutionID > 0 {
 		query.Where("institution_id", "=", institutionID)
 	}

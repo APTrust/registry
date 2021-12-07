@@ -58,7 +58,7 @@ func TestWorkItemViewSelect(t *testing.T) {
 	query := pgmodels.NewQuery()
 	query.Where("name", "!=", "pdfs.tar")
 	query.Where("name", "!=", "coal.tar")
-	query.OrderBy("name asc")
+	query.OrderBy("name", "asc")
 	items, err := pgmodels.WorkItemViewSelect(query)
 	require.Nil(t, err)
 	require.NotEmpty(t, items)

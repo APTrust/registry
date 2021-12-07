@@ -54,7 +54,7 @@ func InstitutionIndex(c *gin.Context) {
 	req := NewRequest(c)
 	template := "institutions/index.html"
 	var institutions []*pgmodels.InstitutionView
-	err := req.LoadResourceList(&institutions, "name", forms.NewInstitutionFilterForm)
+	err := req.LoadResourceList(&institutions, "name", "asc", forms.NewInstitutionFilterForm)
 	if AbortIfError(c, err) {
 		return
 	}
@@ -84,14 +84,14 @@ func InstitutionShow(c *gin.Context) {
 	}
 	req.TemplateData["institution"] = institution
 
-	query := pgmodels.NewQuery().Where("parent_id", "=", institution.ID).OrderBy("name")
+	query := pgmodels.NewQuery().Where("parent_id", "=", institution.ID).OrderBy("name", "asc")
 	subscribers, err := pgmodels.InstitutionViewSelect(query)
 	if AbortIfError(c, err) {
 		return
 	}
 	req.TemplateData["subscribers"] = subscribers
 
-	query = pgmodels.NewQuery().Where("institution_id", "=", institution.ID).IsNull("deactivated_at").OrderBy("name")
+	query = pgmodels.NewQuery().Where("institution_id", "=", institution.ID).IsNull("deactivated_at").OrderBy("name", "asc")
 	users, err := pgmodels.UserViewSelect(query)
 	if AbortIfError(c, err) {
 		return

@@ -10,12 +10,15 @@ import (
 	"os/user"
 	"path"
 	"path/filepath"
+	"regexp"
 	"runtime"
 	"strings"
 	"unicode"
 
 	"github.com/nyaruka/phonenumbers"
 )
+
+var reIllegalIdentifierChars = regexp.MustCompile(`[^A-Za-z0-9_\."]`)
 
 // ProjectRoot returns the project root.
 func ProjectRoot() string {
@@ -188,4 +191,12 @@ func CountryCodeAndPhone(phoneNumber string) (int32, string, error) {
 // trailing whitespace, is empty.
 func IsEmptyString(str string) bool {
 	return strings.TrimSpace(str) == ""
+}
+
+// SanitizeIdentifier strips everything but letters, numbers, underscores
+// periods and double quotes from str. This is used primarily to sanitize
+// SQL column names in queries. Column names may include things like "email",
+// "user"."email", etc.
+func SanitizeIdentifier(str string) string {
+	return reIllegalIdentifierChars.ReplaceAllString(str, "")
 }

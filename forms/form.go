@@ -66,7 +66,7 @@ func (f *Form) HandleError(err error) {
 	f.Error = err
 	f.Status = http.StatusBadRequest
 	if valErr, ok := err.(*common.ValidationError); ok {
-		for fieldName, _ := range valErr.Errors {
+		for fieldName := range valErr.Errors {
 			f.Fields[fieldName].DisplayError = true
 		}
 	} else {

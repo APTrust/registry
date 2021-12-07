@@ -34,7 +34,7 @@ func AlertShow(c *gin.Context) {
 func AlertIndex(c *gin.Context) {
 	req := api.NewRequest(c)
 	var alerts []*pgmodels.AlertView
-	pager, err := req.LoadResourceList(&alerts, "created_at desc")
+	pager, err := req.LoadResourceList(&alerts, "created_at", "desc")
 	if api.AbortIfError(c, err) {
 		return
 	}

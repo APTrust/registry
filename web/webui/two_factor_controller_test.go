@@ -258,6 +258,7 @@ func testSMSVerify(t *testing.T, targetURL string, successStrings, failureString
 	}()
 	otp, err := testutil.Inst1User.CreateOTPToken()
 	require.Nil(t, err)
+	require.NotEmpty(t, otp)
 
 	// Normally, the controller sets this after it knows
 	// the OTP was sent successfully. For testing, we have

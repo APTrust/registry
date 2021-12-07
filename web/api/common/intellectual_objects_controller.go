@@ -15,7 +15,7 @@ import (
 func IntellectualObjectIndex(c *gin.Context) {
 	req := api.NewRequest(c)
 	var objs []*pgmodels.IntellectualObjectView
-	pager, err := req.LoadResourceList(&objs, "updated_at desc")
+	pager, err := req.LoadResourceList(&objs, "updated_at", "desc")
 	if api.AbortIfError(c, err) {
 		return
 	}

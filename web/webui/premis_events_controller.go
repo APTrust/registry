@@ -30,7 +30,7 @@ func PremisEventIndex(c *gin.Context) {
 	req := NewRequest(c)
 	template := "events/index.html"
 	var events []*pgmodels.PremisEventView
-	err := req.LoadResourceList(&events, "date_time desc", forms.NewPremisEventFilterForm)
+	err := req.LoadResourceList(&events, "date_time", "desc", forms.NewPremisEventFilterForm)
 	if AbortIfError(c, err) {
 		return
 	}

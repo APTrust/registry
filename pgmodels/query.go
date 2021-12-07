@@ -65,20 +65,20 @@ func NewQuery() *Query {
 }
 
 func (q *Query) Where(col, op string, val interface{}) *Query {
-	cond := fmt.Sprintf(`(%s %s ?)`, col, op)
+	cond := fmt.Sprintf(`(%s %s ?)`, common.SanitizeIdentifier(col), op)
 	q.conditions = append(q.conditions, cond)
 	q.params = append(q.params, val)
 	return q
 }
 
 func (q *Query) IsNull(col string) *Query {
-	cond := fmt.Sprintf(`(%s is null)`, col)
+	cond := fmt.Sprintf(`(%s is null)`, common.SanitizeIdentifier(col))
 	q.conditions = append(q.conditions, cond)
 	return q
 }
 
 func (q *Query) IsNotNull(col string) *Query {
-	cond := fmt.Sprintf(`(%s is not null)`, col)
+	cond := fmt.Sprintf(`(%s is not null)`, common.SanitizeIdentifier(col))
 	q.conditions = append(q.conditions, cond)
 	return q
 }
@@ -97,7 +97,7 @@ func (q *Query) multi(cols, ops []string, vals []interface{}, logicOp string) {
 	if len(vals) > 0 && len(cols) == len(vals) {
 		conditions := make([]string, len(cols))
 		for i, col := range cols {
-			conditions[i] = fmt.Sprintf(`%s %s ?`, col, ops[i])
+			conditions[i] = fmt.Sprintf(`%s %s ?`, common.SanitizeIdentifier(col), ops[i])
 			q.params = append(q.params, vals[i])
 		}
 		cond := fmt.Sprintf("(%s)", strings.Join(conditions, logicOp))
@@ -106,14 +106,14 @@ func (q *Query) multi(cols, ops []string, vals []interface{}, logicOp string) {
 }
 
 func (q *Query) BetweenInclusive(col string, low, high interface{}) *Query {
-	cond := fmt.Sprintf(`(%s >= ? AND %s <= ?)`, col, col)
+	cond := fmt.Sprintf(`(%s >= ? AND %s <= ?)`, common.SanitizeIdentifier(col), common.SanitizeIdentifier(col))
 	q.conditions = append(q.conditions, cond)
 	q.params = append(q.params, low, high)
 	return q
 }
 
 func (q *Query) BetweenExclusive(col string, low, high interface{}) *Query {
-	cond := fmt.Sprintf(`(%s > ? AND %s < ?)`, col, col)
+	cond := fmt.Sprintf(`(%s > ? AND %s < ?)`, common.SanitizeIdentifier(col), common.SanitizeIdentifier(col))
 	q.conditions = append(q.conditions, cond)
 	q.params = append(q.params, low, high)
 	return q
@@ -130,7 +130,7 @@ func (q *Query) WhereNotIn(col string, vals ...interface{}) *Query {
 func (q *Query) inOrNotIn(col, op string, vals ...interface{}) *Query {
 	if len(vals) > 0 {
 		paramStr := q.MakePlaceholders(len(q.params), len(vals))
-		cond := fmt.Sprintf(`(%s %s (%s))`, col, op, paramStr)
+		cond := fmt.Sprintf(`(%s %s (%s))`, common.SanitizeIdentifier(col), op, paramStr)
 		q.conditions = append(q.conditions, cond)
 		q.params = append(q.params, vals...)
 	}
@@ -163,7 +163,7 @@ func (q *Query) GetColumns() []string {
 func (q *Query) Columns(cols ...string) *Query {
 	q.columns = make([]string, len(cols))
 	for i, col := range cols {
-		q.columns[i] = col
+		q.columns[i] = common.SanitizeIdentifier(col)
 	}
 	return q
 }
@@ -175,7 +175,7 @@ func (q *Query) GetRelations() []string {
 func (q *Query) Relations(relations ...string) *Query {
 	q.relations = make([]string, len(relations))
 	for i, rel := range relations {
-		q.relations[i] = rel
+		q.relations[i] = common.SanitizeIdentifier(rel)
 	}
 	return q
 }
@@ -202,11 +202,19 @@ func (q *Query) GetOrderBy() []string {
 	return q.orderBy
 }
 
-// TODO: limit direction to asc/desc to prevent sql injection.
-func (q *Query) OrderBy(colAndDirection string) *Query {
+// OrderBy adds an "order by" clause to the query. You can add as many
+// of these as you want. If direction is not "desc" it will be coerced
+// to "asc". Param column will be sanitized, removing all but alphanumeric
+// and underscore characters.
+func (q *Query) OrderBy(column, direction string) *Query {
+	dir := strings.ToLower(direction)
+	if dir != "desc" {
+		dir = "asc"
+	}
 	if q.orderBy == nil {
 		q.orderBy = make([]string, 0)
 	}
+	colAndDirection := fmt.Sprintf("%s %s", common.SanitizeIdentifier(column), direction)
 	q.orderBy = append(q.orderBy, colAndDirection)
 	return q
 }

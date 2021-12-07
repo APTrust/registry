@@ -33,7 +33,7 @@ func GenericFileIndex(c *gin.Context) {
 	req := NewRequest(c)
 	template := "files/index.html"
 	var files []*pgmodels.GenericFile
-	err := req.LoadResourceList(&files, "updated_at desc", forms.NewFileFilterForm)
+	err := req.LoadResourceList(&files, "updated_at", "desc", forms.NewFileFilterForm)
 	if AbortIfError(c, err) {
 		return
 	}

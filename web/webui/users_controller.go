@@ -58,7 +58,7 @@ func UserIndex(c *gin.Context) {
 	req := NewRequest(c)
 	template := "users/index.html"
 	var users []*pgmodels.UserView
-	err := req.LoadResourceList(&users, "name asc", forms.NewUserFilterForm)
+	err := req.LoadResourceList(&users, "name", "asc", forms.NewUserFilterForm)
 	if AbortIfError(c, err) {
 		return
 	}

@@ -138,7 +138,7 @@ func (obj *IntellectualObject) lastEvent(eventType string) (*PremisEvent, error)
 		Where("intellectual_object_id", "=", obj.ID).
 		Where("event_type", "=", eventType).
 		IsNull("generic_file_id").
-		OrderBy("created_at desc").
+		OrderBy("created_at", "desc").
 		Offset(0).
 		Limit(1)
 	return PremisEventGet(query)
@@ -235,7 +235,7 @@ func (obj *IntellectualObject) DeletionItem() (*WorkItem, error) {
 		IsNull("generic_file_id").
 		Where("action", "=", constants.ActionDelete).
 		Where("stage", "=", constants.StatusStarted).
-		OrderBy("updated_at desc").
+		OrderBy("updated_at", "desc").
 		Limit(1)
 	return WorkItemGet(query)
 }

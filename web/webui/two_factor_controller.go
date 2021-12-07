@@ -317,7 +317,7 @@ func userConfirmAuthy(req *Request) (bool, error) {
 		req.CurrentUser.ConfirmedTwoFactor = true
 		err = req.CurrentUser.Save()
 	}
-	if err == nil && approved == false {
+	if err == nil && !approved {
 		common.Context().Log.Warn().Msgf("User %s rejected Authy confirmation", req.CurrentUser.Email)
 	}
 	return approved, err

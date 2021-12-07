@@ -30,7 +30,7 @@ func loadDashData(r *Request) error {
 }
 
 func loadDashWorkItems(r *Request) error {
-	query := pgmodels.NewQuery().OrderBy("date_processed desc").Offset(0).Limit(10)
+	query := pgmodels.NewQuery().OrderBy("date_processed", "desc").Offset(0).Limit(10)
 	if !r.Auth.CurrentUser().IsAdmin() {
 		query.Where("institution_id", "=", r.Auth.CurrentUser().InstitutionID)
 	}
@@ -43,7 +43,7 @@ func loadDashWorkItems(r *Request) error {
 }
 
 func loadDashAlerts(r *Request) error {
-	query := pgmodels.NewQuery().Where("user_id", "=", r.Auth.CurrentUser().ID).OrderBy("created_at desc").Offset(0).Limit(10)
+	query := pgmodels.NewQuery().Where("user_id", "=", r.Auth.CurrentUser().ID).OrderBy("created_at", "desc").Offset(0).Limit(10)
 	alerts, err := pgmodels.AlertViewSelect(query)
 	if err != nil {
 		return err

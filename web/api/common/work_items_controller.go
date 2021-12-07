@@ -15,7 +15,7 @@ import (
 func WorkItemIndex(c *gin.Context) {
 	req := api.NewRequest(c)
 	var items []*pgmodels.WorkItemView
-	pager, err := req.LoadResourceList(&items, "updated_at desc")
+	pager, err := req.LoadResourceList(&items, "updated_at", "desc")
 	if api.AbortIfError(c, err) {
 		return
 	}

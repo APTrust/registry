@@ -58,7 +58,7 @@ func (req *Request) BaseURL() string {
 	return fmt.Sprintf("%s://%s", scheme, host)
 }
 
-func (req *Request) LoadResourceList(items interface{}, orderBy string) (*common.Pager, error) {
+func (req *Request) LoadResourceList(items interface{}, orderByColumn, direction string) (*common.Pager, error) {
 	// Ensure that items is a pointer to a slice of pointers, so we don't
 	// get a panic in call to Elem() below.
 	if items == nil || !strings.HasPrefix(reflect.TypeOf(items).String(), "*[]*pgmodels.") {
@@ -77,7 +77,7 @@ func (req *Request) LoadResourceList(items interface{}, orderBy string) (*common
 			query.Where("user_id", "=", req.CurrentUser.ID)
 		}
 	}
-	query.OrderBy(orderBy)
+	query.OrderBy(orderByColumn, direction)
 	pager, err := common.NewPager(req.GinContext, req.PathAndQuery, 20)
 	if err != nil {
 		return nil, err

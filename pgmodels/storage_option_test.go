@@ -74,7 +74,7 @@ func TestStorageOptionSelect(t *testing.T) {
 	db.LoadFixtures()
 	query := pgmodels.NewQuery()
 	query.Where("provider", "=", "AWS")
-	query.OrderBy("name asc")
+	query.OrderBy("name", "asc")
 	options, err := pgmodels.StorageOptionSelect(query)
 	require.Nil(t, err)
 	require.NotEmpty(t, options)

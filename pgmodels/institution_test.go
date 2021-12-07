@@ -87,7 +87,7 @@ func TestInstitutionSelect(t *testing.T) {
 	query := pgmodels.NewQuery()
 	query.Where("name", "!=", "Institution One")
 	query.Where("name", "!=", "Institution Two")
-	query.OrderBy("name asc")
+	query.OrderBy("name", "asc")
 	institutions, err := pgmodels.InstitutionSelect(query)
 	require.Nil(t, err)
 	require.NotEmpty(t, institutions)
