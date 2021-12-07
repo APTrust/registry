@@ -228,3 +228,14 @@ func (obj *IntellectualObject) BeforeUpdate(c context.Context) (context.Context,
 	}
 	return c, err
 }
+
+func (obj *IntellectualObject) DeletionItem() (*WorkItem, error) {
+	query := NewQuery().
+		Where("intellectual_object_id", "=", obj.ID).
+		IsNull("generic_file_id").
+		Where("action", "=", constants.ActionDelete).
+		Where("stage", "=", constants.StatusStarted).
+		OrderBy("updated_at desc").
+		Limit(1)
+	return WorkItemGet(query)
+}
