@@ -166,3 +166,10 @@ func TestObjInsertAndUpdate(t *testing.T) {
 	require.Nil(t, err)
 	assert.True(t, obj.UpdatedAt.After(origUpdatedAt))
 }
+
+// TODO: Test the following
+//
+// AssertDeletionPreconditions
+// LatestDeletionWorkItem
+// DeletionRequest
+// NewDeletionEvent

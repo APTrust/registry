@@ -269,6 +269,7 @@ func (obj *IntellectualObject) assertNoActiveFiles() error {
 	} else if hasFiles {
 		return common.ErrActiveFiles
 	}
+	return nil
 }
 
 func (obj *IntellectualObject) assertNotAlreadyDeleted() error {
@@ -306,7 +307,7 @@ func (obj *IntellectualObject) assertDeletionApproved() error {
 		return fmt.Errorf("Error getting deletion request work item: %v", err)
 	}
 	if workItem == nil {
-		return fmt.Errorf("Missing deletion request work item: %v")
+		return fmt.Errorf("Missing deletion request work item")
 	}
 	if common.IsEmptyString(workItem.InstApprover) {
 		return fmt.Errorf("Deletion work item is missing institutional approver")
