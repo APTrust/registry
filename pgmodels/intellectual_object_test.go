@@ -1,7 +1,6 @@
 package pgmodels_test
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/APTrust/registry/common"
@@ -183,6 +182,7 @@ func TestAssertObjDeletionPreconditions(t *testing.T) {
 	require.NotNil(t, obj)
 
 	testLastObjDeletionWorkItem(t, obj)
+	testObjectDeletionRequest(t, obj)
 }
 
 func testLastObjDeletionWorkItem(t *testing.T, obj *pgmodels.IntellectualObject) {
@@ -208,7 +208,6 @@ func testLastObjDeletionWorkItem(t *testing.T, obj *pgmodels.IntellectualObject)
 	// and it has been started.
 	objWorkItem.Status = constants.StatusStarted
 	require.Nil(t, objWorkItem.Save())
-	fmt.Println(objWorkItem)
 	item, err = obj.ActiveDeletionWorkItem()
 	require.Nil(t, err)
 	require.NotNil(t, item)
@@ -216,8 +215,33 @@ func testLastObjDeletionWorkItem(t *testing.T, obj *pgmodels.IntellectualObject)
 
 }
 
-func TestObjDeletionRequest(t *testing.T) {
+func testObjectDeletionRequest(t *testing.T, obj *pgmodels.IntellectualObject) {
+	// Initially, there's no deletion request for this object
+	reqView, err := obj.DeletionRequest(99999999999)
+	require.NotNil(t, err)
+	assert.Empty(t, reqView.ID) // Should we even get this back??
 
+	// Figure out the work item id. That will lead us back to
+	// the original deletion request.
+	item, err := obj.ActiveDeletionWorkItem()
+	require.Nil(t, err)
+	require.NotNil(t, item)
+
+	// START HERE
+	// You have a problem. Fix it.
+
+	// objects := []*pgmodels.IntellectualObject{obj}
+	// req, err := pgmodels.CreateDeletionRequest(objects, nil)
+	// require.Nil(t, err)
+	// require.NotNil(t, req)
+	// req.WorkItemID = item.ID
+	// require.Nil(t, req.Save())
+
+	// deletionReqView, err := obj.DeletionRequest(item.ID)
+	// require.Nil(t, err)
+	// require.NotNil(t, deletionReqView)
+
+	// assert.Equal(t, req.ID, deletionReqView.ID)
 }
 
 func TestNewObjDeletionEvent(t *testing.T) {

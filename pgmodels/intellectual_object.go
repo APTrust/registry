@@ -252,7 +252,10 @@ func (obj *IntellectualObject) DeletionRequest(workItemID int64) (*DeletionReque
 	// creates a WorkItem when deletion request is approved. This is a
 	// one-to-one relationship. If we can't find the deletion request view
 	// for a valid deletion WorkItem, something is wrong!
-	query := NewQuery().Where("work_item_id", "=", workItemID)
+	query := NewQuery().
+		Where("work_item_id", "=", workItemID).
+		Where("object_count", ">", 0).
+		Where("file_count", "=", 0)
 	return DeletionRequestViewGet(query)
 }
 
