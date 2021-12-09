@@ -1,6 +1,7 @@
 package pgmodels_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/APTrust/registry/common"
@@ -173,3 +174,52 @@ func TestObjInsertAndUpdate(t *testing.T) {
 // LatestDeletionWorkItem
 // DeletionRequest
 // NewDeletionEvent
+
+func TestAssertObjDeletionPreconditions(t *testing.T) {
+	db.LoadFixtures()
+	defer db.ForceFixtureReload()
+	obj, err := pgmodels.CreateObjectWithRelations()
+	require.Nil(t, err)
+	require.NotNil(t, obj)
+
+	testLastObjDeletionWorkItem(t, obj)
+}
+
+func testLastObjDeletionWorkItem(t *testing.T, obj *pgmodels.IntellectualObject) {
+	item, err := obj.ActiveDeletionWorkItem()
+	require.Nil(t, err)
+	assert.Nil(t, item)
+
+	// This one should NOT be returned because its a file deletion
+	gfWorkItem := pgmodels.RandomWorkItem(obj.BagName, constants.ActionDelete, obj.ID, obj.GenericFiles[0].ID)
+	require.Nil(t, gfWorkItem.Save())
+	item, err = obj.ActiveDeletionWorkItem()
+	require.Nil(t, err)
+	assert.Nil(t, item)
+
+	// This one should NOT be returned because item status is not Started
+	objWorkItem := pgmodels.RandomWorkItem(obj.BagName, constants.ActionDelete, obj.ID, 0)
+	require.Nil(t, objWorkItem.Save())
+	item, err = obj.ActiveDeletionWorkItem()
+	require.Nil(t, err)
+	require.Nil(t, item)
+
+	// This one SHOULD be returned because it's an object deletion
+	// and it has been started.
+	objWorkItem.Status = constants.StatusStarted
+	require.Nil(t, objWorkItem.Save())
+	fmt.Println(objWorkItem)
+	item, err = obj.ActiveDeletionWorkItem()
+	require.Nil(t, err)
+	require.NotNil(t, item)
+	assert.Equal(t, objWorkItem.ID, item.ID)
+
+}
+
+func TestObjDeletionRequest(t *testing.T) {
+
+}
+
+func TestNewObjDeletionEvent(t *testing.T) {
+
+}

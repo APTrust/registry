@@ -231,15 +231,20 @@ func (obj *IntellectualObject) BeforeUpdate(c context.Context) (context.Context,
 	return c, err
 }
 
-func (obj *IntellectualObject) LatestDeletionWorkItem() (*WorkItem, error) {
+func (obj *IntellectualObject) ActiveDeletionWorkItem() (*WorkItem, error) {
 	query := NewQuery().
 		Where("intellectual_object_id", "=", obj.ID).
 		IsNull("generic_file_id").
 		Where("action", "=", constants.ActionDelete).
-		Where("stage", "=", constants.StatusStarted).
+		Where("status", "=", constants.StatusStarted).
 		OrderBy("updated_at", "desc").
 		Limit(1)
-	return WorkItemGet(query)
+	item, err := WorkItemGet(query)
+	if err != nil && err.Error() == pg.ErrNoRows.Error() {
+		// >99% of cases will have no rows. Just return nil.
+		return nil, nil
+	}
+	return item, err
 }
 
 func (obj *IntellectualObject) DeletionRequest(workItemID int64) (*DeletionRequestView, error) {
@@ -302,9 +307,9 @@ func (obj *IntellectualObject) assertNotAlreadyDeleted() error {
 }
 
 func (obj *IntellectualObject) assertDeletionApproved() error {
-	workItem, err := obj.LatestDeletionWorkItem()
+	workItem, err := obj.ActiveDeletionWorkItem()
 	if err != nil {
-		return fmt.Errorf("Error getting deletion request work item: %v", err)
+		return fmt.Errorf("Error getting active deletion work item: %v", err)
 	}
 	if workItem == nil {
 		return fmt.Errorf("Missing deletion request work item")
@@ -316,7 +321,7 @@ func (obj *IntellectualObject) assertDeletionApproved() error {
 }
 
 func (obj *IntellectualObject) NewDeletionEvent() (*PremisEvent, error) {
-	workItem, err := obj.LatestDeletionWorkItem()
+	workItem, err := obj.ActiveDeletionWorkItem()
 	if err != nil {
 		return nil, fmt.Errorf("Error getting deletion request work item: %v", err)
 	}
