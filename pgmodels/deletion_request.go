@@ -112,6 +112,7 @@ func (request *DeletionRequest) Save() error {
 		}
 		if err != nil {
 			registryContext.Log.Error().Msgf("Transaction failed. Model: %v. Error: %v", request, err)
+			return err
 		}
 		return request.saveRelations(db)
 	})

@@ -227,21 +227,18 @@ func testObjectDeletionRequest(t *testing.T, obj *pgmodels.IntellectualObject) {
 	require.Nil(t, err)
 	require.NotNil(t, item)
 
-	// START HERE
-	// You have a problem. Fix it.
+	objects := []*pgmodels.IntellectualObject{obj}
+	req, err := pgmodels.CreateDeletionRequest(objects, nil)
+	require.Nil(t, err)
+	require.NotNil(t, req)
+	req.WorkItemID = item.ID
+	require.Nil(t, req.Save())
 
-	// objects := []*pgmodels.IntellectualObject{obj}
-	// req, err := pgmodels.CreateDeletionRequest(objects, nil)
-	// require.Nil(t, err)
-	// require.NotNil(t, req)
-	// req.WorkItemID = item.ID
-	// require.Nil(t, req.Save())
+	deletionReqView, err := obj.DeletionRequest(item.ID)
+	require.Nil(t, err)
+	require.NotNil(t, deletionReqView)
 
-	// deletionReqView, err := obj.DeletionRequest(item.ID)
-	// require.Nil(t, err)
-	// require.NotNil(t, deletionReqView)
-
-	// assert.Equal(t, req.ID, deletionReqView.ID)
+	assert.Equal(t, req.ID, deletionReqView.ID)
 }
 
 func TestNewObjDeletionEvent(t *testing.T) {

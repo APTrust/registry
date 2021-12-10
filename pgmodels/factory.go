@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/APTrust/registry/common"
+	//"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/google/uuid"
@@ -14,11 +14,15 @@ import (
 // --------------------------------------------------------------------
 // TODO:
 //
-// 1. Explain the magic number 4 & set as constant.
-// 2. Rename these methods so it's clear they are factory methods
+// ✓ Explain the magic number 4 & set as constant.
+// x  Rename these methods so it's clear they are factory methods
 //    to be used for testing only. (Maybe move them to a different
 //    package.)
 // --------------------------------------------------------------------
+
+var testInstitutionID = int64(4)
+var testInstAdminID = int64(8)
+var testInstUserID = int64(9)
 
 // GetTestObject returns an IntellectualObject with valid settings
 // that can be altered per-test.
@@ -211,43 +215,19 @@ func RandomStorageRecord() *StorageRecord {
 }
 
 func CreateDeletionRequest(objects []*IntellectualObject, files []*GenericFile) (*DeletionRequest, error) {
-	db := common.Context().DB
 	now := time.Now().UTC()
 	req, err := NewDeletionRequest()
 	if err != nil {
-		goto ERR
+		return nil, err
 	}
 	req.InstitutionID = 4
 	req.RequestedAt = now.Add(-1 * time.Hour)
-	//req.GenericFiles = files
-	//req.IntellectualObjects = objects
+	req.RequestedByID = testInstUserID
+	req.GenericFiles = files
+	req.IntellectualObjects = objects
+
 	err = req.Save()
-	if err != nil {
-		goto ERR
-	}
-	for _, obj := range objects {
-		drObj := DeletionRequestsIntellectualObjects{
-			DeletionRequestID:    req.ID,
-			IntellectualObjectID: obj.ID,
-		}
-		_, err := db.Model(drObj).Insert()
-		if err != nil {
-			goto ERR
-		}
-	}
-	for _, file := range files {
-		drgf := DeletionRequestsGenericFiles{
-			DeletionRequestID: req.ID,
-			GenericFileID:     file.ID,
-		}
-		_, err := db.Model(drgf).Insert()
-		if err != nil {
-			goto ERR
-		}
-	}
-	return req, nil
-ERR:
-	return nil, err
+	return req, err
 }
 
 func Title() string {

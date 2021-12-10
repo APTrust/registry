@@ -87,6 +87,9 @@ func (obj *IntellectualObject) Save() error {
 	if obj.ID == int64(0) {
 		return insert(obj)
 	}
+
+	// Insert relations, as in DeletionRequest?
+
 	return update(obj)
 }
 
