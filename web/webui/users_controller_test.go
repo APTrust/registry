@@ -82,7 +82,7 @@ func TestUserIndex(t *testing.T) {
 	testutil.AssertMatchesAll(t, html, instUserLinks)
 	testutil.AssertMatchesAll(t, html, nonInst1Links)
 	testutil.AssertMatchesAll(t, html, adminFilters)
-	testutil.AssertMatchesResultCount(t, html, 7)
+	testutil.AssertMatchesResultCount(t, html, 9)
 
 	html = testutil.Inst1AdminClient.GET("/users").Expect().
 		Status(http.StatusOK).Body().Raw()
