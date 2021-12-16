@@ -34,7 +34,11 @@ func TestWorkItemValidation(t *testing.T) {
 
 func TestWorkItemGetID(t *testing.T) {
 	item := &pgmodels.WorkItem{
-		ID: 199,
+		TimestampModel: pgmodels.TimestampModel{
+			BaseModel: pgmodels.BaseModel{
+				ID: 199,
+			},
+		},
 	}
 	assert.Equal(t, int64(199), item.GetID())
 }

@@ -1,11 +1,9 @@
 package pgmodels
 
 import (
-	"context"
 	"time"
 
 	"github.com/APTrust/registry/common"
-	"github.com/go-pg/pg/v10"
 )
 
 const (
@@ -20,7 +18,7 @@ const (
 // StorageOption contains information about APTrust storage option
 // costs. This is used mainly in monthly cost reporting.
 type StorageOption struct {
-	ID             int64     `json:"id"`
+	BaseModel
 	Provider       string    `json:"provider"`
 	Service        string    `json:"service"`
 	Region         string    `json:"region"`
@@ -61,44 +59,18 @@ func StorageOptionSelect(query *Query) ([]*StorageOption, error) {
 	return options, err
 }
 
-func (option *StorageOption) GetID() int64 {
-	return option.ID
-}
-
 // Save saves this StorageOption to the database. This will peform an insert
 // if StorageOption.ID is zero. Otherwise, it updates.
 func (option *StorageOption) Save() error {
+	option.UpdatedAt = time.Now().UTC()
+	err := option.Validate()
+	if err != nil {
+		return err
+	}
 	if option.ID == int64(0) {
 		return insert(option)
 	}
 	return update(option)
-}
-
-// The following statements have no effect other than to force a compile-time
-// check that ensures our model properly implements these hook interfaces.
-var (
-	_ pg.BeforeInsertHook = (*StorageOption)(nil)
-	_ pg.BeforeUpdateHook = (*StorageOption)(nil)
-)
-
-// BeforeInsert sets timestamps and bucket names on creation.
-func (option *StorageOption) BeforeInsert(c context.Context) (context.Context, error) {
-	option.UpdatedAt = time.Now().UTC()
-	err := option.Validate()
-	if err == nil {
-		return c, nil
-	}
-	return c, err
-}
-
-// BeforeUpdate sets the UpdatedAt timestamp.
-func (option *StorageOption) BeforeUpdate(c context.Context) (context.Context, error) {
-	option.UpdatedAt = time.Now().UTC()
-	err := option.Validate()
-	if err == nil {
-		return c, nil
-	}
-	return c, err
 }
 
 // Validate validates the model. This is called automatically on insert

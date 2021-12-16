@@ -134,6 +134,10 @@ var ErrActiveFiles = errors.New("cannot delete object with active files")
 // probably the programmer's fault.
 var ErrInternal = errors.New("internal server error")
 
+// ErrSubclassMustImplement indicates that a subclass has not implemented
+// a method inherited from a base class.
+var ErrSubclassMustImplement = errors.New("subclass must implement this method")
+
 type ValidationError struct {
 	Errors map[string]string
 }

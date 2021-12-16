@@ -1,7 +1,6 @@
 package pgmodels
 
 import (
-	"context"
 	"time"
 
 	"github.com/APTrust/registry/common"
@@ -18,7 +17,7 @@ const (
 )
 
 type Alert struct {
-	ID                int64            `json:"id"`
+	BaseModel
 	InstitutionID     int64            `json:"institution_id"`
 	Type              string           `json:"type"`
 	Subject           string           `json:"subject"`
@@ -78,10 +77,6 @@ func AlertSelect(query *Query) ([]*Alert, error) {
 	return alerts, err
 }
 
-func (alert *Alert) GetID() int64 {
-	return alert.ID
-}
-
 // Save saves this alert to the database. This will peform an insert
 // if Alert.ID is zero. Otherwise, it updates. It also saves all of
 // the many-to-many relations (PremisEvents, Users, and WorkItems), though
@@ -89,40 +84,45 @@ func (alert *Alert) GetID() int64 {
 // have a use case for that yet, since alerts are generally created and never
 // updated.
 func (alert *Alert) Save() error {
+	err := alert.Validate()
+	if err != nil {
+		return err
+	}
 	registryContext := common.Context()
 	db := registryContext.DB
-	return db.RunInTransaction(db.Context(), func(*pg.Tx) error {
+	return db.RunInTransaction(db.Context(), func(tx *pg.Tx) error {
 		var err error
 		if alert.ID == 0 {
-			_, err = db.Model(alert).Insert()
+			alert.CreatedAt = time.Now().UTC()
+			_, err = tx.Model(alert).Insert()
 		} else {
-			_, err = db.Model(alert).WherePK().Update()
+			_, err = tx.Model(alert).WherePK().Update()
 		}
 		if err != nil {
 			registryContext.Log.Error().Msgf("Transaction failed. Model: %v. Error: %v", alert, err)
 		}
-		return alert.saveRelations(db)
+		return alert.saveRelations(tx)
 	})
 }
 
 // This is run inside the Save transaction.
-func (alert *Alert) saveRelations(db *pg.DB) error {
-	err := alert.saveEvents(db)
+func (alert *Alert) saveRelations(tx *pg.Tx) error {
+	err := alert.saveEvents(tx)
 	if err != nil {
 		return err
 	}
-	err = alert.saveWorkItems(db)
+	err = alert.saveWorkItems(tx)
 	if err != nil {
 		return err
 	}
-	err = alert.saveUsers(db)
+	err = alert.saveUsers(tx)
 	return err
 }
 
-func (alert *Alert) saveEvents(db *pg.DB) error {
+func (alert *Alert) saveEvents(tx *pg.Tx) error {
 	sql := "insert into alerts_premis_events (alert_id, premis_event_id) values (?, ?) on conflict do nothing"
 	for _, event := range alert.PremisEvents {
-		_, err := db.Exec(sql, alert.ID, event.ID)
+		_, err := tx.Exec(sql, alert.ID, event.ID)
 		if err != nil {
 			return err
 		}
@@ -130,10 +130,10 @@ func (alert *Alert) saveEvents(db *pg.DB) error {
 	return nil
 }
 
-func (alert *Alert) saveUsers(db *pg.DB) error {
+func (alert *Alert) saveUsers(tx *pg.Tx) error {
 	sql := "insert into alerts_users (alert_id, user_id, sent_at, read_at) values (?, ?, ?, ?) on conflict do nothing"
 	for _, user := range alert.Users {
-		_, err := db.Exec(sql, alert.ID, user.ID, nil, nil)
+		_, err := tx.Exec(sql, alert.ID, user.ID, nil, nil)
 		if err != nil {
 			return err
 		}
@@ -141,44 +141,15 @@ func (alert *Alert) saveUsers(db *pg.DB) error {
 	return nil
 }
 
-func (alert *Alert) saveWorkItems(db *pg.DB) error {
+func (alert *Alert) saveWorkItems(tx *pg.Tx) error {
 	sql := "insert into alerts_work_items (alert_id, work_item_id) values (?, ?) on conflict do nothing"
 	for _, item := range alert.WorkItems {
-		_, err := db.Exec(sql, alert.ID, item.ID)
+		_, err := tx.Exec(sql, alert.ID, item.ID)
 		if err != nil {
 			return err
 		}
 	}
 	return nil
-}
-
-// The following statements have no effect other than to force a compile-time
-// check that ensures our Alert model properly implements these hook
-// interfaces.
-var (
-	_ pg.BeforeInsertHook = (*Alert)(nil)
-	_ pg.BeforeUpdateHook = (*Alert)(nil)
-)
-
-// BeforeInsert sets timestamps and bucket names on creation.
-func (alert *Alert) BeforeInsert(c context.Context) (context.Context, error) {
-	now := time.Now().UTC()
-	alert.CreatedAt = now
-
-	err := alert.Validate()
-	if err == nil {
-		return c, nil
-	}
-	return c, err
-}
-
-// BeforeUpdate sets the UpdatedAt timestamp.
-func (alert *Alert) BeforeUpdate(c context.Context) (context.Context, error) {
-	err := alert.Validate()
-	if err == nil {
-		return c, nil
-	}
-	return c, err
 }
 
 // Validate validates the model. This is called automatically on insert

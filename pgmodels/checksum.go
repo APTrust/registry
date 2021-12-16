@@ -5,15 +5,12 @@ import (
 )
 
 type Checksum struct {
-	ID            int64     `json:"id"`
-	Algorithm     string    `json:"algorithm"`
-	DateTime      time.Time `json:"datetime" pg:"datetime"`
-	Digest        string    `json:"digest"`
-	GenericFileID int64     `json:"generic_file_id" pg:"generic_file_id"`
-	CreatedAt     time.Time `json:"created_at"`
-	UpdatedAt     time.Time `json:"updated_at"`
-
-	GenericFile *GenericFile `json:"-" pg:"rel:has-one"`
+	TimestampModel
+	Algorithm     string       `json:"algorithm"`
+	DateTime      time.Time    `json:"datetime" pg:"datetime"`
+	Digest        string       `json:"digest"`
+	GenericFileID int64        `json:"generic_file_id" pg:"generic_file_id"`
+	GenericFile   *GenericFile `json:"-" pg:"rel:has-one"`
 }
 
 // ChecksumByID returns the file with the specified id.
@@ -35,10 +32,6 @@ func ChecksumSelect(query *Query) ([]*Checksum, error) {
 	var files []*Checksum
 	err := query.Select(&files)
 	return files, err
-}
-
-func (cs *Checksum) GetID() int64 {
-	return cs.ID
 }
 
 // Save saves this file to the database. This will peform an insert

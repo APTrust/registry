@@ -28,7 +28,7 @@ func init() {
 }
 
 type DeletionRequest struct {
-	ID                         int64                 `json:"id"`
+	BaseModel
 	InstitutionID              int64                 `json:"institution_id"`
 	RequestedByID              int64                 `json:"-"`
 	RequestedAt                time.Time             `json:"requested_at"`
@@ -94,27 +94,23 @@ func DeletionRequestSelect(query *Query) ([]*DeletionRequest, error) {
 	return requests, err
 }
 
-func (request *DeletionRequest) GetID() int64 {
-	return request.ID
-}
-
 // Save saves this requestitution to the database. This will peform an insert
 // if DeletionRequest.ID is zero. Otherwise, it updates.
 func (request *DeletionRequest) Save() error {
 	registryContext := common.Context()
 	db := registryContext.DB
-	return db.RunInTransaction(db.Context(), func(*pg.Tx) error {
+	return db.RunInTransaction(db.Context(), func(tx *pg.Tx) error {
 		var err error
 		if request.ID == 0 {
-			_, err = db.Model(request).Insert()
+			_, err = tx.Model(request).Insert()
 		} else {
-			_, err = db.Model(request).WherePK().Update()
+			_, err = tx.Model(request).WherePK().Update()
 		}
 		if err != nil {
 			registryContext.Log.Error().Msgf("Transaction failed. Model: %v. Error: %v", request, err)
 			return err
 		}
-		return request.saveRelations(db)
+		return request.saveRelations(tx)
 	})
 }
 
@@ -204,23 +200,23 @@ func (request *DeletionRequest) AddObject(obj *IntellectualObject) {
 	request.IntellectualObjects = append(request.IntellectualObjects, obj)
 }
 
-func (request *DeletionRequest) saveRelations(db *pg.DB) error {
-	err := request.saveFiles(db)
+func (request *DeletionRequest) saveRelations(tx *pg.Tx) error {
+	err := request.saveFiles(tx)
 	if err != nil {
 		return err
 	}
-	err = request.saveObjects(db)
+	err = request.saveObjects(tx)
 	if err != nil {
 		return err
 	}
-	return request.saveWorkItem(db)
+	return request.saveWorkItem(tx)
 }
 
-func (request *DeletionRequest) saveFiles(db *pg.DB) error {
+func (request *DeletionRequest) saveFiles(tx *pg.Tx) error {
 	// Note: on conflict refers to unique index index_drgf_unique
 	sql := "insert into deletion_requests_generic_files (deletion_request_id, generic_file_id) values (?, ?) on conflict do nothing"
 	for _, gf := range request.GenericFiles {
-		_, err := db.Exec(sql, request.ID, gf.ID)
+		_, err := tx.Exec(sql, request.ID, gf.ID)
 		if err != nil {
 			return err
 		}
@@ -228,11 +224,11 @@ func (request *DeletionRequest) saveFiles(db *pg.DB) error {
 	return nil
 }
 
-func (request *DeletionRequest) saveObjects(db *pg.DB) error {
+func (request *DeletionRequest) saveObjects(tx *pg.Tx) error {
 	// Note: on conflict refers to unique index index_drio_unique
 	sql := "insert into deletion_requests_intellectual_objects (deletion_request_id, intellectual_object_id) values (?, ?) on conflict do nothing"
 	for _, obj := range request.IntellectualObjects {
-		_, err := db.Exec(sql, request.ID, obj.ID)
+		_, err := tx.Exec(sql, request.ID, obj.ID)
 		if err != nil {
 			return err
 		}
@@ -240,7 +236,7 @@ func (request *DeletionRequest) saveObjects(db *pg.DB) error {
 	return nil
 }
 
-func (request *DeletionRequest) saveWorkItem(db *pg.DB) error {
+func (request *DeletionRequest) saveWorkItem(tx *pg.Tx) error {
 	if request.WorkItem != nil {
 		err := request.WorkItem.Save()
 		if err != nil {
@@ -249,7 +245,7 @@ func (request *DeletionRequest) saveWorkItem(db *pg.DB) error {
 		if request.WorkItemID == 0 {
 			request.WorkItemID = request.WorkItem.ID
 			sql := "update deletion_requests set work_item_id = ? where id = ?"
-			_, err = db.Exec(sql, request.WorkItem.ID, request.ID)
+			_, err = tx.Exec(sql, request.WorkItem.ID, request.ID)
 		}
 		return err
 	}

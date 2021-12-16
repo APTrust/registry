@@ -130,6 +130,10 @@ ERR:
 func RandomWorkItem(name, action string, objID, gfID int64) *WorkItem {
 	now := time.Now().UTC()
 	return &WorkItem{
+		TimestampModel: TimestampModel{
+			CreatedAt: now,
+			UpdatedAt: now,
+		},
 		Name:                 name,
 		ETag:                 ETag(),
 		InstitutionID:        4,
@@ -146,8 +150,6 @@ func RandomWorkItem(name, action string, objID, gfID int64) *WorkItem {
 		Retry:                true,
 		QueuedAt:             now,
 		Size:                 gofakeit.Int64(),
-		CreatedAt:            now,
-		UpdatedAt:            now,
 	}
 }
 
@@ -156,13 +158,15 @@ func RandomWorkItem(name, action string, objID, gfID int64) *WorkItem {
 func RandomGenericFile(objID int64, objIdentifier string) *GenericFile {
 	now := time.Now().UTC()
 	return &GenericFile{
+		TimestampModel: TimestampModel{
+			CreatedAt: now,
+			UpdatedAt: now,
+		},
 		FileFormat:           gofakeit.AnimalType(),
 		Size:                 gofakeit.Int64(),
 		Identifier:           FileIdentifier(objIdentifier),
 		InstitutionID:        4,
 		IntellectualObjectID: objID,
-		CreatedAt:            now,
-		UpdatedAt:            now,
 		State:                constants.StateActive,
 		LastFixityCheck:      now.AddDate(0, -4, 0),
 		StorageOption:        constants.StorageOptionStandard,
@@ -198,11 +202,13 @@ func RandomPremisEvent(eventType string) *PremisEvent {
 func RandomChecksum(alg string) *Checksum {
 	now := time.Now().UTC()
 	return &Checksum{
+		TimestampModel: TimestampModel{
+			CreatedAt: now,
+			UpdatedAt: now,
+		},
 		Algorithm: alg,
 		DateTime:  now,
 		Digest:    ETag(),
-		CreatedAt: now,
-		UpdatedAt: now,
 	}
 }
 

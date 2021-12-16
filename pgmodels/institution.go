@@ -28,7 +28,7 @@ var InstitutionFilters = []string{
 }
 
 type Institution struct {
-	ID                  int64     `json:"id"`
+	TimestampModel
 	Name                string    `json:"name"`
 	Identifier          string    `json:"identifier"`
 	State               string    `json:"state"`
@@ -39,8 +39,6 @@ type Institution struct {
 	EnableSpotRestore   bool      `json:"enable_spot_restore" pg:",use_zero"`
 	ReceivingBucket     string    `json:"receiving_bucket"`
 	RestoreBucket       string    `json:"restore_bucket"`
-	CreatedAt           time.Time `json:"created_at"`
-	UpdatedAt           time.Time `json:"updated_at"`
 }
 
 // InstitutionByID returns the institution with the specified id.
@@ -78,10 +76,6 @@ func InstitutionSelect(query *Query) ([]*Institution, error) {
 	var institutions []*Institution
 	err := query.Select(&institutions)
 	return institutions, err
-}
-
-func (inst *Institution) GetID() int64 {
-	return inst.ID
 }
 
 // Save saves this institution to the database. This will peform an insert

@@ -1,6 +1,8 @@
 package pgmodels
 
 import (
+	"time"
+
 	"github.com/APTrust/registry/common"
 	"github.com/go-pg/pg/v10"
 )
@@ -8,6 +10,58 @@ import (
 type Model interface {
 	GetID() int64
 	Save() error
+	SetTimestamps()
+	IsJoinModel() bool
+	Validate() *common.ValidationError
+}
+
+type BaseModel struct {
+	ID int64 `pg:"id" form:"id" json:"id"`
+}
+
+func (bm *BaseModel) GetID() int64 {
+	return bm.ID
+}
+
+func (bm *BaseModel) IsJoinModel() bool {
+	return false
+}
+
+func (bm *BaseModel) SetTimestamps() {
+	// No-Op
+}
+
+func (bm *BaseModel) Save() error {
+	return common.ErrSubclassMustImplement
+}
+
+type TimestampModel struct {
+	BaseModel
+	CreatedAt time.Time `bun:",nullzero" json:",omitempty"`
+	UpdatedAt time.Time `bun:",nullzero" json:",omitempty"`
+}
+
+func (tsm *TimestampModel) SetTimestamps() {
+	now := time.Now().UTC()
+	if tsm.CreatedAt.IsZero() {
+		tsm.CreatedAt = now
+	}
+	tsm.UpdatedAt = now
+}
+
+type JoinModel struct {
+}
+
+func (jm *JoinModel) GetID() int64 {
+	return 0
+}
+
+func (jm *JoinModel) IsJoinModel() bool {
+	return true
+}
+
+func (jm *JoinModel) SetTimestamps() {
+	// No-Op
 }
 
 type xactType int
@@ -28,12 +82,12 @@ func update(model interface{}) error {
 func transact(model interface{}, action xactType) error {
 	registryContext := common.Context()
 	db := registryContext.DB
-	return db.RunInTransaction(db.Context(), func(*pg.Tx) error {
+	return db.RunInTransaction(db.Context(), func(tx *pg.Tx) error {
 		var err error
 		if action == TypeInsert {
-			_, err = db.Model(model).Insert()
+			_, err = tx.Model(model).Insert()
 		} else {
-			_, err = db.Model(model).WherePK().Update()
+			_, err = tx.Model(model).WherePK().Update()
 		}
 		if err != nil {
 			registryContext.Log.Error().Msgf("Transaction failed. Model: %v. Error: %v", model, err)

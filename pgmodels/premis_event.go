@@ -7,7 +7,7 @@ import (
 )
 
 type PremisEvent struct {
-	ID                   int64     `json:"id"`
+	BaseModel
 	Agent                string    `json:"agent"`
 	CreatedAt            time.Time `json:"created_at"`
 	DateTime             time.Time `json:"date_time"`
@@ -62,17 +62,15 @@ func PremisEventSelect(query *Query) ([]*PremisEvent, error) {
 	return events, err
 }
 
-func (event *PremisEvent) GetID() int64 {
-	return event.ID
-}
-
 // Save saves this event to the database. This will peform an insert
 // if PremisEvent.ID is zero. Otherwise, it updates.
 func (event *PremisEvent) Save() error {
 	if event.ID == int64(0) {
+		event.CreatedAt = time.Now().UTC()
 		return insert(event)
 	}
-	return update(event)
+	// Premis events cannot be updated
+	return common.ErrNotSupported
 }
 
 // ObjectEventCount returns the number of object-level PremisEvents for the

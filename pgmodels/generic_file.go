@@ -26,24 +26,21 @@ var GenericFileFilters = []string{
 }
 
 type GenericFile struct {
-	ID                   int64     `json:"id" pg:"id"`
-	FileFormat           string    `json:"file_format"`
-	Size                 int64     `json:"size"`
-	Identifier           string    `json:"identifier"`
-	IntellectualObjectID int64     `json:"intellectual_object_id"`
-	CreatedAt            time.Time `json:"created_at"`
-	UpdatedAt            time.Time `json:"updated_at"`
-	State                string    `json:"state"`
-	LastFixityCheck      time.Time `json:"last_fixity_check"`
-	InstitutionID        int64     `json:"institution_id"`
-	StorageOption        string    `json:"storage_option"`
-	UUID                 string    `json:"uuid" pg:"uuid"`
-
-	Institution        *Institution        `json:"-" pg:"rel:has-one"`
-	IntellectualObject *IntellectualObject `json:"-" pg:"rel:has-one"`
-	PremisEvents       []*PremisEvent      `json:"premis_events,omitempty" pg:"rel:has-many"`
-	Checksums          []*Checksum         `json:"checksums,omitempty" pg:"rel:has-many"`
-	StorageRecords     []*StorageRecord    `json:"storage_records,omitempty" pg:"rel:has-many"`
+	TimestampModel
+	FileFormat           string              `json:"file_format"`
+	Size                 int64               `json:"size"`
+	Identifier           string              `json:"identifier"`
+	IntellectualObjectID int64               `json:"intellectual_object_id"`
+	State                string              `json:"state"`
+	LastFixityCheck      time.Time           `json:"last_fixity_check"`
+	InstitutionID        int64               `json:"institution_id"`
+	StorageOption        string              `json:"storage_option"`
+	UUID                 string              `json:"uuid" pg:"uuid"`
+	Institution          *Institution        `json:"-" pg:"rel:has-one"`
+	IntellectualObject   *IntellectualObject `json:"-" pg:"rel:has-one"`
+	PremisEvents         []*PremisEvent      `json:"premis_events,omitempty" pg:"rel:has-many"`
+	Checksums            []*Checksum         `json:"checksums,omitempty" pg:"rel:has-many"`
+	StorageRecords       []*StorageRecord    `json:"storage_records,omitempty" pg:"rel:has-many"`
 }
 
 // TODO: When selecting relations, order by UpdatedAt asc.
@@ -83,10 +80,6 @@ func GenericFileSelect(query *Query) ([]*GenericFile, error) {
 	var files []*GenericFile
 	err := query.Select(&files)
 	return files, err
-}
-
-func (gf *GenericFile) GetID() int64 {
-	return gf.ID
 }
 
 // Save saves this file to the database. This will peform an insert

@@ -35,8 +35,7 @@ const (
 // a number of obsolete fields that we should remove after we're stable
 // in production.
 type User struct {
-	// ID is user's unique ID in the database.
-	ID int64 `json:"id" form:"id" pg:"id"`
+	TimestampModel
 
 	// Name is the user's display name.
 	Name string `json:"name" pg:"name"`
@@ -48,12 +47,6 @@ type User struct {
 	// This number is used for SMS two-factor auth, so it should be
 	// a mobile phone.
 	PhoneNumber string `json:"phone_number" pg:"phone_number"`
-
-	// CreatedAt is timestamp of user creation.
-	CreatedAt time.Time `json:"created_at" form:"-" pg:"created_at"`
-
-	// UpdatedAt is when user was last updated.
-	UpdatedAt time.Time `json:"updated_at" form:"-" pg:"updated_at"`
 
 	// EncryptedPassword is the user's password, encrypted.
 	EncryptedPassword string `json:"-" form:"-" pg:"encrypted_password"`
@@ -264,10 +257,6 @@ func UserSignIn(email, password, ipAddr string) (*User, error) {
 	user.CurrentSignInAt = time.Now().UTC()
 	err = user.Save()
 	return user, err
-}
-
-func (user *User) GetID() int64 {
-	return user.ID
 }
 
 // UserSignOut signs a user out.

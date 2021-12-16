@@ -151,11 +151,12 @@ func TestObjInsertAndUpdate(t *testing.T) {
 	obj := pgmodels.GetTestObject()
 	err := obj.Save()
 	assert.Nil(t, err)
+	assert.True(t, obj.ID > 0)
 	assert.NotEmpty(t, obj.CreatedAt)
 	assert.NotEmpty(t, obj.UpdatedAt)
 
 	// Update
-	obj, err = pgmodels.IntellectualObjectByIdentifier("test.edu/obj1")
+	obj, err = pgmodels.IntellectualObjectByIdentifier(obj.Identifier)
 	require.Nil(t, err)
 	require.NotNil(t, obj)
 

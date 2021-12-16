@@ -29,7 +29,7 @@ const (
 )
 
 type WorkItem struct {
-	ID                   int64     `json:"id" pg:"id"`
+	TimestampModel
 	Name                 string    `json:"name" pg:"name"`
 	ETag                 string    `json:"etag" pg:"etag"`
 	InstitutionID        int64     `json:"institution_id"`
@@ -53,8 +53,6 @@ type WorkItem struct {
 	StageStartedAt       time.Time `json:"stage_started_at"`
 	APTrustApprover      string    `json:"aptrust_approver" pg:"aptrust_approver"`
 	InstApprover         string    `json:"inst_approver"`
-	CreatedAt            time.Time `json:"created_at"`
-	UpdatedAt            time.Time `json:"updated_at"`
 }
 
 // WorkItemByID returns the work item with the specified id.
@@ -110,11 +108,6 @@ func WorkItemsPendingForFile(fileID int64) ([]*WorkItem, error) {
 		WhereNotIn("status", completed...).
 		OrderBy("date_processed", "desc")
 	return WorkItemSelect(query)
-}
-
-// GetID returns this item's ID.
-func (item *WorkItem) GetID() int64 {
-	return item.ID
 }
 
 // HasCompleted returns true if this item has completed processing.

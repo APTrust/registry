@@ -1,7 +1,6 @@
 package pgmodels
 
 import (
-	"context"
 	"fmt"
 	"time"
 
@@ -16,28 +15,25 @@ import (
 // Filters are defined in IntellectualObjectView, since we query on the view.
 
 type IntellectualObject struct {
-	ID                        int64     `json:"id"`
-	Title                     string    `json:"title"`
-	Description               string    `json:"description"`
-	Identifier                string    `json:"identifier"`
-	AltIdentifier             string    `json:"alt_identifier"`
-	Access                    string    `json:"access"`
-	BagName                   string    `json:"bag_name"`
-	InstitutionID             int64     `json:"institution_id"`
-	CreatedAt                 time.Time `json:"created_at"`
-	UpdatedAt                 time.Time `json:"updated_at"`
-	State                     string    `json:"state"`
-	ETag                      string    `json:"etag" pg:"etag"`
-	BagGroupIdentifier        string    `json:"bag_group_identifier"`
-	StorageOption             string    `json:"storage_option"`
-	BagItProfileIdentifier    string    `json:"bagit_profile_identifier" pg:"bagit_profile_identifier"`
-	SourceOrganization        string    `json:"source_organization"`
-	InternalSenderIdentifier  string    `json:"internal_sender_identifier"`
-	InternalSenderDescription string    `json:"internal_sender_description"`
-
-	Institution  *Institution   `json:"institution" pg:"rel:has-one"`
-	GenericFiles []*GenericFile `json:"generic_files" pg:"rel:has-many"`
-	PremisEvents []*PremisEvent `json:"premis_events" pg:"rel:has-many"`
+	TimestampModel
+	Title                     string         `json:"title"`
+	Description               string         `json:"description"`
+	Identifier                string         `json:"identifier"`
+	AltIdentifier             string         `json:"alt_identifier"`
+	Access                    string         `json:"access"`
+	BagName                   string         `json:"bag_name"`
+	InstitutionID             int64          `json:"institution_id"`
+	State                     string         `json:"state"`
+	ETag                      string         `json:"etag" pg:"etag"`
+	BagGroupIdentifier        string         `json:"bag_group_identifier"`
+	StorageOption             string         `json:"storage_option"`
+	BagItProfileIdentifier    string         `json:"bagit_profile_identifier" pg:"bagit_profile_identifier"`
+	SourceOrganization        string         `json:"source_organization"`
+	InternalSenderIdentifier  string         `json:"internal_sender_identifier"`
+	InternalSenderDescription string         `json:"internal_sender_description"`
+	Institution               *Institution   `json:"institution" pg:"rel:has-one"`
+	GenericFiles              []*GenericFile `json:"generic_files" pg:"rel:has-many"`
+	PremisEvents              []*PremisEvent `json:"premis_events" pg:"rel:has-many"`
 }
 
 // IntellectualObjectByID returns the object with the specified id.
@@ -77,13 +73,14 @@ func IntellectualObjectSelect(query *Query) ([]*IntellectualObject, error) {
 	return objects, err
 }
 
-func (obj *IntellectualObject) GetID() int64 {
-	return obj.ID
-}
-
 // Save saves this object to the database. This will peform an insert
 // if IntellectualObject.ID is zero. Otherwise, it updates.
 func (obj *IntellectualObject) Save() error {
+	obj.SetTimestamps()
+	err := obj.Validate()
+	if err != nil {
+		return err
+	}
 	if obj.ID == int64(0) {
 		return insert(obj)
 	}
@@ -203,36 +200,36 @@ func (obj *IntellectualObject) ValidateChanges(updatedObj *IntellectualObject) e
 	return nil
 }
 
-// The following statements have no effect other than to force a compile-time
-// check that ensures our IntellectualObject model properly implements these hook
-// interfaces.
-var (
-	_ pg.BeforeInsertHook = (*IntellectualObject)(nil)
-	_ pg.BeforeUpdateHook = (*IntellectualObject)(nil)
-)
+// // The following statements have no effect other than to force a compile-time
+// // check that ensures our IntellectualObject model properly implements these hook
+// // interfaces.
+// var (
+// 	_ pg.BeforeInsertHook = (*IntellectualObject)(nil)
+// 	_ pg.BeforeUpdateHook = (*IntellectualObject)(nil)
+// )
 
-// BeforeInsert sets timestamps and bucket names on creation.
-func (obj *IntellectualObject) BeforeInsert(c context.Context) (context.Context, error) {
-	now := time.Now().UTC()
-	obj.CreatedAt = now
-	obj.UpdatedAt = now
+// // BeforeInsert sets timestamps and bucket names on creation.
+// func (obj *IntellectualObject) BeforeInsert(c context.Context) (context.Context, error) {
+// 	now := time.Now().UTC()
+// 	obj.CreatedAt = now
+// 	obj.UpdatedAt = now
 
-	err := obj.Validate()
-	if err == nil {
-		return c, nil
-	}
-	return c, err
-}
+// 	err := obj.Validate()
+// 	if err == nil {
+// 		return c, nil
+// 	}
+// 	return c, err
+// }
 
-// BeforeUpdate sets the UpdatedAt timestamp.
-func (obj *IntellectualObject) BeforeUpdate(c context.Context) (context.Context, error) {
-	err := obj.Validate()
-	obj.UpdatedAt = time.Now().UTC()
-	if err == nil {
-		return c, nil
-	}
-	return c, err
-}
+// // BeforeUpdate sets the UpdatedAt timestamp.
+// func (obj *IntellectualObject) BeforeUpdate(c context.Context) (context.Context, error) {
+// 	err := obj.Validate()
+// 	obj.UpdatedAt = time.Now().UTC()
+// 	if err == nil {
+// 		return c, nil
+// 	}
+// 	return c, err
+// }
 
 func (obj *IntellectualObject) ActiveDeletionWorkItem() (*WorkItem, error) {
 	query := NewQuery().
