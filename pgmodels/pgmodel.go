@@ -10,8 +10,6 @@ import (
 type Model interface {
 	GetID() int64
 	Save() error
-	SetTimestamps()
-	IsJoinModel() bool
 	Validate() *common.ValidationError
 }
 
@@ -21,14 +19,6 @@ type BaseModel struct {
 
 func (bm *BaseModel) GetID() int64 {
 	return bm.ID
-}
-
-func (bm *BaseModel) IsJoinModel() bool {
-	return false
-}
-
-func (bm *BaseModel) SetTimestamps() {
-	// No-Op
 }
 
 func (bm *BaseModel) Save() error {
@@ -47,21 +37,6 @@ func (tsm *TimestampModel) SetTimestamps() {
 		tsm.CreatedAt = now
 	}
 	tsm.UpdatedAt = now
-}
-
-type JoinModel struct {
-}
-
-func (jm *JoinModel) GetID() int64 {
-	return 0
-}
-
-func (jm *JoinModel) IsJoinModel() bool {
-	return true
-}
-
-func (jm *JoinModel) SetTimestamps() {
-	// No-Op
 }
 
 type xactType int
