@@ -1,14 +1,12 @@
 package pgmodels
 
 import (
-	"context"
 	"fmt"
 	"time"
 
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
 	v "github.com/asaskevich/govalidator"
-	"github.com/go-pg/pg/v10"
 	"github.com/jinzhu/copier"
 	"github.com/stretchr/stew/slice"
 )
@@ -118,6 +116,11 @@ func (item *WorkItem) HasCompleted() bool {
 // Save saves this work item to the database. This will peform an insert
 // if WorkItem.ID is zero. Otherwise, it updates.
 func (item *WorkItem) Save() error {
+	item.SetTimestamps()
+	err := item.Validate()
+	if err != nil {
+		return err
+	}
 	if item.ID == int64(0) {
 		return insert(item)
 	}
@@ -144,32 +147,6 @@ func (item *WorkItem) SetForRequeue(stage string) error {
 	item.PID = 0
 	item.Note = fmt.Sprintf("Requeued for %s", item.Stage)
 	return item.Save()
-}
-
-// The following statements have no effect other than to force a compile-time
-// check that ensures our WorkItem model properly implements these hook
-// interfaces.
-var (
-	_ pg.BeforeInsertHook = (*WorkItem)(nil)
-	_ pg.BeforeUpdateHook = (*WorkItem)(nil)
-)
-
-// BeforeInsert validates the record and does additional prep work.
-func (item *WorkItem) BeforeInsert(c context.Context) (context.Context, error) {
-	now := time.Now().UTC()
-	item.CreatedAt = now
-	item.UpdatedAt = now
-	err := item.Validate()
-	if err == nil {
-		return c, nil
-	}
-	return c, err
-}
-
-// BeforeUpdate sets the UpdatedAt timestamp.
-func (item *WorkItem) BeforeUpdate(c context.Context) (context.Context, error) {
-	item.UpdatedAt = time.Now().UTC()
-	return c, nil
 }
 
 func (item *WorkItem) Validate() *common.ValidationError {

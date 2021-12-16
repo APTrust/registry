@@ -200,37 +200,6 @@ func (obj *IntellectualObject) ValidateChanges(updatedObj *IntellectualObject) e
 	return nil
 }
 
-// // The following statements have no effect other than to force a compile-time
-// // check that ensures our IntellectualObject model properly implements these hook
-// // interfaces.
-// var (
-// 	_ pg.BeforeInsertHook = (*IntellectualObject)(nil)
-// 	_ pg.BeforeUpdateHook = (*IntellectualObject)(nil)
-// )
-
-// // BeforeInsert sets timestamps and bucket names on creation.
-// func (obj *IntellectualObject) BeforeInsert(c context.Context) (context.Context, error) {
-// 	now := time.Now().UTC()
-// 	obj.CreatedAt = now
-// 	obj.UpdatedAt = now
-
-// 	err := obj.Validate()
-// 	if err == nil {
-// 		return c, nil
-// 	}
-// 	return c, err
-// }
-
-// // BeforeUpdate sets the UpdatedAt timestamp.
-// func (obj *IntellectualObject) BeforeUpdate(c context.Context) (context.Context, error) {
-// 	err := obj.Validate()
-// 	obj.UpdatedAt = time.Now().UTC()
-// 	if err == nil {
-// 		return c, nil
-// 	}
-// 	return c, err
-// }
-
 func (obj *IntellectualObject) ActiveDeletionWorkItem() (*WorkItem, error) {
 	query := NewQuery().
 		Where("intellectual_object_id", "=", obj.ID).

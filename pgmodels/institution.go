@@ -1,7 +1,6 @@
 package pgmodels
 
 import (
-	"context"
 	"fmt"
 	"strings"
 	"time"
@@ -9,7 +8,6 @@ import (
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
 	v "github.com/asaskevich/govalidator"
-	"github.com/go-pg/pg/v10"
 )
 
 const (
@@ -81,6 +79,16 @@ func InstitutionSelect(query *Query) ([]*Institution, error) {
 // Save saves this institution to the database. This will peform an insert
 // if Institution.ID is zero. Otherwise, it updates.
 func (inst *Institution) Save() error {
+	inst.SetTimestamps()
+	if inst.ID == 0 {
+		inst.ReceivingBucket = inst.bucket("receiving")
+		inst.RestoreBucket = inst.bucket("restore")
+		inst.State = constants.StateActive
+	}
+	err := inst.Validate()
+	if err != nil {
+		return err
+	}
 	if inst.ID == int64(0) {
 		return insert(inst)
 	}
@@ -101,46 +109,6 @@ func (inst *Institution) Undelete() error {
 	inst.State = constants.StateActive
 	inst.DeactivatedAt = time.Time{}
 	return update(inst)
-}
-
-// The following statements have no effect other than to force a compile-time
-// check that ensures our Institution model properly implements these hook
-// interfaces.
-var (
-	_ pg.BeforeInsertHook = (*Institution)(nil)
-	_ pg.BeforeUpdateHook = (*Institution)(nil)
-)
-
-// BeforeInsert sets timestamps and bucket names on creation.
-func (inst *Institution) BeforeInsert(c context.Context) (context.Context, error) {
-	now := time.Now().UTC()
-	inst.CreatedAt = now
-	inst.UpdatedAt = now
-	inst.ReceivingBucket = inst.bucket("receiving")
-	inst.RestoreBucket = inst.bucket("restore")
-	inst.State = constants.StateActive
-
-	// WTF? The following:
-	//
-	// return c, inst.Validate()
-	//
-	// causes transaction to fail, even when inst.Validate() returns nil.
-	// So we have to do this BS.
-	err := inst.Validate()
-	if err == nil {
-		return c, nil
-	}
-	return c, err
-}
-
-// BeforeUpdate sets the UpdatedAt timestamp.
-func (inst *Institution) BeforeUpdate(c context.Context) (context.Context, error) {
-	inst.UpdatedAt = time.Now().UTC()
-	err := inst.Validate()
-	if err == nil {
-		return c, nil
-	}
-	return c, err
 }
 
 // bucket returns a valid bucket name for this institution.

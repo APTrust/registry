@@ -107,8 +107,6 @@ func TestInstitutionSave(t *testing.T) {
 	}
 	err := inst.Save()
 	require.Nil(t, err)
-
-	// pg library should set ID, BeforeInsert hook should set other values
 	assert.True(t, inst.ID > int64(0))
 	assert.Equal(t, constants.StateActive, inst.State)
 	assert.Equal(t, "aptrust.receiving.test.test1.kom", inst.ReceivingBucket)

@@ -96,8 +96,6 @@ func TestWorkItemSave(t *testing.T) {
 	}
 	err := item.Save()
 	require.Nil(t, err)
-
-	// pg library should set ID, BeforeInsert hook should set other values
 	assert.True(t, item.ID > int64(0))
 	assert.Equal(t, "unit_00001.tar", item.Name)
 	assert.Equal(t, int64(4), item.InstitutionID)

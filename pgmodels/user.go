@@ -1,7 +1,6 @@
 package pgmodels
 
 import (
-	"context"
 	"regexp"
 	"strings"
 	"time"
@@ -9,7 +8,6 @@ import (
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
 	v "github.com/asaskevich/govalidator"
-	"github.com/go-pg/pg/v10"
 )
 
 // Phone: +1234567890 (10 digits)
@@ -273,6 +271,12 @@ func (user *User) SignOut() error {
 }
 
 func (user *User) Save() error {
+	user.SetTimestamps()
+	user.reformatPhone()
+	err := user.Validate()
+	if err != nil {
+		return err
+	}
 	if user.ID == int64(0) {
 		return insert(user)
 	}
@@ -324,34 +328,6 @@ func (user *User) Validate() *common.ValidationError {
 		return &common.ValidationError{Errors: errors}
 	}
 	return nil
-}
-
-var (
-	_ pg.BeforeInsertHook = (*User)(nil)
-	_ pg.BeforeUpdateHook = (*User)(nil)
-)
-
-func (user *User) BeforeInsert(c context.Context) (context.Context, error) {
-	now := time.Now().UTC()
-	user.CreatedAt = now
-	user.UpdatedAt = now
-	user.reformatPhone()
-	err := user.Validate()
-	if err == nil {
-		return c, nil
-	}
-	return c, err
-}
-
-// BeforeUpdate sets the UpdatedAt timestamp.
-func (user *User) BeforeUpdate(c context.Context) (context.Context, error) {
-	user.UpdatedAt = time.Now().UTC()
-	user.reformatPhone()
-	err := user.Validate()
-	if err == nil {
-		return c, nil
-	}
-	return c, err
 }
 
 func (user *User) reformatPhone() {
