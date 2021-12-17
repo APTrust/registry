@@ -192,8 +192,10 @@ func RandomPremisEvent(eventType string) *PremisEvent {
 		Outcome:            gofakeit.Sentence(5),
 		OutcomeDetail:      gofakeit.BeerName(),
 		OutcomeInformation: gofakeit.AppAuthor(),
-		CreatedAt:          now,
-		UpdatedAt:          now,
+		TimestampModel: TimestampModel{
+			CreatedAt: now,
+			UpdatedAt: now,
+		},
 	}
 }
 

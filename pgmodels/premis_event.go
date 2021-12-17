@@ -7,9 +7,8 @@ import (
 )
 
 type PremisEvent struct {
-	BaseModel
+	TimestampModel
 	Agent                string    `json:"agent"`
-	CreatedAt            time.Time `json:"created_at"`
 	DateTime             time.Time `json:"date_time"`
 	Detail               string    `json:"detail"`
 	EventType            string    `json:"event_type"`
@@ -22,7 +21,6 @@ type PremisEvent struct {
 	Outcome              string    `json:"outcome"`
 	OutcomeDetail        string    `json:"outcome_detail"`
 	OutcomeInformation   string    `json:"outcome_information"`
-	UpdatedAt            time.Time `json:"updated_at"`
 }
 
 // PremisEventByID returns the event with the specified id.
@@ -71,6 +69,29 @@ func (event *PremisEvent) Save() error {
 	}
 	// Premis events cannot be updated
 	return common.ErrNotSupported
+}
+
+// TODO: Needs validation
+func (event *PremisEvent) Validate() *common.ValidationError {
+	errors := make(map[string]string)
+
+	// Agent
+	// DateTime
+	// Detail
+	// EventType
+	// GenericFileID
+	// Identifier
+	// InstitutionID
+	// IntellectualObjectID
+	// Object
+	// Outcome
+	// OutcomeDetail
+	// OutcomeInformation
+
+	if len(errors) > 0 {
+		return &common.ValidationError{Errors: errors}
+	}
+	return nil
 }
 
 // ObjectEventCount returns the number of object-level PremisEvents for the

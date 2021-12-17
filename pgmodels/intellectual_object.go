@@ -98,6 +98,16 @@ func (obj *IntellectualObject) IsGlacierOnly() bool {
 
 // Delete soft-deletes this object by setting State to 'D' and
 // the DeletedAt timestamp to now. You can undo this with Undelete.
+// It also creates a deletion PremisEvent. You can't get rid of that.
+//
+// It is legitimate for a depositor to delete an object, then re-upload
+// it later, particularly if they want to change the storage option.
+// In that case, the object's state would be set back to "A" after the
+// new ingest, and the old deletion event would remain to show that an earlier
+// version of the object was once deleted.
+//
+// We would know the new object is active because state = "A" and it would
+// have an ingest event dated after the last deletion event.
 func (obj *IntellectualObject) Delete() error {
 
 	err := obj.AssertDeletionPreconditions()
@@ -108,11 +118,35 @@ func (obj *IntellectualObject) Delete() error {
 	obj.State = constants.StateDeleted
 	obj.UpdatedAt = time.Now().UTC()
 
-	// TODO: Create PremisEvents, update WorkItem. Here? Or Elsewhere?
-	// TODO: Wrap obj deletion, event creation into single transaction.
-	//       Event will have to get deletion details from WorkItem.
+	valErr := obj.Validate()
+	if valErr != nil {
+		return valErr
+	}
 
-	return update(obj)
+	deletionEvent, err := obj.NewDeletionEvent()
+	if err != nil {
+		return err
+	}
+	deletionEvent.SetTimestamps()
+	valErr = deletionEvent.Validate()
+	if valErr != nil {
+		return valErr
+	}
+
+	registryContext := common.Context()
+	db := registryContext.DB
+	return db.RunInTransaction(db.Context(), func(tx *pg.Tx) error {
+		var err error
+		_, err = tx.Model(obj).WherePK().Update()
+		if err != nil {
+			registryContext.Log.Error().Msgf("Intellectual object deletion transaction failed on update of object. Object: %d (%s). Error: %v", obj.ID, obj.Identifier, err)
+		}
+		_, err = tx.Model(deletionEvent).Insert()
+		if err != nil {
+			registryContext.Log.Error().Msgf("Intellectual object deletion transaction failed on insertion of event. Object: %d (%s). Error: %v", obj.ID, obj.Identifier, err)
+		}
+		return err
+	})
 }
 
 // HasActiveFiles returns true if this object has any active (non-deleted)
@@ -236,6 +270,11 @@ func (obj *IntellectualObject) AssertDeletionPreconditions() error {
 	if err == nil {
 		err = obj.assertDeletionApproved()
 	}
+	if err != nil {
+		common.Context().Log.Error().Msgf(
+			"Deletion precondition check failed for object %d (%s): %v",
+			obj.ID, obj.Identifier, err)
+	}
 	return err
 }
 
@@ -318,7 +357,6 @@ func (obj *IntellectualObject) NewDeletionEvent() (*PremisEvent, error) {
 	now := time.Now().UTC()
 	return &PremisEvent{
 		Agent:                "APTrust preservation services",
-		CreatedAt:            now,
 		DateTime:             now,
 		Detail:               "Object deleted from preservation storage",
 		EventType:            constants.EventDeletion,
@@ -329,6 +367,5 @@ func (obj *IntellectualObject) NewDeletionEvent() (*PremisEvent, error) {
 		Outcome:              constants.OutcomeSuccess,
 		OutcomeDetail:        deletionRequest.RequestedByEmail,
 		OutcomeInformation:   fmt.Sprintf("Object deleted at the request of %s. Institutional approver: %s.", deletionRequest.RequestedByEmail, deletionRequest.ConfirmedByEmail),
-		UpdatedAt:            now,
 	}, nil
 }
