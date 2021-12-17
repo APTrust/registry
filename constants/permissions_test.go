@@ -40,7 +40,7 @@ func TestPermissions(t *testing.T) {
 	assert.False(t, constants.CheckPermission(constants.RoleSysAdmin, constants.ChecksumDelete))
 
 	// Check these because they were misbehaving in dev
-	assert.True(t, constants.CheckPermission(constants.RoleInstUser, constants.FileRequestDelete))
+	assert.False(t, constants.CheckPermission(constants.RoleInstUser, constants.FileRequestDelete))
 	assert.True(t, constants.CheckPermission(constants.RoleInstUser, constants.FileRestore))
 
 	assert.True(t, constants.CheckPermission(constants.RoleInstAdmin, constants.FileRequestDelete))
@@ -48,5 +48,39 @@ func TestPermissions(t *testing.T) {
 
 	assert.True(t, constants.CheckPermission(constants.RoleSysAdmin, constants.FileRequestDelete))
 	assert.True(t, constants.CheckPermission(constants.RoleSysAdmin, constants.FileRestore))
+
+}
+
+// Test dangerous permissions to ensure only the right roles have them.
+func TestDangerousPermissions(t *testing.T) {
+
+	// Initiate Object Deletion.
+	//
+	// Admins, yes. Users, no.
+	assert.True(t, constants.CheckPermission(constants.RoleSysAdmin, constants.IntellectualObjectDelete))
+	assert.True(t, constants.CheckPermission(constants.RoleInstAdmin, constants.IntellectualObjectDelete))
+	assert.False(t, constants.CheckPermission(constants.RoleInstUser, constants.IntellectualObjectDelete))
+
+	assert.True(t, constants.CheckPermission(constants.RoleSysAdmin, constants.IntellectualObjectRequestDelete))
+	assert.True(t, constants.CheckPermission(constants.RoleInstAdmin, constants.IntellectualObjectRequestDelete))
+	assert.False(t, constants.CheckPermission(constants.RoleInstUser, constants.IntellectualObjectRequestDelete))
+
+	// Initiate File Deletion.
+	//
+	// Admins, yes. Users, no.
+	assert.True(t, constants.CheckPermission(constants.RoleSysAdmin, constants.FileDelete))
+	assert.True(t, constants.CheckPermission(constants.RoleInstAdmin, constants.FileDelete))
+	assert.False(t, constants.CheckPermission(constants.RoleInstUser, constants.FileDelete))
+
+	assert.True(t, constants.CheckPermission(constants.RoleSysAdmin, constants.FileRequestDelete))
+	assert.True(t, constants.CheckPermission(constants.RoleInstAdmin, constants.FileRequestDelete))
+	assert.False(t, constants.CheckPermission(constants.RoleInstUser, constants.FileRequestDelete))
+
+	// Approve Object Deletion.
+	//
+	// Admins, yes. Users, no.
+	assert.True(t, constants.CheckPermission(constants.RoleSysAdmin, constants.DeletionRequestApprove))
+	assert.True(t, constants.CheckPermission(constants.RoleInstAdmin, constants.DeletionRequestApprove))
+	assert.False(t, constants.CheckPermission(constants.RoleInstUser, constants.DeletionRequestApprove))
 
 }

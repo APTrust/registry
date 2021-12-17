@@ -10,8 +10,10 @@ When the system creates WorkItems in the steps outlined below, the WorkItem must
 
 ### Step 1: Request
 
-1. User clicks Delete button.
-2. User confirms deletion in modal dialog.
+Note that only sys admin and institutional admin can initiate a deletion. Only inst admin can approve deletion.
+
+1. Institutional admin clicks Delete button.
+2. Institutional admin confirms deletion in modal dialog.
 3. System checks to see if this object or any of its files has pending WorkItem actions (ingest, restore, delete) or if item is already deleted (state = D)
     a. If so, system returns 409/Conflict and workflow ends.
 4. If object can't be found, system returns 404.
@@ -39,7 +41,7 @@ When the system creates WorkItems in the steps outlined below, the WorkItem must
 
 ## File Deletion
 
-File deletion follows the same steps as object deletion.
+File deletion follows the same steps as object deletion, with the same restrictions. Only sys admin and institutional admin can initiate a deletion. Only inst admin can approve deletion.
 
 ### Bulk Deletion
 

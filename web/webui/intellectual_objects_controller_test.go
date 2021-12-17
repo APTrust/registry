@@ -24,7 +24,6 @@ func TestObjectShow(t *testing.T) {
 		"1.5 GB",
 		"A bag of photos",
 		"/events/show_xhr/37", // link to ingest premis event
-		"/objects/request_delete/1",
 		"/objects/request_restore/1",
 		"File Summary",
 		"image/jpeg",
@@ -40,14 +39,22 @@ func TestObjectShow(t *testing.T) {
 		"9876543210",
 		"institution1.edu/photos/picture2",
 		"institution1.edu/photos/picture3",
-		"/files/request_delete/1",
 		"/files/request_restore/1",
+	}
+
+	// Only admins see deletion links
+	adminOnlyItems := []string{
+		"/objects/request_delete/1",
+		"/files/request_delete/1",
 	}
 
 	for _, client := range testutil.AllClients {
 		html := client.GET("/objects/show/1").Expect().
 			Status(http.StatusOK).Body().Raw()
 		testutil.AssertMatchesAll(t, html, items)
+		if client != testutil.Inst1UserClient {
+			testutil.AssertMatchesAll(t, html, adminOnlyItems)
+		}
 	}
 
 	// inst 1 users cannot see objects belonging to inst 2
@@ -126,12 +133,16 @@ func TestObjectRequestDelete(t *testing.T) {
 		"Confirm",
 	}
 
-	// Users can request deletions of their own files
-	for _, client := range testutil.AllClients {
-		html := client.GET("/objects/request_delete/2").
-			Expect().Status(http.StatusOK).Body().Raw()
-		testutil.AssertMatchesAll(t, html, items)
-	}
+	resp := testutil.SysAdminClient.GET("/objects/request_delete/2").
+		Expect().Status(http.StatusOK)
+	testutil.AssertMatchesAll(t, resp.Body().Raw(), items)
+
+	resp = testutil.Inst1AdminClient.GET("/objects/request_delete/2").
+		Expect().Status(http.StatusOK)
+	testutil.AssertMatchesAll(t, resp.Body().Raw(), items)
+
+	testutil.Inst1UserClient.GET("/objects/request_delete/2").
+		Expect().Status(http.StatusForbidden)
 
 	// Sys Admin can request any deletion, but others cannot
 	// request deletions outside their own institution.
@@ -157,11 +168,11 @@ func TestObjectInitDelete(t *testing.T) {
 		"institution1.edu/pdfs",
 	}
 
-	// User at inst 1 can initiate deletion of their own
+	// Admin at inst 1 can initiate deletion of their own
 	// institution's object.
-	html := testutil.Inst1UserClient.POST("/objects/init_delete/2").
+	html := testutil.Inst1AdminClient.POST("/objects/init_delete/2").
 		WithHeader("Referer", testutil.BaseURL).
-		WithFormField(constants.CSRFTokenName, testutil.Inst1UserToken).
+		WithFormField(constants.CSRFTokenName, testutil.Inst1AdminToken).
 		Expect().Status(http.StatusCreated).Body().Raw()
 	testutil.AssertMatchesAll(t, html, items)
 
@@ -181,7 +192,7 @@ func TestObjectInitDelete(t *testing.T) {
 	require.NotNil(t, deletionRequest)
 
 	// Make sure this is the request our test user just made
-	require.Equal(t, testutil.Inst1User.ID, deletionRequest.RequestedByID)
+	require.Equal(t, testutil.Inst1Admin.ID, deletionRequest.RequestedByID)
 
 	// There should also be an alert...
 	query = pgmodels.NewQuery().Where("deletion_request_id", "=", drio.DeletionRequestID).Relations("DeletionRequest", "Users")

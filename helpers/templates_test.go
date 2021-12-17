@@ -90,7 +90,7 @@ func TestUserCan(t *testing.T) {
 	assert.False(t, helpers.UserCan(instUser, constants.UserCreate, 1))
 	assert.False(t, helpers.UserCan(instUser, constants.UserCreate, 2))
 	assert.False(t, helpers.UserCan(instUser, constants.UserCreate, 100))
-	assert.True(t, helpers.UserCan(instUser, constants.FileRequestDelete, 1))
+	assert.False(t, helpers.UserCan(instUser, constants.FileRequestDelete, 1))
 	assert.False(t, helpers.UserCan(instUser, constants.FileRequestDelete, 2))
 	assert.True(t, helpers.UserCan(instUser, constants.FileRestore, 1))
 	assert.False(t, helpers.UserCan(instUser, constants.FileRestore, 2))

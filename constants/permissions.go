@@ -197,11 +197,9 @@ func initPermissions() {
 	instUser[DepositReportShow] = true
 	instUser[EventRead] = true
 	instUser[FileRead] = true
-	instUser[FileRequestDelete] = true
 	instUser[FileRestore] = true
 	instUser[InstitutionRead] = true
 	instUser[IntellectualObjectRead] = true
-	instUser[IntellectualObjectRequestDelete] = true
 	instUser[IntellectualObjectRestore] = true
 	instUser[ReportRead] = true
 	instUser[StorageRecordRead] = true

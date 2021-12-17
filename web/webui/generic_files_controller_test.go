@@ -118,12 +118,18 @@ func TestGenericFileRequestDelete(t *testing.T) {
 		"Confirm",
 	}
 
-	// Users can request deletions of their own files
-	for _, client := range testutil.AllClients {
-		html := client.GET("/files/request_delete/1").
-			Expect().Status(http.StatusOK).Body().Raw()
-		testutil.AssertMatchesAll(t, html, items)
-	}
+	// Inst admin can request deletions of their own files.
+	// Inst users cannot.
+	resp := testutil.SysAdminClient.GET("/files/request_delete/1").
+		Expect().Status(http.StatusOK)
+	testutil.AssertMatchesAll(t, resp.Body().Raw(), items)
+
+	resp = testutil.Inst1AdminClient.GET("/files/request_delete/1").
+		Expect().Status(http.StatusOK)
+	testutil.AssertMatchesAll(t, resp.Body().Raw(), items)
+
+	testutil.Inst1UserClient.GET("/files/request_delete/1").
+		Expect().Status(http.StatusForbidden)
 
 	// Sys Admin can request any deletion, but others cannot
 	// request deletions outside their own institution.
@@ -148,11 +154,11 @@ func TestGenericFileInitDelete(t *testing.T) {
 		"institution1.edu/pdfs/doc1",
 	}
 
-	// User at inst 1 can initiate deletion of their own
+	// Admin at inst 1 can initiate deletion of their own
 	// institution's file.
-	html := testutil.Inst1UserClient.POST("/files/init_delete/4").
+	html := testutil.Inst1AdminClient.POST("/files/init_delete/4").
 		WithHeader("Referer", testutil.BaseURL).
-		WithFormField(constants.CSRFTokenName, testutil.Inst1UserToken).
+		WithFormField(constants.CSRFTokenName, testutil.Inst1AdminToken).
 		Expect().Status(http.StatusCreated).Body().Raw()
 	testutil.AssertMatchesAll(t, html, items)
 
@@ -168,7 +174,7 @@ func TestGenericFileInitDelete(t *testing.T) {
 	require.NotNil(t, deletionRequest)
 
 	// Make sure this is the request our test user just made
-	require.Equal(t, testutil.Inst1User.ID, deletionRequest.RequestedByID)
+	require.Equal(t, testutil.Inst1Admin.ID, deletionRequest.RequestedByID)
 
 	// There should also be an alert...
 	query = pgmodels.NewQuery().Where("deletion_request_id", "=", drgf.DeletionRequestID).Relations("DeletionRequest", "Users")
