@@ -122,3 +122,12 @@ func TestSanitizeIdentifier(t *testing.T) {
 	assert.Equal(t, "this_34_xxyadda.yadda", common.SanitizeIdentifier("this_34_!;-xx{yadda.yadda}"))
 	assert.Equal(t, `"users"."email"`, common.SanitizeIdentifier(`"users"."email"`))
 }
+
+func TestLooksLikeUUID(t *testing.T) {
+	assert.True(t, common.LooksLikeUUID("1552abf5-28f3-46a5-ba63-95302d08e209"))
+	assert.True(t, common.LooksLikeUUID("88198c5a-ec91-4ce1-bfcc-0f607ebdcca3"))
+	assert.True(t, common.LooksLikeUUID("88198C5A-EC91-4CE1-BFCC-0F607EBDCCA3"))
+	assert.False(t, common.LooksLikeUUID("88198c5a-ec91-4ce1-bfcc-0f607ebdccx3"))
+	assert.False(t, common.LooksLikeUUID("88198c5a-ec91-4ce1-bfcc-0f6c"))
+	assert.False(t, common.LooksLikeUUID(""))
+}

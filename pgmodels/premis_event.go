@@ -4,6 +4,8 @@ import (
 	"time"
 
 	"github.com/APTrust/registry/common"
+	"github.com/APTrust/registry/constants"
+	"github.com/stretchr/stew/slice"
 )
 
 type PremisEvent struct {
@@ -74,20 +76,41 @@ func (event *PremisEvent) Save() error {
 // TODO: Needs validation
 func (event *PremisEvent) Validate() *common.ValidationError {
 	errors := make(map[string]string)
-
-	// Agent
-	// DateTime
-	// Detail
-	// EventType
-	// GenericFileID
-	// Identifier
-	// InstitutionID
-	// IntellectualObjectID
-	// Object
-	// Outcome
-	// OutcomeDetail
-	// OutcomeInformation
-
+	if common.IsEmptyString(event.Agent) {
+		errors["Agent"] = "Event Agent cannot be empty"
+	}
+	if event.DateTime.IsZero() {
+		errors["DateTime"] = "Event DateTime is required"
+	}
+	if common.IsEmptyString(event.Detail) {
+		errors["Detail"] = "Event Detail cannot be empty"
+	}
+	if !slice.Contains(constants.EventTypes, event.EventType) {
+		errors["EventType"] = "Event requires a valid EventType"
+	}
+	// GenericFileID is optional because not all events pertain
+	// to files.
+	if !common.LooksLikeUUID(event.Identifier) {
+		errors["Identifier"] = "Event identifier should be a UUID"
+	}
+	if event.InstitutionID <= 0 {
+		errors["InstitutionID"] = "Event requires a valid institution id"
+	}
+	if event.IntellectualObjectID <= 0 {
+		errors["IntellectualObjectID"] = "Event requires a valid intellectual object id"
+	}
+	if common.IsEmptyString(event.Object) {
+		errors["Object"] = "Event Object cannot be empty"
+	}
+	if !slice.Contains(constants.EventOutcomes, event.Outcome) {
+		errors["Outcome"] = "Event requires a valid Outcome value"
+	}
+	if common.IsEmptyString(event.OutcomeDetail) {
+		errors["OutcomeDetail"] = "Event OutcomeDetail cannot be empty"
+	}
+	if common.IsEmptyString(event.OutcomeInformation) {
+		errors["OutcomeInformation"] = "Event OutcomeInformation cannot be empty"
+	}
 	if len(errors) > 0 {
 		return &common.ValidationError{Errors: errors}
 	}

@@ -19,6 +19,7 @@ import (
 )
 
 var reIllegalIdentifierChars = regexp.MustCompile(`[^A-Za-z0-9_\."]`)
+var reUUID = regexp.MustCompile(`(?i)^([a-f\d]{8}(-[a-f\d]{4}){3}-[a-f\d]{12}?)$`)
 
 // ProjectRoot returns the project root.
 func ProjectRoot() string {
@@ -199,4 +200,9 @@ func IsEmptyString(str string) bool {
 // "user"."email", etc.
 func SanitizeIdentifier(str string) string {
 	return reIllegalIdentifierChars.ReplaceAllString(str, "")
+}
+
+// LooksLikeUUID returns true if uuid looks like a valid UUID.
+func LooksLikeUUID(uuid string) bool {
+	return reUUID.Match([]byte(uuid))
 }
