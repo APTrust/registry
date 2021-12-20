@@ -1,7 +1,10 @@
 package pgmodels_test
 
 import (
+	"fmt"
+	"strings"
 	"testing"
+	"time"
 
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
@@ -12,6 +15,42 @@ import (
 )
 
 var timeLayout = "2006-01-02 15:04:05 -0700 MST"
+
+func TestIntellectualObjectByID(t *testing.T) {
+	obj, err := pgmodels.IntellectualObjectByID(1)
+	require.Nil(t, err)
+	require.NotNil(t, obj)
+	assert.Equal(t, int64(1), obj.ID)
+	assert.Equal(t, "institution1.edu/photos", obj.Identifier)
+}
+
+func TestIntellectualObjectByIdentifier(t *testing.T) {
+	obj, err := pgmodels.IntellectualObjectByIdentifier("institution1.edu/photos")
+	require.Nil(t, err)
+	require.NotNil(t, obj)
+	assert.Equal(t, int64(1), obj.ID)
+	assert.Equal(t, "institution1.edu/photos", obj.Identifier)
+}
+
+func TestIntellectualObjectSelect(t *testing.T) {
+	query := pgmodels.NewQuery().
+		Where("institution_id", "=", InstOne)
+	objects, err := pgmodels.IntellectualObjectSelect(query)
+	require.Nil(t, err)
+	assert.Equal(t, 6, len(objects))
+	for _, obj := range objects {
+		assert.Equal(t, InstOne, obj.InstitutionID)
+	}
+
+	query.Where("access", "=", constants.AccessConsortia)
+	objects, err = pgmodels.IntellectualObjectSelect(query)
+	require.Nil(t, err)
+	assert.Equal(t, 1, len(objects))
+	for _, obj := range objects {
+		assert.Equal(t, InstOne, obj.InstitutionID)
+		assert.Equal(t, constants.AccessConsortia, obj.Access)
+	}
+}
 
 func TestObjIsGlacierOnly(t *testing.T) {
 	obj := &pgmodels.IntellectualObject{}
@@ -168,15 +207,7 @@ func TestObjInsertAndUpdate(t *testing.T) {
 	assert.True(t, obj.UpdatedAt.After(origUpdatedAt))
 }
 
-// TODO: Test the following
-//
-// AssertDeletionPreconditions
-// LatestDeletionWorkItem
-// DeletionRequest
-// NewDeletionEvent
-
 func TestAssertObjDeletionPreconditions(t *testing.T) {
-	db.LoadFixtures()
 	defer db.ForceFixtureReload()
 	obj, err := pgmodels.CreateObjectWithRelations()
 	require.Nil(t, err)
@@ -184,6 +215,10 @@ func TestAssertObjDeletionPreconditions(t *testing.T) {
 
 	testLastObjDeletionWorkItem(t, obj)
 	testObjectDeletionRequest(t, obj)
+
+	// TODO: test assertNoActiveFiles
+	// TODO: test assertNotAlreadyDeleted
+	// TODO: test assertDeletionApproved
 }
 
 func testLastObjDeletionWorkItem(t *testing.T, obj *pgmodels.IntellectualObject) {
@@ -243,5 +278,73 @@ func testObjectDeletionRequest(t *testing.T, obj *pgmodels.IntellectualObject) {
 }
 
 func TestNewObjDeletionEvent(t *testing.T) {
+	defer db.ForceFixtureReload()
+	obj, err := pgmodels.CreateObjectWithRelations()
+	require.Nil(t, err)
+	require.NotNil(t, obj)
+
+	event, err := obj.NewDeletionEvent()
+	assert.Nil(t, event)
+	require.NotNil(t, err)
+	assert.Equal(t, "Missing deletion request work item", err.Error())
+
+	// Create a deletion work item for this object
+	workItem := pgmodels.RandomWorkItem(obj.BagName, constants.ActionDelete, obj.ID, 0)
+	workItem.Status = constants.StatusStarted
+	require.Nil(t, workItem.Save())
+
+	// Now we have a deletion work item, but no deletion request.
+	// That should produce the following error...
+	event, err = obj.NewDeletionEvent()
+	assert.Nil(t, event)
+	require.NotNil(t, err)
+	assert.True(t, strings.HasPrefix(err.Error(), "No deletion request for work item"), err.Error())
+
+	// Now we have a deletion request with no approver
+	objects := []*pgmodels.IntellectualObject{obj}
+	req, err := pgmodels.CreateDeletionRequest(objects, nil)
+	require.Nil(t, err)
+	require.NotNil(t, req)
+	req.WorkItemID = workItem.ID
+	require.Nil(t, req.Save())
+
+	event, err = obj.NewDeletionEvent()
+	assert.Nil(t, event)
+	require.NotNil(t, err)
+	assert.True(t, strings.Contains(err.Error(), "has no approver"), err.Error())
+
+	// Add an approver
+	req.ConfirmedByID = req.RequestedByID
+	req.ConfirmedAt = time.Now().UTC()
+	require.Nil(t, req.Save())
+
+	// Now we're getting somewhere
+	event, err = obj.NewDeletionEvent()
+	require.Nil(t, err)
+	assert.NotNil(t, event)
+
+	// Get the deletion request view, which has some info we'll need
+	// to verify premis event details below.
+	reqView, err := pgmodels.DeletionRequestViewByID(req.ID)
+	require.Nil(t, err)
+	require.NotNil(t, reqView)
+
+	assert.Equal(t, "APTrust preservation services", event.Agent)
+	assert.True(t, event.DateTime.After(time.Now().UTC().Add(-5*time.Second)))
+	assert.Equal(t, "Object deleted from preservation storage", event.Detail)
+	assert.Equal(t, constants.EventDeletion, event.EventType)
+	assert.True(t, common.LooksLikeUUID(event.Identifier))
+	assert.Equal(t, obj.InstitutionID, event.InstitutionID)
+	assert.Equal(t, obj.ID, event.IntellectualObjectID)
+	assert.Equal(t, "Minio S3 library", event.Object)
+	assert.Equal(t, constants.OutcomeSuccess, event.Outcome)
+	assert.Equal(t, reqView.RequestedByEmail, event.OutcomeDetail)
+	assert.Equal(t,
+		fmt.Sprintf("Object deleted at the request of %s. Institutional approver: %s.",
+			reqView.RequestedByEmail, reqView.ConfirmedByEmail),
+		event.OutcomeInformation)
+}
+
+func TestObjectDelete(t *testing.T) {
 
 }

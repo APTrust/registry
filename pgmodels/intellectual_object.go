@@ -340,14 +340,14 @@ func (obj *IntellectualObject) NewDeletionEvent() (*PremisEvent, error) {
 		return nil, fmt.Errorf("Missing deletion request work item")
 	}
 	deletionRequest, err := obj.DeletionRequest(workItem.ID)
+	if deletionRequest == nil || IsNoRowError(err) {
+		return nil, fmt.Errorf("No deletion request for work item %d", workItem.ID)
+	}
 	if err != nil {
 		return nil, fmt.Errorf("Error getting deletion request: %v", err)
 	}
-	if deletionRequest == nil {
-		return nil, fmt.Errorf("No deletion request for work item %d", workItem.ID)
-	}
-
 	if deletionRequest.RequestedByID == 0 {
+		// We should never hit this because RequestedByID has a not-null constraint.
 		return nil, fmt.Errorf("Deletion request %d has no requestor", deletionRequest.ID)
 	}
 	if deletionRequest.ConfirmedByID == 0 {
