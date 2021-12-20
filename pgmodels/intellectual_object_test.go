@@ -284,6 +284,9 @@ func TestAssertObjDeletionPreconditions(t *testing.T) {
 	// Now we should be OK
 	err = obj.AssertDeletionPreconditions()
 	assert.Nil(t, err)
+
+	// Now test the actual deletion
+	testObjectDelete(t, obj)
 }
 
 func testLastObjDeletionWorkItem(t *testing.T, obj *pgmodels.IntellectualObject) {
@@ -405,6 +408,28 @@ func TestNewObjDeletionEvent(t *testing.T) {
 	require.Nil(t, err)
 	require.NotNil(t, reqView)
 
+	testObjDeletionEventProperties(t, obj, event)
+	assert.Equal(t, reqView.RequestedByEmail, event.OutcomeDetail)
+	assert.Equal(t,
+		fmt.Sprintf("Object deleted at the request of %s. Institutional approver: %s.",
+			reqView.RequestedByEmail, reqView.ConfirmedByEmail),
+		event.OutcomeInformation)
+}
+
+func testObjectDelete(t *testing.T, obj *pgmodels.IntellectualObject) {
+	err := obj.Delete()
+	require.Nil(t, err)
+
+	reloadedObj, err := pgmodels.IntellectualObjectByID(obj.ID)
+	assert.Equal(t, constants.StateDeleted, reloadedObj.State)
+
+	deletionEvent, err := reloadedObj.LastDeletionEvent()
+	require.Nil(t, err)
+	require.NotNil(t, deletionEvent)
+	testObjDeletionEventProperties(t, obj, deletionEvent)
+}
+
+func testObjDeletionEventProperties(t *testing.T, obj *pgmodels.IntellectualObject, event *pgmodels.PremisEvent) {
 	assert.Equal(t, "APTrust preservation services", event.Agent)
 	assert.True(t, event.DateTime.After(time.Now().UTC().Add(-5*time.Second)))
 	assert.Equal(t, "Object deleted from preservation storage", event.Detail)
@@ -414,13 +439,4 @@ func TestNewObjDeletionEvent(t *testing.T) {
 	assert.Equal(t, obj.ID, event.IntellectualObjectID)
 	assert.Equal(t, "Minio S3 library", event.Object)
 	assert.Equal(t, constants.OutcomeSuccess, event.Outcome)
-	assert.Equal(t, reqView.RequestedByEmail, event.OutcomeDetail)
-	assert.Equal(t,
-		fmt.Sprintf("Object deleted at the request of %s. Institutional approver: %s.",
-			reqView.RequestedByEmail, reqView.ConfirmedByEmail),
-		event.OutcomeInformation)
-}
-
-func TestObjectDelete(t *testing.T) {
-
 }
