@@ -216,9 +216,74 @@ func TestAssertObjDeletionPreconditions(t *testing.T) {
 	testLastObjDeletionWorkItem(t, obj)
 	testObjectDeletionRequest(t, obj)
 
-	// TODO: test assertNoActiveFiles
-	// TODO: test assertNotAlreadyDeleted
-	// TODO: test assertDeletionApproved
+	// Hit the following underlying methods:
+	// assertNoActiveFiles
+	// assertNotAlreadyDeleted
+	// assertDeletionApproved
+
+	// First pre-condition: No active files.
+	err = obj.AssertDeletionPreconditions()
+	require.NotNil(t, err)
+	assert.Equal(t, common.ErrActiveFiles, err)
+
+	// Mark files deleted...
+	for _, gf := range obj.GenericFiles {
+		gf.State = constants.StateDeleted
+		err = gf.Save()
+		require.Nil(t, err)
+	}
+
+	// Next pre-condition: Object isn't already deleted.
+	obj.State = constants.StateDeleted
+	err = obj.Save()
+	require.Nil(t, err)
+
+	err = obj.AssertDeletionPreconditions()
+	require.NotNil(t, err)
+	assert.Equal(t, "Object is already in deleted state", err.Error())
+
+	obj.State = constants.StateActive
+	err = obj.Save()
+	require.Nil(t, err)
+
+	// Create a deletion work item for this object
+	workItem := pgmodels.RandomWorkItem(obj.BagName, constants.ActionDelete, obj.ID, 0)
+	workItem.Status = constants.StatusStarted
+	require.Nil(t, workItem.Save())
+
+	err = obj.AssertDeletionPreconditions()
+	require.NotNil(t, err)
+	assert.True(t, strings.HasPrefix(err.Error(), "Deletion work item is missing institutional approver"), err.Error())
+
+	// Approve it
+	workItem.InstApprover = "someone@example.com"
+	require.Nil(t, workItem.Save())
+
+	err = obj.AssertDeletionPreconditions()
+	require.NotNil(t, err)
+	assert.True(t, strings.HasPrefix(err.Error(), "No deletion request for work item"), err.Error())
+
+	// Last pre-condition: Object requires an approved deletion request
+	objects := []*pgmodels.IntellectualObject{obj}
+	req, err := pgmodels.CreateDeletionRequest(objects, nil)
+	require.Nil(t, err)
+	require.NotNil(t, req)
+	req.WorkItemID = workItem.ID
+	require.Nil(t, req.Save())
+
+	err = obj.AssertDeletionPreconditions()
+	require.NotNil(t, err)
+	assert.True(t, strings.Contains(err.Error(), "Deletion request"), err.Error())
+	assert.True(t, strings.Contains(err.Error(), "has no approver"), err.Error())
+
+	// Add an approver
+	req.ConfirmedByID = req.RequestedByID
+	req.ConfirmedAt = time.Now().UTC()
+	require.Nil(t, req.Save())
+
+	// Now we should be OK
+	err = obj.AssertDeletionPreconditions()
+	assert.Nil(t, err)
 }
 
 func testLastObjDeletionWorkItem(t *testing.T, obj *pgmodels.IntellectualObject) {
@@ -255,7 +320,7 @@ func testObjectDeletionRequest(t *testing.T, obj *pgmodels.IntellectualObject) {
 	// Initially, there's no deletion request for this object
 	reqView, err := obj.DeletionRequest(99999999999)
 	require.NotNil(t, err)
-	assert.Empty(t, reqView.ID) // Should we even get this back??
+	assert.Nil(t, reqView)
 
 	// Figure out the work item id. That will lead us back to
 	// the original deletion request.
@@ -293,7 +358,17 @@ func TestNewObjDeletionEvent(t *testing.T) {
 	workItem.Status = constants.StatusStarted
 	require.Nil(t, workItem.Save())
 
-	// Now we have a deletion work item, but no deletion request.
+	// But it's not approved yet...
+	event, err = obj.NewDeletionEvent()
+	assert.Nil(t, event)
+	require.NotNil(t, err)
+	assert.True(t, strings.HasPrefix(err.Error(), "Deletion work item is missing institutional approver"), err.Error())
+
+	// OK, so approve it
+	workItem.InstApprover = "someone@example.com"
+	require.Nil(t, workItem.Save())
+
+	// Now we have an approved work item, but no deletion request.
 	// That should produce the following error...
 	event, err = obj.NewDeletionEvent()
 	assert.Nil(t, event)
@@ -311,6 +386,7 @@ func TestNewObjDeletionEvent(t *testing.T) {
 	event, err = obj.NewDeletionEvent()
 	assert.Nil(t, event)
 	require.NotNil(t, err)
+	assert.True(t, strings.Contains(err.Error(), "Deletion request"), err.Error())
 	assert.True(t, strings.Contains(err.Error(), "has no approver"), err.Error())
 
 	// Add an approver

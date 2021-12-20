@@ -68,6 +68,9 @@ func DeletionRequestViewSelect(query *Query) ([]*DeletionRequestView, error) {
 func DeletionRequestViewGet(query *Query) (*DeletionRequestView, error) {
 	var request DeletionRequestView
 	err := query.Select(&request)
+	if request.ID == 0 {
+		return nil, err
+	}
 	return &request, err
 }
 

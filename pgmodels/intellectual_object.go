@@ -268,7 +268,7 @@ func (obj *IntellectualObject) AssertDeletionPreconditions() error {
 		err = obj.assertNotAlreadyDeleted()
 	}
 	if err == nil {
-		err = obj.assertDeletionApproved()
+		_, _, err = obj.assertDeletionApproved()
 	}
 	if err != nil {
 		common.Context().Log.Error().Msgf(
@@ -317,43 +317,39 @@ func (obj *IntellectualObject) assertNotAlreadyDeleted() error {
 	return err
 }
 
-func (obj *IntellectualObject) assertDeletionApproved() error {
+func (obj *IntellectualObject) assertDeletionApproved() (*WorkItem, *DeletionRequestView, error) {
 	workItem, err := obj.ActiveDeletionWorkItem()
-	if err != nil {
-		return fmt.Errorf("Error getting active deletion work item: %v", err)
+	if workItem == nil || IsNoRowError(err) {
+		return nil, nil, fmt.Errorf("Missing deletion request work item")
 	}
-	if workItem == nil {
-		return fmt.Errorf("Missing deletion request work item")
+	if err != nil {
+		return nil, nil, fmt.Errorf("Error getting active deletion work item: %v", err)
 	}
 	if common.IsEmptyString(workItem.InstApprover) {
-		return fmt.Errorf("Deletion work item is missing institutional approver")
-	}
-	return nil
-}
-
-func (obj *IntellectualObject) NewDeletionEvent() (*PremisEvent, error) {
-	workItem, err := obj.ActiveDeletionWorkItem()
-	if err != nil {
-		return nil, fmt.Errorf("Error getting deletion request work item: %v", err)
-	}
-	if workItem == nil {
-		return nil, fmt.Errorf("Missing deletion request work item")
+		return workItem, nil, fmt.Errorf("Deletion work item is missing institutional approver")
 	}
 	deletionRequest, err := obj.DeletionRequest(workItem.ID)
 	if deletionRequest == nil || IsNoRowError(err) {
-		return nil, fmt.Errorf("No deletion request for work item %d", workItem.ID)
+		return workItem, nil, fmt.Errorf("No deletion request for work item %d", workItem.ID)
 	}
 	if err != nil {
-		return nil, fmt.Errorf("Error getting deletion request: %v", err)
+		return workItem, nil, fmt.Errorf("Error getting deletion request: %v", err)
 	}
 	if deletionRequest.RequestedByID == 0 {
 		// We should never hit this because RequestedByID has a not-null constraint.
-		return nil, fmt.Errorf("Deletion request %d has no requestor", deletionRequest.ID)
+		return workItem, deletionRequest, fmt.Errorf("Deletion request %d has no requestor", deletionRequest.ID)
 	}
 	if deletionRequest.ConfirmedByID == 0 {
-		return nil, fmt.Errorf("Deletion request %d has no approver", deletionRequest.ID)
+		return workItem, deletionRequest, fmt.Errorf("Deletion request %d has no approver", deletionRequest.ID)
 	}
+	return workItem, deletionRequest, nil
+}
 
+func (obj *IntellectualObject) NewDeletionEvent() (*PremisEvent, error) {
+	_, deletionRequestView, err := obj.assertDeletionApproved()
+	if err != nil {
+		return nil, err
+	}
 	now := time.Now().UTC()
 	return &PremisEvent{
 		Agent:                "APTrust preservation services",
@@ -365,7 +361,7 @@ func (obj *IntellectualObject) NewDeletionEvent() (*PremisEvent, error) {
 		IntellectualObjectID: obj.ID,
 		Object:               "Minio S3 library",
 		Outcome:              constants.OutcomeSuccess,
-		OutcomeDetail:        deletionRequest.RequestedByEmail,
-		OutcomeInformation:   fmt.Sprintf("Object deleted at the request of %s. Institutional approver: %s.", deletionRequest.RequestedByEmail, deletionRequest.ConfirmedByEmail),
+		OutcomeDetail:        deletionRequestView.RequestedByEmail,
+		OutcomeInformation:   fmt.Sprintf("Object deleted at the request of %s. Institutional approver: %s.", deletionRequestView.RequestedByEmail, deletionRequestView.ConfirmedByEmail),
 	}, nil
 }

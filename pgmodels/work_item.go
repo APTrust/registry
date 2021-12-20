@@ -64,6 +64,9 @@ func WorkItemByID(id int64) (*WorkItem, error) {
 func WorkItemGet(query *Query) (*WorkItem, error) {
 	var item WorkItem
 	err := query.Select(&item)
+	if item.ID == 0 {
+		return nil, err
+	}
 	return &item, err
 }
 
