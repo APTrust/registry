@@ -8,6 +8,7 @@ import (
 	"github.com/APTrust/registry/constants"
 	v "github.com/asaskevich/govalidator"
 	"github.com/go-pg/pg/v10"
+	"github.com/google/uuid"
 )
 
 var GenericFileFilters = []string{
@@ -74,6 +75,9 @@ func IdForFileIdentifier(identifier string) (int64, error) {
 func GenericFileGet(query *Query) (*GenericFile, error) {
 	var gf GenericFile
 	err := query.Select(&gf)
+	if gf.ID == 0 {
+		return nil, err
+	}
 	return &gf, err
 }
 
@@ -247,22 +251,92 @@ func (gf *GenericFile) Delete() error {
 		var err error
 		_, err = tx.Model(gf).WherePK().Update()
 		if err != nil {
-			registryContext.Log.Error().Msgf("Intellectual gfect deletion transaction failed on update of gfect. File: %d (%s). Error: %v", gf.ID, gf.Identifier, err)
+			registryContext.Log.Error().Msgf("GenericFile deletion transaction failed on update of file. File: %d (%s). Error: %v", gf.ID, gf.Identifier, err)
 		}
 		_, err = tx.Model(deletionEvent).Insert()
 		if err != nil {
-			registryContext.Log.Error().Msgf("Intellectual gfect deletion transaction failed on insertion of event. Gfect: %d (%s). Error: %v", gf.ID, gf.Identifier, err)
+			registryContext.Log.Error().Msgf("GenericFile deletion transaction failed on insertion of event. File: %d (%s). Error: %v", gf.ID, gf.Identifier, err)
 		}
 		return err
 	})
 }
 
-func (gf *GenericFile) AssertDeletionPreconditions() error {
+func (gf *GenericFile) ActiveDeletionWorkItem() (*WorkItem, error) {
+	query := NewQuery().
+		Where("generic_file_id", "=", gf.ID).
+		Where("action", "=", constants.ActionDelete).
+		Where("status", "=", constants.StatusStarted).
+		OrderBy("updated_at", "desc").
+		Limit(1)
+	item, err := WorkItemGet(query)
+	if err != nil && err.Error() == pg.ErrNoRows.Error() {
+		return nil, nil
+	}
+	return item, err
+}
 
-	return nil
+func (gf *GenericFile) DeletionRequest(workItemID int64) (*DeletionRequestView, error) {
+	query := NewQuery().
+		Where("work_item_id", "=", workItemID).
+		Where("object_count", "0", 0).
+		Where("file_count", "=", 1)
+	return DeletionRequestViewGet(query)
+}
+
+func (gf *GenericFile) AssertDeletionPreconditions() error {
+	if gf.State == constants.StateDeleted {
+		return fmt.Errorf("File is already in deleted state")
+	}
+	_, _, err := gf.assertDeletionApproved()
+	return err
+}
+
+func (gf *GenericFile) assertDeletionApproved() (*WorkItem, *DeletionRequestView, error) {
+	workItem, err := gf.ActiveDeletionWorkItem()
+	if workItem == nil || IsNoRowError(err) {
+		return nil, nil, fmt.Errorf("Missing deletion request work item")
+	}
+	if err != nil {
+		return nil, nil, fmt.Errorf("Error getting active deletion work item: %v", err)
+	}
+	if common.IsEmptyString(workItem.InstApprover) {
+		return workItem, nil, fmt.Errorf("Deletion work item is missing institutional approver")
+	}
+	deletionRequest, err := gf.DeletionRequest(workItem.ID)
+	if deletionRequest == nil || IsNoRowError(err) {
+		return workItem, nil, fmt.Errorf("No deletion request for work item %d", workItem.ID)
+	}
+	if err != nil {
+		return workItem, nil, fmt.Errorf("Error getting deletion request: %v", err)
+	}
+	if deletionRequest.RequestedByID == 0 {
+		// We should never hit this because RequestedByID has a not-null constraint.
+		return workItem, deletionRequest, fmt.Errorf("Deletion request %d has no requestor", deletionRequest.ID)
+	}
+	if deletionRequest.ConfirmedByID == 0 {
+		return workItem, deletionRequest, fmt.Errorf("Deletion request %d has no approver", deletionRequest.ID)
+	}
+	return workItem, deletionRequest, nil
 }
 
 func (gf *GenericFile) NewDeletionEvent() (*PremisEvent, error) {
-
-	return nil, nil
+	_, deletionRequestView, err := gf.assertDeletionApproved()
+	if err != nil {
+		return nil, err
+	}
+	now := time.Now().UTC()
+	return &PremisEvent{
+		Agent:                "APTrust preservation services",
+		DateTime:             now,
+		Detail:               "File deleted from preservation storage",
+		EventType:            constants.EventDeletion,
+		Identifier:           uuid.NewString(),
+		InstitutionID:        gf.InstitutionID,
+		IntellectualObjectID: gf.IntellectualObjectID,
+		GenericFileID:        gf.ID,
+		Object:               "Minio S3 library",
+		Outcome:              constants.OutcomeSuccess,
+		OutcomeDetail:        deletionRequestView.RequestedByEmail,
+		OutcomeInformation:   fmt.Sprintf("Object deleted at the request of %s. Institutional approver: %s.", deletionRequestView.RequestedByEmail, deletionRequestView.ConfirmedByEmail),
+	}, nil
 }
