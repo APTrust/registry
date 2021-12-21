@@ -33,3 +33,35 @@ func TestIdForFileIdentifier(t *testing.T) {
 	id, err = pgmodels.IdForFileIdentifier("bad identifier")
 	require.NotNil(t, err)
 }
+
+func TestFileSaveGetUpdate(t *testing.T) {
+
+}
+
+func TestFileSelect(t *testing.T) {
+
+}
+
+func TestFileValidate(t *testing.T) {
+
+}
+
+func TestObjectFileCount(t *testing.T) {
+
+}
+
+func TestObjectFiles(t *testing.T) {
+
+}
+
+func TestAssertDeletionPreconditions(t *testing.T) {
+
+}
+
+func TestNewDeletionEvent(t *testing.T) {
+
+}
+
+func TestGenericFileDelete(t *testing.T) {
+
+}

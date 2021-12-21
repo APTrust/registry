@@ -97,7 +97,7 @@ func (obj *IntellectualObject) IsGlacierOnly() bool {
 }
 
 // Delete soft-deletes this object by setting State to 'D' and
-// the DeletedAt timestamp to now. You can undo this with Undelete.
+// the UpdatedAt timestamp to now. You can undo this with Undelete.
 // It also creates a deletion PremisEvent. You can't get rid of that.
 //
 // It is legitimate for a depositor to delete an object, then re-upload

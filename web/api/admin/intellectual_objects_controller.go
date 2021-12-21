@@ -34,28 +34,12 @@ func IntellectualObjectUpdate(c *gin.Context) {
 }
 
 // IntellectualObjectDelete marks an object record as deleted.
+// It also creates a deletion premis event. Before it does any of
+// that, it checks a number of pre-conditions. See the
+// IntellectualObject model for more info.
 //
 // DELETE /admin-api/v3/objects/delete/:id
 func IntellectualObjectDelete(c *gin.Context) {
-	// We should probably not allow the object to be deleted
-	// unless all of its files have been deleted. Double check
-	// the business logic in Pharos.
-	//
-	// Object deletion changes the state from "A" to "D".
-	//
-	// We should also ensure a Premis Event exists or is created
-	// the documents who deleted this and when.
-	//
-	// Check the Pharos logic on that too. It may be the Go
-	// worker's responsibility to ensure this, or it may be
-	// registry's responsibility.
-	//
-	// Return the full object record.
-	//
-	// See https://github.com/APTrust/pharos/blob/03dda1f57a499c214691f6a739c22884ea2d2f4b/app/controllers/intellectual_objects_controller.rb#L171-L202
-	//
-	// And https://github.com/APTrust/pharos/blob/03dda1f57a499c214691f6a739c22884ea2d2f4b/app/models/intellectual_object.rb#L110-L127
-	//
 	req := api.NewRequest(c)
 	obj, err := pgmodels.IntellectualObjectByID(req.Auth.ResourceID)
 	if api.AbortIfError(c, err) {

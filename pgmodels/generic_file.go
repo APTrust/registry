@@ -5,6 +5,8 @@ import (
 	"time"
 
 	"github.com/APTrust/registry/common"
+	"github.com/APTrust/registry/constants"
+	v "github.com/asaskevich/govalidator"
 	"github.com/go-pg/pg/v10"
 )
 
@@ -97,6 +99,39 @@ func (gf *GenericFile) IsGlacierOnly() bool {
 	return isGlacierOnly(gf.StorageOption)
 }
 
+func (gf *GenericFile) Validate() *common.ValidationError {
+	errors := make(map[string]string)
+	if common.IsEmptyString(gf.FileFormat) {
+		errors["FileFormat"] = "FileFormat is required"
+	}
+	if common.IsEmptyString(gf.Identifier) {
+		errors["Identifier"] = "Identifier is required"
+	}
+	if !v.IsIn(gf.State, constants.States...) {
+		errors["State"] = ErrInstState
+	}
+	if gf.Size < 0 {
+		errors["Size"] = "Size cannot be negative"
+	}
+	if gf.InstitutionID < 1 {
+		errors["InstitutionID"] = "Invalid institution id"
+	}
+	if gf.IntellectualObjectID < 1 {
+		errors["IntellectualObjectID"] = "Intellectual object ID is required"
+	}
+	if !v.IsIn(gf.StorageOption, constants.StorageOptions...) {
+		errors["StorageOption"] = "Invalid storage option"
+	}
+	if !common.LooksLikeUUID(gf.UUID) {
+		errors["UUID"] = "Valid UUID required"
+	}
+	if len(errors) > 0 {
+		return &common.ValidationError{Errors: errors}
+	}
+	return nil
+
+}
+
 // ObjectFileCount returns the number of active files with the specified
 // Intellectial Object ID.
 func ObjectFileCount(objID int64, filter, state string) (int, error) {
@@ -167,4 +202,67 @@ func ObjectFiles(objID int64, filter, state string, offset, limit int) ([]*Gener
 		}
 	}
 	return files, err
+}
+
+// Delete soft-deletes this file by setting State to 'D' and
+// the UpdatedAt timestamp to now. You can undo this with Undelete.
+// It also creates a deletion PremisEvent. You can't get rid of that.
+//
+// It is legitimate for a depositor to delete a file, then re-upload
+// it later, particularly if they want to change the storage option.
+// In that case, the file's state would be set back to "A" after the
+// new ingest, and the old deletion event would remain to show that an earlier
+// version of the file was once deleted.
+//
+// We would know the new file is active because state = "A" and it would
+// have an ingest event dated after the last deletion event.
+func (gf *GenericFile) Delete() error {
+
+	err := gf.AssertDeletionPreconditions()
+	if err != nil {
+		return err
+	}
+
+	gf.State = constants.StateDeleted
+	gf.UpdatedAt = time.Now().UTC()
+
+	valErr := gf.Validate()
+	if valErr != nil {
+		return valErr
+	}
+
+	deletionEvent, err := gf.NewDeletionEvent()
+	if err != nil {
+		return err
+	}
+	deletionEvent.SetTimestamps()
+	valErr = deletionEvent.Validate()
+	if valErr != nil {
+		return valErr
+	}
+
+	registryContext := common.Context()
+	db := registryContext.DB
+	return db.RunInTransaction(db.Context(), func(tx *pg.Tx) error {
+		var err error
+		_, err = tx.Model(gf).WherePK().Update()
+		if err != nil {
+			registryContext.Log.Error().Msgf("Intellectual gfect deletion transaction failed on update of gfect. File: %d (%s). Error: %v", gf.ID, gf.Identifier, err)
+		}
+		_, err = tx.Model(deletionEvent).Insert()
+		if err != nil {
+			registryContext.Log.Error().Msgf("Intellectual gfect deletion transaction failed on insertion of event. Gfect: %d (%s). Error: %v", gf.ID, gf.Identifier, err)
+		}
+		return err
+	})
+}
+
+func (gf *GenericFile) AssertDeletionPreconditions() error {
+
+	return nil
+}
+
+func (gf *GenericFile) NewDeletionEvent() (*PremisEvent, error) {
+
+	return nil, nil
 }
