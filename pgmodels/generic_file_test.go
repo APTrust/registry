@@ -2,6 +2,7 @@ package pgmodels_test
 
 import (
 	//"fmt"
+	"strings"
 	"testing"
 	"time"
 
@@ -129,19 +130,142 @@ func TestFileValidate(t *testing.T) {
 }
 
 func TestObjectFileCount(t *testing.T) {
+	count, err := pgmodels.ObjectFileCount(1, "", constants.StateActive)
+	require.Nil(t, err)
+	assert.Equal(t, 4, count)
 
+	count, err = pgmodels.ObjectFileCount(1, "", constants.StateDeleted)
+	require.Nil(t, err)
+	assert.Equal(t, 0, count)
+
+	count, err = pgmodels.ObjectFileCount(1, "picture", constants.StateActive)
+	require.Nil(t, err)
+	assert.Equal(t, 3, count)
+
+	count, err = pgmodels.ObjectFileCount(1, "doc", constants.StateActive)
+	require.Nil(t, err)
+	assert.Equal(t, 0, count)
+
+	count, err = pgmodels.ObjectFileCount(1, "9876543210", constants.StateActive)
+	require.Nil(t, err)
+	assert.Equal(t, 1, count)
 }
 
 func TestObjectFiles(t *testing.T) {
+	files, err := pgmodels.ObjectFiles(1, "", constants.StateActive, 0, 20)
+	require.Nil(t, err)
+	assert.Equal(t, 4, len(files))
+
+	files, err = pgmodels.ObjectFiles(1, "", constants.StateDeleted, 0, 20)
+	require.Nil(t, err)
+	assert.Equal(t, 0, len(files))
+
+	files, err = pgmodels.ObjectFiles(1, "picture", constants.StateActive, 0, 20)
+	require.Nil(t, err)
+	assert.Equal(t, 3, len(files))
+
+	files, err = pgmodels.ObjectFiles(1, "doc", constants.StateActive, 0, 20)
+	require.Nil(t, err)
+	assert.Equal(t, 0, len(files))
+
+	files, err = pgmodels.ObjectFiles(1, "9876543210", constants.StateActive, 0, 20)
+	require.Nil(t, err)
+	assert.Equal(t, 1, len(files))
 
 }
 
-func TestFileActiveDeletionWorkItem(t *testing.T) {
+func TestFileDeletionPreConditions(t *testing.T) {
+	defer db.ForceFixtureReload()
 
+	gf, err := pgmodels.GenericFileByID(1)
+	require.Nil(t, err)
+	require.NotNil(t, gf)
+
+	// Already marked as deleted...
+	gf.State = constants.StateDeleted
+	err = gf.AssertDeletionPreconditions()
+	require.NotNil(t, err)
+	assert.Equal(t, "File is already in deleted state", err.Error())
+	gf.State = constants.StateActive
+
+	// Has no deletion work item...
+	err = gf.AssertDeletionPreconditions()
+	require.NotNil(t, err)
+	assert.Equal(t, "Missing deletion request work item", err.Error())
+
+	item, err := gf.ActiveDeletionWorkItem()
+	require.Nil(t, err)
+	require.Nil(t, item)
+
+	workItem := pgmodels.RandomWorkItem("BaggerVance.tar",
+		constants.ActionDelete, gf.IntellectualObjectID, gf.ID)
+	workItem.InstitutionID = gf.InstitutionID
+	workItem.Status = constants.StatusStarted
+	err = workItem.Save()
+	require.Nil(t, err)
+
+	item, err = gf.ActiveDeletionWorkItem()
+	require.Nil(t, err)
+	require.NotNil(t, item)
+	assert.Equal(t, workItem.ID, item.ID)
+
+	// Have work item but it's not approved
+	err = gf.AssertDeletionPreconditions()
+	require.NotNil(t, err)
+	assert.Equal(t, "Deletion work item is missing institutional approver", err.Error())
+
+	workItem.InstApprover = "some-guy@example.com"
+	err = workItem.Save()
+	require.Nil(t, err)
+
+	// Approved work item but no deletion request
+	err = gf.AssertDeletionPreconditions()
+	require.NotNil(t, err)
+	assert.True(t, strings.HasPrefix(err.Error(), "No deletion request for work item"))
+
+	testFileDeletionRequest(t, gf, workItem.ID)
+
+	// Request not yet approved
+	err = gf.AssertDeletionPreconditions()
+	require.NotNil(t, err)
+	assert.True(t, strings.HasSuffix(err.Error(), "has no approver"))
+
+	// TODO: Add approver & test
+	query := pgmodels.NewQuery().
+		Where("work_item_id", "=", workItem.ID)
+	req, err := pgmodels.DeletionRequestGet(query)
+	require.Nil(t, err)
+	require.NotNil(t, req)
+	require.NotEqual(t, int64(0), req.ID)
+
+	req.ConfirmedByID = req.RequestedByID
+	err = req.Save()
+	require.Nil(t, err)
+
+	err = gf.AssertDeletionPreconditions()
+	require.Nil(t, err)
 }
 
-func TestFileDeletionRequest(t *testing.T) {
+func testFileDeletionRequest(t *testing.T, gf *pgmodels.GenericFile, workItemID int64) {
+	// Request doesn't exist yet.
+	reqView, err := gf.DeletionRequest(workItemID)
+	require.NotNil(t, err)
+	assert.True(t, pgmodels.IsNoRowError(err))
+	require.Nil(t, reqView)
 
+	// Now make the request and we should find it.
+	files := []*pgmodels.GenericFile{gf}
+	req, err := pgmodels.CreateDeletionRequest(nil, files)
+	require.Nil(t, err)
+	require.NotNil(t, req)
+	req.WorkItemID = workItemID
+	req.ConfirmedByID = 0
+	require.Nil(t, req.Save())
+
+	reqView, err = gf.DeletionRequest(workItemID)
+	require.Nil(t, err)
+	require.NotNil(t, reqView)
+	assert.Equal(t, req.ID, reqView.ID)
 }
 
 func TestFileAssertDeletionPreconditions(t *testing.T) {

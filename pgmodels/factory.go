@@ -138,6 +138,7 @@ func RandomWorkItem(name, action string, objID, gfID int64) *WorkItem {
 		ETag:                 ETag(),
 		InstitutionID:        4,
 		IntellectualObjectID: objID,
+		GenericFileID:        gfID,
 		Bucket:               "blah.receiving.blah",
 		User:                 "someone@example.com",
 		Note:                 "This item was created by the factory",

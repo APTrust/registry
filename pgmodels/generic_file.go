@@ -278,7 +278,7 @@ func (gf *GenericFile) ActiveDeletionWorkItem() (*WorkItem, error) {
 func (gf *GenericFile) DeletionRequest(workItemID int64) (*DeletionRequestView, error) {
 	query := NewQuery().
 		Where("work_item_id", "=", workItemID).
-		Where("object_count", "0", 0).
+		Where("object_count", "=", 0).
 		Where("file_count", "=", 1)
 	return DeletionRequestViewGet(query)
 }
