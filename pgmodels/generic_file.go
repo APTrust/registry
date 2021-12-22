@@ -261,6 +261,28 @@ func (gf *GenericFile) Delete() error {
 	})
 }
 
+// LastIngestEvent returns the latest ingest event for this file.
+// This should never be nil.
+func (gf *GenericFile) LastIngestEvent() (*PremisEvent, error) {
+	return gf.lastEvent(constants.EventIngestion)
+}
+
+// LastDeleationEvent returns the latest deletion event for this file,
+// which may be nil.
+func (gf *GenericFile) LastDeletionEvent() (*PremisEvent, error) {
+	return gf.lastEvent(constants.EventDeletion)
+}
+
+func (gf *GenericFile) lastEvent(eventType string) (*PremisEvent, error) {
+	query := NewQuery().
+		Where("generic_file_id", "=", gf.ID).
+		Where("event_type", "=", eventType).
+		OrderBy("created_at", "desc").
+		Offset(0).
+		Limit(1)
+	return PremisEventGet(query)
+}
+
 func (gf *GenericFile) ActiveDeletionWorkItem() (*WorkItem, error) {
 	query := NewQuery().
 		Where("generic_file_id", "=", gf.ID).
@@ -337,6 +359,6 @@ func (gf *GenericFile) NewDeletionEvent() (*PremisEvent, error) {
 		Object:               "Minio S3 library",
 		Outcome:              constants.OutcomeSuccess,
 		OutcomeDetail:        deletionRequestView.RequestedByEmail,
-		OutcomeInformation:   fmt.Sprintf("Object deleted at the request of %s. Institutional approver: %s.", deletionRequestView.RequestedByEmail, deletionRequestView.ConfirmedByEmail),
+		OutcomeInformation:   fmt.Sprintf("File deleted at the request of %s. Institutional approver: %s.", deletionRequestView.RequestedByEmail, deletionRequestView.ConfirmedByEmail),
 	}, nil
 }

@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/db"
 	"github.com/APTrust/registry/pgmodels"
@@ -186,12 +187,14 @@ func TestFileDeletionPreConditions(t *testing.T) {
 	err = gf.AssertDeletionPreconditions()
 	require.NotNil(t, err)
 	assert.Equal(t, "File is already in deleted state", err.Error())
+	testGenericFileDeleteError(t, gf)
 	gf.State = constants.StateActive
 
 	// Has no deletion work item...
 	err = gf.AssertDeletionPreconditions()
 	require.NotNil(t, err)
 	assert.Equal(t, "Missing deletion request work item", err.Error())
+	testGenericFileDeleteError(t, gf)
 
 	item, err := gf.ActiveDeletionWorkItem()
 	require.Nil(t, err)
@@ -213,6 +216,7 @@ func TestFileDeletionPreConditions(t *testing.T) {
 	err = gf.AssertDeletionPreconditions()
 	require.NotNil(t, err)
 	assert.Equal(t, "Deletion work item is missing institutional approver", err.Error())
+	testGenericFileDeleteError(t, gf)
 
 	workItem.InstApprover = "some-guy@example.com"
 	err = workItem.Save()
@@ -222,6 +226,7 @@ func TestFileDeletionPreConditions(t *testing.T) {
 	err = gf.AssertDeletionPreconditions()
 	require.NotNil(t, err)
 	assert.True(t, strings.HasPrefix(err.Error(), "No deletion request for work item"))
+	testGenericFileDeleteError(t, gf)
 
 	testFileDeletionRequest(t, gf, workItem.ID)
 
@@ -229,8 +234,9 @@ func TestFileDeletionPreConditions(t *testing.T) {
 	err = gf.AssertDeletionPreconditions()
 	require.NotNil(t, err)
 	assert.True(t, strings.HasSuffix(err.Error(), "has no approver"))
+	testGenericFileDeleteError(t, gf)
 
-	// TODO: Add approver & test
+	// Add approver & test
 	query := pgmodels.NewQuery().
 		Where("work_item_id", "=", workItem.ID)
 	req, err := pgmodels.DeletionRequestGet(query)
@@ -244,6 +250,8 @@ func TestFileDeletionPreConditions(t *testing.T) {
 
 	err = gf.AssertDeletionPreconditions()
 	require.Nil(t, err)
+
+	testGenericFileDeleteSuccess(t, gf)
 }
 
 func testFileDeletionRequest(t *testing.T, gf *pgmodels.GenericFile, workItemID int64) {
@@ -268,14 +276,50 @@ func testFileDeletionRequest(t *testing.T, gf *pgmodels.GenericFile, workItemID 
 	assert.Equal(t, req.ID, reqView.ID)
 }
 
-func TestFileAssertDeletionPreconditions(t *testing.T) {
-
+// This test is called a number of times above. In each case, we're
+// missing some deletion pre-condition, and the Delete() call should
+// fail. We check specific errors above. This test just ensures
+// that nothing slips through.
+func testGenericFileDeleteError(t *testing.T, gf *pgmodels.GenericFile) {
+	err := gf.Delete()
+	require.NotNil(t, err)
 }
 
-func TestNewDeletionEvent(t *testing.T) {
+// We call this above once we've set up all necessary pre-conditions for
+// file deletion, including an approved deletion request and an approved
+// work item. This call should succeed.
+//
+// Note that this also implicitly tests NewFileDeletionEvent. We want to
+// make sure 1) the deletion event was created and saved, and 2) it contains
+// the right data.
+func testGenericFileDeleteSuccess(t *testing.T, gf *pgmodels.GenericFile) {
+	err := gf.Delete()
+	require.Nil(t, err)
 
+	reloadedFile, err := pgmodels.GenericFileByID(gf.ID)
+	require.Nil(t, err)
+	require.NotNil(t, reloadedFile)
+	assert.Equal(t, constants.StateDeleted, reloadedFile.State)
+	assert.True(t, reloadedFile.UpdatedAt.After(time.Now().UTC().Add(-5*time.Second)))
+
+	// Make sure the required event was created.
+	deletionEvent, err := reloadedFile.LastDeletionEvent()
+	require.Nil(t, err)
+	require.NotNil(t, deletionEvent)
+	testFileDeletionEventProperties(t, gf, deletionEvent)
 }
 
-func TestGenericFileDelete(t *testing.T) {
-
+func testFileDeletionEventProperties(t *testing.T, gf *pgmodels.GenericFile, event *pgmodels.PremisEvent) {
+	assert.Equal(t, "APTrust preservation services", event.Agent)
+	assert.True(t, event.DateTime.After(time.Now().UTC().Add(-5*time.Second)))
+	assert.Equal(t, "File deleted from preservation storage", event.Detail)
+	assert.Equal(t, constants.EventDeletion, event.EventType)
+	assert.True(t, common.LooksLikeUUID(event.Identifier))
+	assert.Equal(t, gf.InstitutionID, event.InstitutionID)
+	assert.Equal(t, gf.IntellectualObjectID, event.IntellectualObjectID)
+	assert.Equal(t, gf.ID, event.GenericFileID)
+	assert.Equal(t, "Minio S3 library", event.Object)
+	assert.Equal(t, constants.OutcomeSuccess, event.Outcome)
+	assert.Equal(t, "user@test.edu", event.OutcomeDetail)
+	assert.Equal(t, "File deleted at the request of user@test.edu. Institutional approver: user@test.edu.", event.OutcomeInformation)
 }
