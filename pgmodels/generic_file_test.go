@@ -1,7 +1,9 @@
 package pgmodels_test
 
 import (
+	//"fmt"
 	"testing"
+	"time"
 
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/db"
@@ -9,6 +11,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+var HammerTime, _ = time.Parse(time.RFC3339, "2022-01-02T11:42:00Z")
 
 func TestFileIsGlacierOnly(t *testing.T) {
 	gf := &pgmodels.GenericFile{}
@@ -57,15 +61,42 @@ func TestGenericFileByIdentifier(t *testing.T) {
 }
 
 func TestGenericFileSelect(t *testing.T) {
-
+	db.ForceFixtureReload()
+	query := pgmodels.NewQuery().
+		Where("institution_id", "=", InstTest).
+		OrderBy("identifier", "asc")
+	files, err := pgmodels.GenericFileSelect(query)
+	require.Nil(t, err)
+	require.NotEmpty(t, files)
+	assert.Equal(t, 7, len(files))
+	assert.Equal(t, "test.edu/apt-test-restore/aptrust-info.txt", files[0].Identifier)
+	assert.Equal(t, "test.edu/btr-512-test-restore/data/sample.xml", files[6].Identifier)
 }
 
 func TestFileSaveGetUpdate(t *testing.T) {
+	gf, err := pgmodels.GenericFileByID(1)
+	require.Nil(t, err)
+	require.NotNil(t, gf)
 
-}
+	newFile := pgmodels.RandomGenericFile(1, "inst1.edu/photos/unit-test.txt")
+	err = newFile.Save()
+	require.Nil(t, err)
+	assert.True(t, newFile.ID > 0)
 
-func TestFileSelect(t *testing.T) {
+	newFile, err = pgmodels.GenericFileByIdentifier(newFile.Identifier)
+	require.Nil(t, err)
+	require.NotNil(t, newFile)
 
+	newFile.FileFormat = "this-has/been-changed"
+	newFile.LastFixityCheck = HammerTime
+	err = newFile.Save()
+	require.Nil(t, err)
+
+	reloadedFile, err := pgmodels.GenericFileByIdentifier(newFile.Identifier)
+	require.Nil(t, err)
+	require.NotNil(t, reloadedFile)
+	assert.Equal(t, "this-has/been-changed", reloadedFile.FileFormat)
+	assert.Equal(t, HammerTime, reloadedFile.LastFixityCheck)
 }
 
 func TestFileValidate(t *testing.T) {

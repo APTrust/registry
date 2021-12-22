@@ -1,6 +1,8 @@
 package constants
 
-import "github.com/APTrust/registry/common"
+import (
+	"github.com/APTrust/registry/common"
+)
 
 const (
 	AccessConsortia            = "consortia"
