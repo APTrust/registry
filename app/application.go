@@ -341,6 +341,7 @@ func initRoutes(router *gin.Engine) {
 
 		// Premis Events
 		// TODO: Add Create (no update or delete for premis events)
+		adminAPI.POST("/events/create", admin_api.PremisEventCreate)
 		adminAPI.GET("/events/show/*id", common_api.PremisEventShow)
 		adminAPI.GET("/events", common_api.PremisEventIndex)
 
