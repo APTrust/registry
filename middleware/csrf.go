@@ -18,7 +18,7 @@ var safeMethods = []string{"GET", "HEAD", "OPTIONS", "TRACE"}
 func CSRF() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		cookieToken, _ := GetCSRFCookieToken(c)
-		if !IsCSRFSafeMethod(c.Request.Method) && !ExemptFromAuth(c) && !IsAPIRequest(c.Request.URL.Path) {
+		if !IsCSRFSafeMethod(c.Request.Method) && !ExemptFromAuth(c) && !IsAPIRequest(c.FullPath()) {
 			err := AssertSameOrigin(c)
 			if err != nil {
 				abortWithError(c, err)

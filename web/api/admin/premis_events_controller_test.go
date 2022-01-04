@@ -3,13 +3,14 @@ package admin_api_test
 import (
 	"encoding/json"
 	"fmt"
-	//"net/http"
+	"net/http"
+	//"os"
 	"testing"
 
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/pgmodels"
 	tu "github.com/APTrust/registry/web/testutil"
-	//"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -21,9 +22,26 @@ import (
 //       skip API requests. The handler name should be PremisEventCreate,
 //       and the associated resource type is PremisEvent. So WTF?
 //
-//       Happy New Year!
+//       The root of the problem is that the test client is requesting
+//               /admin-api/v3/events/create/
+//       but the server is seeing
+//               /admin-api/v3/events/create/admin-api/v3/events/create
+//
+//       Gin is doing some redirects on its own, but I can't figure out
+//       where. In fact, it processes requests to /admin-api/v3/events/create/
+//       three times, with the final request haveing the the route as
+//       /admin-api/v3/events/create/admin-api/v3/events/create/admin-api/v3/events/create/
+//
+//       Why??
+//
+//       Dunno, but tests for non-admin users report a 307 redirect.
+//       Just have to figure out where that's coming from and why.
+//
+//       Also note that the APTrust session cookie is being set twice.
+//       All redirects force all the middleware to fire again.
 
 func TestPremisEventCreate(t *testing.T) {
+	//os.Setenv("APT_ENV", "test")
 	tu.InitHTTPTests(t)
 
 	gf, err := pgmodels.GenericFileByID(21)
@@ -39,33 +57,36 @@ func TestPremisEventCreate(t *testing.T) {
 
 	resp := tu.SysAdminClient.POST("/admin-api/v3/events/create").WithBytes(jsonData)
 
+	fmt.Println("Client request path:", resp.Expect().Raw().Request.URL.Path)
+
 	//fmt.Println(resp.Expect())
 	fmt.Println(string(resp.Expect().Body().Raw()))
+	fmt.Println(resp.Expect().Raw().StatusCode)
 
 	//resp.Expect().Status(http.StatusCreated)
 
-	// savedEvent := &pgmodels.PremisEvent{}
-	// err = json.Unmarshal([]byte(resp.Expect().Body().Raw()), savedEvent)
-	// require.Nil(t, err)
-	// require.NotNil(t, savedEvent)
-	// assert.True(t, savedEvent.ID > 0)
+	savedEvent := &pgmodels.PremisEvent{}
+	err = json.Unmarshal([]byte(resp.Expect().Body().Raw()), savedEvent)
+	require.Nil(t, err)
+	require.NotNil(t, savedEvent)
+	assert.True(t, savedEvent.ID > 0)
 
-	// ------------------------
+	// Non sys-admin cannot create any events, period.
+	tu.Inst1AdminClient.POST("/admin-api/v3/events/create").
+		WithBytes(jsonData).
+		Expect().
+		Status(http.StatusForbidden)
+	tu.Inst1UserClient.POST("/admin-api/v3/events/create").
+		WithBytes(jsonData).
+		Expect().
+		Status(http.StatusForbidden)
+	tu.Inst2AdminClient.POST("/admin-api/v3/events/create").
+		WithBytes(jsonData).
+		Expect().
+		Status(http.StatusForbidden)
+	tu.Inst2UserClient.POST("/admin-api/v3/events/create").
+		WithBytes(jsonData).
+		Expect().
+		Status(http.StatusForbidden)
 
-	// // Non sys-admin cannot create any events, period.
-	// instIds := []int64{1, 2, 3, 4, 5}
-	// for _, id := range instIds {
-	// 	tu.Inst1AdminClient.GET("/admin-api/v3/institutions/show/{id}", id).
-	// 		Expect().
-	// 		Status(http.StatusForbidden)
-	// 	tu.Inst1UserClient.GET("/admin-api/v3/institutions/show/{id}", id).
-	// 		Expect().
-	// 		Status(http.StatusForbidden)
-	// 	tu.Inst2AdminClient.GET("/admin-api/v3/institutions/show/{id}", id).
-	// 		Expect().
-	// 		Status(http.StatusForbidden)
-	// 	tu.Inst2UserClient.GET("/admin-api/v3/institutions/show/{id}", id).
-	// 		Expect().
-	// 		Status(http.StatusForbidden)
-	// }
 }

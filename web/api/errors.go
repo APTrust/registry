@@ -26,6 +26,7 @@ func AbortIfError(c *gin.Context, err error) bool {
 			StatusCode: status,
 			Error:      err.Error(),
 		}
+		common.Context().Log.Err(err)
 		c.JSON(status, e)
 		c.Abort()
 		return true

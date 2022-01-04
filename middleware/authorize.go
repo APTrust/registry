@@ -21,6 +21,9 @@ import (
 // check. Failure to perform the check is itself an error.
 func Authorize() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		if c.Request.URL.Path == "/admin-api/v3/events/create/admin-api/v3/events/create" {
+			panic("WTF??")
+		}
 		auth := AuthorizeResource(c)
 		c.Set("ResourceAuthorization", auth)
 		if !auth.Checked {

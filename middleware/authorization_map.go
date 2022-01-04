@@ -15,7 +15,7 @@ type AuthMetadata struct {
 	Permission constants.Permission
 }
 
-// PermissionForHandler maps HTTP handler names to the permissions
+// AuthMap maps HTTP handler names to the permissions
 // required to access that handler. We want to be explicit about permissions
 // because explicitness is much easier to debug than assumptions and
 // magic methods.

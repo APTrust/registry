@@ -83,6 +83,11 @@ func (r *ResourceAuthorization) getPermissionType() {
 			r.ResourceType = authMeta.ResourceType
 		} else {
 			r.Error = common.ErrResourcePermission
+			fmt.Println("*********", r.String())
+			fmt.Println("REQUEST", r.ginCtx.Request.URL.Path)
+			fmt.Println("FULL PATH", r.ginCtx.FullPath())
+			fmt.Println("HANDLER", r.ginCtx.HandlerName())
+			fmt.Println(r.ginCtx.HandlerNames())
 		}
 	}
 }
@@ -208,5 +213,5 @@ func (r *ResourceAuthorization) String() string {
 	if r.Error != nil {
 		errMsg = r.Error.Error()
 	}
-	return fmt.Sprintf("User %s, Remote IP: %s, Handler: %s, ResourceType: %s, ResourceID: %d, InstID: %d, Path: %s, Permission: %s, ResourceIdentifier: %s, Error: %s", email, r.ginCtx.Request.RemoteAddr, r.ginCtx.HandlerName(), r.ResourceType, r.ResourceID, r.ResourceInstID, r.ginCtx.FullPath(), r.Permission, r.ResourceIdentifier, errMsg)
+	return fmt.Sprintf("User %s, Remote IP: %s, Handler: %s, ResourceType: %s, ResourceID: %d, InstID: %d, Gin Path: %s, Request Path: %s, Permission: %s, ResourceIdentifier: %s, Error: %s", email, r.ginCtx.Request.RemoteAddr, r.ginCtx.HandlerName(), r.ResourceType, r.ResourceID, r.ResourceInstID, r.ginCtx.FullPath(), r.ginCtx.Request.URL.Path, r.Permission, r.ResourceIdentifier, errMsg)
 }
