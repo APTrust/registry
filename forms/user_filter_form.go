@@ -61,7 +61,7 @@ func (f *UserFilterForm) init() {
 func (f *UserFilterForm) SetValues() {
 	for _, fieldName := range pgmodels.UserFilters {
 		if f.Fields[fieldName] == nil {
-			common.ConsoleDebug("No filter for", fieldName)
+			common.ConsoleDebug("No filter for %s", fieldName)
 			continue
 		}
 		f.Fields[fieldName].Value = f.FilterCollection.ValueOf(fieldName)

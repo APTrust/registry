@@ -48,7 +48,7 @@ func UserTwoFactorGenerateSMS(c *gin.Context) {
 	req.TemplateData["twoFactorMethod"] = constants.TwoFactorSMS
 
 	// For dev work. You'll need this token to log in.
-	common.ConsoleDebug("OTP token:", token)
+	common.ConsoleDebug("OTP token: %s", token)
 
 	user := req.CurrentUser
 
@@ -365,7 +365,7 @@ func UserCompleteSMSSetup(req *Request) error {
 		return err
 	}
 	// For dev work. You'll need this token to log in.
-	common.ConsoleDebug("OTP token:", token)
+	common.ConsoleDebug("OTP token: %s", token)
 	message := fmt.Sprintf("Your Registry one time password is %s", token)
 	err = common.Context().SNSClient.SendSMS(user.PhoneNumber, message)
 	if err != nil {

@@ -218,6 +218,9 @@ func UserChangePassword(c *gin.Context) {
 	// happened and user knows too. If user gets a suspicious
 	// "password changed" alert, they can contact us.
 	_, err = CreatePasswordChangedAlert(req, userToEdit)
+	if err != nil {
+		common.Context().Log.Error().Msgf("UserChangePassword error: %v", err)
+	}
 
 	helpers.SetFlashCookie(c, "Password changed.")
 	redirectURL := fmt.Sprintf("/users/show/%d", userToEdit.ID)
@@ -415,6 +418,7 @@ func SignInUser(c *gin.Context) (int, string, error) {
 	return http.StatusFound, redirectTo, nil
 }
 
+// This is not used. Should it be? Or did we factor something out earlier?
 func getIndexQuery(c *gin.Context) (*pgmodels.Query, error) {
 	allowedFilters := []string{
 		"institution_id",

@@ -63,7 +63,7 @@ func (f *DepositReportFilterForm) init() {
 func (f *DepositReportFilterForm) SetValues() {
 	for _, fieldName := range pgmodels.DepositStatsFilters {
 		if f.Fields[fieldName] == nil {
-			common.ConsoleDebug("No filter for", fieldName)
+			common.ConsoleDebug("No filter for %s", fieldName)
 			continue
 		}
 		f.Fields[fieldName].Value = f.FilterCollection.ValueOf(fieldName)
