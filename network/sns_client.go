@@ -63,7 +63,12 @@ func (client *SNSClient) sendDummySMS(phoneNumber, message string) error {
 
 	// Print this to the console. If developer is testing interactively,
 	// he'll need the OTP to log in.
-	fmt.Println(msg)
+	//
+	// Remove this if calls to common.ConsoleDebug inside
+	// web/webui/two_factor_controller.go handle this case.
+	// We can't import common here because it makes a cyclical dependency.
+	//
+	// fmt.Println(msg)
 
 	// Print to log.
 	client.logger.Info().Msgf(msg)

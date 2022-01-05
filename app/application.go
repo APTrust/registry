@@ -136,6 +136,7 @@ func initRoutes(router *gin.Engine) {
 
 	// This ensures that routes match with or without trailing slash.
 	router.RedirectTrailingSlash = true
+	router.RedirectFixedPath = false
 
 	router.Static("/static", "./static")
 	router.Static("/favicon.ico", "./static/img/favicon.png")

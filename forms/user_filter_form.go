@@ -1,8 +1,7 @@
 package forms
 
 import (
-	"fmt"
-
+	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/pgmodels"
 )
 
@@ -62,7 +61,7 @@ func (f *UserFilterForm) init() {
 func (f *UserFilterForm) SetValues() {
 	for _, fieldName := range pgmodels.UserFilters {
 		if f.Fields[fieldName] == nil {
-			fmt.Println("No filter for", fieldName)
+			common.ConsoleDebug("No filter for", fieldName)
 			continue
 		}
 		f.Fields[fieldName].Value = f.FilterCollection.ValueOf(fieldName)

@@ -83,11 +83,6 @@ func (r *ResourceAuthorization) getPermissionType() {
 			r.ResourceType = authMeta.ResourceType
 		} else {
 			r.Error = common.ErrResourcePermission
-			fmt.Println("*********", r.String())
-			fmt.Println("REQUEST", r.ginCtx.Request.URL.Path)
-			fmt.Println("FULL PATH", r.ginCtx.FullPath())
-			fmt.Println("HANDLER", r.ginCtx.HandlerName())
-			fmt.Println(r.ginCtx.HandlerNames())
 		}
 	}
 }

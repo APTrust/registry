@@ -1,7 +1,6 @@
 package forms_test
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/APTrust/registry/constants"
@@ -50,7 +49,6 @@ func TestListUsers(t *testing.T) {
 		{"5", "Inst Two Admin"},
 		{"7", "Inst Two User"},
 	}
-	fmt.Println(options)
 	for i, option := range options {
 		assert.Equal(t, expected[i].Value, option.Value)
 		assert.Equal(t, expected[i].Text, option.Text)

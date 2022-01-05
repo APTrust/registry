@@ -92,7 +92,7 @@ func (f *Form) GetFields() map[string]*Field {
 
 func (f *Form) SetValues() {
 	// no-op
-	fmt.Println("***** Called base.setValues() *****")
+	common.ConsoleDebug("***** Called base.setValues() *****")
 }
 
 type Field struct {
