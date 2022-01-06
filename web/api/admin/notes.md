@@ -31,7 +31,7 @@ Create should support bulk insert.
 [x] Show - uses common API
 [x] Create - admin API only
 [x] Update - admin API only
-[ ] Delete - admin API only
+[x] Delete - admin API only
 
 Delete needs to ensure all files are already marked as deleted and must create a deletion premis event.
 
@@ -42,7 +42,7 @@ Delete needs to ensure all files are already marked as deleted and must create a
 
 [x] List - uses common API
 [x] Show - uses common API
-[ ] Create - admin API only
+[x] Create - admin API only
 
 ## Work Items
 

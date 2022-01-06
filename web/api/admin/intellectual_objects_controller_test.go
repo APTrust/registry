@@ -2,8 +2,10 @@ package admin_api_test
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/pgmodels"
@@ -73,14 +75,54 @@ func TestObjectIndex(t *testing.T) {
 func TestObjectCreateUpdateDelete(t *testing.T) {
 	tu.InitHTTPTests(t)
 	obj := testObjectCreate(t)
+	updatedObj := testObjectUpdate(t, obj)
 
-	testObjectUpdate(t, obj)
+	createDeletionPreConditions(t, obj)
+	testObjectDelete(t, updatedObj)
+}
 
-	// This is in progress and will fail at the moment.
-	// Uncomment after completing object deletion work.
-	//
-	// updatedObj := testObjectUpdate(t, obj)
-	// testObjectDelete(t, updatedObj)
+// The registry won't allow deletions without the pre-conditions
+// below. In reality, the supporting object are created during
+// actual workflows.
+//
+// - Ingest event at ingest.
+// - Deletion request when a user clicks the delete object button
+//   in the web UI.
+// - WorkItem when an inst admin has approved the deletion request.
+//
+// Here, we create them just so we can complete our test.
+func createDeletionPreConditions(t *testing.T, obj *pgmodels.IntellectualObject) {
+	// Deletion checks for last ingest event on this object.
+	event := pgmodels.RandomPremisEvent(constants.EventIngestion)
+	event.IntellectualObjectID = obj.ID
+	event.GenericFileID = 0
+	event.InstitutionID = obj.InstitutionID
+	require.Nil(t, event.Save())
+
+	// Also requires an approved Deletion work item
+	item := pgmodels.RandomWorkItem(
+		obj.BagName,
+		constants.ActionDelete,
+		obj.ID,
+		0)
+	item.User = "admin@test.edu"
+	item.InstApprover = "admin@test.edu"
+	item.Status = constants.StatusStarted
+	require.Nil(t, item.Save())
+	require.True(t, item.ID > 0)
+
+	// Requires approved deletion request
+	now := time.Now().UTC()
+	req, err := pgmodels.NewDeletionRequest()
+	require.Nil(t, err)
+	req.IntellectualObjects = append(req.IntellectualObjects, obj)
+	req.InstitutionID = obj.InstitutionID
+	req.RequestedByID = 8 // admin@test.edu
+	req.RequestedAt = now
+	req.ConfirmedByID = 8
+	req.ConfirmedAt = now
+	req.WorkItemID = item.ID
+	require.Nil(t, req.Save())
 }
 
 func testObjectCreate(t *testing.T) *pgmodels.IntellectualObject {
@@ -128,6 +170,7 @@ func testObjectUpdate(t *testing.T, obj *pgmodels.IntellectualObject) *pgmodels.
 
 func testObjectDelete(t *testing.T, obj *pgmodels.IntellectualObject) {
 	resp := tu.SysAdminClient.DELETE("/admin-api/v3/objects/delete/{id}", obj.ID).Expect()
+	fmt.Println(resp.Body())
 	resp.Status(http.StatusOK)
 
 	deletedObj := &pgmodels.IntellectualObject{}
