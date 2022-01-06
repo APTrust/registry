@@ -2,7 +2,6 @@ package admin_api_test
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"testing"
 	"time"
@@ -170,7 +169,6 @@ func testObjectUpdate(t *testing.T, obj *pgmodels.IntellectualObject) *pgmodels.
 
 func testObjectDelete(t *testing.T, obj *pgmodels.IntellectualObject) {
 	resp := tu.SysAdminClient.DELETE("/admin-api/v3/objects/delete/{id}", obj.ID).Expect()
-	fmt.Println(resp.Body())
 	resp.Status(http.StatusOK)
 
 	deletedObj := &pgmodels.IntellectualObject{}
