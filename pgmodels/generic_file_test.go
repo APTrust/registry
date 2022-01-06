@@ -130,6 +130,47 @@ func TestFileValidate(t *testing.T) {
 	assert.Nil(t, err)
 }
 
+func getFileForChangeValidateion() *pgmodels.GenericFile {
+	return &pgmodels.GenericFile{
+		TimestampModel: pgmodels.TimestampModel{
+			BaseModel: pgmodels.BaseModel{
+				ID: int64(444),
+			},
+		},
+		InstitutionID: 4,
+		Identifier:    "test.edu/bag/data/file.txt",
+		State:         constants.StateActive,
+		StorageOption: constants.StorageOptionStandard,
+	}
+}
+
+func TestFileValidateChanges(t *testing.T) {
+	gf1 := getFileForChangeValidateion()
+	gf2 := getFileForChangeValidateion()
+
+	assert.Nil(t, gf1.ValidateChanges(gf2))
+
+	gf1.ID = 999
+	gf2.ID = 1000
+	err := gf1.ValidateChanges(gf2)
+	assert.Equal(t, common.ErrIDMismatch, err)
+	gf2.ID = gf1.ID
+
+	gf2.InstitutionID = 4500
+	err = gf1.ValidateChanges(gf2)
+	assert.Equal(t, common.ErrInstIDChange, err)
+	gf2.InstitutionID = gf1.InstitutionID
+
+	gf2.Identifier = "test.edu/changed"
+	err = gf1.ValidateChanges(gf2)
+	assert.Equal(t, common.ErrIdentifierChange, err)
+	gf2.Identifier = gf1.Identifier
+
+	gf2.StorageOption = constants.StorageOptionGlacierOH
+	err = gf1.ValidateChanges(gf2)
+	assert.Equal(t, common.ErrStorageOptionChange, err)
+}
+
 func TestObjectFileCount(t *testing.T) {
 	count, err := pgmodels.ObjectFileCount(1, "", constants.StateActive)
 	require.Nil(t, err)

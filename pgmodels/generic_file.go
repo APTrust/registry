@@ -133,7 +133,24 @@ func (gf *GenericFile) Validate() *common.ValidationError {
 		return &common.ValidationError{Errors: errors}
 	}
 	return nil
+}
 
+func (gf *GenericFile) ValidateChanges(updatedFile *GenericFile) error {
+	if gf.ID != updatedFile.ID {
+		return common.ErrIDMismatch
+	}
+	if gf.InstitutionID != updatedFile.InstitutionID {
+		return common.ErrInstIDChange
+	}
+	if gf.Identifier != updatedFile.Identifier {
+		return common.ErrIdentifierChange
+	}
+	// Caller should force storage option of updated object to
+	// match existing object before calling this validation function.
+	if gf.State == constants.StateActive && gf.StorageOption != updatedFile.StorageOption {
+		return common.ErrStorageOptionChange
+	}
+	return nil
 }
 
 // ObjectFileCount returns the number of active files with the specified
