@@ -31,9 +31,6 @@ func GenericFileDelete(c *gin.Context) {
 	c.JSON(http.StatusOK, gf)
 }
 
-// START HERE
-// TODO: Test the methods below, then work on GF deletion.
-
 // GenericFileCreate creates a new object record.
 //
 // POST /admin-api/v3/files/create/:institution_id

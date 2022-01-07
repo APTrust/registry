@@ -70,10 +70,9 @@ func TestWorkItemIndex(t *testing.T) {
 	assert.Equal(t, "/member-api/v3/items?page=1&per_page=5", list.Previous)
 	assert.Equal(t, tu.Inst2User.InstitutionID, list.Results[0].InstitutionID)
 
-	// Test some filters. This object has 1 deleted, 4 active items.
+	// Test some filters.
 	resp = tu.SysAdminClient.GET("/member-api/v3/items").
 		WithQuery("institution_id", tu.Inst2Admin.InstitutionID).
-		WithQuery("state", "A").
 		Expect().Status(http.StatusOK)
 
 	list = api.WorkItemViewList{}
