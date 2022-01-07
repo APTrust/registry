@@ -323,10 +323,12 @@ func initRoutes(router *gin.Engine) {
 		adminAPI.GET("/deletions", common_api.DeletionRequestIndex)
 
 		// Generic Files
-		// TODO: Add Create, Update, Delete. Support bulk insert/update with transactions.
+		// TODO: Add Delete. Support bulk insert/update with transactions.
 		adminAPI.GET("/files/show/*id", common_api.GenericFileShow)
 		adminAPI.GET("/files", common_api.GenericFileIndex)
 		adminAPI.DELETE("/files/delete/:id", admin_api.GenericFileDelete)
+		adminAPI.POST("/files/create/:institution_id", admin_api.GenericFileCreate)
+		adminAPI.PUT("/files/update/:id", admin_api.GenericFileUpdate)
 
 		// Institutions
 		adminAPI.GET("/institutions", admin_api.InstitutionIndex)

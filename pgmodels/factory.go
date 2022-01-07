@@ -2,10 +2,10 @@ package pgmodels
 
 import (
 	"fmt"
+	"math/rand"
 	"strings"
 	"time"
 
-	//"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/google/uuid"
@@ -150,7 +150,7 @@ func RandomWorkItem(name, action string, objID, gfID int64) *WorkItem {
 		DateProcessed:        now,
 		Retry:                true,
 		QueuedAt:             now,
-		Size:                 gofakeit.Int64(),
+		Size:                 rand.Int63(),
 	}
 }
 
@@ -164,7 +164,7 @@ func RandomGenericFile(objID int64, objIdentifier string) *GenericFile {
 			UpdatedAt: now,
 		},
 		FileFormat:           gofakeit.AnimalType(),
-		Size:                 gofakeit.Int64(),
+		Size:                 rand.Int63(),
 		Identifier:           FileIdentifier(objIdentifier),
 		InstitutionID:        4,
 		IntellectualObjectID: objID,

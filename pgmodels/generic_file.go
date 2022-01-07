@@ -91,6 +91,11 @@ func GenericFileSelect(query *Query) ([]*GenericFile, error) {
 // Save saves this file to the database. This will peform an insert
 // if GenericFile.ID is zero. Otherwise, it updates.
 func (gf *GenericFile) Save() error {
+	gf.SetTimestamps()
+	err := gf.Validate()
+	if err != nil {
+		return err
+	}
 	if gf.ID == int64(0) {
 		return insert(gf)
 	}

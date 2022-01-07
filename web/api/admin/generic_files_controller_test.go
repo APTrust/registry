@@ -7,6 +7,7 @@ import (
 	//"time"
 
 	"github.com/APTrust/registry/constants"
+	"github.com/APTrust/registry/db"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/APTrust/registry/web/api"
 	tu "github.com/APTrust/registry/web/testutil"
@@ -93,10 +94,62 @@ func TestGenericFileIndex(t *testing.T) {
 	}
 }
 
-func TestFileCreate(t *testing.T) {
+func TestFileCreateUpdateDelete(t *testing.T) {
+	// Reset DB after this test so we don't screw up others.
+	defer db.ForceFixtureReload()
+	tu.InitHTTPTests(t)
+	gf := testFileCreate(t)
+	testFileUpdate(t, gf)
 
+	// TODO: Implement GF deletion logic first.
+	//       Then proceed to these tests.
+	//
+	//createDeletionPreConditions(t, obj)
+	//testFileDelete(t, updatedObj)
 }
 
-func TestFileUpdate(t *testing.T) {
+func testFileCreate(t *testing.T) *pgmodels.GenericFile {
+	obj, err := pgmodels.IntellectualObjectGet(
+		pgmodels.NewQuery().
+			Where("institution_id", "=", 4).
+			Limit(1))
+	require.Nil(t, err)
+	require.NotNil(t, obj)
+	gf := pgmodels.RandomGenericFile(obj.ID, obj.Identifier)
+	resp := tu.SysAdminClient.POST("/admin-api/v3/files/create/{id}", gf.InstitutionID).WithJSON(gf).Expect()
+	resp.Status(http.StatusCreated)
 
+	savedFile := &pgmodels.GenericFile{}
+	err = json.Unmarshal([]byte(resp.Body().Raw()), savedFile)
+	require.Nil(t, err)
+	assert.True(t, savedFile.ID > int64(0))
+	assert.Equal(t, gf.Identifier, savedFile.Identifier)
+	assert.Equal(t, gf.InstitutionID, savedFile.InstitutionID)
+	assert.Equal(t, gf.Size, savedFile.Size)
+	assert.Equal(t, gf.FileFormat, savedFile.FileFormat)
+	assert.Equal(t, gf.StorageOption, savedFile.StorageOption)
+	assert.NotEmpty(t, savedFile.CreatedAt)
+	assert.NotEmpty(t, savedFile.UpdatedAt)
+	return savedFile
+}
+
+func testFileUpdate(t *testing.T, gf *pgmodels.GenericFile) *pgmodels.GenericFile {
+	origUpdatedAt := gf.UpdatedAt
+	copyOfGf := gf
+	copyOfGf.Size = gf.Size + 200
+	copyOfGf.FileFormat = "txt/screed"
+
+	resp := tu.SysAdminClient.PUT("/admin-api/v3/files/update/{id}", gf.ID).WithJSON(copyOfGf).Expect()
+	resp.Status(http.StatusOK)
+
+	updatedGf := &pgmodels.GenericFile{}
+	err := json.Unmarshal([]byte(resp.Body().Raw()), updatedGf)
+	require.Nil(t, err)
+
+	assert.Equal(t, copyOfGf.Size, updatedGf.Size)
+	assert.Equal(t, copyOfGf.FileFormat, updatedGf.FileFormat)
+	assert.Equal(t, gf.CreatedAt, updatedGf.CreatedAt)
+	assert.True(t, updatedGf.UpdatedAt.After(origUpdatedAt))
+
+	return updatedGf
 }
