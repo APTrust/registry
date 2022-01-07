@@ -32,6 +32,37 @@ func TestWorkItemValidation(t *testing.T) {
 	assert.Equal(t, pgmodels.ErrItemOutcome, err.Errors["Outcome"])
 }
 
+func TestWorkItemValidateChanges(t *testing.T) {
+	item1 := pgmodels.RandomWorkItem("rando", constants.ActionIngest, 1, 0)
+	item1.ID = 1
+	item2 := pgmodels.RandomWorkItem("odnar", constants.ActionRead, 2, 1)
+	item2.ID = 2
+	item2.InstitutionID = item1.InstitutionID + 1
+
+	assert.Equal(t, common.ErrIDMismatch, item1.ValidateChanges(item2))
+
+	item2.ID = item1.ID
+	assert.Equal(t, common.ErrInstIDChange, item1.ValidateChanges(item2))
+
+	item2.InstitutionID = item1.InstitutionID
+	assert.Equal(t, "intellectual object id cannot change", item1.ValidateChanges(item2).Error())
+
+	item2.IntellectualObjectID = item1.IntellectualObjectID
+	assert.Equal(t, "generic file id cannot change", item1.ValidateChanges(item2).Error())
+
+	item2.GenericFileID = item1.GenericFileID
+	assert.Equal(t, "name cannot change", item1.ValidateChanges(item2).Error())
+
+	item2.Name = item1.Name
+	assert.Equal(t, "etag cannot change", item1.ValidateChanges(item2).Error())
+
+	item1.ETag = item2.ETag
+	assert.Equal(t, "action cannot change", item1.ValidateChanges(item2).Error())
+
+	item1.Action = item2.Action
+	assert.Nil(t, item1.ValidateChanges(item2))
+}
+
 func TestWorkItemGetID(t *testing.T) {
 	item := &pgmodels.WorkItem{
 		TimestampModel: pgmodels.TimestampModel{

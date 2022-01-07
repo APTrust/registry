@@ -196,6 +196,35 @@ func (item *WorkItem) Validate() *common.ValidationError {
 	return nil
 }
 
+// ValidateChanges returns an error if updatedItem contains illegal changes.
+// Don't change action on work items. Create a new work item instead.
+// Changing any of the other IDs or identifiers leads to incorrect data,
+// so it's prohibited.
+func (item *WorkItem) ValidateChanges(updatedItem *WorkItem) error {
+	if item.ID != updatedItem.ID {
+		return common.ErrIDMismatch
+	}
+	if item.InstitutionID != updatedItem.InstitutionID {
+		return common.ErrInstIDChange
+	}
+	if item.IntellectualObjectID != updatedItem.IntellectualObjectID {
+		return fmt.Errorf("intellectual object id cannot change")
+	}
+	if item.GenericFileID != updatedItem.GenericFileID {
+		return fmt.Errorf("generic file id cannot change")
+	}
+	if item.Name != updatedItem.Name {
+		return fmt.Errorf("name cannot change")
+	}
+	if item.ETag != updatedItem.ETag {
+		return fmt.Errorf("etag cannot change")
+	}
+	if item.Action != updatedItem.Action {
+		return fmt.Errorf("action cannot change")
+	}
+	return nil
+}
+
 // LastSuccessfulIngest returns the last successful
 // ingest WorkItem for the specified intellectual object id.
 func LastSuccessfulIngest(objID int64) (*WorkItem, error) {
