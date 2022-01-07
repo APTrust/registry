@@ -6,8 +6,8 @@ import (
 	"testing"
 	//"time"
 
-	"github.com/APTrust/registry/constants"
-	"github.com/APTrust/registry/db"
+	//"github.com/APTrust/registry/constants"
+	//"github.com/APTrust/registry/db"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/APTrust/registry/web/api"
 	tu "github.com/APTrust/registry/web/testutil"
@@ -36,7 +36,7 @@ func TestWorkItemShow(t *testing.T) {
 		if client == tu.SysAdminClient {
 			continue
 		}
-		tu.Inst2AdminClient.GET("/admin-api/v3/items/show/{id}", gf.ID).
+		tu.Inst2AdminClient.GET("/admin-api/v3/items/show/{id}", item.ID).
 			Expect().
 			Status(http.StatusForbidden)
 	}
@@ -54,7 +54,7 @@ func TestWorkItemIndex(t *testing.T) {
 	list := api.WorkItemViewList{}
 	err := json.Unmarshal([]byte(resp.Body().Raw()), &list)
 	require.Nil(t, err)
-	assert.Equal(t, 32, list.Count)
+	assert.Equal(t, 33, list.Count)
 	assert.Equal(t, "/admin-api/v3/items?page=3&per_page=5", list.Next)
 	assert.Equal(t, "/admin-api/v3/items?page=1&per_page=5", list.Previous)
 	assert.Equal(t, tu.Inst2User.InstitutionID, list.Results[0].InstitutionID)

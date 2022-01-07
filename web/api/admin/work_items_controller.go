@@ -3,8 +3,8 @@ package admin_api
 import (
 	"net/http"
 
-	"github.com/APTrust/registry/common"
-	"github.com/APTrust/registry/constants"
+	//"github.com/APTrust/registry/common"
+	//"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/APTrust/registry/web/api"
 	"github.com/gin-gonic/gin"
