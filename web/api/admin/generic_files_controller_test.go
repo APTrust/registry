@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"testing"
-	//"time"
+	"time"
 
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/db"
@@ -99,13 +99,10 @@ func TestFileCreateUpdateDelete(t *testing.T) {
 	defer db.ForceFixtureReload()
 	tu.InitHTTPTests(t)
 	gf := testFileCreate(t)
-	testFileUpdate(t, gf)
+	updatedFile := testFileUpdate(t, gf)
 
-	// TODO: Implement GF deletion logic first.
-	//       Then proceed to these tests.
-	//
-	//createDeletionPreConditions(t, obj)
-	//testFileDelete(t, updatedObj)
+	createFileDeletionPreConditions(t, updatedFile)
+	testFileDelete(t, updatedFile)
 }
 
 func testFileCreate(t *testing.T) *pgmodels.GenericFile {
@@ -152,4 +149,61 @@ func testFileUpdate(t *testing.T, gf *pgmodels.GenericFile) *pgmodels.GenericFil
 	assert.True(t, updatedGf.UpdatedAt.After(origUpdatedAt))
 
 	return updatedGf
+}
+
+// Registry business rules won't allow deletions without the following:
+//
+// - Ingest event at ingest.
+// - Deletion request when a user clicks the delete file button
+//   in the web UI.
+// - WorkItem when an inst admin has approved the deletion request.
+//
+// Here, we create them just so we can complete our test.
+func createFileDeletionPreConditions(t *testing.T, gf *pgmodels.GenericFile) {
+	// Deletion checks for last ingest event on this object.
+	event := pgmodels.RandomPremisEvent(constants.EventIngestion)
+	event.IntellectualObjectID = gf.IntellectualObjectID
+	event.GenericFileID = gf.ID
+	event.GenericFileID = 0
+	event.InstitutionID = gf.InstitutionID
+	require.Nil(t, event.Save())
+
+	// Also requires an approved Deletion work item
+	item := pgmodels.RandomWorkItem(
+		"TestBagName.tar",
+		constants.ActionDelete,
+		gf.IntellectualObjectID,
+		gf.ID)
+	item.User = "admin@test.edu"
+	item.InstApprover = "admin@test.edu"
+	item.Status = constants.StatusStarted
+	require.Nil(t, item.Save())
+	require.True(t, item.ID > 0)
+
+	// Requires approved deletion request
+	now := time.Now().UTC()
+	req, err := pgmodels.NewDeletionRequest()
+	require.Nil(t, err)
+	req.GenericFiles = append(req.GenericFiles, gf)
+	req.InstitutionID = gf.InstitutionID
+	req.RequestedByID = 8 // admin@test.edu
+	req.RequestedAt = now
+	req.ConfirmedByID = 8
+	req.ConfirmedAt = now
+	req.WorkItemID = item.ID
+	require.Nil(t, req.Save())
+}
+
+func testFileDelete(t *testing.T, gf *pgmodels.GenericFile) {
+	resp := tu.SysAdminClient.DELETE("/admin-api/v3/files/delete/{id}", gf.ID).Expect()
+	resp.Status(http.StatusOK)
+
+	deletedFile := &pgmodels.GenericFile{}
+	err := json.Unmarshal([]byte(resp.Body().Raw()), deletedFile)
+	require.Nil(t, err)
+
+	assert.Equal(t, gf.ID, deletedFile.ID)
+	assert.Equal(t, constants.StateDeleted, deletedFile.State)
+
+	// Test for deletion event
 }

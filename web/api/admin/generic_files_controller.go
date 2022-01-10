@@ -22,8 +22,6 @@ func GenericFileDelete(c *gin.Context) {
 	if api.AbortIfError(c, err) {
 		return
 	}
-
-	// TODO: Ensure underlying logic, similar to IntelObj delete
 	err = gf.Delete()
 	if api.AbortIfError(c, err) {
 		return

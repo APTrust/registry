@@ -49,5 +49,5 @@ Delete needs to ensure all files are already marked as deleted and must create a
 
 [x] List - uses common API
 [x] Show - uses common API
-[ ] Create - admin API only
-[ ] Update - admin API only
+[x] Create - admin API only
+[x] Update - admin API only

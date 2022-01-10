@@ -76,7 +76,7 @@ func TestObjectCreateUpdateDelete(t *testing.T) {
 	obj := testObjectCreate(t)
 	updatedObj := testObjectUpdate(t, obj)
 
-	createDeletionPreConditions(t, obj)
+	createObjectDeletionPreConditions(t, obj)
 	testObjectDelete(t, updatedObj)
 }
 
@@ -90,7 +90,7 @@ func TestObjectCreateUpdateDelete(t *testing.T) {
 // - WorkItem when an inst admin has approved the deletion request.
 //
 // Here, we create them just so we can complete our test.
-func createDeletionPreConditions(t *testing.T, obj *pgmodels.IntellectualObject) {
+func createObjectDeletionPreConditions(t *testing.T, obj *pgmodels.IntellectualObject) {
 	// Deletion checks for last ingest event on this object.
 	event := pgmodels.RandomPremisEvent(constants.EventIngestion)
 	event.IntellectualObjectID = obj.ID
@@ -177,6 +177,8 @@ func testObjectDelete(t *testing.T, obj *pgmodels.IntellectualObject) {
 
 	assert.Equal(t, obj.ID, deletedObj.ID)
 	assert.Equal(t, constants.StateDeleted, deletedObj.State)
+
+	// Test for deletion event
 }
 
 func TestObjectCreateUnauthorized(t *testing.T) {
