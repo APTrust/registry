@@ -17,7 +17,7 @@
 [x] Create
 [x] Update
 [ ] Batch Create
-[ ] Delete
+[x] Delete
 
 Create should support bulk insert.
 
@@ -36,8 +36,8 @@ Create should support bulk insert.
 
 Delete needs to ensure all files are already marked as deleted and must create a deletion premis event.
 
-[ ] Ensure all files deleted
-[ ] Create deletion premis event
+[x] Ensure all files deleted (when deleting objects only)
+[x] Create deletion premis event
 
 ## Premis Events
 

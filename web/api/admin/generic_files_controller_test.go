@@ -198,6 +198,7 @@ func testFileDelete(t *testing.T, gf *pgmodels.GenericFile) {
 	resp := tu.SysAdminClient.DELETE("/admin-api/v3/files/delete/{id}", gf.ID).Expect()
 	resp.Status(http.StatusOK)
 
+	// Make sure we got the expected JSON response from the server.
 	deletedFile := &pgmodels.GenericFile{}
 	err := json.Unmarshal([]byte(resp.Body().Raw()), deletedFile)
 	require.Nil(t, err)
@@ -205,5 +206,14 @@ func testFileDelete(t *testing.T, gf *pgmodels.GenericFile) {
 	assert.Equal(t, gf.ID, deletedFile.ID)
 	assert.Equal(t, constants.StateDeleted, deletedFile.State)
 
+	// Make sure the state was actually saved
+	savedFile, err := pgmodels.GenericFileByID(gf.ID)
+	require.Nil(t, err)
+	assert.Equal(t, constants.StateDeleted, savedFile.State)
+
 	// Test for deletion event
+	event, err := gf.LastDeletionEvent()
+	require.Nil(t, err)
+	require.NotNil(t, event)
+	require.True(t, event.DateTime.After(time.Now().UTC().Add(-5*time.Second)))
 }

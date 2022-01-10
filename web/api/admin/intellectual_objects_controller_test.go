@@ -178,7 +178,16 @@ func testObjectDelete(t *testing.T, obj *pgmodels.IntellectualObject) {
 	assert.Equal(t, obj.ID, deletedObj.ID)
 	assert.Equal(t, constants.StateDeleted, deletedObj.State)
 
+	// Make sure the state was actually saved
+	savedObj, err := pgmodels.IntellectualObjectByID(obj.ID)
+	require.Nil(t, err)
+	assert.Equal(t, constants.StateDeleted, savedObj.State)
+
 	// Test for deletion event
+	event, err := obj.LastDeletionEvent()
+	require.Nil(t, err)
+	require.NotNil(t, event)
+	require.True(t, event.DateTime.After(time.Now().UTC().Add(-5*time.Second)))
 }
 
 func TestObjectCreateUnauthorized(t *testing.T) {
