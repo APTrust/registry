@@ -3,16 +3,14 @@ package admin_api
 import (
 	"net/http"
 
-	//"github.com/APTrust/registry/common"
-	//"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/APTrust/registry/web/api"
 	"github.com/gin-gonic/gin"
 )
 
-// WorkItemCreate creates a new object record.
+// WorkItemCreate creates a new WorkItem.
 //
-// POST /admin-api/v3/files/create/:institution_id
+// POST /admin-api/v3/items/create/:institution_id
 func WorkItemCreate(c *gin.Context) {
 	gf, err := CreateOrUpdateItem(c)
 	if api.AbortIfError(c, err) {
@@ -21,10 +19,9 @@ func WorkItemCreate(c *gin.Context) {
 	c.JSON(http.StatusCreated, gf)
 }
 
-// WorkItemUpdate updates an existing intellectual
-// object record.
+// WorkItemUpdate updates an existing WorkItem record.
 //
-// PUT /admin-api/v3/files/update/:id
+// PUT /admin-api/v3/items/update/:id
 func WorkItemUpdate(c *gin.Context) {
 	gf, err := CreateOrUpdateItem(c)
 	if api.AbortIfError(c, err) {

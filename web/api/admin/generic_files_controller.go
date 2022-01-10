@@ -31,7 +31,7 @@ func GenericFileDelete(c *gin.Context) {
 	c.JSON(http.StatusOK, gf)
 }
 
-// GenericFileCreate creates a new object record.
+// GenericFileCreate creates a new GenericFile.
 //
 // POST /admin-api/v3/files/create/:institution_id
 func GenericFileCreate(c *gin.Context) {
@@ -42,8 +42,7 @@ func GenericFileCreate(c *gin.Context) {
 	c.JSON(http.StatusCreated, gf)
 }
 
-// GenericFileUpdate updates an existing intellectual
-// object record.
+// GenericFileUpdate updates an existing GenericFile.
 //
 // PUT /admin-api/v3/files/update/:id
 func GenericFileUpdate(c *gin.Context) {

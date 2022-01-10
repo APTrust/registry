@@ -26,6 +26,19 @@ const (
 	ErrItemOutcome       = "Outcome cannot be empty."
 )
 
+// WorkItem contains information about a task or suite of related tasks
+// to be performed by the preservation services workers, such as ingest,
+// restoration, and deletion. While preservation services uses Redis
+// to track interim processing data as it works, WorkItem records here
+// in the registry keep a record that's visible to both depositors and
+// APTrust admins.
+//
+// These high-level records let us know whether a task is pending, in process,
+// or completed. They also let us know the outcome and what specific errors
+// may have occurred.
+//
+// WorkItems cannot be deleted because they're part of our system's
+// audit trail.
 type WorkItem struct {
 	TimestampModel
 	Name                 string    `json:"name" pg:"name"`

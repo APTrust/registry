@@ -349,6 +349,8 @@ func initRoutes(router *gin.Engine) {
 
 		// Work Items
 		// TODO: Add Create & Update
+		adminAPI.POST("/items/create/:institution_id", admin_api.WorkItemCreate)
+		adminAPI.PUT("/items/update/:id", admin_api.WorkItemUpdate)
 		adminAPI.GET("/items/show/:id", common_api.WorkItemShow)
 		adminAPI.GET("/items", common_api.WorkItemIndex)
 

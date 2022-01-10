@@ -3,11 +3,10 @@ package admin_api_test
 import (
 	"encoding/json"
 	"net/http"
+	"os"
 	"testing"
-	//"time"
 
-	//"github.com/APTrust/registry/constants"
-	//"github.com/APTrust/registry/db"
+	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/APTrust/registry/web/api"
 	tu "github.com/APTrust/registry/web/testutil"
@@ -80,10 +79,60 @@ func TestWorkItemIndex(t *testing.T) {
 		if client == tu.SysAdminClient {
 			continue
 		}
-		tu.Inst2AdminClient.GET("/admin-api/v3/files").
+		tu.Inst2AdminClient.GET("/admin-api/v3/items").
 			Expect().
 			Status(http.StatusForbidden)
 	}
 }
 
-// TODO: Test create and update
+func TestItemCreateAndUpdate(t *testing.T) {
+	os.Setenv("APT_ENV", "test")
+	item := testItemCreate(t)
+	testItemUpdate(t, item)
+}
+
+func testItemCreate(t *testing.T) *pgmodels.WorkItem {
+	obj, err := pgmodels.IntellectualObjectGet(
+		pgmodels.NewQuery().
+			Where("institution_id", "=", 4).
+			Limit(1))
+	require.Nil(t, err)
+	require.NotNil(t, obj)
+	item := pgmodels.RandomWorkItem(obj.BagName, constants.ActionIngest, 1, 1)
+	resp := tu.SysAdminClient.POST("/admin-api/v3/items/create/{id}", item.InstitutionID).WithJSON(item).Expect()
+	resp.Status(http.StatusCreated)
+
+	savedItem := &pgmodels.WorkItem{}
+	err = json.Unmarshal([]byte(resp.Body().Raw()), savedItem)
+	require.Nil(t, err)
+	assert.True(t, savedItem.ID > int64(0))
+	assert.Equal(t, item.Name, savedItem.Name)
+	assert.Equal(t, item.InstitutionID, savedItem.InstitutionID)
+	assert.Equal(t, item.Size, savedItem.Size)
+	assert.Equal(t, item.Action, savedItem.Action)
+	assert.Equal(t, item.Outcome, savedItem.Outcome)
+	assert.NotEmpty(t, savedItem.CreatedAt)
+	assert.NotEmpty(t, savedItem.UpdatedAt)
+	return savedItem
+}
+
+func testItemUpdate(t *testing.T, item *pgmodels.WorkItem) *pgmodels.WorkItem {
+	origUpdatedAt := item.UpdatedAt
+	copyOfItem := item
+	copyOfItem.Size = item.Size + 200
+	copyOfItem.Outcome = "This outcome has been edited"
+
+	resp := tu.SysAdminClient.PUT("/admin-api/v3/items/update/{id}", item.ID).WithJSON(copyOfItem).Expect()
+	resp.Status(http.StatusOK)
+
+	updatedItem := &pgmodels.WorkItem{}
+	err := json.Unmarshal([]byte(resp.Body().Raw()), updatedItem)
+	require.Nil(t, err)
+
+	assert.Equal(t, copyOfItem.Size, updatedItem.Size)
+	assert.Equal(t, copyOfItem.Outcome, updatedItem.Outcome)
+	assert.Equal(t, item.CreatedAt, updatedItem.CreatedAt)
+	assert.True(t, updatedItem.UpdatedAt.After(origUpdatedAt))
+
+	return updatedItem
+}
