@@ -73,7 +73,7 @@ func (event *PremisEvent) Save() error {
 	return common.ErrNotSupported
 }
 
-// TODO: Needs validation
+// Validate returns errors if this event isn't valid.
 func (event *PremisEvent) Validate() *common.ValidationError {
 	errors := make(map[string]string)
 	if common.IsEmptyString(event.Agent) {

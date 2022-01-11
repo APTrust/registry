@@ -40,6 +40,20 @@ func GenericFileCreate(c *gin.Context) {
 	c.JSON(http.StatusCreated, gf)
 }
 
+// GenericFileCreateBatch creates a batch of now GenericFiles
+// and also saves their related records (PremisEvents, Checksums,
+// and StorageRecords). Items in the batch must be new. This
+// won't updated existing records.
+//
+// POST /admin-api/v3/files/create_batch/:institution_id
+func GenericFileCreateBatch(c *gin.Context) {
+	gf, err := CreateOrUpdateFile(c)
+	if api.AbortIfError(c, err) {
+		return
+	}
+	c.JSON(http.StatusCreated, gf)
+}
+
 // GenericFileUpdate updates an existing GenericFile.
 //
 // PUT /admin-api/v3/files/update/:id

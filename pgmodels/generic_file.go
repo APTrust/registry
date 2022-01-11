@@ -102,6 +102,95 @@ func (gf *GenericFile) Save() error {
 	return update(gf)
 }
 
+// CreateGenericFileBatch creates a batch of GenericFiles and
+// their dependent records (PremisEvents, Checksums, and StorageRecords)
+// in a single transaction. This transaction's single commit is much
+// more efficient than doing one commit per insert.
+//
+// This is used heavily during ingest.
+func CreateGenericFileBatch(files []*GenericFile) error {
+	registryContext := common.Context()
+	db := registryContext.DB
+	return db.RunInTransaction(db.Context(), func(tx *pg.Tx) error {
+		var err error
+		for _, gf := range files {
+			gf.saveInTransaction(tx)
+			if err != nil {
+				break
+			}
+		}
+		return err
+	})
+}
+
+func (gf *GenericFile) saveInTransaction(tx *pg.Tx) error {
+	gf.SetTimestamps()
+	validationErr := gf.Validate()
+	if validationErr != nil {
+		return validationErr
+	}
+	_, err := tx.Model(gf).Insert()
+	if err == nil {
+		err = gf.saveChecksumsTx(tx)
+	}
+	if err == nil {
+		err = gf.saveStorageRecordsTx(tx)
+	}
+	if err == nil {
+		err = gf.saveEventsTx(tx)
+	}
+	return err
+}
+
+func (gf *GenericFile) saveChecksumsTx(tx *pg.Tx) error {
+	for _, checksum := range gf.Checksums {
+		checksum.GenericFileID = gf.ID
+		checksum.SetTimestamps()
+		validationErr := checksum.Validate()
+		if validationErr != nil {
+			return validationErr
+		}
+		_, err := tx.Model(checksum).Insert()
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (gf *GenericFile) saveStorageRecordsTx(tx *pg.Tx) error {
+	for _, sr := range gf.StorageRecords {
+		sr.GenericFileID = gf.ID
+		validationErr := sr.Validate()
+		if sr != nil {
+			return validationErr
+		}
+		_, err := tx.Model(sr).Insert()
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (gf *GenericFile) saveEventsTx(tx *pg.Tx) error {
+	for _, event := range gf.PremisEvents {
+		event.InstitutionID = gf.InstitutionID
+		event.IntellectualObjectID = gf.IntellectualObjectID
+		event.GenericFileID = gf.ID
+		event.CreatedAt = time.Now().UTC()
+		validationErr := event.Validate()
+		if validationErr != nil {
+			return validationErr
+		}
+		_, err := tx.Model(event).Insert()
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // IsGlacierOnly returns true if this file is stored only
 // in Glacier.
 func (gf *GenericFile) IsGlacierOnly() bool {

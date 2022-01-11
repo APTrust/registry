@@ -1,8 +1,9 @@
 package pgmodels
 
 import (
-//"github.com/APTrust/registry/common"
-//"github.com/APTrust/registry/constants"
+	"github.com/APTrust/registry/common"
+	//"github.com/APTrust/registry/constants"
+	v "github.com/asaskevich/govalidator"
 )
 
 type StorageRecord struct {
@@ -40,8 +41,26 @@ func (sr *StorageRecord) GetID() int64 {
 // Save saves this file to the database. This will peform an insert
 // if StorageRecord.ID is zero. Otherwise, it updates.
 func (sr *StorageRecord) Save() error {
+	err := sr.Validate()
+	if err != nil {
+		return err
+	}
 	if sr.ID == int64(0) {
 		return insert(sr)
 	}
 	return update(sr)
+}
+
+func (sr *StorageRecord) Validate() *common.ValidationError {
+	errors := make(map[string]string)
+	if sr.GenericFileID <= 0 {
+		errors["GenericFileID"] = "Storage record requires a valid file id"
+	}
+	if !v.IsURL(sr.URL) {
+		errors["URL"] = "Storage record requires a valid URL"
+	}
+	if len(errors) > 0 {
+		return &common.ValidationError{Errors: errors}
+	}
+	return nil
 }
