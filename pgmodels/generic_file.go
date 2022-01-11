@@ -127,6 +127,7 @@ func (gf *GenericFile) saveInTransaction(tx *pg.Tx) error {
 	gf.SetTimestamps()
 	validationErr := gf.Validate()
 	if validationErr != nil {
+		common.Context().Log.Error().Msgf("GenericFile batch insertion failed on validation of file  (%s). Error: %s", gf.Identifier, validationErr.Error())
 		return validationErr
 	}
 	_, err := tx.Model(gf).Insert()
@@ -148,10 +149,12 @@ func (gf *GenericFile) saveChecksumsTx(tx *pg.Tx) error {
 		checksum.SetTimestamps()
 		validationErr := checksum.Validate()
 		if validationErr != nil {
+			common.Context().Log.Error().Msgf("GenericFile batch insertion failed on validation of checksum (%s) - %s. Error: %s", gf.Identifier, checksum.Digest, validationErr.Error())
 			return validationErr
 		}
 		_, err := tx.Model(checksum).Insert()
 		if err != nil {
+			common.Context().Log.Error().Msgf("GenericFile batch insertion failed on insert of checksum (%s) - %s. Error: %s", gf.Identifier, checksum.Digest, err.Error())
 			return err
 		}
 	}
@@ -163,10 +166,12 @@ func (gf *GenericFile) saveStorageRecordsTx(tx *pg.Tx) error {
 		sr.GenericFileID = gf.ID
 		validationErr := sr.Validate()
 		if sr != nil {
+			common.Context().Log.Error().Msgf("GenericFile batch insertion failed on validation of storage record (%s) - %s. Error: %s", gf.Identifier, sr.URL, validationErr.Error())
 			return validationErr
 		}
 		_, err := tx.Model(sr).Insert()
 		if err != nil {
+			common.Context().Log.Error().Msgf("GenericFile batch insertion failed on insert of storage record (%s) %s. Error: %s", gf.Identifier, sr.URL, err.Error())
 			return err
 		}
 	}
@@ -181,10 +186,12 @@ func (gf *GenericFile) saveEventsTx(tx *pg.Tx) error {
 		event.CreatedAt = time.Now().UTC()
 		validationErr := event.Validate()
 		if validationErr != nil {
+			common.Context().Log.Error().Msgf("GenericFile batch insertion failed on validation of event (%s) - %s. Error: %s", gf.Identifier, event.EventType, validationErr.Error())
 			return validationErr
 		}
 		_, err := tx.Model(event).Insert()
 		if err != nil {
+			common.Context().Log.Error().Msgf("GenericFile batch insertion failed on insert of event (%s) - %s. Error: %s", gf.Identifier, event.EventType, err.Error())
 			return err
 		}
 	}
@@ -367,6 +374,12 @@ func (gf *GenericFile) Delete() error {
 		_, err = tx.Model(deletionEvent).Insert()
 		if err != nil {
 			registryContext.Log.Error().Msgf("GenericFile deletion transaction failed on insertion of event. File: %d (%s). Error: %v", gf.ID, gf.Identifier, err)
+		}
+		for _, sr := range gf.StorageRecords {
+			_, err = tx.Model(sr).Where("id = ?", sr.ID).Delete()
+			if err != nil {
+				registryContext.Log.Error().Msgf("GenericFile deletion transaction failed on deletion of StorageRecord %d. File: %d (%s). Error: %v", sr.ID, gf.ID, gf.Identifier, err)
+			}
 		}
 		return err
 	})

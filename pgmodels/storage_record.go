@@ -2,13 +2,12 @@ package pgmodels
 
 import (
 	"github.com/APTrust/registry/common"
-	//"github.com/APTrust/registry/constants"
 	v "github.com/asaskevich/govalidator"
 )
 
 type StorageRecord struct {
-	ID            int64        `json:"id" form:"id" pg:"id"`
-	GenericFileID int64        `json:"generic_file_id" form:"generic_file_id" pg:"generic_file_id"`
+	ID            int64        `json:"id" pg:"id"`
+	GenericFileID int64        `json:"generic_file_id"`
 	URL           string       `json:"url" form:"url" pg:"url"`
 	GenericFile   *GenericFile `json:"-" pg:"rel:has-one"`
 }
@@ -16,7 +15,7 @@ type StorageRecord struct {
 // StorageRecordByID returns the file with the specified id.
 // Returns pg.ErrNoRows if there is no match.
 func StorageRecordByID(id int64) (*StorageRecord, error) {
-	query := NewQuery().Where(`"checksum"."id"`, "=", id).Relations()
+	query := NewQuery().Where("id", "=", id).Relations()
 	return StorageRecordGet(query)
 }
 

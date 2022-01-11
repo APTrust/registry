@@ -11,6 +11,58 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestPremisEventByID(t *testing.T) {
+	event, err := pgmodels.PremisEventByID(1)
+	require.Nil(t, err)
+	require.NotNil(t, event)
+	assert.Equal(t, int64(1), event.ID)
+}
+
+func TestPremisEventGet(t *testing.T) {
+	query := pgmodels.NewQuery().
+		Where("institution_id", "=", 2).
+		Offset(0).
+		Limit(1)
+	event, err := pgmodels.PremisEventGet(query)
+	require.Nil(t, err)
+	require.NotNil(t, event)
+	assert.Equal(t, int64(2), event.InstitutionID)
+}
+
+func TestPremisEventSelect(t *testing.T) {
+	query := pgmodels.NewQuery().
+		Where("institution_id", "=", 2).
+		Offset(0).
+		Limit(4)
+	events, err := pgmodels.PremisEventSelect(query)
+	require.Nil(t, err)
+	require.NotEmpty(t, events)
+	assert.Equal(t, 4, len(events))
+	for _, event := range events {
+		assert.Equal(t, int64(2), event.InstitutionID)
+	}
+}
+
+func TestPremisEventGetID(t *testing.T) {
+	event := &pgmodels.PremisEvent{}
+	assert.Equal(t, int64(0), event.GetID())
+	event, _ = pgmodels.PremisEventByID(4)
+	assert.Equal(t, int64(4), event.GetID())
+}
+
+func TestPremisEventSave(t *testing.T) {
+	event := pgmodels.RandomPremisEvent(constants.EventIngestion)
+	err := event.Save()
+	assert.Nil(t, err)
+	assert.True(t, event.ID > 0)
+
+	invalidEvent := event
+	invalidEvent.ID = 0
+	invalidEvent.EventType = ""
+	err = invalidEvent.Save()
+	assert.NotNil(t, err)
+}
+
 func TestObjectEventCount(t *testing.T) {
 	db.LoadFixtures()
 	count, err := pgmodels.ObjectEventCount(3)

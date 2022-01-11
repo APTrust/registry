@@ -60,7 +60,7 @@ func (cs *Checksum) Validate() *common.ValidationError {
 		errors["DateTime"] = "Checksum DateTime is required"
 	}
 	if !slice.Contains(constants.DigestAlgs, cs.Algorithm) {
-		errors["Algorithm"] = "Checksum requires a valid Algorithm"
+		errors["Algorithm"] = "Checksum requires a valid algorithm"
 	}
 	if cs.GenericFileID <= 0 {
 		errors["GenericFileID"] = "Checksum requires a valid file id"
