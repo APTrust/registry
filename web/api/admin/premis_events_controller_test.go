@@ -23,7 +23,6 @@ import (
 //
 // These subsequent requests cause errors in the gin engine because they don't
 // match any known routes.
-
 func TestPremisEventCreate(t *testing.T) {
 	os.Setenv("APT_ENV", "test")
 	tu.InitHTTPTests(t)

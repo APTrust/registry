@@ -1,7 +1,7 @@
 package pgmodels_test
 
 import (
-	//"fmt"
+	"os"
 	"strings"
 	"testing"
 	"time"
@@ -10,6 +10,7 @@ import (
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/db"
 	"github.com/APTrust/registry/pgmodels"
+	v "github.com/asaskevich/govalidator"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -363,4 +364,85 @@ func testFileDeletionEventProperties(t *testing.T, gf *pgmodels.GenericFile, eve
 	assert.Equal(t, constants.OutcomeSuccess, event.Outcome)
 	assert.Equal(t, "user@test.edu", event.OutcomeDetail)
 	assert.Equal(t, "File deleted at the request of user@test.edu. Institutional approver: user@test.edu.", event.OutcomeInformation)
+}
+
+// getRandFileBatch returns a slice of 20 GenericFiles, each with
+// 4 events, checksums, and storage records.
+func getRandomFileBatch(t *testing.T) (*pgmodels.IntellectualObject, []*pgmodels.GenericFile) {
+	obj := pgmodels.RandomObject()
+	require.Nil(t, obj.Save())
+
+	files := make([]*pgmodels.GenericFile, 20)
+	for i := 0; i < 20; i++ {
+		gf := pgmodels.RandomGenericFile(obj.ID, obj.Identifier)
+		for j := 0; j < 4; j++ {
+			event := pgmodels.RandomPremisEvent(constants.EventIngestion)
+			event.Outcome = constants.OutcomeSuccess
+			gf.PremisEvents = append(gf.PremisEvents, event)
+
+			checksum := pgmodels.RandomChecksum(constants.AlgSha1)
+			gf.Checksums = append(gf.Checksums, checksum)
+
+			sr := pgmodels.RandomStorageRecord()
+			gf.StorageRecords = append(gf.StorageRecords, sr)
+		}
+		files[i] = gf
+	}
+	return obj, files
+}
+
+func TestGenericFileCreateBatch(t *testing.T) {
+	// defer db.ForceFixtureReload()
+	os.Setenv("APT_ENV", "test")
+	obj, files := getRandomFileBatch(t)
+	err := pgmodels.GenericFileCreateBatch(files)
+	require.Nil(t, err)
+
+	// Now let's see what was saved.
+	query := pgmodels.NewQuery().
+		Where("intellectual_object_id", "=", obj.ID)
+	savedFiles, err := pgmodels.GenericFileSelect(query)
+	require.Nil(t, err)
+	assert.Equal(t, 20, len(savedFiles))
+	for _, gf := range savedFiles {
+		// Make sure file properties were set...
+		assert.True(t, gf.ID > 0)
+		assert.Equal(t, obj.ID, gf.IntellectualObjectID)
+		assert.Equal(t, obj.InstitutionID, gf.InstitutionID)
+
+		// Make sure all events were saved with correct properties.
+		query := pgmodels.NewQuery().Where("generic_file_id", "=", gf.ID)
+		events, err := pgmodels.PremisEventSelect(query)
+		require.Nil(t, err)
+		assert.Equal(t, 4, len(events))
+		for _, event := range events {
+			assert.Equal(t, gf.ID, event.GenericFileID)
+			assert.Equal(t, gf.IntellectualObjectID, event.IntellectualObjectID)
+			assert.Equal(t, gf.InstitutionID, event.InstitutionID)
+			assert.Equal(t, constants.EventIngestion, event.EventType)
+			assert.False(t, event.DateTime.IsZero())
+			assert.False(t, event.CreatedAt.IsZero())
+		}
+
+		// Check checksums
+		checksums, err := pgmodels.ChecksumSelect(query)
+		require.Nil(t, err)
+		assert.Equal(t, 4, len(checksums))
+		for _, cs := range checksums {
+			assert.Equal(t, gf.ID, cs.GenericFileID)
+			assert.Equal(t, constants.AlgSha1, cs.Algorithm)
+			assert.False(t, cs.DateTime.IsZero())
+			assert.False(t, cs.CreatedAt.IsZero())
+			assert.False(t, cs.UpdatedAt.IsZero())
+		}
+
+		// And storage records
+		storageRecs, err := pgmodels.StorageRecordSelect(query)
+		require.Nil(t, err)
+		assert.Equal(t, 4, len(storageRecs))
+		for _, sr := range storageRecs {
+			assert.Equal(t, gf.ID, sr.GenericFileID)
+			assert.True(t, v.IsURL(sr.URL))
+		}
+	}
 }

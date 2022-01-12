@@ -16,7 +16,7 @@
 [x] Show - uses common API
 [x] Create
 [x] Update
-[ ] Batch Create
+[x] Batch Create
 [x] Delete
 
 Create should support bulk insert.

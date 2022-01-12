@@ -102,19 +102,19 @@ func (gf *GenericFile) Save() error {
 	return update(gf)
 }
 
-// CreateGenericFileBatch creates a batch of GenericFiles and
+// GenericFileCreateBatch creates a batch of GenericFiles and
 // their dependent records (PremisEvents, Checksums, and StorageRecords)
 // in a single transaction. This transaction's single commit is much
 // more efficient than doing one commit per insert.
 //
 // This is used heavily during ingest.
-func CreateGenericFileBatch(files []*GenericFile) error {
+func GenericFileCreateBatch(files []*GenericFile) error {
 	registryContext := common.Context()
 	db := registryContext.DB
 	return db.RunInTransaction(db.Context(), func(tx *pg.Tx) error {
 		var err error
 		for _, gf := range files {
-			gf.saveInTransaction(tx)
+			err = gf.saveInTransaction(tx)
 			if err != nil {
 				break
 			}
@@ -165,7 +165,7 @@ func (gf *GenericFile) saveStorageRecordsTx(tx *pg.Tx) error {
 	for _, sr := range gf.StorageRecords {
 		sr.GenericFileID = gf.ID
 		validationErr := sr.Validate()
-		if sr != nil {
+		if validationErr != nil {
 			common.Context().Log.Error().Msgf("GenericFile batch insertion failed on validation of storage record (%s) - %s. Error: %s", gf.Identifier, sr.URL, validationErr.Error())
 			return validationErr
 		}
