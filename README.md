@@ -113,6 +113,22 @@ Note that Go does not rerun tests that passed on the prior run. If you want to f
 
 This may be necessary if the tests passed on the prior run, but you want to force a reload of the schema or the fixtures.
 
+## Fixtures
+
+The test script automatically loads fixtures when tests begin. Fixtures for Inst 1 and Inst 2 are stable. Tests don't add objects, files, etc. to those institutions. That means you can test for a certain number of items (e.g. the index page should return 4 objects, or 6 files) and you should get that number.
+
+Items added dynamically during tests are added to the test.edu institution. Counts of these items may change between tests, so don't rely on them.
+
+If you want to ensure a 100% known dataset before any test, call `db.ForceFixtureReload()` at the top of your test fuction. If your test is going to pollute the DB, call `defer db.ForceFixtureReload()` at the outset, so your test will clean up after itself.
+
+The only reason we don't call `db.ForceFixtureReload()` for every test is because it will slow down the test suite.
+
+## HTTP Tests
+
+We use the httpexpect test library, which sometimes panics when calling Expect(). That seems to be a bug. It can also send repeat requests if you call Expect() and then later call Expect().Body(). The repeated requests mangle the URL, causing errors. That also seems to be a bug.
+
+You can call `testutil.InitHTTPTests()` before any HTTP tests to ensure HTTP test clients are ready to use. This call is idempotent, and will only initialize clients that have not yet been initialized, so it's always safe to call.
+
 # External Services
 
 If you want to send two-factor OTP codes through SMS, or two-factor Authy push notifications, you'll need to enable these in the .env (or .env.test) file. Set the following:
