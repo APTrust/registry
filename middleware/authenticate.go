@@ -89,6 +89,13 @@ func GetUserFromAPIHeaders(c *gin.Context) (user *pgmodels.User, err error) {
 		return nil, err
 	}
 	if common.ComparePasswords(user.EncryptedAPISecretKey, apiUserKey) {
+		// Set this because API requests bypass CSRF protection and
+		// we want to ensure user passed valid auth headers. This
+		// prevents a CSRF hijack where bad actor sends XHR PUT/POST
+		// with valid user cookie. For API, we accept the token header
+		// only, which won't be present in the browser environment and
+		// therefore can't be hijacked.
+		c.Set("UserIsApiAuthenticated", true)
 		return user, nil
 	}
 	common.Context().Log.Warn().Msgf("Invalid API token from user %s at %s.", apiUserEmail, c.Request.RemoteAddr)

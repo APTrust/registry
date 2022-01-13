@@ -37,7 +37,20 @@ func Authorize() gin.HandlerFunc {
 	}
 }
 
-func IsAPIRequest(path string) bool {
+func IsAPIRequest(c *gin.Context) bool {
+	// If we're going to bypass CSRF, make sure user authenticated
+	// via API token, and not by cookie because cookies can be
+	// hijacked by XSS attacks. API token won't exist in the browser
+	// context, and can't be hijacked by a malicious script.
+	isApiAuthenticated, exists := c.Get("UserIsApiAuthenticated")
+	if !exists || !isApiAuthenticated.(bool) {
+		return false
+	}
+	return IsAPIRoute(c)
+}
+
+func IsAPIRoute(c *gin.Context) bool {
+	path := c.Request.URL.Path // c.FullPath()
 	for _, prefix := range constants.APIPrefixes {
 		if strings.HasPrefix(path, prefix) {
 			return true
@@ -49,7 +62,7 @@ func IsAPIRequest(path string) bool {
 func showNotCheckedError(c *gin.Context, auth *ResourceAuthorization) {
 	common.Context().Log.Error().Msgf(auth.GetError())
 	errMsg := fmt.Sprintf("Missing authorization check for %s", c.FullPath())
-	if IsAPIRequest(c.Request.URL.Path) {
+	if IsAPIRequest(c) {
 		c.JSON(http.StatusInternalServerError, map[string]string{
 			"error": errMsg,
 		})
@@ -68,7 +81,7 @@ func showAuthFailedError(c *gin.Context, auth *ResourceAuthorization) {
 	if auth.Error != nil {
 		errMsg = fmt.Sprintf("%s %s", errMsg, auth.Error.Error())
 	}
-	if IsAPIRequest(c.Request.URL.Path) {
+	if IsAPIRoute(c) {
 		c.JSON(http.StatusForbidden, map[string]string{
 			"error": errMsg,
 		})

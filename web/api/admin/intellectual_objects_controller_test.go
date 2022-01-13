@@ -22,7 +22,10 @@ func TestObjectShow(t *testing.T) {
 	require.NotNil(t, obj)
 
 	// Sysadmin can get this object through the admin API.
-	resp := tu.SysAdminClient.GET("/admin-api/v3/objects/show/{id}", obj.ID).Expect().Status(http.StatusOK)
+	resp := tu.SysAdminClient.GET("/admin-api/v3/objects/show/{id}", obj.ID).
+		WithHeader(constants.APIUserHeader, tu.SysAdmin.Email).
+		WithHeader(constants.APIKeyHeader, "password").
+		Expect().Status(http.StatusOK)
 	record := &pgmodels.IntellectualObject{}
 	err = json.Unmarshal([]byte(resp.Body().Raw()), record)
 	require.Nil(t, err)
@@ -30,7 +33,10 @@ func TestObjectShow(t *testing.T) {
 	assert.Equal(t, obj.InstitutionID, record.InstitutionID)
 
 	// Sysadmin should also be able to find by identifier
-	resp = tu.SysAdminClient.GET("/admin-api/v3/objects/show/{id}", obj.Identifier).Expect().Status(http.StatusOK)
+	resp = tu.SysAdminClient.GET("/admin-api/v3/objects/show/{id}", obj.Identifier).
+		WithHeader(constants.APIUserHeader, tu.SysAdmin.Email).
+		WithHeader(constants.APIKeyHeader, "password").
+		Expect().Status(http.StatusOK)
 	record = &pgmodels.IntellectualObject{}
 	err = json.Unmarshal([]byte(resp.Body().Raw()), record)
 	require.Nil(t, err)
@@ -49,6 +55,8 @@ func TestObjectIndex(t *testing.T) {
 
 	// Admin can see this page.
 	resp := tu.SysAdminClient.GET("/admin-api/v3/objects").
+		WithHeader(constants.APIUserHeader, tu.SysAdmin.Email).
+		WithHeader(constants.APIKeyHeader, "password").
 		WithQuery("page", 2).
 		WithQuery("per_page", 5).
 		Expect().Status(http.StatusOK)
@@ -127,7 +135,10 @@ func createObjectDeletionPreConditions(t *testing.T, obj *pgmodels.IntellectualO
 func testObjectCreate(t *testing.T) *pgmodels.IntellectualObject {
 	// Random objects use inst id 4 -> test.edu
 	obj := pgmodels.RandomObject()
-	resp := tu.SysAdminClient.POST("/admin-api/v3/objects/create/{id}", obj.InstitutionID).WithJSON(obj).Expect()
+	resp := tu.SysAdminClient.POST("/admin-api/v3/objects/create/{id}", obj.InstitutionID).
+		WithHeader(constants.APIUserHeader, tu.SysAdmin.Email).
+		WithHeader(constants.APIKeyHeader, "password").
+		WithJSON(obj).Expect()
 	resp.Status(http.StatusCreated)
 
 	savedObj := &pgmodels.IntellectualObject{}
@@ -151,7 +162,10 @@ func testObjectUpdate(t *testing.T, obj *pgmodels.IntellectualObject) *pgmodels.
 	copyOfObj.Title = "Updated Title"
 	copyOfObj.ETag = "UpdatedETag"
 
-	resp := tu.SysAdminClient.PUT("/admin-api/v3/objects/update/{id}", obj.ID).WithJSON(copyOfObj).Expect()
+	resp := tu.SysAdminClient.PUT("/admin-api/v3/objects/update/{id}", obj.ID).
+		WithHeader(constants.APIUserHeader, tu.SysAdmin.Email).
+		WithHeader(constants.APIKeyHeader, "password").
+		WithJSON(copyOfObj).Expect()
 	resp.Status(http.StatusOK)
 
 	updatedObj := &pgmodels.IntellectualObject{}
@@ -168,7 +182,10 @@ func testObjectUpdate(t *testing.T, obj *pgmodels.IntellectualObject) *pgmodels.
 }
 
 func testObjectDelete(t *testing.T, obj *pgmodels.IntellectualObject) {
-	resp := tu.SysAdminClient.DELETE("/admin-api/v3/objects/delete/{id}", obj.ID).Expect()
+	resp := tu.SysAdminClient.DELETE("/admin-api/v3/objects/delete/{id}", obj.ID).
+		WithHeader(constants.APIUserHeader, tu.SysAdmin.Email).
+		WithHeader(constants.APIKeyHeader, "password").
+		Expect()
 	resp.Status(http.StatusOK)
 
 	deletedObj := &pgmodels.IntellectualObject{}

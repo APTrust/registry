@@ -38,7 +38,11 @@ func TestPremisEventCreate(t *testing.T) {
 	require.Nil(t, err)
 	require.NotEmpty(t, jsonData)
 
-	resp := tu.SysAdminClient.POST("/admin-api/v3/events/create").WithBytes(jsonData).Expect()
+	resp := tu.SysAdminClient.POST("/admin-api/v3/events/create").
+		WithHeader(constants.APIUserHeader, tu.SysAdmin.Email).
+		WithHeader(constants.APIKeyHeader, "password").
+		WithBytes(jsonData).
+		Expect()
 	savedEvent := &pgmodels.PremisEvent{}
 	err = json.Unmarshal([]byte(resp.Body().Raw()), savedEvent)
 	require.Nil(t, err)

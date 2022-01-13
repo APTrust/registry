@@ -25,7 +25,10 @@ func TestGenericFileShow(t *testing.T) {
 	// Sysadmin should be able to get this.
 	// This is a pass-through to the common api endpoint,
 	// but we want to make sure it's available at this URL.
-	resp := tu.SysAdminClient.GET("/admin-api/v3/files/show/{id}", gf.ID).Expect().Status(http.StatusOK)
+	resp := tu.SysAdminClient.GET("/admin-api/v3/files/show/{id}", gf.ID).
+		WithHeader(constants.APIUserHeader, tu.SysAdmin.Email).
+		WithHeader(constants.APIKeyHeader, "password").
+		Expect().Status(http.StatusOK)
 	record := &pgmodels.GenericFile{}
 	err = json.Unmarshal([]byte(resp.Body().Raw()), record)
 	require.Nil(t, err)
@@ -50,6 +53,8 @@ func TestGenericFileIndex(t *testing.T) {
 	// This endpoint should work for sys admin
 	// but not for others.
 	resp := tu.SysAdminClient.GET("/admin-api/v3/files").
+		WithHeader(constants.APIUserHeader, tu.SysAdmin.Email).
+		WithHeader(constants.APIKeyHeader, "password").
 		WithQuery("page", 2).
 		WithQuery("per_page", 5).
 		Expect().Status(http.StatusOK)
@@ -64,6 +69,8 @@ func TestGenericFileIndex(t *testing.T) {
 
 	// Test some filters. This object has 1 deleted, 4 active files.
 	resp = tu.SysAdminClient.GET("/admin-api/v3/files").
+		WithHeader(constants.APIUserHeader, tu.SysAdmin.Email).
+		WithHeader(constants.APIKeyHeader, "password").
 		WithQuery("intellectual_object_id", 3).
 		WithQuery("state", "A").
 		Expect().Status(http.StatusOK)
@@ -113,7 +120,10 @@ func testFileCreate(t *testing.T) *pgmodels.GenericFile {
 	require.Nil(t, err)
 	require.NotNil(t, obj)
 	gf := pgmodels.RandomGenericFile(obj.ID, obj.Identifier)
-	resp := tu.SysAdminClient.POST("/admin-api/v3/files/create/{id}", gf.InstitutionID).WithJSON(gf).Expect()
+	resp := tu.SysAdminClient.POST("/admin-api/v3/files/create/{id}", gf.InstitutionID).
+		WithHeader(constants.APIUserHeader, tu.SysAdmin.Email).
+		WithHeader(constants.APIKeyHeader, "password").
+		WithJSON(gf).Expect()
 	resp.Status(http.StatusCreated)
 
 	savedFile := &pgmodels.GenericFile{}
@@ -136,7 +146,10 @@ func testFileUpdate(t *testing.T, gf *pgmodels.GenericFile) *pgmodels.GenericFil
 	copyOfGf.Size = gf.Size + 200
 	copyOfGf.FileFormat = "txt/screed"
 
-	resp := tu.SysAdminClient.PUT("/admin-api/v3/files/update/{id}", gf.ID).WithJSON(copyOfGf).Expect()
+	resp := tu.SysAdminClient.PUT("/admin-api/v3/files/update/{id}", gf.ID).
+		WithHeader(constants.APIUserHeader, tu.SysAdmin.Email).
+		WithHeader(constants.APIKeyHeader, "password").
+		WithJSON(copyOfGf).Expect()
 	resp.Status(http.StatusOK)
 
 	updatedGf := &pgmodels.GenericFile{}
@@ -195,7 +208,10 @@ func createFileDeletionPreConditions(t *testing.T, gf *pgmodels.GenericFile) {
 }
 
 func testFileDelete(t *testing.T, gf *pgmodels.GenericFile) {
-	resp := tu.SysAdminClient.DELETE("/admin-api/v3/files/delete/{id}", gf.ID).Expect()
+	resp := tu.SysAdminClient.DELETE("/admin-api/v3/files/delete/{id}", gf.ID).
+		WithHeader(constants.APIUserHeader, tu.SysAdmin.Email).
+		WithHeader(constants.APIKeyHeader, "password").
+		Expect()
 	resp.Status(http.StatusOK)
 
 	// Make sure we got the expected JSON response from the server.
@@ -216,4 +232,9 @@ func testFileDelete(t *testing.T, gf *pgmodels.GenericFile) {
 	require.Nil(t, err)
 	require.NotNil(t, event)
 	require.True(t, event.DateTime.After(time.Now().UTC().Add(-5*time.Second)))
+}
+
+// POST /admin-api/v3/files/create_batch/:institution_id
+func TestGenericFileCreateBatch(t *testing.T) {
+
 }

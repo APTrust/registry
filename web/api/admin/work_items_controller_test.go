@@ -22,7 +22,10 @@ func TestWorkItemShow(t *testing.T) {
 	require.NotNil(t, item)
 
 	// Sysadmin can access any item through this endpoint
-	resp := tu.SysAdminClient.GET("/admin-api/v3/items/show/{id}", item.ID).Expect().Status(http.StatusOK)
+	resp := tu.SysAdminClient.GET("/admin-api/v3/items/show/{id}", item.ID).
+		WithHeader(constants.APIUserHeader, tu.SysAdmin.Email).
+		WithHeader(constants.APIKeyHeader, "password").
+		Expect().Status(http.StatusOK)
 	record := &pgmodels.WorkItem{}
 	err = json.Unmarshal([]byte(resp.Body().Raw()), record)
 	require.Nil(t, err)
@@ -46,6 +49,8 @@ func TestWorkItemIndex(t *testing.T) {
 
 	// Sys Admin should see all items and filters
 	resp := tu.SysAdminClient.GET("/admin-api/v3/items").
+		WithHeader(constants.APIUserHeader, tu.SysAdmin.Email).
+		WithHeader(constants.APIKeyHeader, "password").
 		WithQuery("page", 2).
 		WithQuery("per_page", 5).
 		Expect().Status(http.StatusOK)
@@ -60,6 +65,8 @@ func TestWorkItemIndex(t *testing.T) {
 
 	// Test some filters.
 	resp = tu.SysAdminClient.GET("/admin-api/v3/items").
+		WithHeader(constants.APIUserHeader, tu.SysAdmin.Email).
+		WithHeader(constants.APIKeyHeader, "password").
 		WithQuery("institution_id", tu.Inst2Admin.InstitutionID).
 		Expect().Status(http.StatusOK)
 
@@ -99,7 +106,10 @@ func testItemCreate(t *testing.T) *pgmodels.WorkItem {
 	require.Nil(t, err)
 	require.NotNil(t, obj)
 	item := pgmodels.RandomWorkItem(obj.BagName, constants.ActionIngest, 1, 1)
-	resp := tu.SysAdminClient.POST("/admin-api/v3/items/create/{id}", item.InstitutionID).WithJSON(item).Expect()
+	resp := tu.SysAdminClient.POST("/admin-api/v3/items/create/{id}", item.InstitutionID).
+		WithHeader(constants.APIUserHeader, tu.SysAdmin.Email).
+		WithHeader(constants.APIKeyHeader, "password").
+		WithJSON(item).Expect()
 	resp.Status(http.StatusCreated)
 
 	savedItem := &pgmodels.WorkItem{}
@@ -122,7 +132,10 @@ func testItemUpdate(t *testing.T, item *pgmodels.WorkItem) *pgmodels.WorkItem {
 	copyOfItem.Size = item.Size + 200
 	copyOfItem.Outcome = "This outcome has been edited"
 
-	resp := tu.SysAdminClient.PUT("/admin-api/v3/items/update/{id}", item.ID).WithJSON(copyOfItem).Expect()
+	resp := tu.SysAdminClient.PUT("/admin-api/v3/items/update/{id}", item.ID).
+		WithHeader(constants.APIUserHeader, tu.SysAdmin.Email).
+		WithHeader(constants.APIKeyHeader, "password").
+		WithJSON(copyOfItem).Expect()
 	resp.Status(http.StatusOK)
 
 	updatedItem := &pgmodels.WorkItem{}
