@@ -223,6 +223,36 @@ func RandomStorageRecord() *StorageRecord {
 	}
 }
 
+// RandFileBatch returns a slice of 20 GenericFiles, each with
+// 4 events, checksums, and storage records. Note that this also
+// creates the parent object in the database. You may want to
+// reset the DB after calling this.
+func RandomFileBatch() (*IntellectualObject, []*GenericFile, error) {
+	obj := RandomObject()
+	err := obj.Save()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	files := make([]*GenericFile, 20)
+	for i := 0; i < 20; i++ {
+		gf := RandomGenericFile(obj.ID, obj.Identifier)
+		for j := 0; j < 4; j++ {
+			event := RandomPremisEvent(constants.EventIngestion)
+			event.Outcome = constants.OutcomeSuccess
+			gf.PremisEvents = append(gf.PremisEvents, event)
+
+			checksum := RandomChecksum(constants.AlgSha1)
+			gf.Checksums = append(gf.Checksums, checksum)
+
+			sr := RandomStorageRecord()
+			gf.StorageRecords = append(gf.StorageRecords, sr)
+		}
+		files[i] = gf
+	}
+	return obj, files, nil
+}
+
 func CreateDeletionRequest(objects []*IntellectualObject, files []*GenericFile) (*DeletionRequest, error) {
 	now := time.Now().UTC()
 	req, err := NewDeletionRequest()

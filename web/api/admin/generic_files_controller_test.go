@@ -2,6 +2,7 @@ package admin_api_test
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"testing"
 	"time"
@@ -11,6 +12,7 @@ import (
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/APTrust/registry/web/api"
 	tu "github.com/APTrust/registry/web/testutil"
+	v "github.com/asaskevich/govalidator"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -236,5 +238,69 @@ func testFileDelete(t *testing.T, gf *pgmodels.GenericFile) {
 
 // POST /admin-api/v3/files/create_batch/:institution_id
 func TestGenericFileCreateBatch(t *testing.T) {
+	defer db.ForceFixtureReload()
+	obj, files, err := pgmodels.RandomFileBatch()
+	require.Nil(t, err)
+	require.NotNil(t, obj)
+	require.NotNil(t, files)
+	require.NotEmpty(t, files)
 
+	resp := tu.SysAdminClient.POST("/admin-api/v3/files/create_batch/{id}", obj.InstitutionID).
+		WithHeader(constants.APIUserHeader, tu.SysAdmin.Email).
+		WithHeader(constants.APIKeyHeader, "password").
+		WithJSON(files).
+		Expect()
+
+	// Unless there's an error, we should get an empty JSON payload.
+	// If there is an error, let's see it.
+	fmt.Println(resp.Body())
+	resp.Status(http.StatusCreated)
+
+	// Make sure everything was saved correctly.
+	query := pgmodels.NewQuery().
+		Where("intellectual_object_id", "=", obj.ID)
+	savedFiles, err := pgmodels.GenericFileSelect(query)
+	require.Nil(t, err)
+	assert.Equal(t, 20, len(savedFiles))
+	for _, gf := range savedFiles {
+		// Make sure file properties were set...
+		assert.True(t, gf.ID > 0)
+		assert.Equal(t, obj.ID, gf.IntellectualObjectID)
+		assert.Equal(t, obj.InstitutionID, gf.InstitutionID)
+
+		// Make sure all events were saved with correct properties.
+		query := pgmodels.NewQuery().Where("generic_file_id", "=", gf.ID)
+		events, err := pgmodels.PremisEventSelect(query)
+		require.Nil(t, err)
+		assert.Equal(t, 4, len(events))
+		for _, event := range events {
+			assert.Equal(t, gf.ID, event.GenericFileID)
+			assert.Equal(t, gf.IntellectualObjectID, event.IntellectualObjectID)
+			assert.Equal(t, gf.InstitutionID, event.InstitutionID)
+			assert.Equal(t, constants.EventIngestion, event.EventType)
+			assert.False(t, event.DateTime.IsZero())
+			assert.False(t, event.CreatedAt.IsZero())
+		}
+
+		// Check checksums
+		checksums, err := pgmodels.ChecksumSelect(query)
+		require.Nil(t, err)
+		assert.Equal(t, 4, len(checksums))
+		for _, cs := range checksums {
+			assert.Equal(t, gf.ID, cs.GenericFileID)
+			assert.Equal(t, constants.AlgSha1, cs.Algorithm)
+			assert.False(t, cs.DateTime.IsZero())
+			assert.False(t, cs.CreatedAt.IsZero())
+			assert.False(t, cs.UpdatedAt.IsZero())
+		}
+
+		// And storage records
+		storageRecs, err := pgmodels.StorageRecordSelect(query)
+		require.Nil(t, err)
+		assert.Equal(t, 4, len(storageRecs))
+		for _, sr := range storageRecs {
+			assert.Equal(t, gf.ID, sr.GenericFileID)
+			assert.True(t, v.IsURL(sr.URL))
+		}
+	}
 }

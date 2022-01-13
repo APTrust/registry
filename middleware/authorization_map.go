@@ -51,6 +51,7 @@ var AuthMap = map[string]AuthMetadata{
 	"DeletionRequestShow":                {"DeletionRequest", constants.DeletionRequestShow},
 	"DepositReportShow":                  {"DepositStats", constants.DepositReportShow},
 	"GenericFileCreate":                  {"GenericFile", constants.FileCreate},
+	"GenericFileCreateBatch":             {"GenericFile", constants.FileCreate},
 	"GenericFileDelete":                  {"GenericFile", constants.FileDelete},
 	"GenericFileFinishBulkDelete":        {"GenericFile", constants.FileFinishBulkDelete},
 	"GenericFileIndex":                   {"GenericFile", constants.FileRead},

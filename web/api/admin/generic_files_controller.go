@@ -1,6 +1,7 @@
 package admin_api
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/APTrust/registry/common"
@@ -47,11 +48,21 @@ func GenericFileCreate(c *gin.Context) {
 //
 // POST /admin-api/v3/files/create_batch/:institution_id
 func GenericFileCreateBatch(c *gin.Context) {
-	gf, err := CreateOrUpdateFile(c)
+	req := api.NewRequest(c)
+	files := make([]*pgmodels.GenericFile, 0)
+	err := req.GinContext.BindJSON(&files)
 	if api.AbortIfError(c, err) {
 		return
 	}
-	c.JSON(http.StatusCreated, gf)
+	for _, gf := range files {
+		if gf.InstitutionID != req.Auth.ResourceInstID {
+			err = fmt.Errorf("GenericFile.InstitutionID must match request institution ID")
+			api.AbortIfError(c, err)
+			return
+		}
+	}
+	err = pgmodels.GenericFileCreateBatch(files)
+	c.JSON(http.StatusCreated, nil)
 }
 
 // GenericFileUpdate updates an existing GenericFile.

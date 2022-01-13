@@ -1,7 +1,6 @@
 package pgmodels_test
 
 import (
-	"os"
 	"strings"
 	"testing"
 	"time"
@@ -366,36 +365,14 @@ func testFileDeletionEventProperties(t *testing.T, gf *pgmodels.GenericFile, eve
 	assert.Equal(t, "File deleted at the request of user@test.edu. Institutional approver: user@test.edu.", event.OutcomeInformation)
 }
 
-// getRandFileBatch returns a slice of 20 GenericFiles, each with
-// 4 events, checksums, and storage records.
-func getRandomFileBatch(t *testing.T) (*pgmodels.IntellectualObject, []*pgmodels.GenericFile) {
-	obj := pgmodels.RandomObject()
-	require.Nil(t, obj.Save())
-
-	files := make([]*pgmodels.GenericFile, 20)
-	for i := 0; i < 20; i++ {
-		gf := pgmodels.RandomGenericFile(obj.ID, obj.Identifier)
-		for j := 0; j < 4; j++ {
-			event := pgmodels.RandomPremisEvent(constants.EventIngestion)
-			event.Outcome = constants.OutcomeSuccess
-			gf.PremisEvents = append(gf.PremisEvents, event)
-
-			checksum := pgmodels.RandomChecksum(constants.AlgSha1)
-			gf.Checksums = append(gf.Checksums, checksum)
-
-			sr := pgmodels.RandomStorageRecord()
-			gf.StorageRecords = append(gf.StorageRecords, sr)
-		}
-		files[i] = gf
-	}
-	return obj, files
-}
-
 func TestGenericFileCreateBatch(t *testing.T) {
 	// defer db.ForceFixtureReload()
-	os.Setenv("APT_ENV", "test")
-	obj, files := getRandomFileBatch(t)
-	err := pgmodels.GenericFileCreateBatch(files)
+	obj, files, err := pgmodels.RandomFileBatch()
+	require.Nil(t, err)
+	require.NotNil(t, obj)
+	require.NotNil(t, files)
+	require.NotEmpty(t, files)
+	err = pgmodels.GenericFileCreateBatch(files)
 	require.Nil(t, err)
 
 	// Now let's see what was saved.
