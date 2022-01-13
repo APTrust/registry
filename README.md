@@ -159,3 +159,18 @@ The Registry includes three pieces of middleware that execute before the target 
     * middleware/authenticate.go reads an encrypted cookie and sets the value of CurrentUser so that all subsequent code in the current request can access it.
     * middleware/authorize.go figures out the resource being requested, the institution that owns the resource, and the action the user wants to perform on that resource. It checks middleware/authorization_map.go to see if the user is allowed to perform that action on that resource. If so, the request proceeds. If not, the user gets a 403 error. Note that permissions are hard-coded in the authorization_map instead of being stored in the DB. This prevents hackers from elevating privileges by manipulating the DB. APTrust permissions are fixed and documented. There is no need to change them dynamically.
     * middleware/csrf.go provides CSRF protection for unsafe methods coming through the Web UI. Any method other than GET, HEAD, OPTIONS, and TRACE is considered unsafe.
+
+With the exception of a few whitelisted pages, the middleware will not permit any requests to proceed unless an authorization check has been performed and the user has passed. "Missing authorization check" is a fatal error that immediately aborts the request.
+
+Routes excepted from auth checks include:
+
+* The login page
+* The log off page
+* The "forgot password" landing page, which comes from a link in the "forgot password" email
+* The "complete password reset" page, which comes from a link in the "password reset" email
+* The general error page
+* Static files, such as scripts, stylesheets, images, favicon, etc.
+
+The "forgot password" and "password reset" pages both use a secure token in the query string to identify the user.
+
+The authentication middleware also hijacks all requests in cases where a user must complete registration activities. For example, if a user needs to reset their password, confirm an Authy account, or provide the second factor for multi-factor auth, the middleware will not let them past the reset/confirmation/token page until they've provided the required info.

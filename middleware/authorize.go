@@ -49,6 +49,9 @@ func IsAPIRequest(c *gin.Context) bool {
 	return IsAPIRoute(c)
 }
 
+// IsAPIRoute returns true if the requested route matches one of our
+// API prefixes. This uses c.Request.URL.Path because c.FullPath() can
+// return an empty string if the path does not match any known routes.
 func IsAPIRoute(c *gin.Context) bool {
 	path := c.Request.URL.Path // c.FullPath()
 	for _, prefix := range constants.APIPrefixes {
