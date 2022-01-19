@@ -61,14 +61,15 @@ func TestGenericFileIndex(t *testing.T) {
 	resp := tu.SysAdminClient.GET("/member-api/v3/files").
 		WithQuery("page", 2).
 		WithQuery("per_page", 5).
+		WithQuery("sort", "id__asc").
 		Expect().Status(http.StatusOK)
 
 	list := api.GenericFileViewList{}
 	err := json.Unmarshal([]byte(resp.Body().Raw()), &list)
 	require.Nil(t, err)
 	assert.Equal(t, 62, list.Count)
-	assert.Equal(t, "/member-api/v3/files?page=3&per_page=5", list.Next)
-	assert.Equal(t, "/member-api/v3/files?page=1&per_page=5", list.Previous)
+	assert.Equal(t, "/member-api/v3/files?page=3&per_page=5&sort=id__asc", list.Next)
+	assert.Equal(t, "/member-api/v3/files?page=1&per_page=5&sort=id__asc", list.Previous)
 	assert.Equal(t, tu.Inst1User.InstitutionID, list.Results[0].InstitutionID)
 
 	// Test some filters. This object has 1 deleted, 4 active files.

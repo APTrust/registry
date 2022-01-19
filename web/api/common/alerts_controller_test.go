@@ -53,14 +53,15 @@ func TestAlertIndex(t *testing.T) {
 	resp := tu.SysAdminClient.GET("/member-api/v3/alerts").
 		WithQuery("page", 2).
 		WithQuery("per_page", 5).
+		WithQuery("sort", "created_at__asc").
 		Expect().Status(http.StatusOK)
 
 	list := api.AlertViewList{}
 	err := json.Unmarshal([]byte(resp.Body().Raw()), &list)
 	require.Nil(t, err)
 	assert.Equal(t, 15, list.Count)
-	assert.Equal(t, "/member-api/v3/alerts?page=3&per_page=5", list.Next)
-	assert.Equal(t, "/member-api/v3/alerts?page=1&per_page=5", list.Previous)
+	assert.Equal(t, "/member-api/v3/alerts?page=3&per_page=5&sort=created_at__asc", list.Next)
+	assert.Equal(t, "/member-api/v3/alerts?page=1&per_page=5&sort=created_at__asc", list.Previous)
 	assert.Equal(t, "Deletion Confirmed", list.Results[0].Subject)
 
 	// Make sure filters work. Should be 3 deletion requested

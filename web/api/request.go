@@ -46,6 +46,9 @@ func (req *Request) GetFilterCollection() *pgmodels.FilterCollection {
 	for _, key := range allowedFilters {
 		fc.Add(key, req.GinContext.QueryArray(key))
 	}
+	for _, value := range req.GinContext.QueryArray("sort") {
+		fc.AddOrderBy(value)
+	}
 	return fc
 }
 
@@ -58,6 +61,12 @@ func (req *Request) BaseURL() string {
 	return fmt.Sprintf("%s://%s", scheme, host)
 }
 
+// LoadResourceList loads a list of resources for an index page.
+// Param items should be a pointer to a slice of the type of item
+// you want to load (GenericFile, Institution, etc.). Params
+// orderByColumn and direction indicate a default sort order to be
+// applied if the request did not explicitly include a sort order.
+// (I.e. no sort=column__direction on the query string.)
 func (req *Request) LoadResourceList(items interface{}, orderByColumn, direction string) (*common.Pager, error) {
 	// Ensure that items is a pointer to a slice of pointers, so we don't
 	// get a panic in call to Elem() below.
@@ -77,7 +86,9 @@ func (req *Request) LoadResourceList(items interface{}, orderByColumn, direction
 			query.Where("user_id", "=", req.CurrentUser.ID)
 		}
 	}
-	query.OrderBy(orderByColumn, direction)
+	if !filterCollection.HasExplicitSorting() {
+		query.OrderBy(orderByColumn, direction)
+	}
 	pager, err := common.NewPager(req.GinContext, req.PathAndQuery, 20)
 	if err != nil {
 		return nil, err

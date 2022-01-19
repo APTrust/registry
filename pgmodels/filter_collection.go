@@ -12,12 +12,14 @@ import (
 // we go.
 type FilterCollection struct {
 	filters []*ParamFilter
+	sorts   []*SortParam
 }
 
 // NewFilterCollection returns a ParamFileters object.
 func NewFilterCollection() *FilterCollection {
 	return &FilterCollection{
 		filters: make([]*ParamFilter, 0),
+		sorts:   make([]*SortParam, 0),
 	}
 }
 
@@ -37,6 +39,18 @@ func (fc *FilterCollection) Add(key string, values []string) error {
 	return nil
 }
 
+// AddOrderBy adds sort columns to the filters.
+func (fc *FilterCollection) AddOrderBy(values string) {
+	sort := NewSortParam(values)
+	fc.sorts = append(fc.sorts, sort)
+}
+
+// HasExplicitSorting returns true if this object includes explicit
+// sort params that will show up as an "order by" clause in the SQL query.
+func (fc *FilterCollection) HasExplicitSorting() bool {
+	return len(fc.sorts) > 0
+}
+
 // ToQuery returns a query object based on the keys and values passed in.
 // The Query's WhereClause() will return the where conditions for the filters
 // passed in through Add(), and the Query's Params() method will return the
@@ -51,6 +65,9 @@ func (fc *FilterCollection) ToQuery() (*Query, error) {
 		if err != nil {
 			return nil, err
 		}
+	}
+	for _, sort := range fc.sorts {
+		query.OrderBy(sort.Column, sort.Direction)
 	}
 	return query, nil
 }
@@ -83,6 +100,11 @@ type ParamFilter struct {
 	Values []string
 }
 
+type SortParam struct {
+	Column    string
+	Direction string // only asc and desc allowed
+}
+
 // NewParamFilter returns a new ParamFilter object based on the key and
 // values submitted in the query string. It will return a custom error
 // if it can't parse the key or values. The caller should log the error
@@ -106,6 +128,31 @@ func NewParamFilter(key string, values []string) (*ParamFilter, error) {
 		SQLOp:  sqlOp,
 		Values: values,
 	}, nil
+}
+
+// NewSortParam creates a new sort parameter to add to a query.
+//
+// Sorts will appear on the query string like this:
+//
+// sort=updated_at__desc&sort=user_id__asc
+//
+// That means sort first by updated_at descending, then by user_id
+// ascending. If sort direction is missing or invalid, it defaults
+// to asc.
+func NewSortParam(value string) *SortParam {
+	colAndDir := strings.Split(value, "__")
+	if len(colAndDir) != 2 {
+		colAndDir = append(colAndDir, "asc")
+	}
+	col := colAndDir[0]
+	direction := colAndDir[1]
+	if direction != "asc" && direction != "desc" {
+		direction = "asc"
+	}
+	return &SortParam{
+		Column:    col,
+		Direction: direction,
+	}
 }
 
 // AddToQuery adds this ParamFilter to SQL query q. If it can't map the

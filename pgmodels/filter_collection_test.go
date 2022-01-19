@@ -195,3 +195,24 @@ func TestFilterCollection(t *testing.T) {
 	assert.Equal(t, `(name = ?) AND (name != ?) AND (age > ?) AND (age >= ?) AND (age < ?) AND (age <= ?) AND (name ILIKE ?) AND (name ILIKE ?) AND (name is null) AND (name is not null) AND (name IN (?, ?, ?))`, query.WhereClause())
 	assert.Equal(t, []interface{}{"Homer", "Homer", "38", "38", "38", "38", "Simpson%", "%Simpson%", "Bart", "Lisa", "Maggie"}, query.Params())
 }
+
+func TestFCOrderBy(t *testing.T) {
+	fc := pgmodels.NewFilterCollection()
+	err := fc.Add("name", []string{"Homer"})
+	require.Nil(t, err)
+
+	assert.False(t, fc.HasExplicitSorting())
+
+	fc.AddOrderBy("name")
+	fc.AddOrderBy("email__asc")
+	fc.AddOrderBy("created_at__desc")
+
+	assert.True(t, fc.HasExplicitSorting())
+
+	query, err := fc.ToQuery()
+	require.Nil(t, err)
+	require.NotNil(t, query)
+	assert.Equal(t, `(name = ?)`, query.WhereClause())
+	assert.Equal(t, []interface{}{"Homer"}, query.Params())
+	assert.Equal(t, []string{"name asc", "email asc", "created_at desc"}, query.GetOrderBy())
+}
