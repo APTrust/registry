@@ -67,7 +67,10 @@ func TestEventList(t *testing.T) {
 	}
 
 	for _, client := range testutil.AllClients {
-		html := client.GET("/events").Expect().
+		html := client.GET("/events").
+			WithQuery("sort", "date_time__desc").
+			WithQuery("sort", "id__desc").
+			Expect().
 			Status(http.StatusOK).Body().Raw()
 		testutil.AssertMatchesAll(t, html, inst1Links)
 		testutil.AssertMatchesAll(t, html, commonFilters)

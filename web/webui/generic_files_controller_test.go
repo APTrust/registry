@@ -67,7 +67,9 @@ func TestGenericFileIndex(t *testing.T) {
 	}
 
 	for _, client := range testutil.AllClients {
-		html := client.GET("/files").Expect().
+		html := client.GET("/files").
+			WithQuery("sort", "id").
+			Expect().
 			Status(http.StatusOK).Body().Raw()
 		testutil.AssertMatchesAll(t, html, items)
 		testutil.AssertMatchesAll(t, html, commonFilters)
