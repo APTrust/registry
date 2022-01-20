@@ -151,6 +151,7 @@ func (f *ObjectFilterForm) SetValues() {
 	f.Fields["access"].Value = f.FilterCollection.ValueOf("access")
 	f.Fields["alt_identifier"].Value = f.FilterCollection.ValueOf("alt_identifier")
 	f.Fields["bag_group_identifier"].Value = f.FilterCollection.ValueOf("bag_group_identifier")
+	f.Fields["bag_name"].Value = f.FilterCollection.ValueOf("bag_name")
 	f.Fields["bagit_profile_identifier"].Value = f.FilterCollection.ValueOf("bagit_profile_identifier")
 	f.Fields["etag"].Value = f.FilterCollection.ValueOf("etag")
 	f.Fields["file_count__gteq"].Value = f.FilterCollection.ValueOf("file_count__gteq")
