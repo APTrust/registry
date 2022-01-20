@@ -60,4 +60,8 @@ func TestTopicFor(t *testing.T) {
 	topic, err = constants.TopicFor(constants.ActionIngest, constants.StageCleanup)
 	require.Nil(t, err)
 	assert.Equal(t, constants.IngestCleanup, topic)
+
+	topic, err = constants.TopicFor("invalid action", "invalid stage")
+	require.NotNil(t, err)
+	assert.Empty(t, topic)
 }

@@ -5,7 +5,6 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"strings"
 
 	"github.com/APTrust/registry/common"
 	"github.com/go-pg/pg/v10"
@@ -231,15 +230,6 @@ func loadCSVFile(db *pg.DB, table string) error {
 		err = fmt.Errorf(`Error executing "%s": %v`, sql, err)
 	}
 	return err
-}
-
-// Get the placeholders for a sql query.
-func sqlPlaceholders(count int) string {
-	placeholders := make([]string, count)
-	for i := 0; i < count; i++ {
-		placeholders[i] = "?"
-	}
-	return strings.Join(placeholders, ", ")
 }
 
 // Our fixtures include explicit IDs because other fixtures must refer

@@ -21,7 +21,7 @@ func getAlertFilters() *pgmodels.FilterCollection {
 	return fc
 }
 
-func getFilterForm(t *testing.T, user *pgmodels.User) (*pgmodels.FilterCollection, forms.FilterForm) {
+func getAlertFilterForm(t *testing.T, user *pgmodels.User) (*pgmodels.FilterCollection, forms.FilterForm) {
 	fc := getAlertFilters()
 	form, err := forms.NewAlertFilterForm(fc, user)
 	require.Nil(t, err)
@@ -31,9 +31,9 @@ func getFilterForm(t *testing.T, user *pgmodels.User) (*pgmodels.FilterCollectio
 
 func TestAlertFilterFormSysAdmin(t *testing.T) {
 	sysAdmin := testutil.InitUser(t, "system@aptrust.org")
-	fc, form := getFilterForm(t, sysAdmin)
+	fc, form := getAlertFilterForm(t, sysAdmin)
 	fields := form.GetFields()
-	testFields(t, fc, fields)
+	testAlertFields(t, fc, fields)
 	assert.True(t, len(fields["institution_id"].Options) > 1)
 	assert.True(t, len(fields["user_id"].Options) > 1)
 }
@@ -45,9 +45,9 @@ func TestAlertFilterFormNonAdmin(t *testing.T) {
 	}
 	for _, email := range nonSysAdmins {
 		user := testutil.InitUser(t, email)
-		fc, form := getFilterForm(t, user)
+		fc, form := getAlertFilterForm(t, user)
 		fields := form.GetFields()
-		testFields(t, fc, fields)
+		testAlertFields(t, fc, fields)
 		// Non sysadmin can see only their own alerts, so
 		// there should be no filter options in these lists.
 		assert.Empty(t, fields["institution_id"].Options)
@@ -55,7 +55,7 @@ func TestAlertFilterFormNonAdmin(t *testing.T) {
 	}
 }
 
-func testFields(t *testing.T, fc *pgmodels.FilterCollection, fields map[string]*forms.Field) {
+func testAlertFields(t *testing.T, fc *pgmodels.FilterCollection, fields map[string]*forms.Field) {
 	assert.Equal(t, fc.ValueOf("created_at__gteq"), fields["created_at__gteq"].Value)
 	assert.Equal(t, fc.ValueOf("created_at__lteq"), fields["created_at__lteq"].Value)
 	assert.Equal(t, fc.ValueOf("institution_id"), fields["institution_id"].Value)
