@@ -67,7 +67,9 @@ func (f *Form) HandleError(err error) {
 	f.Status = http.StatusBadRequest
 	if valErr, ok := err.(*common.ValidationError); ok {
 		for fieldName := range valErr.Errors {
-			f.Fields[fieldName].DisplayError = true
+			if field, ok := f.Fields[fieldName]; ok {
+				field.DisplayError = true
+			}
 		}
 	} else {
 		// Integrity violation is usually someone entering
