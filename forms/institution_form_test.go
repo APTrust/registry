@@ -3,10 +3,8 @@ package forms_test
 import (
 	"testing"
 
-	//"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/forms"
 	"github.com/APTrust/registry/pgmodels"
-	//"github.com/APTrust/registry/web/testutil"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
