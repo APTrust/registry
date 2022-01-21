@@ -23,6 +23,7 @@ var WorkItemFilters = []string{
 	"institution_id",
 	"name",
 	"needs_admin_review",
+	"node__not_null",
 	"object_identifier",
 	"size__gteq",
 	"size__lteq",
