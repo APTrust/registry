@@ -31,6 +31,11 @@ type DepositStats struct {
 	MonthlyCost     float64 `json:"monthly_cost"`
 }
 
+// DepositStatsSelect returns info about materials a depositor updated
+// in our system before a given date. This breaks down deposits by
+// storage option and institution. To report on all institutions, use
+// zero for institutionID. To report on all storage options, pass an
+// empty string for storageOption.
 func DepositStatsSelect(institutionID int64, storageOption string, updatedBefore time.Time) ([]*DepositStats, error) {
 	var stats []*DepositStats
 	_, err := common.Context().DB.Query(&stats, depositStatsQuery,
@@ -44,6 +49,8 @@ func DepositStatsSelect(institutionID int64, storageOption string, updatedBefore
 // filters that may or may not be present.
 //
 // This is used on the deposits report page.
+//
+// TODO: Consider filtering on created_at instead of updated_at.
 const depositStatsQuery = `
 		select
 		  coalesce(stats.institution_name, 'Total') as institution_name,

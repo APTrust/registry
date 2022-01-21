@@ -12,6 +12,10 @@ type DepositFormatStats struct {
 	TotalTB    float64 `json:"total_tb" pg:"total_tb"`
 }
 
+// DepositFormatStatsSelect returns summary stats on the
+// files belonging to the specified institution and/or object.
+// Specify object ID for object status, Institution ID for
+// institution status.
 func DepositFormatStatsSelect(institutionID, intellectualObjectID int64) ([]*DepositFormatStats, error) {
 	var stats []*DepositFormatStats
 	_, err := common.Context().DB.Query(&stats, depositFormatQuery,
@@ -33,6 +37,7 @@ const depositFormatQuery = `
         from generic_files
         where (? = 0 or institution_id = ?)
         and   (? = 0 or intellectual_object_id = ?)
+        and   (state = 'A')
         group by rollup(file_format)
         order by file_format
 `
