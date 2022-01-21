@@ -1,30 +1,18 @@
 package network_test
 
 import (
-	"net/http"
-	"net/http/httptest"
 	"testing"
 
 	"github.com/APTrust/registry/common"
 	"github.com/stretchr/testify/require"
 )
 
-func TestNSQClientEnqueue(t *testing.T) {
-	testServer := httptest.NewServer(http.HandlerFunc(NsqOkHandler()))
-	defer testServer.Close()
-
+func TestNSQClient(t *testing.T) {
 	aptContext := common.Context()
-	aptContext.NSQClient.URL = testServer.URL
 
-	err := aptContext.NSQClient.Enqueue("some_topic", 788)
+	err := aptContext.NSQClient.Enqueue("throwaway_test_topic", 788)
 	require.Nil(t, err)
-}
 
-// NsqOkhandler just returns Ok, which is the NSQ response when you queue
-// an item in a topic.
-func NsqOkHandler() func(http.ResponseWriter, *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("ok"))
-	}
+	err = aptContext.NSQClient.EnqueueString("throwaway_test_topic", "some/object/identifier")
+	require.Nil(t, err)
 }

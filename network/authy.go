@@ -77,6 +77,9 @@ func (ac *AuthyClient) AwaitOneTouch(userEmail, authyID string) (bool, error) {
 // as these need to be separate. Do not pass user.PhoneNumber in format
 // "+<country_code><number>" because that won't work.
 func (ac *AuthyClient) RegisterUser(userEmail string, countryCode int, phone string) (string, error) {
+	if !ac.enabled {
+		return "", ErrAuthyDisabled
+	}
 	authyUser, err := ac.client.RegisterUser(userEmail, countryCode, phone, url.Values{})
 	if err != nil {
 		ac.log.Error().Msgf("Can't register user %s (%d %s) with Authy: %v", userEmail, countryCode, phone, err)
