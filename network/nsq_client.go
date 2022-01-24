@@ -28,7 +28,7 @@ type NSQStatsData struct {
 }
 
 type ChannelSummary struct {
-	InFlightCount int64
+	InFlightCount int
 	MessageCount  uint64
 	FinishCount   uint64
 	RequeueCount  uint64
@@ -55,10 +55,13 @@ func (data *NSQStatsData) GetChannelSummary(topicName, channelName string) (*Cha
 			found = true
 			for _, client := range c.Clients {
 				summary.FinishCount += client.FinishCount
-				summary.InFlightCount += client.InFlightCount
-				summary.MessageCount += client.MessageCount
-				summary.RequeueCount += client.RequeueCount
+				//summary.InFlightCount += int(client.InFlightCount)
+				//summary.MessageCount += client.MessageCount
+				//summary.RequeueCount += client.RequeueCount
 			}
+			summary.MessageCount = c.MessageCount
+			summary.InFlightCount = c.InFlightCount
+			summary.RequeueCount = c.RequeueCount
 		}
 	}
 	if !found {
@@ -137,21 +140,21 @@ func (client *NSQClient) GetStats() (*NSQStatsData, error) {
 	url := fmt.Sprintf("%s/stats?format=json", client.URL)
 	resp, err := http.Get(url)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error connecting to nsq at %s: %v", client.URL, err)
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	resp.Body.Close()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error reading nsq response body: %v", err)
 	}
 	if resp.StatusCode != 200 {
-		return nil, fmt.Errorf("NSQ returned status code %d, body: %s",
+		return nil, fmt.Errorf("nsq returned status code %d, body: %s",
 			resp.StatusCode, body)
 	}
 	stats := &NSQStatsData{}
 	err = json.Unmarshal(body, stats)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error parsing nsq response json: %v", err)
 	}
 	return stats, nil
 }

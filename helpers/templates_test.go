@@ -24,14 +24,24 @@ func TestTruncate(t *testing.T) {
 
 func TestDateUS(t *testing.T) {
 	assert.Equal(t, "Apr 16, 2021", helpers.DateUS(testDate))
+	assert.Equal(t, "", helpers.DateUS(time.Time{}))
 }
 
 func TestDateISO(t *testing.T) {
 	assert.Equal(t, "2021-04-16", helpers.DateISO(testDate))
+	assert.Equal(t, "", helpers.DateISO(time.Time{}))
 }
 
 func TestDateTimeISO(t *testing.T) {
 	assert.Equal(t, "2021-04-16T12:24:16Z", helpers.DateTimeISO(testDate))
+	assert.Equal(t, "", helpers.DateTimeISO(time.Time{}))
+}
+
+func TestRoleName(t *testing.T) {
+	assert.Equal(t, "Admin", helpers.RoleName(constants.RoleInstAdmin))
+	assert.Equal(t, "User", helpers.RoleName(constants.RoleInstUser))
+	assert.Equal(t, "SysAdmin", helpers.RoleName(constants.RoleSysAdmin))
+	assert.Equal(t, "not-a-role", helpers.RoleName("not-a-role"))
 }
 
 func TestStrEq(t *testing.T) {
@@ -96,6 +106,13 @@ func TestUserCan(t *testing.T) {
 	assert.False(t, helpers.UserCan(instUser, constants.FileRestore, 2))
 }
 
+func TestHumanSize(t *testing.T) {
+	assert.Equal(t, "2.0 kB", helpers.HumanSize(2*1024))
+	assert.Equal(t, "2.0 MB", helpers.HumanSize(2*1024*1024))
+	assert.Equal(t, "2.0 GB", helpers.HumanSize(2*1024*1024*1024))
+	assert.Equal(t, "2.0 TB", helpers.HumanSize(2*1024*1024*1024*1024))
+}
+
 func TestIconFor(t *testing.T) {
 	// Should return item defined in map
 	assert.Equal(
@@ -122,6 +139,7 @@ func TestTruncateStart(t *testing.T) {
 	assert.Equal(t, "...a greyhound for racing.", helpers.TruncateStart(longString, 20))
 	assert.Equal(t, "...y nag and a greyhound for racing.", helpers.TruncateStart(longString, 30))
 	assert.Equal(t, longString, helpers.TruncateStart(longString, 500))
+	assert.Equal(t, longString, helpers.TruncateStart(longString, 5000))
 }
 
 func TestDict(t *testing.T) {
