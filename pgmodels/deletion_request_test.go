@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/APTrust/registry/common"
+	"github.com/APTrust/registry/db"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -62,4 +63,110 @@ func TestDeletionRequestByID(t *testing.T) {
 	assert.Equal(t, 1, len(request.IntellectualObjects))
 }
 
-// TODO: Test validation.
+func TestDeletionRequestSelect(t *testing.T) {
+	query := pgmodels.NewQuery().
+		IsNull("confirmed_at").
+		OrderBy("id", "asc").
+		Limit(2)
+	requests, err := pgmodels.DeletionRequestSelect(query)
+	require.Nil(t, err)
+	require.NotEmpty(t, requests)
+	assert.Equal(t, 2, len(requests))
+	assert.EqualValues(t, 1, requests[0].ID)
+	assert.EqualValues(t, 3, requests[1].ID)
+}
+
+func TestDeletionRequestValidate(t *testing.T) {
+	err := db.LoadFixtures()
+	require.Nil(t, err)
+
+	// These IDS are fixed in the fixture data under db/fixtures/users.sql
+	//inst1AdminID := int64(2)
+	inst1UserID := int64(3)
+	inst2AdminID := int64(5)
+	inst1ID := int64(2)
+
+	req, err := pgmodels.NewDeletionRequest()
+	require.Nil(t, err)
+	require.NotNil(t, req)
+	valErr := req.Validate()
+	require.NotNil(t, valErr)
+	assert.Equal(t, pgmodels.ErrDeletionInstitutionID, valErr.Errors["InstitutionID"])
+	// assert.Equal(t, pgmodels.ErrDeletionRequesterID, valErr.Errors["RequestedByID"])
+
+	// START HERE
+
+	// ----------------------------------------------------------
+	// TODO: Fix this. We're getting the wrong error here
+	// ----------------------------------------------------------
+	// Invalid requester, approver, canceller
+	// These users don't exist
+	// req.InstitutionID = inst1UserID
+	// req.RequestedByID = 559988
+	// req.ConfirmedByID = 331149
+	// req.CancelledByID = 808080
+	// valErr = req.Validate()
+	// require.NotNil(t, valErr)
+	// assert.Equal(t, pgmodels.ErrDeletionUserNotFound, valErr.Errors["RequestedByID"])
+	// assert.Equal(t, pgmodels.ErrDeletionUserNotFound, valErr.Errors["ConfirmedByID"])
+	// assert.Equal(t, pgmodels.ErrDeletionUserNotFound, valErr.Errors["CancelledByID"])
+
+	// User role cannot approve or cancel deletions
+	req.InstitutionID = inst1ID
+	req.RequestedByID = inst1UserID
+	req.ConfirmedByID = inst1UserID
+	req.CancelledByID = inst1UserID
+	valErr = req.Validate()
+	require.NotNil(t, valErr)
+	assert.Equal(t, pgmodels.ErrDeletionWrongRole, valErr.Errors["ConfirmedByID"])
+	assert.Equal(t, pgmodels.ErrDeletionWrongRole, valErr.Errors["CancelledByID"])
+
+	// Admin can approve & cancel deletions, but only at their
+	// own institution.
+	req.InstitutionID = inst1ID
+	req.RequestedByID = inst2AdminID
+	req.ConfirmedByID = inst2AdminID
+	req.CancelledByID = inst2AdminID
+	valErr = req.Validate()
+	require.NotNil(t, valErr)
+	//assert.Equal(t, pgmodels.ErrDeletionWrongInst, valErr.Errors["RequestedByID"])
+	assert.Equal(t, pgmodels.ErrDeletionWrongInst, valErr.Errors["ConfirmedByID"])
+	assert.Equal(t, pgmodels.ErrDeletionWrongInst, valErr.Errors["CancelledByID"])
+
+	// ----------------------------------------------------------
+	// TODO: Fix this. User is coming back as nil in Validate,
+	// and they shouldn't because the user is there.
+	// ----------------------------------------------------------
+	// This is OK, though technically, a deletion would not
+	// be both confirmed and cancelled.
+	// req.InstitutionID = inst1ID
+	// req.RequestedByID = inst1AdminID
+	// req.ConfirmedByID = inst1AdminID
+	// req.CancelledByID = inst1AdminID
+	// valErr = req.Validate()
+	// assert.Nil(t, valErr)
+}
+
+func TestDeletionRequestAddFile(t *testing.T) {
+
+}
+
+func TestDeletionRequestAddObject(t *testing.T) {
+
+}
+
+func TestDeletionRequestFirstFile(t *testing.T) {
+
+}
+
+func TestDeletionRequestFirstObject(t *testing.T) {
+
+}
+
+func TestDeletionRequestConfirm(t *testing.T) {
+
+}
+
+func TestDeletionRequestCancel(t *testing.T) {
+
+}

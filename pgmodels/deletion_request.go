@@ -128,14 +128,17 @@ func (request *DeletionRequest) Validate() *common.ValidationError {
 	}
 
 	// Make sure requester is valid
+	var err error
 	if request.RequestedByID < 1 {
 		errors["RequestedByID"] = ErrDeletionRequesterID
 	}
 	if request.RequestedByID > 0 && request.RequestedBy == nil {
-		request.RequestedBy, _ = UserByID(request.RequestedByID)
+		request.RequestedBy, err = UserByID(request.RequestedByID)
 	}
-	if request.RequestedBy == nil {
-		errors["RequestedByID"] = ErrDeletionRequesterID
+	if request.RequestedBy == nil || err != nil {
+		errors["RequestedByID"] = ErrDeletionUserNotFound
+	} else if !request.RequestedBy.DeactivatedAt.IsZero() {
+		errors["RequestedByID"] = ErrDeletionUserInactive
 	} else if request.RequestedBy.InstitutionID != request.InstitutionID {
 		errors["RequestedByID"] = ErrDeletionWrongInst
 	}
@@ -144,7 +147,7 @@ func (request *DeletionRequest) Validate() *common.ValidationError {
 	if request.ConfirmedByID > 0 {
 		if request.ConfirmedBy == nil {
 			user, err := UserByID(request.ConfirmedByID)
-			if err != nil {
+			if err != nil || user.ID == 0 {
 				errors["ConfirmedByID"] = ErrDeletionUserNotFound
 			}
 			if user.InstitutionID != request.InstitutionID {
@@ -160,7 +163,7 @@ func (request *DeletionRequest) Validate() *common.ValidationError {
 	if request.CancelledByID > 0 {
 		if request.CancelledBy == nil {
 			user, err := UserByID(request.CancelledByID)
-			if err != nil {
+			if err != nil || user.ID == 0 {
 				errors["CancelledByID"] = ErrDeletionUserNotFound
 			}
 			if user.InstitutionID != request.InstitutionID {
