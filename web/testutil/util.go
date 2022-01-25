@@ -60,41 +60,54 @@ func InitHTTPTests(t *testing.T) {
 	}
 	if appEngine == nil {
 		appEngine = app.InitAppEngine(true)
-		SysAdminClient, SysAdminToken = InitClient(t, "system@aptrust.org")
-		Inst1AdminClient, Inst1AdminToken = InitClient(t, "admin@inst1.edu")
-		Inst1UserClient, Inst1UserToken = InitClient(t, "user@inst1.edu")
-		Inst2AdminClient, Inst2AdminToken = InitClient(t, "admin@inst2.edu")
-		Inst2UserClient, Inst2UserToken = InitClient(t, "user@inst2.edu")
-		SmsUserClient, SmsUserToken = InitClient(t, "sms_user@example.com")
-		AllClients = []*httpexpect.Expect{
-			SysAdminClient,
-			Inst1AdminClient,
-			Inst1UserClient,
-		}
-
-		SysAdmin = InitUser(t, "system@aptrust.org")
-		Inst1Admin = InitUser(t, "admin@inst1.edu")
-		Inst1User = InitUser(t, "user@inst1.edu")
-		Inst2Admin = InitUser(t, "admin@inst2.edu")
-		Inst2User = InitUser(t, "user@inst2.edu")
-		SmsUser = InitUser(t, "sms_user@example.com")
-
-		UserFor = make(map[*httpexpect.Expect]*pgmodels.User)
-		UserFor[SysAdminClient] = SysAdmin
-		UserFor[Inst1AdminClient] = Inst1Admin
-		UserFor[Inst1UserClient] = Inst1User
-		UserFor[Inst2AdminClient] = Inst2Admin
-		UserFor[Inst2UserClient] = Inst2User
-		UserFor[SmsUserClient] = SmsUser
-
-		TokenFor = make(map[*httpexpect.Expect]string)
-		TokenFor[SysAdminClient] = SysAdminToken
-		TokenFor[Inst1AdminClient] = Inst1AdminToken
-		TokenFor[Inst1UserClient] = Inst1UserToken
-		TokenFor[Inst2AdminClient] = Inst2AdminToken
-		TokenFor[Inst2UserClient] = Inst2UserToken
-		TokenFor[SmsUserClient] = SmsUserToken
+		initAllClients(t)
 	}
+}
+
+// ReInitAllClients re-initializes all HTTP test clients.
+// This function exists because some tests may hit the logout
+// endpoint, and if another test tries to use that client later,
+// they'll get a 401/Unauthorized. Note that pgmodes/user_test.go
+// also signs users out.
+func ReInitAllClients(t *testing.T) {
+	initAllClients(t)
+}
+
+func initAllClients(t *testing.T) {
+	SysAdminClient, SysAdminToken = InitClient(t, "system@aptrust.org")
+	Inst1AdminClient, Inst1AdminToken = InitClient(t, "admin@inst1.edu")
+	Inst1UserClient, Inst1UserToken = InitClient(t, "user@inst1.edu")
+	Inst2AdminClient, Inst2AdminToken = InitClient(t, "admin@inst2.edu")
+	Inst2UserClient, Inst2UserToken = InitClient(t, "user@inst2.edu")
+	SmsUserClient, SmsUserToken = InitClient(t, "sms_user@example.com")
+	AllClients = []*httpexpect.Expect{
+		SysAdminClient,
+		Inst1AdminClient,
+		Inst1UserClient,
+	}
+
+	SysAdmin = InitUser(t, "system@aptrust.org")
+	Inst1Admin = InitUser(t, "admin@inst1.edu")
+	Inst1User = InitUser(t, "user@inst1.edu")
+	Inst2Admin = InitUser(t, "admin@inst2.edu")
+	Inst2User = InitUser(t, "user@inst2.edu")
+	SmsUser = InitUser(t, "sms_user@example.com")
+
+	UserFor = make(map[*httpexpect.Expect]*pgmodels.User)
+	UserFor[SysAdminClient] = SysAdmin
+	UserFor[Inst1AdminClient] = Inst1Admin
+	UserFor[Inst1UserClient] = Inst1User
+	UserFor[Inst2AdminClient] = Inst2Admin
+	UserFor[Inst2UserClient] = Inst2User
+	UserFor[SmsUserClient] = SmsUser
+
+	TokenFor = make(map[*httpexpect.Expect]string)
+	TokenFor[SysAdminClient] = SysAdminToken
+	TokenFor[Inst1AdminClient] = Inst1AdminToken
+	TokenFor[Inst1UserClient] = Inst1UserToken
+	TokenFor[Inst2AdminClient] = Inst2AdminToken
+	TokenFor[Inst2UserClient] = Inst2UserToken
+	TokenFor[SmsUserClient] = SmsUserToken
 }
 
 func InitClient(t *testing.T, email string) (*httpexpect.Expect, string) {

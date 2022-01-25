@@ -365,3 +365,53 @@ func TestNewRestorationItem(t *testing.T) {
 	assert.EqualValues(t, file.ID, item.GenericFileID)
 	assert.Equal(t, constants.ActionGlacierRestore, item.Action)
 }
+
+func TestNewDeletionItem(t *testing.T) {
+	defer db.ForceFixtureReload()
+	obj, err := pgmodels.IntellectualObjectByID(2)
+	require.Nil(t, err)
+	require.NotNil(t, obj)
+
+	query := pgmodels.NewQuery().
+		Where("institution_id", "=", obj.InstitutionID).
+		Where("state", "=", constants.StateActive).
+		Limit(1)
+	user, err := pgmodels.UserGet(query)
+	require.Nil(t, err)
+	require.NotNil(t, user)
+
+	item1, err := pgmodels.NewDeletionItem(obj, nil, user)
+	require.Nil(t, err)
+	require.NotNil(t, item1)
+	assert.Equal(t, obj.ID, item1.IntellectualObjectID)
+	assert.Equal(t, constants.ActionDelete, item1.Action)
+	assert.Equal(t, user.Email, item1.User)
+
+	query2 := pgmodels.NewQuery().
+		Where("intellectual_object_id", "=", obj.ID).
+		Where("state", "=", constants.StateActive).
+		Limit(1)
+	gf, err := pgmodels.GenericFileGet(query2)
+	require.Nil(t, err)
+	require.NotNil(t, gf)
+
+	item2, err := pgmodels.NewDeletionItem(obj, gf, user)
+	require.Nil(t, err)
+	require.NotNil(t, item2)
+	assert.Equal(t, obj.ID, item2.IntellectualObjectID)
+	assert.Equal(t, constants.ActionDelete, item2.Action)
+	assert.Equal(t, user.Email, item2.User)
+	assert.Equal(t, gf.ID, item2.GenericFileID)
+	assert.Equal(t, gf.Size, item2.Size)
+
+	// Missing object should cause an error
+	item3, err := pgmodels.NewDeletionItem(nil, gf, user)
+	require.NotNil(t, err)
+	require.Nil(t, item3)
+
+	// Object that has never been ingested should cause error
+	randomObj := pgmodels.RandomObject()
+	item4, err := pgmodels.NewDeletionItem(randomObj, nil, user)
+	require.NotNil(t, err)
+	require.Nil(t, item4)
+}

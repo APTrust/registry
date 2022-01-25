@@ -94,9 +94,6 @@ func TestDeletionRequestValidate(t *testing.T) {
 	assert.Equal(t, pgmodels.ErrDeletionInstitutionID, valErr.Errors["InstitutionID"])
 	assert.Equal(t, pgmodels.ErrDeletionRequesterID, valErr.Errors["RequestedByID"])
 
-	// ----------------------------------------------------------
-	// TODO: Fix this. We're getting the wrong error here
-	// ----------------------------------------------------------
 	// Invalid requester, approver, canceller
 	// These users don't exist
 	req.InstitutionID = inst1UserID
