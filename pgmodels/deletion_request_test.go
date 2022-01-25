@@ -142,6 +142,28 @@ func TestDeletionRequestValidate(t *testing.T) {
 	req.CancelledByID = inst1AdminID
 	valErr = req.Validate()
 	assert.Nil(t, valErr)
+
+	// Make sure we catch illegal files and objects.
+	// User can't delete file or object belonging
+	// to another institution.
+	req.GenericFiles = []*pgmodels.GenericFile{
+		&pgmodels.GenericFile{
+			InstitutionID: 9999,
+		},
+	}
+	valErr = req.Validate()
+	assert.NotNil(t, valErr)
+	assert.Equal(t, pgmodels.ErrDeletionIllegalObject, valErr.Errors["GenericFiles"])
+	req.GenericFiles = []*pgmodels.GenericFile{}
+
+	req.IntellectualObjects = []*pgmodels.IntellectualObject{
+		&pgmodels.IntellectualObject{
+			InstitutionID: 9999,
+		},
+	}
+	valErr = req.Validate()
+	assert.NotNil(t, valErr)
+	assert.Equal(t, pgmodels.ErrDeletionIllegalObject, valErr.Errors["IntellectualObjects"])
 }
 
 func TestDeletionRequestAddFile(t *testing.T) {

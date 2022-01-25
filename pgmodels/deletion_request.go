@@ -18,6 +18,7 @@ const (
 	ErrDeletionUserNotFound  = "User does not exist."
 	ErrDeletionUserInactive  = "User has been deactivated."
 	ErrTokenNotEncrypted     = "Token must be encrypted."
+	ErrDeletionIllegalObject = "User cannot delete files or objects belonging to other institutions"
 )
 
 // init does some setup work so go-pg can recognize many-to-many
@@ -137,8 +138,20 @@ func (request *DeletionRequest) Validate() *common.ValidationError {
 		errors["EncryptedConfirmationToken"] = ErrTokenNotEncrypted
 	}
 
-	// TODO: Ensure that all objects and files actually belong to the
-	// specified institution.
+	// Make sure all objects and files belong to the requesting
+	// user's institution.
+	for _, obj := range request.IntellectualObjects {
+		if obj.InstitutionID != request.RequestedBy.InstitutionID {
+			errors["IntellectualObjects"] = ErrDeletionIllegalObject
+			break
+		}
+	}
+	for _, gf := range request.GenericFiles {
+		if gf.InstitutionID != request.RequestedBy.InstitutionID {
+			errors["GenericFiles"] = ErrDeletionIllegalObject
+			break
+		}
+	}
 
 	if len(errors) > 0 {
 		return &common.ValidationError{Errors: errors}
