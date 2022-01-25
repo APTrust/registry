@@ -1,7 +1,6 @@
 package pgmodels
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/APTrust/registry/common"
@@ -171,7 +170,6 @@ func (request *DeletionRequest) validateRequestedBy(errors map[string]string) {
 	} else if !request.RequestedBy.DeactivatedAt.IsZero() {
 		errors["RequestedByID"] = ErrDeletionUserInactive
 	} else if request.RequestedBy.InstitutionID != request.InstitutionID {
-		fmt.Println("--->", request.RequestedBy.ID, request.RequestedBy, request.InstitutionID)
 		errors["RequestedByID"] = ErrDeletionWrongInst
 	}
 }

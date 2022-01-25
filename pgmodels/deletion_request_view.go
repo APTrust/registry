@@ -49,13 +49,6 @@ func DeletionRequestViewByID(id int64) (*DeletionRequestView, error) {
 	return DeletionRequestViewGet(query)
 }
 
-// DeletionRequestViewByEmail returns the DeletionRequestView record with the
-// specified email address. Returns pg.ErrNoRows if there is no match.
-func DeletionRequestViewByEmail(email string) (*DeletionRequestView, error) {
-	query := NewQuery().Where("email", "=", email)
-	return DeletionRequestViewGet(query)
-}
-
 // DeletionRequestViewSelect returns all DeletionRequestView records matching
 // the query.
 func DeletionRequestViewSelect(query *Query) ([]*DeletionRequestView, error) {
