@@ -1,6 +1,7 @@
 package pgmodels
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/APTrust/registry/common"
@@ -127,53 +128,9 @@ func (request *DeletionRequest) Validate() *common.ValidationError {
 		errors["InstitutionID"] = ErrDeletionInstitutionID
 	}
 
-	// Make sure requester is valid
-	var err error
-	if request.RequestedByID < 1 {
-		errors["RequestedByID"] = ErrDeletionRequesterID
-	}
-	if request.RequestedByID > 0 && request.RequestedBy == nil {
-		request.RequestedBy, err = UserByID(request.RequestedByID)
-	}
-	if request.RequestedBy == nil || err != nil {
-		errors["RequestedByID"] = ErrDeletionUserNotFound
-	} else if !request.RequestedBy.DeactivatedAt.IsZero() {
-		errors["RequestedByID"] = ErrDeletionUserInactive
-	} else if request.RequestedBy.InstitutionID != request.InstitutionID {
-		errors["RequestedByID"] = ErrDeletionWrongInst
-	}
-
-	// Make sure approver has admin role at the right institution
-	if request.ConfirmedByID > 0 {
-		if request.ConfirmedBy == nil {
-			user, err := UserByID(request.ConfirmedByID)
-			if err != nil || user.ID == 0 {
-				errors["ConfirmedByID"] = ErrDeletionUserNotFound
-			}
-			if user.InstitutionID != request.InstitutionID {
-				errors["ConfirmedByID"] = ErrDeletionWrongInst
-			}
-			if user.Role != constants.RoleInstAdmin {
-				errors["ConfirmedByID"] = ErrDeletionWrongRole
-			}
-		}
-	}
-
-	// Make sure canceller has admin role at the right institution
-	if request.CancelledByID > 0 {
-		if request.CancelledBy == nil {
-			user, err := UserByID(request.CancelledByID)
-			if err != nil || user.ID == 0 {
-				errors["CancelledByID"] = ErrDeletionUserNotFound
-			}
-			if user.InstitutionID != request.InstitutionID {
-				errors["CancelledByID"] = ErrDeletionWrongInst
-			}
-			if user.Role != constants.RoleInstAdmin {
-				errors["CancelledByID"] = ErrDeletionWrongRole
-			}
-		}
-	}
+	request.validateRequestedBy(errors)
+	request.validateConfirmedBy(errors)
+	request.validateCancelledBy(errors)
 
 	// Make sure tokens are actually encrypted
 	if !common.LooksEncrypted(request.EncryptedConfirmationToken) {
@@ -187,6 +144,55 @@ func (request *DeletionRequest) Validate() *common.ValidationError {
 		return &common.ValidationError{Errors: errors}
 	}
 	return nil
+}
+
+func (request *DeletionRequest) validateRequestedBy(errors map[string]string) {
+	var err error
+	if request.RequestedByID > 0 && request.RequestedBy == nil {
+		request.RequestedBy, err = UserByID(request.RequestedByID)
+	}
+	if request.RequestedByID < 1 {
+		errors["RequestedByID"] = ErrDeletionRequesterID
+	} else if request.RequestedBy == nil || err != nil {
+		errors["RequestedByID"] = ErrDeletionUserNotFound
+	} else if !request.RequestedBy.DeactivatedAt.IsZero() {
+		errors["RequestedByID"] = ErrDeletionUserInactive
+	} else if request.RequestedBy.InstitutionID != request.InstitutionID {
+		fmt.Println("--->", request.RequestedBy.ID, request.RequestedBy, request.InstitutionID)
+		errors["RequestedByID"] = ErrDeletionWrongInst
+	}
+}
+
+func (request *DeletionRequest) validateConfirmedBy(errors map[string]string) {
+	// Make sure approver has admin role at the right institution
+	if request.ConfirmedByID > 0 {
+		if request.ConfirmedBy == nil {
+			user, err := UserByID(request.ConfirmedByID)
+			if err != nil || user.ID == 0 {
+				errors["ConfirmedByID"] = ErrDeletionUserNotFound
+			} else if user.InstitutionID != request.InstitutionID {
+				errors["ConfirmedByID"] = ErrDeletionWrongInst
+			} else if user.Role != constants.RoleInstAdmin {
+				errors["ConfirmedByID"] = ErrDeletionWrongRole
+			}
+		}
+	}
+}
+
+func (request *DeletionRequest) validateCancelledBy(errors map[string]string) {
+	// Make sure canceller has admin role at the right institution
+	if request.CancelledByID > 0 {
+		if request.CancelledBy == nil {
+			user, err := UserByID(request.CancelledByID)
+			if err != nil || user.ID == 0 {
+				errors["CancelledByID"] = ErrDeletionUserNotFound
+			} else if user.InstitutionID != request.InstitutionID {
+				errors["CancelledByID"] = ErrDeletionWrongInst
+			} else if user.Role != constants.RoleInstAdmin {
+				errors["CancelledByID"] = ErrDeletionWrongRole
+			}
+		}
+	}
 }
 
 func (request *DeletionRequest) AddFile(gf *GenericFile) {
