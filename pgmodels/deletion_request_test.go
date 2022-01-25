@@ -167,25 +167,67 @@ func TestDeletionRequestValidate(t *testing.T) {
 }
 
 func TestDeletionRequestAddFile(t *testing.T) {
+	req, err := pgmodels.NewDeletionRequest()
+	require.Nil(t, err)
+	require.NotNil(t, req)
+	assert.Empty(t, req.GenericFiles)
+	assert.Nil(t, req.FirstFile())
 
+	for i := 0; i < 5; i++ {
+		req.AddFile(pgmodels.RandomGenericFile(9999, "obj/identifier"))
+	}
+	assert.Equal(t, 5, len(req.GenericFiles))
+	assert.Equal(t, req.GenericFiles[0], req.FirstFile())
 }
 
 func TestDeletionRequestAddObject(t *testing.T) {
+	req, err := pgmodels.NewDeletionRequest()
+	require.Nil(t, err)
+	require.NotNil(t, req)
+	assert.Empty(t, req.IntellectualObjects)
+	assert.Nil(t, req.FirstObject())
 
-}
-
-func TestDeletionRequestFirstFile(t *testing.T) {
-
-}
-
-func TestDeletionRequestFirstObject(t *testing.T) {
-
+	for i := 0; i < 5; i++ {
+		req.AddObject(pgmodels.RandomObject())
+	}
+	assert.Equal(t, 5, len(req.IntellectualObjects))
+	assert.Equal(t, req.IntellectualObjects[0], req.FirstObject())
 }
 
 func TestDeletionRequestConfirm(t *testing.T) {
+	user, err := pgmodels.UserByID(5)
+	require.Nil(t, err)
+	require.NotNil(t, user)
 
+	req, err := pgmodels.NewDeletionRequest()
+	require.Nil(t, err)
+	require.NotNil(t, req)
+
+	assert.Empty(t, req.ConfirmedBy)
+	assert.Empty(t, req.ConfirmedByID)
+	assert.Empty(t, req.ConfirmedAt)
+
+	req.Confirm(user)
+	assert.Equal(t, user, req.ConfirmedBy)
+	assert.Equal(t, user.ID, req.ConfirmedByID)
+	assert.NotEmpty(t, req.ConfirmedAt)
 }
 
 func TestDeletionRequestCancel(t *testing.T) {
+	user, err := pgmodels.UserByID(5)
+	require.Nil(t, err)
+	require.NotNil(t, user)
 
+	req, err := pgmodels.NewDeletionRequest()
+	require.Nil(t, err)
+	require.NotNil(t, req)
+
+	assert.Empty(t, req.CancelledBy)
+	assert.Empty(t, req.CancelledByID)
+	assert.Empty(t, req.CancelledAt)
+
+	req.Cancel(user)
+	assert.Equal(t, user, req.CancelledBy)
+	assert.Equal(t, user.ID, req.CancelledByID)
+	assert.NotEmpty(t, req.CancelledAt)
 }
