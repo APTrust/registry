@@ -64,15 +64,6 @@ func InitHTTPTests(t *testing.T) {
 	}
 }
 
-// ReInitAllClients re-initializes all HTTP test clients.
-// This function exists because some tests may hit the logout
-// endpoint, and if another test tries to use that client later,
-// they'll get a 401/Unauthorized. Note that pgmodes/user_test.go
-// also signs users out.
-func ReInitAllClients(t *testing.T) {
-	initAllClients(t)
-}
-
 func initAllClients(t *testing.T) {
 	SysAdminClient, SysAdminToken = InitClient(t, "system@aptrust.org")
 	Inst1AdminClient, Inst1AdminToken = InitClient(t, "admin@inst1.edu")
