@@ -178,7 +178,26 @@ func TestUserSignIn_Valid(t *testing.T) {
 		assert.Equal(t, "2.2.2.2", user.CurrentSignInIP)
 		assert.True(t, user.SignInCount > oldSignInCount)
 		assert.True(t, user.CurrentSignInAt.After(oldSignInTime))
+		testUserSignOut(t, user)
 	}
+}
+
+func testUserSignOut(t *testing.T, user *pgmodels.User) {
+	signInIP := user.CurrentSignInIP
+	signInTime := user.CurrentSignInAt
+	err := user.SignOut()
+	require.Nil(t, err)
+
+	savedUser, err := pgmodels.UserByID(user.ID)
+	require.Nil(t, err)
+	require.NotNil(t, savedUser)
+
+	assert.Empty(t, savedUser.CurrentSignInIP)
+	assert.Empty(t, savedUser.CurrentSignInAt)
+	assert.Empty(t, savedUser.EncryptedOTPSecret)
+	assert.Empty(t, savedUser.EncryptedOTPSentAt)
+	assert.Equal(t, signInIP, savedUser.LastSignInIP)
+	assert.Equal(t, signInTime, savedUser.LastSignInAt)
 }
 
 func TestUserSignIn_Invalid(t *testing.T) {
@@ -422,4 +441,14 @@ func TestCreateOTPToken(t *testing.T) {
 	require.Nil(t, err)
 	require.NotNil(t, user)
 	assert.True(t, len(user.EncryptedOTPSecret) > 10)
+}
+
+func TestUserCountryCodeAndPhone(t *testing.T) {
+	user := &pgmodels.User{
+		PhoneNumber: "+13135551234",
+	}
+	countryCode, phone, err := user.CountryCodeAndPhone()
+	require.Nil(t, err)
+	assert.EqualValues(t, 1, countryCode)
+	assert.Equal(t, "3135551234", phone)
 }

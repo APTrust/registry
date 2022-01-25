@@ -7,6 +7,7 @@ import (
 	"github.com/APTrust/registry/db"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestInstIDFor(t *testing.T) {
@@ -56,4 +57,44 @@ func TestInstIDFor(t *testing.T) {
 	assert.Equal(t, common.ErrInvalidParam, err)
 	assert.EqualValues(t, 0, id)
 
+	alert, err := pgmodels.AlertByID(1)
+	require.Nil(t, err)
+	require.NotNil(t, alert)
+	instID, err := pgmodels.InstIDFor("Alert", alert.ID)
+	require.Nil(t, err)
+	assert.Equal(t, alert.InstitutionID, instID)
+
+	req, err := pgmodels.DeletionRequestByID(1)
+	require.Nil(t, err)
+	require.NotNil(t, req)
+	instID, err = pgmodels.InstIDFor("DeletionRequest", req.ID)
+	require.Nil(t, err)
+	assert.Equal(t, req.InstitutionID, instID)
+}
+
+func TestPgmodelSave(t *testing.T) {
+	// Models must implement their own save method.
+	// If they don't, and fall through to their base,
+	// we should get an error.
+	baseModel := pgmodels.BaseModel{}
+	assert.Error(t, baseModel.Save())
+	tsModel := pgmodels.TimestampModel{}
+	assert.Error(t, tsModel.Save())
+}
+
+func TestFiltersFor(t *testing.T) {
+	types := []string{
+		"Alert",
+		"DeletionRequest",
+		"DepositStats",
+		"GenericFile",
+		"IntellectualObject",
+		"Institution",
+		"PremisEvent",
+		"User",
+		"WorkItem",
+	}
+	for _, typeName := range types {
+		assert.NotEmpty(t, pgmodels.FiltersFor(typeName))
+	}
 }
