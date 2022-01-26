@@ -1,15 +1,13 @@
 package webui_test
 
 import (
-	// "fmt"
+	"fmt"
 	"net/http"
-	// "os"
 	"testing"
 	"time"
 
-	// "github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
-	// "github.com/APTrust/registry/db"
+	"github.com/APTrust/registry/db"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/APTrust/registry/web/testutil"
 
@@ -98,27 +96,31 @@ func makeDeletionRequest(t *testing.T) *pgmodels.DeletionRequest {
 }
 
 func TestDeletionRequestReview(t *testing.T) {
-	// START HERE
-	// No idea WTF is happening here, but we seem to lose the auth cookie.
+	testutil.InitHTTPTests(t)
+	defer db.ForceFixtureReload()
+	request := makeDeletionRequest(t)
 
-	// testutil.InitHTTPTests(t)
-	// testutil.ReInitAllClients(t)
-	// request := makeDeletionRequest(t)
+	expect := testutil.Inst1AdminClient.GET("/deletions/review/{id}", request.ID).
+		WithQuery("token", request.ConfirmationToken).Expect()
 
-	// expect := testutil.Inst1AdminClient.GET("deletions/review/{id}", request.ID).
-	// 	//WithHeader(constants.CSRFHeaderName, testutil.Inst1AdminToken).
-	// 	WithQuery("token", request.ConfirmationToken).Expect()
+	expect.Status(http.StatusOK)
+	html := expect.Body().Raw()
 
-	// //fmt.Println(expect.Cookie(common.Context().Config.Cookies.SessionCookie))
-
-	// expect.Status(http.StatusOK)
-	// html := expect.Body().Raw()
-
-	// expected := []string{
-	// 	request.FirstObject().Identifier,
-	// 	request.RequestedBy.Email,
-	// }
-	// testutil.AssertMatchesAll(t, html, expected)
+	// What should be on this page?
+	// - Prompt to approve or cancel
+	// - URLs for posting confirm & cancel
+	// - The identifier of the object to be deleted
+	// - The email address of the person who requested the deletion
+	// - The confirmation token used to reach this page
+	expected := []string{
+		"Do you want to approve or cancel this request?",
+		fmt.Sprintf(`action="/deletions/approve/%d"`, request.ID),
+		fmt.Sprintf(`action="/deletions/cancel/%d"`, request.ID),
+		request.FirstObject().Identifier,
+		testutil.Inst1Admin.Email, // user who requested deletion
+		request.ConfirmationToken,
+	}
+	testutil.AssertMatchesAll(t, html, expected)
 }
 
 func TestDeletionRequestApprove(t *testing.T) {
