@@ -158,7 +158,37 @@ func TestDeletionRequestApprove(t *testing.T) {
 }
 
 func TestDeletionRequestCancel(t *testing.T) {
+	testutil.InitHTTPTests(t)
+	defer db.ForceFixtureReload()
+	request := makeDeletionRequest(t)
 
-	// Fix TestDeletionRequestReview before implementing this.
+	expect := testutil.Inst1AdminClient.POST("/deletions/cancel/{id}", request.ID).
+		WithHeader("Referer", testutil.BaseURL).
+		WithFormField("token", request.ConfirmationToken).
+		WithFormField("csrf_token", testutil.Inst1AdminToken).
+		Expect()
 
+	fmt.Println(expect.Body().Raw())
+	expect.Status(http.StatusOK)
+
+	// Make sure we captured the approver and created a work item
+	req, err := pgmodels.DeletionRequestByID(request.ID)
+	require.Nil(t, err)
+	require.NotNil(t, req)
+	assert.Equal(t, req.CancelledByID, testutil.Inst1Admin.ID)
+	assert.Equal(t, req.CancelledBy.ID, testutil.Inst1Admin.ID)
+	assert.False(t, req.CancelledAt.IsZero())
+
+	// There should be no work item because the deletion was cancelled.
+	assert.Nil(t, req.WorkItem)
+
+	// We also should have an alert for this deletion confirmation
+	query := pgmodels.NewQuery().
+		Where("deletion_request_id", "=", req.ID).
+		Offset(0).
+		Limit(1)
+	alert, err := pgmodels.AlertGet(query)
+	require.Nil(t, err)
+	require.NotNil(t, alert)
+	assert.Equal(t, constants.AlertDeletionCancelled, alert.Type)
 }
