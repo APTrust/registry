@@ -194,6 +194,7 @@ func TestFilterCollection(t *testing.T) {
 	require.NotNil(t, query)
 	assert.Equal(t, `(name = ?) AND (name != ?) AND (age > ?) AND (age >= ?) AND (age < ?) AND (age <= ?) AND (name ILIKE ?) AND (name ILIKE ?) AND (name is null) AND (name is not null) AND (name IN (?, ?, ?))`, query.WhereClause())
 	assert.Equal(t, []interface{}{"Homer", "Homer", "38", "38", "38", "38", "Simpson%", "%Simpson%", "Bart", "Lisa", "Maggie"}, query.Params())
+	assert.Equal(t, "Homer", fc.ValueOf("name__ne"))
 }
 
 func TestFCOrderBy(t *testing.T) {

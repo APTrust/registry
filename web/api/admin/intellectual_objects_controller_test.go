@@ -9,6 +9,7 @@ import (
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/APTrust/registry/web/api"
+	admin_api "github.com/APTrust/registry/web/api/admin"
 	tu "github.com/APTrust/registry/web/testutil"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -250,4 +251,31 @@ func TestObjectDeleteUpdateUnauthorized(t *testing.T) {
 
 	resp = tu.Inst1UserClient.POST("/admin-api/v3/objects/delete/{id}", obj.ID).WithJSON(obj).Expect()
 	resp.Status(http.StatusForbidden)
+}
+
+func TestCoerceObjectStorageOption(t *testing.T) {
+	existingObj := &pgmodels.IntellectualObject{
+		State:         constants.StateActive,
+		StorageOption: constants.StorageOptionGlacierDeepOR,
+	}
+	submittedObj := &pgmodels.IntellectualObject{
+		State:         constants.StateActive,
+		StorageOption: constants.StorageOptionWasabiVA,
+	}
+	assert.NotEqual(t, existingObj.StorageOption, submittedObj.StorageOption)
+
+	// Per APTrust rules, new obj storage option must be set to match
+	// existing object storage option if existing obj is still active.
+	// https://aptrust.github.io/userguide/bagging/#allowed-storage-option-values
+	admin_api.CoerceObjectStorageOption(existingObj, submittedObj)
+	assert.Equal(t, existingObj.StorageOption, submittedObj.StorageOption)
+
+	// But if existing obj is not active, this should not coerce.
+	// Documented way of changing storage option is to delete the old
+	// copy, then upload new copy with desired storage option.
+	existingObj.State = constants.StateDeleted
+	submittedObj.StorageOption = constants.StorageOptionWasabiVA
+	assert.NotEqual(t, existingObj.StorageOption, submittedObj.StorageOption)
+	admin_api.CoerceObjectStorageOption(existingObj, submittedObj)
+	assert.NotEqual(t, existingObj.StorageOption, submittedObj.StorageOption)
 }

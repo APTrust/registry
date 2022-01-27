@@ -157,3 +157,24 @@ func TestInstitutionIndex(t *testing.T) {
 	testutil.Inst1AdminClient.GET("/institutions").Expect().Status(http.StatusForbidden)
 	testutil.Inst1UserClient.GET("/institutions").Expect().Status(http.StatusForbidden)
 }
+
+func TestInstitutionEdit(t *testing.T) {
+	testutil.InitHTTPTests(t)
+
+	instLinks := []string{
+		`input type="text" name="Name" value="Institution One"`,
+		`type="text" name="Identifier" value="institution1.edu"`,
+		"aptrust.receiving.test.institution1.edu",
+	}
+
+	// SysAdmin can see the institutions page
+	html := testutil.SysAdminClient.GET("/institutions/edit/2").Expect().
+		Status(http.StatusOK).Body().Raw()
+	testutil.AssertMatchesAll(t, html, instLinks)
+
+	// No other roles can edit institutions, even their own institution.
+	testutil.Inst1AdminClient.GET("/institutions/edit/2").Expect().Status(http.StatusForbidden)
+	testutil.Inst1UserClient.GET("/institutions/edit/2").Expect().Status(http.StatusForbidden)
+	testutil.Inst2AdminClient.GET("/institutions/edit/2").Expect().Status(http.StatusForbidden)
+	testutil.Inst2UserClient.GET("/institutions/edit/2").Expect().Status(http.StatusForbidden)
+}

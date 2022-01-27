@@ -10,6 +10,7 @@ import (
 	"github.com/APTrust/registry/db"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/APTrust/registry/web/api"
+	admin_api "github.com/APTrust/registry/web/api/admin"
 	tu "github.com/APTrust/registry/web/testutil"
 	v "github.com/asaskevich/govalidator"
 	"github.com/stretchr/testify/assert"
@@ -302,4 +303,31 @@ func TestGenericFileCreateBatch(t *testing.T) {
 			assert.True(t, v.IsURL(sr.URL))
 		}
 	}
+}
+
+func TestCoerceFileStorageOption(t *testing.T) {
+	existingFile := &pgmodels.GenericFile{
+		State:         constants.StateActive,
+		StorageOption: constants.StorageOptionGlacierDeepOR,
+	}
+	submittedFile := &pgmodels.GenericFile{
+		State:         constants.StateActive,
+		StorageOption: constants.StorageOptionWasabiVA,
+	}
+	assert.NotEqual(t, existingFile.StorageOption, submittedFile.StorageOption)
+
+	// Per APTrust rules, new file storage option must be set to match
+	// existing file storage option if existing file is still active.
+	// https://aptrust.github.io/userguide/bagging/#allowed-storage-option-values
+	admin_api.CoerceFileStorageOption(existingFile, submittedFile)
+	assert.Equal(t, existingFile.StorageOption, submittedFile.StorageOption)
+
+	// But if existing file is not active, this should not coerce.
+	// Documented way of changing storage option is to delete the old
+	// copy, then upload new copy with desired storage option.
+	existingFile.State = constants.StateDeleted
+	submittedFile.StorageOption = constants.StorageOptionWasabiVA
+	assert.NotEqual(t, existingFile.StorageOption, submittedFile.StorageOption)
+	admin_api.CoerceFileStorageOption(existingFile, submittedFile)
+	assert.NotEqual(t, existingFile.StorageOption, submittedFile.StorageOption)
 }

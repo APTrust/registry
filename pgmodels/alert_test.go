@@ -62,3 +62,11 @@ func TestAlertValidate(t *testing.T) {
 	assert.Equal(t, pgmodels.ErrAlertType, err.Errors["Type"])
 	assert.Equal(t, pgmodels.ErrAlertContent, err.Errors["Content"])
 }
+
+func TestAlertSelect(t *testing.T) {
+	query := pgmodels.NewQuery().Where("institution_id", "=", 2)
+	alerts, err := pgmodels.AlertSelect(query)
+	require.Nil(t, err)
+	require.NotEmpty(t, alerts)
+	assert.Equal(t, 9, len(alerts))
+}
