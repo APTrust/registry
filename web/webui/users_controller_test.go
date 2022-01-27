@@ -205,6 +205,18 @@ func TestUserSignInSignOut(t *testing.T) {
 	client.GET("/dashboard").Expect().Status(http.StatusUnauthorized)
 }
 
+func TestUserSignInBadCredentials(t *testing.T) {
+	testutil.InitHTTPTests(t)
+	client := testutil.GetAnonymousClient(t)
+
+	// Invalid credentials should get a 400 response
+	client.POST("/users/sign_in").
+		WithHeader("Referer", testutil.BaseURL).
+		WithFormField("email", "bad-email@inst1.edu").
+		WithFormField("password", "invalid-password").
+		Expect().Status(http.StatusBadRequest)
+}
+
 func TestUserChangePassword(t *testing.T) {
 	testutil.InitHTTPTests(t)
 

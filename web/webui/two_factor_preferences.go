@@ -11,7 +11,7 @@ type TwoFactorPreferences struct {
 	NewPhone  string
 	OldMethod string
 	NewMethod string
-	user      *pgmodels.User
+	User      *pgmodels.User
 }
 
 func NewTwoFactorPreferences(req *Request) (*TwoFactorPreferences, error) {
@@ -33,7 +33,7 @@ func NewTwoFactorPreferences(req *Request) (*TwoFactorPreferences, error) {
 		NewPhone:  user.PhoneNumber,
 		OldMethod: oldMethod,
 		NewMethod: user.AuthyStatus,
-		user:      user,
+		User:      user,
 	}
 
 	return prefs, nil
@@ -68,7 +68,7 @@ func (p *TwoFactorPreferences) UseSMS() bool {
 }
 
 func (p *TwoFactorPreferences) NeedsAuthyRegistration() bool {
-	return p.NewMethod == constants.TwoFactorAuthy && p.user.AuthyID == ""
+	return p.NewMethod == constants.TwoFactorAuthy && p.User.AuthyID == ""
 }
 
 func (p *TwoFactorPreferences) NeedsAuthyConfirmation() bool {

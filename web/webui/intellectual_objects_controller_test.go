@@ -281,3 +281,32 @@ func TestObjectInitRestore(t *testing.T) {
 		Expect().Status(http.StatusForbidden)
 
 }
+
+func TestIntellectualObjectEvents(t *testing.T) {
+	testutil.InitHTTPTests(t)
+	expect := testutil.Inst2UserClient.GET("/objects/events/1").Expect()
+	html := expect.Body().Raw()
+	expect.Status(http.StatusOK)
+
+	expected := []string{
+		"Events History",
+		"ingestion",
+		"Aug 26, 2016",
+	}
+	testutil.AssertMatchesAll(t, html, expected)
+}
+
+func TestIntellectualObjectFiles(t *testing.T) {
+	testutil.InitHTTPTests(t)
+	expect := testutil.Inst2UserClient.GET("/objects/files/1").Expect()
+	html := expect.Body().Raw()
+	expect.Status(http.StatusOK)
+
+	expected := []string{
+		"Active Files",
+		"institution1.edu/photos/picture1",
+		"institution1.edu/photos/picture2",
+		"institution1.edu/photos/picture3",
+	}
+	testutil.AssertMatchesAll(t, html, expected)
+}

@@ -152,6 +152,8 @@ func IntellectualObjectShow(c *gin.Context) {
 // This is called when user pages through events on the
 // intellectual object detail page. This returns an HTML
 // fragment, not an entire page.
+//
+// GET /objects/events/:id (intellectual object id)
 func IntellectualObjectEvents(c *gin.Context) {
 	req := NewRequest(c)
 	err := loadEvents(req, req.Auth.ResourceID)
@@ -164,6 +166,8 @@ func IntellectualObjectEvents(c *gin.Context) {
 // This is called when user pages through files on the
 // intellectual object detail page. This returns an HTML
 // fragment, not an entire page.
+//
+// GET /objects/files/:id (intellectual object id)
 func IntellectualObjectFiles(c *gin.Context) {
 	req := NewRequest(c)
 	err := loadFiles(req, req.Auth.ResourceID)
