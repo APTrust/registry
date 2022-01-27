@@ -3,11 +3,13 @@ package webui_test
 import (
 	"net/http"
 	"regexp"
+	"strings"
 	"testing"
 	"time"
 
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
+
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/APTrust/registry/web/testutil"
 	"github.com/APTrust/registry/web/webui"
@@ -177,8 +179,26 @@ func TestUserTwoComplete2FASetup(t *testing.T) {
 	// - Changing to SMS   (partially tested above in TestCompleteSMSSetup)
 	// - Changing to None
 	//
-	// These have been manually tested. Need time to write the
-	// automated tests.
+	// These have been manually tested. Automated tests cover only
+	// a few cases.
+
+	// Submit with no change
+	expect := testutil.Inst1UserClient.POST("/users/2fa_setup").
+		WithHeader("Referer", testutil.BaseURL).
+		WithFormField(constants.CSRFTokenName, testutil.Inst1UserToken).Expect()
+	html := expect.Body().Raw()
+	assert.True(t, strings.Contains(html, "Your two-factor preferences remain unchanged."))
+
+	// Submit with change to Phone number
+	expect = testutil.Inst1UserClient.POST("/users/2fa_setup").
+		WithHeader("Referer", testutil.BaseURL).
+		WithFormField(constants.CSRFTokenName, testutil.Inst1UserToken).
+		WithFormField("PhoneNumber", "12223334444").
+		WithFormField("AuthyStatus", "").
+		Expect()
+	html = expect.Body().Raw()
+	assert.True(t, strings.Contains(html, "Are you sure you want to turn off two-factor authentication?"))
+
 }
 
 func TestUserConfirmPhone(t *testing.T) {
@@ -193,12 +213,6 @@ func TestUserConfirmPhone(t *testing.T) {
 		"getAPIKey()",
 	}
 	testSMSVerify(t, targetURL, successStrings, failureStrings)
-}
-
-func TestUserAuthyRegister(t *testing.T) {
-	// We can't test this without an Authy API key
-	// and Authy user id AND a user with a phone to
-	// respond to the push.
 }
 
 // This tests both backup code generation and verification.

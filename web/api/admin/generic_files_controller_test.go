@@ -2,7 +2,6 @@ package admin_api_test
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"testing"
 	"time"
@@ -254,7 +253,6 @@ func TestGenericFileCreateBatch(t *testing.T) {
 
 	// Unless there's an error, we should get an empty JSON payload.
 	// If there is an error, let's see it.
-	fmt.Println(resp.Body())
 	resp.Status(http.StatusCreated)
 
 	// Make sure everything was saved correctly.

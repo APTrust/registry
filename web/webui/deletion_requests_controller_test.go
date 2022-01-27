@@ -134,7 +134,6 @@ func TestDeletionRequestApprove(t *testing.T) {
 		WithFormField("csrf_token", testutil.Inst1AdminToken).
 		Expect()
 
-	fmt.Println(expect.Body().Raw())
 	expect.Status(http.StatusOK)
 
 	// Make sure we captured the approver and created a work item
@@ -168,7 +167,6 @@ func TestDeletionRequestCancel(t *testing.T) {
 		WithFormField("csrf_token", testutil.Inst1AdminToken).
 		Expect()
 
-	fmt.Println(expect.Body().Raw())
 	expect.Status(http.StatusOK)
 
 	// Make sure we captured the approver and created a work item
