@@ -16,7 +16,7 @@ type APTContext struct {
 	Config      *Config
 	DB          *pg.DB
 	Log         zerolog.Logger
-	AuthyClient *network.AuthyClient
+	AuthyClient network.AuthyClientInterface
 	NSQClient   *network.NSQClient
 	SNSClient   *network.SNSClient
 }

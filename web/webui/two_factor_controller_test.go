@@ -9,6 +9,7 @@ import (
 
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
+	"github.com/APTrust/registry/network"
 
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/APTrust/registry/web/testutil"
@@ -138,9 +139,24 @@ func TestUserTwoFactorGenerateSMS(t *testing.T) {
 }
 
 func TestUserTwoFactorPush(t *testing.T) {
-	// We can't test this without an Authy API key
-	// and Authy user id AND a user with a phone to
-	// respond to the push.
+	aptContext := common.Context()
+	originalAuthyClient := aptContext.AuthyClient
+	aptContext.AuthyClient = network.NewMockAuthyClient()
+
+	origAuthyID := testutil.Inst1User.AuthyID
+	testutil.Inst1User.AuthyID = "abc123"
+	require.Nil(t, testutil.Inst1User.Save())
+
+	defer func() {
+		aptContext.AuthyClient = originalAuthyClient
+		testutil.Inst1User.AuthyID = origAuthyID
+		testutil.Inst1User.Save()
+	}()
+
+	testutil.Inst1UserClient.POST("/users/2fa_push").
+		WithHeader("Referer", testutil.BaseURL).
+		WithFormField(constants.CSRFTokenName, testutil.Inst1UserToken).
+		Expect().Status(http.StatusOK)
 }
 
 func TestUserTwoFactorVerify(t *testing.T) {
@@ -182,6 +198,14 @@ func TestUserTwoComplete2FASetup(t *testing.T) {
 	// These have been manually tested. Automated tests cover only
 	// a few cases.
 
+	aptContext := common.Context()
+	originalAuthyClient := aptContext.AuthyClient
+	aptContext.AuthyClient = network.NewMockAuthyClient()
+
+	defer func() {
+		aptContext.AuthyClient = originalAuthyClient
+	}()
+
 	// Submit with no change
 	expect := testutil.Inst1UserClient.POST("/users/2fa_setup").
 		WithHeader("Referer", testutil.BaseURL).
@@ -193,12 +217,42 @@ func TestUserTwoComplete2FASetup(t *testing.T) {
 	expect = testutil.Inst1UserClient.POST("/users/2fa_setup").
 		WithHeader("Referer", testutil.BaseURL).
 		WithFormField(constants.CSRFTokenName, testutil.Inst1UserToken).
-		WithFormField("PhoneNumber", "12223334444").
+		WithFormField("PhoneNumber", "+12223334444").
 		WithFormField("AuthyStatus", "").
 		Expect()
 	html = expect.Body().Raw()
-	assert.True(t, strings.Contains(html, "Are you sure you want to turn off two-factor authentication?"))
+	assert.True(t, strings.Contains(html, "Your phone number has been updated."))
 
+	// Submit with change to Phone number and AuthyStatus
+	expect = testutil.Inst1UserClient.POST("/users/2fa_setup").
+		WithHeader("Referer", testutil.BaseURL).
+		WithFormField(constants.CSRFTokenName, testutil.Inst1UserToken).
+		WithFormField("PhoneNumber", "+15556662627").
+		WithFormField("AuthyStatus", constants.TwoFactorAuthy).
+		Expect()
+	html = expect.Body().Raw()
+	assert.True(t, strings.Contains(html, "Your two-factor setup is complete."))
+	assert.True(t, strings.Contains(html, "receive a push notification from Authy to complete the sign-in process."))
+
+	// Submit with change to Phone number and SMS
+	expect = testutil.Inst1UserClient.POST("/users/2fa_setup").
+		WithHeader("Referer", testutil.BaseURL).
+		WithFormField(constants.CSRFTokenName, testutil.Inst1UserToken).
+		WithFormField("PhoneNumber", "+15556662888").
+		WithFormField("AuthyStatus", constants.TwoFactorSMS).
+		Expect()
+	html = expect.Body().Raw()
+	assert.True(t, strings.Contains(html, "Enter the code we just texted you into the box below."))
+
+	// Turn off two-factor
+	expect = testutil.Inst1UserClient.POST("/users/2fa_setup").
+		WithHeader("Referer", testutil.BaseURL).
+		WithFormField(constants.CSRFTokenName, testutil.Inst1UserToken).
+		WithFormField("PhoneNumber", "+15556662888").
+		WithFormField("AuthyStatus", constants.TwoFactorNone).
+		Expect()
+	html = expect.Body().Raw()
+	assert.True(t, strings.Contains(html, "Two-factor authentication has been turned off for your account."))
 }
 
 func TestUserConfirmPhone(t *testing.T) {

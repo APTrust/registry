@@ -7,6 +7,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/brianvoe/gofakeit/v6"
 	"github.com/dcu/go-authy"
 	"github.com/rs/zerolog"
 )
@@ -24,7 +25,12 @@ type AuthyClient struct {
 	log     zerolog.Logger
 }
 
-func NewAuthyClient(authyEnabled bool, authyAPIKey string, log zerolog.Logger) *AuthyClient {
+type AuthyClientInterface interface {
+	AwaitOneTouch(string, string) (bool, error)
+	RegisterUser(string, int, string) (string, error)
+}
+
+func NewAuthyClient(authyEnabled bool, authyAPIKey string, log zerolog.Logger) AuthyClientInterface {
 	// Authy library logs to Stderr by default. We want either our logger
 	// (which doesn't support the standard go logger interface) or Stdout
 	// because Docker gathers Stdout logs.
@@ -86,4 +92,25 @@ func (ac *AuthyClient) RegisterUser(userEmail string, countryCode int, phone str
 		return "", err
 	}
 	return authyUser.ID, err
+}
+
+// MockAuthyClient is used in testing.
+type MockAuthyClient struct{}
+
+// NewMockAuthyClient returns a mock authy client for testing.
+func NewMockAuthyClient() AuthyClientInterface {
+	return &MockAuthyClient{}
+}
+
+// AwaitOneTouch for unit tests. Returns true unless param authyID == "fail".
+func (m *MockAuthyClient) AwaitOneTouch(userEmail, authyID string) (bool, error) {
+	if authyID == "fail" {
+		return false, nil
+	}
+	return true, nil
+}
+
+// RegisterUser for unit testing. Always succeeds.
+func (m *MockAuthyClient) RegisterUser(userEmail string, countryCode int, phone string) (string, error) {
+	return gofakeit.FarmAnimal(), nil
 }

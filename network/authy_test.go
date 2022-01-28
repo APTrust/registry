@@ -14,11 +14,7 @@ func TestAuthyClient(t *testing.T) {
 		zerolog.New(ioutil.Discard))
 	assert.NotNil(t, client)
 
-	// We can't test registration and push notifications
-	// in unit tests, but we do want to make sure our
-	// client is properly constructed. If so, it will return
-	// the following errors with Authy disabled (instead of
-	// panicking).
+	// Test authy when disabled.
 	response, err := client.RegisterUser("homer@example.com", 1, "302-555-1212")
 	assert.Empty(t, response)
 	assert.Equal(t, network.ErrAuthyDisabled, err)
@@ -26,4 +22,21 @@ func TestAuthyClient(t *testing.T) {
 	ok, err := client.AwaitOneTouch("homer@example.com", "no-id")
 	assert.False(t, ok)
 	assert.Equal(t, network.ErrAuthyDisabled, err)
+
+	// Test our mock authy client. This seems superfluous, but
+	// we want to make sure it works for tests in web/webui.
+	client = network.NewMockAuthyClient()
+	assert.NotNil(t, client)
+
+	response, err = client.RegisterUser("homer@example.com", 1, "302-555-1212")
+	assert.NotEmpty(t, response)
+	assert.Nil(t, err)
+
+	ok, err = client.AwaitOneTouch("homer@example.com", "no-id")
+	assert.True(t, ok)
+	assert.Nil(t, err)
+
+	ok, err = client.AwaitOneTouch("homer@example.com", "fail")
+	assert.False(t, ok)
+	assert.Nil(t, err)
 }

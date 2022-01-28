@@ -176,7 +176,7 @@ func UserComplete2FASetup(c *gin.Context) {
 	if prefs.DoNotUseTwoFactor() {
 		user.EnabledTwoFactor = false
 		helpers.SetFlashCookie(c, "Two-factor authentication has been turned off for your account.")
-		c.HTML(http.StatusFound, "users/my_account.html", req.TemplateData)
+		c.Redirect(http.StatusFound, "/users/my_account")
 		return
 	}
 
@@ -209,7 +209,12 @@ func UserComplete2FASetup(c *gin.Context) {
 		}
 		c.HTML(http.StatusOK, "users/confirm_phone.html", req.TemplateData)
 		return
+	} else {
+		if prefs.PhoneChanged() {
+			helpers.SetFlashCookie(c, "Your phone number has been updated.")
+		}
 	}
+	c.Redirect(http.StatusFound, "/users/my_account")
 }
 
 // UserConfirmPhone accepts the form from UserComplete2FASetup.
