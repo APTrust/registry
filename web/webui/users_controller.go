@@ -114,9 +114,14 @@ func UserEdit(c *gin.Context) {
 // UserSignInShow shows the user sign-in form.
 // GET /users/sign_in
 func UserSignInShow(c *gin.Context) {
+	// For these environments, prefill logins defined in fixtures
+	// to make dev's life easier. These envs contain only fixture
+	// and test data.
+	envName := common.Context().Config.EnvName
+	preFillTestLogins := envName == "test" || envName == "integration"
 	c.HTML(200, "users/sign_in.html", gin.H{
 		"cover":             helpers.GetCover(),
-		"preFillTestLogins": common.Context().Config.EnvName == "test",
+		"preFillTestLogins": preFillTestLogins,
 	})
 }
 

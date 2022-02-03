@@ -5,6 +5,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 
 	"github.com/APTrust/registry/common"
 	"github.com/go-pg/pg/v10"
@@ -278,15 +279,32 @@ func runTransaction(db *pg.DB, sql string, params ...interface{}) error {
 }
 
 // Blow up and die if this is run in any environment other than "test",
-// "integration", or "dev". We call this at every step of the way, in case
-// some clever developer ever tries to use or abuse any function in this file.
+// "integration", "travis", or "dev". We call this at every step of
+// the way, in case some clever developer ever tries to use or abuse
+// any function in this file.
+//
 // Our paranoid level of protection comes from us actually having deleted
-// a production database after mistyping a single character in a command.
-// Top-notch DevOps saved the day, but paranoid programming would have
-// prevented it in the first place.
+// a production database after mistyping a single character in a rake
+// command. Top-notch DevOps saved the day, but paranoid programming
+// would have prevented it in the first place.
 func panicOnWrongEnv() {
-	envName := os.Getenv("APT_ENV")
+	ctx := common.Context()
+	envName := ctx.Config.EnvName
 	if !slice.Contains(SafeEnvironments, envName) {
-		panic("Cannot run destructive DB operations outside dev, test, travis environments.")
+		panic("Cannot run destructive DB operations outside dev, integration, test, travis environments.")
+	}
+	// Be extra safe. Why? Because some jackass rake task once
+	// deleted our entire production DB.
+	//
+	// Don't like the kludgy, ugly code below? See how much you
+	// like restoring 250GB of deleted data.
+	if ctx.Config.DB.Host != "localhost" {
+		panic("Cannot run destructive DB operations against external servers.")
+	}
+	if !strings.HasSuffix(ctx.Config.DB.Name, "_development") &&
+		!strings.HasSuffix(ctx.Config.DB.Name, "_integration") &&
+		!strings.HasSuffix(ctx.Config.DB.Name, "_test") &&
+		!strings.HasSuffix(ctx.Config.DB.Name, "_travis") {
+		panic("Cannot run destructive DB operations against non dev, integration, test, or travis DB.")
 	}
 }
