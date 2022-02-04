@@ -6,6 +6,8 @@ The fixtures in this directory are used in unit and integration tests. They are 
 
 The password for all users in the user.csv file is `password`.
 
+The API key for all active users in the users.csv file is also `password`.
+
 ## DeletionRequests
 
 For all deletion requests in deletion_requests.csv, the plaintext value of the encrypted confirmation token is `ConfirmationToken`.

@@ -43,6 +43,7 @@ func IsAPIRequest(c *gin.Context) bool {
 	// hijacked by XSS attacks. API token won't exist in the browser
 	// context, and can't be hijacked by a malicious script.
 	isApiAuthenticated, exists := c.Get("UserIsApiAuthenticated")
+	common.Context().Log.Debug().Msgf("IsAPIRequest - IsAPIAuthenticated: %t", isApiAuthenticated)
 	if !exists || !isApiAuthenticated.(bool) {
 		return false
 	}
@@ -53,12 +54,15 @@ func IsAPIRequest(c *gin.Context) bool {
 // API prefixes. This uses c.Request.URL.Path because c.FullPath() can
 // return an empty string if the path does not match any known routes.
 func IsAPIRoute(c *gin.Context) bool {
+	log := common.Context().Log
 	path := c.Request.URL.Path // c.FullPath()
 	for _, prefix := range constants.APIPrefixes {
 		if strings.HasPrefix(path, prefix) {
+			log.Debug().Msgf("IsAPIRoute - YES - %s", path)
 			return true
 		}
 	}
+	log.Debug().Msgf("IsAPIRoute - NO - %s", path)
 	return false
 }
 
