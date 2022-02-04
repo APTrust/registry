@@ -8,6 +8,14 @@ import (
 	"github.com/stretchr/stew/slice"
 )
 
+var ChecksumFilters = []string{
+	"algorithm",
+	"digest",
+	"generic_file_id",
+	"date_time__gteq",
+	"date_time__lteq",
+}
+
 type Checksum struct {
 	TimestampModel
 	Algorithm     string       `json:"algorithm"`

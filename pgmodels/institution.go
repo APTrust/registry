@@ -57,8 +57,7 @@ func InstitutionByIdentifier(identifier string) (*Institution, error) {
 // the given identifier, or an error if no matching record exists.
 func IdForInstIdentifier(identifier string) (int64, error) {
 	query := NewQuery().Columns("id").Where("identifier", "=", identifier)
-	var inst Institution
-	err := query.Select(&inst)
+	inst, err := InstitutionGet(query)
 	return inst.ID, err
 }
 

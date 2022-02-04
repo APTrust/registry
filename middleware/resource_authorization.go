@@ -99,7 +99,12 @@ func (r *ResourceAuthorization) readRequestIds() {
 	// id may be an identifier in the URL (not in post body or query string)
 	if r.ResourceID == 0 && r.ginCtx.Param("id") != "" {
 		idStr := r.ginCtx.Param("id")
-		r.ResourceIdentifier = idStr[1:] // remove leading slash
+		// Not sure why we sometimes get this leading slash.
+		// It's dirty, and we should fix it.
+		if strings.HasPrefix(idStr, "/") {
+			idStr = idStr[1:]
+		}
+		r.ResourceIdentifier = idStr
 		r.ResourceID, r.Error = r.idFromIdentifier()
 	}
 	r.ResourceInstID = r.idFromRequest("institution_id")
