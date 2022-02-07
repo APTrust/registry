@@ -28,7 +28,7 @@ func IntellectualObjectIndex(c *gin.Context) {
 // GET /admin-api/v3/objects/show/:id
 func IntellectualObjectShow(c *gin.Context) {
 	req := api.NewRequest(c)
-	obj, err := pgmodels.IntellectualObjectByID(req.Auth.ResourceID)
+	obj, err := pgmodels.IntellectualObjectViewByID(req.Auth.ResourceID)
 	if api.AbortIfError(c, err) {
 		return
 	}

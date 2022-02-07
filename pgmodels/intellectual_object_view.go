@@ -17,8 +17,6 @@ var IntellectualObjectFilters = []string{
 	"bagit_profile_identifier",
 	"created_at__lteq",
 	"created_at__gteq",
-	// "description",
-	// "description__contains",
 	"etag",
 	"file_count__gteq",
 	"file_count__lteq",
