@@ -146,6 +146,7 @@ func FiltersFor(typeName string) []string {
 func initFilters() {
 	filters = make(map[string][]string)
 	filters["Alert"] = AlertFilters
+	filters["Checksum"] = ChecksumFilters
 	filters["DeletionRequest"] = DeletionRequestFilters
 	filters["DepositStats"] = DepositStatsFilters
 	filters["GenericFile"] = GenericFileFilters

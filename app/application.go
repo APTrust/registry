@@ -282,6 +282,10 @@ func initRoutes(router *gin.Engine) {
 		memberAPI.GET("/alerts", common_api.AlertIndex)
 		memberAPI.GET("/alerts/show/:id/:user_id", common_api.AlertShow)
 
+		// Checksums
+		memberAPI.GET("/checksums", common_api.ChecksumIndex)
+		memberAPI.GET("/checksums/show/:id", common_api.ChecksumShow)
+
 		// Deletion Requests
 		// TODO: Should we really expose this through the API?
 		memberAPI.GET("/deletions/show/:id", common_api.DeletionRequestShow)
@@ -316,6 +320,10 @@ func initRoutes(router *gin.Engine) {
 		// TODO: Delete this? Admin API doesn't really need it.
 		adminAPI.GET("/alerts", common_api.AlertIndex)
 		adminAPI.GET("/alerts/show/:id/:user_id", common_api.AlertShow)
+
+		// Checksums
+		adminAPI.GET("/checksums", common_api.ChecksumIndex)
+		adminAPI.GET("/checksums/show/:id", common_api.ChecksumShow)
 
 		// Deletion Requests
 		// TODO: Does Admin API really need this?

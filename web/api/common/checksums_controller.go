@@ -14,8 +14,8 @@ import (
 // GET /admin-api/v3/checksums
 func ChecksumIndex(c *gin.Context) {
 	req := api.NewRequest(c)
-	var checksums []*pgmodels.Checksum
-	pager, err := req.LoadResourceList(&checksums, "updated_at", "desc")
+	var checksums []*pgmodels.ChecksumView
+	pager, err := req.LoadResourceList(&checksums, "datetime", "desc")
 	if api.AbortIfError(c, err) {
 		return
 	}
@@ -28,9 +28,9 @@ func ChecksumIndex(c *gin.Context) {
 // GET /admin-api/v3/checksums/show/:id
 func ChecksumShow(c *gin.Context) {
 	req := api.NewRequest(c)
-	gf, err := pgmodels.ChecksumByID(req.Auth.ResourceID)
+	cs, err := pgmodels.ChecksumViewByID(req.Auth.ResourceID)
 	if api.AbortIfError(c, err) {
 		return
 	}
-	c.JSON(http.StatusOK, gf)
+	c.JSON(http.StatusOK, cs)
 }

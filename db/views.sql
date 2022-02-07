@@ -285,3 +285,17 @@ select
 from generic_files gf
 left join intellectual_objects io on io.id = gf.intellectual_object_id
 left join institutions i on i.id = gf.institution_id;
+
+-- Checksums view
+create or replace view checksums_view as
+select cs.id,
+       cs.algorithm,
+       cs.datetime,
+       cs.digest,
+       gf.state,
+       gf.identifier as "generic_file_identifier",
+       cs.generic_file_id,
+       gf.intellectual_object_id,
+       gf.institution_id
+from checksums cs
+left join generic_files gf on cs.generic_file_id = gf.id;

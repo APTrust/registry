@@ -8,14 +8,6 @@ import (
 	"github.com/stretchr/stew/slice"
 )
 
-var ChecksumFilters = []string{
-	"algorithm",
-	"digest",
-	"generic_file_id",
-	"date_time__gteq",
-	"date_time__lteq",
-}
-
 type Checksum struct {
 	TimestampModel
 	Algorithm     string       `json:"algorithm"`
@@ -41,9 +33,9 @@ func ChecksumGet(query *Query) (*Checksum, error) {
 
 // ChecksumSelect returns all files matching the query.
 func ChecksumSelect(query *Query) ([]*Checksum, error) {
-	var files []*Checksum
-	err := query.Select(&files)
-	return files, err
+	var checksums []*Checksum
+	err := query.Select(&checksums)
+	return checksums, err
 }
 
 // Save saves this file to the database. This will peform an insert
