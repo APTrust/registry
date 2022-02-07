@@ -296,6 +296,8 @@ select cs.id,
        gf.identifier as "generic_file_identifier",
        cs.generic_file_id,
        gf.intellectual_object_id,
-       gf.institution_id
+       gf.institution_id,
+       cs.created_at,
+       cs.updated_at
 from checksums cs
 left join generic_files gf on cs.generic_file_id = gf.id;

@@ -27,6 +27,8 @@ type ChecksumView struct {
 	GenericFileID         int64     `json:"generic_file_id"`
 	IntellectualObjectID  int64     `json:"intellectual_object_id"`
 	InstitutionID         int64     `json:"institution_id"`
+	CreatedAt             time.Time `json:"created_at"`
+	UpdatedAt             time.Time `json:"updated_at"`
 }
 
 // ChecksumViewByID returns the file with the specified id.
