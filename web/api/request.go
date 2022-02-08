@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
 	"reflect"
 	"strings"
@@ -13,11 +14,11 @@ import (
 )
 
 type Request struct {
-	PathAndQuery string
-	CurrentUser  *pgmodels.User
-	GinContext   *gin.Context
-	Auth         *middleware.ResourceAuthorization
-	Error        error
+	PathAndQuery string                            `json:"pathAndQuery"`
+	CurrentUser  *pgmodels.User                    `json:"currentUser"`
+	GinContext   *gin.Context                      `json:"-"`
+	Auth         *middleware.ResourceAuthorization `json:"resourceAuth"`
+	Error        error                             `json:"error"`
 }
 
 func NewRequest(c *gin.Context) *Request {
@@ -124,4 +125,18 @@ func (req *Request) AssertValidIDs(resourceID, instID int64) error {
 		return common.ErrIDMismatch
 	}
 	return nil
+}
+
+// ToJson returns the request object as JSON (minus the gin context
+// object). This is primarily for interactive debugging. Param pretty
+// is for pretty printing.
+func (req *Request) ToJson(pretty bool) (string, error) {
+	var data []byte
+	var err error
+	if pretty == true {
+		data, err = json.MarshalIndent(req, "", "  ")
+	} else {
+		data, err = json.Marshal(req)
+	}
+	return string(data), err
 }
