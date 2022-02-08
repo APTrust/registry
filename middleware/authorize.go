@@ -7,6 +7,7 @@ import (
 
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
+	"github.com/APTrust/registry/pgmodels"
 	"github.com/gin-gonic/gin"
 )
 
@@ -23,6 +24,11 @@ func Authorize() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		auth := AuthorizeResource(c)
 		c.Set("ResourceAuthorization", auth)
+		if pgmodels.IsNoRowError(auth.Error) {
+			showNotFoundError(c, auth)
+			c.Abort()
+			return
+		}
 		if !auth.Checked {
 			showNotCheckedError(c, auth)
 			c.Abort()
@@ -69,17 +75,7 @@ func IsAPIRoute(c *gin.Context) bool {
 func showNotCheckedError(c *gin.Context, auth *ResourceAuthorization) {
 	common.Context().Log.Error().Msgf(auth.GetError())
 	errMsg := fmt.Sprintf("Missing authorization check for %s", c.FullPath())
-	if IsAPIRequest(c) {
-		c.JSON(http.StatusInternalServerError, map[string]string{
-			"error": errMsg,
-		})
-	} else {
-		c.HTML(http.StatusInternalServerError, "errors/show.html", gin.H{
-			"suppressSideNav": true,
-			"suppressTopNav":  false,
-			"error":           errMsg,
-		})
-	}
+	showError(c, auth, errMsg, http.StatusInternalServerError)
 }
 
 func showAuthFailedError(c *gin.Context, auth *ResourceAuthorization) {
@@ -88,12 +84,22 @@ func showAuthFailedError(c *gin.Context, auth *ResourceAuthorization) {
 	if auth.Error != nil {
 		errMsg = fmt.Sprintf("%s %s", errMsg, auth.Error.Error())
 	}
+	showError(c, auth, errMsg, http.StatusForbidden)
+}
+
+func showNotFoundError(c *gin.Context, auth *ResourceAuthorization) {
+	common.Context().Log.Error().Msgf(auth.GetError())
+	errMsg := fmt.Sprintf("Not found: %s", c.Request.URL.Path)
+	showError(c, auth, errMsg, http.StatusNotFound)
+}
+
+func showError(c *gin.Context, auth *ResourceAuthorization, errMsg string, status int) {
 	if IsAPIRoute(c) {
-		c.JSON(http.StatusForbidden, map[string]string{
+		c.JSON(status, map[string]string{
 			"error": errMsg,
 		})
 	} else {
-		c.HTML(http.StatusForbidden, "errors/show.html", gin.H{
+		c.HTML(status, "errors/show.html", gin.H{
 			"suppressSideNav": true,
 			"suppressTopNav":  false,
 			"error":           errMsg,
