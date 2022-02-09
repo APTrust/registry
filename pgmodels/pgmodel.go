@@ -27,8 +27,8 @@ func (bm *BaseModel) Save() error {
 
 type TimestampModel struct {
 	BaseModel
-	CreatedAt time.Time `bun:",nullzero" json:",omitempty"`
-	UpdatedAt time.Time `bun:",nullzero" json:",omitempty"`
+	CreatedAt time.Time `bun:",nullzero" json:"created_at,omitempty"`
+	UpdatedAt time.Time `bun:",nullzero" json:"updated_at,omitempty"`
 }
 
 func (tsm *TimestampModel) SetTimestamps() {

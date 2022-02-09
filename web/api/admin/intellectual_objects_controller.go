@@ -59,7 +59,10 @@ func CreateOrUpdateObject(c *gin.Context) (*pgmodels.IntellectualObject, error) 
 		return nil, err
 	}
 	err = obj.Save()
-	return obj, err
+	if err != nil {
+		return nil, err
+	}
+	return obj, nil
 }
 
 // IntellectualObjectFromJson returns the IntellectualObject from the
