@@ -66,7 +66,7 @@ func PremisEventSelect(query *Query) ([]*PremisEvent, error) {
 // if PremisEvent.ID is zero. Otherwise, it updates.
 func (event *PremisEvent) Save() error {
 	if event.ID == int64(0) {
-		event.CreatedAt = time.Now().UTC()
+		event.SetTimestamps()
 		return insert(event)
 	}
 	// Premis events cannot be updated

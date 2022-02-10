@@ -32,6 +32,7 @@ func GenericFileDelete(c *gin.Context) {
 
 // GenericFileCreate creates a new GenericFile.
 //
+// TODO: Change institution_id to object_id?
 // POST /admin-api/v3/files/create/:institution_id
 func GenericFileCreate(c *gin.Context) {
 	gf, err := CreateOrUpdateFile(c)
@@ -46,6 +47,7 @@ func GenericFileCreate(c *gin.Context) {
 // and StorageRecords). Items in the batch must be new. This
 // won't updated existing records.
 //
+// TODO: Change institution_id to object_id?
 // POST /admin-api/v3/files/create_batch/:institution_id
 func GenericFileCreateBatch(c *gin.Context) {
 	req := api.NewRequest(c)
@@ -62,7 +64,14 @@ func GenericFileCreateBatch(c *gin.Context) {
 		}
 	}
 	err = pgmodels.GenericFileCreateBatch(files)
-	c.JSON(http.StatusCreated, nil)
+	if api.AbortIfError(c, err) {
+		return
+	}
+	jsonList := &api.JsonList{
+		Count:   len(files),
+		Results: files,
+	}
+	c.JSON(http.StatusCreated, jsonList)
 }
 
 // GenericFileUpdate updates an existing GenericFile.

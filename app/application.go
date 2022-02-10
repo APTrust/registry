@@ -331,6 +331,7 @@ func initRoutes(router *gin.Engine) {
 		adminAPI.GET("/deletions", common_api.DeletionRequestIndex)
 
 		// Generic Files
+		// TODO: Change institution_id to object_id?
 		adminAPI.GET("/files/show/*id", common_api.GenericFileShow)
 		adminAPI.GET("/files", common_api.GenericFileIndex)
 		adminAPI.DELETE("/files/delete/:id", admin_api.GenericFileDelete)

@@ -183,7 +183,7 @@ func (gf *GenericFile) saveEventsTx(tx *pg.Tx) error {
 		event.InstitutionID = gf.InstitutionID
 		event.IntellectualObjectID = gf.IntellectualObjectID
 		event.GenericFileID = gf.ID
-		event.CreatedAt = time.Now().UTC()
+		event.SetTimestamps()
 		validationErr := event.Validate()
 		if validationErr != nil {
 			common.Context().Log.Error().Msgf("GenericFile batch insertion failed on validation of event (%s) - %s. Error: %s", gf.Identifier, event.EventType, validationErr.Error())
