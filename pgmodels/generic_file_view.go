@@ -8,7 +8,7 @@ type GenericFileView struct {
 	FileFormat            string    `json:"file_format"`
 	Size                  int64     `json:"size"`
 	Identifier            string    `json:"identifier"`
-	IntellectualObjectID  int64     `json:"intellection_object_id"`
+	IntellectualObjectID  int64     `json:"intellectual_object_id"`
 	ObjectIdentifier      string    `json:"object_identifier"`
 	Access                string    `json:"access"`
 	State                 string    `json:"state"`
