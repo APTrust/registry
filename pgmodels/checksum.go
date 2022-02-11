@@ -53,7 +53,7 @@ func (cs *Checksum) Save() error {
 	if cs.ID == int64(0) {
 		return insert(cs)
 	}
-	return update(cs)
+	return common.ErrNotSupported
 }
 
 func (cs *Checksum) Validate() *common.ValidationError {
