@@ -324,6 +324,7 @@ func initRoutes(router *gin.Engine) {
 		// Checksums
 		adminAPI.GET("/checksums", common_api.ChecksumIndex)
 		adminAPI.GET("/checksums/show/:id", common_api.ChecksumShow)
+		adminAPI.POST("/checksums/create/:institution_id", admin_api.ChecksumCreate)
 
 		// Deletion Requests
 		// TODO: Does Admin API really need this?

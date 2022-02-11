@@ -2,9 +2,13 @@ package admin_api_test
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"testing"
+	"time"
 
+	"github.com/APTrust/registry/constants"
+	"github.com/APTrust/registry/db"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/APTrust/registry/web/api"
 	tu "github.com/APTrust/registry/web/testutil"
@@ -86,4 +90,41 @@ func TestChecksumIndex(t *testing.T) {
 			Expect().
 			Status(http.StatusForbidden)
 	}
+}
+
+func TestChecksumCreate(t *testing.T) {
+	// Reset DB after this test so we don't screw up others.
+	defer db.ForceFixtureReload()
+	tu.InitHTTPTests(t)
+	gf, err := pgmodels.GenericFileByID(12)
+	require.Nil(t, err)
+	require.NotNil(t, gf)
+
+	timestamp := time.Now().UTC()
+	checksum := &pgmodels.Checksum{
+		GenericFileID: gf.ID,
+		Algorithm:     constants.AlgSha512,
+		Digest:        "ManThose512sAreSomeLongAssDigests",
+		DateTime:      timestamp,
+	}
+
+	resp := tu.SysAdminClient.POST("/admin-api/v3/checksums/create/{id}", gf.InstitutionID).
+		WithHeader(constants.APIUserHeader, tu.SysAdmin.Email).
+		WithHeader(constants.APIKeyHeader, "password").
+		WithJSON(checksum).Expect()
+	fmt.Println(resp.Body().Raw())
+	resp.Status(http.StatusCreated)
+
+	savedChecksum := &pgmodels.Checksum{}
+	err = json.Unmarshal([]byte(resp.Body().Raw()), savedChecksum)
+	require.Nil(t, err)
+	assert.True(t, savedChecksum.ID > int64(0))
+	assert.Equal(t, gf.ID, savedChecksum.GenericFileID)
+	assert.Equal(t, constants.AlgSha512, savedChecksum.Algorithm)
+	assert.Equal(t, "ManThose512sAreSomeLongAssDigests", savedChecksum.Digest)
+	assert.Equal(t, timestamp, savedChecksum.DateTime)
+
+	cs, err := pgmodels.ChecksumByID(savedChecksum.ID)
+	require.Nil(t, err)
+	require.NotNil(t, cs)
 }

@@ -41,6 +41,7 @@ func ChecksumSelect(query *Query) ([]*Checksum, error) {
 // Save saves this file to the database. This will peform an insert
 // if Checksum.ID is zero. Otherwise, it updates.
 func (cs *Checksum) Save() error {
+	cs.SetTimestamps()
 	err := cs.Validate()
 	if err != nil {
 		return err
