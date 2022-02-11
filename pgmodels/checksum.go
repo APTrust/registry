@@ -39,7 +39,11 @@ func ChecksumSelect(query *Query) ([]*Checksum, error) {
 }
 
 // Save saves this file to the database. This will peform an insert
-// if Checksum.ID is zero. Otherwise, it updates.
+// if Checksum.ID is zero. Otherwise, it returns an error, since updating
+// checksums is not allowed. Checksums should only ever change on
+// re-ingest, when we get a new version of an existing file. In that case,
+// we add a new checksum, so that we have records for all checksums that
+// have existed over time.
 func (cs *Checksum) Save() error {
 	cs.SetTimestamps()
 	err := cs.Validate()

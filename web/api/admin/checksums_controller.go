@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/APTrust/registry/web/api"
 	"github.com/gin-gonic/gin"
@@ -43,6 +44,10 @@ func ChecksumFromJson(req *api.Request) (*pgmodels.Checksum, error) {
 	err := req.GinContext.BindJSON(cs)
 	if err != nil {
 		return nil, err
+	}
+	// Updating checksums is not allowed.
+	if cs.ID != 0 {
+		return nil, common.ErrNotSupported
 	}
 	gf, err := pgmodels.GenericFileByID(cs.GenericFileID)
 	if gf == nil {

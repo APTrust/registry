@@ -101,10 +101,11 @@ func TestChecksumCreate(t *testing.T) {
 	require.NotNil(t, gf)
 
 	timestamp := time.Now().UTC()
+	digest := "ManThose512sAreSomeLongAssDigests"
 	checksum := &pgmodels.Checksum{
 		GenericFileID: gf.ID,
 		Algorithm:     constants.AlgSha512,
-		Digest:        "ManThose512sAreSomeLongAssDigests",
+		Digest:        digest,
 		DateTime:      timestamp,
 	}
 
@@ -121,10 +122,18 @@ func TestChecksumCreate(t *testing.T) {
 	assert.True(t, savedChecksum.ID > int64(0))
 	assert.Equal(t, gf.ID, savedChecksum.GenericFileID)
 	assert.Equal(t, constants.AlgSha512, savedChecksum.Algorithm)
-	assert.Equal(t, "ManThose512sAreSomeLongAssDigests", savedChecksum.Digest)
+	assert.Equal(t, digest, savedChecksum.Digest)
 	assert.Equal(t, timestamp, savedChecksum.DateTime)
 
 	cs, err := pgmodels.ChecksumByID(savedChecksum.ID)
 	require.Nil(t, err)
 	require.NotNil(t, cs)
+
+	// Also note that the new checksum should become the "latest"
+	// sha512 for this file.
+	gfView, err := pgmodels.GenericFileViewByID(12)
+	require.Nil(t, err)
+	require.NotNil(t, gfView)
+	assert.EqualValues(t, 12, gfView.ID)
+	assert.Equal(t, digest, gfView.Sha512)
 }
