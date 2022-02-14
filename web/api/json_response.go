@@ -83,6 +83,15 @@ type GenericFileViewList struct {
 	Results  []*pgmodels.GenericFileView `json:"results"`
 }
 
+// InstitutionViewList is used in testing to convert a generic
+// JsonList into a typed list that we can test with assertions.
+type InstitutionViewList struct {
+	Count    int                         `json:"count"`
+	Next     string                      `json:"next"`
+	Previous string                      `json:"previous"`
+	Results  []*pgmodels.InstitutionView `json:"results"`
+}
+
 // IntellectualObjectList is used in testing to convert a generic
 // JsonList into a typed list that we can test with assertions.
 type IntellectualObjectList struct {
@@ -101,6 +110,15 @@ type PremisEventViewList struct {
 	Results  []*pgmodels.PremisEventView `json:"results"`
 }
 
+// StorageRecordList is used in testing to convert a generic
+// JsonList into a typed list that we can test with assertions.
+type StorageRecordList struct {
+	Count    int                       `json:"count"`
+	Next     string                    `json:"next"`
+	Previous string                    `json:"previous"`
+	Results  []*pgmodels.StorageRecord `json:"results"`
+}
+
 // WorkItemViewList is used in testing to convert a generic
 // JsonList into a typed list that we can test with assertions.
 type WorkItemViewList struct {
@@ -108,13 +126,4 @@ type WorkItemViewList struct {
 	Next     string                   `json:"next"`
 	Previous string                   `json:"previous"`
 	Results  []*pgmodels.WorkItemView `json:"results"`
-}
-
-// InstitutionViewList is used in testing to convert a generic
-// JsonList into a typed list that we can test with assertions.
-type InstitutionViewList struct {
-	Count    int                         `json:"count"`
-	Next     string                      `json:"next"`
-	Previous string                      `json:"previous"`
-	Results  []*pgmodels.InstitutionView `json:"results"`
 }

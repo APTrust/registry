@@ -5,6 +5,10 @@ import (
 	v "github.com/asaskevich/govalidator"
 )
 
+var StorageRecordFilters = []string{
+	"generic_file_id",
+}
+
 type StorageRecord struct {
 	ID            int64        `json:"id" pg:"id"`
 	GenericFileID int64        `json:"generic_file_id"`

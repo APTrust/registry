@@ -2,7 +2,6 @@ package admin_api_test
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"testing"
 	"time"
@@ -113,7 +112,6 @@ func TestChecksumCreate(t *testing.T) {
 		WithHeader(constants.APIUserHeader, tu.SysAdmin.Email).
 		WithHeader(constants.APIKeyHeader, "password").
 		WithJSON(checksum).Expect()
-	fmt.Println(resp.Body().Raw())
 	resp.Status(http.StatusCreated)
 
 	savedChecksum := &pgmodels.Checksum{}

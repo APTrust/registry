@@ -153,6 +153,7 @@ func initFilters() {
 	filters["IntellectualObject"] = IntellectualObjectFilters
 	filters["Institution"] = InstitutionFilters
 	filters["PremisEvent"] = PremisEventFilters
+	filters["StorageRecord"] = StorageRecordFilters
 	filters["User"] = UserFilters
 	filters["WorkItem"] = WorkItemFilters
 }
