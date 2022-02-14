@@ -28,13 +28,7 @@ func PremisEventIndex(c *gin.Context) {
 // GET /admin-api/v3/events/show/:id
 func PremisEventShow(c *gin.Context) {
 	req := api.NewRequest(c)
-	var gf *pgmodels.PremisEventView
-	var err error
-	if req.Auth.ResourceIdentifier != "" && req.Auth.ResourceID == 0 {
-		gf, err = pgmodels.PremisEventViewByIdentifier(req.Auth.ResourceIdentifier)
-	} else {
-		gf, err = pgmodels.PremisEventViewByID(req.Auth.ResourceID)
-	}
+	gf, err := pgmodels.PremisEventViewByID(req.Auth.ResourceID)
 	if api.AbortIfError(c, err) {
 		return
 	}
