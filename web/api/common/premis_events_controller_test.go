@@ -28,6 +28,14 @@ func TestPremisEventShow(t *testing.T) {
 	assert.Equal(t, event.ID, record.ID)
 	assert.Equal(t, event.InstitutionID, record.InstitutionID)
 
+	// Make sure we can get this event by identifier as well.
+	resp = tu.SysAdminClient.GET("/member-api/v3/events/show/{id}", event.Identifier).Expect().Status(http.StatusOK)
+	record = &pgmodels.PremisEvent{}
+	err = json.Unmarshal([]byte(resp.Body().Raw()), record)
+	require.Nil(t, err)
+	assert.Equal(t, event.ID, record.ID)
+	assert.Equal(t, event.Identifier, record.Identifier)
+
 	// Inst admin can read event from own inst
 	resp = tu.Inst1AdminClient.GET("/member-api/v3/events/show/{id}", event.ID).Expect().Status(http.StatusOK)
 	err = json.Unmarshal([]byte(resp.Body().Raw()), record)
