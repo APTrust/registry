@@ -68,7 +68,7 @@ func TestStorageRecordIndex(t *testing.T) {
 		if client == tu.SysAdminClient {
 			continue
 		}
-		tu.Inst2AdminClient.GET("/admin-api/v3/checksums").
+		tu.Inst2AdminClient.GET("/admin-api/v3/storage_records").
 			Expect().
 			Status(http.StatusForbidden)
 	}
