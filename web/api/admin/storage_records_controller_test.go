@@ -2,13 +2,9 @@ package admin_api_test
 
 import (
 	"encoding/json"
-	//"fmt"
 	"net/http"
 	"testing"
-	//"time"
 
-	"github.com/APTrust/registry/constants"
-	"github.com/APTrust/registry/db"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/APTrust/registry/web/api"
 	tu "github.com/APTrust/registry/web/testutil"
@@ -72,39 +68,4 @@ func TestStorageRecordIndex(t *testing.T) {
 			Expect().
 			Status(http.StatusForbidden)
 	}
-}
-
-func TestStorageRecordCreateDelete(t *testing.T) {
-	// Reset DB after this test so we don't screw up others.
-	defer db.ForceFixtureReload()
-	tu.InitHTTPTests(t)
-	gf, err := pgmodels.GenericFileByID(12)
-	require.Nil(t, err)
-	require.NotNil(t, gf)
-
-	recordUrl := "https://example.com/bucket/unit-test-record"
-	checksum := &pgmodels.StorageRecord{
-		GenericFileID: gf.ID,
-		URL:           recordUrl,
-	}
-
-	resp := tu.SysAdminClient.POST("/admin-api/v3/storage_records/create/{id}", gf.InstitutionID).
-		WithHeader(constants.APIUserHeader, tu.SysAdmin.Email).
-		WithHeader(constants.APIKeyHeader, "password").
-		WithJSON(checksum).Expect()
-	//fmt.Println(resp.Body().Raw())
-	resp.Status(http.StatusCreated)
-
-	savedStorageRecord := &pgmodels.StorageRecord{}
-	err = json.Unmarshal([]byte(resp.Body().Raw()), savedStorageRecord)
-	require.Nil(t, err)
-	assert.True(t, savedStorageRecord.ID > int64(0))
-	assert.Equal(t, gf.ID, savedStorageRecord.GenericFileID)
-	assert.Equal(t, recordUrl, savedStorageRecord.URL)
-
-	sr, err := pgmodels.StorageRecordByID(savedStorageRecord.ID)
-	require.Nil(t, err)
-	require.NotNil(t, sr)
-	assert.Equal(t, gf.ID, sr.GenericFileID)
-	assert.Equal(t, recordUrl, sr.URL)
 }

@@ -357,7 +357,6 @@ func initRoutes(router *gin.Engine) {
 		adminAPI.GET("/events", common_api.PremisEventIndex)
 
 		// Storage Records
-		adminAPI.POST("/storage_records/create/:institution_id", admin_api.StorageRecordCreate)
 		adminAPI.GET("/storage_records/show/:id", admin_api.StorageRecordShow)
 		adminAPI.GET("/storage_records", admin_api.StorageRecordIndex)
 
