@@ -20,7 +20,7 @@ import (
 func StorageRecordIndex(c *gin.Context) {
 	req := api.NewRequest(c)
 	var storageRecords []*pgmodels.StorageRecord
-	pager, err := req.LoadResourceList(&storageRecords, "datetime", "desc")
+	pager, err := req.LoadResourceList(&storageRecords, "id", "desc")
 	if api.AbortIfError(c, err) {
 		return
 	}
