@@ -18,11 +18,11 @@ import (
 // POST /admin-api/v3/prepare_file_delete/:id
 func PrepareFileDelete(c *gin.Context) {
 	req := api.NewRequest(c)
-	err := prepareFileDeletionPreconditions(req.Auth.ResourceID)
+	item, err := prepareFileDeletionPreconditions(req.Auth.ResourceID)
 	if api.AbortIfError(c, err) {
 		return
 	}
-	c.JSON(http.StatusOK, nil)
+	c.JSON(http.StatusOK, item)
 }
 
 // PrepareObjectDelete sets up preconditions for an object deletion operation.
@@ -31,26 +31,26 @@ func PrepareFileDelete(c *gin.Context) {
 // POST /admin-api/v3/prepare_object_delete/:id
 func PrepareObjectDelete(c *gin.Context) {
 	req := api.NewRequest(c)
-	err := prepareObjectDeletionPreconditions(req.Auth.ResourceID)
+	item, err := prepareObjectDeletionPreconditions(req.Auth.ResourceID)
 	if api.AbortIfError(c, err) {
 		return
 	}
-	c.JSON(http.StatusOK, nil)
+	c.JSON(http.StatusOK, item)
 }
 
-func prepareFileDeletionPreconditions(gfID int64) error {
+func prepareFileDeletionPreconditions(gfID int64) (*pgmodels.WorkItem, error) {
 	if !isTestEnv() {
-		return common.ErrNotSupported
+		return nil, common.ErrNotSupported
 	}
 
 	gf, err := pgmodels.GenericFileByID(gfID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	instAdmin, err := getInstAdmin(gf.InstitutionID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// Deletion checks for last ingest event on this object.
@@ -60,7 +60,7 @@ func prepareFileDeletionPreconditions(gfID int64) error {
 	event.InstitutionID = gf.InstitutionID
 	err = event.Save()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// Also requires an approved Deletion work item
@@ -74,14 +74,14 @@ func prepareFileDeletionPreconditions(gfID int64) error {
 	item.Status = constants.StatusStarted
 	err = item.Save()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// Requires approved deletion request
 	now := time.Now().UTC()
 	request, err := pgmodels.NewDeletionRequest()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	request.GenericFiles = append(request.GenericFiles, gf)
@@ -92,22 +92,22 @@ func prepareFileDeletionPreconditions(gfID int64) error {
 	request.ConfirmedAt = now
 	request.WorkItemID = item.ID
 	err = request.Save()
-	return err
+	return item, err
 }
 
-func prepareObjectDeletionPreconditions(objID int64) error {
+func prepareObjectDeletionPreconditions(objID int64) (*pgmodels.WorkItem, error) {
 	if !isTestEnv() {
-		return common.ErrNotSupported
+		return nil, common.ErrNotSupported
 	}
 
 	obj, err := pgmodels.IntellectualObjectByID(objID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	instAdmin, err := getInstAdmin(obj.InstitutionID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// Deletion checks for last ingest event on this object.
@@ -116,7 +116,7 @@ func prepareObjectDeletionPreconditions(objID int64) error {
 	event.InstitutionID = obj.InstitutionID
 	err = event.Save()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// Also requires an approved Deletion work item
@@ -130,14 +130,14 @@ func prepareObjectDeletionPreconditions(objID int64) error {
 	item.Status = constants.StatusStarted
 	err = item.Save()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// Requires approved deletion request
 	now := time.Now().UTC()
 	request, err := pgmodels.NewDeletionRequest()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	request.IntellectualObjects = append(request.IntellectualObjects, obj)
@@ -148,7 +148,7 @@ func prepareObjectDeletionPreconditions(objID int64) error {
 	request.ConfirmedAt = now
 	request.WorkItemID = item.ID
 	err = request.Save()
-	return err
+	return item, err
 }
 
 // Check some preconditions to ensure it's safe to run the methods above.

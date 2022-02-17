@@ -3,8 +3,6 @@ package admin_api_test
 import (
 	"encoding/json"
 	"net/http"
-
-	"os"
 	"testing"
 
 	"github.com/APTrust/registry/constants"
@@ -24,7 +22,6 @@ import (
 // These subsequent requests cause errors in the gin engine because they don't
 // match any known routes.
 func TestPremisEventCreate(t *testing.T) {
-	os.Setenv("APT_ENV", "test")
 	tu.InitHTTPTests(t)
 
 	gf, err := pgmodels.GenericFileByID(21)
@@ -51,18 +48,26 @@ func TestPremisEventCreate(t *testing.T) {
 
 	// Non sys-admin cannot create any events, period.
 	tu.Inst1AdminClient.POST("/admin-api/v3/events/create").
+		WithHeader(constants.APIUserHeader, tu.Inst1Admin.Email).
+		WithHeader(constants.APIKeyHeader, "password").
 		WithBytes(jsonData).
 		Expect().
 		Status(http.StatusForbidden)
 	tu.Inst1UserClient.POST("/admin-api/v3/events/create").
+		WithHeader(constants.APIUserHeader, tu.Inst1User.Email).
+		WithHeader(constants.APIKeyHeader, "password").
 		WithBytes(jsonData).
 		Expect().
 		Status(http.StatusForbidden)
 	tu.Inst2AdminClient.POST("/admin-api/v3/events/create").
+		WithHeader(constants.APIUserHeader, tu.Inst2Admin.Email).
+		WithHeader(constants.APIKeyHeader, "password").
 		WithBytes(jsonData).
 		Expect().
 		Status(http.StatusForbidden)
 	tu.Inst2UserClient.POST("/admin-api/v3/events/create").
+		WithHeader(constants.APIUserHeader, tu.Inst2User.Email).
+		WithHeader(constants.APIKeyHeader, "password").
 		WithBytes(jsonData).
 		Expect().
 		Status(http.StatusForbidden)

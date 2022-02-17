@@ -407,9 +407,24 @@ func (gf *GenericFile) lastEvent(eventType string) (*PremisEvent, error) {
 	return PremisEventGet(query)
 }
 
+// ActiveDeletionWorkItem returns the in-progress WorkItem for this file's
+// deletion. The WorkItem may be for the deletion of this specific file,
+// or of its parent object.
 func (gf *GenericFile) ActiveDeletionWorkItem() (*WorkItem, error) {
+	cols := []string{
+		"generic_file_id",
+		"intellectual_object_id",
+	}
+	ops := []string{
+		"=",
+		"=",
+	}
+	vals := []interface{}{
+		gf.ID,
+		gf.IntellectualObjectID,
+	}
 	query := NewQuery().
-		Where("generic_file_id", "=", gf.ID).
+		Or(cols, ops, vals).
 		Where("action", "=", constants.ActionDelete).
 		Where("status", "=", constants.StatusStarted).
 		OrderBy("updated_at", "desc").
