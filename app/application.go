@@ -368,5 +368,8 @@ func initRoutes(router *gin.Engine) {
 		adminAPI.GET("/items/show/:id", common_api.WorkItemShow)
 		adminAPI.GET("/items", common_api.WorkItemIndex)
 
+		// Special test endpoints
+		adminAPI.POST("/prepare_file_delete/:id", admin_api.PrepareFileDelete)
+		adminAPI.POST("/prepare_object_delete/:id", admin_api.PrepareObjectDelete)
 	}
 }

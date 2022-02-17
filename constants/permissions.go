@@ -52,6 +52,8 @@ const (
 	IntellectualObjectRequestDelete    = "IntellectualObjectRequestDelete"
 	IntellectualObjectRestore          = "IntellectualObjectRestore"
 	IntellectualObjectUpdate           = "IntellectualObjectUpdate"
+	PrepareFileDelete                  = "PrepareFileDelete"
+	PrepareObjectDelete                = "PrepareObjectDelete"
 	ReportRead                         = "ReportRead"
 	StorageRecordCreate                = "StorageRecordCreate"
 	StorageRecordDelete                = "StorageRecordDelete"
@@ -120,6 +122,8 @@ var Permissions = []Permission{
 	IntellectualObjectRequestDelete,
 	IntellectualObjectRestore,
 	IntellectualObjectUpdate,
+	PrepareFileDelete,
+	PrepareObjectDelete,
 	ReportRead,
 	StorageRecordCreate,
 	StorageRecordDelete,
@@ -297,6 +301,8 @@ func initPermissions() {
 	sysAdmin[IntellectualObjectRequestDelete] = true
 	sysAdmin[IntellectualObjectRestore] = true
 	sysAdmin[IntellectualObjectUpdate] = true
+	sysAdmin[PrepareFileDelete] = true
+	sysAdmin[PrepareObjectDelete] = true
 	sysAdmin[ReportRead] = true
 	sysAdmin[StorageRecordCreate] = true
 	sysAdmin[StorageRecordDelete] = true

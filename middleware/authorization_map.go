@@ -87,6 +87,8 @@ var AuthMap = map[string]AuthMetadata{
 	"PremisEventIndex":                   {"PremisEvent", constants.EventRead},
 	"PremisEventShow":                    {"PremisEvent", constants.EventRead},
 	"PremisEventShowXHR":                 {"PremisEvent", constants.EventRead},
+	"PrepareFileDelete":                  {"GenericFile", constants.PrepareFileDelete},
+	"PrepareObjectDelete":                {"IntellectualObject", constants.PrepareObjectDelete},
 	"StorageRecordCreate":                {"StorageRecord", constants.StorageRecordCreate},
 	"StorageRecordDelete":                {"StorageRecord", constants.StorageRecordDelete},
 	"StorageRecordIndex":                 {"StorageRecord", constants.StorageRecordRead},

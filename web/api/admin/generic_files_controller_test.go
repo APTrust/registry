@@ -2,6 +2,7 @@ package admin_api_test
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"testing"
 	"time"
@@ -176,38 +177,12 @@ func testFileUpdate(t *testing.T, gf *pgmodels.GenericFile) *pgmodels.GenericFil
 //
 // Here, we create them just so we can complete our test.
 func createFileDeletionPreConditions(t *testing.T, gf *pgmodels.GenericFile) {
-	// Deletion checks for last ingest event on this object.
-	event := pgmodels.RandomPremisEvent(constants.EventIngestion)
-	event.IntellectualObjectID = gf.IntellectualObjectID
-	event.GenericFileID = gf.ID
-	event.GenericFileID = 0
-	event.InstitutionID = gf.InstitutionID
-	require.Nil(t, event.Save())
-
-	// Also requires an approved Deletion work item
-	item := pgmodels.RandomWorkItem(
-		"TestBagName.tar",
-		constants.ActionDelete,
-		gf.IntellectualObjectID,
-		gf.ID)
-	item.User = "admin@test.edu"
-	item.InstApprover = "admin@test.edu"
-	item.Status = constants.StatusStarted
-	require.Nil(t, item.Save())
-	require.True(t, item.ID > 0)
-
-	// Requires approved deletion request
-	now := time.Now().UTC()
-	req, err := pgmodels.NewDeletionRequest()
-	require.Nil(t, err)
-	req.GenericFiles = append(req.GenericFiles, gf)
-	req.InstitutionID = gf.InstitutionID
-	req.RequestedByID = 8 // admin@test.edu
-	req.RequestedAt = now
-	req.ConfirmedByID = 8
-	req.ConfirmedAt = now
-	req.WorkItemID = item.ID
-	require.Nil(t, req.Save())
+	resp := tu.SysAdminClient.POST("/admin-api/v3/prepare_file_delete/{id}", gf.ID).
+		WithHeader(constants.APIUserHeader, tu.SysAdmin.Email).
+		WithHeader(constants.APIKeyHeader, "password").
+		Expect()
+	fmt.Println(resp.Body().Raw())
+	resp.Status(http.StatusOK)
 }
 
 func testFileDelete(t *testing.T, gf *pgmodels.GenericFile) {

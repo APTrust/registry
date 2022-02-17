@@ -73,6 +73,7 @@ func IsAPIRoute(c *gin.Context) bool {
 }
 
 func showNotCheckedError(c *gin.Context, auth *ResourceAuthorization) {
+	fmt.Println(auth.String())
 	common.Context().Log.Error().Msgf(auth.GetError())
 	errMsg := fmt.Sprintf("Missing authorization check for %s", c.FullPath())
 	showError(c, auth, errMsg, http.StatusInternalServerError)
