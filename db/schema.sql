@@ -256,7 +256,7 @@ CREATE TABLE public.intellectual_objects (
 	updated_at timestamp NOT NULL,
 	state varchar NULL,
 	etag varchar NULL,
-	bag_group_identifier varchar NOT NULL DEFAULT ''::character varying,
+	bag_group_identifier varchar NULL,
 	storage_option varchar NOT NULL DEFAULT 'Standard'::character varying,
 	bagit_profile_identifier varchar NULL,
 	source_organization varchar NULL,

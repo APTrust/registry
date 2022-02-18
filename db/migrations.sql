@@ -81,6 +81,12 @@ $$;
 alter table intellectual_objects drop column if exists ingest_state;
 alter table generic_files drop column if exists ingest_state;
 
+
+-- intellectual_objects.bag_group_identifier is almost always empty.
+-- Make this column nullable to ease inserts.
+alter table intellectual_objects alter column bag_group_identifier drop not null;
+
+
 -- Remove object_identifier and generic_file_identifier from work_items.
 -- We can use a view to join the files & objects tables, avoiding the
 -- duplicate data.
