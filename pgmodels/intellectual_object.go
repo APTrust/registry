@@ -1,6 +1,7 @@
 package pgmodels
 
 import (
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -140,10 +141,14 @@ func (obj *IntellectualObject) Delete() error {
 		_, err = tx.Model(obj).WherePK().Update()
 		if err != nil {
 			registryContext.Log.Error().Msgf("Intellectual object deletion transaction failed on update of object. Object: %d (%s). Error: %v", obj.ID, obj.Identifier, err)
+			j, _ := json.Marshal(obj)
+			registryContext.Log.Error().Msgf("Object: %s", string(j))
 		}
 		_, err = tx.Model(deletionEvent).Insert()
 		if err != nil {
 			registryContext.Log.Error().Msgf("Intellectual object deletion transaction failed on insertion of event. Object: %d (%s). Error: %v", obj.ID, obj.Identifier, err)
+			j, _ := json.Marshal(deletionEvent)
+			registryContext.Log.Error().Msgf("DeletionEvent: %s", string(j))
 		}
 		return err
 	})
