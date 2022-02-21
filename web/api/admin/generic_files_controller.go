@@ -116,6 +116,10 @@ func GenericFileFromJson(req *api.Request) (*pgmodels.GenericFile, error) {
 			return submittedFile, err
 		}
 		CoerceFileStorageOption(existingFile, submittedFile)
+
+		// Preserve the CreatedAt timestamp on the updated file.
+		submittedFile.CreatedAt = existingFile.CreatedAt
+
 		err = existingFile.ValidateChanges(submittedFile)
 	}
 	return submittedFile, err
