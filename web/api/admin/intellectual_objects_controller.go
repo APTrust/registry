@@ -86,6 +86,11 @@ func IntellectualObjectFromJson(req *api.Request) (*pgmodels.IntellectualObject,
 			return submittedObject, err
 		}
 		CoerceObjectStorageOption(existingObject, submittedObject)
+
+		// Preservation services won't send the CreatedAt
+		// timestamp, so we have to set this.
+		submittedObject.CreatedAt = existingObject.CreatedAt
+
 		err = existingObject.ValidateChanges(submittedObject)
 	}
 	return submittedObject, err
