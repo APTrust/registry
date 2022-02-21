@@ -9,6 +9,7 @@ var PremisEventFilters = []string{
 	"date_time__lteq",
 	"event_type",
 	"generic_file_id",
+	"generic_file_id__is_null",
 	"generic_file_identifier",
 	"identifier",
 	"institution_id",
