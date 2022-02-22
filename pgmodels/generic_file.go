@@ -90,16 +90,15 @@ func GenericFileSelect(query *Query) ([]*GenericFile, error) {
 
 // Save saves this file to the database. This will peform an insert
 // if GenericFile.ID is zero. Otherwise, it updates.
+//
+// Note that the insert/update also saves all associated records
+// (checksums, storage records, and premis events).
 func (gf *GenericFile) Save() error {
-	gf.SetTimestamps()
-	err := gf.Validate()
-	if err != nil {
-		return err
-	}
-	if gf.ID == int64(0) {
-		return insert(gf)
-	}
-	return update(gf)
+	registryContext := common.Context()
+	db := registryContext.DB
+	return db.RunInTransaction(db.Context(), func(tx *pg.Tx) error {
+		return gf.saveInTransaction(tx)
+	})
 }
 
 // GenericFileCreateBatch creates a batch of GenericFiles and
@@ -127,10 +126,15 @@ func (gf *GenericFile) saveInTransaction(tx *pg.Tx) error {
 	gf.SetTimestamps()
 	validationErr := gf.Validate()
 	if validationErr != nil {
-		common.Context().Log.Error().Msgf("GenericFile batch insertion failed on validation of file  (%s). Error: %s", gf.Identifier, validationErr.Error())
+		common.Context().Log.Error().Msgf("GenericFile save failed on validation of file  (%s). Error: %s", gf.Identifier, validationErr.Error())
 		return validationErr
 	}
-	_, err := tx.Model(gf).Insert()
+	var err error
+	if gf.ID == 0 {
+		_, err = tx.Model(gf).Insert()
+	} else {
+		_, err = tx.Model(gf).WherePK().Update()
+	}
 	if err == nil {
 		err = gf.saveChecksumsTx(tx)
 	}
@@ -145,6 +149,10 @@ func (gf *GenericFile) saveInTransaction(tx *pg.Tx) error {
 
 func (gf *GenericFile) saveChecksumsTx(tx *pg.Tx) error {
 	for _, checksum := range gf.Checksums {
+		// Checksums can't be updated, only added.
+		if checksum.ID > 0 {
+			continue
+		}
 		checksum.GenericFileID = gf.ID
 		checksum.SetTimestamps()
 		validationErr := checksum.Validate()
@@ -152,9 +160,10 @@ func (gf *GenericFile) saveChecksumsTx(tx *pg.Tx) error {
 			common.Context().Log.Error().Msgf("GenericFile batch insertion failed on validation of checksum (%s) - %s. Error: %s", gf.Identifier, checksum.Digest, validationErr.Error())
 			return validationErr
 		}
-		_, err := tx.Model(checksum).Insert()
+		// Checksums can't be updated, only added.
+		_, err := tx.Model(checksum).OnConflict("DO NOTHING").Insert()
 		if err != nil {
-			common.Context().Log.Error().Msgf("GenericFile batch insertion failed on insert of checksum (%s) - %s. Error: %s", gf.Identifier, checksum.Digest, err.Error())
+			common.Context().Log.Error().Msgf("GenericFile save failed on insert of checksum (%s) - %s. Error: %s", gf.Identifier, checksum.Digest, err.Error())
 			return err
 		}
 	}
@@ -163,15 +172,19 @@ func (gf *GenericFile) saveChecksumsTx(tx *pg.Tx) error {
 
 func (gf *GenericFile) saveStorageRecordsTx(tx *pg.Tx) error {
 	for _, sr := range gf.StorageRecords {
+		if sr.ID > 0 {
+			continue // already saved and updated aren't allowed
+		}
 		sr.GenericFileID = gf.ID
 		validationErr := sr.Validate()
 		if validationErr != nil {
-			common.Context().Log.Error().Msgf("GenericFile batch insertion failed on validation of storage record (%s) - %s. Error: %s", gf.Identifier, sr.URL, validationErr.Error())
+			common.Context().Log.Error().Msgf("GenericFile save failed on validation of storage record (%s) - %s. Error: %s", gf.Identifier, sr.URL, validationErr.Error())
 			return validationErr
 		}
-		_, err := tx.Model(sr).Insert()
+		// We can have only one record per URL.
+		_, err := tx.Model(sr).OnConflict("DO NOTHING").Insert()
 		if err != nil {
-			common.Context().Log.Error().Msgf("GenericFile batch insertion failed on insert of storage record (%s) %s. Error: %s", gf.Identifier, sr.URL, err.Error())
+			common.Context().Log.Error().Msgf("GenericFile save failed on insert of storage record (%s) %s. Error: %s", gf.Identifier, sr.URL, err.Error())
 			return err
 		}
 	}
@@ -180,15 +193,19 @@ func (gf *GenericFile) saveStorageRecordsTx(tx *pg.Tx) error {
 
 func (gf *GenericFile) saveEventsTx(tx *pg.Tx) error {
 	for _, event := range gf.PremisEvents {
+		if event.ID > 0 {
+			continue // already saved and updates aren't allowed
+		}
 		event.InstitutionID = gf.InstitutionID
 		event.IntellectualObjectID = gf.IntellectualObjectID
 		event.GenericFileID = gf.ID
 		event.SetTimestamps()
 		validationErr := event.Validate()
 		if validationErr != nil {
-			common.Context().Log.Error().Msgf("GenericFile batch insertion failed on validation of event (%s) - %s. Error: %s", gf.Identifier, event.EventType, validationErr.Error())
+			common.Context().Log.Error().Msgf("GenericFile save failed on validation of event (%s) - %s. Error: %s", gf.Identifier, event.EventType, validationErr.Error())
 			return validationErr
 		}
+		// Premis events can only be inserted, not updated.
 		_, err := tx.Model(event).Insert()
 		if err != nil {
 			common.Context().Log.Error().Msgf("GenericFile batch insertion failed on insert of event (%s) - %s. Error: %s", gf.Identifier, event.EventType, err.Error())
