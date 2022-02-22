@@ -90,7 +90,7 @@ func TestGenericFileIndex(t *testing.T) {
 			Expect().
 			Status(http.StatusOK).Body().Raw()
 		if client == testutil.SysAdminClient {
-			testutil.AssertMatchesResultCount(t, html, 43)
+			testutil.AssertMatchesResultCount(t, html, 39)
 		} else {
 			testutil.AssertMatchesNone(t, html, adminFilters)
 			testutil.AssertMatchesResultCount(t, html, 15)
