@@ -24,6 +24,13 @@ type GenericFileView struct {
 	Sha512                string    `json:"sha512"`
 	CreatedAt             time.Time `json:"created_at"`
 	UpdatedAt             time.Time `json:"updated_at"`
+
+	// This is a late hack. Needed for object restoration.
+	// Note that there's no join the DB for this (and there shouldn't
+	// be, because it would produce multiple records). The
+	// GenericFilesController will hack in the storage records
+	// only when specifically requested.
+	StorageRecords []*StorageRecord `pg:"-" json:"storage_records,omitempty"`
 }
 
 // GenericFileViewByID returns the GenericFileView record
