@@ -43,14 +43,14 @@ func GenericFileViewByIdentifier(identifier string) (*GenericFileView, error) {
 // GenericFileViewSelect returns all GenericFileView records matching
 // the query.
 func GenericFileViewSelect(query *Query) ([]*GenericFileView, error) {
-	var requests []*GenericFileView
-	err := query.Select(&requests)
-	return requests, err
+	var files []*GenericFileView
+	err := query.Select(&files)
+	return files, err
 }
 
 // GenericFileViewGet returns the first user view record matching the query.
 func GenericFileViewGet(query *Query) (*GenericFileView, error) {
-	var request GenericFileView
-	err := query.Select(&request)
-	return &request, err
+	var gf GenericFileView
+	err := query.Select(&gf)
+	return &gf, err
 }
