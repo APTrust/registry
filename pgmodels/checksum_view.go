@@ -6,8 +6,8 @@ import (
 
 var ChecksumFilters = []string{
 	"algorithm",
-	"date_time__gteq",
-	"date_time__lteq",
+	"datetime__gteq",
+	"datetime__lteq",
 	"digest",
 	"generic_file_id",
 	"generic_file_identifier",
