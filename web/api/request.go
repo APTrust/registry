@@ -95,7 +95,14 @@ func (req *Request) LoadResourceList(items interface{}, orderByColumn, direction
 		return nil, err
 	}
 	query.Offset(pager.QueryOffset).Limit(pager.PerPage)
-	err = query.Select(items)
+
+	// This sucks. Maybe there's a way to call the underlying
+	// type's select method, because that would handle this.
+	if reflect.ValueOf(items).Elem().Type() == reflect.TypeOf([]*pgmodels.GenericFile{}) {
+		err = query.Relations("Checksums", "PremisEvents", "StorageRecords").Select(items)
+	} else {
+		err = query.Select(items)
+	}
 	if err != nil {
 		return nil, err
 	}

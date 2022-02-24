@@ -50,6 +50,37 @@ func TestGenericFileShow(t *testing.T) {
 	}
 }
 
+func TestGenericFileIndexHasRelations(t *testing.T) {
+	tu.InitHTTPTests(t)
+	defer db.ForceFixtureReload()
+
+	obj, err := pgmodels.CreateObjectWithRelations()
+	require.Nil(t, err)
+
+	resp := tu.SysAdminClient.GET("/admin-api/v3/files").
+		WithHeader(constants.APIUserHeader, tu.SysAdmin.Email).
+		WithHeader(constants.APIKeyHeader, "password").
+		WithQuery("page", 1).
+		WithQuery("per_page", 5).
+		WithQuery("intellectual_object_id", obj.ID).
+		WithQuery("sort", "id__asc").
+		Expect().Status(http.StatusOK)
+
+	list := api.GenericFileList{}
+	err = json.Unmarshal([]byte(resp.Body().Raw()), &list)
+	require.Nil(t, err)
+	assert.Equal(t, 5, list.Count)
+
+	for _, file := range list.Results {
+		assert.Equal(t, obj.ID, file.IntellectualObjectID)
+		assert.Equal(t, "A", file.State)
+		assert.True(t, file.Size > 0)
+		assert.True(t, len(file.Checksums) > 0)
+		assert.True(t, len(file.StorageRecords) > 0)
+		assert.True(t, len(file.PremisEvents) > 0)
+	}
+}
+
 func TestGenericFileIndex(t *testing.T) {
 	tu.InitHTTPTests(t)
 
@@ -63,7 +94,7 @@ func TestGenericFileIndex(t *testing.T) {
 		WithQuery("sort", "id__asc").
 		Expect().Status(http.StatusOK)
 
-	list := api.GenericFileViewList{}
+	list := api.GenericFileList{}
 	err := json.Unmarshal([]byte(resp.Body().Raw()), &list)
 	require.Nil(t, err)
 	assert.Equal(t, 62, list.Count)
@@ -79,16 +110,14 @@ func TestGenericFileIndex(t *testing.T) {
 		WithQuery("state", "A").
 		Expect().Status(http.StatusOK)
 
-	list = api.GenericFileViewList{}
+	list = api.GenericFileList{}
 	err = json.Unmarshal([]byte(resp.Body().Raw()), &list)
 	require.Nil(t, err)
 	assert.Equal(t, 4, list.Count)
 	assert.Equal(t, 4, len(list.Results))
+
 	for _, file := range list.Results {
 		assert.Equal(t, int64(3), file.IntellectualObjectID)
-		assert.Equal(t, "institution1.edu/glass", file.ObjectIdentifier)
-		assert.Equal(t, "institution1.edu", file.InstitutionIdentifier)
-		assert.Equal(t, constants.AccessConsortia, file.Access)
 		assert.Equal(t, "A", file.State)
 		assert.True(t, file.Size > 0)
 	}

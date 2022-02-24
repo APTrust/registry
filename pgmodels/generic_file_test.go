@@ -64,15 +64,22 @@ func TestGenericFileByIdentifier(t *testing.T) {
 
 func TestGenericFileSelect(t *testing.T) {
 	db.ForceFixtureReload()
+
+	obj, err := pgmodels.CreateObjectWithRelations()
+	require.Nil(t, err)
+
 	query := pgmodels.NewQuery().
-		Where("institution_id", "=", InstTest).
+		Where("intellectual_object_id", "=", obj.ID).
 		OrderBy("identifier", "asc")
 	files, err := pgmodels.GenericFileSelect(query)
 	require.Nil(t, err)
 	require.NotEmpty(t, files)
-	assert.Equal(t, 7, len(files))
-	assert.Equal(t, "test.edu/apt-test-restore/aptrust-info.txt", files[0].Identifier)
-	assert.Equal(t, "test.edu/btr-512-test-restore/data/sample.xml", files[6].Identifier)
+	// Make sure related records come through
+	for _, gf := range files {
+		assert.NotEmpty(t, gf.Checksums)
+		assert.NotEmpty(t, gf.PremisEvents)
+		assert.NotEmpty(t, gf.StorageRecords)
+	}
 }
 
 func TestFileSaveGetUpdate(t *testing.T) {
