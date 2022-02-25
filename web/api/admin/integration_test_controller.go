@@ -13,7 +13,8 @@ import (
 )
 
 // PrepareFileDelete sets up preconditions for a file deletion operation.
-// This runs only in the test and integration environments.
+// This runs only in the test and integration environments. It returns
+// a WorkItem for deletion of the specified file.
 //
 // POST /admin-api/v3/prepare_file_delete/:id
 func PrepareFileDelete(c *gin.Context) {
@@ -26,7 +27,8 @@ func PrepareFileDelete(c *gin.Context) {
 }
 
 // PrepareObjectDelete sets up preconditions for an object deletion operation.
-// This runs only in the test and integration environments.
+// This runs only in the test and integration environments. It returns
+// a WorkItem for deletion of the specified object.
 //
 // POST /admin-api/v3/prepare_object_delete/:id
 func PrepareObjectDelete(c *gin.Context) {
