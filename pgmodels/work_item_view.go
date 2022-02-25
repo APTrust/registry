@@ -19,6 +19,8 @@ var WorkItemFilters = []string{
 	"date_processed__gteq",
 	"date_processed__lteq",
 	"etag",
+	"generic_file_id",
+	"generic_file_id__is_null",
 	"generic_file_identifier",
 	"institution_id",
 	"intellectual_object_id",
