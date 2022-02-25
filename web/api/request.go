@@ -11,6 +11,7 @@ import (
 	"github.com/APTrust/registry/middleware"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/gin-gonic/gin"
+	"github.com/stretchr/stew/slice"
 )
 
 type Request struct {
@@ -35,6 +36,33 @@ func NewRequest(c *gin.Context) *Request {
 		Auth:         auth.(*middleware.ResourceAuthorization),
 	}
 	return req
+}
+
+// VailidateFilters returns an error if the query string contains invalid
+// or unrecognized values. Even though GetFilterCollection below applies
+// only valid filters, the caller should know when we are ignoring their
+// filters, so they don't mistakenly accept invalid results.
+//
+// This problem appeared in integration testing with preservation services,
+// when some Registry calls included old Pharos filter params that are no
+// longer valid in Registry. Registry would silently ignore those filters
+// and return *unfiltered* results, which preserv would then act on.
+//
+// It's much better to fail and force the developer (that jerk!) to fix
+// the issues in preservation services.
+func (req *Request) ValidateFilters() error {
+	allowedFilters := pgmodels.FiltersFor(req.Auth.ResourceType)
+	allowedParams := append(allowedFilters, "sort", "page", "per_page")
+	invalid := make([]string, 0)
+	for paramName, _ := range req.GinContext.Request.URL.Query() {
+		if !slice.Contains(allowedParams, paramName) {
+			invalid = append(invalid, paramName)
+		}
+	}
+	if len(invalid) > 0 {
+		return fmt.Errorf("Invalid query params: %s", strings.Join(invalid, ", "))
+	}
+	return nil
 }
 
 // GetFilterCollection returns a collection of filters the user
@@ -74,6 +102,11 @@ func (req *Request) LoadResourceList(items interface{}, orderByColumn, direction
 	if items == nil || !strings.HasPrefix(reflect.TypeOf(items).String(), "*[]*pgmodels.") {
 		common.Context().Log.Error().Msgf("Request.LoadResourceList: Param items should be pointer to slice of pointers.")
 		return nil, common.ErrInvalidParam
+	}
+
+	err := req.ValidateFilters()
+	if err != nil {
+		return nil, err
 	}
 
 	filterCollection := req.GetFilterCollection()
