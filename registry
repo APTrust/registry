@@ -68,6 +68,20 @@ if [[ "$APT_ENV" == "test" || "$APT_ENV" == "integration" ]]; then
     rm ~/tmp/logs/registry_test.log
 fi
 
+
+# ----------------------------------------------------------------------
+#
+# Set test BUILD_TAGS for all test environments. This turns on
+# controller functions in web/api/admin/integration_test_controller.go
+# instead of the dummy functions in web/api/admin/dummy_controller.go
+#
+# ----------------------------------------------------------------------
+if [[ "$APT_ENV" == "test" || "$APT_ENV" == "integration" || "$APT_ENV" == "travis" ]]; then
+    echo "*** Turning on integration test endpoints ***"
+    BUILD_TAGS="-tags=test"
+fi
+
+
 # ----------------------------------------------------------------------
 #
 # Start the services: NSQ and Redis unless any of the following are true:
@@ -105,10 +119,10 @@ fi
 # ----------------------------------------------------------------------
 if [[ $1 == "test" ]]; then
     echo "Running registry tests..."
-    APT_ENV=$APT_ENV go test -p 1 ./...
+    APT_ENV=$APT_ENV go test $BUILD_TAGS -p 1 ./...
 elif [[ $1 == "cover" ]]; then
     echo "Generating test coverage report..."
-    APT_ENV=$APT_ENV go test -p 1 ./... -coverprofile c.out
+    APT_ENV=$APT_ENV go test $BUILD_TAGS -p 1 ./... -coverprofile c.out
     echo "To generate HTML report:"
     echo "> go tool cover -html=c.out"
 elif [[ $1 == "serve" ]]; then
@@ -117,10 +131,10 @@ elif [[ $1 == "serve" ]]; then
         APT_ENV=$APT_ENV go run loader/load_fixtures.go
     fi
     echo "Starting registry app..."
-    APT_ENV=$APT_ENV go run registry.go
+    APT_ENV=$APT_ENV go run $BUILD_TAGS registry.go
 elif [[ $1 == "serve-ssl" ]]; then
     echo "Building registry-ssl"
-    go build -o registry-ssl
+    go build $BUILD_TAGS -o registry-ssl
     echo "Starting registry-ssl"
     APT_ENV=$APT_ENV GIN_MODE=release ./registry-ssl
 fi
