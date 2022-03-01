@@ -5,12 +5,113 @@
 -- branch) to make it match schema.sql.
 --
 -- All operations in this file must be idempotent, so we can run it
--- any number of times and always know that it will leave the DB in a
+-- any number of times and always know that it will leave the DB in 
 -- consistent and known state that matches schema.sql.
 --
 -- NOTE: When migrating old Pharos DB, we will also need to create the
 --       views in the schema.sql file.
 -------------------------------------------------------------------------------
+
+---------------------------------------------------------
+-- START OF PHAROS MASTER -> STORAGE RECORD MIGRATIONS --
+---------------------------------------------------------
+
+-- Drop legacy table from Pharos DB.
+drop table if exists work_item_states;
+
+-- Create the storage_records table, with indexes.
+do $$
+begin
+  if not exists (select 1 from information_schema.columns where table_schema='public' AND table_name='storage_records') then
+	create table public.storage_records (
+    	id bigserial not null,
+    	generic_file_id int8 not null,
+    	url varchar not null,
+    	constraint storage_records_pkey primary key (id),
+    	constraint fk_rails_a126ea6adc foreign key (generic_file_id) references generic_files(id)
+	);
+	create index if not exists index_storage_records_on_generic_file_id ON public.storage_records USING btree (generic_file_id);
+	create unique index if not exists index_storage_records_on_url ON public.storage_records("url");
+  end if;
+end
+$$;
+
+-- Add column generic_files.uuid.
+alter table generic_files add column if not exists "uuid" varchar;
+
+-- Copy uuid from uri into uuid field.
+do $$
+begin
+  if exists (select 1 from information_schema.columns where table_schema='public' AND table_name='generic_files' AND column_name='uri') then
+	update generic_files set uuid=split_part(uri, '/', 5);
+  end if;
+end
+$$;
+
+-- Change generic_files.uuid to not null and add a unique index.
+do
+$$
+begin
+  if exists (select 1 from information_schema.columns where table_schema='public' AND table_name='generic_files' AND column_name='uuid' and is_nullable = 'YES') then
+  	alter table generic_files alter column "uuid" set not null;
+	create unique index if not exists index_generic_files_on_uuid on generic_files(uuid);
+  end if;
+end
+$$;
+
+-- Copy generic_files.uri from storage_records.url.
+do $$
+begin
+  if exists (select 1 from information_schema.columns where table_schema='public' AND table_name='generic_files' AND column_name='uri') then
+
+  	  -- Get the intial URL. All items, regadless of storage option, have one URL.
+      -- The inner if statement makes sure this hasn't already run. (Prevents duplicate inserts.)
+	  if exists (select 1 from information_schema.columns where table_schema='public' AND table_name='storage_records') then
+	    if not exists (select 1 from storage_records where length(url) > 0) then
+		  insert into storage_records (generic_file_id, url) select id, uri from generic_files gf order by gf.id;
+		end if;
+	  end if;
+
+	  -- For items in standard storage, we need to add a Glacier URL. URLs differ per environment, so we check.
+	  -- In each case, the inner if statement tries to ensure that these inserts have not already run.
+
+	  -- Production
+	  if exists (select 1 from generic_files gf where uri like 'https://s3.amazonaws.com/aptrust.preservation.storage/%') then
+	    if not exists (select 1 from storage_records where url like 'https://s3.amazonaws.com/aptrust.preservation.oregon/%') then
+		  insert into storage_records(generic_file_id, url)
+		  select gf.id, replace(uri, '/aptrust.preservation.storage/', '/aptrust.preservation.oregon/') from generic_files gf
+		  where gf.uri like 'https://s3.amazonaws.com/aptrust.preservation.storage/%' order by gf.id;
+		end if;
+	  end if;
+
+	  -- Test/Demo
+	  if exists (select 1 from generic_files gf where uri like 'https://s3.amazonaws.com/aptrust.test.preservation/%') then
+	    if not exists (select 1 from storage_records where url like 'https://s3.amazonaws.com/aptrust.test.preservation.oregon/%') then
+	      insert into storage_records(generic_file_id, url)
+		  select gf.id, replace(uri, '/aptrust.test.preservation/', '/aptrust.test.preservation.oregon/') from generic_files gf
+		  where gf.uri like 'https://s3.amazonaws.com/aptrust.test.preservation/%' order by gf.id;
+		end if;
+	  end if;
+
+	  -- Staging
+	  if exists (select 1 from generic_files gf where uri like 'https://s3.amazonaws.com/aptrust.staging.preservation/%') then
+	    if not exists (select 1 from storage_records where url like 'https://s3.amazonaws.com/aptrust.staging.preservation.oregon/%') then
+		  insert into storage_records(generic_file_id, url)
+		  select gf.id, replace(uri, '/aptrust.staging.preservation/', '/aptrust.staging.preservation.oregon/') from generic_files gf
+		  where gf.uri like 'https://s3.amazonaws.com/aptrust.staging.preservation/%' order by gf.id;
+		end if;
+	  end if;
+
+  end if;
+end
+$$;
+
+-- Now remove generic_files.uri, since the data is now in storage_records
+alter table generic_files drop column if exists uri;
+
+-------------------------------------------------------
+-- END OF PHAROS MASTER -> STORAGE RECORD MIGRATIONS --
+-------------------------------------------------------
 
 -- The premis_events.date_time column is varchar, but it should be
 -- timestamp. We need to change it. This change may fail if 1) there
@@ -30,7 +131,7 @@ begin
 		and data_type = 'character varying')
 	then
 		alter table premis_events alter column date_time type timestamp
-		using TO_TIMESTAMP(date_time, 'YYYY-MM-DD HH24:MI:SS');
+		using TO_TIMESTAMP(date_time, 'YYYY-MM-DDTHH24:MI:SS');
 	end if;
 end
 $$;
