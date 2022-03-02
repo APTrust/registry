@@ -358,3 +358,7 @@ create table if not exists public.storage_options (
 	updated_at timestamp not null
 );
 create unique index if not exists index_storage_options_name ON public.storage_options ("name");
+
+-- In Pharos DB, many generic_file_ids in premis_events are set to zero when they should be null.
+-- Fix that here.
+update premis_events set generic_file_id = null where generic_file_id = 0;
