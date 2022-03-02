@@ -362,3 +362,26 @@ create unique index if not exists index_storage_options_name ON public.storage_o
 -- In Pharos DB, many generic_file_ids in premis_events are set to zero when they should be null.
 -- Fix that here.
 update premis_events set generic_file_id = null where generic_file_id = 0;
+
+
+-------------------------------------------------------------------------------
+-- Functions
+--
+-- Fuctions are defined in schema.sql as well. Adding them to migrations 
+-- ensures they'll be present in converted DB.
+-------------------------------------------------------------------------------
+
+CREATE OR REPLACE FUNCTION create_constraint_if_not_exists (t_name text, c_name text, constraint_sql text)
+  RETURNS void
+AS
+$BODY$
+  begin
+    -- Look for our constraint
+    if not exists (select constraint_name
+                   from information_schema.constraint_column_usage
+                   where table_name = t_name  and constraint_name = c_name) then
+        execute 'ALTER TABLE ' || t_name || ' ADD CONSTRAINT ' || c_name || ' ' || constraint_sql;
+    end if;
+end;
+$BODY$
+LANGUAGE plpgsql VOLATILE;
