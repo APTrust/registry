@@ -172,7 +172,7 @@ func ToHumanSize(size, unit int64) string {
 // automated tests because they clutter the test output.
 func ConsoleDebug(message string, args ...interface{}) {
 	envName := Context().Config.EnvName
-	if !TestsAreRunning() && (envName == "dev" || envName == "test") {
+	if !TestsAreRunning() && (envName == "dev" || envName == "test" || envName == "integration") {
 		fmt.Println(fmt.Sprintf(message, args...))
 	}
 }

@@ -341,6 +341,7 @@ func NewRestorationItem(obj *IntellectualObject, gf *GenericFile, user *User) (*
 	return restorationItem, err
 }
 
+// TODO: Deletion WorkItem needs approver.
 func NewDeletionItem(obj *IntellectualObject, gf *GenericFile, user *User) (*WorkItem, error) {
 	if obj == nil {
 		return nil, common.ErrInvalidParam

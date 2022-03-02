@@ -132,9 +132,11 @@ func AssertSameOrigin(c *gin.Context) error {
 	// Wrong scheme means possible man-in-the-middle when
 	// switching from http to https. Wrong host means this
 	// is a cross-origin request.
-	scheme := common.Context().Config.HTTPScheme()
+	ctx := common.Context()
+	scheme := ctx.Config.HTTPScheme()
 	host := c.Request.Host // host or host:port
 	if referer.Scheme != scheme || referer.Host != host {
+		ctx.Log.Warn().Msgf("Rejecting cross-origin request for '%s'. This host is '%s://%s', but referrer is '%s://%s'", c.Request.URL.String(), scheme, host, referer.Scheme, referer.Host)
 		return common.ErrCrossOriginReferer
 	}
 	return nil

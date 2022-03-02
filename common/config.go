@@ -231,7 +231,7 @@ func (config *Config) ToJSON() string {
 // environments. It returns "https" for all other environments.
 func (config *Config) HTTPScheme() string {
 	switch config.EnvName {
-	case "dev", "test", "ci", "travis":
+	case "dev", "test", "ci", "travis", "integration":
 		return "http"
 	}
 	return "https"
