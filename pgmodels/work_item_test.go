@@ -375,17 +375,29 @@ func TestNewDeletionItem(t *testing.T) {
 	query := pgmodels.NewQuery().
 		Where("institution_id", "=", obj.InstitutionID).
 		Where("state", "=", constants.StateActive).
+		Where("role", "=", constants.RoleInstUser).
 		Limit(1)
-	user, err := pgmodels.UserGet(query)
+	requestor, err := pgmodels.UserGet(query)
 	require.Nil(t, err)
-	require.NotNil(t, user)
+	require.NotNil(t, requestor)
 
-	item1, err := pgmodels.NewDeletionItem(obj, nil, user)
+	query = pgmodels.NewQuery().
+		Where("institution_id", "=", obj.InstitutionID).
+		Where("state", "=", constants.StateActive).
+		Where("role", "=", constants.RoleInstAdmin).
+		Limit(1)
+	approver, err := pgmodels.UserGet(query)
+	require.Nil(t, err)
+	require.NotNil(t, approver)
+
+	item1, err := pgmodels.NewDeletionItem(obj, nil, requestor, approver)
 	require.Nil(t, err)
 	require.NotNil(t, item1)
 	assert.Equal(t, obj.ID, item1.IntellectualObjectID)
 	assert.Equal(t, constants.ActionDelete, item1.Action)
-	assert.Equal(t, user.Email, item1.User)
+	assert.Equal(t, requestor.Email, item1.User)
+	assert.Equal(t, approver.Email, item1.InstApprover)
+	assert.Empty(t, item1.GenericFileID)
 
 	query2 := pgmodels.NewQuery().
 		Where("intellectual_object_id", "=", obj.ID).
@@ -395,23 +407,33 @@ func TestNewDeletionItem(t *testing.T) {
 	require.Nil(t, err)
 	require.NotNil(t, gf)
 
-	item2, err := pgmodels.NewDeletionItem(obj, gf, user)
+	item2, err := pgmodels.NewDeletionItem(obj, gf, requestor, approver)
 	require.Nil(t, err)
 	require.NotNil(t, item2)
 	assert.Equal(t, obj.ID, item2.IntellectualObjectID)
 	assert.Equal(t, constants.ActionDelete, item2.Action)
-	assert.Equal(t, user.Email, item2.User)
+	assert.Equal(t, requestor.Email, item2.User)
+	assert.Equal(t, approver.Email, item2.InstApprover)
 	assert.Equal(t, gf.ID, item2.GenericFileID)
 	assert.Equal(t, gf.Size, item2.Size)
 
 	// Missing object should cause an error
-	item3, err := pgmodels.NewDeletionItem(nil, gf, user)
+	item3, err := pgmodels.NewDeletionItem(nil, gf, requestor, approver)
 	require.NotNil(t, err)
 	require.Nil(t, item3)
 
-	// Object that has never been ingested should cause error
-	randomObj := pgmodels.RandomObject()
-	item4, err := pgmodels.NewDeletionItem(randomObj, nil, user)
+	// Missing requestor and missing approver should cause errors
+	item4, err := pgmodels.NewDeletionItem(obj, gf, nil, approver)
 	require.NotNil(t, err)
 	require.Nil(t, item4)
+
+	item5, err := pgmodels.NewDeletionItem(obj, gf, requestor, nil)
+	require.NotNil(t, err)
+	require.Nil(t, item5)
+
+	// Object that has never been ingested should cause error
+	randomObj := pgmodels.RandomObject()
+	item6, err := pgmodels.NewDeletionItem(randomObj, nil, requestor, approver)
+	require.NotNil(t, err)
+	require.Nil(t, item6)
 }

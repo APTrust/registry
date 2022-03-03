@@ -323,7 +323,8 @@ func NewRestorationItem(obj *IntellectualObject, gf *GenericFile, user *User) (*
 	if obj.IsGlacierOnly() {
 		restorationItem.Action = constants.ActionGlacierRestore
 	} else {
-		// TODO: https://trello.com/c/GirQ712I
+		// TODO: Test, because this should resolve https://trello.com/c/GirQ712I
+		// If so, close that out.
 		if gf != nil {
 			restorationItem.Action = constants.ActionRestoreFile
 		} else {
@@ -341,9 +342,15 @@ func NewRestorationItem(obj *IntellectualObject, gf *GenericFile, user *User) (*
 	return restorationItem, err
 }
 
-// TODO: Deletion WorkItem needs approver.
-func NewDeletionItem(obj *IntellectualObject, gf *GenericFile, user *User) (*WorkItem, error) {
-	if obj == nil {
+// NewDeletionItem creates a new work item to delete a file or object.
+// Param obj is required. If gf is not nil, this will create a WorkItem
+// to delete file gf. Otherwise, it creates a WorkItem to delete object obj.
+//
+// Param requestedBy is the User who initially requested the deletion.
+// Param approvedBy is the User who approved the deletion request.
+// These two are required.
+func NewDeletionItem(obj *IntellectualObject, gf *GenericFile, requestedBy, approvedBy *User) (*WorkItem, error) {
+	if obj == nil || requestedBy == nil || approvedBy == nil {
 		return nil, common.ErrInvalidParam
 	}
 
@@ -352,15 +359,28 @@ func NewDeletionItem(obj *IntellectualObject, gf *GenericFile, user *User) (*Wor
 		return nil, err
 	}
 
-	// If file deletion, set the file id & override object
+	// If this is a file deletion, set the file id & override object
 	// with file size
 	if gf != nil {
 		deletionItem.GenericFileID = gf.ID
 		deletionItem.Size = gf.Size
 	}
 
+	// We've checked this before, but we're going to check it again
+	// because deletions are dangerous.
+	if obj.InstitutionID != requestedBy.InstitutionID {
+		return nil, fmt.Errorf("user %s at institution %d can't request deletion of object belonging to institution %d", requestedBy.Email, requestedBy.InstitutionID, obj.InstitutionID)
+	}
+	if obj.InstitutionID != approvedBy.InstitutionID {
+		return nil, fmt.Errorf("user %s at institution %d can't approve deletion of object belonging to institution %d", approvedBy.Email, approvedBy.InstitutionID, obj.InstitutionID)
+	}
+	if approvedBy.Role != constants.RoleInstAdmin {
+		return nil, fmt.Errorf("user %s can't approve deletion of object %d because user is not an admin at the object's institution", approvedBy.Email, obj.ID)
+	}
+
 	deletionItem.Action = constants.ActionDelete
-	deletionItem.User = user.Email
+	deletionItem.User = requestedBy.Email
+	deletionItem.InstApprover = approvedBy.Email
 	err = deletionItem.Save()
 	return deletionItem, err
 }

@@ -205,8 +205,7 @@ func (del *Deletion) CreateWorkItem() (*pgmodels.WorkItem, error) {
 		}
 	}
 
-	// TODO: WorkItem needs approver.
-	workItem, err := pgmodels.NewDeletionItem(obj, gf, del.currentUser)
+	workItem, err := pgmodels.NewDeletionItem(obj, gf, del.DeletionRequest.RequestedBy, del.DeletionRequest.ConfirmedBy)
 	if err != nil {
 		return nil, err
 	}
