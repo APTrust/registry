@@ -505,7 +505,7 @@ func (gf *GenericFile) NewDeletionEvent() (*PremisEvent, error) {
 	return &PremisEvent{
 		Agent:                "APTrust preservation services",
 		DateTime:             now,
-		Detail:               "File deleted from preservation storage",
+		Detail:               "All copies of this file have been deleted from preservation storage",
 		EventType:            constants.EventDeletion,
 		Identifier:           uuid.NewString(),
 		InstitutionID:        gf.InstitutionID,
@@ -514,6 +514,6 @@ func (gf *GenericFile) NewDeletionEvent() (*PremisEvent, error) {
 		Object:               "Minio S3 library",
 		Outcome:              constants.OutcomeSuccess,
 		OutcomeDetail:        deletionRequestView.RequestedByEmail,
-		OutcomeInformation:   fmt.Sprintf("File deleted at the request of %s. Institutional approver: %s.", deletionRequestView.RequestedByEmail, deletionRequestView.ConfirmedByEmail),
+		OutcomeInformation:   fmt.Sprintf("File deleted at the request of %s. Institutional approver: %s. This event confirms all preservation copies have been deleted.", deletionRequestView.RequestedByEmail, deletionRequestView.ConfirmedByEmail),
 	}, nil
 }
