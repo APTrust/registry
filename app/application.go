@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"html/template"
 	"io"
-	"net/http"
+	//"net/http"
 	"os"
 	"strings"
 
@@ -16,8 +16,8 @@ import (
 	common_api "github.com/APTrust/registry/web/api/common"
 	"github.com/APTrust/registry/web/webui"
 	"github.com/gin-contrib/logger"
+	"github.com/gin-gonic/autotls"
 	"github.com/gin-gonic/gin"
-	"golang.org/x/crypto/acme/autocert"
 )
 
 // Run runs the Registry application. This is called from main() to start
@@ -26,7 +26,7 @@ func Run() {
 	r := InitAppEngine(false)
 	ctx := common.Context()
 	if ctx.Config.Cookies.HTTPSOnly && ctx.Config.Cookies.Domain != "localhost" {
-		err := http.Serve(autocert.NewListener(ctx.Config.Cookies.Domain), r)
+		err := autotls.Run(r, ctx.Config.Cookies.Domain)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err.Error())
 		}
