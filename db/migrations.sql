@@ -5,7 +5,7 @@
 -- branch) to make it match schema.sql.
 --
 -- All operations in this file must be idempotent, so we can run it
--- any number of times and always know that it will leave the DB in 
+-- any number of times and always know that it will leave the DB in
 -- consistent and known state that matches schema.sql.
 --
 -- NOTE: When migrating old Pharos DB, we will also need to create the
@@ -363,11 +363,18 @@ create unique index if not exists index_storage_options_name ON public.storage_o
 -- Fix that here.
 update premis_events set generic_file_id = null where generic_file_id = 0;
 
+-- In Pharos, the Devise auth system leaves stale password reset data forever.
+-- We have to clear these values in Registry, or all users will be stuck in
+-- the "please finish resetting your password" loop forever. We have no idea
+-- what reset tokens Devise sent two years ago, so no one will be able to
+-- unlock their accounts.
+update users set reset_password_token = null, reset_password_sent_at = null;
+
 
 -------------------------------------------------------------------------------
 -- Functions
 --
--- Fuctions are defined in schema.sql as well. Adding them to migrations 
+-- Fuctions are defined in schema.sql as well. Adding them to migrations
 -- ensures they'll be present in converted DB.
 -------------------------------------------------------------------------------
 
