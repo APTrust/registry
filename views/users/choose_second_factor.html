@@ -13,10 +13,12 @@
 <p>How would you like to complete your login?</p>
 
 <div class="two-factor-option clickable" onclick="submitSecondFactor('authy')">
-  Authy
+  Authy <br/>
+  <span id="two-factor-method-authy" class="two-factor-message" style="display:none"> <i class="fas fa-spinner"></i> Sent push notification.</span>
 </div>
 <div class="two-factor-option clickable" onclick="submitSecondFactor('sms')">
-  Text Message
+  Text Message <br/>
+  <span id="two-factor-method-sms" class="two-factor-message" style="display:none;"> <i class="fas fa-spinner"></i> Sent code via SMS.</span>
 </div>
 <div class="two-factor-option clickable" onclick="submitSecondFactor('backup')">
   Backup Code
@@ -49,6 +51,7 @@
          form.method = "post"
          form.action = "/users/2fa_sms/"
      }
+     showTwoFactorMessage(twoFactorMethod)
      form.submit()
  }
  function addCsrf(form, token) {
@@ -58,6 +61,16 @@
          input.setAttribute("name", "csrf_token");
          input.setAttribute("value", token);
          form.appendChild(input);
+     }
+ }
+ function showTwoFactorMessage(twoFactorMethod) {
+     document.querySelectorAll('.two-factor-message').forEach(function (element) {
+         element.style.display = 'none'
+     });
+     try {
+         document.getElementById('two-factor-method-' + twoFactorMethod).style.display = 'inline'
+     } catch (ex) {
+
      }
  }
 </script>
