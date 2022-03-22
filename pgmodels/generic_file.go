@@ -18,6 +18,7 @@ var GenericFileFilters = []string{
 	"institution_id",
 	"state",
 	"storage_option",
+	"storage_option__in",
 	"size__gteq",
 	"size__lteq",
 	"created_at__gteq",
