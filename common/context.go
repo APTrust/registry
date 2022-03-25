@@ -43,8 +43,10 @@ func Context() *APTContext {
 			Database: config.DB.Name,
 		})
 		logger := getLogger(config)
-		queryLogger := NewQueryLogger(logger)
-		db.AddQueryHook(queryLogger)
+		if config.Logging.LogSql {
+			queryLogger := NewQueryLogger(logger)
+			db.AddQueryHook(queryLogger)
+		}
 		ctx = &APTContext{
 			Config:      config,
 			DB:          db,

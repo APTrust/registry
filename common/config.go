@@ -52,6 +52,7 @@ type LoggingConfig struct {
 	Level        zerolog.Level
 	LogCaller    bool
 	LogToConsole bool
+	LogSql       bool
 }
 
 type TwoFactorConfig struct {
@@ -131,6 +132,7 @@ func loadConfig() *Config {
 			Level:        getLogLevel(v.GetInt("LOG_LEVEL")),
 			LogCaller:    v.GetBool("LOG_CALLER"),
 			LogToConsole: v.GetBool("LOG_TO_CONSOLE"),
+			LogSql:       v.GetBool("LOG_SQL"),
 		},
 		DB: &DBConfig{
 			Host:     v.GetString("DB_HOST"),
