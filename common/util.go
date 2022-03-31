@@ -16,6 +16,7 @@ import (
 	"unicode"
 
 	"github.com/nyaruka/phonenumbers"
+	"github.com/stretchr/stew/slice"
 )
 
 var reIllegalIdentifierChars = regexp.MustCompile(`[^A-Za-z0-9_\."]`)
@@ -170,9 +171,12 @@ func ToHumanSize(size, unit int64) string {
 // tests. We want to see these messages in the console when we're doing
 // interactive testing in the dev or test environments, but NOT when running
 // automated tests because they clutter the test output.
+//
+// We also don't want these messages to appear in production, which is why
+// we have a hard-coded list of safe environment names.
 func ConsoleDebug(message string, args ...interface{}) {
-	envName := Context().Config.EnvName
-	if !TestsAreRunning() && (envName == "dev" || envName == "test" || envName == "integration") {
+	envs := []string{"dev", "test", "integration", "staging"}
+	if !TestsAreRunning() && slice.ContainsString(envs, Context().Config.EnvName) {
 		fmt.Println(fmt.Sprintf(message, args...))
 	}
 }
