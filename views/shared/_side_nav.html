@@ -7,11 +7,11 @@
   {{ end }}
 
   {{ if userCan .CurrentUser "IntellectualObjectRead" .CurrentUser.InstitutionID }}
-  <li><a href="/objects"><i class="fa fa-archive"></i> Objects</a></li>
+  <li><a href="/objects?state=A"><i class="fa fa-archive"></i> Objects</a></li>
   {{ end }}
 
   {{ if userCan .CurrentUser "FileRead" .CurrentUser.InstitutionID }}
-  <li><a href="/files"><i class="fa fa-file"></i> Files</a></li>
+  <li><a href="/files?state=A"><i class="fa fa-file"></i> Files</a></li>
   {{ end }}
 
   {{ if userCan .CurrentUser "EventRead" .CurrentUser.InstitutionID }}
