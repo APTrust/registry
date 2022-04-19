@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/pgmodels"
@@ -71,4 +72,41 @@ func TestPremisEventCreate(t *testing.T) {
 		WithBytes(jsonData).
 		Expect().
 		Status(http.StatusForbidden)
+}
+
+func TestPremisEventFixityCheck(t *testing.T) {
+	tu.InitHTTPTests(t)
+
+	gf, err := pgmodels.GenericFileByID(21)
+	require.Nil(t, err)
+	require.NotNil(t, gf)
+
+	now := time.Now().UTC()
+	assert.NotEqual(t, now, gf.LastFixityCheck)
+
+	event := pgmodels.RandomPremisEvent(constants.EventFixityCheck)
+	event.GenericFileID = gf.ID
+	event.IntellectualObjectID = gf.IntellectualObjectID
+	event.DateTime = now
+
+	jsonData, err := json.Marshal(event)
+	require.Nil(t, err)
+	require.NotEmpty(t, jsonData)
+
+	resp := tu.SysAdminClient.POST("/admin-api/v3/events/create").
+		WithHeader(constants.APIUserHeader, tu.SysAdmin.Email).
+		WithHeader(constants.APIKeyHeader, "password").
+		WithBytes(jsonData).
+		Expect()
+	savedEvent := &pgmodels.PremisEvent{}
+	err = json.Unmarshal([]byte(resp.Body().Raw()), savedEvent)
+	require.Nil(t, err)
+	require.NotNil(t, savedEvent)
+	assert.True(t, savedEvent.ID > 0)
+
+	// Make sure LastFixityCheck was upated
+	gf, err = pgmodels.GenericFileByID(21)
+	require.Nil(t, err)
+	require.NotNil(t, gf)
+	assert.Equal(t, now, gf.LastFixityCheck)
 }
