@@ -2,6 +2,21 @@
 
 {{ template "shared/_header.html" .}}
 
+{{ if eq .file.State "A" }}
+<div class="row">
+  <div class="column column-50">
+    {{ if userCan .CurrentUser "FileRequestDelete" .file.InstitutionID }}
+    <button class="button button-outline" data-modal="modal-one" data-xhr-url="/files/request_delete/{{ .file.ID }}">Delete</button>
+    {{ end }}
+  </div>
+  <div class="column column-50">
+    {{ if userCan .CurrentUser "FileRestore" .file.InstitutionID }}
+    <button class="button button-outline" data-modal="modal-one" data-xhr-url="/files/request_restore/{{ .file.ID }}">Restore</button>
+    {{ end }}
+  </div>
+</div>
+{{ end }}
+
 <h1>Generic File</h1>
 
 <table>
