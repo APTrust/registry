@@ -85,16 +85,18 @@
               </table>
               </p>
 
-              {{ if userCan $CurrentUser "FileRequestDelete" $file.InstitutionID }}
-              <div class="float-left">
-                <button class="button button-outline" data-modal="modal-one" data-xhr-url="/files/request_delete/{{ $file.ID }}">Delete File</button>
-              </div>
-              {{ end }}
+              {{ if eq $file.State "A"}}
+                {{ if userCan $CurrentUser "FileRequestDelete" $file.InstitutionID }}
+                <div class="float-left">
+                  <button class="button button-outline" data-modal="modal-one" data-xhr-url="/files/request_delete/{{ $file.ID }}">Delete File</button>
+                </div>
+                {{ end }}
 
-              {{ if userCan $CurrentUser "FileRestore" $file.InstitutionID }}
-              <div class="float-right">
-                <button class="button button-outline" data-modal="modal-one" data-xhr-url="/files/request_restore/{{ $file.ID }}">Restore File</button>
-              </div>
+                {{ if userCan $CurrentUser "FileRestore" $file.InstitutionID }}
+                <div class="float-right">
+                  <button class="button button-outline" data-modal="modal-one" data-xhr-url="/files/request_restore/{{ $file.ID }}">Restore File</button>
+                </div>
+                {{ end }}
               {{ end }}
 
             </div>
