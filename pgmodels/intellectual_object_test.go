@@ -277,7 +277,9 @@ func TestAssertObjDeletionPreconditions(t *testing.T) {
 	assert.True(t, strings.Contains(err.Error(), "has no approver"), err.Error())
 
 	// Add an approver
-	req.ConfirmedByID = req.RequestedByID
+	testEduAdmin, err := pgmodels.UserByEmail("admin@test.edu")
+	require.Nil(t, err)
+	req.ConfirmedByID = testEduAdmin.ID
 	req.ConfirmedAt = time.Now().UTC()
 	require.Nil(t, req.Save())
 
@@ -393,7 +395,9 @@ func TestNewObjDeletionEvent(t *testing.T) {
 	assert.True(t, strings.Contains(err.Error(), "has no approver"), err.Error())
 
 	// Add an approver
-	req.ConfirmedByID = req.RequestedByID
+	testEduAdmin, err := pgmodels.UserByEmail("admin@test.edu")
+	require.Nil(t, err)
+	req.ConfirmedByID = testEduAdmin.ID
 	req.ConfirmedAt = time.Now().UTC()
 	require.Nil(t, req.Save())
 

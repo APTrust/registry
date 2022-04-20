@@ -226,7 +226,7 @@ func TestObjectFiles(t *testing.T) {
 func TestFileDeletionPreConditions(t *testing.T) {
 	defer db.ForceFixtureReload()
 
-	gf, err := pgmodels.GenericFileByID(1)
+	gf, err := pgmodels.GenericFileByID(26) // belongs to test.edu
 	require.Nil(t, err)
 	require.NotNil(t, gf)
 
@@ -292,7 +292,9 @@ func TestFileDeletionPreConditions(t *testing.T) {
 	require.NotNil(t, req)
 	require.NotEqual(t, int64(0), req.ID)
 
-	req.ConfirmedByID = req.RequestedByID
+	testEduAdmin, err := pgmodels.UserByEmail("admin@test.edu")
+	require.Nil(t, err)
+	req.ConfirmedByID = testEduAdmin.ID
 	err = req.Save()
 	require.Nil(t, err)
 
@@ -369,7 +371,7 @@ func testFileDeletionEventProperties(t *testing.T, gf *pgmodels.GenericFile, eve
 	assert.Equal(t, "Minio S3 library", event.Object)
 	assert.Equal(t, constants.OutcomeSuccess, event.Outcome)
 	assert.Equal(t, "user@test.edu", event.OutcomeDetail)
-	assert.Equal(t, "File deleted at the request of user@test.edu. Institutional approver: user@test.edu. This event confirms all preservation copies have been deleted.", event.OutcomeInformation)
+	assert.Equal(t, "File deleted at the request of user@test.edu. Institutional approver: admin@test.edu. This event confirms all preservation copies have been deleted.", event.OutcomeInformation)
 }
 
 func TestGenericFileCreateBatch(t *testing.T) {

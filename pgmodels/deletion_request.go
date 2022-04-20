@@ -98,6 +98,10 @@ func DeletionRequestSelect(query *Query) ([]*DeletionRequest, error) {
 // Save saves this requestitution to the database. This will peform an insert
 // if DeletionRequest.ID is zero. Otherwise, it updates.
 func (request *DeletionRequest) Save() error {
+	err := request.Validate()
+	if err != nil {
+		return err
+	}
 	registryContext := common.Context()
 	db := registryContext.DB
 	return db.RunInTransaction(db.Context(), func(tx *pg.Tx) error {
