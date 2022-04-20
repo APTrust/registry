@@ -298,7 +298,7 @@ func TestIntellectualObjectEvents(t *testing.T) {
 
 func TestIntellectualObjectFiles(t *testing.T) {
 	testutil.InitHTTPTests(t)
-	expect := testutil.Inst2UserClient.GET("/objects/files/1").Expect()
+	expect := testutil.Inst1UserClient.GET("/objects/files/1").Expect()
 	html := expect.Body().Raw()
 	expect.Status(http.StatusOK)
 
