@@ -4,7 +4,7 @@
 
 <label>{{ .Label }}
 <select name="{{ .Name }}" {{ template "forms/attrs.html" . }}>
-    <option value="">Choose One</option>
+    <option value="">Any</option>
     {{ range $index, $option := .Options }}
     <option value="{{ $option.Value }}" {{ if strEq $option.Value $value }}selected{{ end }}>{{ $option.Text }}</option>
     {{ end }}
