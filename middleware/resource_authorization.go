@@ -211,7 +211,7 @@ func (r *ResourceAuthorization) String() string {
 	}
 	errMsg := ""
 	if r.Error != nil {
-		errMsg = r.Error.Error()
+		errMsg = fmt.Sprintf(", Error: %s", r.Error.Error())
 	}
-	return fmt.Sprintf("User %s, Remote IP: %s, Handler: %s, ResourceType: %s, ResourceID: %d, InstID: %d, Gin Path: %s, Request Path: %s, Permission: %s, ResourceIdentifier: %s, Error: %s", email, r.ginCtx.Request.RemoteAddr, r.ginCtx.HandlerName(), r.ResourceType, r.ResourceID, r.ResourceInstID, r.ginCtx.FullPath(), r.ginCtx.Request.URL.Path, r.Permission, r.ResourceIdentifier, errMsg)
+	return fmt.Sprintf("User %s, Remote IP: %s, Handler: %s, ResourceType: %s, ResourceID: %d, InstID: %d, Gin Path: %s, Request Path: %s, Permission: %s, ResourceIdentifier: %s %s", email, r.ginCtx.Request.RemoteAddr, r.ginCtx.HandlerName(), r.ResourceType, r.ResourceID, r.ResourceInstID, r.ginCtx.FullPath(), r.ginCtx.Request.URL.Path, r.Permission, r.ResourceIdentifier, errMsg)
 }
