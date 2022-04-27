@@ -283,10 +283,10 @@ func initPermissions() {
 	sysAdmin[EventRead] = true
 	sysAdmin[EventUpdate] = false // no one can do this
 	sysAdmin[FileCreate] = true
-	sysAdmin[FileDelete] = true
-	sysAdmin[FileFinishBulkDelete] = true
+	sysAdmin[FileDelete] = true           // // preserv workers do this with sys admin account
+	sysAdmin[FileFinishBulkDelete] = true // not implemented yet
 	sysAdmin[FileRead] = true
-	sysAdmin[FileRequestDelete] = true
+	sysAdmin[FileRequestDelete] = false
 	sysAdmin[FileRestore] = true
 	sysAdmin[FileUpdate] = true
 	sysAdmin[InstitutionCreate] = true
@@ -295,10 +295,10 @@ func initPermissions() {
 	sysAdmin[InstitutionRead] = true
 	sysAdmin[InstitutionUpdate] = true
 	sysAdmin[IntellectualObjectCreate] = true
-	sysAdmin[IntellectualObjectDelete] = true
-	sysAdmin[IntellectualObjectFinishBulkDelete] = true
+	sysAdmin[IntellectualObjectDelete] = true           // preserv workers do this with sys admin account
+	sysAdmin[IntellectualObjectFinishBulkDelete] = true // not implemented yet
 	sysAdmin[IntellectualObjectRead] = true
-	sysAdmin[IntellectualObjectRequestDelete] = true
+	sysAdmin[IntellectualObjectRequestDelete] = false // inst admin only
 	sysAdmin[IntellectualObjectRestore] = true
 	sysAdmin[IntellectualObjectUpdate] = true
 	sysAdmin[PrepareFileDelete] = true

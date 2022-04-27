@@ -121,23 +121,23 @@ func TestGenericFileRequestDelete(t *testing.T) {
 	}
 
 	// Inst admin can request deletions of their own files.
-	// Inst users cannot.
-	resp := testutil.SysAdminClient.GET("/files/request_delete/1").
+	// Inst users cannot, and neither can sys admin.
+	resp := testutil.Inst1AdminClient.GET("/files/request_delete/1").
 		Expect().Status(http.StatusOK)
 	testutil.AssertMatchesAll(t, resp.Body().Raw(), items)
 
-	resp = testutil.Inst1AdminClient.GET("/files/request_delete/1").
-		Expect().Status(http.StatusOK)
-	testutil.AssertMatchesAll(t, resp.Body().Raw(), items)
-
+	// Inst user: No
 	testutil.Inst1UserClient.GET("/files/request_delete/1").
 		Expect().Status(http.StatusForbidden)
 
-	// Sys Admin can request any deletion, but others cannot
-	// request deletions outside their own institution.
+	// Sys Admin: No
+	testutil.SysAdminClient.GET("/files/request_delete/1").
+		Expect().Status(http.StatusForbidden)
+
+	// No one can request deletions outside their own institution.
 	// File 18 from fixtures belongs to Inst2
 	testutil.SysAdminClient.GET("/files/request_delete/18").
-		Expect().Status(http.StatusOK)
+		Expect().Status(http.StatusForbidden)
 	testutil.Inst1AdminClient.GET("/files/request_delete/18").
 		Expect().Status(http.StatusForbidden)
 	testutil.Inst1UserClient.GET("/files/request_delete/18").

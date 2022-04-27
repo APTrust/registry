@@ -50,9 +50,13 @@ func TestUserHasPermission(t *testing.T) {
 		InstitutionID: ownInst,
 	}
 
-	// SysAdmin has all permissions at all institutions
+	// SysAdmin has almost all permissions at all institutions
+	sysAdminCannot := []string{
+		string(constants.FileRequestDelete),
+		string(constants.IntellectualObjectRequestDelete),
+	}
 	for _, perm := range constants.Permissions {
-		if slice.Contains(constants.ForbiddenToAll, perm) {
+		if slice.Contains(constants.ForbiddenToAll, perm) || slice.Contains(sysAdminCannot, string(perm)) {
 			assert.False(t, sysAdmin.HasPermission(perm, sysAdmin.InstitutionID), perm)
 			assert.False(t, sysAdmin.HasPermission(perm, ownInst), perm)
 			assert.False(t, sysAdmin.HasPermission(perm, otherInst), perm)

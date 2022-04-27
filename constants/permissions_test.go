@@ -46,7 +46,7 @@ func TestPermissions(t *testing.T) {
 	assert.True(t, constants.CheckPermission(constants.RoleInstAdmin, constants.FileRequestDelete))
 	assert.True(t, constants.CheckPermission(constants.RoleInstAdmin, constants.FileRestore))
 
-	assert.True(t, constants.CheckPermission(constants.RoleSysAdmin, constants.FileRequestDelete))
+	assert.False(t, constants.CheckPermission(constants.RoleSysAdmin, constants.FileRequestDelete))
 	assert.True(t, constants.CheckPermission(constants.RoleSysAdmin, constants.FileRestore))
 
 }
@@ -61,7 +61,7 @@ func TestDangerousPermissions(t *testing.T) {
 	assert.True(t, constants.CheckPermission(constants.RoleInstAdmin, constants.IntellectualObjectDelete))
 	assert.False(t, constants.CheckPermission(constants.RoleInstUser, constants.IntellectualObjectDelete))
 
-	assert.True(t, constants.CheckPermission(constants.RoleSysAdmin, constants.IntellectualObjectRequestDelete))
+	assert.False(t, constants.CheckPermission(constants.RoleSysAdmin, constants.IntellectualObjectRequestDelete))
 	assert.True(t, constants.CheckPermission(constants.RoleInstAdmin, constants.IntellectualObjectRequestDelete))
 	assert.False(t, constants.CheckPermission(constants.RoleInstUser, constants.IntellectualObjectRequestDelete))
 
@@ -72,7 +72,7 @@ func TestDangerousPermissions(t *testing.T) {
 	assert.True(t, constants.CheckPermission(constants.RoleInstAdmin, constants.FileDelete))
 	assert.False(t, constants.CheckPermission(constants.RoleInstUser, constants.FileDelete))
 
-	assert.True(t, constants.CheckPermission(constants.RoleSysAdmin, constants.FileRequestDelete))
+	assert.False(t, constants.CheckPermission(constants.RoleSysAdmin, constants.FileRequestDelete))
 	assert.True(t, constants.CheckPermission(constants.RoleInstAdmin, constants.FileRequestDelete))
 	assert.False(t, constants.CheckPermission(constants.RoleInstUser, constants.FileRequestDelete))
 

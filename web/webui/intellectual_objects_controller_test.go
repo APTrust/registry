@@ -52,7 +52,7 @@ func TestObjectShow(t *testing.T) {
 		html := client.GET("/objects/show/1").Expect().
 			Status(http.StatusOK).Body().Raw()
 		testutil.AssertMatchesAll(t, html, items)
-		if client != testutil.Inst1UserClient {
+		if client == testutil.Inst1AdminClient {
 			testutil.AssertMatchesAll(t, html, adminOnlyItems)
 		}
 	}
@@ -133,22 +133,22 @@ func TestObjectRequestDelete(t *testing.T) {
 		"Confirm",
 	}
 
-	resp := testutil.SysAdminClient.GET("/objects/request_delete/2").
-		Expect().Status(http.StatusOK)
-	testutil.AssertMatchesAll(t, resp.Body().Raw(), items)
+	// Sys Admin cannot request deletion
+	testutil.SysAdminClient.GET("/objects/request_delete/2").
+		Expect().Status(http.StatusForbidden)
 
-	resp = testutil.Inst1AdminClient.GET("/objects/request_delete/2").
+	// But Inst Admin can, if item belongs to his own institution
+	resp := testutil.Inst1AdminClient.GET("/objects/request_delete/2").
 		Expect().Status(http.StatusOK)
 	testutil.AssertMatchesAll(t, resp.Body().Raw(), items)
 
 	testutil.Inst1UserClient.GET("/objects/request_delete/2").
 		Expect().Status(http.StatusForbidden)
 
-	// Sys Admin can request any deletion, but others cannot
-	// request deletions outside their own institution.
+	// No one can request deletions outside their own institution.
 	// Object 6 from fixtures belongs to Inst2
 	testutil.SysAdminClient.GET("/objects/request_delete/6").
-		Expect().Status(http.StatusOK)
+		Expect().Status(http.StatusForbidden)
 	testutil.Inst1AdminClient.GET("/objects/request_delete/6").
 		Expect().Status(http.StatusForbidden)
 	testutil.Inst1UserClient.GET("/objects/request_delete/6").
