@@ -54,6 +54,7 @@ func TestUserHasPermission(t *testing.T) {
 	sysAdminCannot := []string{
 		string(constants.FileRequestDelete),
 		string(constants.IntellectualObjectRequestDelete),
+		string(constants.DeletionRequestApprove),
 	}
 	for _, perm := range constants.Permissions {
 		if slice.Contains(constants.ForbiddenToAll, perm) || slice.Contains(sysAdminCannot, string(perm)) {

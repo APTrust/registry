@@ -78,8 +78,8 @@ func TestDangerousPermissions(t *testing.T) {
 
 	// Approve Object Deletion.
 	//
-	// Admins, yes. Users, no.
-	assert.True(t, constants.CheckPermission(constants.RoleSysAdmin, constants.DeletionRequestApprove))
+	// Inst Admins, yes. Others, no.
+	assert.False(t, constants.CheckPermission(constants.RoleSysAdmin, constants.DeletionRequestApprove))
 	assert.True(t, constants.CheckPermission(constants.RoleInstAdmin, constants.DeletionRequestApprove))
 	assert.False(t, constants.CheckPermission(constants.RoleInstUser, constants.DeletionRequestApprove))
 

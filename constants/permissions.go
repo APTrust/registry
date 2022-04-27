@@ -274,7 +274,7 @@ func initPermissions() {
 	sysAdmin[ChecksumRead] = true
 	sysAdmin[ChecksumUpdate] = false // no one can do this
 	sysAdmin[DashboardShow] = true
-	sysAdmin[DeletionRequestApprove] = true
+	sysAdmin[DeletionRequestApprove] = false // only inst admin can do this
 	sysAdmin[DeletionRequestList] = true
 	sysAdmin[DeletionRequestShow] = true
 	sysAdmin[DepositReportShow] = true
