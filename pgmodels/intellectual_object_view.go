@@ -62,6 +62,8 @@ type IntellectualObjectView struct {
 	InstitutionParentID       int64     `json:"institution_parent_id"`
 	FileCount                 int64     `json:"file_count"`
 	Size                      int64     `json:"size"`
+	PayloadFileCount          int64     `json:"payload_file_count"`
+	PayloadSize               int64     `json:"payload_size"`
 }
 
 // IntellectualObjectViewByID returns the object with the specified id.

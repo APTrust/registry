@@ -12,10 +12,10 @@
       <dt>Alt Identifier</dt>
       <dd>{{ defaultString .object.AltIdentifier "---" }}</dd>
 
-      <dt>File Count</dt>
+      <dt>Total File Count</dt>
       <dd>{{ .object.FileCount }}</dd>
 
-      <dt>Size (Active Files)</dt>
+      <dt>Total Size (Active Files)</dt>
       <dd>{{ humanSize .object.Size }}</dd>
     </dl>
   </div>
@@ -29,6 +29,12 @@
 
       <dt>Access</dt>
       <dd>{{ .object.Access }}</dd>
+
+      <dt>Payload File Count</dt>
+      <dd>{{ .object.PayloadFileCount }}</dd>
+
+      <dt>Payload Size (Active Files)</dt>
+      <dd>{{ humanSize .object.PayloadSize }}</dd>
 
       <dt>Storage Option</dt>
       <dd>{{ .object.StorageOption }}</dd>

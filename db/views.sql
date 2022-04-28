@@ -178,7 +178,9 @@ select
 	i."type" as institution_type,
 	i.member_institution_id as institution_parent_id,
 	(select count(*) from generic_files gf where gf.intellectual_object_id = io.id and gf.state = 'A') as "file_count",
-	(select sum(gf."size") from generic_files gf where gf.intellectual_object_id = io.id and gf.state = 'A') as "size"
+	(select sum(gf."size") from generic_files gf where gf.intellectual_object_id = io.id and gf.state = 'A') as "size",
+	(select count(*) from generic_files gf where gf.intellectual_object_id = io.id and gf.state = 'A' and identifier like concat(io.identifier, '/data/%')) as "payload_file_count",
+	(select sum(gf."size") from generic_files gf where gf.intellectual_object_id = io.id and gf.state = 'A' and identifier like concat(io.identifier, '/data/%')) as "payload_size"
 from intellectual_objects io
 left join institutions i on io.institution_id = i.id;
 
