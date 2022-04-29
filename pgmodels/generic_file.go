@@ -52,8 +52,25 @@ type GenericFile struct {
 // GenericFileByID returns the file with the specified id.
 // Returns pg.ErrNoRows if there is no match.
 func GenericFileByID(id int64) (*GenericFile, error) {
-	query := NewQuery().Where(`"generic_file"."id"`, "=", id).Relations("Institution", "IntellectualObject", "PremisEvents", "Checksums", "StorageRecords")
-	return GenericFileGet(query)
+	// Use pg's query builder because ours doesn't support ordering relation queries. Oops.
+	var gf GenericFile
+	db := common.Context().DB
+	err := db.Model(&gf).
+		Relation("PremisEvents", func(q *pg.Query) (*pg.Query, error) {
+			return q.Order("premis_event.date_time desc"), nil
+		}).
+		Relation("Checksums", func(q *pg.Query) (*pg.Query, error) {
+			return q.Order("checksum.created_at desc"), nil
+		}).
+		Relation("Institution").
+		Relation("IntellectualObject").
+		Relation("StorageRecords").
+		Where("generic_file.id = ?", id).
+		First()
+	if gf.ID == 0 {
+		return nil, err
+	}
+	return &gf, err
 }
 
 // GenericFileByIdentifier returns the file with the specified
