@@ -1,0 +1,26 @@
+{
+  "name": "registry",
+  "version": "1.0.0",
+  "description": "APTrust Registry",
+  "main": "registry.go",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "sass-dev": "sass --watch --update --style=expanded static/scss:static/css",
+    "sass-prod": "sass --no-source-map --style=compressed static/scss:static/css"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/APTrust/registry.git"
+  },
+  "author": "AP Trust",
+  "license": "BSD 2-Clause",
+  "bugs": {
+    "url": "https://github.com/APTrust/registry/issues"
+  },
+  "homepage": "https://github.com/APTrust/registry#readme",
+  "devDependencies": {
+    "sass": "^1.51.0"
+  }
+}

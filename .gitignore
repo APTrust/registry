@@ -20,3 +20,6 @@
 
 # Mac Junk
 *.DS_Store
+
+# Node dependencies
+node_modules/
