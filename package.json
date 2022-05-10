@@ -8,13 +8,13 @@
   },
   "scripts": {
     "sass-dev": "sass --watch --update --style=expanded static/scss:static/css",
-    "sass-prod": "sass --no-source-map --style=compressed static/scss:static/css"
+    "sass-build": "sass --no-source-map --style=compressed static/scss:static/css"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/APTrust/registry.git"
   },
-  "author": "AP Trust",
+  "author": "APTrust",
   "license": "BSD 2-Clause",
   "bugs": {
     "url": "https://github.com/APTrust/registry/issues"
