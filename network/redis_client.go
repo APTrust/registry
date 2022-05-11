@@ -10,7 +10,10 @@ import (
 )
 
 // RedisClient is a client that lets workers store and retrieve working
-// data from a Redis server.
+// data from a Redis server. This is a crude and deliberately limited
+// implementation. It returns JSON only, and that JSON is intended for
+// human consumption. APTrust admins may want to view JSON data when
+// debugging problems. The registry itself does nothing with this info.
 type RedisClient struct {
 	client *redis.Client
 }
@@ -43,11 +46,15 @@ func (c *RedisClient) Keys(pattern string) ([]string, error) {
 	return c.client.Keys(pattern).Result()
 }
 
+// IngestObjectGet returns a JSON string representing an ingest object
+// and its associated work results.
 func (c *RedisClient) IngestObjectGet(workItemID int64, objIdentifier string) (string, error) {
-	obj, err := c.ingestObjectGet(workItemID, objIdentifier)
+	obj := make(map[string]interface{})
+	ingestObj, err := c.ingestObjectGet(workItemID, objIdentifier)
 	if err != nil {
 		return "", err
 	}
+	obj["object"] = ingestObj
 	for _, operationName := range constants.NSQIngestTopicFor {
 		op, err := c.workResultGet(workItemID, operationName)
 		if err == nil {
@@ -72,7 +79,7 @@ func (c *RedisClient) ingestObjectGet(workItemID int64, objIdentifier string) (m
 		return nil, fmt.Errorf("IngestObjectGet from Redis (%d, %s): %s",
 			workItemID, objIdentifier, err.Error())
 	}
-	err = json.Unmarshal([]byte(data), obj)
+	err = json.Unmarshal([]byte(data), &obj)
 	if err != nil {
 		return nil, fmt.Errorf("IngestObjectGet unmarshal JSON (%d, %s): %s",
 			workItemID, objIdentifier, err.Error())
@@ -89,7 +96,7 @@ func (c *RedisClient) workResultGet(workItemID int64, operationName string) (map
 		return nil, fmt.Errorf("WorkResultGet (%d, %s): %s",
 			workItemID, operationName, err.Error())
 	}
-	err = json.Unmarshal([]byte(data), obj)
+	err = json.Unmarshal([]byte(data), &obj)
 	if err != nil {
 		return nil, fmt.Errorf("WorkResultGet unmarshal JSON (%d, %s): %s",
 			workItemID, operationName, err.Error())
@@ -97,6 +104,8 @@ func (c *RedisClient) workResultGet(workItemID int64, operationName string) (map
 	return obj, nil
 }
 
+// RestorationObjectGet returns a JSON string representing the specified
+// restoration object.
 func (c *RedisClient) RestorationObjectGet(workItemID int64, objIdentifier string) (string, error) {
 	key := strconv.FormatInt(workItemID, 10)
 	field := fmt.Sprintf("restoration:%s", objIdentifier)
