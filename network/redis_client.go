@@ -123,3 +123,10 @@ func (c *RedisClient) WorkItemDelete(workItemID int64) (int64, error) {
 	key := strconv.FormatInt(workItemID, 10)
 	return c.client.Del(key).Result()
 }
+
+// SaveItem saves value to Redis. This is used only for testing.
+func (c *RedisClient) SaveItem(workItemID int64, field, value string) error {
+	key := strconv.FormatInt(workItemID, 10)
+	_, err := c.client.HSet(key, field, value).Result()
+	return err
+}

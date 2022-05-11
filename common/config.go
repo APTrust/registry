@@ -229,11 +229,19 @@ func (config *Config) ToJSON() string {
 	return string(data)
 }
 
+// Returns true if we're in a test or dev environment.
+func (config *Config) IsTestOrDevEnv() bool {
+	switch config.EnvName {
+	case "dev", "test", "ci", "travis", "integration":
+		return true
+	}
+	return false
+}
+
 // HTTPScheme returns "http" for the dev, test, ci, and travis
 // environments. It returns "https" for all other environments.
 func (config *Config) HTTPScheme() string {
-	switch config.EnvName {
-	case "dev", "test", "ci", "travis", "integration":
+	if config.IsTestOrDevEnv() {
 		return "http"
 	}
 	return "https"
