@@ -12,6 +12,7 @@ require (
 	github.com/gin-gonic/autotls v0.0.3
 	github.com/gin-gonic/gin v1.7.7
 	github.com/go-pg/pg/v10 v10.9.1
+	github.com/go-redis/redis/v7 v7.4.1 // indirect
 	github.com/gojektech/heimdall v5.0.2+incompatible // indirect
 	github.com/gojektech/valkyrie v0.0.0-20190210220504-8f62c1e7ba45 // indirect
 	github.com/google/uuid v1.2.0

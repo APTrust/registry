@@ -54,10 +54,6 @@ var ErrParentRecordNotFound = errors.New("parent record not found")
 // determine which permission is required to access the specified resoruce.
 var ErrResourcePermission = errors.New("cannot determine permission type for requested requested resource")
 
-// ErrInvalidRequeue occurs when someone attempts to requeue an item to the
-// wrong stage, or to a stage for which no NSQ topic exists.
-var ErrInvalidRequeue = errors.New("item cannot be requeued to the specified stage")
-
 // ErrPendingWorkItems occurs when a user wants to restore or delete an
 // object or file but the WorkItems list shows other operations are pending
 // on that item. For example, we can't delete or restore an object or file
