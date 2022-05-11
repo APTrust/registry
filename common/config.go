@@ -63,6 +63,12 @@ type TwoFactorConfig struct {
 	OTPExpiration time.Duration
 }
 
+type RedisConfig struct {
+	URL       string
+	Password  string
+	DefaultDB int
+}
+
 type Config struct {
 	Cookies   *CookieConfig
 	DB        *DBConfig
@@ -70,6 +76,7 @@ type Config struct {
 	Logging   *LoggingConfig
 	NsqUrl    string
 	TwoFactor *TwoFactorConfig
+	Redis     *RedisConfig
 }
 
 // Returns a new config based on APT_ENV
@@ -160,6 +167,11 @@ func loadConfig() *Config {
 			AWSRegion:     v.GetString("AWS_REGION"),
 			SMSEnabled:    v.GetBool("ENABLE_TWO_FACTOR_SMS"),
 			OTPExpiration: v.GetDuration("OTP_EXPIRATION"),
+		},
+		Redis: &RedisConfig{
+			DefaultDB: v.GetInt("REDIS_DEFAULT_DB"),
+			Password:  v.GetString("REDIS_PASSWORD"),
+			URL:       v.GetString("REDIS_URL"),
 		},
 	}
 }
