@@ -144,9 +144,9 @@ func (item *WorkItem) Save() error {
 }
 
 // SetForRequeue sets properies so this item can be requeued.
-// Note that it saves the object. It will return common.ErrInvalidRequeue
-// if the stage is not valid, and may return validation or pg error
-// if the object cannot be saved.
+// Note that it saves the object. It will return
+// constants.ErrInvalidRequeue if the stage is not valid, and
+// may return validation or pg error if the object cannot be saved.
 //
 // The call is responsible for actually pushing the WorkItem.ID into
 // the correct NSQ topic.

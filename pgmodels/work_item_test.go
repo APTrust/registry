@@ -181,7 +181,7 @@ func TestWorkItemSetForRequeue(t *testing.T) {
 	// This should fail, because Package is not a valid stage for Ingest.
 	err = item.SetForRequeue(constants.StagePackage)
 	require.NotNil(t, err)
-	assert.ErrorIs(t, err, common.ErrInvalidRequeue)
+	assert.ErrorIs(t, err, constants.ErrInvalidRequeue)
 }
 
 func TestWorkItemsPendingForObject(t *testing.T) {

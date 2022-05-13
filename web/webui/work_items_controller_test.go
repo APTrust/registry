@@ -1,10 +1,12 @@
 package webui_test
 
 import (
+	"fmt"
 	"net/http"
 	"testing"
 	"time"
 
+	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/APTrust/registry/web/testutil"
@@ -194,6 +196,56 @@ func TestWorkItemRequeue(t *testing.T) {
 		WithFormField("Stage", constants.StageReingestCheck).
 		Expect().Status(http.StatusForbidden)
 
+}
+
+/*
+Note:
+
+You can also test this manually by running redis-cli at the command line
+and entering:
+
+> hset "22" "object:institution1.edu/glass" '{"object": "value", "yadda": [1,2,3,4]}'
+
+Then run ./registry serve, log in as sys admin and go to
+http://localhost:8080/work_items/show/22
+*/
+func TestWorkItemRedisInfo(t *testing.T) {
+	ctx := common.Context()
+
+	items := []string{
+		"obj_key1",
+		"obj_value1",
+	}
+
+	// These items are in our fixture data.
+	// Obj 3 is processed in work item 22.
+	obj, err := pgmodels.IntellectualObjectByID(3)
+	require.Nil(t, err)
+	require.NotNil(t, obj)
+	key := fmt.Sprintf("object:%s", obj.Identifier)
+	err = ctx.RedisClient.SaveItem(22, key, `{"object":{"obj_key1":"obj_value1"}}`)
+	require.Nil(t, err)
+
+	// Make sure the data is there.
+	str, err := ctx.RedisClient.IngestObjectGet(22, obj.Identifier)
+	require.Nil(t, err)
+	require.NotEmpty(t, str)
+
+	// Sys Admin should see this JSON from Redis
+	html := testutil.SysAdminClient.GET("/work_items/show/22").Expect().
+		Status(http.StatusOK).Body().Raw()
+	testutil.AssertMatchesAll(t, html, items)
+
+	// Other users should not.
+	// Don't bother testing users outside of inst 1,
+	// because they can't even view this item.
+	html = testutil.Inst1UserClient.GET("/work_items/show/22").Expect().
+		Status(http.StatusOK).Body().Raw()
+	testutil.AssertMatchesNone(t, html, items)
+
+	html = testutil.Inst1AdminClient.GET("/work_items/show/22").Expect().
+		Status(http.StatusOK).Body().Raw()
+	testutil.AssertMatchesNone(t, html, items)
 }
 
 func createWorkItem(t *testing.T, name string) *pgmodels.WorkItem {

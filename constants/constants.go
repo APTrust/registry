@@ -1,7 +1,7 @@
 package constants
 
 import (
-	"github.com/APTrust/registry/common"
+	"errors"
 )
 
 const (
@@ -305,6 +305,13 @@ var NSQIngestTopicFor = map[string]string{
 	StageCleanup:              IngestCleanup,
 }
 
+// All other common errors are defined in common. We had to move this
+// one into constants to prevent an illegal import cycle.
+
+// ErrInvalidRequeue occurs when someone attempts to requeue an item to the
+// wrong stage, or to a stage for which no NSQ topic exists.
+var ErrInvalidRequeue = errors.New("item cannot be requeued to the specified stage")
+
 func TopicFor(action, stage string) (string, error) {
 	var err error
 	topic := ""
@@ -323,7 +330,7 @@ func TopicFor(action, stage string) (string, error) {
 		topic = ""
 	}
 	if topic == "" {
-		err = common.ErrInvalidRequeue
+		err = ErrInvalidRequeue
 	}
 	return topic, err
 }
