@@ -11,7 +11,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var redisItemID = int64(31337)
+var redisIngestItemID = int64(867)
+var redisRestoreItemID = int64(5309)
 var redisObjIdentifier = "test.edu/MaySample"
 
 var ingestObjectJson = `{
@@ -45,6 +46,11 @@ var ingestObjectJson = `{
   "ingest09_cleanup": {
     "result": "cleanup result"
   }
+}`
+
+var restoreItemJSON = `{
+  "key1":"value1",
+  "key2": 2.02
 }`
 
 func getRedisClient() *network.RedisClient {
@@ -83,14 +89,20 @@ func createRedisIngestObject(t *testing.T, c *network.RedisClient) {
 		require.Nil(t, err)
 		if key == "object" {
 			rkey := fmt.Sprintf("object:%s", redisObjIdentifier)
-			err = c.SaveItem(redisItemID, rkey, string(jsonBytes))
+			err = c.SaveItem(redisIngestItemID, rkey, string(jsonBytes))
 			require.Nil(t, err, key)
 		} else {
 			rkey := fmt.Sprintf("workresult:%s", key)
-			err = c.SaveItem(redisItemID, rkey, string(jsonBytes))
+			err = c.SaveItem(redisIngestItemID, rkey, string(jsonBytes))
 			require.Nil(t, err, key)
 		}
 	}
+}
+
+func createRedisRestoreObject(t *testing.T, c *network.RedisClient) {
+	key := fmt.Sprintf("restoration:%s", redisObjIdentifier)
+	err := c.SaveItem(redisRestoreItemID, key, string(restoreItemJSON))
+	require.Nil(t, err, key)
 }
 
 func TestRedisIngestObjectGet(t *testing.T) {
@@ -98,7 +110,7 @@ func TestRedisIngestObjectGet(t *testing.T) {
 	assert.NotNil(t, client)
 	createRedisIngestObject(t, client)
 
-	objJson, err := client.IngestObjectGet(redisItemID, redisObjIdentifier)
+	objJson, err := client.IngestObjectGet(redisIngestItemID, redisObjIdentifier)
 	require.Nil(t, err)
 
 	expected, err := jsonToMap(ingestObjectJson)
@@ -110,7 +122,42 @@ func TestRedisIngestObjectGet(t *testing.T) {
 	assert.Equal(t, expected, actual)
 }
 
-// TODO:
-// Put Restoration json
-// Test RestorationObjectGet
-// Test WorkItemDelete
+func TestRedisRestoreObjectGet(t *testing.T) {
+	client := getRedisClient()
+	assert.NotNil(t, client)
+	createRedisRestoreObject(t, client)
+
+	str, err := client.RestorationObjectGet(redisRestoreItemID, redisObjIdentifier)
+	require.Nil(t, err)
+	assert.Equal(t, restoreItemJSON, str)
+}
+
+func TestRedisWorkItemDelete(t *testing.T) {
+	client := getRedisClient()
+	assert.NotNil(t, client)
+	createRedisIngestObject(t, client)
+	createRedisRestoreObject(t, client)
+
+	str, err := client.RestorationObjectGet(redisRestoreItemID, redisObjIdentifier)
+	require.Nil(t, err)
+	assert.NotEmpty(t, str)
+
+	str, err = client.IngestObjectGet(redisIngestItemID, redisObjIdentifier)
+	require.Nil(t, err)
+	assert.NotEmpty(t, str)
+
+	count, err := client.WorkItemDelete(redisRestoreItemID)
+	require.Nil(t, err)
+	assert.Equal(t, int64(1), count)
+
+	count, err = client.WorkItemDelete(redisIngestItemID)
+	require.Nil(t, err)
+	assert.Equal(t, int64(1), count)
+
+	// If keys were successfully deleted, these calls should return error.
+	_, err = client.RestorationObjectGet(redisRestoreItemID, redisObjIdentifier)
+	assert.NotNil(t, err)
+
+	_, err = client.IngestObjectGet(redisRestoreItemID, redisObjIdentifier)
+	assert.NotNil(t, err)
+}

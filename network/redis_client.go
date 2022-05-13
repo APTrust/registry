@@ -9,11 +9,14 @@ import (
 	"github.com/go-redis/redis/v7"
 )
 
-// RedisClient is a client that lets workers store and retrieve working
-// data from a Redis server. This is a crude and deliberately limited
-// implementation. It returns JSON only, and that JSON is intended for
-// human consumption. APTrust admins may want to view JSON data when
-// debugging problems. The registry itself does nothing with this info.
+// RedisClient is a crude and deliberately limited implementation that
+// returns JSON only. The JSON is intended for human consumption, primarily
+// for APTrust admins to view when debugging problems.
+//
+// The JSON represents internal state information from the ingest and
+// restoration workers. The structure of the data may change over time,
+// so this client simply uses map[string]interface{} structures to
+// accomodate arbitrary JSON structures.
 type RedisClient struct {
 	client *redis.Client
 }
