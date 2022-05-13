@@ -63,6 +63,12 @@ type TwoFactorConfig struct {
 	OTPExpiration time.Duration
 }
 
+type RedisConfig struct {
+	URL       string
+	Password  string
+	DefaultDB int
+}
+
 type Config struct {
 	Cookies   *CookieConfig
 	DB        *DBConfig
@@ -70,6 +76,7 @@ type Config struct {
 	Logging   *LoggingConfig
 	NsqUrl    string
 	TwoFactor *TwoFactorConfig
+	Redis     *RedisConfig
 }
 
 // Returns a new config based on APT_ENV
@@ -161,6 +168,11 @@ func loadConfig() *Config {
 			SMSEnabled:    v.GetBool("ENABLE_TWO_FACTOR_SMS"),
 			OTPExpiration: v.GetDuration("OTP_EXPIRATION"),
 		},
+		Redis: &RedisConfig{
+			DefaultDB: v.GetInt("REDIS_DEFAULT_DB"),
+			Password:  v.GetString("REDIS_PASSWORD"),
+			URL:       v.GetString("REDIS_URL"),
+		},
 	}
 }
 
@@ -229,11 +241,19 @@ func (config *Config) ToJSON() string {
 	return string(data)
 }
 
+// Returns true if we're in a test or dev environment.
+func (config *Config) IsTestOrDevEnv() bool {
+	switch config.EnvName {
+	case "dev", "test", "ci", "travis", "integration":
+		return true
+	}
+	return false
+}
+
 // HTTPScheme returns "http" for the dev, test, ci, and travis
 // environments. It returns "https" for all other environments.
 func (config *Config) HTTPScheme() string {
-	switch config.EnvName {
-	case "dev", "test", "ci", "travis", "integration":
+	if config.IsTestOrDevEnv() {
 		return "http"
 	}
 	return "https"

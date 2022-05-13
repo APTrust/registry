@@ -66,6 +66,31 @@ func TestConfigBucketQualifier(t *testing.T) {
 	assert.Equal(t, ".test", config.BucketQualifier())
 }
 
+func TestIsTestEnv(t *testing.T) {
+	config := common.NewConfig()
+
+	config.EnvName = "test"
+	assert.True(t, config.IsTestOrDevEnv())
+
+	config.EnvName = "dev"
+	assert.True(t, config.IsTestOrDevEnv())
+
+	config.EnvName = "travis"
+	assert.True(t, config.IsTestOrDevEnv())
+
+	config.EnvName = "ci"
+	assert.True(t, config.IsTestOrDevEnv())
+
+	config.EnvName = "demo"
+	assert.False(t, config.IsTestOrDevEnv())
+
+	config.EnvName = "staging"
+	assert.False(t, config.IsTestOrDevEnv())
+
+	config.EnvName = "production"
+	assert.False(t, config.IsTestOrDevEnv())
+}
+
 func TestHTTPScheme(t *testing.T) {
 	config := common.NewConfig()
 

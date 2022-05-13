@@ -1,12 +1,16 @@
 package pgmodels
 
 import (
+	"fmt"
+	"regexp"
 	"time"
 
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
 	"github.com/stretchr/stew/slice"
 )
+
+var tarExtension = regexp.MustCompile("\\.tar$")
 
 var WorkItemFilters = []string{
 	"action",
@@ -117,4 +121,18 @@ func (item *WorkItemView) Validate() *common.ValidationError {
 // HasCompleted returns true if this item has completed processing.
 func (item *WorkItemView) HasCompleted() bool {
 	return slice.Contains(constants.CompletedStatusValues, item.Status)
+}
+
+// ObjIdentifier returns this item's ObjectIdentifier if it exists, or
+// what the object identifier would be if the item were fully ingested.
+// Note that for ingest items, no object identifier is assigned until
+// ingest is complete. However, to get a look at preservation services'
+// internal Redis data, we need to know this not-yet-assigned identifier
+// to compose the Redis key.
+func (item *WorkItemView) GetObjIdentifier() string {
+	if item.ObjectIdentifier != "" {
+		return item.ObjectIdentifier
+	}
+	itemName := tarExtension.ReplaceAllString(item.Name, "")
+	return fmt.Sprintf("%s/%s", item.InstitutionIdentifier, itemName)
 }

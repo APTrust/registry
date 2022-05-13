@@ -80,3 +80,19 @@ func TestWorkItemHasViewCompleted(t *testing.T) {
 		assert.True(t, item.HasCompleted())
 	}
 }
+
+func TestWorkItemViewGetObjIdentifier(t *testing.T) {
+	item := &pgmodels.WorkItemView{
+		InstitutionIdentifier: "test.edu",
+		Name:                  "BagOfVideos.tar",
+	}
+
+	// If no explicit ObjectIdentifier, this method should
+	// assemble one according to object naming rules.
+	assert.Equal(t, "test.edu/BagOfVideos", item.GetObjIdentifier())
+
+	// If there's an explicit ObjectIdentifier, it should
+	// return that.
+	item.ObjectIdentifier = "example.edu/override"
+	assert.Equal(t, "example.edu/override", item.GetObjIdentifier())
+}
