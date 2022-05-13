@@ -1,17 +1,49 @@
 @charset "utf-8";
-@import "../../node_modules/normalize.css/normalize.css";
+@import "../../node_modules/normalize.css/normalize";
+
+// Set brand colors
+// Brand greys
+$grey-dark-brand: #333030;
+$grey-1: #6B6B6B;
+$grey-2: #A2A2A2;
+$grey-3: #C4C4C4;
+$grey-4: #D6D6D6;
+$grey-highlight: #EEEEEE;
+$grey-background: #F7F7F7;
+$grey-pending: #8D9396;
+
+// Override bulma greys
+$grey-darker: $grey-dark-brand;
+$grey-dark: $grey-1;
+$grey: $grey-2;
+$grey-light: $grey-3;
+$grey-lighter: $grey-4;
+$grey-lightest: $grey-highlight;
+
+// Brand colors
+$gold: #BB9566;
+$purple: #13135C;
+$red: #BE1F45;
+$teal: #00A99D;
+$turquoise: $teal;
+$green: #35826B;
+$brown: #935A15;
+$blue-dark: #608292;
+$blue-light: #6097CD;
+
+
 // Override bulma variables as needed
 // $body-background-color: pink;
 
 // Import bulma packages as needed
 @import "../../node_modules/bulma/sass/utilities/all";
-// @import "../../node_modules/bulma/sass/base/all";
-@import "../../node_modules/bulma/sass/components/all";
-@import "../../node_modules/bulma/sass/elements/all";
-@import "../../node_modules/bulma/sass/form/all";
-@import "../../node_modules/bulma/sass/grid/all";
-@import "../../node_modules/bulma/sass/helpers/all";
-@import "../../node_modules/bulma/sass/layout/all";
+@import "../../node_modules/bulma/sass/base/all";
+// @import "../../node_modules/bulma/sass/components/all";
+// @import "../../node_modules/bulma/sass/elements/all";
+// @import "../../node_modules/bulma/sass/form/all";
+// @import "../../node_modules/bulma/sass/grid/all";
+// @import "../../node_modules/bulma/sass/helpers/all";
+// @import "../../node_modules/bulma/sass/layout/all";
 
 // Import individual custom components
 // @import 'legacy';
