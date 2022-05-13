@@ -18,6 +18,7 @@ type APTContext struct {
 	Log         zerolog.Logger
 	AuthyClient network.AuthyClientInterface
 	NSQClient   *network.NSQClient
+	RedisClient *network.RedisClient
 	SNSClient   *network.SNSClient
 }
 
@@ -42,18 +43,24 @@ func Context() *APTContext {
 			Password: config.DB.Password,
 			Database: config.DB.Name,
 		})
-		logger := getLogger(config)
+		zlogger := getLogger(config)
 		if config.Logging.LogSql {
-			queryLogger := NewQueryLogger(logger)
+			queryLogger := NewQueryLogger(zlogger)
 			db.AddQueryHook(queryLogger)
+		}
+		redisClient := network.NewRedisClient(config.Redis.URL, config.Redis.Password, config.Redis.DefaultDB)
+		_, err := redisClient.Ping()
+		if err != nil {
+			zlogger.Warn().Msgf("Error pinging Redis: %v", err)
 		}
 		ctx = &APTContext{
 			Config:      config,
 			DB:          db,
-			Log:         logger,
-			AuthyClient: network.NewAuthyClient(config.TwoFactor.AuthyEnabled, config.TwoFactor.AuthyAPIKey, logger),
-			NSQClient:   network.NewNSQClient(config.NsqUrl, logger),
-			SNSClient:   network.NewSNSClient(config.TwoFactor.SMSEnabled, config.TwoFactor.AWSRegion, logger),
+			Log:         zlogger,
+			AuthyClient: network.NewAuthyClient(config.TwoFactor.AuthyEnabled, config.TwoFactor.AuthyAPIKey, zlogger),
+			NSQClient:   network.NewNSQClient(config.NsqUrl, zlogger),
+			SNSClient:   network.NewSNSClient(config.TwoFactor.SMSEnabled, config.TwoFactor.AWSRegion, zlogger),
+			RedisClient: redisClient,
 		}
 	}
 	return ctx

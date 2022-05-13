@@ -35,6 +35,7 @@ func WorkItemShow(c *gin.Context) {
 	req.TemplateData["item"] = item
 
 	// Show requeue options to Admin, if item has not completed.
+	// Only sys admin should have this permission.
 	userCanRequeue := req.CurrentUser.HasPermission(constants.WorkItemRequeue, item.InstitutionID)
 	if userCanRequeue && !item.HasCompleted() {
 		workItem, err := pgmodels.WorkItemByID(req.Auth.ResourceID)
@@ -47,6 +48,7 @@ func WorkItemShow(c *gin.Context) {
 		}
 		req.TemplateData["form"] = form
 	}
+	getRedisInfo(req, item)
 	c.HTML(http.StatusOK, "work_items/show.html", req.TemplateData)
 }
 
@@ -120,4 +122,29 @@ func getFormAndRequest(c *gin.Context) (*forms.WorkItemForm, *Request, error) {
 	form := forms.NewWorkItemForm(workItem)
 	req.TemplateData["form"] = form
 	return form, req, nil
+}
+
+// Show Redis info if user has permission. This should be sys admin only.
+func getRedisInfo(req *Request, item *pgmodels.WorkItemView) {
+	var err error
+	jsonStr := ""
+	if !req.CurrentUser.HasPermission(constants.RedisRead, item.InstitutionID) {
+		return
+	}
+	ctx := common.Context()
+	if ctx.RedisClient.KeyExists(item.ID) {
+		return
+	}
+	if item.Action == constants.ActionIngest {
+		jsonStr, err = ctx.RedisClient.IngestObjectGet(item.ID, item.GetObjIdentifier())
+		if err != nil {
+			ctx.Log.Warn().Msgf("Error getting IngestObject from Redis: %v", err)
+		}
+	} else if item.Action == constants.ActionRestoreFile || item.Action == constants.ActionRestoreObject {
+		jsonStr, err = ctx.RedisClient.RestorationObjectGet(item.ID, item.GetObjIdentifier())
+		if err != nil {
+			ctx.Log.Warn().Msgf("Error getting RestorationObject from Redis: %v", err)
+		}
+	}
+	req.TemplateData["redisInfo"] = jsonStr
 }

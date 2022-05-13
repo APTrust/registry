@@ -55,6 +55,8 @@ const (
 	PrepareFileDelete                  = "PrepareFileDelete"
 	PrepareObjectDelete                = "PrepareObjectDelete"
 	ReportRead                         = "ReportRead"
+	RedisDelete                        = "RedisDelete"
+	RedisRead                          = "RedisRead"
 	StorageRecordCreate                = "StorageRecordCreate"
 	StorageRecordDelete                = "StorageRecordDelete"
 	StorageRecordRead                  = "StorageRecordRead"
@@ -125,6 +127,8 @@ var Permissions = []Permission{
 	PrepareFileDelete,
 	PrepareObjectDelete,
 	ReportRead,
+	RedisDelete,
+	RedisRead,
 	StorageRecordCreate,
 	StorageRecordDelete,
 	StorageRecordRead,
@@ -304,6 +308,8 @@ func initPermissions() {
 	sysAdmin[PrepareFileDelete] = true
 	sysAdmin[PrepareObjectDelete] = true
 	sysAdmin[ReportRead] = true
+	sysAdmin[RedisDelete] = true
+	sysAdmin[RedisRead] = true
 	sysAdmin[StorageRecordCreate] = true
 	sysAdmin[StorageRecordDelete] = true
 	sysAdmin[StorageRecordRead] = true
