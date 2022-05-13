@@ -34,3 +34,7 @@ Here's some general messiness to clean up, refactor, and/or document.
 - [ ] Document test fixtures.
 - [ ] Document fixtures vs. factory-generated models.
 - [ ] Move factory out of pgmodels namespace.
+
+## Front-end
+
+- [ ] Research `flash` in `shared/_header`.

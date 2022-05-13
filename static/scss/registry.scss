@@ -4,13 +4,13 @@
 // Set brand colors
 // Brand greys
 $grey-dark-brand: #333030;
-$grey-1: #6B6B6B;
-$grey-2: #A2A2A2;
-$grey-3: #C4C4C4;
-$grey-4: #D6D6D6;
-$grey-highlight: #EEEEEE;
-$grey-background: #F7F7F7;
-$grey-pending: #8D9396;
+$grey-1: #6b6b6b;
+$grey-2: #a2a2a2;
+$grey-3: #c4c4c4;
+$grey-4: #d6d6d6;
+$grey-highlight: #eeeeee;
+$grey-background: #f7f7f7;
+$grey-pending: #8d9396;
 
 // Override bulma greys
 $grey-darker: $grey-dark-brand;
@@ -21,23 +21,24 @@ $grey-lighter: $grey-4;
 $grey-lightest: $grey-highlight;
 
 // Brand colors
-$gold: #BB9566;
-$purple: #13135C;
-$red: #BE1F45;
-$teal: #00A99D;
+$gold: #bb9566;
+$purple: #13135c;
+$red: #be1f45;
+$teal: #00a99d;
 $turquoise: $teal;
-$green: #35826B;
-$brown: #935A15;
+$green: #35826b;
+$brown: #935a15;
 $blue-dark: #608292;
-$blue-light: #6097CD;
-
+$blue-light: #6097cd;
 
 // Override bulma variables as needed
 $body-background-color: $grey-background;
 $body-color: $grey-darker;
-$body-family: "Roboto", BlinkMacSystemFont, -apple-system, "Segoe UI", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+$body-family: "Roboto", BlinkMacSystemFont, -apple-system, "Segoe UI", "Oxygen",
+  "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+  "Helvetica", "Arial", sans-serif;
 $body-line-height: 20px;
-$family-monospace: 'Roboto Mono', monospace;
+$family-monospace: "Roboto Mono", monospace;
 $link: $grey-darker;
 $primary: $purple;
 
@@ -52,5 +53,10 @@ $primary: $purple;
 // @import "../../node_modules/bulma/sass/layout/all";
 
 // Import individual custom components
-// @import 'legacy';
-@import 'shared/typography';
+// @import "legacy";
+@import "shared/all";
+
+// Temporary styles
+.modal {
+  display: none;
+}

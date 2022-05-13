@@ -421,7 +421,7 @@ th:not([align]) {
 }
 
 html {
-  background-color: #F7F7F7;
+  background-color: #f7f7f7;
   font-size: 16px;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
@@ -524,7 +524,7 @@ fieldset {
 pre {
   -webkit-overflow-scrolling: touch;
   background-color: hsl(0deg, 0%, 96%);
-  color: #6B6B6B;
+  color: #6b6b6b;
   font-size: 0.875em;
   overflow-x: auto;
   padding: 1.25rem 1.5rem;
@@ -617,6 +617,33 @@ p {
 
 .text-bold {
   font-weight: 700;
+}
+
+.page-wrapper {
+  display: flex;
+  min-height: 100vh;
+}
+
+.side-nav {
+  background: hsl(0deg, 0%, 100%);
+  flex-shrink: 0;
+  width: 200px;
+}
+.side-nav li {
+  padding: 16px 24px;
+}
+
+.content-wrapper {
+  flex: 1;
+  max-width: 1240px;
+}
+
+.site-logo {
+  padding: 50px 12px;
+}
+
+.modal {
+  display: none;
 }
 
 /*# sourceMappingURL=registry.css.map */
