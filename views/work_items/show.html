@@ -113,6 +113,14 @@
   </tbody>
 </table>
 
+{{ if .redisInfo }}
+<!-- Show raw json data. For sys admin only. -->
+<p><b>Redis Data</b></p>
+<textarea style="min-height: 300px;">
+{{ .redisInfo }}
+</textarea>
+{{ end }}
+
 {{ template "shared/_footer.html" . }}
 
 

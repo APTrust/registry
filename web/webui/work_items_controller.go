@@ -132,7 +132,7 @@ func getRedisInfo(req *Request, item *pgmodels.WorkItemView) {
 		return
 	}
 	ctx := common.Context()
-	if ctx.RedisClient.KeyExists(item.ID) {
+	if !ctx.RedisClient.KeyExists(item.ID) {
 		return
 	}
 	if item.Action == constants.ActionIngest {
