@@ -5,4 +5,18 @@
   <i class="fa fa-search"></i>
 </div>
 
+<div class="user-icons">
+  {{ if userCan .CurrentUser "AlertRead" .CurrentUser.InstitutionID }}
+    <!-- Moved this to the top nav -->
+    <a href="/alerts">
+      <span class="material-icons" aria-hidden="true">notifications</span> 
+      <span class="is-sr-only">Alerts</span>
+    </a>
+    {{ end }}
+  <a href="/users/my_account">
+    <span class="material-icons" aria-hidden="true">account_circle</span> 
+    <span class="is-sr-only">My Account</span>
+  </a>
+</div>
+
 {{ end }}

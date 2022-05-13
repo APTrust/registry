@@ -8,11 +8,11 @@
   <ul>
 
     {{ if userCan .CurrentUser "DashboardShow" .CurrentUser.InstitutionID }}
-    <li><a href="/dashboard"><i class="fa fa-home"></i> Dashboard</a></li>
+    <li><a href="/dashboard"><span class="material-icons" aria-hidden="true">home</span> Dashboard</a></li>
     {{ end }}
   
     {{ if userCan .CurrentUser "IntellectualObjectRead" .CurrentUser.InstitutionID }}
-    <li><a href="/objects?state=A"><i class="fa fa-archive"></i> Objects</a></li>
+    <li><a href="/objects?state=A"><span class="material-icons" aria-hidden="true">inventory</span> Objects</a></li>
     {{ end }}
   
     {{ if userCan .CurrentUser "FileRead" .CurrentUser.InstitutionID }}
@@ -24,7 +24,7 @@
     {{ end }}
   
     {{ if userCan .CurrentUser "WorkItemRead" .CurrentUser.InstitutionID }}
-    <li><a href="/work_items"><i class="fa fa-cog"></i> Work Items</a></li>
+    <li><a href="/work_items"><span class="material-icons" aria-hidden="true">build</span> Work Items</a></li>
     {{ end }}
   
     {{ if userCan .CurrentUser "DeletionRequestList" .CurrentUser.InstitutionID }}
@@ -32,11 +32,12 @@
     {{ end }}
   
     {{ if userCan .CurrentUser "DepositReportShow" .CurrentUser.InstitutionID }}
-    <li><a href="/reports/deposits"><i class="fa fa-chart-line"></i> Reports</a></li>
+    <li><a href="/reports/deposits"><span class="material-icons" aria-hidden="true">insert_chart</span> Reports</a></li>
     {{ end }}
   
     {{ if userCan .CurrentUser "AlertRead" .CurrentUser.InstitutionID }}
-    <li><a href="/alerts"><i class="fa fa-bell"></i> Alerts</a></li>
+    <!-- Moved this to the top nav -->
+    <!-- <li><a href="/alerts"><i class="fa fa-bell"></i> Alerts</a></li> -->
     {{ end }}
   
     {{ if .CurrentUser.IsAdmin }}
@@ -48,12 +49,12 @@
     {{ end }}
   
       {{ if userCan .CurrentUser "UserCreate" .CurrentUser.InstitutionID }}
-      <li><a href="/users"><i class="fa fa-users"></i> Users</a></li>
+      <li><a href="/users"><span class="material-icons" aria-hidden="true">people</span> Users</a></li>
       {{ end }}
   
-  
-    <li><a href="/users/my_account"><i class="far fa-user-circle"></i> My Account</a></li>
-    <li><a href="/users/sign_out"><i class="fas fa-sign-out-alt"></i> Sign Out</a></li>
+    <!-- Moved this to the top nav -->
+    <!-- <li><a href="/users/my_account"><i class="far fa-user-circle"></i> My Account</a></li> -->
+    <li><a href="/users/sign_out"><span class="material-icons" aria-hidden="true">logout</span> Sign Out</a></li>
   </ul>
 </nav>
 
