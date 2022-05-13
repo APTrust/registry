@@ -24,23 +24,23 @@
     <script type="module" src="/static/js/registry.js"></script>
   </head>
 
-  <body class="container">
+  <body>
 
-    {{ if not .suppressTopNav }}
-    <div class="row top-nav">
-      {{ template "shared/_top_nav.html" .}}
-    </div>
-    {{ end }}
+    <div class="page-wrapper">
 
-    <div class="row">
-
-      <div class="column column-20 side-nav">
+      <div class="side-nav">
         {{ if not .suppressSideNav }}
         {{ template "shared/_side_nav.html" .}}
         {{ end }}
       </div>
 
-      <div class="column column-80">
+      <div class="page-content">
+
+        {{ if not .suppressTopNav }}
+        <div class="top-nav">
+          {{ template "shared/_top_nav.html" .}}
+        </div>
+        {{ end }}
 
         {{ if .flash }}
         <div class="row flash">

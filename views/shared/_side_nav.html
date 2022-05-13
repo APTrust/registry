@@ -1,5 +1,9 @@
 {{ define "shared/_side_nav.html" }}
 
+<div class="site-logo">
+  <img src="/static/img/AP-Trust-Logo.png">
+</div>
+
 <ul>
 
   {{ if userCan .CurrentUser "DashboardShow" .CurrentUser.InstitutionID }}
