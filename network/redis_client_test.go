@@ -132,7 +132,7 @@ func TestRedisRestoreObjectGet(t *testing.T) {
 	assert.Equal(t, restoreItemJSON, str)
 }
 
-func TestRedisWorkItemDelete(t *testing.T) {
+func TestRedisWorkItemExistsDelete(t *testing.T) {
 	client := getRedisClient()
 	assert.NotNil(t, client)
 	createRedisIngestObject(t, client)
@@ -145,6 +145,9 @@ func TestRedisWorkItemDelete(t *testing.T) {
 	str, err = client.IngestObjectGet(redisIngestItemID, redisObjIdentifier)
 	require.Nil(t, err)
 	assert.NotEmpty(t, str)
+
+	assert.True(t, client.KeyExists(redisIngestItemID))
+	assert.True(t, client.KeyExists(redisRestoreItemID))
 
 	count, err := client.WorkItemDelete(redisRestoreItemID)
 	require.Nil(t, err)
@@ -160,4 +163,7 @@ func TestRedisWorkItemDelete(t *testing.T) {
 
 	_, err = client.IngestObjectGet(redisRestoreItemID, redisObjIdentifier)
 	assert.NotNil(t, err)
+
+	assert.False(t, client.KeyExists(redisIngestItemID))
+	assert.False(t, client.KeyExists(redisRestoreItemID))
 }

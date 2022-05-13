@@ -41,12 +41,11 @@ func (c *RedisClient) Ping() (string, error) {
 	return c.client.Ping().Result()
 }
 
-// Keys returns all keys in the Redis DB matching the specified pattern.
-// Each key is a WorkItem.ID in string form. It's generally safe to call
-// this with pattern "*" because we rarely have more than a few dozen items
-// in Redis at any given time.
-func (c *RedisClient) Keys(pattern string) ([]string, error) {
-	return c.client.Keys(pattern).Result()
+// KeyExists returns true if the specified key exists in our Redis DB.
+func (c *RedisClient) KeyExists(workItemID int64) bool {
+	key := strconv.FormatInt(workItemID, 10)
+	count, err := c.client.Exists(key).Result()
+	return count > 0 && err == nil
 }
 
 // IngestObjectGet returns a JSON string representing an ingest object
