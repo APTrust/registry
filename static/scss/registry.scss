@@ -33,7 +33,10 @@ $blue-light: #6097CD;
 
 
 // Override bulma variables as needed
-// $body-background-color: pink;
+$family-sans-serif: "Roboto", BlinkMacSystemFont, -apple-system, "Segoe UI", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+$family-monospace: 'Roboto Mono', monospace;
+$primary: $purple;
+$link: $grey-darker;
 
 // Import bulma packages as needed
 @import "../../node_modules/bulma/sass/utilities/all";
