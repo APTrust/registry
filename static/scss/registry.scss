@@ -37,6 +37,7 @@ $family-sans-serif: "Roboto", BlinkMacSystemFont, -apple-system, "Segoe UI", "Ox
 $family-monospace: 'Roboto Mono', monospace;
 $primary: $purple;
 $link: $grey-darker;
+$body-line-height: 20px;
 
 // Import bulma packages as needed
 @import "../../node_modules/bulma/sass/utilities/all";
@@ -50,3 +51,4 @@ $link: $grey-darker;
 
 // Import individual custom components
 // @import 'legacy';
+@import 'shared/typography';
