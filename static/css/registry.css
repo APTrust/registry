@@ -980,17 +980,8 @@ p {
 
 .side-nav {
   background: hsl(0deg, 0%, 100%);
-  display: flex;
-  flex-direction: column;
   flex-shrink: 0;
   width: 200px;
-}
-.side-nav nav {
-  flex: 1;
-}
-.side-nav ul {
-  display: flex;
-  flex-direction: column;
 }
 .side-nav ul a {
   align-items: center;
@@ -1003,9 +994,6 @@ p {
 .side-nav ul .material-icons {
   color: #bb9566;
   margin-right: 10px;
-}
-.side-nav li:last-child {
-  margin-top: auto;
 }
 
 .content-wrapper {

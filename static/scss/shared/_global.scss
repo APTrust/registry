@@ -6,19 +6,10 @@
 
 .side-nav {
   background: $white;
-  display: flex;
-  flex-direction: column;
   flex-shrink: 0;
   width: 200px;
 
-  nav {
-    flex: 1;
-  }
-
   ul {
-    display: flex;
-    flex-direction: column;
-
     a {
       @extend .text-label;
       align-items: center;
@@ -35,10 +26,6 @@
       color: $gold;
       margin-right: 10px;
     }
-  }
-
-  li:last-child {
-    margin-top: auto;
   }
 }
 

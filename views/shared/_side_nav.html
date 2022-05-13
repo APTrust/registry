@@ -16,11 +16,11 @@
     {{ end }}
   
     {{ if userCan .CurrentUser "FileRead" .CurrentUser.InstitutionID }}
-    <li><a href="/files?state=A"><i class="fa fa-file"></i> Files</a></li>
+    <li><a href="/files?state=A"><span class="material-icons" aria-hidden="true">insert_drive_file</span> Files</a></li>
     {{ end }}
   
     {{ if userCan .CurrentUser "EventRead" .CurrentUser.InstitutionID }}
-    <li><a href="/events"><i class="fab fa-elementor"></i> Events</a></li>
+    <li><a href="/events"><span class="material-icons" aria-hidden="true">fact_check</span> Events</a></li>
     {{ end }}
   
     {{ if userCan .CurrentUser "WorkItemRead" .CurrentUser.InstitutionID }}
@@ -28,7 +28,7 @@
     {{ end }}
   
     {{ if userCan .CurrentUser "DeletionRequestList" .CurrentUser.InstitutionID }}
-    <li><a href="/deletions"><i class="fa fa-backspace"></i> Deletions</a></li>
+    <li><a href="/deletions"><span class="material-icons" aria-hidden="true">backspace</span> Deletions</a></li>
     {{ end }}
   
     {{ if userCan .CurrentUser "DepositReportShow" .CurrentUser.InstitutionID }}
@@ -41,10 +41,10 @@
     {{ end }}
   
     {{ if .CurrentUser.IsAdmin }}
-      <li><a href="/institutions"><i class="fa fa-landmark"></i> Institutions</a></li>
+      <li><a href="/institutions"><span class="material-icons" aria-hidden="true">location_city</span> Institutions</a></li>
     {{ else }}
       {{ if userCan .CurrentUser "InstitutionRead" .CurrentUser.InstitutionID }}
-      <li><a href="/institutions/show/{{ .CurrentUser.InstitutionID }}"><i class="fa fa-landmark"></i> Institution</a></li>
+      <li><a href="/institutions/show/{{ .CurrentUser.InstitutionID }}"><span class="material-icons" aria-hidden="true">location_city</span> Institution</a></li>
       {{ end }}
     {{ end }}
   
