@@ -2,8 +2,10 @@ package network
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/APTrust/registry/constants"
 	"github.com/go-redis/redis/v7"
@@ -52,22 +54,30 @@ func (c *RedisClient) KeyExists(workItemID int64) bool {
 // and its associated work results.
 func (c *RedisClient) IngestObjectGet(workItemID int64, objIdentifier string) (string, error) {
 	obj := make(map[string]interface{})
+	errMessages := make([]string, 0)
 	ingestObj, err := c.ingestObjectGet(workItemID, objIdentifier)
 	if err != nil {
 		return "", err
 	}
 	obj["object"] = ingestObj
+
+	// Ideally, we'd log errors here, but logging is in common
+	// and common imports this package, and we can't do a circular
+	// import. So we collect errors and return them as one.
+
 	for _, operationName := range constants.NSQIngestTopicFor {
 		op, err := c.workResultGet(workItemID, operationName)
-		if err == nil {
-			obj[operationName] = op
-		} else {
-			obj[operationName] = err.Error()
+		obj[operationName] = op
+		if err != nil {
+			errMessages = append(errMessages, err.Error())
 		}
 	}
 	data, err := json.MarshalIndent(obj, "", "  ")
 	if err != nil {
 		return "", err
+	}
+	if len(errMessages) > 0 {
+		err = errors.New(strings.Join(errMessages, "; "))
 	}
 	return string(data), err
 }
@@ -94,9 +104,12 @@ func (c *RedisClient) workResultGet(workItemID int64, operationName string) (map
 	key := strconv.FormatInt(workItemID, 10)
 	field := fmt.Sprintf("workresult:%s", operationName)
 	data, err := c.client.HGet(key, field).Result()
-	if err != nil {
+	if err != nil && err.Error() != "redis: nil" {
 		return nil, fmt.Errorf("WorkResultGet (%d, %s): %s",
 			workItemID, operationName, err.Error())
+	}
+	if strings.TrimSpace(data) == "" {
+		return nil, nil
 	}
 	err = json.Unmarshal([]byte(data), &obj)
 	if err != nil {
