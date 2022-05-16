@@ -129,6 +129,7 @@ var AuthMap = map[string]AuthMetadata{
 	"WorkItemEdit":                       {"WorkItem", constants.WorkItemUpdate},
 	"WorkItemIndex":                      {"WorkItem", constants.WorkItemRead},
 	"WorkItemNew":                        {"WorkItem", constants.WorkItemCreate},
+	"WorkItemRedisDelete":                {"WorkItem", constants.WorkItemRedisDelete},
 	"WorkItemRequeue":                    {"WorkItem", constants.WorkItemRequeue},
 	"WorkItemShow":                       {"WorkItem", constants.WorkItemRead},
 	"WorkItemShowRequeue":                {"WorkItem", constants.WorkItemRequeue},

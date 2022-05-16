@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"html/template"
 	"io"
-	//"net/http"
 	"os"
 	"strings"
 
@@ -206,6 +205,8 @@ func initRoutes(router *gin.Engine) {
 		webRoutes.POST("/work_items/edit/:id", webui.WorkItemUpdate)
 		webRoutes.PUT("/work_items/requeue/:id", webui.WorkItemRequeue)
 		webRoutes.POST("/work_items/requeue/:id", webui.WorkItemRequeue)
+		webRoutes.DELETE("/work_items/redis_delete/:id", webui.WorkItemRedisDelete)
+		webRoutes.POST("/work_items/redis_delete/:id", webui.WorkItemRedisDelete)
 
 		// Users
 		webRoutes.POST("/users/new", webui.UserCreate)

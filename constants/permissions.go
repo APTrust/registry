@@ -55,7 +55,7 @@ const (
 	PrepareFileDelete                  = "PrepareFileDelete"
 	PrepareObjectDelete                = "PrepareObjectDelete"
 	ReportRead                         = "ReportRead"
-	RedisDelete                        = "RedisDelete"
+	RedisList                          = "RedisList"
 	RedisRead                          = "RedisRead"
 	StorageRecordCreate                = "StorageRecordCreate"
 	StorageRecordDelete                = "StorageRecordDelete"
@@ -83,6 +83,7 @@ const (
 	WorkItemCreate                     = "WorkItemCreate"
 	WorkItemDelete                     = "WorkItemDelete"
 	WorkItemRead                       = "WorkItemRead"
+	WorkItemRedisDelete                = "WorkItemRedisDelete"
 	WorkItemRequeue                    = "WorkItemRequeue"
 	WorkItemUpdate                     = "WorkItemUpdate"
 )
@@ -127,7 +128,7 @@ var Permissions = []Permission{
 	PrepareFileDelete,
 	PrepareObjectDelete,
 	ReportRead,
-	RedisDelete,
+	RedisList,
 	RedisRead,
 	StorageRecordCreate,
 	StorageRecordDelete,
@@ -155,6 +156,7 @@ var Permissions = []Permission{
 	WorkItemCreate,
 	WorkItemDelete,
 	WorkItemRead,
+	WorkItemRedisDelete,
 	WorkItemRequeue,
 	WorkItemUpdate,
 }
@@ -308,7 +310,7 @@ func initPermissions() {
 	sysAdmin[PrepareFileDelete] = true
 	sysAdmin[PrepareObjectDelete] = true
 	sysAdmin[ReportRead] = true
-	sysAdmin[RedisDelete] = true
+	sysAdmin[RedisList] = true
 	sysAdmin[RedisRead] = true
 	sysAdmin[StorageRecordCreate] = true
 	sysAdmin[StorageRecordDelete] = true
@@ -336,6 +338,7 @@ func initPermissions() {
 	sysAdmin[WorkItemCreate] = true
 	sysAdmin[WorkItemDelete] = true
 	sysAdmin[WorkItemRead] = true
+	sysAdmin[WorkItemRedisDelete] = true
 	sysAdmin[WorkItemRequeue] = true
 	sysAdmin[WorkItemUpdate] = true
 

@@ -112,6 +112,24 @@ func WorkItemRequeue(c *gin.Context) {
 	c.Redirect(http.StatusSeeOther, redirectTo)
 }
 
+// WorkItemRedisDelete deletes a WorkItem's Redis record.
+// This is an admin-only feature.
+//
+// PUT or POST /work_items/requeue/:id
+func WorkItemRedisDelete(c *gin.Context) {
+	aptContext := common.Context()
+	req := NewRequest(c)
+	_, err := aptContext.RedisClient.WorkItemDelete(req.Auth.ResourceID)
+	if err != nil {
+		aptContext.Log.Error().Msgf("Error deleting WorkItem %d from Redis: %v", req.Auth.ResourceID, err)
+	} else {
+		aptContext.Log.Info().Msgf("User %s deleted WorkItem %d from Redis.", req.CurrentUser.Email, req.Auth.ResourceID)
+	}
+	helpers.SetFlashCookie(c, "Redis data for this work item has been deleted.")
+	redirectTo := fmt.Sprintf("/work_items/show/%d", req.Auth.ResourceID)
+	c.Redirect(http.StatusSeeOther, redirectTo)
+}
+
 func getFormAndRequest(c *gin.Context) (*forms.WorkItemForm, *Request, error) {
 	req := NewRequest(c)
 	workItem, err := pgmodels.WorkItemByID(req.Auth.ResourceID)
@@ -128,6 +146,7 @@ func getFormAndRequest(c *gin.Context) (*forms.WorkItemForm, *Request, error) {
 func getRedisInfo(req *Request, item *pgmodels.WorkItemView) {
 	var err error
 	jsonStr := ""
+	req.TemplateData["showRedisDelete"] = false
 	if !req.CurrentUser.HasPermission(constants.RedisRead, item.InstitutionID) {
 		return
 	}
@@ -147,4 +166,8 @@ func getRedisInfo(req *Request, item *pgmodels.WorkItemView) {
 		}
 	}
 	req.TemplateData["redisInfo"] = jsonStr
+
+	if req.CurrentUser.HasPermission(constants.WorkItemRedisDelete, item.InstitutionID) && (item.HasCompleted() || item.Action == constants.ActionIngest) {
+		req.TemplateData["showRedisDelete"] = true
+	}
 }
