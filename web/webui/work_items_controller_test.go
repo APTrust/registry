@@ -215,8 +215,73 @@ func TestWorkItemRedisInfo(t *testing.T) {
 	items := []string{
 		"obj_key1",
 		"obj_value1",
+		"Delete Redis Data",
 	}
 
+	itemID, _ := createRedisRecord(t, ctx)
+
+	// Sys Admin should see this JSON from Redis
+	html := testutil.SysAdminClient.GET("/work_items/show/{id}", itemID).
+		Expect().
+		Status(http.StatusOK).Body().Raw()
+	testutil.AssertMatchesAll(t, html, items)
+
+	// Other users should not.
+	// Don't bother testing users outside of inst 1,
+	// because they can't even view this item.
+	html = testutil.Inst1UserClient.GET("/work_items/show/{id}", itemID).
+		Expect().
+		Status(http.StatusOK).Body().Raw()
+	testutil.AssertMatchesNone(t, html, items)
+
+	html = testutil.Inst1AdminClient.GET("/work_items/show/{id}", itemID).
+		Expect().
+		Status(http.StatusOK).Body().Raw()
+	testutil.AssertMatchesNone(t, html, items)
+}
+
+func TestWorkItemRedisDelete(t *testing.T) {
+	ctx := common.Context()
+
+	items := []string{
+		"Redis data for this work item has been deleted.",
+	}
+
+	itemID, objIdentifier := createRedisRecord(t, ctx)
+
+	// Sys Admin should be able to delete this object
+	// and should see confirmation that it was deleted.
+	html := testutil.SysAdminClient.DELETE("/work_items/redis_delete/{id}", itemID).
+		WithHeader("Referer", testutil.BaseURL).
+		WithHeader(constants.CSRFHeaderName, testutil.SysAdminToken).
+		Expect().
+		Status(http.StatusOK).
+		Body().Raw()
+	testutil.AssertMatchesAll(t, html, items)
+
+	// Check redis. Make sure the record is really gone.
+	str, err := ctx.RedisClient.IngestObjectGet(itemID, objIdentifier)
+	require.NotNil(t, err)
+	require.Empty(t, str)
+
+	// Recreate the Redis record and make sure non-admins
+	// cannot delete it.
+	itemID, objIdentifier = createRedisRecord(t, ctx)
+
+	testutil.Inst1UserClient.DELETE("/work_items/redis_delete/{id}", itemID).
+		WithHeader("Referer", testutil.BaseURL).
+		WithHeader(constants.CSRFHeaderName, testutil.Inst1UserToken).
+		Expect().
+		Status(http.StatusForbidden)
+
+	testutil.Inst1AdminClient.DELETE("/work_items/redis_delete/{id}", itemID).
+		WithHeader("Referer", testutil.BaseURL).
+		WithHeader(constants.CSRFHeaderName, testutil.Inst1AdminToken).
+		Expect().
+		Status(http.StatusForbidden)
+}
+
+func createRedisRecord(t *testing.T, ctx *common.APTContext) (int64, string) {
 	// These items are in our fixture data.
 	// Obj 3 is processed in work item 22.
 	obj, err := pgmodels.IntellectualObjectByID(3)
@@ -231,21 +296,7 @@ func TestWorkItemRedisInfo(t *testing.T) {
 	require.Nil(t, err)
 	require.NotEmpty(t, str)
 
-	// Sys Admin should see this JSON from Redis
-	html := testutil.SysAdminClient.GET("/work_items/show/22").Expect().
-		Status(http.StatusOK).Body().Raw()
-	testutil.AssertMatchesAll(t, html, items)
-
-	// Other users should not.
-	// Don't bother testing users outside of inst 1,
-	// because they can't even view this item.
-	html = testutil.Inst1UserClient.GET("/work_items/show/22").Expect().
-		Status(http.StatusOK).Body().Raw()
-	testutil.AssertMatchesNone(t, html, items)
-
-	html = testutil.Inst1AdminClient.GET("/work_items/show/22").Expect().
-		Status(http.StatusOK).Body().Raw()
-	testutil.AssertMatchesNone(t, html, items)
+	return 22, obj.Identifier
 }
 
 func createWorkItem(t *testing.T, name string) *pgmodels.WorkItem {
