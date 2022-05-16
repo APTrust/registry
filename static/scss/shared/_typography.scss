@@ -1,0 +1,61 @@
+h1 {
+  font-size: 32px;
+  font-weight: $weight-normal;
+  line-height: 38px;
+}
+
+h2 {
+  font-size: 20px;
+  font-weight: $weight-medium;
+  line-height: 24px;
+}
+
+h3 {
+  font-size: 18px;
+  font-weight: $weight-medium;
+  line-height: 21px;
+}
+
+p,
+.text-md {
+  font-size: $body-size;
+  line-height: $body-line-height;
+}
+
+.text-sm {
+  font-size: 14px;
+  line-height: 16px;
+}
+
+.text-xs {
+  font-size: 12px;
+  line-height: 14px;
+}
+
+.num {
+  font-family: $family-monospace;
+  font-size: 14px;
+  font-weight: $weight-medium;
+  line-height: $body-line-height;
+}
+
+.text-table {
+  font-size: 15px;
+  line-height: $body-line-height;
+}
+
+.text-label {
+  font-size: $body-size;
+  font-weight: $weight-medium;
+  line-height: $body-line-height;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+
+.text-medium {
+  font-weight: $weight-medium;
+}
+
+.text-bold {
+  font-weight: $weight-bold;
+}

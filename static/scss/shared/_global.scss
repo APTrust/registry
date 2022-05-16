@@ -1,0 +1,128 @@
+.page-wrapper {
+  display: flex;
+  min-height: 100vh;
+}
+
+.side-nav {
+  background: $white;
+  flex-shrink: 0;
+  width: 200px;
+
+  ul {
+    a {
+      @extend .text-label;
+      align-items: center;
+      display: flex;
+      padding: 16px 24px;
+
+      &:hover,
+      &.active {
+        background-color: $grey-highlight;
+      }
+    }
+
+    .material-icons {
+      color: $gold;
+      margin-right: 10px;
+    }
+  }
+}
+
+.content-wrapper {
+  flex: 1;
+  max-width: 1240px;
+  padding: 36px 36px 36px 28px;
+}
+
+.site-logo {
+  padding: 50px 12px;
+}
+
+.top-nav {
+  display: flex;
+}
+
+.global-search {
+  flex: 1;
+  margin-bottom: 24px;
+
+  .input,
+  .button {
+    height: 52px;
+  }
+
+  .input {
+    border-color: $gold;
+    border-radius: $radius-large;
+
+    @include placeholder {
+      font-style: italic;
+    }
+  }
+
+  .button {
+    @extend .text-label;
+    background-color: $gold;
+    border-bottom-right-radius: $radius-large !important;
+    border-top-right-radius: $radius-large !important;
+    color: $white;
+    padding: 0 48px;
+  }
+
+  + .help {
+    margin-top: 0;
+  }
+}
+
+.global-search-input-control {
+  max-width: 590px;
+}
+
+.user-icons {
+  flex-grow: 0;
+  margin-left: 36px;
+  padding-top: 10px;
+
+  .alert-icon {
+    position: relative;
+    &.has-notifications {
+      &::after {
+        background-color: $red;
+        border: 1px solid $white;
+        border-radius: 50%;
+        content: "";
+        height: 8px;
+        position: absolute;
+        right: 8px;
+        top: -8px;
+        width: 8px;
+      }
+    }
+  }
+
+  .account-icon {
+    color: $gold;
+    margin-left: 20px;
+  }
+}
+
+.global-footer {
+  margin-top: 24px;
+  text-align: center;
+}
+
+.material-icons.md-18 {
+  font-size: 18px;
+}
+.material-icons.md-24 {
+  font-size: 24px;
+}
+.material-icons.md-30 {
+  font-size: 30px;
+}
+.material-icons.md-36 {
+  font-size: 36px;
+}
+.material-icons.md-48 {
+  font-size: 48px;
+}
