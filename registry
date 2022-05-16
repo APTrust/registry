@@ -165,5 +165,11 @@ kill $REDIS_PID
 
 #rm *.dat
 
+if [[ $1 == "test" && $EXIT_CODE == 0 ]]; then
+    echo "**** 😁 PASS 😁 ****"
+elif [[ $1 == "test" && $EXIT_CODE != 0 ]]; then
+    echo "**** 🤬 FAIL 🤬 ****"
+fi
+
 echo "Finished with code $EXIT_CODE"
 exit $EXIT_CODE
