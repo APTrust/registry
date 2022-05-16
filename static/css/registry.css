@@ -3307,6 +3307,7 @@ p,
 
 .user-icons {
   flex-grow: 0;
+  margin-left: 36px;
   padding-top: 10px;
 }
 .user-icons .alert-icon {
@@ -3326,6 +3327,11 @@ p,
 .user-icons .account-icon {
   color: #bb9566;
   margin-left: 20px;
+}
+
+.global-footer {
+  margin-top: 24px;
+  text-align: center;
 }
 
 .material-icons.md-18 {

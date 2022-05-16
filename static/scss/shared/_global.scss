@@ -81,6 +81,7 @@
 
 .user-icons {
   flex-grow: 0;
+  margin-left: 36px;
   padding-top: 10px;
 
   .alert-icon {
@@ -104,6 +105,11 @@
     color: $gold;
     margin-left: 20px;
   }
+}
+
+.global-footer {
+  margin-top: 24px;
+  text-align: center;
 }
 
 .material-icons.md-18 { font-size: 18px; }
