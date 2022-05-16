@@ -35,11 +35,6 @@
     <li><a href="/reports/deposits"><span class="material-icons" aria-hidden="true">insert_chart</span> Reports</a></li>
     {{ end }}
   
-    {{ if userCan .CurrentUser "AlertRead" .CurrentUser.InstitutionID }}
-    <!-- Moved this to the top nav -->
-    <!-- <li><a href="/alerts"><i class="fa fa-bell"></i> Alerts</a></li> -->
-    {{ end }}
-  
     {{ if .CurrentUser.IsAdmin }}
       <li><a href="/institutions"><span class="material-icons" aria-hidden="true">location_city</span> Institutions</a></li>
     {{ else }}
@@ -52,8 +47,6 @@
       <li><a href="/users"><span class="material-icons" aria-hidden="true">people</span> Users</a></li>
       {{ end }}
   
-    <!-- Moved this to the top nav -->
-    <!-- <li><a href="/users/my_account"><i class="far fa-user-circle"></i> My Account</a></li> -->
     <li><a href="/users/sign_out"><span class="material-icons" aria-hidden="true">logout</span> Sign Out</a></li>
   </ul>
 </nav>
