@@ -38,3 +38,5 @@ Here's some general messiness to clean up, refactor, and/or document.
 ## Front-end
 
 - [ ] Research `flash` in `shared/_header`.
+- [ ] Add `active` classname to nav items when on current page
+- [ ] If there are new alerts, show red dot on notifications icon, using `has-notifications` classname

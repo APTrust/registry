@@ -16,7 +16,8 @@ h3 {
   line-height: 21px;
 }
 
-p {
+p, 
+.text-md {
   font-size: $body-size;
   line-height: $body-line-height;
 }
