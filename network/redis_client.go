@@ -154,3 +154,11 @@ func (c *RedisClient) SaveItem(workItemID int64, field, value string) error {
 	_, err := c.client.HSet(key, field, value).Result()
 	return err
 }
+
+// Keys returns all keys in the Redis DB matching the specified pattern.
+// Each key is a WorkItem.ID in string form. It's generally safe to call
+// this with pattern "*" because we rarely have more than a few dozen items
+// in Redis at any given time.
+func (c *RedisClient) Keys(pattern string) ([]string, error) {
+	return c.client.Keys(pattern).Result()
+}

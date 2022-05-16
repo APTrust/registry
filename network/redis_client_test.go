@@ -3,6 +3,7 @@ package network_test
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"testing"
 
 	"github.com/APTrust/registry/common"
@@ -166,4 +167,17 @@ func TestRedisWorkItemExistsDelete(t *testing.T) {
 
 	assert.False(t, client.KeyExists(redisIngestItemID))
 	assert.False(t, client.KeyExists(redisRestoreItemID))
+}
+
+func TestRedisKeys(t *testing.T) {
+	client := getRedisClient()
+	assert.NotNil(t, client)
+	createRedisIngestObject(t, client)
+	createRedisRestoreObject(t, client)
+
+	keys, err := client.Keys("*")
+	require.Nil(t, err)
+	assert.Equal(t, 2, len(keys))
+	assert.Contains(t, keys, strconv.FormatInt(redisIngestItemID, 10))
+	assert.Contains(t, keys, strconv.FormatInt(redisRestoreItemID, 10))
 }
