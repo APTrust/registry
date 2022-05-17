@@ -130,6 +130,7 @@ var AuthMap = map[string]AuthMetadata{
 	"WorkItemIndex":                      {"WorkItem", constants.WorkItemRead},
 	"WorkItemNew":                        {"WorkItem", constants.WorkItemCreate},
 	"WorkItemRedisDelete":                {"WorkItem", constants.WorkItemRedisDelete},
+	"WorkItemRedisIndex":                 {"WorkItem", constants.RedisList},
 	"WorkItemRequeue":                    {"WorkItem", constants.WorkItemRequeue},
 	"WorkItemShow":                       {"WorkItem", constants.WorkItemRead},
 	"WorkItemShowRequeue":                {"WorkItem", constants.WorkItemRequeue},

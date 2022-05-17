@@ -205,6 +205,7 @@ func initRoutes(router *gin.Engine) {
 		webRoutes.POST("/work_items/edit/:id", webui.WorkItemUpdate)
 		webRoutes.PUT("/work_items/requeue/:id", webui.WorkItemRequeue)
 		webRoutes.POST("/work_items/requeue/:id", webui.WorkItemRequeue)
+		webRoutes.GET("/work_items/redis_list", webui.WorkItemRedisIndex)
 		webRoutes.DELETE("/work_items/redis_delete/:id", webui.WorkItemRedisDelete)
 		webRoutes.POST("/work_items/redis_delete/:id", webui.WorkItemRedisDelete)
 

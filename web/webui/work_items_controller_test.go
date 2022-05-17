@@ -281,6 +281,31 @@ func TestWorkItemRedisDelete(t *testing.T) {
 		Status(http.StatusForbidden)
 }
 
+func TestWorkItemRedisIndex(t *testing.T) {
+	ctx := common.Context()
+
+	items := []string{
+		"glass_shards.tar",
+	}
+
+	createRedisRecord(t, ctx)
+
+	// Sys Admin should get a list
+	html := testutil.SysAdminClient.GET("/work_items/redis_list").
+		Expect().
+		Status(http.StatusOK).Body().Raw()
+	testutil.AssertMatchesAll(t, html, items)
+
+	// Other users should not be allowed to access this page.
+	testutil.Inst1UserClient.GET("/work_items/redis_list").
+		Expect().
+		Status(http.StatusForbidden)
+
+	testutil.Inst1AdminClient.GET("/work_items/redis_list").
+		Expect().
+		Status(http.StatusForbidden)
+}
+
 func createRedisRecord(t *testing.T, ctx *common.APTContext) (int64, string) {
 	// These items are in our fixture data.
 	// Obj 3 is processed in work item 22.

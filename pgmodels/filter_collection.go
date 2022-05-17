@@ -39,9 +39,13 @@ func (fc *FilterCollection) Add(key string, values []string) error {
 	return nil
 }
 
-// AddOrderBy adds sort columns to the filters.
-func (fc *FilterCollection) AddOrderBy(values string) {
-	sort := NewSortParam(values)
+// AddOrderBy adds sort columns to the filters. Param colAndDir should
+// be in format "column_name__dir", where dir is "asc" or "desc".
+// If dir is omitted, it defaults to "asc."
+//
+// Examples: "created_at__desc", "id__asc".
+func (fc *FilterCollection) AddOrderBy(colAndDir string) {
+	sort := NewSortParam(colAndDir)
 	fc.sorts = append(fc.sorts, sort)
 }
 

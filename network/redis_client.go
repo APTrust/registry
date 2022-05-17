@@ -155,10 +155,14 @@ func (c *RedisClient) SaveItem(workItemID int64, field, value string) error {
 	return err
 }
 
-// Keys returns all keys in the Redis DB matching the specified pattern.
-// Each key is a WorkItem.ID in string form. It's generally safe to call
-// this with pattern "*" because we rarely have more than a few dozen items
-// in Redis at any given time.
-func (c *RedisClient) Keys(pattern string) ([]string, error) {
-	return c.client.Keys(pattern).Result()
+// List returns up to the first 500 keys in the Redis DB matching
+// the specified pattern. The 500 limit is to prevent overload if
+// our Redis DB fills up with lots of entries.
+//
+// Realistically, we will almost never have more than a few dozen keys
+// at any given time, since Redis data  is deleted as soon as processing
+// completes. Each key is a WorkItem.ID in string form.
+func (c *RedisClient) List(pattern string) ([]string, error) {
+	keys, _, err := c.client.Scan(0, pattern, 500).Result()
+	return keys, err
 }

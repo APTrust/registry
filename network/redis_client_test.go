@@ -169,13 +169,13 @@ func TestRedisWorkItemExistsDelete(t *testing.T) {
 	assert.False(t, client.KeyExists(redisRestoreItemID))
 }
 
-func TestRedisKeys(t *testing.T) {
+func TestRedisList(t *testing.T) {
 	client := getRedisClient()
 	assert.NotNil(t, client)
 	createRedisIngestObject(t, client)
 	createRedisRestoreObject(t, client)
 
-	keys, err := client.Keys("*")
+	keys, err := client.List("*")
 	require.Nil(t, err)
 	assert.Equal(t, 2, len(keys))
 	assert.Contains(t, keys, strconv.FormatInt(redisIngestItemID, 10))
