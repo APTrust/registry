@@ -1,6 +1,6 @@
 {{ define "work_items/_filters.html" }}
 
-<form id="itemFilterForm" method="get">
+<form id="itemFilterForm" method="get" onsubmit="chooseEndpoint()">
 
   <div class="row">
     <div class="column col-30">
@@ -72,7 +72,9 @@
       {{ template "forms/select.html" .filterForm.Fields.bagit_profile_identifier }}
     </div>
     <div class="column col-30">
-
+      {{ if .CurrentUser.IsAdmin }}
+      {{ template "forms/select.html" .filterForm.Fields.redis_only }}
+      {{ end }}
     </div>
   </div>
 
@@ -89,5 +91,20 @@
   </div>
 
 </form>
+
+<script>
+ function chooseEndpoint() {
+     {{ if .CurrentUser.IsAdmin }}
+     let form = document.forms['itemFilterForm']
+     let redisOnly = form['redis_only'].value
+     if (redisOnly == "true") {
+         form.action = "/work_items/redis_list"
+     } else {
+         form.action = "/work_items"
+     }
+     {{ end }}
+     return true
+ }
+</script>
 
 {{ end }}

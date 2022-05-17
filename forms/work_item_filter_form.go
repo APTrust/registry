@@ -152,13 +152,23 @@ func (f *WorkItemFilterForm) init() {
 		Label:       "Initiated By",
 		Placeholder: "User email address",
 	}
+	// This is a special case. Doesn't quite
+	// fit with our framework.
+	f.Fields["redis_only"] = &Field{
+		Name:        "redis_only",
+		Label:       "Redis Only",
+		Placeholder: "Redis Only",
+		Options:     YesNoList,
+	}
 }
 
 // setValues sets the form values to match the Institution values.
 func (f *WorkItemFilterForm) SetValues() {
 	for _, fieldName := range pgmodels.WorkItemFilters {
 		if f.Fields[fieldName] == nil {
-			common.ConsoleDebug("No filter for %s", fieldName)
+			if fieldName != "redis_only" {
+				common.ConsoleDebug("No filter for %s", fieldName)
+			}
 			continue
 		}
 		f.Fields[fieldName].Value = f.FilterCollection.ValueOf(fieldName)

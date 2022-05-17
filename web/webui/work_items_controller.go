@@ -166,6 +166,7 @@ func WorkItemRedisIndex(c *gin.Context) {
 	if AbortIfError(c, err) {
 		return
 	}
+	filterForm.GetFields()["redis_only"].Value = "true"
 	req.TemplateData["filterForm"] = filterForm
 
 	c.HTML(http.StatusOK, "work_items/index.html", req.TemplateData)
