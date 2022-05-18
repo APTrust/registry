@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"strconv"
 
 	"github.com/nsqio/nsq/nsqd"
@@ -25,13 +26,16 @@ type NSQStatsData struct {
 	Health    string             `json:"status_code"`
 	StartTime uint64             `json:"start_time"`
 	Topics    []*nsqd.TopicStats `json:"topics"`
+	Info      *NSQInfo           `json:"info"`
 }
 
-type ChannelSummary struct {
-	InFlightCount int
-	MessageCount  uint64
-	FinishCount   uint64
-	RequeueCount  uint64
+type NSQInfo struct {
+	Version          string `json:"version"`
+	BroadcastAddress string `json:"broadcast_address"`
+	Hostname         string `json:"hostname"`
+	HttpPort         int    `json:"http_port"`
+	TcpPort          int    `json:"tcp_port"`
+	StartTime        int64  `json:"start_time"`
 }
 
 func (data *NSQStatsData) GetTopic(name string) *nsqd.TopicStats {
@@ -41,30 +45,6 @@ func (data *NSQStatsData) GetTopic(name string) *nsqd.TopicStats {
 		}
 	}
 	return nil
-}
-
-func (data *NSQStatsData) GetChannelSummary(topicName, channelName string) (*ChannelSummary, error) {
-	topic := data.GetTopic(topicName)
-	if topic == nil {
-		return nil, fmt.Errorf("Can't find topic %s", topicName)
-	}
-	summary := &ChannelSummary{}
-	found := false
-	for _, c := range topic.Channels {
-		if c.ChannelName == channelName {
-			found = true
-			for _, client := range c.Clients {
-				summary.FinishCount += client.FinishCount
-			}
-			summary.MessageCount = c.MessageCount
-			summary.InFlightCount = c.InFlightCount
-			summary.RequeueCount = c.RequeueCount
-		}
-	}
-	if !found {
-		return nil, fmt.Errorf("Can't find topic/channel %s/%s", topicName, channelName)
-	}
-	return summary, nil
 }
 
 // NewNSQClient returns a new NSQ client that will connect to the NSQ
@@ -125,17 +105,9 @@ func (client *NSQClient) EnqueueString(topic string, data string) error {
 	return nil
 }
 
-// GetStats allows us to get some basic stats from NSQ. The NSQ /stats endpoint
-// returns a richer set of stats than what this fuction returns, but we only
-// need some basic data for integration tests, so that's all we're parsing.
-// The return value is a map whose key is the topic name and whose value is
-// an NSQTopicStats object. NSQ is supposed to support topic_name as a query
-// param, but this doesn't seem to be working in NSQ 0.3.0, so we're just
-// returning stats for all topics right now. Also note that requests to
-// /stats/ (with trailing slash) produce a 404.
-func (client *NSQClient) GetStats() (*NSQStatsData, error) {
-	url := fmt.Sprintf("%s/stats?format=json", client.URL)
-	resp, err := http.Get(url)
+// get performs an HTTP get request and returns the body as a byte slice.
+func (client *NSQClient) get(_url string) ([]byte, error) {
+	resp, err := http.Get(_url)
 	if err != nil {
 		return nil, fmt.Errorf("error connecting to nsq at %s: %v", client.URL, err)
 	}
@@ -148,10 +120,145 @@ func (client *NSQClient) GetStats() (*NSQStatsData, error) {
 		return nil, fmt.Errorf("nsq returned status code %d, body: %s",
 			resp.StatusCode, body)
 	}
+	return body, err
+}
+
+// doEmptyPost posts an empty request body to the specifid url.
+func (client *NSQClient) doEmptyPost(_url string) error {
+	resp, err := http.Post(_url, "text/html", nil)
+	defer resp.Body.Close()
+	if resp.StatusCode < 200 || resp.StatusCode > 204 {
+		return fmt.Errorf("post to %s got unexecpted status %d", _url, resp.StatusCode)
+	}
+	return err
+}
+
+// GetStats allows us to get some basic stats from NSQ. The NSQ /stats endpoint
+// returns a richer set of stats than what this fuction returns, but we only
+// need some basic data for integration tests, so that's all we're parsing.
+// The return value is a map whose key is the topic name and whose value is
+// an NSQTopicStats object. NSQ is supposed to support topic_name as a query
+// param, but this doesn't seem to be working in NSQ 0.3.0, so we're just
+// returning stats for all topics right now. Also note that requests to
+// /stats/ (with trailing slash) produce a 404.
+func (client *NSQClient) GetStats() (*NSQStatsData, error) {
+	url := fmt.Sprintf("%s/stats?format=json", client.URL)
+	body, err := client.get(url)
+	if err != nil {
+		return nil, err
+	}
 	stats := &NSQStatsData{}
 	err = json.Unmarshal(body, stats)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing nsq response json: %v", err)
 	}
+	info, err := client.GetInfo()
+	if err != nil {
+		stats.Info = info
+	}
 	return stats, nil
+}
+
+// GetInfo returns basic info about nsqd, including hostname and port numbers.
+func (client *NSQClient) GetInfo() (*NSQInfo, error) {
+	url := fmt.Sprintf("%s/info?format=json", client.URL)
+	body, err := client.get(url)
+	if err != nil {
+		return nil, err
+	}
+	info := &NSQInfo{}
+	err = json.Unmarshal(body, info)
+	if err != nil {
+		return nil, fmt.Errorf("error parsing nsq response json: %v", err)
+	}
+	return info, nil
+}
+
+// applyToAll is a generic function for pausing/unpausing all topics and/or
+// channels.
+func (client *NSQClient) applyToAll(action string) error {
+	stats, err := client.GetStats()
+	if err != nil {
+		return err
+	}
+	errMsg := ""
+	for _, topic := range stats.Topics {
+		switch action {
+		case "PauseTopics":
+			err = client.PauseTopic(topic.TopicName)
+		case "UnpauseTopics":
+			err = client.UnpauseTopic(topic.TopicName)
+		}
+		for _, channel := range topic.Channels {
+			switch action {
+			case "PauseChannels":
+				err = client.PauseChannel(topic.TopicName, channel.ChannelName)
+			case "UnpauseChannels":
+				err = client.UnpauseChannel(topic.TopicName, channel.ChannelName)
+			}
+		}
+		if err != nil {
+			errMsg += fmt.Sprintf("%s; ", err.Error())
+		}
+	}
+	if len(errMsg) > 0 {
+		err = fmt.Errorf(errMsg)
+	}
+	return err
+}
+
+// PauseTopic pauses the topic with the specified name.
+func (client *NSQClient) PauseTopic(topicName string) error {
+	_url := fmt.Sprintf("%s/topic/pause?topic=%s", client.URL, url.QueryEscape(topicName))
+	return client.doEmptyPost(_url)
+}
+
+// UnpauseTopic unpauses the specified topic.
+func (client *NSQClient) UnpauseTopic(topicName string) error {
+	_url := fmt.Sprintf("%s/topic/unpause?topic=%s", client.URL, url.QueryEscape(topicName))
+	return client.doEmptyPost(_url)
+}
+
+// PauseAllTopics pauses all topics.
+func (client *NSQClient) PauseAllTopics() error {
+	return client.applyToAll("PauseTopics")
+}
+
+// UnpauseAllTopics unpauses all topics.
+func (client *NSQClient) UnpauseAllTopics() error {
+	return client.applyToAll("UnpauseTopics")
+}
+
+// EmptyTopic empties the specified topic.
+func (client *NSQClient) EmptyTopic(topicName string) error {
+	_url := fmt.Sprintf("%s/topic/empty?topic=%s", client.URL, url.QueryEscape(topicName))
+	return client.doEmptyPost(_url)
+}
+
+// PauseChannel pauses the specified channel.
+func (client *NSQClient) PauseChannel(topicName, channelName string) error {
+	_url := fmt.Sprintf("%s/channel/pause?topic=%s&channel=%s", client.URL, url.QueryEscape(topicName), url.QueryEscape(channelName))
+	return client.doEmptyPost(_url)
+}
+
+// UnpauseChannel unpauses the specified channel.
+func (client *NSQClient) UnpauseChannel(topicName, channelName string) error {
+	_url := fmt.Sprintf("%s/channel/unpause?topic=%s&channel=%s", client.URL, url.QueryEscape(topicName), url.QueryEscape(channelName))
+	return client.doEmptyPost(_url)
+}
+
+// PauseAllChannels pauses all channels.
+func (client *NSQClient) PauseAllChannels() error {
+	return client.applyToAll("PauseChannels")
+}
+
+// UnpauseAllChannels unpauses all channels.
+func (client *NSQClient) UnpauseAllChannels() error {
+	return client.applyToAll("UnpauseChannels")
+}
+
+// EmptyChannel empties the specified channel.
+func (client *NSQClient) EmptyChannel(topicName, channelName string) error {
+	_url := fmt.Sprintf("%s/channel/empty?topic=%s&channel=%s", client.URL, url.QueryEscape(topicName), url.QueryEscape(channelName))
+	return client.doEmptyPost(_url)
 }

@@ -48,13 +48,4 @@ func TestNSQClient(t *testing.T) {
 	stats, err = aptContext.NSQClient.GetStats()
 	require.Nil(t, err)
 	require.NotNil(t, stats)
-
-	// Get the channel stats
-	channelSummary, err := stats.GetChannelSummary(topic, channel)
-	require.Nil(t, err)
-	require.NotNil(t, channelSummary)
-	assert.Equal(t, uint64(0), channelSummary.FinishCount)
-	assert.Equal(t, 0, channelSummary.InFlightCount)
-	assert.Equal(t, uint64(10), channelSummary.MessageCount)
-	assert.Equal(t, uint64(0), channelSummary.RequeueCount)
 }
