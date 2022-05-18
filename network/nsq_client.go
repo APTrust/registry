@@ -47,6 +47,18 @@ func (data *NSQStatsData) GetTopic(name string) *nsqd.TopicStats {
 	return nil
 }
 
+func (data *NSQStatsData) GetChannel(topicName, channelName string) *nsqd.ChannelStats {
+	topic := data.GetTopic(topicName)
+	if topic != nil {
+		for _, channel := range topic.Channels {
+			if channel.ChannelName == channelName {
+				return &channel
+			}
+		}
+	}
+	return nil
+}
+
 // NewNSQClient returns a new NSQ client that will connect to the NSQ
 // server and the specified url. The URL is typically available through
 // Config.NsqdHttpAddress, and usually ends with :4151. This is
@@ -128,7 +140,7 @@ func (client *NSQClient) doEmptyPost(_url string) error {
 	resp, err := http.Post(_url, "text/html", nil)
 	defer resp.Body.Close()
 	if resp.StatusCode < 200 || resp.StatusCode > 204 {
-		return fmt.Errorf("post to %s got unexecpted status %d", _url, resp.StatusCode)
+		return fmt.Errorf("post to %s got unexpected status %d", _url, resp.StatusCode)
 	}
 	return err
 }
@@ -188,6 +200,10 @@ func (client *NSQClient) applyToAll(action string) error {
 			err = client.PauseTopic(topic.TopicName)
 		case "UnpauseTopics":
 			err = client.UnpauseTopic(topic.TopicName)
+		case "DeleteTopics":
+			err = client.DeleteTopic(topic.TopicName)
+		case "EmptyTopics":
+			err = client.EmptyTopic(topic.TopicName)
 		}
 		for _, channel := range topic.Channels {
 			switch action {
@@ -195,6 +211,10 @@ func (client *NSQClient) applyToAll(action string) error {
 				err = client.PauseChannel(topic.TopicName, channel.ChannelName)
 			case "UnpauseChannels":
 				err = client.UnpauseChannel(topic.TopicName, channel.ChannelName)
+			case "DeleteChannels":
+				err = client.DeleteChannel(topic.TopicName, channel.ChannelName)
+			case "EmptyChannels":
+				err = client.EmptyChannel(topic.TopicName, channel.ChannelName)
 			}
 		}
 		if err != nil {
@@ -235,6 +255,11 @@ func (client *NSQClient) EmptyTopic(topicName string) error {
 	return client.doEmptyPost(_url)
 }
 
+// EmptyAllTopics empties all topics.
+func (client *NSQClient) EmptyAllTopics() error {
+	return client.applyToAll("EmptyTopics")
+}
+
 // PauseChannel pauses the specified channel.
 func (client *NSQClient) PauseChannel(topicName, channelName string) error {
 	_url := fmt.Sprintf("%s/channel/pause?topic=%s&channel=%s", client.URL, url.QueryEscape(topicName), url.QueryEscape(channelName))
@@ -261,4 +286,45 @@ func (client *NSQClient) UnpauseAllChannels() error {
 func (client *NSQClient) EmptyChannel(topicName, channelName string) error {
 	_url := fmt.Sprintf("%s/channel/empty?topic=%s&channel=%s", client.URL, url.QueryEscape(topicName), url.QueryEscape(channelName))
 	return client.doEmptyPost(_url)
+}
+
+// EmptyAllChannels empties all channels.
+func (client *NSQClient) EmptyAllChannels() error {
+	return client.applyToAll("EmptyChannels")
+}
+
+// CreateTopic creates a topic. This is used only in testing.
+func (client *NSQClient) CreateTopic(topicName string) error {
+	_url := fmt.Sprintf("%s/topic/create?topic=%s", client.URL, url.QueryEscape(topicName))
+	return client.doEmptyPost(_url)
+}
+
+// CreateChannel creates a channel in the specified topic. This is used
+// only in testing.
+func (client *NSQClient) CreateChannel(topicName, channelName string) error {
+	_url := fmt.Sprintf("%s/channel/create?topic=%s&channel=%s", client.URL, url.QueryEscape(topicName), url.QueryEscape(channelName))
+	return client.doEmptyPost(_url)
+}
+
+// DeleteTopic deletes a topic. This is used only in testing.
+func (client *NSQClient) DeleteTopic(topicName string) error {
+	_url := fmt.Sprintf("%s/topic/delete?topic=%s", client.URL, url.QueryEscape(topicName))
+	return client.doEmptyPost(_url)
+}
+
+// DeleteChannel deletes a channel in the specified topic. This is used
+// only in testing.
+func (client *NSQClient) DeleteChannel(topicName, channelName string) error {
+	_url := fmt.Sprintf("%s/channel/delete?topic=%s&channel=%s", client.URL, url.QueryEscape(topicName), url.QueryEscape(channelName))
+	return client.doEmptyPost(_url)
+}
+
+// DeleteAllTopics deletes all topics
+func (client *NSQClient) DeleteAllTopics() error {
+	return client.applyToAll("DeleteTopics")
+}
+
+// DeleteAllChannels deletes all channels
+func (client *NSQClient) DeleteAllChannels() error {
+	return client.applyToAll("DeleteChannels")
 }
