@@ -57,6 +57,25 @@ func TestNsqShow(t *testing.T) {
 	}
 }
 
+func TestNsqInit(t *testing.T) {
+	// Sysadmin can hit this
+	testutil.SysAdminClient.POST("/nsq/init").
+		WithHeader("Referer", testutil.BaseURL).
+		WithFormField(constants.CSRFTokenName, testutil.SysAdminToken).
+		Expect().
+		Status(http.StatusOK)
+
+	// Non-admin cannot see this page
+	for _, client := range testutil.AllClients {
+		if client != testutil.SysAdminClient {
+			client.POST("/nsq/init").
+				WithHeader("Referer", testutil.BaseURL).
+				WithFormField(constants.CSRFTokenName, testutil.TokenFor[client]).
+				Expect().Status(http.StatusForbidden)
+		}
+	}
+}
+
 func TestNsqAdmin(t *testing.T) {
 	testAdminSingleOps(t)
 	testAdminMultiOps(t)
@@ -150,7 +169,7 @@ func testNonAdminAnyOps(t *testing.T) {
 		if client != testutil.SysAdminClient {
 			client.POST("/nsq/admin").
 				WithHeader("Referer", testutil.BaseURL).
-				WithFormField(constants.CSRFTokenName, testutil.SysAdminToken).
+				WithFormField(constants.CSRFTokenName, testutil.TokenFor[client]).
 				Expect().Status(http.StatusForbidden)
 		}
 	}

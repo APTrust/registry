@@ -6,6 +6,7 @@
 
 <p>Version {{ .stats.Info.Version }} running at <b>{{ .stats.Info.BroadcastAddress }}:{{ .stats.Info.HttpPort }}</b> (TCP port {{ .stats.Info.TcpPort }}). </p>
 <p>Started {{ unixToISO .stats.Info.StartTime }}. Health: {{ .stats.Health }}.</p>
+<p>Nothing here? <a href="javascript:nsqInit()">Initialize NSQ</a></p>
 
 {{ range $index, $topic := .stats.Topics }}
 <table>
@@ -49,7 +50,7 @@
   <tr>
     <td>
       {{ $channel.ChannelName }} <br/>
-      {{ if $topic.Paused }}
+      {{ if $channel.Paused }}
       <a href="javascript:nsqPost('unpause', '{{ $topic.TopicName }}', '{{ $channel.ChannelName }}', 'channel', false)" title="Unpause channel {{ $channel.ChannelName }}">Unpause</a>
       {{ else }}
       <a href="javascript:nsqPost('pause', '{{ $topic.TopicName }}', '{{ $channel.ChannelName }}', 'channel', false)" title="Pause channel {{ $channel.ChannelName }}">Pause</button>
@@ -122,6 +123,12 @@
      form.elements['topicName'].value = topicName
      form.elements['channelName'].value = channelName
      form.elements['applyToAll'].value = applyToAll ? 'true' : 'false'
+     form.submit()
+ }
+
+ function nsqInit() {
+     let form = document.forms['nsqForm']
+     form.action = '/nsq/init'
      form.submit()
  }
 

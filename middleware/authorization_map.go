@@ -88,6 +88,7 @@ var AuthMap = map[string]AuthMetadata{
 	"IntellectualObjectUpdate":           {"IntellectualObject", constants.IntellectualObjectUpdate},
 	"NsqShow":                            {"NSQ", constants.NsqAdmin},
 	"NsqAdmin":                           {"NSQ", constants.NsqAdmin},
+	"NsqInit":                            {"NSQ", constants.NsqAdmin},
 	"PremisEventCreate":                  {"PremisEvent", constants.EventCreate},
 	"PremisEventIndex":                   {"PremisEvent", constants.EventRead},
 	"PremisEventShow":                    {"PremisEvent", constants.EventRead},

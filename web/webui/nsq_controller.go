@@ -20,7 +20,6 @@ func NsqShow(c *gin.Context) {
 	if AbortIfError(c, err) {
 		return
 	}
-	nsqInitTopics(stats)
 	req.TemplateData["stats"] = stats
 	c.HTML(http.StatusOK, "nsq/show.html", req.TemplateData)
 }
@@ -48,12 +47,14 @@ func NsqAdmin(c *gin.Context) {
 	c.Redirect(http.StatusSeeOther, "/nsq")
 }
 
-// TODO: Move this to it's own endpoint.
-//
-// initTopics creates the initial NSQ topics and channels, so we'll have
+// NsqInit creates the initial NSQ topics and channels, so we'll have
 // somthing to look at. Outside of our dev and test machines, these topics
 // and channels are created by the queue workers that push items into NSQ.
-func nsqInitTopics(stats *network.NSQStatsData) {
+func NsqInit(c *gin.Context) {
+	stats, err := common.Context().NSQClient.GetStats()
+	if AbortIfError(c, err) {
+		return
+	}
 	ctx := common.Context()
 	client := ctx.NSQClient
 	allTopics := make([]string, len(constants.NonIngestTopics))
@@ -74,6 +75,7 @@ func nsqInitTopics(stats *network.NSQStatsData) {
 			}
 		}
 	}
+	c.Redirect(http.StatusSeeOther, "/nsq")
 }
 
 // nsqDoToAll performs the requested operation on all topics or channels.

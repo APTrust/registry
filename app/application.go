@@ -249,6 +249,7 @@ func initRoutes(router *gin.Engine) {
 
 		// NSQ
 		webRoutes.GET("/nsq", webui.NsqShow)
+		webRoutes.POST("/nsq/init", webui.NsqInit)
 		webRoutes.POST("/nsq/admin", webui.NsqAdmin)
 
 		// Error page
