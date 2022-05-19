@@ -56,6 +56,11 @@ func DateTimeISO(date time.Time) string {
 	return date.Format(time.RFC3339)
 }
 
+// UnixToISO converts a Unix timestamp to ISO format.
+func UnixToISO(ts int64) string {
+	return time.Unix(ts, 0).Format(time.RFC3339)
+}
+
 // RoleName transforms ugly DB role names into more readable ones.
 func RoleName(role string) string {
 	switch role {

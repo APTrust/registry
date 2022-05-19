@@ -23,7 +23,7 @@ type NSQClient struct {
 // topic and queue.
 type NSQStatsData struct {
 	Version   string             `json:"version"`
-	Health    string             `json:"status_code"`
+	Health    string             `json:"health"`
 	StartTime uint64             `json:"start_time"`
 	Topics    []*nsqd.TopicStats `json:"topics"`
 	Info      *NSQInfo           `json:"info"`
@@ -138,11 +138,14 @@ func (client *NSQClient) get(_url string) ([]byte, error) {
 // doEmptyPost posts an empty request body to the specifid url.
 func (client *NSQClient) doEmptyPost(_url string) error {
 	resp, err := http.Post(_url, "text/html", nil)
+	if err != nil {
+		return err
+	}
 	defer resp.Body.Close()
 	if resp.StatusCode < 200 || resp.StatusCode > 204 {
 		return fmt.Errorf("post to %s got unexpected status %d", _url, resp.StatusCode)
 	}
-	return err
+	return nil
 }
 
 // GetStats allows us to get some basic stats from NSQ. The NSQ /stats endpoint
@@ -166,8 +169,9 @@ func (client *NSQClient) GetStats() (*NSQStatsData, error) {
 	}
 	info, err := client.GetInfo()
 	if err != nil {
-		stats.Info = info
+		return nil, err
 	}
+	stats.Info = info
 	return stats, nil
 }
 

@@ -79,6 +79,7 @@ func initTemplates(router *gin.Engine) {
 		"truncate":       helpers.Truncate,
 		"truncateMiddle": helpers.TruncateMiddle,
 		"truncateStart":  helpers.TruncateStart,
+		"unixToISO":      helpers.UnixToISO,
 		"userCan":        helpers.UserCan,
 		"yesNo":          helpers.YesNo,
 	})
@@ -245,6 +246,17 @@ func initRoutes(router *gin.Engine) {
 		webRoutes.GET("/users/sign_in", webui.UserSignInShow)
 		webRoutes.POST("/users/sign_in", webui.UserSignIn)
 		webRoutes.GET("/users/sign_out", webui.UserSignOut) // should be delete?
+
+		// NSQ
+		webRoutes.GET("/nsq", webui.NsqShow)
+		webRoutes.POST("/nsq/topic/pause", webui.NsqTopicPause)
+		webRoutes.POST("/nsq/topic/unpause", webui.NsqTopicUnpause)
+		webRoutes.POST("/nsq/topic/empty", webui.NsqTopicEmpty)
+		webRoutes.POST("/nsq/topic/delete", webui.NsqTopicDelete)
+		webRoutes.POST("/nsq/channel/pause", webui.NsqChannelPause)
+		webRoutes.POST("/nsq/channel/unpause", webui.NsqChannelUnpause)
+		webRoutes.POST("/nsq/channel/empty", webui.NsqChannelEmpty)
+		webRoutes.POST("/nsq/channel/delete", webui.NsqChannelDelete)
 
 		// Error page
 		webRoutes.GET("/error", webui.ErrorShow)

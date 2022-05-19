@@ -1,0 +1,84 @@
+{{ define "nsq/show.html" }}
+
+{{ template "shared/_header.html" .}}
+
+<h1>NSQ</h1>
+
+<p>Version {{ .stats.Info.Version }} running at <b>{{ .stats.Info.BroadcastAddress }}:{{ .stats.Info.HttpPort }}</b> (TCP port {{ .stats.Info.TcpPort }}). </p>
+<p>Started {{ unixToISO .stats.Info.StartTime }}. Health: {{ .stats.Health }}.</p>
+
+{{ range $index, $topic := .stats.Topics }}
+<h3>{{ $topic.TopicName }} {{ if $topic.Paused }} <span color="red">Paused</span> {{end }}</h3>
+<table>
+  <tr>
+    <th></th>
+    <th>Depth</th>
+    <th>Backend Depth</th>
+    <th>In Flight</th>
+    <th>Deferred</th>
+    <th>Messages</th>
+    <th>Requeued</th>
+    <th>Timed Out</th>
+    <th>Clients</th>
+  </tr>
+  <tr>
+    <td>Topic Totals</td>
+    <td>{{ $topic.Depth }}</td>
+    <td>{{ $topic.BackendDepth }}</td>
+    <td></td>
+    <td></td>
+    <td>{{ $topic.MessageCount }}</td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  {{ range $chIndex, $channel := $topic.Channels }}
+  <tr>
+    <td>{{ $channel.ChannelName }}</td>
+    <td>{{ $channel.Depth }}</td>
+    <td>{{ $channel.BackendDepth }}</td>
+    <td>{{ $channel.InFlightCount }}</td>
+    <td>{{ $channel.DeferredCount }}</td>
+    <td>{{ $channel.MessageCount }}</td>
+    <td>{{ $channel.RequeueCount }}</td>
+    <td>{{ $channel.TimeoutCount }}</td>
+    <td>{{ $channel.ClientCount }}</td>
+  </tr>
+  {{ if $channel.Clients }}
+  <tr>
+    <th colspan="2">Client</th>
+    <th>State</th>
+    <th>Ready Count</th>
+    <th>In Flight</th>
+    <th>Messages</th>
+    <th>Finished</th>
+    <th>Requeued</th>
+    <th>Connected Since</th>
+  </tr>
+  {{ if $channel.Clients }}
+  {{ range $clIndex, $client := $channel.Clients }}
+  <tr>
+    <td colspan="2">{{ $client.ClientID }}</td>
+    <td>{{ $client.State }}</td>
+    <td>{{ $client.ReadyCount }}</td>
+    <td>{{ $client.InFlightCount }}</td>
+    <td>{{ $client.MessageCount }}</td>
+    <td>{{ $client.FinishCount }}</td>
+    <td>{{ $client.RequeueCount }}</td>
+    <td>{{ unixToISO $client.ConnectTime }}</td>
+  </tr>
+  {{ end }}
+  {{ else }}
+  <tr>
+    <td colspan="9" style="background-color:#ddd;">No clients connected</td>
+  </tr>
+  {{ end }}
+  {{ end }}
+  {{ end }}
+</table>
+{{ end }}
+
+
+{{ template "shared/_footer.html" .}}
+
+{{ end }}

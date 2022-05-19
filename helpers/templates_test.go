@@ -182,3 +182,7 @@ func TestToJSON(t *testing.T) {
 	expected := template.JS(`{"Names":["Homer","Marge"],"Numbers":[39,38]}`)
 	assert.Equal(t, expected, helpers.ToJSON(x))
 }
+
+func TestUnixToISO(t *testing.T) {
+	assert.Equal(t, "2022-05-09T14:33:24-04:00", helpers.UnixToISO(1652121204))
+}
