@@ -8,8 +8,21 @@
 <p>Started {{ unixToISO .stats.Info.StartTime }}. Health: {{ .stats.Health }}.</p>
 
 {{ range $index, $topic := .stats.Topics }}
-<h3>{{ $topic.TopicName }} {{ if $topic.Paused }} <span color="red">Paused</span> {{end }}</h3>
 <table>
+  <tr>
+    <td><h4>{{ $topic.TopicName }}</h4></td>
+    <td>
+      {{ if $topic.Paused }}
+      <button onclick="topicUnpause('{{ $topic.TopicName }}')" title="Unpause topic {{ $topic.TopicName }}">Unpause</button>
+      {{ else }}
+      <button onclick="topicPause('{{ $topic.TopicName }}')" title="Pause topic {{ $topic.TopicName }}">Pause</button>
+      {{ end }}
+    </td>
+    <td><button onclick="topicEmpty('{{ $topic.TopicName }}')" title="Empty topic {{ $topic.TopicName }}">Empty</button></td>
+    <td><button onclick="topicDelete('{{ $topic.TopicName }}')" title="Delete topic {{ $topic.TopicName }}">Delete</button></td>
+  </tr>
+</table>
+<table style="margin-bottom: 160px;">
   <tr>
     <th></th>
     <th>Depth</th>
@@ -34,7 +47,33 @@
   </tr>
   {{ range $chIndex, $channel := $topic.Channels }}
   <tr>
-    <td>{{ $channel.ChannelName }}</td>
+    <td></td>
+    <td>
+      {{ if $topic.Paused }}
+      <a href="javascript:channelUnpause('{{ $topic.ChannelName }}')" title="Unpause channel {{ $channel.ChannelName }}">Unpause</a>
+      {{ else }}
+      <a href="javascript:channelPause('{{ $channel.ChannelName }}')" title="Pause channel {{ $channel.ChannelName }}">Pause</button>
+      {{ end }}
+    </td>
+    <td></td>
+    <td><a href="javascript:channelEmpty('{{ $channel.ChannelName }}')" title="Empty channel {{ $channel.ChannelName }}">Empty</a></td>
+    <td></td>
+    <td><a href="javascript:channelDelete('{{ $channel.ChannelName }}')" title="Delete channel {{ $channel.ChannelName }}">Delete</a></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>
+      {{ $channel.ChannelName }} <br/>
+      {{ if $topic.Paused }}
+      <a href="javascript:channelUnpause('{{ $topic.ChannelName }}')" title="Unpause channel {{ $channel.ChannelName }}">Unpause</a>
+      {{ else }}
+      <a href="javascript:channelPause('{{ $channel.ChannelName }}')" title="Pause channel {{ $channel.ChannelName }}">Pause</button>
+      {{ end }} |
+        <a href="javascript:channelEmpty('{{ $channel.ChannelName }}')" title="Empty channel {{ $channel.ChannelName }}">Empty</a> |
+        <a href="javascript:channelDelete('{{ $channel.ChannelName }}')" title="Delete channel {{ $channel.ChannelName }}">Delete</a>
+    </td>
     <td>{{ $channel.Depth }}</td>
     <td>{{ $channel.BackendDepth }}</td>
     <td>{{ $channel.InFlightCount }}</td>
@@ -78,6 +117,79 @@
 </table>
 {{ end }}
 
+<form name="nsqForm" method="post">
+  {{ template "forms/csrf_token.html" . }}
+  <input type="hidden" name="name" value="" />
+  <input type="hidden" name="applyToAll" value="false" />
+</form>
+
+<script>
+ function topicPause(name, applyToAll) {
+     let form = initForm(name, applyToAll)
+     form.action = '/nsq/topic/pause'
+     form.submit()
+ }
+
+ function topicUnpause(name, applyToAll) {
+     let form = initForm(name, applyToAll)
+     form.action = '/nsq/topic/unpause'
+     form.submit()
+ }
+
+ function topicEmpty(name, applyToAll) {
+     if (confirm(`Empty topic ${name}?`)) {
+         let form = initForm(name, applyToAll)
+         form.action = '/nsq/topic/empty'
+         form.submit()
+     }
+ }
+
+ function topicDelete(name, applyToAll) {
+     if (confirm(`Delete topic ${name}?`)) {
+         let form = initForm(name, applyToAll)
+         form.action = '/nsq/topic/delete'
+         form.submit()
+     }
+ }
+
+ function channelPause(name, applyToAll) {
+     let form = initForm(name, applyToAll)
+     form.action = '/nsq/channel/pause'
+     form.submit()
+ }
+
+ function channelUnpause(name, applyToAll) {
+     let form = initForm(name, applyToAll)
+     form.action = '/nsq/channel/unpause'
+     form.submit()
+ }
+
+ function channelEmpty(name, applyToAll) {
+     if (confirm(`Empty channel ${name}?`)) {
+         let form = initForm(name, applyToAll)
+         form.action = '/nsq/channel/empty'
+         form.submit()
+     }
+ }
+
+ function channelDelete(name, applyToAll) {
+     if (confirm(`Delete channel ${name}?`)) {
+         let form = initForm(name, applyToAll)
+         form.action = '/nsq/channel/delete'
+         form.submit()
+     }
+ }
+
+ function initForm(name, applyToAll) {
+     let form = document.forms['nsqForm']
+     form.method = 'post'
+     form.action = ''
+     form['name'] = name
+     form['applyToAll'] = applyToAll ? 'true' : 'false'
+     return form
+ }
+
+</script>
 
 {{ template "shared/_footer.html" .}}
 
