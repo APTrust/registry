@@ -557,7 +557,7 @@ code {
 }
 
 hr {
-  background-color: hsl(0deg, 0%, 96%);
+  background-color: #c4c4c4;
   border: none;
   display: block;
   height: 2px;
@@ -3247,9 +3247,16 @@ p,
 .side-nav ul a:hover, .side-nav ul a.active {
   background-color: #eeeeee;
 }
+.side-nav ul ul a {
+  padding-left: 36px;
+}
 .side-nav ul .material-icons {
   color: #bb9566;
   margin-right: 10px;
+}
+.side-nav hr {
+  height: 1px;
+  margin: 1.5rem 1rem;
 }
 
 .content-wrapper {

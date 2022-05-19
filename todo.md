@@ -40,3 +40,4 @@ Here's some general messiness to clean up, refactor, and/or document.
 - [ ] Research `flash` in `shared/_header`.
 - [ ] Add `active` classname to nav items when on current page
 - [ ] If there are new alerts, show red dot on notifications icon, using `has-notifications` classname
+- [ ] Confirm intended use of info tooltip on global search
