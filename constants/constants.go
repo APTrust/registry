@@ -292,6 +292,14 @@ var WorkItemActions = []string{
 	ActionIngest,
 }
 
+var NonIngestTopics = []string{
+	TopicDelete,
+	TopicFileRestore,
+	TopicFixity,
+	TopicGlacierRestore,
+	TopicObjectRestore,
+}
+
 // NSQIngestTopicFor maps ingest stage names to NSQ topics.
 var NSQIngestTopicFor = map[string]string{
 	StageReceive:              IngestPreFetch,

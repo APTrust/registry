@@ -15,7 +15,7 @@
       {{ if $topic.Paused }}
       <button onclick="nsqPost('unpause', '{{ $topic.TopicName }}', '', 'topic', false)" title="Unpause topic {{ $topic.TopicName }}">Unpause</button>
       {{ else }}
-      <button onclick="nsqPost('ause', '{{ $topic.TopicName }}', '', 'topic', false)" title="Pause topic {{ $topic.TopicName }}">Pause</button>
+      <button onclick="nsqPost('pause', '{{ $topic.TopicName }}', '', 'topic', false)" title="Pause topic {{ $topic.TopicName }}">Pause</button>
       {{ end }}
     </td>
     <td><button onclick="nsqPost('empty', '{{ $topic.TopicName }}', '', 'topic', false)" title="Empty topic {{ $topic.TopicName }}">Empty</button></td>
@@ -50,12 +50,12 @@
     <td>
       {{ $channel.ChannelName }} <br/>
       {{ if $topic.Paused }}
-      <a href="javascript:nsqPost('unpause', '{{ $topic.TopicName }}', '{{ $topic.ChannelName }}', 'channel', false)" title="Unpause channel {{ $channel.ChannelName }}">Unpause</a>
+      <a href="javascript:nsqPost('unpause', '{{ $topic.TopicName }}', '{{ $channel.ChannelName }}', 'channel', false)" title="Unpause channel {{ $channel.ChannelName }}">Unpause</a>
       {{ else }}
       <a href="javascript:nsqPost('pause', '{{ $topic.TopicName }}', '{{ $channel.ChannelName }}', 'channel', false)" title="Pause channel {{ $channel.ChannelName }}">Pause</button>
       {{ end }} |
-        <a href="javascript:channelEmpty('empty', '{{ $topic.TopicName }}', '{{ $channel.ChannelName }}', 'channel', false)" title="Empty channel {{ $channel.ChannelName }}">Empty</a> |
-        <a href="javascript:channelDelete('delete', '{{ $topic.TopicName }}', '{{ $channel.ChannelName }}', 'channel', false)" title="Delete channel {{ $channel.ChannelName }}">Delete</a>
+        <a href="javascript:nsqPost('empty', '{{ $topic.TopicName }}', '{{ $channel.ChannelName }}', 'channel', false)" title="Empty channel {{ $channel.ChannelName }}">Empty</a> |
+        <a href="javascript:nsqPost('delete', '{{ $topic.TopicName }}', '{{ $channel.ChannelName }}', 'channel', false)" title="Delete channel {{ $channel.ChannelName }}">Delete</a>
     </td>
     <td>{{ $channel.Depth }}</td>
     <td>{{ $channel.BackendDepth }}</td>
@@ -117,12 +117,12 @@
      if (msg && !confirm(msg)) {
          return
      }
-     form['operation'] = operation
-     form['targetType'] = targetType
-     form['topicName'] = topicName
-     form['channelName'] = channelName
-     form['applyToAll'] = applyToAll ? 'true' : 'false'
-     return form
+     form.elements['operation'].value = operation
+     form.elements['targetType'].value = targetType
+     form.elements['topicName'].value = topicName
+     form.elements['channelName'].value = channelName
+     form.elements['applyToAll'].value = applyToAll ? 'true' : 'false'
+     form.submit()
  }
 
  function getMessage(operation, topicName, channelName, applyToAll) {

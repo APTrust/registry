@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/APTrust/registry/common"
+	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/helpers"
 	"github.com/APTrust/registry/network"
 	"github.com/gin-gonic/gin"
@@ -19,6 +20,7 @@ func NsqShow(c *gin.Context) {
 	if AbortIfError(c, err) {
 		return
 	}
+	nsqInitTopics(stats)
 	req.TemplateData["stats"] = stats
 	c.HTML(http.StatusOK, "nsq/show.html", req.TemplateData)
 }
@@ -44,6 +46,34 @@ func NsqAdmin(c *gin.Context) {
 	}
 	helpers.SetFlashCookie(c, nsqSuccessMessage(operation, topicName, channelName, targetType, applyToAll))
 	c.Redirect(http.StatusSeeOther, "/nsq")
+}
+
+// TODO: Move this to it's own endpoint.
+//
+// initTopics creates the initial NSQ topics and channels, so we'll have
+// somthing to look at. Outside of our dev and test machines, these topics
+// and channels are created by the queue workers that push items into NSQ.
+func nsqInitTopics(stats *network.NSQStatsData) {
+	ctx := common.Context()
+	client := ctx.NSQClient
+	allTopics := make([]string, len(constants.NonIngestTopics))
+	copy(allTopics, constants.NonIngestTopics)
+	for _, topicName := range constants.NSQIngestTopicFor {
+		allTopics = append(allTopics, topicName)
+	}
+	for _, topicName := range constants.NSQIngestTopicFor {
+		if stats.GetTopic(topicName) == nil {
+			err := client.CreateTopic(topicName)
+			if err != nil {
+				ctx.Log.Warn().Msgf("Could not create NSQ topic %s: %v", topicName, err)
+			}
+			channelName := fmt.Sprintf("%s_worker_chan", topicName)
+			err = client.CreateChannel(topicName, channelName)
+			if err != nil {
+				ctx.Log.Warn().Msgf("Could not create NSQ channel %s: %v", channelName, err)
+			}
+		}
+	}
 }
 
 // nsqDoToAll performs the requested operation on all topics or channels.
