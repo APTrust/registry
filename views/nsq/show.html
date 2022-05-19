@@ -7,6 +7,18 @@
 <p>Version {{ .stats.Info.Version }} running at <b>{{ .stats.Info.BroadcastAddress }}:{{ .stats.Info.HttpPort }}</b> (TCP port {{ .stats.Info.TcpPort }}). </p>
 <p>Started {{ unixToISO .stats.Info.StartTime }}. Health: {{ .stats.Health }}.</p>
 <p>Nothing here? <a href="javascript:nsqInit()">Initialize NSQ</a></p>
+<ul>
+  <li><a href="javascript:nsqPost('pause', '', '', 'topic', true)" title="Pause all topics">Pause All Topics</a></li>
+  <li><a href="javascript:nsqPost('unpause', '', '', 'topic', false)">Unpause All Topics</a></li>
+  <li><a href="javascript:nsqPost('empty', '', '', 'topic', true)">Empty All Topics</a></li>
+  <li><a href="javascript:nsqPost('delete', '', '', 'topic', true)">Delete All Topics</a></li>
+
+  <li><a href="javascript:nsqPost('pause', '', '', 'channel', true)" title="Pause all channels">Pause All Channels</a></li>
+  <li><a href="javascript:nsqPost('unpause', '', '', 'channel', false)">Unpause All Channels</a></li>
+  <li><a href="javascript:nsqPost('empty', '', '', 'channel', true)">Empty All Channels</a></li>
+  <li><a href="javascript:nsqPost('delete', '', '', 'channel', true)">Delete All Channels</a></li>
+
+</ul>
 
 {{ range $index, $topic := .stats.Topics }}
 <table>
@@ -133,7 +145,7 @@
  }
 
  function getMessage(operation, topicName, channelName, applyToAll) {
-     if (operation == 'pause' || operation == 'unpause') {
+     if (!applyToAll && (operation == 'pause' || operation == 'unpause')) {
          return null
      }
      let target = topicName
