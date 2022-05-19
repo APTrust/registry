@@ -249,14 +249,7 @@ func initRoutes(router *gin.Engine) {
 
 		// NSQ
 		webRoutes.GET("/nsq", webui.NsqShow)
-		webRoutes.POST("/nsq/topic/pause", webui.NsqTopicPause)
-		webRoutes.POST("/nsq/topic/unpause", webui.NsqTopicUnpause)
-		webRoutes.POST("/nsq/topic/empty", webui.NsqTopicEmpty)
-		webRoutes.POST("/nsq/topic/delete", webui.NsqTopicDelete)
-		webRoutes.POST("/nsq/channel/pause", webui.NsqChannelPause)
-		webRoutes.POST("/nsq/channel/unpause", webui.NsqChannelUnpause)
-		webRoutes.POST("/nsq/channel/empty", webui.NsqChannelEmpty)
-		webRoutes.POST("/nsq/channel/delete", webui.NsqChannelDelete)
+		webRoutes.POST("/nsq/admin", webui.NsqAdmin)
 
 		// Error page
 		webRoutes.GET("/error", webui.ErrorShow)
