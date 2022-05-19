@@ -42,6 +42,7 @@ $family-monospace: "Roboto Mono", monospace;
 $link: $grey-darker;
 $primary: $purple;
 $radius-large: 8px;
+$hr-background-color: $grey-3;
 
 // Import bulma packages as needed
 @import "../../node_modules/bulma/sass/utilities/all";
