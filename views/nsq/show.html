@@ -9,32 +9,30 @@
 <p>Nothing here? <a href="javascript:nsqInit()">Initialize NSQ</a></p>
 <ul>
   <li><a href="javascript:nsqPost('pause', '', '', 'topic', true)" title="Pause all topics">Pause All Topics</a></li>
-  <li><a href="javascript:nsqPost('unpause', '', '', 'topic', false)">Unpause All Topics</a></li>
+  <li><a href="javascript:nsqPost('unpause', '', '', 'topic', true)">Unpause All Topics</a></li>
   <li><a href="javascript:nsqPost('empty', '', '', 'topic', true)">Empty All Topics</a></li>
   <li><a href="javascript:nsqPost('delete', '', '', 'topic', true)">Delete All Topics</a></li>
 
   <li><a href="javascript:nsqPost('pause', '', '', 'channel', true)" title="Pause all channels">Pause All Channels</a></li>
-  <li><a href="javascript:nsqPost('unpause', '', '', 'channel', false)">Unpause All Channels</a></li>
+  <li><a href="javascript:nsqPost('unpause', '', '', 'channel', true)">Unpause All Channels</a></li>
   <li><a href="javascript:nsqPost('empty', '', '', 'channel', true)">Empty All Channels</a></li>
   <li><a href="javascript:nsqPost('delete', '', '', 'channel', true)">Delete All Channels</a></li>
-
 </ul>
 
 {{ range $index, $topic := .stats.Topics }}
-<table>
-  <tr>
-    <td><h4>{{ $topic.TopicName }}</h4></td>
-    <td>
-      {{ if $topic.Paused }}
-      <button onclick="nsqPost('unpause', '{{ $topic.TopicName }}', '', 'topic', false)" title="Unpause topic {{ $topic.TopicName }}">Unpause</button>
-      {{ else }}
-      <button onclick="nsqPost('pause', '{{ $topic.TopicName }}', '', 'topic', false)" title="Pause topic {{ $topic.TopicName }}">Pause</button>
-      {{ end }}
-    </td>
-    <td><button onclick="nsqPost('empty', '{{ $topic.TopicName }}', '', 'topic', false)" title="Empty topic {{ $topic.TopicName }}">Empty</button></td>
-    <td><button onclick="nsqPost('delete', '{{ $topic.TopicName }}', '', 'topic', false)" title="Delete topic {{ $topic.TopicName }}">Delete</button></td>
-  </tr>
-</table>
+<h2>{{ $topic.TopicName }}</h2>
+<p>
+  {{ if $topic.Paused }}
+  <a href="javascript:nsqPost('unpause', '{{ $topic.TopicName }}', '', 'topic', false)" title="Unpause topic {{ $topic.TopicName }}">Unpause</a>
+  {{ else }}
+  <a href="javascript:nsqPost('pause', '{{ $topic.TopicName }}', '', 'topic', false)" title="Pause topic {{ $topic.TopicName }}">Pause</a>
+  {{ end }}
+  |
+  <a href="javascript:nsqPost('empty', '{{ $topic.TopicName }}', '', 'topic', false)" title="Empty topic {{ $topic.TopicName }}">Empty</a>
+  |
+  <a href="javascript:nsqPost('delete', '{{ $topic.TopicName }}', '', 'topic', false)" title="Delete topic {{ $topic.TopicName }}">Delete</a>
+</p>
+
 <table style="margin-bottom: 160px;">
   <tr>
     <th></th>
