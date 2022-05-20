@@ -42,6 +42,10 @@
     {{ end }}
   {{ end }}
 
+    {{ if userCan .CurrentUser "NsqAdmin" .CurrentUser.InstitutionID }}
+    <li><a href="/nsq"><i class="fa fa-tasks"></i> NSQ</a></li>
+    {{ end }}
+
     {{ if userCan .CurrentUser "UserCreate" .CurrentUser.InstitutionID }}
     <li><a href="/users"><i class="fa fa-users"></i> Users</a></li>
     {{ end }}
