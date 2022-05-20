@@ -255,6 +255,9 @@ func initRoutes(router *gin.Engine) {
 		// Error page
 		webRoutes.GET("/error", webui.ErrorShow)
 
+		// UI Components
+		webRoutes.GET("/ui_components", webui.ComponentsIndex)
+
 	}
 
 	// Root goes to sign-in page, which is a web route,
