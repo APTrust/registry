@@ -17,10 +17,15 @@ import (
 // GET /alerts/show/:id
 func AlertShow(c *gin.Context) {
 	req := NewRequest(c)
-	err := alertLoad(req)
+	alertView, err := alertLoad(req)
 	if AbortIfError(c, err) {
 		return
 	}
+	err = alertMarkAsRead(alertView.ID, alertView.UserID)
+	if AbortIfError(c, err) {
+		return
+	}
+	req.TemplateData["alert"] = alertView
 	c.HTML(http.StatusOK, "alerts/show.html", req.TemplateData)
 }
 
@@ -37,17 +42,24 @@ func AlertIndex(c *gin.Context) {
 	c.HTML(http.StatusOK, "alerts/index.html", req.TemplateData)
 }
 
-func alertLoad(req *Request) error {
+func alertLoad(req *Request) (*pgmodels.AlertView, error) {
 	recipientID, err := strconv.ParseInt(req.GinContext.Param("user_id"), 10, 64)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if !req.CurrentUser.IsAdmin() && recipientID != req.CurrentUser.ID {
 		aptContext := common.Context()
 		aptContext.Log.Warn().Msgf("User %d illegally tried to access alert %d belonging to user %d. Permission was denied.", req.CurrentUser.ID, req.Auth.ResourceID, recipientID)
-		return common.ErrPermissionDenied
+		return nil, common.ErrPermissionDenied
 	}
-	alert, err := pgmodels.AlertViewForUser(req.Auth.ResourceID, recipientID)
-	req.TemplateData["alert"] = alert
-	return err
+	return pgmodels.AlertViewForUser(req.Auth.ResourceID, recipientID)
+}
+
+func alertMarkAsRead(alertID, userID int64) error {
+	alert, err := pgmodels.AlertByID(alertID)
+	if err != nil {
+		common.Context().Log.Error().Msgf("Error marking alert %d as read for user %d: %v", alertID, userID, err)
+		return err
+	}
+	return alert.MarkAsRead(userID)
 }
