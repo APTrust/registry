@@ -137,3 +137,16 @@
 .material-icons.md-48 {
   font-size: 48px;
 }
+
+.box {
+  border: 1px solid $grey-4;
+}
+
+.box-header {
+  border-bottom: 1px solid $grey-background;
+  padding: 24px 20px 12px;
+}
+
+.box-content {
+  padding: 16px 20px;
+}

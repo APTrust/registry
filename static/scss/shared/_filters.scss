@@ -1,0 +1,11 @@
+.filters-grid {
+  display: flex;
+
+  &-label {
+    margin-right: 16px;
+  }
+
+  &-form {
+    flex: 1;
+  }
+}

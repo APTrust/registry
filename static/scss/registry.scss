@@ -42,19 +42,25 @@ $family-monospace: "Roboto Mono", monospace;
 $link: $grey-darker;
 $primary: $purple;
 $radius-large: 8px;
-$hr-background-color: $grey-3;
-$notification-background-color: $grey-4;
+$hr-background-color: $grey-light;
+$notification-background-color: $grey-lighter;
 $code-background: $grey-highlight;
 $pre-background: $grey-highlight;
+$box-shadow: none;
+$box-padding: 0;
+$label-color: $grey-dark;
+$label-weight: 400;
+$input-radius: $radius-large;
 
 // Import bulma packages as needed
 @import "../../node_modules/bulma/sass/utilities/all";
 @import "../../node_modules/bulma/sass/base/all";
 // @import "../../node_modules/bulma/sass/components/all";
+@import "../../node_modules/bulma/sass/elements/box";
 @import "../../node_modules/bulma/sass/elements/button";
 @import "../../node_modules/bulma/sass/elements/notification";
 @import "../../node_modules/bulma/sass/form/all";
-// @import "../../node_modules/bulma/sass/grid/all";
+@import "../../node_modules/bulma/sass/grid/columns";
 @import "../../node_modules/bulma/sass/helpers/flexbox";
 @import "../../node_modules/bulma/sass/helpers/spacing";
 @import "../../node_modules/bulma/sass/helpers/typography";

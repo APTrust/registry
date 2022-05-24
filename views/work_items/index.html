@@ -2,36 +2,44 @@
 
 {{ template "shared/_header.html" .}}
 
-{{ template "work_items/_filters.html" . }}
+<div class="box">
+  <div class="box-header">
+    <h1 class="h2">Work Items</h1>
+  </div>
 
-<!-- .items type is []*WorkItemView -->
+  <div class="box-content">
+    {{ template "work_items/_filters.html" . }}
+  </div>
 
-<h1>Work Items</h1>
+  <!-- .items type is []*WorkItemView -->
 
-<table>
-  <thead>
-    <tr>
-      <th>Name</th>
-      <th>Institution</th>
-      <th>Action</th>
-      <th>Stage</th>
-      <th>Status</th>
-    </tr>
-  </thead>
-  <tbody>
-    {{ range $index, $item := .items }}
-    <tr class="clickable" onclick="window.location.href='/work_items/show/{{ $item.ID }}'">
-      <td>{{ $item.Name }}</td>
-      <td>{{ $item.InstitutionName }}</td>
-      <td>{{ $item.Action }}</td>
-      <td>{{ $item.Stage }}</td>
-      <td>{{ $item.Status }}</td>
-    </tr>
-    {{ end }}
-  </tbody>
-</table>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Institution</th>
+        <th>Action</th>
+        <th>Stage</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{ range $index, $item := .items }}
+      <tr class="clickable" onclick="window.location.href='/work_items/show/{{ $item.ID }}'">
+        <td>{{ $item.Name }}</td>
+        <td>{{ $item.InstitutionName }}</td>
+        <td>{{ $item.Action }}</td>
+        <td>{{ $item.Stage }}</td>
+        <td>{{ $item.Status }}</td>
+      </tr>
+      {{ end }}
+    </tbody>
+  </table>
 
-{{ template "shared/_pager.html" dict "pager" .pager }}
+  {{ template "shared/_pager.html" dict "pager" .pager }}
+</div>
+
+
 
 {{ template "shared/_footer.html" .}}
 
