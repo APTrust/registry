@@ -172,3 +172,26 @@ func (alert *Alert) Validate() *common.ValidationError {
 	}
 	return nil
 }
+
+// MarkAsSent marks an alert as sent.
+func (alert *Alert) MarkAsSent(userID int64) error {
+	now := time.Now().UTC()
+	sql := "update alerts_users set sent_at = ? where alert_id = ? and user_id = ?"
+	_, err := common.Context().DB.Exec(sql, now, alert.ID, userID)
+	return err
+}
+
+// MarkAsRead marks an alert as read.
+func (alert *Alert) MarkAsRead(userID int64) error {
+	now := time.Now().UTC()
+	sql := "update alerts_users set read_at = ? where alert_id = ? and user_id = ?"
+	_, err := common.Context().DB.Exec(sql, now, alert.ID, userID)
+	return err
+}
+
+// MarkAsUnread marks an alert as unread.
+func (alert *Alert) MarkAsUnread(userID int64) error {
+	sql := "update alerts_users set read_at = null where alert_id = ? and user_id = ?"
+	_, err := common.Context().DB.Exec(sql, alert.ID, userID)
+	return err
+}
