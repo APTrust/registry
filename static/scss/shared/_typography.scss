@@ -59,3 +59,30 @@ p,
 .text-bold {
   font-weight: $weight-bold;
 }
+
+ol {
+  list-style: none;
+}
+
+.content {
+  a {
+    text-decoration: underline;
+  
+    &:hover {
+      text-decoration: none;
+    }
+  }
+
+  ol,
+  ul {
+    padding-left: 1.5rem;
+  }
+
+  ol {
+    list-style: decimal;
+  }
+
+  ul {
+    list-style: disc;
+  }
+}
