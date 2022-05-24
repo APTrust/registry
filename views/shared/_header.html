@@ -27,13 +27,13 @@
 
   <body>
 
-    <div class="page-wrapper">
+    <div class="page-wrapper" id="top">
 
+      {{ if not .suppressSideNav }}
       <div class="side-nav">
-        {{ if not .suppressSideNav }}
         {{ template "shared/_side_nav.html" .}}
-        {{ end }}
       </div>
+      {{ end }}
 
       <div class="content-wrapper">
 

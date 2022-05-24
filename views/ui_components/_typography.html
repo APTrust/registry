@@ -1,30 +1,105 @@
 {{ define "ui_components/_typography.html" }}
 
-<h1>Typography</h1>
+<div class="content is-flex is-justify-content-space-between is-align-content-center">
+  <h1 id="typography">Typography</h1>
+  <a href="#top">Back to top</a>
+</div>
+<hr>
 
-<h1>Headline 1</h1>
-<h2>Headline 2</h2>
-<h3>Headline 3</h3>
-<h4>Headline 4</h4>
-<h5>Headline 5</h5>
-<h6>Headline 6</h6>
+<h1 class="mb-1">Headline 1</h1>
+<pre class="mb-3"><code>&lt;h1&gt;Headline 1&lt;/h1&gt;</code></pre>
 
-<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+<h2 class="mb-1">Headline 2</h2>
+<pre class="mb-3"><code>&lt;h2&gt;Headline 2&lt;/h2&gt;</code></pre>
 
-<p>Ordered List</li>
-<ol>
-  <li>One</li>
-  <li>Two</li>
-  <li>Three</li>
-  <li>Four</li>
-</ol>
+<h3 class="mb-1">Headline 3</h3>
+<pre class="mb-3"><code>&lt;h3&gt;Headline 3&lt;/h3&gt;</code></pre>
+<div class="notification">Headings <code>h4</code>, <code>h5</code>, and <code>h6</code> are not used in this library. </div>
 
-<p>Unordered List</li>
-<ul>
-  <li>One</li>
-  <li>Two</li>
-  <li>Three</li>
-  <li>Four</li>
-</ul>
+<h2 class="mb-1">Paragraph</h2>
+<p class="mb-2">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+<pre class="mb-3"><code>&lt;p&gt;Lorem ipsum dolor sit amet...&lt;/p&gt;</code></pre>
+
+<h2 class="mb-1">Links</h2>
+<div class="notification">
+  Links are unstyled by default. To give a link back it's normal styles, wrap the
+  link in a container with the class of <code>content</code>.
+</div>
+<div class="content mb-2"><a href="#">This is a link</a></div>
+<pre class="mb-3"><code>&lt;div class=&quot;content&quot;&gt;&lt;a href=&quot;#&quot;&gt;This is a link&lt;/a&gt;&lt;/div&gt;</code></pre>
+
+<h2 class="mb-1">Library Text Styles</h2>
+<div class="notification">
+  The CSS Library has several custom helpers for text styles, as defined below.
+</div>
+
+<p class="text-md mb-1">This is medium-sized text (default, used for overriding larger type)</p>
+<pre class="mb-3"><code>&lt;p class=&quot;text-md&quot;&gt;Medium-sized text&lt;/p&gt;</code></pre>
+
+<p class="text-sm mb-1">This is small text</p>
+<pre class="mb-3"><code>&lt;p class=&quot;text-sm&quot;&gt;Small text&lt;/p&gt;</code></pre>
+
+<p class="text-xs mb-1">This is extra-small text</p>
+<pre class="mb-3"><code>&lt;p class=&quot;text-xs&quot;&gt;Extra-small text&lt;/p&gt;</code></pre>
+
+<p class="num mb-1">012345 - This is a formatted number</p>
+<pre class="mb-3"><code>&lt;p class=&quot;num&quot;&gt;Formatted number&lt;/p&gt;</code></pre>
+
+<p class="text-table mb-1">This is table text</p>
+<pre class="mb-3"><code>&lt;p class=&quot;text-table&quot;&gt;Table text&lt;/p&gt;</code></pre>
+
+<p class="text-label mb-1">This is label text</p>
+<pre class="mb-3"><code>&lt;p class=&quot;text-label&quot;&gt;Label text&lt;/p&gt;</code></pre>
+
+<p class="has-text-weight-medium mb-1">This is medium-weight text (500)</p>
+<pre class="mb-3"><code>&lt;p class=&quot;has-text-weight-medium&quot;&gt;Medium-weight text&lt;/p&gt;</code></pre>
+
+<p class="has-text-weight-bold mb-1">This is bold-weight text (700)</p>
+<pre class="mb-3"><code>&lt;p class=&quot;has-text-weight-bold&quot;&gt;Bold-weight text&lt;/p&gt;</code></pre>
+
+<h2 class="mb-1">Lists</h2>
+<div class="notification">
+  Lists are unstyled by default. To give a list back it's normal styles, wrap the
+  list in a container with the class of <code>content</code>.
+</div>
+
+<h2>Ordered List</h2>
+<div class="content mb-3">
+  <ol>
+    <li>One</li>
+    <li>Two</li>
+    <li>Three</li>
+    <li>Four</li>
+  </ol>
+</div>
+<pre class="mb-3"><code>&lt;div class=&quot;content&quot;&gt;
+  &lt;ol&gt;
+    &lt;li&gt;One&lt;/li&gt;
+    &lt;li&gt;Two&lt;/li&gt;
+    &lt;li&gt;Three&lt;/li&gt;
+    &lt;li&gt;Four&lt;/li&gt;
+  &lt;/ol&gt;
+&lt;/div&gt;</code></pre>
+
+<h2>Unordered List</h2>
+<div class="content mb-3">
+  <ul>
+    <li>One</li>
+    <li>Two</li>
+    <li>Three</li>
+    <li>Four</li>
+  </ul>
+</div>
+<pre class="mb-3"><code>&lt;div class=&quot;content&quot;&gt;
+  &lt;ul&gt;
+    &lt;li&gt;One&lt;/li&gt;
+    &lt;li&gt;Two&lt;/li&gt;
+    &lt;li&gt;Three&lt;/li&gt;
+    &lt;li&gt;Four&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/div&gt;</code></pre>
+
+
+
 
 {{ end }}

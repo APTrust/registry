@@ -3,14 +3,29 @@
 {{ template "shared/_header.html" .}}
 
 
-<div class="intro mb-5">
+
+<div class="mb-5 content">
   <h1>UI Components</h1>
-  <p>This library exists to document various elements of the UI system. 
+  <p class="mb-3">This library exists to document various elements of the UI system.</p>
+  <p class="mb-3">This project uses the CSS framework <a href="https://bulma.io/">Bulma</a>.
+    Documentation can be found at <a href="https://bulma.io/documentation/">https://bulma.io/documentation/</a>.
+    To keep the CSS bundle small, only the Bulma tools that are actually used
+    are imported into <code>/static/scss/registry.scss</code>. If you need to 
+    use a tool that isn't included yet, you can add it manually in that file.</p>
+  <div class="notification">
     Note that the CSS employs a "reset" that removes many default browser
     styles, in favor of custom styles. As such, margins, list styles, and other
-    styles may need to be manually readded in some cases. Where applicable, these will
-    be documented below.</p>
+    styles may need to be manually added in some cases. Where applicable, these will
+    be documented below.
+  </div>
+
+  <h2>Table of contents:</h2>
+  <ul>
+    <li><a href="#typography">Typography</a></li>
+  </ul>
 </div>
+
+<hr>
 
 <!-- Add components inline, or in partials, as belo. -->
 
