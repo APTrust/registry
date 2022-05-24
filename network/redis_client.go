@@ -154,3 +154,15 @@ func (c *RedisClient) SaveItem(workItemID int64, field, value string) error {
 	_, err := c.client.HSet(key, field, value).Result()
 	return err
 }
+
+// List returns up to the first 500 keys in the Redis DB matching
+// the specified pattern. The 500 limit is to prevent overload if
+// our Redis DB fills up with lots of entries.
+//
+// Realistically, we will almost never have more than a few dozen keys
+// at any given time, since Redis data  is deleted as soon as processing
+// completes. Each key is a WorkItem.ID in string form.
+func (c *RedisClient) List(pattern string) ([]string, error) {
+	keys, _, err := c.client.Scan(0, pattern, 500).Result()
+	return keys, err
+}

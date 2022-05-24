@@ -24,7 +24,7 @@
     {{ if userCan .CurrentUser "DepositReportShow" .CurrentUser.InstitutionID }}
     <li><a href="/reports/deposits"><span class="material-icons" aria-hidden="true">insert_chart</span> Reports</a></li>
     {{ end }}
-  
+
     {{ if userCan .CurrentUser "UserCreate" .CurrentUser.InstitutionID }}
     <li><a href="/users"><span class="material-icons" aria-hidden="true">people</span> Users</a></li>
     {{ end }}
@@ -59,6 +59,10 @@
         {{ if userCan .CurrentUser "InstitutionRead" .CurrentUser.InstitutionID }}
         <li><a href="/institutions/show/{{ .CurrentUser.InstitutionID }}"><span class="material-icons" aria-hidden="true">location_city</span> Institution</a></li>
         {{ end }}
+      {{ end }}
+
+      {{ if userCan .CurrentUser "NsqAdmin" .CurrentUser.InstitutionID }}
+      <li><a href="/nsq"><i class="fa fa-tasks"></i> NSQ</a></li>
       {{ end }}
     </ul>
 

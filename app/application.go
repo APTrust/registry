@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"html/template"
 	"io"
-	//"net/http"
 	"os"
 	"strings"
 
@@ -80,6 +79,7 @@ func initTemplates(router *gin.Engine) {
 		"truncate":       helpers.Truncate,
 		"truncateMiddle": helpers.TruncateMiddle,
 		"truncateStart":  helpers.TruncateStart,
+		"unixToISO":      helpers.UnixToISO,
 		"userCan":        helpers.UserCan,
 		"yesNo":          helpers.YesNo,
 	})
@@ -206,6 +206,9 @@ func initRoutes(router *gin.Engine) {
 		webRoutes.POST("/work_items/edit/:id", webui.WorkItemUpdate)
 		webRoutes.PUT("/work_items/requeue/:id", webui.WorkItemRequeue)
 		webRoutes.POST("/work_items/requeue/:id", webui.WorkItemRequeue)
+		webRoutes.GET("/work_items/redis_list", webui.WorkItemRedisIndex)
+		webRoutes.DELETE("/work_items/redis_delete/:id", webui.WorkItemRedisDelete)
+		webRoutes.POST("/work_items/redis_delete/:id", webui.WorkItemRedisDelete)
 
 		// Users
 		webRoutes.POST("/users/new", webui.UserCreate)
@@ -244,8 +247,16 @@ func initRoutes(router *gin.Engine) {
 		webRoutes.POST("/users/sign_in", webui.UserSignIn)
 		webRoutes.GET("/users/sign_out", webui.UserSignOut) // should be delete?
 
+		// NSQ
+		webRoutes.GET("/nsq", webui.NsqShow)
+		webRoutes.POST("/nsq/init", webui.NsqInit)
+		webRoutes.POST("/nsq/admin", webui.NsqAdmin)
+
 		// Error page
 		webRoutes.GET("/error", webui.ErrorShow)
+
+		// UI Components
+		webRoutes.GET("/ui_components", webui.ComponentsIndex)
 
 	}
 

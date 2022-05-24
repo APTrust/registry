@@ -24,7 +24,13 @@
     </tr>
     <tr>
       <th>Intellectual Object</th>
-      <td>{{ .item.ObjectIdentifier }}</td>
+      <td>
+        {{ if .item.IntellectualObjectID }}
+        <a href="/objects/show/{{ .item.IntellectualObjectID }}">{{ .item.ObjectIdentifier }}</a>
+        {{ else }}
+        {{ .item.ObjectIdentifier }}
+        {{ end }}
+      </td>
     </tr>
     <tr>
       <th>Generic File</th>
@@ -121,7 +127,15 @@
 </textarea>
 {{ end }}
 
-{{ template "shared/_footer.html" . }}
 
+{{ if .showRedisDelete }}
+<form id="redisDelete" method="post" action="/work_items/redis_delete/{{ .item.ID }}" onsubmit='return confirm("Delete Redis record? If in doubt, cancel!")'>
+  {{ template "forms/csrf_token.html" . }}
+  <input type="submit" value="Delete Redis Data"></input>
+</form>
+{{ end }}
+
+
+{{ template "shared/_footer.html" . }}
 
 {{ end }}
