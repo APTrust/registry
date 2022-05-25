@@ -51,6 +51,7 @@ $box-padding: 0;
 $label-color: $grey-dark;
 $label-weight: 400;
 $input-radius: $radius-large;
+$input-border-color: $grey;
 
 // Import bulma packages as needed
 @import "../../node_modules/bulma/sass/utilities/all";

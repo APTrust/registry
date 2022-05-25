@@ -3,9 +3,59 @@
 
   &-label {
     margin-right: 16px;
+    padding-top: 36px;
   }
 
   &-form {
     flex: 1;
+  }
+
+  &-all {
+    hr {
+      background-color: $grey-4;
+      height: 1px;
+      margin: 40px 0;
+    }
+  }
+
+  &.is-open {
+    .filter-toggle {
+      .material-icons {
+        transform: rotate(180deg);
+      }
+    }
+  }
+}
+
+.filter-button, 
+.filter-toggle {
+  @extend .text-xs;
+  height: 40px;
+  text-transform: uppercase;
+}
+
+.filter-button {
+  padding-left: 40px;
+  padding-right: 40px;
+}
+
+.filter-toggle {
+  &:hover,
+  &.is-hovered {
+    background-color: transparent !important;
+  }
+
+  .more-filters,
+  .less-filters {
+    text-decoration: underline;
+
+    &:hover,
+    &.is-hovered {
+      text-decoration: none;
+    }
+  }
+
+  .material-icons {
+    transform-origin: center;
   }
 }

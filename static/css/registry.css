@@ -1892,7 +1892,7 @@ a.box:active {
 /* Bulma Form */
 .select select, .textarea, .input {
   background-color: hsl(0deg, 0%, 100%);
-  border-color: #d6d6d6;
+  border-color: #a2a2a2;
   border-radius: 8px;
   color: #333030;
 }
@@ -6141,7 +6141,8 @@ p,
   line-height: 16px;
 }
 
-.text-xs, .button {
+.text-xs, .filter-button,
+.filter-toggle {
   font-size: 12px;
   line-height: 14px;
 }
@@ -6312,21 +6313,50 @@ ol {
   padding: 16px 20px;
 }
 
-.button {
-  height: 40px;
-  padding-left: 40px;
-  padding-right: 40px;
-  text-transform: uppercase;
-}
-
 .filters-grid {
   display: flex;
 }
 .filters-grid-label {
   margin-right: 16px;
+  padding-top: 36px;
 }
 .filters-grid-form {
   flex: 1;
+}
+.filters-grid-all hr {
+  background-color: #d6d6d6;
+  height: 1px;
+  margin: 40px 0;
+}
+.filters-grid.is-open .filter-toggle .material-icons {
+  transform: rotate(180deg);
+}
+
+.filter-button,
+.filter-toggle {
+  height: 40px;
+  text-transform: uppercase;
+}
+
+.filter-button {
+  padding-left: 40px;
+  padding-right: 40px;
+}
+
+.filter-toggle:hover, .filter-toggle.is-hovered {
+  background-color: transparent !important;
+}
+.filter-toggle .more-filters,
+.filter-toggle .less-filters {
+  text-decoration: underline;
+}
+.filter-toggle .more-filters:hover, .filter-toggle .more-filters.is-hovered,
+.filter-toggle .less-filters:hover,
+.filter-toggle .less-filters.is-hovered {
+  text-decoration: none;
+}
+.filter-toggle .material-icons {
+  transform-origin: center;
 }
 
 .modal {

@@ -1,11 +1,3 @@
 .label {
   @extend .text-sm;
 }
-
-.button {
-  @extend .text-xs;
-  height: 40px;
-  padding-left: 40px;
-  padding-right: 40px;
-  text-transform: uppercase;
-}

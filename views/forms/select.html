@@ -3,10 +3,10 @@
 {{ $value := .Value }}
 
 <div class="field">
-    <label class="label" for="{{ .Label }}">{{ .Label }}</label>
+    <label class="label" for="{{ .Name }}">{{ .Label }}</label>
     <div class="control">
         <div class="select">
-            <select id="{{ .Label }}">
+            <select id="{{ .Name }}">
                 <option value="">Any</option>
                 {{ range $index, $option := .Options }}
                 <option value="{{ $option.Value }}" {{ if strEq $option.Value $value }}selected{{ end }}>{{ $option.Text }}</option>
