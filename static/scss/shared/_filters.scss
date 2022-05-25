@@ -40,9 +40,6 @@
 }
 
 .filter-toggle {
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
-
   &:hover,
   &.is-hovered {
     background-color: transparent !important;
@@ -60,5 +57,24 @@
 
   .material-icons {
     transform-origin: center;
+  }
+}
+
+.filters-grid-clear {
+  align-items: baseline;
+  display: flex;
+
+  .filter-chip {
+    margin-right: 0.5rem;
+  }
+
+  .filter-clear {
+    text-decoration: underline;
+
+    &:hover,
+    &.is-hovered {
+      background-color: transparent !important;
+      text-decoration: none;
+    }
   }
 }

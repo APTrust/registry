@@ -6361,6 +6361,7 @@ ol {
   border-radius: 11px;
   border-color: #d6d6d6;
   color: #333030;
+  cursor: pointer;
   line-height: 1.25rem;
   padding: 0 0.5rem;
 }
@@ -6396,10 +6397,6 @@ ol {
   transform: rotate(180deg);
 }
 
-.filter-toggle {
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
-}
 .filter-toggle:hover, .filter-toggle.is-hovered {
   background-color: transparent !important;
 }
@@ -6416,10 +6413,29 @@ ol {
   transform-origin: center;
 }
 
+.filters-grid-clear {
+  align-items: baseline;
+  display: flex;
+}
+.filters-grid-clear .filter-chip {
+  margin-right: 0.5rem;
+}
+.filters-grid-clear .filter-clear {
+  text-decoration: underline;
+}
+.filters-grid-clear .filter-clear:hover, .filters-grid-clear .filter-clear.is-hovered {
+  background-color: transparent !important;
+  text-decoration: none;
+}
+
 .button {
   height: 40px;
   padding-left: 40px;
   padding-right: 40px;
+}
+.button.is-compact {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
 }
 
 .modal {
