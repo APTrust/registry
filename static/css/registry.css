@@ -6396,6 +6396,9 @@ ol {
 .filters-grid.is-open .filter-toggle .material-icons {
   transform: rotate(180deg);
 }
+.filters-grid.is-open .columns:last-child {
+  margin-bottom: 0;
+}
 
 .filter-toggle:hover, .filter-toggle.is-hovered {
   background-color: transparent !important;
