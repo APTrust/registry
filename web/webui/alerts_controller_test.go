@@ -2,6 +2,7 @@ package webui_test
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"testing"
 
@@ -135,7 +136,6 @@ func TestMarkReadAndUnread(t *testing.T) {
 	resetAlertsToUnread(t, alerts)
 	testMarkAlertsRead(t, alerts, alertIDs)
 	testMarkAlertsUnread(t, alerts, alertIDs)
-	resetAlertsToUnread(t, alerts)
 	testMarkAllAlertsRead(t, alerts, alertIDs)
 
 	testMarkAlertsReadWrongUser(t, alerts, alertIDs)
@@ -146,7 +146,7 @@ func TestMarkReadAndUnread(t *testing.T) {
 
 func resetAlertsToUnread(t *testing.T, alerts []*pgmodels.Alert) {
 	for _, alert := range alerts {
-		require.Nil(t, alert.MarkAsRead(testutil.Inst1Admin.ID))
+		require.Nil(t, alert.MarkAsUnread(testutil.Inst1Admin.ID))
 	}
 }
 
@@ -167,17 +167,69 @@ func testMarkAlertsRead(t *testing.T, alerts []*pgmodels.Alert, alertIDs []int64
 	assert.Empty(t, result.Failed)
 	assert.Empty(t, result.Error)
 
-	assert.Contains(t, result.Succeeded, alertIDs[0])
-	assert.Contains(t, result.Succeeded, alertIDs[1])
-	assert.Contains(t, result.Succeeded, alertIDs[2])
+	// Make sure controller marked these as succeeded
+	// and they were really changed in the database.
+	for i := 0; i < 3; i++ {
+		id := alertIDs[i]
+		assert.Contains(t, result.Succeeded, id)
+		alertView, err := pgmodels.AlertViewForUser(id, testutil.Inst1Admin.ID)
+		require.Nil(t, err)
+		assert.NotEmpty(t, alertView.ReadAt)
+	}
 }
 
 func testMarkAlertsUnread(t *testing.T, alerts []*pgmodels.Alert, alertIDs []int64) {
+	resp := testutil.Inst1AdminClient.PUT("/alerts/mark_as_unread").
+		WithHeader("Referer", testutil.BaseURL).
+		WithFormField(constants.CSRFTokenName, testutil.Inst1AdminToken).
+		WithFormField("id__in", alertIDs[0]).
+		WithFormField("id__in", alertIDs[1]).
+		WithFormField("id__in", alertIDs[2]).
+		Expect()
+	body := resp.Body().Raw()
+	resp.Status(http.StatusOK)
+	result := &webui.AlertReadResult{}
+	err := json.Unmarshal([]byte(body), result)
+	require.Nil(t, err)
+	assert.Equal(t, 3, len(result.Succeeded))
+	assert.Empty(t, result.Failed)
+	assert.Empty(t, result.Error)
 
+	// Make sure controller marked these as succeeded
+	// and they were really changed in the database.
+	for i := 0; i < 3; i++ {
+		id := alertIDs[i]
+		assert.Contains(t, result.Succeeded, id)
+		alertView, err := pgmodels.AlertViewForUser(id, testutil.Inst1Admin.ID)
+		require.Nil(t, err)
+		assert.Empty(t, alertView.ReadAt)
+	}
 }
 
 func testMarkAllAlertsRead(t *testing.T, alerts []*pgmodels.Alert, alertIDs []int64) {
+	resetAlertsToUnread(t, alerts)
+	resp := testutil.Inst1AdminClient.PUT("/alerts/mark_all_as_read").
+		WithHeader("Referer", testutil.BaseURL).
+		WithFormField(constants.CSRFTokenName, testutil.Inst1AdminToken).
+		Expect()
+	body := resp.Body().Raw()
+	fmt.Println(body)
+	resp.Status(http.StatusOK)
+	result := &webui.AlertReadResult{}
+	err := json.Unmarshal([]byte(body), result)
+	require.Nil(t, err)
+	assert.Equal(t, len(alerts), len(result.Succeeded))
+	assert.Empty(t, result.Failed)
+	assert.Empty(t, result.Error)
 
+	// Make sure controller marked these as succeeded
+	// and they were really changed in the database.
+	for _, id := range alertIDs {
+		assert.Contains(t, result.Succeeded, id)
+		alertView, err := pgmodels.AlertViewForUser(id, testutil.Inst1Admin.ID)
+		require.Nil(t, err)
+		assert.NotEmpty(t, alertView.ReadAt)
+	}
 }
 
 func testMarkAlertsReadWrongUser(t *testing.T, alerts []*pgmodels.Alert, alertIDs []int64) {
