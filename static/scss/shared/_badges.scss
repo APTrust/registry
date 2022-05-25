@@ -7,6 +7,7 @@
   display: inline-flex;
   line-height: 1.5rem;
   padding: 0 1rem;
+  white-space: nowrap;
 
   &.is-full {
     align-items: center;

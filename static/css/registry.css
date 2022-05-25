@@ -6327,6 +6327,7 @@ ol {
   display: inline-flex;
   line-height: 1.5rem;
   padding: 0 1rem;
+  white-space: nowrap;
 }
 .badge.is-full {
   align-items: center;
@@ -6419,6 +6420,7 @@ ol {
 .filters-grid-clear {
   align-items: baseline;
   display: flex;
+  flex-wrap: wrap;
 }
 .filters-grid-clear .filter-chip {
   margin-right: 0.5rem;
