@@ -22,6 +22,10 @@
     }
   }
 
+  &-controls {
+    white-space: nowrap;
+  }
+
   &.is-open {
     .filters-grid-header {
       margin-bottom: 0.75rem !important;
@@ -35,19 +39,10 @@
   }
 }
 
-.filter-button, 
 .filter-toggle {
-  @extend .text-xs;
-  height: 40px;
-  text-transform: uppercase;
-}
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
 
-.filter-button {
-  padding-left: 40px;
-  padding-right: 40px;
-}
-
-.filter-toggle {
   &:hover,
   &.is-hovered {
     background-color: transparent !important;

@@ -6122,7 +6122,7 @@ h3,
   line-height: 20px;
 }
 
-.text-label, .global-search .button, .side-nav ul a {
+.text-label, .button, .global-search .button, .side-nav ul a {
   font-size: 16px;
   font-weight: 500;
   line-height: 20px;
@@ -6141,8 +6141,7 @@ p,
   line-height: 16px;
 }
 
-.text-xs, .filter-button,
-.filter-toggle {
+.text-xs, .button {
   font-size: 12px;
   line-height: 14px;
 }
@@ -6313,6 +6312,12 @@ ol {
   padding: 16px 20px;
 }
 
+.button {
+  height: 40px;
+  padding-left: 40px;
+  padding-right: 40px;
+}
+
 .filters-grid {
   display: flex;
 }
@@ -6331,6 +6336,9 @@ ol {
   height: 1px;
   margin: 40px 0;
 }
+.filters-grid-controls {
+  white-space: nowrap;
+}
 .filters-grid.is-open .filters-grid-header {
   margin-bottom: 0.75rem !important;
 }
@@ -6338,17 +6346,10 @@ ol {
   transform: rotate(180deg);
 }
 
-.filter-button,
 .filter-toggle {
-  height: 40px;
-  text-transform: uppercase;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
 }
-
-.filter-button {
-  padding-left: 40px;
-  padding-right: 40px;
-}
-
 .filter-toggle:hover, .filter-toggle.is-hovered {
   background-color: transparent !important;
 }
