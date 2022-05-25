@@ -6316,6 +6316,9 @@ ol {
 .filters-grid {
   display: flex;
 }
+.filters-grid-header {
+  margin-bottom: 0 !important;
+}
 .filters-grid-label {
   margin-right: 16px;
   padding-top: 36px;
@@ -6327,6 +6330,9 @@ ol {
   background-color: #d6d6d6;
   height: 1px;
   margin: 40px 0;
+}
+.filters-grid.is-open .filters-grid-header {
+  margin-bottom: 0.75rem !important;
 }
 .filters-grid.is-open .filter-toggle .material-icons {
   transform: rotate(180deg);

@@ -1,6 +1,10 @@
 .filters-grid {
   display: flex;
 
+  &-header {
+    margin-bottom: 0 !important;
+  }
+
   &-label {
     margin-right: 16px;
     padding-top: 36px;
@@ -19,6 +23,10 @@
   }
 
   &.is-open {
+    .filters-grid-header {
+      margin-bottom: 0.75rem !important;
+    }
+
     .filter-toggle {
       .material-icons {
         transform: rotate(180deg);

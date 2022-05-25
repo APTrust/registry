@@ -4,7 +4,7 @@
   <h3 class="filters-grid-label text-label text-xs">Filter</h3>
   <form class="filters-grid-form" id="itemFilterForm" method="get" onsubmit="chooseEndpoint()">
 
-    <div class="columns">
+    <div class="columns filters-grid-header">
       <div class="column">
         {{ template "forms/select.html" .filterForm.Fields.action }}
       </div>
