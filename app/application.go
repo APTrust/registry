@@ -146,6 +146,9 @@ func initRoutes(router *gin.Engine) {
 		// Alerts
 		webRoutes.GET("/alerts", webui.AlertIndex)
 		webRoutes.GET("/alerts/show/:id/:user_id", webui.AlertShow)
+		webRoutes.PUT("/alerts/mark_as_read", webui.AlertMarkAsReadXHR)
+		webRoutes.PUT("/alerts/mark_all_as_read", webui.AlertMarkAllAsReadXHR)
+		webRoutes.PUT("/alerts/mark_as_unread", webui.AlertMarkAsUnreadXHR)
 
 		// Deletion Requests
 		// Note that these routes are for read-only views.
