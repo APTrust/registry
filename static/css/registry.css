@@ -6443,6 +6443,23 @@ ol {
   padding-right: 0.5rem;
 }
 
+.action-icon {
+  align-items: center;
+  background-color: #a2a2a2;
+  border-radius: 50%;
+  color: hsl(0deg, 0%, 100%);
+  display: inline-flex;
+  height: 36px;
+  justify-content: center;
+  width: 36px;
+}
+.action-icon.is-ingest .material-icons::after, .action-icon.is-upload .material-icons::after {
+  content: "file_upload";
+}
+.action-icon.is-ingest .material-icons span, .action-icon.is-upload .material-icons span {
+  display: none;
+}
+
 .modal {
   display: none;
 }

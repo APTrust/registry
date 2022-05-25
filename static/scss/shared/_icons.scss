@@ -1,0 +1,23 @@
+.action-icon {
+  align-items: center;
+  background-color: $grey;
+  border-radius: 50%;
+  color: $white;
+  display: inline-flex;
+  height: 36px;
+  justify-content: center;
+  width: 36px;
+
+  &.is-ingest,
+  &.is-upload {
+    .material-icons {
+      &::after {
+        content: 'file_upload';
+      }
+
+      span {
+        display: none;
+      }
+    }
+  }
+}
