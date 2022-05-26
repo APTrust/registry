@@ -4,15 +4,153 @@
   border-radius: 50%;
   color: $white;
   display: inline-flex;
-  height: 36px;
+  height: 28px;
   justify-content: center;
-  width: 36px;
+  width: 28px;
+
+  &.is-large {
+    height: 36px;
+    width: 36px;
+  }
+
+  &.is-dark {
+    background-color: $grey-dark;
+  }
+
+  &.is-danger {
+    background-color: $red;
+  }
+
+  &.is-check,
+  &.is-complete,
+  &.is-done {
+    .material-icons {
+      &::after {
+        content: 'done';
+      }
+
+      span {
+        display: none;
+      }
+    }
+  }
 
   &.is-ingest,
   &.is-upload {
     .material-icons {
       &::after {
         content: 'file_upload';
+      }
+
+      span {
+        display: none;
+      }
+    }
+  }
+
+  &.is-restore,
+  &.is-download {
+    .material-icons {
+      &::after {
+        content: 'file_download';
+      }
+
+      span {
+        display: none;
+      }
+    }
+  }
+
+  &.is-delete {
+    .material-icons {
+      &::after {
+        content: 'delete_forever';
+      }
+
+      span {
+        display: none;
+      }
+    }
+  }
+
+  &.is-new,
+  &.is-feature {
+    .material-icons {
+      &::after {
+        content: 'star';
+      }
+
+      span {
+        display: none;
+      }
+    }
+  }
+
+  &.is-user {
+    .material-icons {
+      &::after {
+        content: 'person';
+      }
+
+      span {
+        display: none;
+      }
+    }
+  }
+
+  &.is-replication {
+    .material-icons {
+      &::after {
+        content: 'library_books';
+      }
+
+      span {
+        display: none;
+      }
+    }
+  }
+
+  &.is-search,
+  &.is-identifier {
+    .material-icons {
+      &::after {
+        content: 'search';
+      }
+
+      span {
+        display: none;
+      }
+    }
+  }
+
+  &.is-work-item {
+    .material-icons {
+      &::after {
+        content: 'build';
+      }
+
+      span {
+        display: none;
+      }
+    }
+  }
+
+  &.is-object {
+    .material-icons {
+      &::after {
+        content: 'inventory';
+      }
+
+      span {
+        display: none;
+      }
+    }
+  }
+
+  &.is-file {
+    .material-icons {
+      &::after {
+        content: 'insert_drive_file';
       }
 
       span {

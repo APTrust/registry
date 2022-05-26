@@ -40,17 +40,259 @@
 <pre class="mb-5"><code>&lt;span class=&quot;material-icons md-48&quot; aria-hidden=&quot;true&quot;&gt;face&lt;/span&gt;</code></pre>
 
 <h2 class="mb-3">Action Icons</h2>
-<div class="notification">These are used in various situations on multiple pages.
-  Based on your needs, you can either use the class names or update the html value.
-  The classname supercedes the html value.
+<div class="notification">These are used in various situations throughout the site.
+  Based on your needs, you can either update the html value or use the class names.
+  The classname supercedes the html value. See examples below.
 </div>
 
-<span class="action-icon">
+<h3 class="mb-3">Basic Example</h3>
+<span class="action-icon mb-3">
   <span class="material-icons md-16" aria-hidden="true"><span>check</span></span>
 </span>
+<pre class="mb-5"><code>&lt;span class=&quot;action-icon&quot;&gt;
+  &lt;span class=&quot;material-icons md-16&quot; aria-hidden=&quot;true&quot;&gt;&lt;span&gt;check&lt;/span&gt;&lt;/span&gt;
+&lt;/span&gt;</code></pre>
 
-<span class="action-icon is-upload">
+<h3 class="mb-3">Larger Icon</h3>
+<span class="action-icon mb-3 is-large">
   <span class="material-icons md-16" aria-hidden="true"><span>check</span></span>
 </span>
+<pre class="mb-5"><code>&lt;span class=&quot;action-icon is-large&quot;&gt;
+  &lt;span class=&quot;material-icons md-16&quot; aria-hidden=&quot;true&quot;&gt;&lt;span&gt;check&lt;/span&gt;&lt;/span&gt;
+&lt;/span&gt;</code></pre>
+
+<h3 class="mb-3">Darker Icon</h3>
+<span class="action-icon mb-3 is-dark">
+  <span class="material-icons md-16" aria-hidden="true"><span>check</span></span>
+</span>
+<pre class="mb-5"><code>&lt;span class=&quot;action-icon is-dark&quot;&gt;
+  &lt;span class=&quot;material-icons md-16&quot; aria-hidden=&quot;true&quot;&gt;&lt;span&gt;check&lt;/span&gt;&lt;/span&gt;
+&lt;/span&gt;</code></pre>
+
+<h3 class="mb-3">Danger Icon</h3>
+<span class="action-icon mb-3 is-danger is-dark">
+  <span class="material-icons md-16" aria-hidden="true"><span>delete_forever</span></span>
+</span>
+<pre class="mb-5"><code>&lt;span class=&quot;action-icon is-danger&quot;&gt;
+  &lt;span class=&quot;material-icons md-16&quot; aria-hidden=&quot;true&quot;&gt;&lt;span&gt;delete_forever&lt;/span&gt;&lt;/span&gt;
+&lt;/span&gt;</code></pre>
+
+<h3 class="mb-3">Check / Complete Variants</h3>
+<div class="mb-3">
+  <span class="action-icon">
+    <span class="material-icons md-16" aria-hidden="true"><span>check</span></span>
+  </span>
+  <span class="action-icon">
+    <span class="material-icons md-16" aria-hidden="true"><span>done</span></span>
+  </span>
+  <span class="action-icon is-check">
+    <span class="material-icons md-16" aria-hidden="true"><span>face</span></span>
+  </span>
+  <span class="action-icon is-complete">
+    <span class="material-icons md-16" aria-hidden="true"><span>face</span></span>
+  </span>
+  <span class="action-icon is-done">
+    <span class="material-icons md-16" aria-hidden="true"><span>face</span></span>
+  </span>
+</div>
+<pre class="mb-5"><code>&lt;span class=&quot;action-icon&quot;&gt;
+  &lt;span class=&quot;material-icons md-16&quot; aria-hidden=&quot;true&quot;&gt;&lt;span&gt;check&lt;/span&gt;&lt;/span&gt;
+&lt;/span&gt;
+&lt;span class=&quot;action-icon&quot;&gt;
+  &lt;span class=&quot;material-icons md-16&quot; aria-hidden=&quot;true&quot;&gt;&lt;span&gt;done&lt;/span&gt;&lt;/span&gt;
+&lt;/span&gt;
+&lt;span class=&quot;action-icon is-check&quot;&gt;
+  &lt;span class=&quot;material-icons md-16&quot; aria-hidden=&quot;true&quot;&gt;&lt;span&gt;face&lt;/span&gt;&lt;/span&gt;
+&lt;/span&gt;
+&lt;span class=&quot;action-icon is-complete&quot;&gt;
+  &lt;span class=&quot;material-icons md-16&quot; aria-hidden=&quot;true&quot;&gt;&lt;span&gt;face&lt;/span&gt;&lt;/span&gt;
+&lt;/span&gt;
+&lt;span class=&quot;action-icon is-done&quot;&gt;
+  &lt;span class=&quot;material-icons md-16&quot; aria-hidden=&quot;true&quot;&gt;&lt;span&gt;face&lt;/span&gt;&lt;/span&gt;
+&lt;/span&gt;</code></pre>
+
+<h3 class="mb-3">Upload / Ingest Variants</h3>
+<div class="mb-3">
+  <span class="action-icon">
+    <span class="material-icons md-16" aria-hidden="true"><span>file_upload</span></span>
+  </span>
+  <span class="action-icon is-upload">
+    <span class="material-icons md-16" aria-hidden="true"><span>face</span></span>
+  </span>
+  <span class="action-icon is-ingest">
+    <span class="material-icons md-16" aria-hidden="true"><span>face</span></span>
+  </span>
+</div>
+<pre class="mb-5"><code>&lt;span class=&quot;action-icon&quot;&gt;
+  &lt;span class=&quot;material-icons md-16&quot; aria-hidden=&quot;true&quot;&gt;&lt;span&gt;file_upload&lt;/span&gt;&lt;/span&gt;
+&lt;/span&gt;
+&lt;span class=&quot;action-icon is-upload&quot;&gt;
+  &lt;span class=&quot;material-icons md-16&quot; aria-hidden=&quot;true&quot;&gt;&lt;span&gt;face&lt;/span&gt;&lt;/span&gt;
+&lt;/span&gt;
+&lt;span class=&quot;action-icon is-ingest&quot;&gt;
+  &lt;span class=&quot;material-icons md-16&quot; aria-hidden=&quot;true&quot;&gt;&lt;span&gt;face&lt;/span&gt;&lt;/span&gt;
+&lt;/span&gt;</code></pre>
+
+<h3 class="mb-3">Download / Restore Variants</h3>
+<div class="mb-3">
+  <span class="action-icon">
+    <span class="material-icons md-16" aria-hidden="true"><span>file_download</span></span>
+  </span>
+  <span class="action-icon is-download">
+    <span class="material-icons md-16" aria-hidden="true"><span>face</span></span>
+  </span>
+  <span class="action-icon is-restore">
+    <span class="material-icons md-16" aria-hidden="true"><span>face</span></span>
+  </span>
+</div>
+<pre class="mb-5"><code>&lt;span class=&quot;action-icon&quot;&gt;
+  &lt;span class=&quot;material-icons md-16&quot; aria-hidden=&quot;true&quot;&gt;&lt;span&gt;file_download&lt;/span&gt;&lt;/span&gt;
+&lt;/span&gt;
+&lt;span class=&quot;action-icon is-download&quot;&gt;
+  &lt;span class=&quot;material-icons md-16&quot; aria-hidden=&quot;true&quot;&gt;&lt;span&gt;face&lt;/span&gt;&lt;/span&gt;
+&lt;/span&gt;
+&lt;span class=&quot;action-icon is-restore&quot;&gt;
+  &lt;span class=&quot;material-icons md-16&quot; aria-hidden=&quot;true&quot;&gt;&lt;span&gt;face&lt;/span&gt;&lt;/span&gt;
+&lt;/span&gt;</code></pre>
+
+<h3 class="mb-3">Delete Variants</h3>
+<div class="mb-3">
+  <span class="action-icon">
+    <span class="material-icons md-16" aria-hidden="true"><span>delete_forever</span></span>
+  </span>
+  <span class="action-icon is-delete">
+    <span class="material-icons md-16" aria-hidden="true"><span>face</span></span>
+  </span>
+</div>
+<pre class="mb-5"><code>&lt;span class=&quot;action-icon&quot;&gt;
+  &lt;span class=&quot;material-icons md-16&quot; aria-hidden=&quot;true&quot;&gt;&lt;span&gt;delete_forever&lt;/span&gt;&lt;/span&gt;
+&lt;/span&gt;
+&lt;span class=&quot;action-icon is-delete&quot;&gt;
+  &lt;span class=&quot;material-icons md-16&quot; aria-hidden=&quot;true&quot;&gt;&lt;span&gt;face&lt;/span&gt;&lt;/span&gt;
+&lt;/span&gt;</code></pre>
+
+<h3 class="mb-3">New Feature Variants</h3>
+<div class="mb-3">
+  <span class="action-icon">
+    <span class="material-icons md-16" aria-hidden="true"><span>star</span></span>
+  </span>
+  <span class="action-icon is-new">
+    <span class="material-icons md-16" aria-hidden="true"><span>face</span></span>
+  </span>
+  <span class="action-icon is-feature">
+    <span class="material-icons md-16" aria-hidden="true"><span>face</span></span>
+  </span>
+</div>
+<pre class="mb-5"><code>&lt;span class=&quot;action-icon&quot;&gt;
+  &lt;span class=&quot;material-icons md-16&quot; aria-hidden=&quot;true&quot;&gt;&lt;span&gt;star&lt;/span&gt;&lt;/span&gt;
+&lt;/span&gt;
+&lt;span class=&quot;action-icon is-new&quot;&gt;
+  &lt;span class=&quot;material-icons md-16&quot; aria-hidden=&quot;true&quot;&gt;&lt;span&gt;face&lt;/span&gt;&lt;/span&gt;
+&lt;/span&gt;
+&lt;span class=&quot;action-icon is-feature&quot;&gt;
+  &lt;span class=&quot;material-icons md-16&quot; aria-hidden=&quot;true&quot;&gt;&lt;span&gt;face&lt;/span&gt;&lt;/span&gt;
+&lt;/span&gt;</code></pre>
+
+<h3 class="mb-3">User Variants</h3>
+<div class="mb-3">
+  <span class="action-icon">
+    <span class="material-icons md-16" aria-hidden="true"><span>person</span></span>
+  </span>
+  <span class="action-icon is-user">
+    <span class="material-icons md-16" aria-hidden="true"><span>face</span></span>
+  </span>
+</div>
+<pre class="mb-5"><code>&lt;span class=&quot;action-icon&quot;&gt;
+  &lt;span class=&quot;material-icons md-16&quot; aria-hidden=&quot;true&quot;&gt;&lt;span&gt;person&lt;/span&gt;&lt;/span&gt;
+&lt;/span&gt;
+&lt;span class=&quot;action-icon is-user&quot;&gt;
+  &lt;span class=&quot;material-icons md-16&quot; aria-hidden=&quot;true&quot;&gt;&lt;span&gt;face&lt;/span&gt;&lt;/span&gt;
+&lt;/span&gt;</code></pre>
+
+<h3 class="mb-3">Replication Variants</h3>
+<div class="mb-3">
+  <span class="action-icon">
+    <span class="material-icons md-16" aria-hidden="true"><span>library_books</span></span>
+  </span>
+  <span class="action-icon is-replication">
+    <span class="material-icons md-16" aria-hidden="true"><span>face</span></span>
+  </span>
+</div>
+<pre class="mb-5"><code>&lt;span class=&quot;action-icon&quot;&gt;
+  &lt;span class=&quot;material-icons md-16&quot; aria-hidden=&quot;true&quot;&gt;&lt;span&gt;library_books&lt;/span&gt;&lt;/span&gt;
+&lt;/span&gt;
+&lt;span class=&quot;action-icon is-replication&quot;&gt;
+  &lt;span class=&quot;material-icons md-16&quot; aria-hidden=&quot;true&quot;&gt;&lt;span&gt;face&lt;/span&gt;&lt;/span&gt;
+&lt;/span&gt;</code></pre>
+
+<h3 class="mb-3">Search / Identifier Variants</h3>
+<div class="mb-3">
+  <span class="action-icon">
+    <span class="material-icons md-16" aria-hidden="true"><span>search</span></span>
+  </span>
+  <span class="action-icon is-search">
+    <span class="material-icons md-16" aria-hidden="true"><span>face</span></span>
+  </span>
+  <span class="action-icon is-identifier">
+    <span class="material-icons md-16" aria-hidden="true"><span>face</span></span>
+  </span>
+</div>
+<pre class="mb-5"><code>&lt;span class=&quot;action-icon&quot;&gt;
+  &lt;span class=&quot;material-icons md-16&quot; aria-hidden=&quot;true&quot;&gt;&lt;span&gt;search&lt;/span&gt;&lt;/span&gt;
+&lt;/span&gt;
+&lt;span class=&quot;action-icon is-search&quot;&gt;
+  &lt;span class=&quot;material-icons md-16&quot; aria-hidden=&quot;true&quot;&gt;&lt;span&gt;face&lt;/span&gt;&lt;/span&gt;
+&lt;/span&gt;
+&lt;span class=&quot;action-icon is-identifier&quot;&gt;
+  &lt;span class=&quot;material-icons md-16&quot; aria-hidden=&quot;true&quot;&gt;&lt;span&gt;face&lt;/span&gt;&lt;/span&gt;
+&lt;/span&gt;</code></pre>
+
+<h3 class="mb-3">Work Item Variants</h3>
+<div class="mb-3">
+  <span class="action-icon">
+    <span class="material-icons md-16" aria-hidden="true"><span>build</span></span>
+  </span>
+  <span class="action-icon is-work-item">
+    <span class="material-icons md-16" aria-hidden="true"><span>face</span></span>
+  </span>
+</div>
+<pre class="mb-5"><code>&lt;span class=&quot;action-icon&quot;&gt;
+  &lt;span class=&quot;material-icons md-16&quot; aria-hidden=&quot;true&quot;&gt;&lt;span&gt;build&lt;/span&gt;&lt;/span&gt;
+&lt;/span&gt;
+&lt;span class=&quot;action-icon is-work-item&quot;&gt;
+  &lt;span class=&quot;material-icons md-16&quot; aria-hidden=&quot;true&quot;&gt;&lt;span&gt;face&lt;/span&gt;&lt;/span&gt;
+&lt;/span&gt;</code></pre>
+
+<h3 class="mb-3">Object Variants</h3>
+<div class="mb-3">
+  <span class="action-icon">
+    <span class="material-icons md-16" aria-hidden="true"><span>inventory</span></span>
+  </span>
+  <span class="action-icon is-object">
+    <span class="material-icons md-16" aria-hidden="true"><span>face</span></span>
+  </span>
+</div>
+<pre class="mb-5"><code>&lt;span class=&quot;action-icon&quot;&gt;
+  &lt;span class=&quot;material-icons md-16&quot; aria-hidden=&quot;true&quot;&gt;&lt;span&gt;inventory&lt;/span&gt;&lt;/span&gt;
+&lt;/span&gt;
+&lt;span class=&quot;action-icon is-object&quot;&gt;
+  &lt;span class=&quot;material-icons md-16&quot; aria-hidden=&quot;true&quot;&gt;&lt;span&gt;face&lt;/span&gt;&lt;/span&gt;
+&lt;/span&gt;</code></pre>
+
+<h3 class="mb-3">File Variants</h3>
+<div class="mb-3">
+  <span class="action-icon">
+    <span class="material-icons md-16" aria-hidden="true"><span>insert_drive_file</span></span>
+  </span>
+  <span class="action-icon is-file">
+    <span class="material-icons md-16" aria-hidden="true"><span>face</span></span>
+  </span>
+</div>
+<pre class="mb-5"><code>&lt;span class=&quot;action-icon&quot;&gt;
+  &lt;span class=&quot;material-icons md-16&quot; aria-hidden=&quot;true&quot;&gt;&lt;span&gt;insert_drive_file&lt;/span&gt;&lt;/span&gt;
+&lt;/span&gt;
+&lt;span class=&quot;action-icon is-file&quot;&gt;
+  &lt;span class=&quot;material-icons md-16&quot; aria-hidden=&quot;true&quot;&gt;&lt;span&gt;face&lt;/span&gt;&lt;/span&gt;
+&lt;/span&gt;</code></pre>
 
 {{ end }}

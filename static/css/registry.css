@@ -6449,14 +6449,84 @@ ol {
   border-radius: 50%;
   color: hsl(0deg, 0%, 100%);
   display: inline-flex;
-  height: 36px;
+  height: 28px;
   justify-content: center;
+  width: 28px;
+}
+.action-icon.is-large {
+  height: 36px;
   width: 36px;
+}
+.action-icon.is-dark {
+  background-color: #6b6b6b;
+}
+.action-icon.is-danger {
+  background-color: #be1f45;
+}
+.action-icon.is-check .material-icons::after, .action-icon.is-complete .material-icons::after, .action-icon.is-done .material-icons::after {
+  content: "done";
+}
+.action-icon.is-check .material-icons span, .action-icon.is-complete .material-icons span, .action-icon.is-done .material-icons span {
+  display: none;
 }
 .action-icon.is-ingest .material-icons::after, .action-icon.is-upload .material-icons::after {
   content: "file_upload";
 }
 .action-icon.is-ingest .material-icons span, .action-icon.is-upload .material-icons span {
+  display: none;
+}
+.action-icon.is-restore .material-icons::after, .action-icon.is-download .material-icons::after {
+  content: "file_download";
+}
+.action-icon.is-restore .material-icons span, .action-icon.is-download .material-icons span {
+  display: none;
+}
+.action-icon.is-delete .material-icons::after {
+  content: "delete_forever";
+}
+.action-icon.is-delete .material-icons span {
+  display: none;
+}
+.action-icon.is-new .material-icons::after, .action-icon.is-feature .material-icons::after {
+  content: "star";
+}
+.action-icon.is-new .material-icons span, .action-icon.is-feature .material-icons span {
+  display: none;
+}
+.action-icon.is-user .material-icons::after {
+  content: "person";
+}
+.action-icon.is-user .material-icons span {
+  display: none;
+}
+.action-icon.is-replication .material-icons::after {
+  content: "library_books";
+}
+.action-icon.is-replication .material-icons span {
+  display: none;
+}
+.action-icon.is-search .material-icons::after, .action-icon.is-identifier .material-icons::after {
+  content: "search";
+}
+.action-icon.is-search .material-icons span, .action-icon.is-identifier .material-icons span {
+  display: none;
+}
+.action-icon.is-work-item .material-icons::after {
+  content: "build";
+}
+.action-icon.is-work-item .material-icons span {
+  display: none;
+}
+.action-icon.is-object .material-icons::after {
+  content: "inventory";
+}
+.action-icon.is-object .material-icons span {
+  display: none;
+}
+.action-icon.is-file .material-icons::after {
+  content: "insert_drive_file";
+}
+.action-icon.is-file .material-icons span {
   display: none;
 }
 
