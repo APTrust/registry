@@ -6607,6 +6607,13 @@ ol {
   padding-right: 0.5rem;
 }
 
+.select {
+  width: 100%;
+}
+.select select {
+  width: 100%;
+}
+
 .material-icons.md-12 {
   font-size: 12px;
 }
