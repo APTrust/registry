@@ -1,59 +1,18 @@
-.badge {
-  @extend .text-label;
-  @extend .text-xs;
+.pager {
+  @extend .text-table;
   align-items: center;
-  border: 1px solid $body-color;
-  border-radius: 13rem;
-  display: inline-flex;
-  line-height: 1.5rem;
-  padding: 0 1rem;
-  white-space: nowrap;
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1.5rem;
+  padding: 0 40px;
 
-  &.is-full {
-    align-items: center;
-    display: flex;
-    justify-content: center;
-  }
+  p,
+  button,
+  a {
+    margin-left: 48px;
 
-  &.is-pending {
-    border-color: $grey-pending;
-    color: $grey-pending;
-  }
-
-  &.is-started {
-    border-color: $green;
-    color: $green;
-  }
-
-  &.is-success {
-    background-color: $green;
-    border-color: $green;
-    color: $white;
-  }
-
-  &.is-failed {
-    background-color: $red;
-    border-color: $red;
-    color: $white;
-  }
-
-  &.is-cancelled {
-    background-color: $grey-darker;
-    border-color: $grey-darker;
-    color: $white;
-  }
-
-  &.filter-chip {
-    background-color: $grey-lighter;
-    border-radius: 11px;
-    border-color: $grey-lighter;
-    color: $grey-darker;
-    cursor: pointer;
-    line-height: 1.25rem;
-    padding: 0 0.5rem;
-
-    .icon {
-      margin-left: 0.5rem;
+    &:last-child {
+      margin-left: 18px;
     }
   }
 }

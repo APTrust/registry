@@ -6309,7 +6309,7 @@ h3,
   line-height: 20px;
 }
 
-.text-table, .table tbody td {
+.text-table, .pager, .table tbody td {
   font-size: 15px;
   line-height: 20px;
 }
@@ -6733,54 +6733,22 @@ ol {
 .table thead th {
   color: #6b6b6b;
 }
-.badge {
-  align-items: center;
-  border: 1px solid #333030;
-  border-radius: 13rem;
-  display: inline-flex;
-  line-height: 1.5rem;
-  padding: 0 1rem;
-  white-space: nowrap;
-}
-.badge.is-full {
+.pager {
   align-items: center;
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
+  margin-bottom: 1.5rem;
+  padding: 0 40px;
 }
-.badge.is-pending {
-  border-color: #8d9396;
-  color: #8d9396;
+.pager p,
+.pager button,
+.pager a {
+  margin-left: 48px;
 }
-.badge.is-started {
-  border-color: #35826b;
-  color: #35826b;
-}
-.badge.is-success {
-  background-color: #35826b;
-  border-color: #35826b;
-  color: hsl(0deg, 0%, 100%);
-}
-.badge.is-failed {
-  background-color: #be1f45;
-  border-color: #be1f45;
-  color: hsl(0deg, 0%, 100%);
-}
-.badge.is-cancelled {
-  background-color: #333030;
-  border-color: #333030;
-  color: hsl(0deg, 0%, 100%);
-}
-.badge.filter-chip {
-  background-color: #d6d6d6;
-  border-radius: 11px;
-  border-color: #d6d6d6;
-  color: #333030;
-  cursor: pointer;
-  line-height: 1.25rem;
-  padding: 0 0.5rem;
-}
-.badge.filter-chip .icon {
-  margin-left: 0.5rem;
+.pager p:last-child,
+.pager button:last-child,
+.pager a:last-child {
+  margin-left: 18px;
 }
 
 .modal {
