@@ -1,11 +1,8 @@
 {{ define "shared/_pager.html" }}
 
-<div class="row">
-  <div class="column column-100 center-text">
-    {{ .pager.ItemFirst }} - {{ .pager.ItemLast }} of {{ .pager.TotalItems }}
-  </div>
-</div>
-<div class="row">
+<div class="pager">
+  <p>Rows per page: 20</p><!-- TODO Make this dynamic? -->
+  <p>{{ .pager.ItemFirst }} - {{ .pager.ItemLast }} of {{ .pager.TotalItems }}</p>
 
   <!--
        Previous and Next links.
@@ -17,24 +14,46 @@
 
        If there's no .xhrTarget, the buttons should be standard <a> elements,
        and clicking them will cause a full page reload.
-  -->
 
+       If the link is disabled, a button shows with a disabled state
+  -->
 
   {{ if .pager.PreviousLink }}
     {{ if .xhrTarget }}
-    <div class="column column-50"><button type="button" class="button button-outline clickable" data-xhr-url="{{ .pager.PreviousLink }}" data-xhr-target="{{ .xhrTarget }}">&lt;</button></div>
+    <button class="button is-compact is-white" type="button" data-xhr-url="{{ .pager.PreviousLink }}" data-xhr-target="{{ .xhrTarget }}">
+      <span class="material-icons" aria-hidden="true">chevron_left</span>
+      <span class="is-sr-only">Previous</span>
+    </button>
     {{ else }}
-    <div class="column column-50"><a class="button button-outline clickable" href="{{ .pager.PreviousLink }}">&lt;</a></div>
+    <a class="button is-compact is-white" href="{{ .pager.PreviousLink }}">
+      <span class="material-icons" aria-hidden="true">chevron_left</span>
+      <span class="is-sr-only">Previous</span>
+    </a>
     {{ end }}
+  {{ else }}
+  <button class="button is-compact is-white" type="button" disabled>
+    <span class="material-icons" aria-hidden="true">chevron_left</span>
+    <span class="is-sr-only">Previous</span>
+  </button>
   {{ end }}
-
 
   {{ if .pager.NextLink }}
     {{ if .xhrTarget }}
-    <div class="column column-50"><button type="button" class="button button-outline clickable" data-xhr-url="{{ .pager.NextLink }}" data-xhr-target="{{ .xhrTarget }}">&gt;</button></div>
+    <button class="button is-compact is-white" type="button" data-xhr-url="{{ .pager.NextLink }}" data-xhr-target="{{ .xhrTarget }}">
+      <span class="material-icons" aria-hidden="true">chevron_right</span>
+      <span class="is-sr-only">Next</span>
+    </button>
     {{ else }}
-    <div class="column column-50"><a class="button button-outline clickable" href="{{ .pager.NextLink }}">&gt;</a></div>
+    <a class="button is-compact is-white" href="{{ .pager.NextLink }}">
+      <span class="material-icons" aria-hidden="true">chevron_right</span>
+      <span class="is-sr-only">Next</span>
+    </a>
     {{ end }}
+  {{ else }}
+  <button class="button is-compact is-white" type="button" disabled>
+    <span class="material-icons" aria-hidden="true">chevron_right</span>
+    <span class="is-sr-only">Next</span>
+  </button>
   {{ end }}
 </div>
 

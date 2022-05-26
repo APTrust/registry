@@ -2,15 +2,19 @@
 
 {{ $value := .Value }}
 
-<label>{{ .Label }}
-<select name="{{ .Name }}" {{ template "forms/attrs.html" . }}>
-    <option value="">Any</option>
-    {{ range $index, $option := .Options }}
-    <option value="{{ $option.Value }}" {{ if strEq $option.Value $value }}selected{{ end }}>{{ $option.Text }}</option>
-    {{ end }}
-</select>
-</label>
-
-{{ if .DisplayError }}<div class="row form-error">{{ .ErrMsg }}</div>{{ end }}
+<div class="field">
+    <label class="label" for="{{ .Name }}">{{ .Label }}</label>
+    <div class="control">
+        <div class="select">
+            <select id="{{ .Name }}">
+                <option value="">Any</option>
+                {{ range $index, $option := .Options }}
+                <option value="{{ $option.Value }}" {{ if strEq $option.Value $value }}selected{{ end }}>{{ $option.Text }}</option>
+                {{ end }}
+            </select>
+        </div>
+    </div>
+    {{ if .DisplayError }}<p class="help is-danger">{{ .ErrMsg }}</p>{{ end }}
+</div>
 
 {{ end }}

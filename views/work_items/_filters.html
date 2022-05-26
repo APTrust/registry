@@ -1,96 +1,132 @@
 {{ define "work_items/_filters.html" }}
 
-<form id="itemFilterForm" method="get" onsubmit="chooseEndpoint()">
+<div class="filters-grid">
+  <h3 class="filters-grid-label text-label text-xs">Filter</h3>
+  <div class="filters-grid-content">
+    <form class="filters-grid-form" id="itemFilterForm" method="get" onsubmit="chooseEndpoint()">
 
-  <div class="row">
-    <div class="column col-30">
-      {{ template "forms/select.html" .filterForm.Fields.action }}
-    </div>
-    <div class="column col-30">
-      {{ template "forms/select.html" .filterForm.Fields.stage }}
-    </div>
-    <div class="column col-30">
-      {{ template "forms/select.html" .filterForm.Fields.status }}
+      <div class="columns filters-grid-header">
+        <div class="column">
+          {{ template "forms/select.html" .filterForm.Fields.action }}
+        </div>
+        <div class="column">
+          {{ template "forms/select.html" .filterForm.Fields.stage }}
+        </div>
+        <div class="column">
+          {{ template "forms/select.html" .filterForm.Fields.status }}
+        </div>
+        <div class="column is-align-self-flex-end">
+          <div class="filters-grid-controls">
+            <input class="filter-button button is-primary" type="submit" value="Filter">
+            <a class="filter-toggle button is-compact is-white" href="#gridFiltersAll">
+              <span class="material-icons md-16" aria-hidden="true">expand_more</span>
+              <span class="more-filters">More Filters</span>
+              <span class="less-filters is-hidden">Less Filters</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    
+      <div class="filters-grid-all is-sr-only" id="gridFiltersAll">
+        <hr>
+  
+        <div class="columns">
+          <div class="column is-one-quarter">
+            {{ template "forms/text_input.html" .filterForm.Fields.name }}
+          </div>
+          <div class="column is-one-quarter">
+            {{ template "forms/text_input.html" .filterForm.Fields.etag }}
+          </div>
+          <div class="column is-one-quarter">
+            {{ if .CurrentUser.IsAdmin }}
+            {{ template "forms/select.html" .filterForm.Fields.institution_id }}
+            {{ end }}
+          </div>
+        </div>
+      
+        <div class="columns">
+          <div class="column is-one-quarter">
+            {{ template "forms/date.html" .filterForm.Fields.date_processed__gteq }}
+          </div>
+          <div class="column is-one-quarter">
+            {{ template "forms/date.html" .filterForm.Fields.date_processed__lteq }}
+          </div>
+          <div class="column is-one-quarter">
+            {{ template "forms/select.html" .filterForm.Fields.needs_admin_review }}
+          </div>
+        </div>
+  
+        <hr>
+      
+        <div class="columns">
+          <div class="column is-one-quarter">
+            {{ template "forms/text_input.html" .filterForm.Fields.object_identifier }}
+          </div>
+          <div class="column is-one-quarter">
+            {{ template "forms/text_input.html" .filterForm.Fields.generic_file_identifier }}
+          </div>
+          <div class="column is-one-quarter">
+            {{ template "forms/select.html" .filterForm.Fields.storage_option }}
+          </div>
+        </div>
+      
+        <div class="columns">
+          <div class="column is-one-quarter">
+            {{ template "forms/text_input.html" .filterForm.Fields.alt_identifier }}
+          </div>
+          <div class="column is-one-quarter">
+            {{ template "forms/text_input.html" .filterForm.Fields.bag_group_identifier }}
+          </div>
+          <div class="column is-one-quarter">
+            {{ template "forms/text_input.html" .filterForm.Fields.bucket }}
+          </div>
+        </div>
+  
+        <hr>
+      
+        <div class="columns">
+          <div class="column is-one-quarter">
+            {{ template "forms/text_input.html" .filterForm.Fields.user }}
+          </div>
+          <div class="column is-one-quarter">
+            {{ template "forms/select.html" .filterForm.Fields.bagit_profile_identifier }}
+          </div>
+          <div class="column is-one-quarter">
+            {{ if .CurrentUser.IsAdmin }}
+            {{ template "forms/select.html" .filterForm.Fields.redis_only }}
+            {{ end }}
+          </div>
+        </div>
+      
+        <div class="columns">
+          <div class="column is-one-quarter">
+            {{ template "forms/number.html" .filterForm.Fields.size__gteq }}
+          </div>
+          <div class="column is-one-quarter">
+            {{ template "forms/number.html" .filterForm.Fields.size__lteq }}
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <div class="filters-grid-clear">
+      <!-- TODO Example filter chips below, not wired up yet -->
+      <button class="badge filter-chip mb-3">
+        <strong class="mr-1">Action:</strong> Restore File
+        <span class="icon material-icons md-16" aria-hidden="true">cancel</span>
+      </button>
+      <button class="badge filter-chip mb-3">
+        <strong class="mr-1">Action:</strong> Restore File
+        <span class="icon material-icons md-16" aria-hidden="true">cancel</span>
+      </button>
+      <button class="badge filter-chip mb-3">
+        <strong class="mr-1">Action:</strong> Restore File
+        <span class="icon material-icons md-16" aria-hidden="true">cancel</span>
+      </button>
+      <button class="filter-clear button is-compact is-white">Clear Filters</button>
     </div>
   </div>
-
-  <div class="row">
-    <div class="column col-30">
-      {{ template "forms/text_input.html" .filterForm.Fields.name }}
-    </div>
-    <div class="column col-30">
-      {{ template "forms/text_input.html" .filterForm.Fields.etag }}
-    </div>
-    <div class="column col-30">
-      {{ if .CurrentUser.IsAdmin }}
-      {{ template "forms/select.html" .filterForm.Fields.institution_id }}
-      {{ end }}
-    </div>
-  </div>
-
-  <div class="row">
-    <div class="column col-30">
-      {{ template "forms/date.html" .filterForm.Fields.date_processed__gteq }}
-    </div>
-    <div class="column col-30">
-      {{ template "forms/date.html" .filterForm.Fields.date_processed__lteq }}
-    </div>
-    <div class="column col-30">
-      {{ template "forms/select.html" .filterForm.Fields.needs_admin_review }}
-    </div>
-  </div>
-
-  <div class="row">
-    <div class="column col-30">
-      {{ template "forms/text_input.html" .filterForm.Fields.object_identifier }}
-    </div>
-    <div class="column col-30">
-      {{ template "forms/text_input.html" .filterForm.Fields.generic_file_identifier }}
-    </div>
-    <div class="column col-30">
-      {{ template "forms/select.html" .filterForm.Fields.storage_option }}
-    </div>
-  </div>
-
-  <div class="row">
-    <div class="column col-30">
-      {{ template "forms/text_input.html" .filterForm.Fields.alt_identifier }}
-    </div>
-    <div class="column col-30">
-      {{ template "forms/text_input.html" .filterForm.Fields.bag_group_identifier }}
-    </div>
-    <div class="column col-30">
-      {{ template "forms/text_input.html" .filterForm.Fields.bucket }}
-    </div>
-  </div>
-
-  <div class="row">
-    <div class="column col-30">
-      {{ template "forms/text_input.html" .filterForm.Fields.user }}
-    </div>
-    <div class="column col-30">
-      {{ template "forms/select.html" .filterForm.Fields.bagit_profile_identifier }}
-    </div>
-    <div class="column col-30">
-      {{ if .CurrentUser.IsAdmin }}
-      {{ template "forms/select.html" .filterForm.Fields.redis_only }}
-      {{ end }}
-    </div>
-  </div>
-
-  <div class="row">
-    <div class="column col-30">
-      {{ template "forms/number.html" .filterForm.Fields.size__gteq }}
-    </div>
-    <div class="column col-30">
-      {{ template "forms/number.html" .filterForm.Fields.size__lteq }}
-    </div>
-    <div class="column col-30">
-      <input type="submit" value="Filter">
-    </div>
-  </div>
-
-</form>
+</div>
 
 <script>
  function chooseEndpoint() {

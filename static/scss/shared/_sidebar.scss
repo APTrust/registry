@@ -1,0 +1,39 @@
+.side-nav {
+  background: $white;
+  flex-shrink: 0;
+  width: 200px;
+
+  ul {
+    a {
+      @extend .text-label;
+      align-items: center;
+      display: flex;
+      padding: 16px 24px;
+
+      &:hover,
+      &.active {
+        background-color: $grey-highlight;
+      }
+    }
+
+    ul {
+      a {
+        padding-left: 36px;
+      }
+    }
+
+    .material-icons {
+      color: $gold;
+      margin-right: 10px;
+    }
+  }
+
+  hr {
+    height: 1px;
+    margin: 1.5rem 1rem;
+  }
+}
+
+.site-logo {
+  padding: 50px 12px;
+}

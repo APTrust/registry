@@ -1,0 +1,112 @@
+{{ define "ui_components/_forms.html" }}
+
+<hr>
+<div class="content is-flex is-justify-content-space-between is-align-items-center">
+  <h1 id="forms">Forms</h1>
+  <a href="#top">Back to top</a>
+</div>
+<hr>
+
+<h2 class="mb-3">Text Inputs</h2>
+<div class="field">
+  <label class="label" for="textInput1">Basic Text Input</label>
+  <div class="control">
+    <input class="input" type="text" id="textInput1" name="name" value="" placeholder="Basic Text Input">
+  </div>
+</div>
+<pre class="mb-3"><code>&lt;div class=&quot;field&quot;&gt;
+  &lt;label class=&quot;label&quot; for=&quot;textInput1&quot;&gt;Basic Text Input&lt;/label&gt;
+  &lt;div class=&quot;control&quot;&gt;
+    &lt;input class=&quot;input&quot; type=&quot;text&quot; id=&quot;textInput1&quot; name=&quot;name&quot; value=&quot;&quot; placeholder=&quot;Basic Text Input&quot;&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+
+<div class="field">
+  <label class="label" for="textInput2">Text Input With Help Note</label>
+  <div class="control">
+    <input class="input" type="text" id="textInput2" name="name" value="" placeholder="Text Input With Help Note">
+  </div>
+  <p class="help">A helpful message</p>
+</div>
+<pre class="mb-3"><code>&lt;div class=&quot;field&quot;&gt;
+  &lt;label class=&quot;label&quot; for=&quot;textInput2&quot;&gt;Text Input With Help Note&lt;/label&gt;
+  &lt;div class=&quot;control&quot;&gt;
+    &lt;input class=&quot;input&quot; type=&quot;text&quot; id=&quot;textInput2&quot; name=&quot;name&quot; value=&quot;&quot; placeholder=&quot;Text Input With Help Note&quot;&gt;
+  &lt;/div&gt;
+  &lt;p class=&quot;help&quot;&gt;A helpful message&lt;/p&gt;
+&lt;/div&gt;</code></pre>
+
+<div class="field">
+  <label class="label" for="textInput3">Text Input With Error Message</label>
+  <div class="control">
+    <input class="input" type="text" id="textInput3" name="name" value="" placeholder="Text Input With Error Message">
+  </div>
+  <p class="help is-danger">An error message</p>
+</div>
+<pre class="mb-5"><code>&lt;div class=&quot;field&quot;&gt;
+  &lt;label class=&quot;label&quot; for=&quot;textInput3&quot;&gt;Text Input With Error Message&lt;/label&gt;
+  &lt;div class=&quot;control&quot;&gt;
+    &lt;input class=&quot;input&quot; type=&quot;text&quot; id=&quot;textInput3&quot; name=&quot;name&quot; value=&quot;&quot; placeholder=&quot;Text Input With Error Message&quot;&gt;
+  &lt;/div&gt;
+  &lt;p class=&quot;help is-danger&quot;&gt;An error message&lt;/p&gt;
+&lt;/div&gt;</code></pre>
+
+<h2 class="mb-3">Select Input</h2>
+<div class="field">
+  <label class="label" for="selectInput">Select Input</label>
+  <div class="control">
+      <div class="select">
+          <select id="selectInput">
+            <option value="">Any</option>
+            <option value="">Option One</option>
+            <option value="">The Second Option</option>
+            <option value="">Another</option>
+            <option value="">The Last Option</option>
+          </select>
+      </div>
+  </div>
+</div>
+<pre class="mb-5"><code>&lt;div class=&quot;field&quot;&gt;
+  &lt;label class=&quot;label&quot; for=&quot;selectInput&quot;&gt;Select Input&lt;/label&gt;
+  &lt;div class=&quot;control&quot;&gt;
+      &lt;div class=&quot;select&quot;&gt;
+          &lt;select id=&quot;selectInput&quot;&gt;
+            &lt;option value=&quot;&quot;&gt;Any&lt;/option&gt;
+            &lt;option value=&quot;&quot;&gt;Option One&lt;/option&gt;
+            &lt;option value=&quot;&quot;&gt;The Second Option&lt;/option&gt;
+            &lt;option value=&quot;&quot;&gt;Another&lt;/option&gt;
+            &lt;option value=&quot;&quot;&gt;The Last Option&lt;/option&gt;
+          &lt;/select&gt;
+      &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+
+<h2 class="mb-3">Date Input</h2>
+<div class="field">
+  <label class="label" for="dateInput">Date Input</label>
+  <div class="control">
+    <input class="input" type="date" id="dateInput" name="dateInput" value="">
+  </div>
+</div>
+<pre class="mb-5"><code>&lt;div class=&quot;field&quot;&gt;
+  &lt;label class=&quot;label&quot; for=&quot;dateInput&quot;&gt;Date Input&lt;/label&gt;
+  &lt;div class=&quot;control&quot;&gt;
+    &lt;input class=&quot;input&quot; type=&quot;date&quot; id=&quot;dateInput&quot; name=&quot;dateInput&quot; value=&quot;&quot;&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+
+<h2 class="mb-3">Number Input</h2>
+<div class="field">
+  <label class="label" for="numberInput">Number Input</label>
+  <div class="control">
+    <input class="input" type="number" id="numberInput" name="numberInput" value="" placeholder="0">
+  </div>
+</div>
+<pre class="mb-5"><code>&lt;div class=&quot;field&quot;&gt;
+  &lt;label class=&quot;label&quot; for=&quot;numberInput&quot;&gt;Number Input&lt;/label&gt;
+  &lt;div class=&quot;control&quot;&gt;
+    &lt;input class=&quot;input&quot; type=&quot;number&quot; id=&quot;numberInput&quot; name=&quot;numberInput&quot; value=&quot;&quot; placeholder=&quot;0&quot;&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+
+{{ end }}

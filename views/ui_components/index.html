@@ -2,8 +2,6 @@
 
 {{ template "shared/_header.html" .}}
 
-
-
 <div class="mb-5 content">
   <h1>UI Components</h1>
   <p class="mb-3">This library exists to document various elements of the UI system.</p>
@@ -22,14 +20,20 @@
   <h2>Table of contents:</h2>
   <ul>
     <li><a href="#typography">Typography</a></li>
+    <li><a href="#forms">Forms</a></li>
+    <li><a href="#buttons">Buttons</a></li>
+    <li><a href="#badges">Badges and Chips</a></li>
+    <li><a href="#icons">Icons</a></li>
   </ul>
 </div>
-
-<hr>
 
 <!-- Add components inline, or in partials, as belo. -->
 
 {{ template "ui_components/_typography.html" . }}
+{{ template "ui_components/_forms.html" . }}
+{{ template "ui_components/_buttons.html" . }}
+{{ template "ui_components/_badges.html" . }}
+{{ template "ui_components/_icons.html" . }}
 
 
 
