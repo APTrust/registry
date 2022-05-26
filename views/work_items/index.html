@@ -30,7 +30,7 @@
       <tr class="clickable" onclick="window.location.href='/work_items/show/{{ $item.ID }}'">
         <td>
           <div class="is-flex is-align-items-center">
-            <span class="action-icon mr-3"><!-- Make this update with correct icon-->
+            <span class="action-icon mr-3"><!-- TODO Make this update with correct icon-->
               <span class="material-icons md-16" aria-hidden="true"><span>check</span></span>
             </span>
             <span class="is-grey-dark">{{ $item.Action }}</span>
@@ -40,7 +40,7 @@
         <td class="is-grey-dark">{{ $item.InstitutionName }}*</td><!-- TODO See above -->
         <td class="is-grey-dark num text-sm">2.5GB*</td><!-- TODO See above -->
         <td class="is-grey-dark">{{ $item.Stage }}</td>
-        <td><span class="badge">{{ $item.Status }}</span></td><!-- Make status change classes -->
+        <td><span class="badge">{{ $item.Status }}</span></td><!-- TODO Make status change classes -->
         <td class="is-grey-dark text-sm is-uppercase">January 1, 2022*</td><!-- TODO See above -->
       </tr>
       {{ end }}
