@@ -71,6 +71,7 @@ $label-weight: 400;
 $input-radius: $radius-large;
 $input-border-color: $grey;
 $table-row-hover-background-color: $grey-lightest;
+$table-head-cell-border-width: 0 0 1px;
 
 // Import bulma packages as needed
 @import "../../node_modules/bulma/sass/utilities/all";

@@ -2028,7 +2028,7 @@ a.box:active {
 }
 .table thead td,
 .table thead th {
-  border-width: 0 0 2px;
+  border-width: 0 0 1px;
   color: #333030;
 }
 .table tfoot {
