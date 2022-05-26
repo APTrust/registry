@@ -337,6 +337,30 @@ template {
   display: none;
 }
 
+.is-grey-darker {
+  color: #333030;
+}
+
+.is-grey-dark {
+  color: #6b6b6b;
+}
+
+.is-grey {
+  color: #a2a2a2;
+}
+
+.is-grey-light {
+  color: #c4c4c4;
+}
+
+.is-grey-lighter {
+  color: #d6d6d6;
+}
+
+.is-grey-lightest {
+  color: #eeeeee;
+}
+
 /* Bulma Utilities */
 .file-cta,
 .file-name, .select select, .textarea, .input, .button {
@@ -396,7 +420,7 @@ fieldset[disabled] .file-name, fieldset[disabled] .select select, .select fields
   width: 0.625em;
 }
 
-.notification:not(:last-child), .box:not(:last-child) {
+.table-container:not(:last-child), .table:not(:last-child), .notification:not(:last-child), .box:not(:last-child) {
   margin-bottom: 1.5rem;
 }
 
@@ -1887,6 +1911,174 @@ a.box:active {
 .notification.is-danger.is-light {
   background-color: #fcedf1;
   color: #d7234e;
+}
+
+.table {
+  background-color: hsl(0deg, 0%, 100%);
+  color: #333030;
+}
+.table td,
+.table th {
+  border: 1px solid #d6d6d6;
+  border-width: 0 0 1px;
+  padding: 0.5em 0.75em;
+  vertical-align: top;
+}
+.table td.is-white,
+.table th.is-white {
+  background-color: hsl(0deg, 0%, 100%);
+  border-color: hsl(0deg, 0%, 100%);
+  color: hsl(0deg, 0%, 4%);
+}
+.table td.is-black,
+.table th.is-black {
+  background-color: hsl(0deg, 0%, 4%);
+  border-color: hsl(0deg, 0%, 4%);
+  color: hsl(0deg, 0%, 100%);
+}
+.table td.is-light,
+.table th.is-light {
+  background-color: hsl(0deg, 0%, 96%);
+  border-color: hsl(0deg, 0%, 96%);
+  color: rgba(0, 0, 0, 0.7);
+}
+.table td.is-dark,
+.table th.is-dark {
+  background-color: #333030;
+  border-color: #333030;
+  color: #fff;
+}
+.table td.is-primary,
+.table th.is-primary {
+  background-color: #13135c;
+  border-color: #13135c;
+  color: #fff;
+}
+.table td.is-link,
+.table th.is-link {
+  background-color: #333030;
+  border-color: #333030;
+  color: #fff;
+}
+.table td.is-info,
+.table th.is-info {
+  background-color: hsl(207deg, 61%, 53%);
+  border-color: hsl(207deg, 61%, 53%);
+  color: #fff;
+}
+.table td.is-success,
+.table th.is-success {
+  background-color: #35826b;
+  border-color: #35826b;
+  color: #fff;
+}
+.table td.is-warning,
+.table th.is-warning {
+  background-color: hsl(44deg, 100%, 77%);
+  border-color: hsl(44deg, 100%, 77%);
+  color: rgba(0, 0, 0, 0.7);
+}
+.table td.is-danger,
+.table th.is-danger {
+  background-color: #be1f45;
+  border-color: #be1f45;
+  color: #fff;
+}
+.table td.is-narrow,
+.table th.is-narrow {
+  white-space: nowrap;
+  width: 1%;
+}
+.table td.is-selected,
+.table th.is-selected {
+  background-color: #13135c;
+  color: #fff;
+}
+.table td.is-selected a,
+.table td.is-selected strong,
+.table th.is-selected a,
+.table th.is-selected strong {
+  color: currentColor;
+}
+.table td.is-vcentered,
+.table th.is-vcentered {
+  vertical-align: middle;
+}
+.table th {
+  color: #333030;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+.table tr.is-selected {
+  background-color: #13135c;
+  color: #fff;
+}
+.table tr.is-selected a,
+.table tr.is-selected strong {
+  color: currentColor;
+}
+.table tr.is-selected td,
+.table tr.is-selected th {
+  border-color: #fff;
+  color: currentColor;
+}
+.table thead {
+  background-color: transparent;
+}
+.table thead td,
+.table thead th {
+  border-width: 0 0 2px;
+  color: #333030;
+}
+.table tfoot {
+  background-color: transparent;
+}
+.table tfoot td,
+.table tfoot th {
+  border-width: 2px 0 0;
+  color: #333030;
+}
+.table tbody {
+  background-color: transparent;
+}
+.table tbody tr:last-child td,
+.table tbody tr:last-child th {
+  border-bottom-width: 0;
+}
+.table.is-bordered td,
+.table.is-bordered th {
+  border-width: 1px;
+}
+.table.is-bordered tr:last-child td,
+.table.is-bordered tr:last-child th {
+  border-bottom-width: 1px;
+}
+.table.is-fullwidth {
+  width: 100%;
+}
+.table.is-hoverable tbody tr:not(.is-selected):hover {
+  background-color: #eeeeee;
+}
+.table.is-hoverable.is-striped tbody tr:not(.is-selected):hover {
+  background-color: #eeeeee;
+}
+.table.is-hoverable.is-striped tbody tr:not(.is-selected):hover:nth-child(even) {
+  background-color: hsl(0deg, 0%, 96%);
+}
+.table.is-narrow td,
+.table.is-narrow th {
+  padding: 0.25em 0.5em;
+}
+.table.is-striped tbody tr:not(.is-selected):nth-child(even) {
+  background-color: hsl(0deg, 0%, 98%);
+}
+
+.table-container {
+  -webkit-overflow-scrolling: touch;
+  overflow: auto;
+  overflow-y: hidden;
+  max-width: 100%;
 }
 
 /* Bulma Form */
@@ -6117,12 +6309,12 @@ h3,
   line-height: 20px;
 }
 
-.text-table {
+.text-table, .table tbody td {
   font-size: 15px;
   line-height: 20px;
 }
 
-.text-label, .button, .badge, .global-search .button, .side-nav ul a {
+.text-label, .table thead th, .button, .badge, .global-search .button, .side-nav ul a {
   font-size: 16px;
   font-weight: 500;
   line-height: 20px;
@@ -6141,7 +6333,7 @@ p,
   line-height: 16px;
 }
 
-.text-xs, .button, .badge {
+.text-xs, .table thead th, .button, .badge {
   font-size: 12px;
   line-height: 14px;
 }
@@ -6530,6 +6722,17 @@ ol {
   display: none;
 }
 
+.table.has-padding td {
+  padding-bottom: 1rem;
+  padding-top: 1rem;
+  vertical-align: middle;
+}
+.table.is-hoverable tbody tr:not(.is-selected):hover {
+  cursor: pointer;
+}
+.table thead th {
+  color: #6b6b6b;
+}
 .modal {
   display: none;
 }

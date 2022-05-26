@@ -1,0 +1,27 @@
+.table {
+  &.has-padding {
+    td {
+      padding-bottom: 1rem;
+      padding-top: 1rem;
+      vertical-align: middle;
+    }
+  }
+
+  &.is-hoverable tbody tr:not(.is-selected):hover {
+    cursor: pointer;
+  }
+
+  thead {
+    th {
+      @extend .text-label;
+      @extend .text-xs;
+      color: $grey-dark;
+    }
+  }
+
+  tbody {
+    td {
+      @extend .text-table;
+    }
+  }
+}

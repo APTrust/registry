@@ -14,11 +14,29 @@ $grey-pending: #8d9396;
 
 // Override bulma greys
 $grey-darker: $grey-dark-brand;
+.is-grey-darker {
+  color: $grey-darker;
+}
 $grey-dark: $grey-1;
+.is-grey-dark {
+  color: $grey-dark;
+}
 $grey: $grey-2;
+.is-grey {
+  color: $grey;
+}
 $grey-light: $grey-3;
+.is-grey-light {
+  color: $grey-light;
+}
 $grey-lighter: $grey-4;
+.is-grey-lighter {
+  color: $grey-lighter;
+}
 $grey-lightest: $grey-highlight;
+.is-grey-lightest {
+  color: $grey-lightest;
+}
 
 // Brand colors
 $gold: #bb9566;
@@ -52,6 +70,7 @@ $label-color: $grey-dark;
 $label-weight: 400;
 $input-radius: $radius-large;
 $input-border-color: $grey;
+$table-row-hover-background-color: $grey-lightest;
 
 // Import bulma packages as needed
 @import "../../node_modules/bulma/sass/utilities/all";
@@ -60,6 +79,7 @@ $input-border-color: $grey;
 @import "../../node_modules/bulma/sass/elements/box";
 @import "../../node_modules/bulma/sass/elements/button";
 @import "../../node_modules/bulma/sass/elements/notification";
+@import "../../node_modules/bulma/sass/elements/table";
 @import "../../node_modules/bulma/sass/form/all";
 @import "../../node_modules/bulma/sass/grid/columns";
 @import "../../node_modules/bulma/sass/helpers/flexbox";
