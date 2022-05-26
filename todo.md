@@ -44,3 +44,4 @@ Here's some general messiness to clean up, refactor, and/or document.
 - [ ] Make sure all form partials use Bulma, so far only the used ones have.
 - [ ] Add `is-danger` classname to form fields on error
 - [ ] Hook up filter chips, clearing filters functionality
+- [ ] Figure out this icons file and whether we still need it `helpers/icons.go`

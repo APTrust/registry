@@ -3,50 +3,10 @@
   min-height: 100vh;
 }
 
-.side-nav {
-  background: $white;
-  flex-shrink: 0;
-  width: 200px;
-
-  ul {
-    a {
-      @extend .text-label;
-      align-items: center;
-      display: flex;
-      padding: 16px 24px;
-
-      &:hover,
-      &.active {
-        background-color: $grey-highlight;
-      }
-    }
-
-    ul {
-      a {
-        padding-left: 36px;
-      }
-    }
-
-    .material-icons {
-      color: $gold;
-      margin-right: 10px;
-    }
-  }
-
-  hr {
-    height: 1px;
-    margin: 1.5rem 1rem;
-  }
-}
-
 .content-wrapper {
   flex: 1;
   max-width: 1240px;
   padding: 36px 36px 36px 28px;
-}
-
-.site-logo {
-  padding: 50px 12px;
 }
 
 .top-nav {
@@ -120,39 +80,4 @@
 .global-footer {
   margin-top: 24px;
   text-align: center;
-}
-
-.material-icons.md-12 {
-  font-size: 12px;
-}
-.material-icons.md-16 {
-  font-size: 16px;
-}
-.material-icons.md-18 {
-  font-size: 18px;
-}
-.material-icons.md-24 {
-  font-size: 24px;
-}
-.material-icons.md-30 {
-  font-size: 30px;
-}
-.material-icons.md-36 {
-  font-size: 36px;
-}
-.material-icons.md-48 {
-  font-size: 48px;
-}
-
-.box {
-  border: 1px solid $grey-4;
-}
-
-.box-header {
-  border-bottom: 1px solid $grey-background;
-  padding: 24px 20px 12px;
-}
-
-.box-content {
-  padding: 16px 20px;
 }
