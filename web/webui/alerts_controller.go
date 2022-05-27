@@ -60,6 +60,10 @@ func AlertIndex(c *gin.Context) {
 // whose value is a list of alert ids. This will mark each of those
 // alerts as read by the current user.
 //
+// Because this method acts only on alerts belonging to the current
+// user, it's impossible for one user to mark another user's alerts
+// as read. (Unless the user logs in under someone else's account.)
+//
 // PUT /alerts/mark_as_read
 func AlertMarkAsReadXHR(c *gin.Context) {
 	markAlerts(c, "read")
@@ -70,12 +74,21 @@ func AlertMarkAsReadXHR(c *gin.Context) {
 // whose value is a list of alert ids. This will mark each of those
 // alerts as unread by the current user.
 //
+// Because this method acts only on alerts belonging to the current
+// user, it's impossible for one user to mark another user's alerts
+// as unread. (Unless the user logs in under someone else's account.)
+//
 // PUT /alerts/mark_as_unread
 func AlertMarkAsUnreadXHR(c *gin.Context) {
 	markAlerts(c, "unread")
 }
 
 // AlertsMarkAllAsRead marks all of a user's unread alerts as read.
+//
+//
+// Because this method acts only on alerts belonging to the current
+// user, it's impossible for one user to mark another user's alerts
+// as read. (Unless the user logs in under someone else's account.)
 //
 // PUT /alerts/mark_all_as_read
 func AlertMarkAllAsReadXHR(c *gin.Context) {

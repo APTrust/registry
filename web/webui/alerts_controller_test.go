@@ -137,11 +137,6 @@ func TestMarkReadAndUnread(t *testing.T) {
 	testMarkAlertsRead(t, alerts, alertIDs)
 	testMarkAlertsUnread(t, alerts, alertIDs)
 	testMarkAllAlertsRead(t, alerts, alertIDs)
-
-	testMarkAlertsReadWrongUser(t, alerts, alertIDs)
-	testMarkAlertsUnreadWrongUser(t, alerts, alertIDs)
-	testMarkAllAlertsReadWrongUser(t, alerts, alertIDs)
-
 }
 
 func resetAlertsToUnread(t *testing.T, alerts []*pgmodels.Alert) {
@@ -230,30 +225,4 @@ func testMarkAllAlertsRead(t *testing.T, alerts []*pgmodels.Alert, alertIDs []in
 		require.Nil(t, err)
 		assert.NotEmpty(t, alertView.ReadAt)
 	}
-}
-
-func testMarkAlertsReadWrongUser(t *testing.T, alerts []*pgmodels.Alert, alertIDs []int64) {
-
-	// TODO: Properly implement security check so user cannot
-	// mark other user's alerts as read/unread. Probably best
-	// to pass user_id param. See alertLoad in the controller.
-
-	// resp := testutil.Inst2AdminClient.PUT("/alerts/mark_as_read").
-	// 	WithHeader("Referer", testutil.BaseURL).
-	// 	WithFormField(constants.CSRFTokenName, testutil.Inst2AdminToken).
-	// 	WithFormField("id__in", alertIDs[0]).
-	// 	WithFormField("id__in", alertIDs[1]).
-	// 	WithFormField("id__in", alertIDs[2]).
-	// 	Expect()
-	// fmt.Println(resp.Body())
-	// resp.Status(http.StatusForbidden)
-
-}
-
-func testMarkAlertsUnreadWrongUser(t *testing.T, alerts []*pgmodels.Alert, alertIDs []int64) {
-
-}
-
-func testMarkAllAlertsReadWrongUser(t *testing.T, alerts []*pgmodels.Alert, alertIDs []int64) {
-
 }
