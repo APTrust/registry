@@ -1,0 +1,92 @@
+openapi: 3.0.0
+
+info:
+  title: APTrust Registry Member API
+  description: Open API documentation for version 3 of the APTrust Member API.
+  version: '3.0'
+  contact:
+    email: "help@aptrust.org"
+  license:
+    name: BSD 2-Clause "Simplified" License
+    url: https://raw.githubusercontent.com/APTrust/registry/master/LICENSE
+
+servers:
+  - url: http://registry.aptrust.org/member-api/v3
+    description: APTrust staging server. Currently not open to members or the public.
+
+components:
+  schemas:
+    AlertView:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        institution_id:
+          type: integer
+          format: int64
+        institution_name:
+          type: string
+        institution_identifier:
+          type: string
+        type:
+          type: string
+        subject:
+          type: string
+        content: 
+          type: string
+        deletion_request_id:
+          type: integer
+          format: int64
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        user_id:
+          type: integer
+          format: int64
+        user_name:
+          type: string
+        sent_at:
+          type: string
+          format: date-time
+          nullable: true
+        read_at:
+          type: string
+          format: date-time
+          nullable: true
+
+paths:
+  /member-api/v3/alerts/show/{id}/{user_id}:
+    get:
+      summary: Returns an alert with the specified id for the specified user.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The id of the alert.
+          schema:
+            type: integer
+            format: int64
+            minimum: 1 
+        - name: user_id 
+          in: path
+          required: true
+          description: The id of the alert.
+          schema:
+            type: integer
+            format: int64
+            minimum: 1 
+      responses:
+        '200':
+          description: An alert object with the requested user_id.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlertView'
+        '400':
+          description: Bad request. One or more required parameters are missing.
+        '403':
+          description: The current user does not have permission to view this alert. Typically, this means the current user's ID does not match the user_id param in the URL.
+        '404':
+          description: Either there is no alert with this ID, or the alert having this ID was never intended for the user identified by user_id.
