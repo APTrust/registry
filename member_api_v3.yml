@@ -15,6 +15,17 @@ servers:
     description: APTrust staging server. Currently not open to members or the public.
 
 components:
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      in: header
+      name: X-Pharos-API-Key
+      description: User's secret API key
+    apiUser:
+      type: apiKey
+      in: header
+      name: X-Pharos-API-User
+      description: User's email address
   schemas:
     AlertView:
       type: object
@@ -31,32 +42,114 @@ components:
           type: string
         type:
           type: string
+          description: The type of alert. 
+          enum: ["Deletion Cancelled", "Deletion Completed", "Deletion Confirmed", "Deletion Requested", "Failed Fixity Check", "Password Changed", "Password Reset", "Restoration Completed", "Stalled Work Items", "Welcome New User"]
         subject:
           type: string
         content: 
           type: string
+          description: The main body of the alert message.
         deletion_request_id:
           type: integer
           format: int64
           nullable: true
+          description: The id of the deletion request, if this alert pertains to a deletion request.
         created_at:
           type: string
           format: date-time
+          description: Date and time the alert was generated.
         user_id:
           type: integer
           format: int64
+          description: The ID of the user to whom the alert was sent.
         user_name:
           type: string
+          description: The name of the user to whom the alert was sent.
         sent_at:
           type: string
           format: date-time
           nullable: true
+          description: Date and time this alert was sent to the user. This may be null if the system was unable to send the alert.
         read_at:
           type: string
           format: date-time
           nullable: true
-
+          description: Date and time the recipient read this alert. This will be null if the recipient has not yet viewed the alert, or if the recipient manually set the message to 'unread' in the Web UI.
+    AlertViewList:
+      properties:
+        count:
+          type: integer
+          format: int64
+          description: The total number of results matching your query.
+        next: 
+          type: string
+          description: The URL for the next page of results.
+        previous: 
+          type: string
+          description: The URL for the previous page of results.
+        items:
+          $ref: '#/components/schemas/AlertView'
+          description: An array of AlertView objects matching your query.
 paths:
+  /member-api/v3/alerts:
+    get:
+      summary: Returns a list of alerts for the currently authenticated user. 
+      parameters:
+        - name: page
+          in: query
+          description: The page of results to fetch
+          required: false
+          schema:
+            type: integer
+            default: 1
+            format: int32      
+        - name: per_page
+          in: query
+          description: The number of results to fetch per page.
+          required: false
+          schema:
+            type: integer
+            default: 20
+            format: int32      
+        - name: sort
+          in: query
+          description: Sort the results in the specified column and direction. The format for this param is column__direction, where column is the column name and direction is either "asc" or "desc".
+          required: false
+          schema:
+            type: string            
+            enum: ["created_at__asc", "created_at__desc", "type__asc", "type__desc"]
+        - name: created_at__gteq
+          in: query
+          description: Return alerts created on or after the given timestamp.
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: created_at__lteq
+          in: query
+          description: Return alerts created on or before the given timestamp.
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: type
+          in: query
+          description: Return alerts of the specified type.
+          required: false
+          schema:
+            type: string 
+            enum: ["Deletion Cancelled", "Deletion Completed", "Deletion Confirmed", "Deletion Requested", "Failed Fixity Check", "Password Changed", "Password Reset", "Restoration Completed", "Stalled Work Items", "Welcome New User"]
+      responses:
+        '200':
+          description: A list of alerts for the currently authenticated user.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlertView'
+        '401':
+          description: Request is not authorized. Be sure you passed valid API credentials with your request.
+        '403':
+          description: The current user does not have permission to view alerts. You should not see this error if you've authenticated.
   /member-api/v3/alerts/show/{id}/{user_id}:
     get:
       summary: Returns an alert with the specified id for the specified user.
@@ -86,6 +179,8 @@ paths:
                 $ref: '#/components/schemas/AlertView'
         '400':
           description: Bad request. One or more required parameters are missing.
+        '401':
+          description: Request is not authorized. Be sure you passed valid API credentials with your request.
         '403':
           description: The current user does not have permission to view this alert. Typically, this means the current user's ID does not match the user_id param in the URL.
         '404':
