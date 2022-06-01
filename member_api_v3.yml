@@ -399,6 +399,83 @@ components:
           type: string
           format: date-time
           description: The date and time at which the generic file was last updated. Updates may indicate re-ingest or changes to last fixity check date.
+    GenericFileView:
+      properties:        
+        id:
+          type: integer
+          format: int64
+        file_format:
+          type: string
+          description: The mime type of the file.
+        size:
+          type: integer
+          format: int64
+          description: The size (in bytes) of the file.
+        identifier:
+          type: string
+          description: The file's semantic identifier in the format <instution_identifier>/<bag_name>/<path_in_bag>.
+        intellectual_object_id:
+          type: integer
+          format: int64
+          description: The ID of the IntellectualObject to which this file belongs.
+        object_identifier:
+          type: string
+          description: The semantic identifier of the file's parent object, in the format <instution_identifier>/<bag_name>
+        access:
+          type: string
+          description: Describes whether this files's metadata can be accessed by the APTrust consortia, by the institution, or only by admins at the institution (restricted). This is vestigial field. Access settings have never been fully implemented, and all objects are treated as access-level "institution". 
+          enum: ["consortia", "institution", "restricted"]
+        state:
+          type: string
+          description: Indicates whether the file is Active (A) or Deleted (D).
+          enum: ["A", "D"]
+        last_fixity_check:
+          type: string
+          format: date-time
+          description: The date and time of this file's last fixity check.
+        institution_id:
+          type: integer
+          format: int64
+          description: The ID of the institution that owns this file.
+        institution_name:
+          type: string
+          description: The name of the institution that deposited this file.
+        institution_identifier:
+          type: string
+          description: The institution's unique identifier, usually a domain name.
+        storage_option:
+          type: string
+          description: Indicates where the file is stored.
+          enum: ["Glacier-Deep-OH", "Glacier-Deep-OR", "Glacier-Deep-VA", "Glacier-OH", "Glacier-OR", "Glacier-VA", "Standard", "Wasabi-OR", "Wasabi-VA"]
+        uuid:
+          type: string
+          format: uuid
+          description: The file's unique identifier in preserveration storage. This is its S3/Glacier key name.
+        md5:
+          type: string
+          description: The most recent md5 digest for this file.
+        sha1:
+          type: string
+          description: The most recent sha1 digest for this file.
+        sha256:
+          type: string
+          description: The most recent sha256 digest for this file.
+        sha512:
+          type: string
+          description: The most recent sha512 digest for this file.
+        storage_records:
+          description: A list of storage records for this file. Each record points to a copy of this file in a preservation storage bucket.
+          type: array
+          items:
+            $ref: '#/components/schemas/StorageRecord'
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time at which the generic file record was created. This indicates the date of initial ingest.
+        updated_at:
+          type: string
+          format: date-time
+          description: The date and time at which the generic file was last updated. Updates may indicate re-ingest or changes to last fixity check date.
 
     Institution:
       properties:
@@ -449,6 +526,73 @@ components:
           type: string
           format: date-time
           description: The date and time this record was last updated.
+    InstitutionView:
+      properties:        
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+          description: The name of the institution.
+        identifier:
+          type: string
+          description: The institution's identifier. This is usually a domain name.
+        state:
+          type: string
+          description: Indicates whether the institution is Active (A) or Deactived (D).
+          enum: ["A", "D"]
+        type:
+          type: string
+          description: Indicates whether this is a member institution (account) or subscribing institution (sub-account).
+          enum: ["MemberInstitution", "SubscriptionInstitution"]
+        deactivated_at:
+          type: string
+          format: date-time
+          description: The date and time at which this institution was deactivated.
+          nullable: true
+        otp_enabled:
+          type: boolean
+          description: Indicates whether the institution enforces two-factor authencation for all its users.
+        enable_spot_restore:
+          type: boolean
+          description: Indicates whether the institution has enabled spot restoration tests.
+        receiving_bucket:
+          type: string
+          description: The name of the instituition's receiving bucket for ingest. Items to be ingested should be uploaded here.
+        restore_bucket:
+          type: string
+          description: The name of the instituition's restoration bucket. Restored files and bags will be put here.
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time this record was created.
+        updated_at:
+          type: string
+          format: date-time
+          description: The date and time this record was last updated.
+        parent_id:
+          type: integer
+          format: int64
+          description: ID of this institution's parent. Applicable to subscriber institutions (sub-accounts) only.
+          nullable: true
+        parent_name:
+          type: string
+          description: Name of this institution's parent institution. Applicable to subscriber institutions (sub-accounts) only.
+          nullable: true
+        parent_identifier:
+          type: string
+          description: Identifier of this institution's parent institution. Applicable to subscriber institutions (sub-accounts) only.
+          nullable: true
+        parent_state:
+          type: string
+          description: Indicates whether parent institution is Active (A) or Deactivated (D).
+          enum: ["A", "D"]
+          nullable: true
+        parent_deactivated_at:
+          type: string
+          format: date-time
+          description: Date on which this institution's parent was deactivated.
+          nullable: true
 
     IntellectualObject:
       properties:
@@ -531,6 +675,108 @@ components:
           type: string
           format: date-time
           description: The date and time this record was last updated.
+    IntellectualObjectView:
+      properties:
+        id:
+          type: integer
+          format: int64
+        title:
+          type: string
+          description: The title should briefly describe the contents of the object.
+        description:
+          type: string
+          description: A more detailed description of the object's contents.
+        identifier:
+          type: string
+          description: A unique identifier for this object in the format <instution_identifier>/<bag_name>.
+        alt_identifier:
+          type: string
+          description: An alternate identifier for this object, supplied by the depositor.
+          nullable: true
+        access:
+          type: string
+          description: Describes whether this object's metadata can be accessed by the APTrust consortia, by the institution, or only by admins at the institution (restricted). This is vestigial field. Access settings have never been fully implemented, and all objects are treated as access-level "institution". 
+          enum: ["consortia", "institution", "restricted"]
+        bag_name:
+          type: string
+          description: The name of the bag when it was uploaded to the depositor's receiving bucket, minus the .tar extention. For example, bag "Photos_1945.tar" will have bag name "Photos_1945".
+        institution_id:
+          type: integer
+          format: int64
+          description: The ID of the institution that owns this object.
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time this record was created.
+        updated_at:
+          type: string
+          format: date-time
+          description: The date and time this record was last updated.
+        state:
+          type: string
+          description: Indicates whether the object is Active (A) or Deleted (D).
+          enum: ["A", "D"]
+        etag:
+          type: string
+          description: The etag of last ingested version of this object. The etag is assinged by S3 upon upload to the depositor's receiving bucket. 
+          nullable: false
+        bag_group_identifier:
+          type: string
+          description: An optional identifier naming the logical group to which this object belongs. For instance, if ten bags are all part of the same collection, the collection name may be used as the group identifier associating all ten bags.
+          nullable: true
+        storage_option:
+          type: string
+          description: Indicates where the object's files are stored.
+          enum: ["Glacier-Deep-OH", "Glacier-Deep-OR", "Glacier-Deep-VA", "Glacier-OH", "Glacier-OR", "Glacier-VA", "Standard", "Wasabi-OR", "Wasabi-VA"]
+        bagit_profile_identifier:
+          type: string
+          description: The identifier of the BagIt profile used to create this bag. This can be either the APTrust profile URL or the BTR profile URL. Bags will be restored using the same profile under which they were submitted.
+          enum: ["https://github.com/dpscollaborative/btr_bagit_profile/releases/download/1.0/btr-bagit-profile.json", "https://raw.githubusercontent.com/APTrust/preservation-services/master/profiles/aptrust-v2.2.json"]
+        source_organization:
+          type: string
+          description: The name of the institution that submitted the object for ingest.
+        internal_sender_identifier:
+          type: string
+          description: An optional identifier for internal use by the depositor. 
+          nullable: true
+        internal_sender_description:
+          type: string
+          description: An optional description for use by the depositor.
+          nullable: true
+        institution_name:
+          type: string
+          description: Name of the institution that deposited this object.
+        institution_identifier:
+          type: string
+          description: Identifier of the institution that deposited this object.
+        institution_type:
+          type: string
+          description: Indicates whether the institution that owns this object is a member institution (account) or subscribing institution (sub-account).
+          enum: ["MemberInstitution", "SubscriptionInstitution"]
+        institution_parent_id:
+          type: integer
+          format: int64
+          description: ID of this institution's parent. Applicable to subscriber institutions (sub-accounts) only.
+          nullable: true
+        file_count:
+          type: integer
+          format: int64
+          description: The total number of files preserved for this object. This includes payload files and preserved manifests. APTrust does not preserve manifests or tag manifests.  This number can change over time as additional new files are ingested or existing ones are deleted.
+          nullable: false
+        size:
+          type: integer
+          format: int64
+          description: The total number of bytes for all files preserved for this object.  This number can change over time as additional new files are ingested or existing ones are deleted.
+        payload_file_count:
+          type: integer
+          format: int64
+          description: The total number of files in this object's payload. I.e., inside the data directory of the bag that was uploaded for deposit. This number can change over time as additional new files are ingested or existing ones are deleted.
+          nullable: false
+        payload_size:
+          type: integer
+          format: int64
+          description: Total size, in bytes, of the files in this object's payload directory (the data directory of the bag that was uploaded for ingest).  This number can change over time as additional new files are ingested or existing ones are deleted.
+          nullable: false
 
     PremisEvent:
       properties:
@@ -598,6 +844,86 @@ components:
           type: string
           format: date-time
           description: The date and time this record was created.
+        updated_at:
+          type: string
+          format: date-time
+          description: Because Premis Events cannot be changed, this timestamp should always match created_at.
+    PremisEventView:
+      properties:
+        id:
+          type: integer
+          format: int64
+        agent:
+          type: string
+          description: The name of the software or service that performed the action this event is recording.
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time this record was created.
+        date_time:
+          type: string
+          format: date-time
+          description: The date and time at which the action was performed.
+        detail:
+          type: string
+          description: A description of the event.
+        event_type:
+          type: string
+          description: The type of event.
+          enum:
+            - access assignment
+            - creation
+            - deletion
+            - fixity check
+            - identifier assignment
+            - ingestion
+            - message digest calculation
+            - replication
+        generic_file_id:
+          type: integer
+          format: int64
+          description: The ID of the file with which this event is associated. This will be null for object-level events.
+          nullable: true
+        generic_file_identifier:
+          type: string
+          description: The file's semantic identifier in the format <instution_identifier>/<bag_name>/<path_in_bag>.
+          nullable: true
+        identifier:
+          type: string
+          format: uuid
+          description: A unique identifier for this event.
+        institution_id:
+          type: integer
+          format: int64
+          description: The ID of the institution that owns the file or object to which this event pertains.
+        institution_name:
+          type: string
+          description: The name of the institution that owns the file or object to which the event pertains.
+        intellectual_object_id:
+          type: integer
+          format: int64
+          description: The ID of the IntellectualObject with which this event is associated.
+        intellectual_object_identifier:
+          type: string
+          description: A unique identifier for the object to which this event pertains in the format <instution_identifier>/<bag_name>.
+        object:
+          type: string
+          description: More information about the agent that performed this action.
+        old_uuid:
+          type: string
+          format: uuid
+          description: Legacy UUID of events created before 2017. This will be empty for most events.
+          nullable: true
+        outcome:
+          type: string
+          description: Indicates the outcome of the action. 
+          enum: ["Failure", "Success"]
+        outcome_detail:
+          type: string
+          description: Details of the action's outcome, such as what identifier was assigned, what digest was calculated, etc.
+        outcome_information:
+          type: string
+          description: A summary of the action's outcome.
         updated_at:
           type: string
           format: date-time
@@ -721,6 +1047,149 @@ components:
           type: string
           format: date-time
           description: The date and time this record was last updated.
+    UserView:
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+          description: The user's name.
+        email:
+          type: string
+          format: email
+          description: The user's email address.
+        phone_number:
+          type: string
+          description: The user's phone number.
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time this record was created.
+        updated_at:
+          type: string
+          format: date-time
+          description: The date and time this record was last updated.
+        reset_password_sent_at:
+          type: string
+          format: date-time
+          description: The date and time at which the system last sent a password reset email to this user.
+          nullable: true
+        sign_in_count:
+          type: integer
+          format: int64
+          description: The number of times this user has signed in to the Registry.
+          nullable: false
+        current_sign_in_at:
+          type: string
+          format: date-time
+          description: The date and time of the user's current Registry sign-in.
+          nullable: true
+        last_sign_in_at:
+          type: string
+          format: date-time
+          description: The date and time of the user's previous Registry sign-in.
+          nullable: true
+        current_sign_in_ip:
+          type: string
+          description: The IP address from which the user signed in for their current session.
+          nullable: true
+        last_sign_in_ip:
+          type: string
+          description: The IP address from which the user signed in for their last session.
+          nullable: true
+        institution_id:
+          type: integer
+          format: int64
+          description: The ID of the institution with which this user is affiliated.
+        password_changed_at:
+          type: string
+          format: date-time
+          description: The timestamp of the user's last password change.
+          nullable: true
+        otp_required_for_login:
+          type: boolean
+          description: Indicates whether the user must use two-factor authencation when signing in.
+        deactivated_at:
+          type: string
+          format: date-time
+          description: The date and time at which the user's account was deactivated. Will be null for active users.
+          nullable: true
+        enabled_two_factor:
+          type: boolean
+          description: Indicates whether two-factor authencation has been enabled for this user. 
+        confirmed_two_factor:
+          type: boolean
+          description: Indicates whether the user has completed two-factor setup by confirming their phone number or Authy push functionality.
+        last_sign_in_with_authy:
+          type: string
+          format: date-time
+          description: Date and time at which user last signed in with Authy.
+          nullable: true
+        authy_status:
+          type: string
+          description: Describes how to contact user for second step of two-factor authencation.
+          nullable: true
+          enum: ["onetouch", "sms", "none"]
+        email_verified:
+          type: boolean
+          description: Indicates whether the user has verified their email address.
+        initial_password_updated:
+          type: boolean
+          description: Indicates whether the user has updated their initial password.
+        force_password_update:
+          type: boolean
+          description: Indicates whether the user will be forced to update their password at their next login.
+        grace_period:
+          type: string
+          format: date-time
+          description: The date by which the user must finish setting up two-factor authencation. Until then, they can log in with just email and password.
+          nullable: true
+        role:
+          type: string
+          description: The user's role at their institution. Users with role "none" have no privileges.
+          enum: ["institutional_admin", "institutional_user", "none", "admin"]
+        institution_name:
+          type: string
+          description: The name of the institution with which this user is affiliated.
+        institution_identifier:
+          type: string
+          description: The unique identifier (usually a domain name) of the institution with which this user is affiliated.
+        institution_state:
+          type: string
+          description: Indicates whether the user's institution is Active (A) or Deactived (D).
+          enum: ["A", "D"]
+        institution_type:
+          type: string
+          description: Indicates whether this is a member institution (account) or subscribing institution (sub-account).
+          enum: ["MemberInstitution", "SubscriptionInstitution"]
+        member_institution_id:
+          type: integer
+          format: int64
+          description: For subscribing institutions, this is the ID of the parent (member) institution.
+          nullable: true
+        member_institution_name:
+          type: string
+          description: Name of the parent of the institution with which this user is affiliated. Applicable to subscriber institutions (sub-accounts) only.
+          nullable: true
+        member_institution_identifier:
+          type: string
+          description: Identifier of the parent of the institution with which this user is affiliated. Applicable to subscriber institutions (sub-accounts) only.
+          nullable: true
+        member_institution_state:
+          type: string
+          description: Indicates whether parent of this user's institution is Active (A) or Deactivated (D).
+          enum: ["A", "D"]
+          nullable: true
+        otp_enabled:
+          type: boolean
+          description: Indicates whether the user's institution enforces two-factor authencation for all its users.
+        receiving_bucket:
+          type: string
+          description: The name of this user's institutional receiving bucket for ingest. Items to be ingested should be uploaded here.
+        restore_bucket:
+          type: string
+          description: The name of this user's instituitional restoration bucket. Restored files and bags will be put here.
 
     WorkItem:
       properties:
