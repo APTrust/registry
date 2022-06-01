@@ -77,7 +77,6 @@ components:
           nullable: true
           description: Date and time the recipient read this alert. This will be null if the recipient has not yet viewed the alert, or if the recipient manually set the message to 'unread' in the Web UI.
     AlertViewList:
-
       properties:
         count:
           type: integer
@@ -336,6 +335,23 @@ components:
         work_item:
           $ref: '#/components/schemas/WorkItem'
           description: The WorkItem created to process this deletion. This will exist only if the deletion request was approved.
+    DeletionRequestViewList:
+      properties:
+        count:
+          type: integer
+          format: int64
+          description: The total number of results matching your query.
+        next: 
+          type: string
+          description: The URL for the next page of results.
+        previous: 
+          type: string
+          description: The URL for the previous page of results.
+        items:
+          description: A list of deletion requests matching your query.
+          type: array
+          items:
+            $ref: '#/components/schemas/DeletionRequestView'
 
     GenericFile: 
       properties:
@@ -476,6 +492,23 @@ components:
           type: string
           format: date-time
           description: The date and time at which the generic file was last updated. Updates may indicate re-ingest or changes to last fixity check date.
+    GenericFileList:
+      properties:
+        count:
+          type: integer
+          format: int64
+          description: The total number of results matching your query.
+        next: 
+          type: string
+          description: The URL for the next page of results.
+        previous: 
+          type: string
+          description: The URL for the previous page of results.
+        items:
+          description: A list of files matching your query.
+          type: array
+          items:
+            $ref: '#/components/schemas/GenericFile'
 
     Institution:
       properties:
@@ -777,6 +810,23 @@ components:
           format: int64
           description: Total size, in bytes, of the files in this object's payload directory (the data directory of the bag that was uploaded for ingest).  This number can change over time as additional new files are ingested or existing ones are deleted.
           nullable: false
+    IntellectualObjectViewList:
+      properties:
+        count:
+          type: integer
+          format: int64
+          description: The total number of results matching your query.
+        next: 
+          type: string
+          description: The URL for the next page of results.
+        previous: 
+          type: string
+          description: The URL for the previous page of results.
+        items:
+          description: A list of objects matching your query.
+          type: array
+          items:
+            $ref: '#/components/schemas/IntellectualObjectView'
 
     PremisEvent:
       properties:
@@ -928,6 +978,23 @@ components:
           type: string
           format: date-time
           description: Because Premis Events cannot be changed, this timestamp should always match created_at.
+    PremisEventViewList:
+      properties:
+        count:
+          type: integer
+          format: int64
+          description: The total number of results matching your query.
+        next: 
+          type: string
+          description: The URL for the next page of results.
+        previous: 
+          type: string
+          description: The URL for the previous page of results.
+        items:
+          description: A list of events matching your query.
+          type: array
+          items:
+            $ref: '#/components/schemas/PremisEventView'
 
     StorageRecord:
       properties:        
@@ -1189,7 +1256,7 @@ components:
           description: The name of this user's institutional receiving bucket for ingest. Items to be ingested should be uploaded here.
         restore_bucket:
           type: string
-          description: The name of this user's instituitional restoration bucket. Restored files and bags will be put here.
+          description: The name of this user's institutional restoration bucket. Restored files and bags will be put here.
 
     WorkItem:
       properties:
@@ -1494,8 +1561,23 @@ components:
           type: string
           format: date-time
           description: The date and time this record was last updated.
-
-
+    WorkItemViewList:
+      properties:
+        count:
+          type: integer
+          format: int64
+          description: The total number of results matching your query.
+        next: 
+          type: string
+          description: The URL for the next page of results.
+        previous: 
+          type: string
+          description: The URL for the previous page of results.
+        items:
+          description: A list of items matching your query.
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkItemView'
 
 paths:
   /member-api/v3/alerts:
