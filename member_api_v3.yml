@@ -266,7 +266,7 @@ components:
         status: 
           type: string
           description: The status of the deletion WorkItem, if it exists. This describes whether the deletion operation has started, completed, etc.
-          enum: ["Cancelled", "Started", "Pending", "Started", "Success"]
+          enum: ["Cancelled", "Failed", "Pending", "Started", "Success"]
           nullable: true
         date_processed: 
           type: string
@@ -1020,242 +1020,6 @@ components:
           type: string
           format: email
           description: The user's email address.
-        phone_number:
-          type: string
-          description: The user's phone number.
-        reset_password_sent_at:
-          type: string
-          format: date-time
-          description: The date and time at which the system last sent a password reset email to this user.
-          nullable: true
-        sign_in_count:
-          type: integer
-          format: int64
-          description: The number of times this user has signed in to the Registry.
-          nullable: false
-        current_sign_in_at:
-          type: string
-          format: date-time
-          description: The date and time of the user's current Registry sign-in.
-          nullable: true
-        last_sign_in_at:
-          type: string
-          format: date-time
-          description: The date and time of the user's previous Registry sign-in.
-          nullable: true
-        current_sign_in_ip:
-          type: string
-          description: The IP address from which the user signed in for their current session.
-          nullable: true
-        last_sign_in_ip:
-          type: string
-          description: The IP address from which the user signed in for their last session.
-          nullable: true
-        institution_id:
-          type: integer
-          format: int64
-          description: The ID of the institution with which this user is affiliated.
-        password_changed_at:
-          type: string
-          format: date-time
-          description: The timestamp of the user's last password change.
-          nullable: true
-        otp_required_for_login:
-          type: boolean
-          description: Indicates whether the user must use two-factor authencation when signing in.
-        deactivated_at:
-          type: string
-          format: date-time
-          description: The date and time at which the user's account was deactivated. Will be null for active users.
-          nullable: true
-        enabled_two_factor:
-          type: boolean
-          description: Indicates whether two-factor authencation has been enabled for this user. 
-        confirmed_two_factor:
-          type: boolean
-          description: Indicates whether the user has completed two-factor setup by confirming their phone number or Authy push functionality.
-        last_sign_in_with_authy:
-          type: string
-          format: date-time
-          description: Date and time at which user last signed in with Authy.
-          nullable: true
-        authy_status:
-          type: string
-          description: Describes how to contact user for second step of two-factor authencation.
-          nullable: true
-          enum: ["onetouch", "sms", "none"]
-        email_verified:
-          type: boolean
-          description: Indicates whether the user has verified their email address.
-        initial_password_updated:
-          type: boolean
-          description: Indicates whether the user has updated their initial password.
-        force_password_update:
-          type: boolean
-          description: Indicates whether the user will be forced to update their password at their next login.
-        grace_period:
-          type: string
-          format: date-time
-          description: The date by which the user must finish setting up two-factor authencation. Until then, they can log in with just email and password.
-          nullable: true
-        role:
-          type: string
-          description: The user's role at their institution. Users with role "none" have no privileges.
-          enum: ["institutional_admin", "institutional_user", "none", "admin"]
-        institution:
-          description: The institution with which this user is affiliated.
-          $ref: '#/components/schemas/Institution'
-        created_at:
-          type: string
-          format: date-time
-          description: The date and time this record was created.
-        updated_at:
-          type: string
-          format: date-time
-          description: The date and time this record was last updated.
-    UserView:
-      properties:
-        id:
-          type: integer
-          format: int64
-        name:
-          type: string
-          description: The user's name.
-        email:
-          type: string
-          format: email
-          description: The user's email address.
-        phone_number:
-          type: string
-          description: The user's phone number.
-        created_at:
-          type: string
-          format: date-time
-          description: The date and time this record was created.
-        updated_at:
-          type: string
-          format: date-time
-          description: The date and time this record was last updated.
-        reset_password_sent_at:
-          type: string
-          format: date-time
-          description: The date and time at which the system last sent a password reset email to this user.
-          nullable: true
-        sign_in_count:
-          type: integer
-          format: int64
-          description: The number of times this user has signed in to the Registry.
-          nullable: false
-        current_sign_in_at:
-          type: string
-          format: date-time
-          description: The date and time of the user's current Registry sign-in.
-          nullable: true
-        last_sign_in_at:
-          type: string
-          format: date-time
-          description: The date and time of the user's previous Registry sign-in.
-          nullable: true
-        current_sign_in_ip:
-          type: string
-          description: The IP address from which the user signed in for their current session.
-          nullable: true
-        last_sign_in_ip:
-          type: string
-          description: The IP address from which the user signed in for their last session.
-          nullable: true
-        institution_id:
-          type: integer
-          format: int64
-          description: The ID of the institution with which this user is affiliated.
-        password_changed_at:
-          type: string
-          format: date-time
-          description: The timestamp of the user's last password change.
-          nullable: true
-        otp_required_for_login:
-          type: boolean
-          description: Indicates whether the user must use two-factor authencation when signing in.
-        deactivated_at:
-          type: string
-          format: date-time
-          description: The date and time at which the user's account was deactivated. Will be null for active users.
-          nullable: true
-        enabled_two_factor:
-          type: boolean
-          description: Indicates whether two-factor authencation has been enabled for this user. 
-        confirmed_two_factor:
-          type: boolean
-          description: Indicates whether the user has completed two-factor setup by confirming their phone number or Authy push functionality.
-        last_sign_in_with_authy:
-          type: string
-          format: date-time
-          description: Date and time at which user last signed in with Authy.
-          nullable: true
-        authy_status:
-          type: string
-          description: Describes how to contact user for second step of two-factor authencation.
-          nullable: true
-          enum: ["onetouch", "sms", "none"]
-        email_verified:
-          type: boolean
-          description: Indicates whether the user has verified their email address.
-        initial_password_updated:
-          type: boolean
-          description: Indicates whether the user has updated their initial password.
-        force_password_update:
-          type: boolean
-          description: Indicates whether the user will be forced to update their password at their next login.
-        grace_period:
-          type: string
-          format: date-time
-          description: The date by which the user must finish setting up two-factor authencation. Until then, they can log in with just email and password.
-          nullable: true
-        role:
-          type: string
-          description: The user's role at their institution. Users with role "none" have no privileges.
-          enum: ["institutional_admin", "institutional_user", "none", "admin"]
-        institution_name:
-          type: string
-          description: The name of the institution with which this user is affiliated.
-        institution_identifier:
-          type: string
-          description: The unique identifier (usually a domain name) of the institution with which this user is affiliated.
-        institution_state:
-          type: string
-          description: Indicates whether the user's institution is Active (A) or Deactived (D).
-          enum: ["A", "D"]
-        institution_type:
-          type: string
-          description: Indicates whether this is a member institution (account) or subscribing institution (sub-account).
-          enum: ["MemberInstitution", "SubscriptionInstitution"]
-        member_institution_id:
-          type: integer
-          format: int64
-          description: For subscribing institutions, this is the ID of the parent (member) institution.
-          nullable: true
-        member_institution_name:
-          type: string
-          description: Name of the parent of the institution with which this user is affiliated. Applicable to subscriber institutions (sub-accounts) only.
-          nullable: true
-        member_institution_identifier:
-          type: string
-          description: Identifier of the parent of the institution with which this user is affiliated. Applicable to subscriber institutions (sub-accounts) only.
-          nullable: true
-        member_institution_state:
-          type: string
-          description: Indicates whether parent of this user's institution is Active (A) or Deactivated (D).
-          enum: ["A", "D"]
-          nullable: true
-        otp_enabled:
-          type: boolean
-          description: Indicates whether the user's institution enforces two-factor authencation for all its users.
-        receiving_bucket:
-          type: string
-          description: The name of this user's institutional receiving bucket for ingest. Items to be ingested should be uploaded here.
-        restore_bucket:
-          type: string
-          description: The name of this user's institutional restoration bucket. Restored files and bags will be put here.
 
     WorkItem:
       properties:
@@ -1800,6 +1564,34 @@ paths:
     get: 
       summary: Returns a list of deletion requests.
       parameters: 
+        - name: requested_at__gteq
+          in: query
+          description: Return deletion requests made on or after the given timestamp.
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: requested_at__lteq
+          in: query
+          description: Return deletion requests made on or before the given timestamp.
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: stage
+          in: query
+          description: Return deletion requests in this stage of processing.
+          required: false
+          schema:
+            type: string
+            enum: ["Requested", "Resolve"]
+        - name: status
+          in: query
+          description: Return deletion requests with this status.
+          required: false
+          schema:
+            type: string
+            enum: ["Cancelled", "Failed", "Pending", "Started", "Success"]
       responses:
         '200':
           description: A list of deletion requests belonging to the currently authenticated user's institution.
@@ -1811,11 +1603,18 @@ paths:
           description: Request is not authorized. Be sure you passed valid API credentials with your request.
         '403':
           description: The current user does not have permission to view the requested deletion requests.
-
   /member-api/v3/deletions/show/{id}:
     get: 
       summary: Returns the deletion request with the specified id.
-      parameters: 
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The id of the deletion request to show.
+          schema:
+            type: integer
+            format: int64
+            minimum: 1 
       responses:
         '200':
           description: The deletion request with the requested id.
@@ -1836,6 +1635,96 @@ paths:
     get: 
       summary: Returns a list of GenericFiles.
       parameters: 
+        - name: created_at__gteq
+          in: query
+          description: Return files created on or after the given timestamp.
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: created_at__lteq
+          in: query
+          description: Return files created on or before the given timestamp.
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: identifier
+          in: query
+          description: Return the file with this identifier.
+          required: false
+          schema:
+            type: string
+        - name: intellectual_object_id
+          in: query
+          description: Return files belonging to the specified intellectual object.
+          required: false
+          schema:
+            type: integer
+            format: int64
+        - name: last_fixity_check__gteq
+          in: query
+          description: Return files whose last fixity check was on or after the given timestamp.
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: last_fixity_check__lteq
+          in: query
+          description: Return files whose last fixity check was on or before the given timestamp.
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: size__gteq
+          in: query
+          description: Return files whose size is at least this number of bytes.
+          required: false
+          schema:
+            type: integer
+            format: int64
+        - name: size__lteq
+          in: query
+          description: Return files whose size is less than or equal to this number of bytes.
+          required: false
+          schema:
+            type: integer
+            format: int64
+        - name: state
+          in: query
+          description: Return files with this state. A = Active, D = Deleted.
+          required: false
+          schema:
+            type: string
+            enum: ["A", "D"]
+        - name: storage_option
+          in: query
+          description: Return files with the specified storage option.
+          required: false
+          schema:
+            type: string
+            enum: ["Glacier-Deep-OH", "Glacier-Deep-OR", "Glacier-Deep-VA", "Glacier-OH", "Glacier-OR", "Glacier-VA", "Standard", "Wasabi-OR", "Wasabi-VA"]
+        - name: updated_at__gteq
+          in: query
+          description: Return files updated on or after the given timestamp.
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: updated_at__lteq
+          in: query
+          description: Return files updated on or before the given timestamp.
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: uuid
+          in: query
+          description: Return the file with this uuid.
+          required: false
+          schema:
+            type: string
+            format: uuid
       responses:
         '200':
           description: A list of generic files belonging to the currently authenticated user's institution.
@@ -1847,11 +1736,18 @@ paths:
           description: Request is not authorized. Be sure you passed valid API credentials with your request.
         '403':
           description: The current user does not have permission to view the requested files.
-
   /member-api/v3/files/show/{id}:
     get: 
       summary: Returns the generic file with the speficied id.
-      parameters: 
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The id of the file to show.
+          schema:
+            type: integer
+            format: int64
+            minimum: 1       
       responses:
         '200':
           description: The generic file with the requested id.
@@ -1887,7 +1783,15 @@ paths:
   /member-api/v3/objects/show/{id}:
     get: 
       summary: Returns the intellectual object with the specified id.
-      parameters: 
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The id of the object to show.
+          schema:
+            type: integer
+            format: int64
+            minimum: 1 
       responses:
         '200':
           description: The intellectual object with the requested id.
@@ -1923,7 +1827,15 @@ paths:
   /member-api/v3/events/show/{id}:
     get: 
       summary: Returns the premis event with the specified id.
-      parameters: 
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The id of the event to show.
+          schema:
+            type: integer
+            format: int64
+            minimum: 1 
       responses:
         '200':
           description: The premis event with the requested id.
@@ -1959,7 +1871,15 @@ paths:
   /member-api/v3/items/show/{id}:
     get: 
       summary: Returns the work item with the specified id.
-      parameters: 
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The id of the work item to show.
+          schema:
+            type: integer
+            format: int64
+            minimum: 1 
       responses:
         '200':
           description: The work item with the requested id.
