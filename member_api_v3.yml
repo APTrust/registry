@@ -26,6 +26,7 @@ components:
       in: header
       name: X-Pharos-API-User
       description: User's email address
+
   schemas:
     AlertView:
       type: object
@@ -94,6 +95,7 @@ components:
             $ref: '#/components/schemas/AlertView'
 
     Checksum:
+      type: object
       properties:
         id:
           type: integer
@@ -114,6 +116,7 @@ components:
           format: int64
           description: The unique id of the GenericFile to which this checksum pertains. 
     ChecksumView:
+      type: object
       properties:
         id:
           type: integer
@@ -176,6 +179,7 @@ components:
             $ref: '#/components/schemas/ChecksumView'            
 
     DeletionRequestView:
+      type: object
       properties:
         id: 
           type: integer
@@ -282,58 +286,6 @@ components:
           type: string
           description: A brief, human-readable summary of the current state of the deletion WorkItem. This will be null if the deletion request was not approved.
           nullable: true
-    DeletionRequest: 
-      properties:
-        id:
-          type: integer
-          format: int64
-        institution_id:
-          type: integer
-          format: int64
-          description: The ID of the institution that owns the files or objects to which this deletion request pertains.
-        requested_at:
-          type: string
-          format: date-time
-          description: Date and time at which this request was created.
-        confirmed_at:
-          type: string
-          format: date-time
-          description: Date and time at which this request was confirmed (approved). May be null.
-          nullable: true
-        cancelled_at:
-          type: string
-          format: date-time
-          description: Date and time at which this request was cancelled. May be null.
-          nullable: true
-        requested_by:
-          $ref: '#/components/schemas/User'
-          description: The user who requested this deletion.
-        confirmed_by:
-          $ref: '#/components/schemas/User'
-          description: The user who confirmed (approved) this deletion.
-          nullable: true
-        cancelled_by:
-          $ref: '#/components/schemas/User'
-          description: The user who cancelled this deletion.
-          nullable: true
-        work_item_id:
-          type: integer
-          format: int64
-          description: The ID of the WorkItem created to process the deletion. This will be non-zero only if the deletion request has been approved. 
-          nullable: false
-        generic_files:
-          description: A list of files to be deleted. This may be empty in cases of object deletion.
-          type: array
-          items:
-            $ref: '#/components/schemas/GenericFile'
-        intellectual_objects:
-          description: A list of objects to be deleted. This may be empty in cases of file deletion.
-          type: array
-          items:
-            $ref: '#/components/schemas/IntellectualObject'
-        work_item:
-          $ref: '#/components/schemas/WorkItem'
-          description: The WorkItem created to process this deletion. This will exist only if the deletion request was approved.
     DeletionRequestViewList:
       properties:
         count:
@@ -353,6 +305,7 @@ components:
             $ref: '#/components/schemas/DeletionRequestView'
 
     GenericFile: 
+      type: object
       properties:
         id:
           type: integer
@@ -415,6 +368,7 @@ components:
           format: date-time
           description: The date and time at which the generic file was last updated. Updates may indicate re-ingest or changes to last fixity check date.
     GenericFileView:
+      type: object
       properties:        
         id:
           type: integer
@@ -509,205 +463,8 @@ components:
           items:
             $ref: '#/components/schemas/GenericFile'
 
-    Institution:
-      properties:
-        id:
-          type: integer
-          format: int64
-        name:
-          type: string
-          description: The name of the institution.
-        identifier:
-          type: string
-          description: The institution's identifier. This is usually a domain name.
-        state:
-          type: string
-          description: Indicates whether the institution is Active (A) or Deactived (D).
-          enum: ["A", "D"]
-        type:
-          type: string
-          description: Indicates whether this is a member institution (account) or subscribing institution (sub-account).
-          enum: ["MemberInstitution", "SubscriptionInstitution"]
-        member_institution_id:
-          type: integer
-          format: int64
-          description: For subscribing institutions, this is the ID of the parent (member) institution.
-          nullable: true
-        deactivated_at:
-          type: string
-          format: date-time
-          description: The date and time at which this institution was deactivated.
-          nullable: true
-        otp_enabled:
-          type: boolean
-          description: Indicates whether the institution enforces two-factor authencation for all its users.
-        enable_spot_restore:
-          type: boolean
-          description: Indicates whether the institution has enabled spot restoration tests.
-        receiving_bucket:
-          type: string
-          description: The name of the instituition's receiving bucket for ingest. Items to be ingested should be uploaded here.
-        restore_bucket:
-          type: string
-          description: The name of the instituition's restoration bucket. Restored files and bags will be put here.
-        created_at:
-          type: string
-          format: date-time
-          description: The date and time this record was created.
-        updated_at:
-          type: string
-          format: date-time
-          description: The date and time this record was last updated.
-    InstitutionView:
-      properties:        
-        id:
-          type: integer
-          format: int64
-        name:
-          type: string
-          description: The name of the institution.
-        identifier:
-          type: string
-          description: The institution's identifier. This is usually a domain name.
-        state:
-          type: string
-          description: Indicates whether the institution is Active (A) or Deactived (D).
-          enum: ["A", "D"]
-        type:
-          type: string
-          description: Indicates whether this is a member institution (account) or subscribing institution (sub-account).
-          enum: ["MemberInstitution", "SubscriptionInstitution"]
-        deactivated_at:
-          type: string
-          format: date-time
-          description: The date and time at which this institution was deactivated.
-          nullable: true
-        otp_enabled:
-          type: boolean
-          description: Indicates whether the institution enforces two-factor authencation for all its users.
-        enable_spot_restore:
-          type: boolean
-          description: Indicates whether the institution has enabled spot restoration tests.
-        receiving_bucket:
-          type: string
-          description: The name of the instituition's receiving bucket for ingest. Items to be ingested should be uploaded here.
-        restore_bucket:
-          type: string
-          description: The name of the instituition's restoration bucket. Restored files and bags will be put here.
-        created_at:
-          type: string
-          format: date-time
-          description: The date and time this record was created.
-        updated_at:
-          type: string
-          format: date-time
-          description: The date and time this record was last updated.
-        parent_id:
-          type: integer
-          format: int64
-          description: ID of this institution's parent. Applicable to subscriber institutions (sub-accounts) only.
-          nullable: true
-        parent_name:
-          type: string
-          description: Name of this institution's parent institution. Applicable to subscriber institutions (sub-accounts) only.
-          nullable: true
-        parent_identifier:
-          type: string
-          description: Identifier of this institution's parent institution. Applicable to subscriber institutions (sub-accounts) only.
-          nullable: true
-        parent_state:
-          type: string
-          description: Indicates whether parent institution is Active (A) or Deactivated (D).
-          enum: ["A", "D"]
-          nullable: true
-        parent_deactivated_at:
-          type: string
-          format: date-time
-          description: Date on which this institution's parent was deactivated.
-          nullable: true
-
-    IntellectualObject:
-      properties:
-        id:
-          type: integer
-          format: int64
-        title:
-          type: string
-          description: The title should briefly describe the contents of the object.
-        description:
-          type: string
-          description: A more detailed description of the object's contents.
-        identifier:
-          type: string
-          description: A unique identifier for this object in the format <instution_identifier>/<bag_name>.
-        alt_identifier:
-          type: string
-          description: An alternate identifier for this object, supplied by the depositor.
-          nullable: true
-        access:
-          type: string
-          description: Describes whether this object's metadata can be accessed by the APTrust consortia, by the institution, or only by admins at the institution (restricted). This is vestigial field. Access settings have never been fully implemented, and all objects are treated as access-level "institution". 
-          enum: ["consortia", "institution", "restricted"]
-        bag_name:
-          type: string
-          description: The name of the bag when it was uploaded to the depositor's receiving bucket, minus the .tar extention. For example, bag "Photos_1945.tar" will have bag name "Photos_1945".
-        institution_id:
-          type: integer
-          format: int64
-          description: The ID of the institution that owns this object.
-        state:
-          type: string
-          description: Indicates whether the object is Active (A) or Deleted (D).
-          enum: ["A", "D"]
-        etag:
-          type: string
-          description: The etag of last ingested version of this object. The etag is assinged by S3 upon upload to the depositor's receiving bucket. 
-          nullable: false
-        bag_group_identifier:
-          type: string
-          description: An optional identifier naming the logical group to which this object belongs. For instance, if ten bags are all part of the same collection, the collection name may be used as the group identifier associating all ten bags.
-          nullable: true
-        storage_option:
-          type: string
-          description: Indicates where the object's files are stored.
-          enum: ["Glacier-Deep-OH", "Glacier-Deep-OR", "Glacier-Deep-VA", "Glacier-OH", "Glacier-OR", "Glacier-VA", "Standard", "Wasabi-OR", "Wasabi-VA"]
-        bagit_profile_identifier:
-          type: string
-          description: The identifier of the BagIt profile used to create this bag. This can be either the APTrust profile URL or the BTR profile URL. Bags will be restored using the same profile under which they were submitted.
-          enum: ["https://github.com/dpscollaborative/btr_bagit_profile/releases/download/1.0/btr-bagit-profile.json", "https://raw.githubusercontent.com/APTrust/preservation-services/master/profiles/aptrust-v2.2.json"]
-        source_organization:
-          type: string
-          description: The name of the institution that submitted the object for ingest.
-        internal_sender_identifier:
-          type: string
-          description: An optional identifier for internal use by the depositor. 
-          nullable: true
-        internal_sender_description:
-          type: string
-          description: An optional description for use by the depositor.
-          nullable: true
-        institution:
-          description: The institution that owns or has rights to manipulate this object in aptrust.
-          $ref: '#/components/schemas/Institution'
-        generic_files:
-          description: The files that make up this object. Because objects may have hundreds of thousands of files, some API calls may return an empty list to avoid huge results. Use the /files endpoint, specifying an IntellectualObject ID, to page through lists of files.
-          type: array
-          items:
-            $ref: '#/components/schemas/GenericFile'
-        premis_events:
-          description: Premis events pertaining to this object and its files. Because objects may have hundreds of thousands of events, some API calls may return an empty list to avoid huge results. Use the /events endpoint, specifying an IntellectualObject ID, to page through lists of events.
-          type: array
-          items:
-            $ref: '#/components/schemas/GenericFile'
-        created_at:
-          type: string
-          format: date-time
-          description: The date and time this record was created.
-        updated_at:
-          type: string
-          format: date-time
-          description: The date and time this record was last updated.
     IntellectualObjectView:
+      type: object
       properties:
         id:
           type: integer
@@ -828,6 +585,7 @@ components:
             $ref: '#/components/schemas/IntellectualObjectView'
 
     PremisEvent:
+      type: object
       properties:
         id:
           type: integer
@@ -898,6 +656,7 @@ components:
           format: date-time
           description: Because Premis Events cannot be changed, this timestamp should always match created_at.
     PremisEventView:
+      type: object
       properties:
         id:
           type: integer
@@ -996,6 +755,7 @@ components:
             $ref: '#/components/schemas/PremisEventView'
 
     StorageRecord:
+      type: object
       properties:        
         id:
           type: integer
@@ -1008,153 +768,8 @@ components:
           type: string
           description: The URL of the GenericFile in preservation storage.
 
-    User:
-      properties:        
-        id:
-          type: integer
-          format: int64
-        name:
-          type: string
-          description: The user's name.
-        email:
-          type: string
-          format: email
-          description: The user's email address.
-
-    WorkItem:
-      properties:
-        id:
-          type: integer
-          format: int64
-        name:
-          type: string
-          description: The name of the original tar file uploaded to the receiving bucket for ingest.
-          nullable: false
-        etag:
-          type: string
-          description: The etag of tar file uploaded for ingest.
-          nullable: false
-        institution_id:
-          type: integer
-          format: int64
-          description: The ID of the institution that owns the file or object that is the subject of this work item.
-        intellectual_object_id:
-          type: integer
-          format: int64
-          description: The ID of the IntellectualObject being worked on. This will be null for ingest work items where the ingest is not yet complete.
-          nullable: true
-        generic_file_id:
-          type: integer
-          format: int64
-          description: The ID of the GenericFile this work item pertains to. This will be null if the WorkItem pertains to an object.
-          nullable: true
-        bucket:
-          type: string
-          description: The name of the receiving bucket into which the original bag was uploaded for ingest.
-          nullable: false
-        user:
-          type: string
-          format: email
-          description: The email address of the user who initiated this work item.
-          nullable: false
-        note:
-          type: string
-          description: A brief summary of the status of this item.
-          nullable: false
-        action:
-          type: string
-          description: The action being performed.
-          enum: ["Delete", "Restore Object", "Restore File", "Glacier Restore", "Ingest"]
-        stage:
-          type: string
-          description: The stage of processing.
-          enum: 
-            - Available in S3
-            - Cleanup
-            - Copy To Staging
-            - Fetch
-            - Format Identification
-            - Package
-            - Receive
-            - Record
-            - Reingest Check
-            - Requested
-            - Resolve
-            - Restoring
-            - Storage Validation
-            - Store
-            - Unpack
-            - Validate
-        status:
-          type: string
-          description: The status of the current operation.
-          enum:
-            - Cancelled
-            - Failed
-            - Pending
-            - Started
-            - Success
-            - Suspended
-        outcome:
-          type: string
-          description: The outcome of this item's activity.
-          enum: ["Failure", "Success"]
-        bag_date:
-          type: string
-          format: date-time
-          description: The date on which the originally submitted bag appeared in the receiving bucket. 
-        date_processed:
-          type: string
-          format: date-time
-          description: The date and time of last known activity on this work item. This timestamp may change several times during multipart processes such as ingest.
-        retry:
-          type: boolean
-          description: Indicates whether APTrust worker process should continue trying to process this work item. This is set to false only after certain fatal errors, or after too many transient errors.
-        node:
-          type: string
-          description: The hostname of the microservice worker currently processing this item.
-          nullable: true
-        pid:
-          type: integer
-          format: int64
-          description: The process ID of the worker that is currently working on this item.
-        needs_admin_review:
-          type: boolean
-          description: Indicates whether an APTrust admin needs to review and possibly requeue this item. This flag is set after an item encounters too many transient errors.
-        queued_at:
-          type: string
-          format: date-time
-          description: The date and time this item was queued for processing. 
-          nullable: true
-        size:
-          type: integer
-          format: int64
-          description: The size (in bytes) of the bag, object, or file being worked on.
-          nullable: false
-        stage_started_at:
-          type: string
-          format: date-time
-          description: Indicates when the current stage of processing started for this item.
-          nullable: true
-        aptrust_approver:
-          type: string
-          format: email
-          description: The email address of the APTrust admin who approved this item. In the past, this was used to only to approve bulk deletions.
-          nullable: true
-        inst_approver:
-          type: string
-          format: email
-          description: The email address of the institutional admin who approved a deletion request.
-          nullable: true
-        created_at:
-          type: string
-          format: date-time
-          description: The date and time this record was created.
-        updated_at:
-          type: string
-          format: date-time
-          description: The date and time this record was last updated.
     WorkItemView:
+      type: object
       properties:
         id:
           type: integer
@@ -1621,7 +1236,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DeletionRequest'
+                $ref: '#/components/schemas/DeletionRequestView'
         '400':
           description: Bad request. One or more required parameters are missing.
         '401':
@@ -1768,6 +1383,120 @@ paths:
     get: 
       summary: Returns a list of intellectual objects.
       parameters: 
+        - name: access
+          in: query
+          description: Return objects with this access setting.
+          required: false
+          schema:
+            type: string
+            enum: ["consortia", "institution", "restricted"]
+        - name: alt_identifier
+          in: query
+          description: Return objects with this alternate identifier.
+          required: false
+          schema:
+            type: string
+        - name: bag_group_identifier
+          in: query
+          description: Return objects with this bag group identifier.
+          required: false
+          schema:
+            type: string
+        - name: bagit_proobject_identifier
+          in: query
+          description: Return objects with this BagIt proobject identifier.
+          required: false
+          schema:
+            type: string
+            enum: ["https://github.com/dpscollaborative/btr_bagit_proobject/releases/download/1.0/btr-bagit-proobject.json", "https://raw.githubusercontent.com/APTrust/preservation-services/master/proobjects/aptrust-v2.2.json"]
+        - name: created_at__gteq
+          in: query
+          description: Return objects created on or after the given timestamp.
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: created_at__lteq
+          in: query
+          description: Return objects created on or before the given timestamp.
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: etag
+          in: query
+          description: Return the object with this etag.
+          required: false
+          schema:
+            type: string
+        - name: file_count__gteq
+          in: query
+          description: Return objects containing at least this number of files.
+          required: false
+          schema:
+            type: integer
+            format: int64
+        - name: file_count__lteq
+          in: query
+          description: Return objects containing no more than this number of files.
+          required: false
+          schema:
+            type: integer
+            format: int64
+        - name: identifier
+          in: query
+          description: Return the object with this identifier.
+          required: false
+          schema:
+            type: string            
+        - name: internal_sender_identifier
+          in: query
+          description: Return objects with this internal sender identifier.
+          required: false
+          schema:
+            type: string
+        - name: size__gteq
+          in: query
+          description: Return objects whose size is at least this number of bytes.
+          required: false
+          schema:
+            type: integer
+            format: int64
+        - name: size__lteq
+          in: query
+          description: Return objects whose size is less than or equal to this number of bytes.
+          required: false
+          schema:
+            type: integer
+            format: int64
+        - name: state
+          in: query
+          description: Return objects with this state. A = Active, D = Deleted.
+          required: false
+          schema:
+            type: string
+            enum: ["A", "D"]
+        - name: storage_option
+          in: query
+          description: Return objects with the specified storage option.
+          required: false
+          schema:
+            type: string
+            enum: ["Glacier-Deep-OH", "Glacier-Deep-OR", "Glacier-Deep-VA", "Glacier-OH", "Glacier-OR", "Glacier-VA", "Standard", "Wasabi-OR", "Wasabi-VA"]
+        - name: updated_at__gteq
+          in: query
+          description: Return objects updated on or after the given timestamp.
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: updated_at__lteq
+          in: query
+          description: Return objects updated on or before the given timestamp.
+          required: false
+          schema:
+            type: string
+            format: date-time
       responses:
         '200':
           description: A list of intellectual objects belonging to the currently authenticated user's institution.
@@ -1812,6 +1541,83 @@ paths:
     get: 
       summary: Returns a list of premis events.
       parameters: 
+        - name: date_time__gteq
+          in: query
+          description: Return events that occurred on or after the given timestamp.
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: date_time__lteq
+          in: query
+          description: Return events that occurred on or before the given timestamp.
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: event_type
+          in: query
+          description: Return events of the specified type.
+          required: false
+          schema:
+            type: string
+            enum: 
+              - access assignment
+              - creation
+              - deletion
+              - fixity check
+              - identifier assignment
+              - ingestion
+              - message digest calculation
+              - replication
+            
+        - name: generic_file_id
+          in: query
+          description: Return events for the specified file.
+          required: false
+          schema:
+            type: integer
+            format: int64
+        - name: generic_file_id__is_null
+          in: query
+          description: Return events that pertain to objects, not files.
+          required: false
+          schema:
+            type: string
+            enum: ["true"]
+        - name: generic_file_identifier
+          in: query
+          description: Return events for the file with this identifier.
+          required: false
+          schema:
+            type: string            
+        - name: identifier
+          in: query
+          description: Return the event with this identifier (uuid).
+          required: false
+          schema:
+            type: string
+            format: uuid
+        - name: intellectual_object_id
+          in: query
+          description: Return events for the specified object.
+          required: false
+          schema:
+            type: integer
+            format: int64
+        - name: intellectual_object_identifier
+          in: query
+          description: Return events for the object with this identifier. This will include both object- and file-level events.
+          required: false
+          schema:
+            type: string            
+        - name: outcome
+          in: query
+          description: Return events with the specified outcome.
+          required: false
+          schema:
+            type: string
+            enum: ["Failure", "Success"]
       responses:
         '200':
           description: A list of premis events belonging to the currently authenticated user's institution.
@@ -1856,6 +1662,204 @@ paths:
     get: 
       summary: Returns a list of work items
       parameters: 
+        - name: action
+          in: query
+          description: Return items with the specified action.
+          required: false
+          schema:
+            type: string
+            enum: ["Delete", "Restore Object", "Restore File", "Glacier Restore", "Ingest"]
+        - name: alt_identifier
+          in: query
+          description: Return work items pertaining to objects with this alternate identifier.
+          required: false
+          schema:
+            type: string
+        - name: bag_date__gteq
+          in: query
+          description: Return items pertaining to bags uploaded on or after the given timestamp.
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: bag_date__lteq
+          in: query
+          description: Return items pertaining to bags uploaded on or before the given timestamp.
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: bag_group_identifier
+          in: query
+          description: Return items pertaining to objects with this bag group identifier.
+          required: false
+          schema:
+            type: string
+        - name: bagit_proobject_identifier
+          in: query
+          description: Return items pertaining to objects with this BagIt proobject identifier.
+          required: false
+          schema:
+            type: string
+            enum: ["https://github.com/dpscollaborative/btr_bagit_proobject/releases/download/1.0/btr-bagit-proobject.json", "https://raw.githubusercontent.com/APTrust/preservation-services/master/proobjects/aptrust-v2.2.json"]
+        - name: date_processed__gteq
+          in: query
+          description: Return items processed on or after the given timestamp.
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: date_processed__lteq
+          in: query
+          description: Return items processed on or before the given timestamp.
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: etag
+          in: query
+          description: Return the object with this etag.
+          required: false
+          schema:
+            type: string
+        - name: generic_file_id
+          in: query
+          description: Return work items pertaining to the specified file.
+          required: false
+          schema:
+            type: integer
+            format: int64
+        - name: generic_file_id__is_null
+          in: query
+          description: Return work items that pertain to objects, not files.
+          required: false
+          schema:
+            type: string
+            enum: ["true"]
+        - name: generic_file_identifier
+          in: query
+          description: Return work items for the file with this identifier.
+          required: false
+          schema:
+            type: string 
+        - name: intellectual_object_id
+          in: query
+          description: Return items related to the specified object.
+          required: false
+          schema:
+            type: integer
+            format: int64
+        - name: name
+          in: query
+          description: Return items for bags with the specified name. Name is the name of the original tar file uploaded to the receiving bucket for ingest.
+          required: false
+          schema:
+            type: string            
+        - name: node__is_null
+          in: query
+          description: Return work items that are not currently being processed by any ingest, restoration, or deletion worker.
+          required: false
+          schema:
+            type: string
+            enum: ["true"]
+        - name: node__is_not_null
+          in: query
+          description: Return work items that are currently being processed by any ingest, restoration, or deletion worker.
+          required: false
+          schema:
+            type: string
+            enum: ["true"]
+        - name: object_identifier
+          in: query
+          description: Return work items for the object with this identifier.
+          required: false
+          schema:
+            type: string 
+        - name: queued_at__is_null
+          in: query
+          description: Return work items that have not yet been queued for processing.
+          required: false
+          schema:
+            type: string
+            enum: ["true"]
+        - name: queued_at__is_not_null
+          in: query
+          description: Return work items that have been queued for processing.
+          required: false
+          schema:
+            type: string
+            enum: ["true"]
+        - name: retry
+          in: query
+          description: Return work items that are cleared for processing. 
+          required: false
+          schema:
+            type: string
+            enum: ["true", "false"]
+        - name: size__gteq
+          in: query
+          description: Return work items pertaining to files or objects whose size is at least this many bytes.
+          required: false
+          schema:
+            type: integer
+            format: int64
+        - name: size__lteq
+          in: query
+          description: Return work items pertaining to files or objects whose size is no more than this many bytes.
+          required: false
+          schema:
+            type: integer
+            format: int64
+        - name: stage
+          in: query
+          description: Return work items in this stage of processing. 
+          required: false
+          schema:
+            type: string
+            enum:
+              - Available in S3
+              - Cleanup
+              - Copy To Staging
+              - Fetch
+              - Format Identification
+              - Package
+              - Receive
+              - Record
+              - Reingest Check
+              - Requested
+              - Resolve
+              - Restoring
+              - Storage Validation
+              - Store
+              - Unpack
+              - Validate
+        - name: status
+          in: query
+          description: Return work items with the specified status. 
+          required: false
+          schema:
+            type: string
+            enum:
+              - Cancelled
+              - Failed
+              - Pending
+              - Started
+              - Success
+              - Suspended
+        - name: storage_option
+          in: query
+          description: Return work items enacted on files or objects with the specified storage option. 
+          required: false
+          schema:
+            type: string
+            enum: ["Glacier-Deep-OH", "Glacier-Deep-OR", "Glacier-Deep-VA", "Glacier-OH", "Glacier-OR", "Glacier-VA", "Standard", "Wasabi-OR", "Wasabi-VA"]
+        - name: user
+          in: query
+          description: Return work items initiated by the specified user. 
+          required: false
+          schema:
+            type: string
+            format: email
       responses:
         '200':
           description: A list of work items belonging to the currently authenticated user's institution.
@@ -1895,3 +1899,4 @@ paths:
           description: The current user does not have permission to view this work item.
         '404':
           description: There is no work item with this ID.
+
