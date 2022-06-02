@@ -28,7 +28,6 @@ components:
       description: User's email address
   schemas:
     AlertView:
-
       type: object
       properties:
         id:
@@ -1796,3 +1795,183 @@ paths:
           description: The current user does not have permission to view this checksum.
         '404':
           description: There is no checksum with this ID.
+
+  /member-api/v3/deletions:
+    get: 
+      summary: Returns a list of deletion requests.
+      parameters: 
+      responses:
+        '200':
+          description: A list of deletion requests belonging to the currently authenticated user's institution.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeletionRequestViewList'
+        '401':
+          description: Request is not authorized. Be sure you passed valid API credentials with your request.
+        '403':
+          description: The current user does not have permission to view the requested deletion requests.
+
+  /member-api/v3/deletions/show/{id}:
+    get: 
+      summary: Returns the deletion request with the specified id.
+      parameters: 
+      responses:
+        '200':
+          description: The deletion request with the requested id.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeletionRequest'
+        '400':
+          description: Bad request. One or more required parameters are missing.
+        '401':
+          description: Request is not authorized. Be sure you passed valid API credentials with your request.
+        '403':
+          description: The current user does not have permission to view this deletion request.
+        '404':
+          description: There is no deletion request with this ID.
+
+  /member-api/v3/files:
+    get: 
+      summary: Returns a list of GenericFiles.
+      parameters: 
+      responses:
+        '200':
+          description: A list of generic files belonging to the currently authenticated user's institution.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericFileList'
+        '401':
+          description: Request is not authorized. Be sure you passed valid API credentials with your request.
+        '403':
+          description: The current user does not have permission to view the requested files.
+
+  /member-api/v3/files/show/{id}:
+    get: 
+      summary: Returns the generic file with the speficied id.
+      parameters: 
+      responses:
+        '200':
+          description: The generic file with the requested id.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericFile'
+        '400':
+          description: Bad request. One or more required parameters are missing.
+        '401':
+          description: Request is not authorized. Be sure you passed valid API credentials with your request.
+        '403':
+          description: The current user does not have permission to view this file.
+        '404':
+          description: There is no generic file with this ID.
+
+  /member-api/v3/objects:
+    get: 
+      summary: Returns a list of intellectual objects.
+      parameters: 
+      responses:
+        '200':
+          description: A list of intellectual objects belonging to the currently authenticated user's institution.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntellectualObjectViewList'
+        '401':
+          description: Request is not authorized. Be sure you passed valid API credentials with your request.
+        '403':
+          description: The current user does not have permission to view the requested objects.
+
+  /member-api/v3/objects/show/{id}:
+    get: 
+      summary: Returns the intellectual object with the specified id.
+      parameters: 
+      responses:
+        '200':
+          description: The intellectual object with the requested id.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntellectualObjectView'
+        '400':
+          description: Bad request. One or more required parameters are missing.
+        '401':
+          description: Request is not authorized. Be sure you passed valid API credentials with your request.
+        '403':
+          description: The current user does not have permission to view this object.
+        '404':
+          description: There is no object with this ID.
+
+  /member-api/v3/events:
+    get: 
+      summary: Returns a list of premis events.
+      parameters: 
+      responses:
+        '200':
+          description: A list of premis events belonging to the currently authenticated user's institution.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PremisEventViewList'
+        '401':
+          description: Request is not authorized. Be sure you passed valid API credentials with your request.
+        '403':
+          description: The current user does not have permission to view the requested events.
+
+  /member-api/v3/events/show/{id}:
+    get: 
+      summary: Returns the premis event with the specified id.
+      parameters: 
+      responses:
+        '200':
+          description: The premis event with the requested id.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PremisEventView'
+        '400':
+          description: Bad request. One or more required parameters are missing.
+        '401':
+          description: Request is not authorized. Be sure you passed valid API credentials with your request.
+        '403':
+          description: The current user does not have permission to view this event.
+        '404':
+          description: There is no event with this ID.
+
+  /member-api/v3/items:
+    get: 
+      summary: Returns a list of work items
+      parameters: 
+      responses:
+        '200':
+          description: A list of work items belonging to the currently authenticated user's institution.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkItemViewList'
+        '401':
+          description: Request is not authorized. Be sure you passed valid API credentials with your request.
+        '403':
+          description: The current user does not have permission to view the requested work items.
+
+  /member-api/v3/items/show/{id}:
+    get: 
+      summary: Returns the work item with the specified id.
+      parameters: 
+      responses:
+        '200':
+          description: The work item with the requested id.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkItemView'
+        '400':
+          description: Bad request. One or more required parameters are missing.
+        '401':
+          description: Request is not authorized. Be sure you passed valid API credentials with your request.
+        '403':
+          description: The current user does not have permission to view this work item.
+        '404':
+          description: There is no work item with this ID.
