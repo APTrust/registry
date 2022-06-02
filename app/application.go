@@ -342,7 +342,7 @@ func initRoutes(router *gin.Engine) {
 
 		// Deletion Requests
 		// TODO: Does Admin API really need this?
-		adminAPI.GET("/deletions/show/:id", common_api.DeletionRequestShow)
+		adminAPI.GET("/deletions/show/:id", admin_api.DeletionRequestShow)
 		adminAPI.GET("/deletions", common_api.DeletionRequestIndex)
 
 		// Generic Files
