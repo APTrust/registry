@@ -1179,6 +1179,29 @@ paths:
     get: 
       summary: Returns a list of deletion requests.
       parameters: 
+        - name: page
+          in: query
+          description: The page of results to fetch
+          required: false
+          schema:
+            type: integer
+            default: 1
+            format: int32      
+        - name: per_page
+          in: query
+          description: The number of results to fetch per page.
+          required: false
+          schema:
+            type: integer
+            default: 20
+            format: int32      
+        - name: sort
+          in: query
+          description: Sort the results in the specified column and direction. The format for this param is column__direction, where column is the column name and direction is either "asc" or "desc".
+          required: false
+          schema:
+            type: string            
+            enum: ["requested_at__asc", "requested_at__desc", "stage__asc", "stage__desc", "status__asc", "status__desc"]
         - name: requested_at__gteq
           in: query
           description: Return deletion requests made on or after the given timestamp.
@@ -1250,6 +1273,47 @@ paths:
     get: 
       summary: Returns a list of GenericFiles.
       parameters: 
+        - name: page
+          in: query
+          description: The page of results to fetch
+          required: false
+          schema:
+            type: integer
+            default: 1
+            format: int32      
+        - name: per_page
+          in: query
+          description: The number of results to fetch per page.
+          required: false
+          schema:
+            type: integer
+            default: 20
+            format: int32      
+        - name: sort
+          in: query
+          description: Sort the results in the specified column and direction. The format for this param is column__direction, where column is the column name and direction is either "asc" or "desc".
+          required: false
+          schema:
+            type: string            
+            enum: 
+              - created_at__asc
+              - created_at__desc
+              - identifier__asc
+              - identifier__desc
+              - intellectual_object_id__asc
+              - intellectual_object_id__desc 
+              - last_fixity_check__asc
+              - last_fixity_check__desc
+              - size__asc
+              - size__desc
+              - state__asc
+              - state__desc 
+              - storage_option__asc
+              - storage_option__desc
+              - updated_at__asc
+              - updated_at__desc
+              - uuid__asc
+              - uuid__desc
         - name: created_at__gteq
           in: query
           description: Return files created on or after the given timestamp.
@@ -1383,6 +1447,55 @@ paths:
     get: 
       summary: Returns a list of intellectual objects.
       parameters: 
+        - name: page
+          in: query
+          description: The page of results to fetch
+          required: false
+          schema:
+            type: integer
+            default: 1
+            format: int32      
+        - name: per_page
+          in: query
+          description: The number of results to fetch per page.
+          required: false
+          schema:
+            type: integer
+            default: 20
+            format: int32      
+        - name: sort
+          in: query
+          description: Sort the results in the specified column and direction. The format for this param is column__direction, where column is the column name and direction is either "asc" or "desc".
+          required: false
+          schema:
+            type: string            
+            enum: 
+              - access__asc
+              - access__desc
+              - alt_identifier__asc
+              - alt_identifier__desc
+              - bag_group_identifier__asc
+              - bag_group_identifier__desc
+              - bagit_profile_identifier__asc
+              - bagit_profile_identifier__desc
+              - created_at__asc
+              - created_at__desc
+              - etag__asc
+              - etag__desc
+              - file_count__asc
+              - file_count__desc
+              - identifier__asc
+              - identifier__desc
+              - internal_sender_identifier__asc
+              - internal_sender_identifier__desc 
+              - size__asc
+              - size__desc
+              - state__asc
+              - state__desc 
+              - storage_option__asc
+              - storage_option__desc
+              - updated_at__asc
+              - updated_at__desc
         - name: access
           in: query
           description: Return objects with this access setting.
@@ -1402,13 +1515,13 @@ paths:
           required: false
           schema:
             type: string
-        - name: bagit_proobject_identifier
+        - name: bagit_profile_identifier
           in: query
-          description: Return objects with this BagIt proobject identifier.
+          description: Return objects with this BagIt profile identifier.
           required: false
           schema:
             type: string
-            enum: ["https://github.com/dpscollaborative/btr_bagit_proobject/releases/download/1.0/btr-bagit-proobject.json", "https://raw.githubusercontent.com/APTrust/preservation-services/master/proobjects/aptrust-v2.2.json"]
+            enum: ["https://github.com/dpscollaborative/btr_bagit_profile/releases/download/1.0/btr-bagit-profile.json", "https://raw.githubusercontent.com/APTrust/preservation-services/master/profiles/aptrust-v2.2.json"]
         - name: created_at__gteq
           in: query
           description: Return objects created on or after the given timestamp.
@@ -1508,7 +1621,6 @@ paths:
           description: Request is not authorized. Be sure you passed valid API credentials with your request.
         '403':
           description: The current user does not have permission to view the requested objects.
-
   /member-api/v3/objects/show/{id}:
     get: 
       summary: Returns the intellectual object with the specified id.
@@ -1541,6 +1653,45 @@ paths:
     get: 
       summary: Returns a list of premis events.
       parameters: 
+        - name: page
+          in: query
+          description: The page of results to fetch
+          required: false
+          schema:
+            type: integer
+            default: 1
+            format: int32      
+        - name: per_page
+          in: query
+          description: The number of results to fetch per page.
+          required: false
+          schema:
+            type: integer
+            default: 20
+            format: int32      
+        - name: sort
+          in: query
+          description: Sort the results in the specified column and direction. The format for this param is column__direction, where column is the column name and direction is either "asc" or "desc".
+          required: false
+          schema:
+            type: string            
+            enum: 
+              - date_time__asc
+              - date_time__desc
+              - event_type__asc
+              - event_type__desc
+              - generic_file_id__asc
+              - generic_file_id__desc
+              - generic_file_identifier__asc
+              - generic_file_identifier__desc
+              - identifier__asc
+              - identifier__desc
+              - intellectual_object_id__asc
+              - intellectual_object_id__desc
+              - intellectual_object_identifier__asc
+              - intellectual_object_identifier__desc
+              - outcome__asc
+              - outcome__desc
         - name: date_time__gteq
           in: query
           description: Return events that occurred on or after the given timestamp.
@@ -1570,7 +1721,6 @@ paths:
               - ingestion
               - message digest calculation
               - replication
-            
         - name: generic_file_id
           in: query
           description: Return events for the specified file.
@@ -1629,7 +1779,6 @@ paths:
           description: Request is not authorized. Be sure you passed valid API credentials with your request.
         '403':
           description: The current user does not have permission to view the requested events.
-
   /member-api/v3/events/show/{id}:
     get: 
       summary: Returns the premis event with the specified id.
@@ -1662,6 +1811,65 @@ paths:
     get: 
       summary: Returns a list of work items
       parameters: 
+        - name: page
+          in: query
+          description: The page of results to fetch
+          required: false
+          schema:
+            type: integer
+            default: 1
+            format: int32      
+        - name: per_page
+          in: query
+          description: The number of results to fetch per page.
+          required: false
+          schema:
+            type: integer
+            default: 20
+            format: int32      
+        - name: sort
+          in: query
+          description: Sort the results in the specified column and direction. The format for this param is column__direction, where column is the column name and direction is either "asc" or "desc".
+          required: false
+          schema:
+            type: string            
+            enum: 
+              - action__asc
+              - action__desc
+              - alt_identifier__asc
+              - alt_identifier__desc              
+              - bag_date__asc
+              - bag_date__desc
+              - bag_group_identifier__asc
+              - bag_group_identifier__desc
+              - bagit_profile_identifier__asc
+              - bagit_profile_identifier__desc
+              - date_processed__asc
+              - date_processed__desc
+              - etag__asc
+              - etag__desc
+              - generic_file_id__asc
+              - generic_file_id__desc
+              - generic_file_identifier__asc
+              - generic_file_identifier__desc
+              - identifier__asc
+              - identifier__desc
+              - intellectual_object_id__asc
+              - intellectual_object_id__desc
+              - name__asc
+              - name__desc
+              - object_identifier__asc
+              - object_identifier__desc
+              - queued_at__asc
+              - queued_at__desc
+              - size__asc
+              - size__desc 
+              - stage__asc 
+              - stage__desc 
+              - status__asc  
+              - status__desc
+              - storage_option__asc 
+              - storage_option__desc 
         - name: action
           in: query
           description: Return items with the specified action.
@@ -1695,13 +1903,13 @@ paths:
           required: false
           schema:
             type: string
-        - name: bagit_proobject_identifier
+        - name: bagit_profile_identifier
           in: query
-          description: Return items pertaining to objects with this BagIt proobject identifier.
+          description: Return items pertaining to objects with this BagIt profile identifier.
           required: false
           schema:
             type: string
-            enum: ["https://github.com/dpscollaborative/btr_bagit_proobject/releases/download/1.0/btr-bagit-proobject.json", "https://raw.githubusercontent.com/APTrust/preservation-services/master/proobjects/aptrust-v2.2.json"]
+            enum: ["https://github.com/dpscollaborative/btr_bagit_profile/releases/download/1.0/btr-bagit-profile.json", "https://raw.githubusercontent.com/APTrust/preservation-services/master/profiles/aptrust-v2.2.json"]
         - name: date_processed__gteq
           in: query
           description: Return items processed on or after the given timestamp.
@@ -1871,7 +2079,6 @@ paths:
           description: Request is not authorized. Be sure you passed valid API credentials with your request.
         '403':
           description: The current user does not have permission to view the requested work items.
-
   /member-api/v3/items/show/{id}:
     get: 
       summary: Returns the work item with the specified id.
