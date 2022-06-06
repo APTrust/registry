@@ -72,11 +72,13 @@ func IsAPIRoute(c *gin.Context) bool {
 	return false
 }
 
+// Show a 404 error. If we can't map the requested path to a handler, then
+// the path doesn't exist.
 func showNotCheckedError(c *gin.Context, auth *ResourceAuthorization) {
 	fmt.Println(auth.String())
 	common.Context().Log.Error().Msgf(auth.GetError())
 	errMsg := fmt.Sprintf("Missing authorization check for %s", c.FullPath())
-	showError(c, auth, errMsg, http.StatusInternalServerError)
+	showError(c, auth, errMsg, http.StatusNotFound)
 }
 
 func showAuthFailedError(c *gin.Context, auth *ResourceAuthorization) {
