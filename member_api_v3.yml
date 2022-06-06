@@ -445,7 +445,7 @@ components:
           type: string
           format: date-time
           description: The date and time at which the generic file was last updated. Updates may indicate re-ingest or changes to last fixity check date.
-    GenericFileList:
+    GenericFileViewList:
       properties:
         count:
           type: integer
@@ -461,7 +461,7 @@ components:
           description: A list of files matching your query.
           type: array
           items:
-            $ref: '#/components/schemas/GenericFile'
+            $ref: '#/components/schemas/GenericFileView'
 
     IntellectualObjectView:
       type: object
@@ -1410,7 +1410,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GenericFileList'
+                $ref: '#/components/schemas/GenericFileViewList'
         '401':
           description: Request is not authorized. Be sure you passed valid API credentials with your request.
         '403':
