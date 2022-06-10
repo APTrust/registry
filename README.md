@@ -1,12 +1,17 @@
 [![Build Status](https://travis-ci.com/APTrust/registry.svg?branch=master)](https://travis-ci.com/APTrust/registry)
 [![Maintainability](https://api.codeclimate.com/v1/badges/e4c7cfd351d6bae759e3/maintainability)](https://codeclimate.com/github/APTrust/registry/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/e4c7cfd351d6bae759e3/test_coverage)](https://codeclimate.com/github/APTrust/registry/test_coverage)
+[![REST API Documentation](https://img.shields.io/badge/documentation-REST%20API-blue)](https://aptrust.github.io/registry/)
 
 # Registry
 
 APTrust's registry contains metadata about the millions of items we hold on behalf of our depositors in preservation storage. The registry provides web-based and API-based access to the metadata and to information about items currently undergoing ingest and restoration.
 
 This will be the third-generation of our registry software, based on the [Gin Web Framework](https://github.com/gin-gonic/gin). It will replace our existing Rails application, [Pharos](https://github.com/APTrust/pharos), which suffers from performance and maintability problems, which are discussed in more detail in [these notes](notes.md).
+
+# REST API
+
+If you're looking for our member API documentation, check out our [interactive Swagger docs](https://aptrust.github.io/registry/).
 
 # Requirements
 
