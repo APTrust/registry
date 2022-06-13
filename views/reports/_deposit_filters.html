@@ -1,32 +1,52 @@
 {{ define "reports/_deposit_filters.html" }}
 
-<form id="depositReportFilterForm" method="get">
+<div class="filters-grid">
+  <h3 class="filters-grid-label text-label text-xs">Filter</h3>
+  <div class="filters-grid-content">
+    <form id="depositReportFilterForm" method="get">
 
-  <div class="row">
-    <div class="column col-30">
-      {{ template "forms/select.html" .filterForm.Fields.storage_option }}
-    </div>
-    <div class="column col-30">
-      {{ template "forms/date.html" .filterForm.Fields.updated_at__lteq }}
-    </div>
-    <div class="column col-30">
-      {{ template "forms/select.html" .filterForm.Fields.chart_metric }}
+      <div class="columns">
+        <div class="column is-one-quarter">
+          {{ template "forms/select.html" .filterForm.Fields.storage_option }}
+        </div>
+        <div class="column is-one-quarter">
+          {{ template "forms/date.html" .filterForm.Fields.updated_at__lteq }}
+        </div>
+        <div class="column is-one-quarter is-align-self-flex-end">
+          <input class="filter-button button is-primary" type="submit" value="Filter">
+        </div>
+      </div>
+
+      <div class="columns">
+        <div class="column is-one-quarter">
+          {{ template "forms/select.html" .filterForm.Fields.chart_metric }}
+        </div>
+        <div class="column is-one-quarter">
+          {{ if .CurrentUser.IsAdmin }}
+          {{ template "forms/select.html" .filterForm.Fields.institution_id }}
+          {{ end }}
+        </div>
+      </div>
+
+    </form>
+
+    <div class="filters-grid-clear">
+      <!-- TODO Example filter chips below, not wired up yet -->
+      <button class="badge filter-chip mb-3">
+        <strong class="mr-1">Action:</strong> Restore File
+        <span class="icon material-icons md-16" aria-hidden="true">cancel</span>
+      </button>
+      <button class="badge filter-chip mb-3">
+        <strong class="mr-1">Action:</strong> Restore File
+        <span class="icon material-icons md-16" aria-hidden="true">cancel</span>
+      </button>
+      <button class="badge filter-chip mb-3">
+        <strong class="mr-1">Action:</strong> Restore File
+        <span class="icon material-icons md-16" aria-hidden="true">cancel</span>
+      </button>
+      <button class="filter-clear button is-compact is-white">Clear Filters</button>
     </div>
   </div>
+</div>
 
-  <div class="row">
-    <div class="column col-30">
-      {{ if .CurrentUser.IsAdmin }}
-      {{ template "forms/select.html" .filterForm.Fields.institution_id }}
-      {{ end }}
-    </div>
-    <div class="column col-30">
-    </div>
-    <div class="column col-30">
-      <input type="submit" value="Filter">
-    </div>
-  </div>
-
-</form>
-
-{{ end }}
+  {{ end }}
