@@ -146,6 +146,9 @@ func initRoutes(router *gin.Engine) {
 		// Alerts
 		webRoutes.GET("/alerts", webui.AlertIndex)
 		webRoutes.GET("/alerts/show/:id/:user_id", webui.AlertShow)
+		webRoutes.PUT("/alerts/mark_as_read", webui.AlertMarkAsReadXHR)
+		webRoutes.PUT("/alerts/mark_all_as_read", webui.AlertMarkAllAsReadXHR)
+		webRoutes.PUT("/alerts/mark_as_unread", webui.AlertMarkAsUnreadXHR)
 
 		// Deletion Requests
 		// Note that these routes are for read-only views.
@@ -339,13 +342,12 @@ func initRoutes(router *gin.Engine) {
 
 		// Deletion Requests
 		// TODO: Does Admin API really need this?
-		adminAPI.GET("/deletions/show/:id", common_api.DeletionRequestShow)
+		adminAPI.GET("/deletions/show/:id", admin_api.DeletionRequestShow)
 		adminAPI.GET("/deletions", common_api.DeletionRequestIndex)
 
 		// Generic Files
-		// TODO: Change institution_id to object_id?
 		adminAPI.GET("/files/show/*id", common_api.GenericFileShow)
-		adminAPI.GET("/files", common_api.GenericFileIndex)
+		adminAPI.GET("/files", admin_api.GenericFileIndex)
 		adminAPI.DELETE("/files/delete/:id", admin_api.GenericFileDelete)
 		adminAPI.POST("/files/create/:institution_id", admin_api.GenericFileCreate)
 		adminAPI.POST("/files/create_batch/:institution_id", admin_api.GenericFileCreateBatch)

@@ -109,11 +109,24 @@ func createAlert(alert *pgmodels.Alert, templateName string, alertData map[strin
 		return nil, err
 	}
 
-	// Set the alert text and save...
+	// Set the alert text & save it.
 	alert.Content = buf.String()
 	err = alert.Save()
 	if err != nil {
 		return nil, err
+	}
+
+	// Send the alert & mark as sent
+	for _, recipient := range alert.Users {
+		err := common.Context().SESClient.Send(recipient.Email, alert.Subject, alert.Content)
+		if err == nil {
+			err = alert.MarkAsSent(recipient.ID)
+			if err != nil {
+				common.Context().Log.Error().Msgf("Could not mark alert %d to user %s as sent, even though it was: %v", alert.ID, recipient.Email, err)
+			}
+		} else {
+			common.Context().Log.Error().Msgf("Saved but could not send alert %d to user %s: %v", alert.ID, recipient.Email, err)
+		}
 	}
 
 	// Show the alert text in dev and test consoles,

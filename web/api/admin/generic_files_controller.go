@@ -11,6 +11,23 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// GenericFileIndex shows list of files. Unlike the member API,
+// which returns a list of GenericFileView objects, this returns
+// a list of GenericFile objects, complete with checksums, events
+// and storage records. Some of our API workers depend on the
+// related records.
+//
+// GET /admin-api/v3/files
+func GenericFileIndex(c *gin.Context) {
+	req := api.NewRequest(c)
+	var files []*pgmodels.GenericFile
+	pager, err := req.LoadResourceList(&files, "updated_at", "desc")
+	if api.AbortIfError(c, err) {
+		return
+	}
+	c.JSON(http.StatusOK, api.NewJsonList(files, pager))
+}
+
 // GenericFileDelete marks a generic file record as deleted.
 // It also creates a deletion premis event. Before it does any of
 // that, it checks a number of pre-conditions. See the

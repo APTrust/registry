@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/APTrust/registry/common"
+	"github.com/APTrust/registry/pgmodels"
 	"github.com/gin-gonic/gin"
 )
 
@@ -40,6 +41,9 @@ func AbortIfError(c *gin.Context, err error) bool {
 func StatusCodeForError(err error) (status int) {
 	if _, ok := err.(*common.ValidationError); ok {
 		return http.StatusBadRequest
+	}
+	if pgmodels.IsNoRowError(err) {
+		return http.StatusNotFound
 	}
 
 	switch err {

@@ -39,6 +39,9 @@ func TestNewConfig(t *testing.T) {
 		require.False(t, true, "Wrong APT_ENV environment for testing")
 	}
 
+	assert.False(t, config.Email.Enabled)
+	assert.Equal(t, "help@aptrust.org", config.Email.FromAddress)
+
 	assert.Equal(t, "localhost", config.Cookies.Domain)
 	assert.Equal(t, 43200, config.Cookies.MaxAge)
 	assert.Equal(t, "aptrust_session", config.Cookies.SessionCookie)

@@ -63,6 +63,12 @@ type TwoFactorConfig struct {
 	OTPExpiration time.Duration
 }
 
+type EmailConfig struct {
+	AWSRegion   string
+	Enabled     bool
+	FromAddress string
+}
+
 type RedisConfig struct {
 	URL       string
 	Password  string
@@ -76,6 +82,7 @@ type Config struct {
 	Logging   *LoggingConfig
 	NsqUrl    string
 	TwoFactor *TwoFactorConfig
+	Email     *EmailConfig
 	Redis     *RedisConfig
 }
 
@@ -167,6 +174,11 @@ func loadConfig() *Config {
 			AWSRegion:     v.GetString("AWS_REGION"),
 			SMSEnabled:    v.GetBool("ENABLE_TWO_FACTOR_SMS"),
 			OTPExpiration: v.GetDuration("OTP_EXPIRATION"),
+		},
+		Email: &EmailConfig{
+			AWSRegion:   v.GetString("AWS_REGION"),
+			Enabled:     v.GetBool("EMAIL_ENABLED"),
+			FromAddress: v.GetString("EMAIL_FROM_ADDRESS"),
 		},
 		Redis: &RedisConfig{
 			DefaultDB: v.GetInt("REDIS_DEFAULT_DB"),

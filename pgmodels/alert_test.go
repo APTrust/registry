@@ -51,6 +51,10 @@ func TestAlertRelations(t *testing.T) {
 	assert.Equal(t, 3, len(alert.Users))
 	assert.Equal(t, 3, len(alert.PremisEvents))
 	assert.Equal(t, 3, len(alert.WorkItems))
+
+	testMarkAsSent(t, alert)
+	testMarkAsRead(t, alert)
+	testMarkAsUnread(t, alert)
 }
 
 func TestAlertValidate(t *testing.T) {
@@ -69,4 +73,64 @@ func TestAlertSelect(t *testing.T) {
 	require.Nil(t, err)
 	require.NotEmpty(t, alerts)
 	assert.Equal(t, 9, len(alerts))
+}
+
+func testMarkAsSent(t *testing.T, alert *pgmodels.Alert) {
+	userID := alert.Users[0].ID
+
+	// First, make sure it's unsent.
+	alertView, err := pgmodels.AlertViewForUser(alert.ID, userID)
+	require.Nil(t, err)
+	require.NotNil(t, alertView)
+	require.Empty(t, alertView.SentAt)
+
+	// Mark mark the alert as sent
+	err = alert.MarkAsSent(userID)
+	require.Nil(t, err)
+
+	// Now make sure it really was marked as sent.
+	alertView, err = pgmodels.AlertViewForUser(alert.ID, userID)
+	require.Nil(t, err)
+	require.NotNil(t, alertView)
+	require.NotEmpty(t, alertView.SentAt)
+}
+
+func testMarkAsRead(t *testing.T, alert *pgmodels.Alert) {
+	userID := alert.Users[0].ID
+
+	// First, make sure it's unread.
+	alertView, err := pgmodels.AlertViewForUser(alert.ID, userID)
+	require.Nil(t, err)
+	require.NotNil(t, alertView)
+	require.Empty(t, alertView.ReadAt)
+
+	// Mark mark the alert as read
+	err = alert.MarkAsRead(userID)
+	require.Nil(t, err)
+
+	// Now make sure it really was marked as read.
+	alertView, err = pgmodels.AlertViewForUser(alert.ID, userID)
+	require.Nil(t, err)
+	require.NotNil(t, alertView)
+	require.NotEmpty(t, alertView.ReadAt)
+}
+
+func testMarkAsUnread(t *testing.T, alert *pgmodels.Alert) {
+	userID := alert.Users[0].ID
+
+	// First, make sure it's read.
+	alertView, err := pgmodels.AlertViewForUser(alert.ID, userID)
+	require.Nil(t, err)
+	require.NotNil(t, alertView)
+	require.NotEmpty(t, alertView.ReadAt)
+
+	// Mark mark the alert as unread
+	err = alert.MarkAsUnread(userID)
+	require.Nil(t, err)
+
+	// Now make sure it really was marked as unread.
+	alertView, err = pgmodels.AlertViewForUser(alert.ID, userID)
+	require.Nil(t, err)
+	require.NotNil(t, alertView)
+	require.Empty(t, alertView.ReadAt)
 }

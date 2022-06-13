@@ -19,6 +19,7 @@ type APTContext struct {
 	AuthyClient network.AuthyClientInterface
 	NSQClient   *network.NSQClient
 	RedisClient *network.RedisClient
+	SESClient   *network.SESClient
 	SNSClient   *network.SNSClient
 }
 
@@ -59,6 +60,7 @@ func Context() *APTContext {
 			Log:         zlogger,
 			AuthyClient: network.NewAuthyClient(config.TwoFactor.AuthyEnabled, config.TwoFactor.AuthyAPIKey, zlogger),
 			NSQClient:   network.NewNSQClient(config.NsqUrl, zlogger),
+			SESClient:   network.NewSESClient(config.Email.Enabled, config.TwoFactor.AWSRegion, config.Email.FromAddress, zlogger),
 			SNSClient:   network.NewSNSClient(config.TwoFactor.SMSEnabled, config.TwoFactor.AWSRegion, zlogger),
 			RedisClient: redisClient,
 		}

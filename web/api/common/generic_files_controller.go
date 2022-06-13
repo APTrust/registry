@@ -8,13 +8,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// GenericFileIndex shows list of objects.
+// GenericFileIndex shows list of files. Unlike the admin API,
+// the member API version returns a list of GenericFileView objects.
 //
 // GET /member-api/v3/files
-// GET /admin-api/v3/files
 func GenericFileIndex(c *gin.Context) {
 	req := api.NewRequest(c)
-	var files []*pgmodels.GenericFile
+	var files []*pgmodels.GenericFileView
 	pager, err := req.LoadResourceList(&files, "updated_at", "desc")
 	if api.AbortIfError(c, err) {
 		return

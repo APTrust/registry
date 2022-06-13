@@ -21,14 +21,13 @@ import (
 // (for objects).
 //
 // GET /member-api/v3/deletions/show/:id
-// GET /admin-api/v3/deletions/show/:id
 func DeletionRequestShow(c *gin.Context) {
 	req := api.NewRequest(c)
-	deletionRequest, err := pgmodels.DeletionRequestByID(req.Auth.ResourceID)
+	deletionRequestView, err := pgmodels.DeletionRequestViewByID(req.Auth.ResourceID)
 	if api.AbortIfError(c, err) {
 		return
 	}
-	c.JSON(http.StatusOK, deletionRequest.ToMin())
+	c.JSON(http.StatusOK, deletionRequestView)
 }
 
 // DeletionRequestIndex shows list of deletion requests.

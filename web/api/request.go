@@ -116,7 +116,8 @@ func (req *Request) LoadResourceList(items interface{}, orderByColumn, direction
 	}
 	if !req.CurrentUser.IsAdmin() {
 		query.Where("institution_id", "=", req.CurrentUser.InstitutionID)
-		if reflect.ValueOf(items).Elem().Type() == reflect.TypeOf([]*pgmodels.AlertView{}) {
+		objType := reflect.ValueOf(items).Elem().Type()
+		if objType == reflect.TypeOf([]*pgmodels.AlertView{}) || objType == reflect.TypeOf([]*pgmodels.Alert{}) {
 			query.Where("user_id", "=", req.CurrentUser.ID)
 		}
 	}

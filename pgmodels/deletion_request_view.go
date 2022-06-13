@@ -21,7 +21,7 @@ type DeletionRequestView struct {
 	InstitutionName       string    `json:"institution_name"`
 	InstitutionIdentifier string    `json:"institution_identifier"`
 	RequestedByID         int64     `json:"requested_by_id"`
-	RequestedByName       string    `json:"reqiested_by_name"`
+	RequestedByName       string    `json:"requested_by_name"`
 	RequestedByEmail      string    `json:"requested_by_email"`
 	RequestedAt           time.Time `json:"requested_at"`
 	ConfirmedByID         int64     `json:"confirmed_by_id"`

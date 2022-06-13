@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/APTrust/registry/db"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/APTrust/registry/web/api"
 	tu "github.com/APTrust/registry/web/testutil"
@@ -52,35 +51,6 @@ func TestGenericFileShow(t *testing.T) {
 		Expect().
 		Status(http.StatusForbidden)
 
-}
-
-func TestGenericFileIndexHasRelations(t *testing.T) {
-	tu.InitHTTPTests(t)
-	defer db.ForceFixtureReload()
-
-	obj, err := pgmodels.CreateObjectWithRelations()
-	require.Nil(t, err)
-
-	resp := tu.SysAdminClient.GET("/member-api/v3/files").
-		WithQuery("page", 1).
-		WithQuery("per_page", 5).
-		WithQuery("intellectual_object_id", obj.ID).
-		WithQuery("sort", "id__asc").
-		Expect().Status(http.StatusOK)
-
-	list := api.GenericFileList{}
-	err = json.Unmarshal([]byte(resp.Body().Raw()), &list)
-	require.Nil(t, err)
-	assert.Equal(t, 5, list.Count)
-
-	for _, file := range list.Results {
-		assert.Equal(t, obj.ID, file.IntellectualObjectID)
-		assert.Equal(t, "A", file.State)
-		assert.True(t, file.Size > 0)
-		assert.True(t, len(file.Checksums) > 0)
-		assert.True(t, len(file.StorageRecords) > 0)
-		assert.True(t, len(file.PremisEvents) > 0)
-	}
 }
 
 func TestGenericFileIndex(t *testing.T) {
