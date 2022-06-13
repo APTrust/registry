@@ -11,11 +11,13 @@ export function initFiltersGrid() {
     var gridFiltersMore = document.querySelector('.filters-grid .more-filters')
     var gridFiltersLess = document.querySelector('.filters-grid .less-filters')
 
-    gridFiltersToggle.addEventListener('click', function(event) {
-        event.preventDefault();
-        gridFilters.classList.toggle('is-open')
-        gridFiltersAll.classList.toggle('is-sr-only');
-        gridFiltersMore.classList.toggle('is-hidden');
-        gridFiltersLess.classList.toggle('is-hidden');
-    });
+    if (gridFiltersToggle != null) {
+        gridFiltersToggle.addEventListener('click', function(event) {
+            event.preventDefault();
+            gridFilters.classList.toggle('is-open')
+            gridFiltersAll.classList.toggle('is-sr-only');
+            gridFiltersMore.classList.toggle('is-hidden');
+            gridFiltersLess.classList.toggle('is-hidden');
+        });
+    }
 }
