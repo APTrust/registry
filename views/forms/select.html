@@ -6,7 +6,7 @@
     <label class="label" for="{{ .Name }}">{{ .Label }}</label>
     <div class="control">
         <div class="select">
-            <select id="{{ .Name }}">
+            <select name="{{ .Name }}" id="{{ .Name }}" {{ template "forms/attrs.html" . }}>
                 <option value="">Any</option>
                 {{ range $index, $option := .Options }}
                 <option value="{{ $option.Value }}" {{ if strEq $option.Value $value }}selected{{ end }}>{{ $option.Text }}</option>

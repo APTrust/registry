@@ -4,39 +4,55 @@
 
 <!-- .items type is []*IntellectualObjectView -->
 
-<h1>Objects</h1>
+<div class="box">
+  <div class="box-header">
+    <h1 class="h2">Objects</h1>
+  </div>
 
-{{ template "objects/_filters.html" . }}
 
-<table>
-  <thead>
-    <tr>
-      <th>Title/Identifier</th>
-      <th>Storage Option</th>
-      <th>File Count</th>
-      <th>Size</th>
-      <th>Modified</th>
-    </tr>
-  </thead>
-  <tbody>
-    {{ range $index, $obj := .items }}
-    <tr class="clickable" onclick="window.location.href='/objects/show/{{ $obj.ID }}'">
-      <td>
-        {{ truncate $obj.Title 80 }}<br/>
-        {{ truncate $obj.Identifier 80 }}<br/>
-        {{ truncate $obj.AltIdentifier 80 }}<br/>
-        {{ $obj.BagGroupIdentifier }}
-      </td>
-      <td>{{ $obj.StorageOption }}</td>
-      <td>{{ $obj.FileCount }}</td>
-      <td>{{ humanSize $obj.Size }}</td>
-      <td>{{ dateUS $obj.UpdatedAt }}</td>
-    </tr>
-    {{ end }}
-  </tbody>
-</table>
+  <div class="box-content">
+    {{ template "objects/_filters.html" . }}
+  </div>
 
-{{ template "shared/_pager.html" dict "pager" .pager }}
+  <table class="table is-hoverable is-fullwidth has-padding">
+    <thead>
+      <tr>
+        <!-- TODO make table columns sortable -->
+        <th class="pl-5">Title/Identifier</th>
+        <th>Storage Option</th>
+        <th>File Count</th>
+        <th>Size</th>
+        <th>Modified</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{ range $index, $obj := .items }}
+      <tr class="clickable" onclick="window.location.href='/objects/show/{{ $obj.ID }}'">
+        <td class="pl-5">
+          <div class="is-flex is-align-items-center">
+            <span class="action-icon mr-3">
+              <!-- TODO Make this update with correct icon-->
+              <span class="material-icons md-16" aria-hidden="true"><span>check</span></span>
+            </span>
+            <span class="is-grey-dark">
+              {{ truncate $obj.Title 80 }}<br />
+              {{ truncate $obj.Identifier 80 }}<br />
+              {{ truncate $obj.AltIdentifier 80 }}<br />
+              {{ $obj.BagGroupIdentifier }}
+            </span>
+          </div>
+        </td>
+        <td class="is-grey-dark">{{ $obj.StorageOption }}</td>
+        <td class="is-grey-dark num text-sm">{{ $obj.FileCount }}</td>
+        <td class="is-grey-dark num text-sm">{{ humanSize $obj.Size }}</td>
+        <td class="is-grey-dark text-sm is-uppercase">{{ dateUS $obj.UpdatedAt }}</td>
+      </tr>
+      {{ end }}
+    </tbody>
+  </table>
+
+  {{ template "shared/_pager.html" dict "pager" .pager }}
+</div>
 
 {{ template "shared/_footer.html" .}}
 
