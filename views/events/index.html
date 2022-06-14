@@ -2,36 +2,49 @@
 
 {{ template "shared/_header.html" .}}
 
-<h1>Premis Events</h1>
+<div class="box">
+  <div class="box-header">
+    <h1 class="h2">Premis Events</h1>
+  </div>
 
-{{ template "events/_filters.html" . }}
+  <div class="box-content">
+    {{ template "events/_filters.html" . }}
+  </div>
 
-<!-- .items type is []*PremisEventView -->
+  <!-- .items type is []*PremisEventView -->
 
-<table>
-  <thead>
-    <tr>
-      <th>Type</th>
-      <th>Date</th>
-      <th>Outcome</th>
-      <th>Object Identifier</th>
-      <th>File Identifier</th>
-    </tr>
-  </thead>
-  <tbody>
-    {{ range $index, $event := .items }}
-    <tr class="clickable" onclick="window.location.href='/events/show/{{ $event.ID }}'">
-      <td>{{ $event.EventType }}</td>
-      <td>{{ dateUS $event.DateTime }}</td>
-      <td>{{ $event.Outcome }}</td>
-      <td>{{ truncate $event.IntellectualObjectIdentifier 80 }}</td>
-      <td>{{ truncate $event.GenericFileIdentifier 80 }}</td>
-    </tr>
-    {{ end }}
-  </tbody>
-</table>
+  <table class="table is-hoverable is-fullwidth has-padding">
+    <thead>
+      <tr><!-- TODO make table columns sortable -->
+        <th class="pl-5">Type</th>
+        <th>Date</th>
+        <th>Outcome</th>
+        <th>Object Identifier</th>
+        <th>File Identifier</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{ range $index, $event := .items }}
+      <tr class="clickable" onclick="window.location.href='/events/show/{{ $event.ID }}'">
+        <td class="pl-5">
+          <div class="is-flex is-align-items-center">
+            <span class="action-icon mr-3"><!-- TODO Make this update with correct icon-->
+              <span class="material-icons md-16" aria-hidden="true"><span>check</span></span>
+            </span>
+            <span class="is-grey-dark">{{ $event.EventType }}</span>
+          </div>
+        </td>
+        <td class="is-grey-dark text-sm is-uppercase">{{ dateUS $event.DateTime }}</td>
+        <td><span class="badge">{{ $event.Outcome }}</span></td><!-- TODO Make status change classes -->
+        <td class="is-grey-dark">{{ truncate $event.IntellectualObjectIdentifier 80 }}</td>
+        <td class="is-grey-dark">{{ truncate $event.GenericFileIdentifier 80 }}</td>
+      </tr>
+      {{ end }}
+    </tbody>
+  </table>
 
-{{ template "shared/_pager.html" dict "pager" .pager }}
+  {{ template "shared/_pager.html" dict "pager" .pager }}
+</div>
 
 {{ template "shared/_footer.html" .}}
 
