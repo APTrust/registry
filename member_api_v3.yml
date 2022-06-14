@@ -790,82 +790,123 @@ components:
         id:
           type: integer
           format: int64
-        name:
+        action:
           type: string
-          description: The name of the original tar file uploaded to the receiving bucket for ingest.
+          description: The action being performed.
+          enum: ["Delete", "Restore Object", "Restore File", "Glacier Restore", "Ingest"]
+        alt_identifier:
+          type: string
+          description: An alternate identifier for this object, supplied by the depositor.
+          nullable: true
+        aptrust_approver:
+          type: string
+          format: email
+          description: The email address of the APTrust admin who approved this item. In the past, this was used to only to approve bulk deletions.
+          nullable: true
+        bagit_profile_identifier:
+          type: string
+          description: The identifier of the BagIt profile used to create this bag. This can be either the APTrust profile URL or the BTR profile URL. Bags will be restored using the same profile under which they were submitted.
+          enum: ["https://github.com/dpscollaborative/btr_bagit_profile/releases/download/1.0/btr-bagit-profile.json", "https://raw.githubusercontent.com/APTrust/preservation-services/master/profiles/aptrust-v2.2.json"]
+        bag_date:
+          type: string
+          format: date-time
+          description: The date on which the originally submitted bag appeared in the receiving bucket. 
+        bag_group_identifier:
+          type: string
+          description: An optional identifier naming the logical group to which this object belongs. For instance, if ten bags are all part of the same collection, the collection name may be used as the group identifier associating all ten bags.
+          nullable: true
+        bucket:
+          type: string
+          description: The name of the receiving bucket into which the original bag was uploaded for ingest.
           nullable: false
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time this record was created.
+        date_processed:
+          type: string
+          format: date-time
+          description: The date and time of last known activity on this work item. This timestamp may change several times during multipart processes such as ingest.
         etag:
           type: string
           description: The etag of tar file uploaded for ingest.
           nullable: false
+        generic_file_id:
+          type: integer
+          format: int64
+          description: The ID of the GenericFile this work item pertains to. This will be null if the WorkItem pertains to an object.
+          nullable: true 
+        generic_file_identifier:
+          type: string
+          description: The file's semantic identifier in the format <instution_identifier>/<bag_name>/<path_in_bag>.
+          nullable: true
         institution_id:
           type: integer
           format: int64
           description: The ID of the institution that owns the file or object that is the subject of this work item.
         institution_name: 
           type: string
-          description: The name of the institution that owns the files or objects to which this deletion request pertains.
+          description: The name of the institution that owns the files or objects to which this work item pertains.
         institution_identifier: 
           type: string
-          description: The identifier (domain name) of the institution that owns the files or objects to which this deletion request pertains.
+          description: The identifier (domain name) of the institution that owns the files or objects to which this work item pertains.
+        inst_approver:
+          type: string
+          format: email
+          description: The email address of the institutional admin who approved a deletion request.
+          nullable: true
         intellectual_object_id:
           type: integer
           format: int64
           description: The ID of the IntellectualObject being worked on. This will be null for ingest work items where the ingest is not yet complete.
           nullable: true
-        object_identifier:
-          type: string
-          description: A unique identifier for this object in the format <instution_identifier>/<bag_name>.
-          nullable: true
-        alt_identifier:
-          type: string
-          description: An alternate identifier for this object, supplied by the depositor.
-          nullable: true
-        bag_group_identifier:
-          type: string
-          description: An optional identifier naming the logical group to which this object belongs. For instance, if ten bags are all part of the same collection, the collection name may be used as the group identifier associating all ten bags.
-          nullable: true
-        storage_option:
-          type: string
-          description: Indicates where the object's files are stored.
-          enum: ["Glacier-Deep-OH", "Glacier-Deep-OR", "Glacier-Deep-VA", "Glacier-OH", "Glacier-OR", "Glacier-VA", "Standard", "Wasabi-OR", "Wasabi-VA"]
-        bagit_profile_identifier:
-          type: string
-          description: The identifier of the BagIt profile used to create this bag. This can be either the APTrust profile URL or the BTR profile URL. Bags will be restored using the same profile under which they were submitted.
-          enum: ["https://github.com/dpscollaborative/btr_bagit_profile/releases/download/1.0/btr-bagit-profile.json", "https://raw.githubusercontent.com/APTrust/preservation-services/master/profiles/aptrust-v2.2.json"]
-        source_organization:
-          type: string
-          description: The name of the institution that submitted the object for ingest.
         internal_sender_identifier:
           type: string
           description: An optional identifier for internal use by the depositor. 
           nullable: true
-        generic_file_id:
-          type: integer
-          format: int64
-          description: The ID of the GenericFile this work item pertains to. This will be null if the WorkItem pertains to an object.
-          nullable: true
-        generic_file_identifier:
+        name:
           type: string
-          description: The file's semantic identifier in the format <instution_identifier>/<bag_name>/<path_in_bag>.
-          nullable: true
-        bucket:
-          type: string
-          description: The name of the receiving bucket into which the original bag was uploaded for ingest.
+          description: The name of the original tar file uploaded to the receiving bucket for ingest.
           nullable: false
-        user:
+        needs_admin_review:
+          type: boolean
+          description: Indicates whether an APTrust admin needs to review and possibly requeue this item. This flag is set after an item encounters too many transient errors.
+        node:
           type: string
-          format: email
-          description: The email address of the user who initiated this work item.
-          nullable: false
+          description: The hostname of the microservice worker currently processing this item.
+          nullable: true
         note:
           type: string
           description: A brief summary of the status of this item.
           nullable: false
-        action:
+        object_identifier:
           type: string
-          description: The action being performed.
-          enum: ["Delete", "Restore Object", "Restore File", "Glacier Restore", "Ingest"]
+          description: A unique identifier for this object in the format <instution_identifier>/<bag_name>.
+          nullable: true
+        outcome:
+          type: string
+          description: The outcome of this item's activity.
+          enum: ["Failure", "Success"]
+        pid:
+          type: integer
+          format: int64
+          description: The process ID of the worker that is currently working on this item.
+        queued_at:
+          type: string
+          format: date-time
+          description: The date and time this item was queued for processing. 
+          nullable: true
+        retry:
+          type: boolean
+          description: Indicates whether APTrust worker process should continue trying to process this work item. This is set to false only after certain fatal errors, or after too many transient errors.
+        size:
+          type: integer
+          format: int64
+          description: The size (in bytes) of the bag, object, or file being worked on.
+          nullable: false
+        source_organization:
+          type: string
+          description: The name of the institution that submitted the object for ingest.
         stage:
           type: string
           description: The stage of processing.
@@ -886,6 +927,11 @@ components:
             - Store
             - Unpack
             - Validate
+        stage_started_at:
+          type: string
+          format: date-time
+          description: Indicates when the current stage of processing started for this item.
+          nullable: true
         status:
           type: string
           description: The status of the current operation.
@@ -896,65 +942,19 @@ components:
             - Started
             - Success
             - Suspended
-        outcome:
+        storage_option:
           type: string
-          description: The outcome of this item's activity.
-          enum: ["Failure", "Success"]
-        bag_date:
-          type: string
-          format: date-time
-          description: The date on which the originally submitted bag appeared in the receiving bucket. 
-        date_processed:
-          type: string
-          format: date-time
-          description: The date and time of last known activity on this work item. This timestamp may change several times during multipart processes such as ingest.
-        retry:
-          type: boolean
-          description: Indicates whether APTrust worker process should continue trying to process this work item. This is set to false only after certain fatal errors, or after too many transient errors.
-        node:
-          type: string
-          description: The hostname of the microservice worker currently processing this item.
-          nullable: true
-        pid:
-          type: integer
-          format: int64
-          description: The process ID of the worker that is currently working on this item.
-        needs_admin_review:
-          type: boolean
-          description: Indicates whether an APTrust admin needs to review and possibly requeue this item. This flag is set after an item encounters too many transient errors.
-        queued_at:
-          type: string
-          format: date-time
-          description: The date and time this item was queued for processing. 
-          nullable: true
-        size:
-          type: integer
-          format: int64
-          description: The size (in bytes) of the bag, object, or file being worked on.
-          nullable: false
-        stage_started_at:
-          type: string
-          format: date-time
-          description: Indicates when the current stage of processing started for this item.
-          nullable: true
-        aptrust_approver:
-          type: string
-          format: email
-          description: The email address of the APTrust admin who approved this item. In the past, this was used to only to approve bulk deletions.
-          nullable: true
-        inst_approver:
-          type: string
-          format: email
-          description: The email address of the institutional admin who approved a deletion request.
-          nullable: true
-        created_at:
-          type: string
-          format: date-time
-          description: The date and time this record was created.
+          description: Indicates where the object's files are stored.
+          enum: ["Glacier-Deep-OH", "Glacier-Deep-OR", "Glacier-Deep-VA", "Glacier-OH", "Glacier-OR", "Glacier-VA", "Standard", "Wasabi-OR", "Wasabi-VA"]
         updated_at:
           type: string
           format: date-time
           description: The date and time this record was last updated.
+        user:
+          type: string
+          format: email
+          description: The email address of the user who initiated this work item.
+          nullable: false
     WorkItemViewList:
       properties:
         count:
