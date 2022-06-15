@@ -2,16 +2,23 @@
 
 {{ template "shared/_header.html" .}}
 
-{{ template "deletions/_filters.html" . }}
+<div class="box">
+  <div class="box-header">
+    <h1 class="h2">Deletions</h1>
+  </div>
+
+  <div class="box-content">
+    {{ template "deletions/_filters.html" . }}
+  </div>
+
+
 
 <!-- .items type is []DeletionRequestView -->
 
-<h1>Deletions</h1>
-
-<table>
+<table class="table is-hoverable is-fullwidth has-padding">
   <thead>
     <tr>
-      <th>Requested By</th>
+      <th class="pl-5">Requested By</th>
       <th>Request Date</th>
       <th>Confirmed At</th>
       <th>Files</th>
@@ -22,18 +29,26 @@
   <tbody>
     {{ range $index, $deletion := .items }}
     <tr class="clickable" onclick="window.location.href='/deletions/show/{{ $deletion.ID }}'">
-      <td>{{ $deletion.RequestedByName }}</td>
-      <td>{{ dateUS $deletion.RequestedAt }}</td>
-      <td>{{ dateUS $deletion.ConfirmedAt }}</td>
-      <td>{{ $deletion.FileCount }}</td>
-      <td>{{ $deletion.ObjectCount }}</td>
-      <td>{{ $deletion.DisplayStatus }}</td>
+      <td class="pl-5">
+        <div class="is-flex is-align-items-center">
+          <span class="action-icon mr-3">
+            <span class="material-icons md-16" aria-hidden="true"><span>delete_forever</span></span>
+          </span>
+          <span class="is-grey-dark">{{ $deletion.RequestedByName }}</span>
+        </div>
+      </td>
+      <td class="is-grey-dark text-sm is-uppercase">{{ dateUS $deletion.RequestedAt }}</td>
+      <td class="is-grey-dark text-sm is-uppercase">{{ dateUS $deletion.ConfirmedAt }}</td>
+      <td class="is-grey-dark num text-sm">{{ $deletion.FileCount }}</td>
+      <td class="is-grey-dark num text-sm">{{ $deletion.ObjectCount }}</td>
+      <td><span class="badge">{{ $deletion.DisplayStatus }}</span></td><!-- TODO Make status change classes -->
     </tr>
     {{ end }}
   </tbody>
 </table>
 
 {{ template "shared/_pager.html" dict "pager" .pager }}
+</div>
 
 {{ template "shared/_footer.html" .}}
 

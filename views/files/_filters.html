@@ -1,57 +1,72 @@
 {{ define "files/_filters.html" }}
 
-<form id="fileFilterForm" method="get">
+<div class="filters-grid">
+  <h3 class="filters-grid-label text-label text-xs">Filter</h3>
+  <div class="filters-grid-content">
+    <form id="fileFilterForm" method="get">
 
-  <div class="row">
-    <div class="column col-30">
-      {{ template "forms/text_input.html" .filterForm.Fields.identifier }}
-    </div>
-    <div class="column col-30">
-      {{ template "forms/select.html" .filterForm.Fields.state }}
-    </div>
-    <div class="column col-30">
-      {{ template "forms/select.html" .filterForm.Fields.storage_option }}
-    </div>
+      <div class="columns filters-grid-header">
+        <div class="column">
+          {{ template "forms/text_input.html" .filterForm.Fields.identifier }}
+        </div>
+        <div class="column">
+          {{ template "forms/select.html" .filterForm.Fields.state }}
+        </div>
+        <div class="column">
+          {{ template "forms/select.html" .filterForm.Fields.storage_option }}
+        </div>
+        <div class="column is-align-self-flex-end">
+          <div class="filters-grid-controls">
+            <input class="filter-button button is-primary" type="submit" value="Filter">
+            <a class="filter-toggle button is-compact is-white" href="#gridFiltersAll">
+              <span class="material-icons md-16" aria-hidden="true">expand_more</span>
+              <span class="more-filters">More Filters</span>
+              <span class="less-filters is-hidden">Less Filters</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="filters-grid-all is-sr-only" id="gridFiltersAll">
+        <hr>
+
+        <div class="columns">
+          <div class="column is-one-quarter">
+            {{ template "forms/number.html" .filterForm.Fields.size__gteq }}
+          </div>
+          <div class="column is-one-quarter">
+            {{ template "forms/number.html" .filterForm.Fields.size__lteq }}
+          </div>
+          <div class="column is-one-quarter">
+            {{ if .CurrentUser.IsAdmin }}
+            {{ template "forms/select.html" .filterForm.Fields.institution_id }}
+            {{ end }}
+          </div>
+        </div>
+
+        <div class="columns">
+          <div class="column is-one-quarter">
+            {{ template "forms/date.html" .filterForm.Fields.created_at__gteq }}
+          </div>
+          <div class="column is-one-quarter">
+            {{ template "forms/date.html" .filterForm.Fields.created_at__lteq }}
+          </div>
+          <div class="column is-one-quarter">
+
+          </div>
+        </div>
+
+        <div class="columns">
+          <div class="column is-one-quarter">
+            {{ template "forms/date.html" .filterForm.Fields.updated_at__gteq }}
+          </div>
+          <div class="column is-one-quarter">
+            {{ template "forms/date.html" .filterForm.Fields.updated_at__lteq }}
+          </div>
+        </div>
+      </div>
+    </form>
   </div>
-
-  <div class="row">
-    <div class="column col-30">
-      {{ template "forms/number.html" .filterForm.Fields.size__gteq }}
-    </div>
-    <div class="column col-30">
-      {{ template "forms/number.html" .filterForm.Fields.size__lteq }}
-    </div>
-    <div class="column col-30">
-      {{ if .CurrentUser.IsAdmin }}
-      {{ template "forms/select.html" .filterForm.Fields.institution_id }}
-      {{ end }}
-    </div>
-  </div>
-
-  <div class="row">
-    <div class="column col-30">
-      {{ template "forms/date.html" .filterForm.Fields.created_at__gteq }}
-    </div>
-    <div class="column col-30">
-      {{ template "forms/date.html" .filterForm.Fields.created_at__lteq }}
-    </div>
-    <div class="column col-30">
-
-    </div>
-  </div>
-
-  <div class="row">
-    <div class="column col-30">
-      {{ template "forms/date.html" .filterForm.Fields.updated_at__gteq }}
-    </div>
-    <div class="column col-30">
-      {{ template "forms/date.html" .filterForm.Fields.updated_at__lteq }}
-    </div>
-    <div class="column col-30">
-      <input type="submit" value="Filter">
-    </div>
-  </div>
-
-</form>
+</div>
 
 {{ end }}

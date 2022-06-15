@@ -4,34 +4,47 @@
 
 <!-- .items type is []GenericFile (not view) -->
 
-<h1>Generic Files</h1>
+<div class="box">
+  <div class="box-header">
+    <h1 class="h2">Generic Files</h1>
+  </div>
 
-{{ template "files/_filters.html" . }}
+  <div class="box-content">
+    {{ template "files/_filters.html" . }}
+  </div>
 
-<table>
-  <thead>
-    <tr>
-      <th>Identifier</th>
-      <th>Size</th>
-      <th>Storage Option</th>
-      <th>Modified</th>
-      <th>Last Fixity</th>
-    </tr>
-  </thead>
-  <tbody>
-    {{ range $index, $gf := .items }}
-    <tr class="clickable" onclick="window.location.href='/files/show/{{ $gf.ID }}'">
-      <td>{{ truncate $gf.Identifier 80 }}</td>
-      <td>{{ humanSize $gf.Size }}</td>
-      <td>{{ $gf.StorageOption }}</td>
-      <td>{{ dateUS $gf.UpdatedAt }}</td>
-      <td>{{ dateUS $gf.LastFixityCheck }}</td>
-    </tr>
-    {{ end }}
-  </tbody>
-</table>
+  <table class="table is-hoverable is-fullwidth has-padding">
+    <thead>
+      <tr><!-- TODO make table columns sortable -->
+        <th class="pl-5">Identifier</th>
+        <th>Size</th>
+        <th>Storage Option</th>
+        <th>Modified</th>
+        <th>Last Fixity</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{ range $index, $gf := .items }}
+      <tr class="clickable" onclick="window.location.href='/files/show/{{ $gf.ID }}'">
+        <td class="pl-5">
+          <div class="is-flex is-align-items-center">
+            <span class="action-icon mr-3"><!-- TODO Make this update with correct icon-->
+              <span class="material-icons md-16" aria-hidden="true"><span>check</span></span>
+            </span>
+            <span class="is-grey-dark">{{ truncate $gf.Identifier 80 }}</span>
+          </div>
+        </td>
+        <td class="is-grey-dark num text-sm">{{ humanSize $gf.Size }}</td>
+        <td class="is-grey-dark">{{ $gf.StorageOption }}</td>
+        <td class="is-grey-dark text-sm is-uppercase">{{ dateUS $gf.UpdatedAt }}</td>
+        <td class="is-grey-dark text-sm is-uppercase">{{ dateUS $gf.LastFixityCheck }}</td>
+      </tr>
+      {{ end }}
+    </tbody>
+  </table>
 
-{{ template "shared/_pager.html" dict "pager" .pager }}
+  {{ template "shared/_pager.html" dict "pager" .pager }}
+</div>
 
 {{ template "shared/_footer.html" .}}
 

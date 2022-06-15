@@ -2,39 +2,47 @@
 
 {{ template "shared/_header.html" .}}
 
-<h1>Deposits</h1>
+<div class="box">
+  <div class="box-header">
+    <h1 class="h2">Deposits</h1>
+  </div>
 
-{{ template "reports/_deposit_chart.html" . }}
+  <div class="box-content">
 
-{{ template "reports/_deposit_filters.html" . }}
+    {{ template "reports/_deposit_chart.html" . }}
 
-<table>
-  <thead>
-    <tr>
-      <th>Institution</th>
-      <th>Storage Option</th>
-      <th>Object Count</th>
-      <th>File Count</th>
-      <th>Total GB</th>
-      <th>Total TB</th>
-      <th>Monthly Cost</th>
-    </tr>
-  </thead>
-  <tbody>
-    {{ range $index, $item := .deposits }}
-    <tr>
-      <td>{{ $item.InstitutionName }}</td>
-      <td>{{ $item.StorageOption }}</td>
-      <td>{{ $item.ObjectCount }}</td>
-      <td>{{ $item.FileCount }}</td>
-      <td>{{ formatFloat $item.TotalGB 3 }}</td>
-      <td>{{ formatFloat $item.TotalTB 3 }}</td>
-      <td>${{ formatFloat $item.MonthlyCost  2 }}</td>
-    </tr>
-    {{ end }}
-  </tbody>
-</table>
+    {{ template "reports/_deposit_filters.html" . }}
 
+  </div>
+
+  <table class="table is-hoverable is-fullwidth has-padding">
+    <thead>
+      <tr>
+        <!-- TODO make table columns sortable -->
+        <th class="pl-5">Institution</th>
+        <th>Storage Option</th>
+        <th>Object Count</th>
+        <th>File Count</th>
+        <th>Total GB</th>
+        <th>Total TB</th>
+        <th>Monthly Cost</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{ range $index, $item := .deposits }}
+      <tr>
+        <td class="pl-5">{{ $item.InstitutionName }}</td>
+        <td class="is-grey-dark">{{ $item.StorageOption }}</td>
+        <td class="is-grey-dark num text-sm">{{ $item.ObjectCount }}</td>
+        <td class="is-grey-dark num text-sm">{{ $item.FileCount }}</td>
+        <td class="is-grey-dark num text-sm">{{ formatFloat $item.TotalGB 3 }}</td>
+        <td class="is-grey-dark num text-sm">{{ formatFloat $item.TotalTB 3 }}</td>
+        <td class="is-grey-dark num text-sm">${{ formatFloat $item.MonthlyCost 2 }}</td>
+      </tr>
+      {{ end }}
+    </tbody>
+  </table>
+</div>
 {{ template "shared/_footer.html" .}}
 
 {{ end }}
