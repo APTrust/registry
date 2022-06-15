@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/APTrust/registry/common"
@@ -11,6 +12,7 @@ import (
 	"github.com/APTrust/registry/forms"
 	"github.com/APTrust/registry/helpers"
 	"github.com/APTrust/registry/pgmodels"
+	"github.com/APTrust/registry/web/api"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
@@ -421,6 +423,61 @@ func SignInUser(c *gin.Context) (int, string, error) {
 		redirectTo = "/users/2fa_choose"
 	}
 	return http.StatusFound, redirectTo, nil
+}
+
+// UserUpdateXHR handles updates to individual properties of the
+// User object. These come from inline forms on the user view and
+// user list pages. This allows edits to only the following fields:
+//
+// Name, Email, Phone, Password, Role, Status, and OTPRequiredForLogin.
+//
+// Note: Unlike most calls in this package, this one returns JSON,
+// not HTML. This is a late addition based on UI mockups.
+func UserUpdateXHR(c *gin.Context) {
+	req := NewRequest(c)
+	userToEdit, err := pgmodels.UserByID(req.Auth.ResourceID)
+	if api.AbortIfError(c, err) {
+		return
+	}
+	if strings.TrimSpace(c.PostForm("Name")) != "" {
+		userToEdit.Name = strings.TrimSpace(c.PostForm("Name"))
+	}
+	if strings.TrimSpace(c.PostForm("Email")) != "" {
+		userToEdit.Email = strings.TrimSpace(c.PostForm("Email"))
+	}
+	if strings.TrimSpace(c.PostForm("Phone")) != "" {
+		userToEdit.PhoneNumber = strings.TrimSpace(c.PostForm("Phone"))
+	}
+	if strings.TrimSpace(c.PostForm("Password")) != "" {
+		encPwd, err := common.EncryptPassword(strings.TrimSpace(c.PostForm("Name")))
+		if api.AbortIfError(c, err) {
+			return
+		}
+		userToEdit.EncryptedPassword = encPwd
+		userToEdit.PasswordChangedAt = time.Now().UTC()
+	}
+	if strings.TrimSpace(c.PostForm("Role")) != "" {
+		userToEdit.Role = strings.TrimSpace(c.PostForm("Role"))
+	}
+	if strings.TrimSpace(c.PostForm("Status")) != "" {
+		if strings.ToLower(strings.TrimSpace(c.PostForm("Status"))) == "deactivated" {
+			userToEdit.DeactivatedAt = time.Now().UTC()
+		} else {
+			userToEdit.DeactivatedAt = time.Time{}
+		}
+	}
+	if strings.TrimSpace(c.PostForm("OTPRequiredForLogin")) != "" {
+		otpRequired := strings.TrimSpace(c.PostForm("OTPRequiredForLogin")) == "true"
+		userToEdit.OTPRequiredForLogin = otpRequired
+	}
+	if api.AbortIfError(c, userToEdit.Save()) {
+		return
+	}
+	returnValue := map[string]interface{}{
+		"StatusCode": http.StatusOK,
+		"Message":    "Update succeeded.",
+	}
+	c.JSON(http.StatusOK, returnValue)
 }
 
 // This is not used. Should it be? Or did we factor something out earlier?
