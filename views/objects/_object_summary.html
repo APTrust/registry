@@ -1,55 +1,51 @@
 {{ define "objects/_object_summary.html" }}
 
-<div class="row">
-  <div class="column column-67">
-    <dl>
-      <dt>Identifier</dt>
-      <dd>{{ .object.Identifier }}</dd>
-
-      <dt>Bag Group Identifier</dt>
-      <dd>{{ defaultString .object.BagGroupIdentifier "---" }}</dd>
-
-      <dt>Alt Identifier</dt>
-      <dd>{{ defaultString .object.AltIdentifier "---" }}</dd>
-
-      <dt>Total File Count</dt>
-      <dd>{{ .object.FileCount }}</dd>
-
-      <dt>Total Size (Active Files)</dt>
-      <dd>{{ humanSize .object.Size }}</dd>
-    </dl>
+<div class="box single-item-info">
+  <div class="columns is-gapless single-item-info-stats">
+    <div class="column is-two-thirds">
+      <dl>
+        <dt>Identifier</dt>
+        <dd>{{ .object.Identifier }}</dd>
+  
+        <dt>Bag Group Identifier</dt>
+        <dd>{{ defaultString .object.BagGroupIdentifier "---" }}</dd>
+  
+        <dt>Alt Identifier</dt>
+        <dd>{{ defaultString .object.AltIdentifier "---" }}</dd>
+  
+        <dt>Total File Count</dt>
+        <dd class="num">{{ .object.FileCount }}</dd>
+  
+        <dt>Total Size (Active Files)</dt>
+        <dd class="num">{{ humanSize .object.Size }}</dd>
+      </dl>
+    </div>
+    <div class="column is-one-third">
+      <dl>
+        <dt>Created</dt>
+        <dd>{{ dateUS .object.CreatedAt }}</dd>
+  
+        <dt>Modified</dt>
+        <dd>{{ dateUS .object.UpdatedAt }}</dd>
+  
+        <dt>Access</dt>
+        <dd>{{ .object.Access }}</dd>
+  
+        <dt>Payload File Count</dt>
+        <dd class="num">{{ .object.PayloadFileCount }}</dd>
+  
+        <dt>Payload Size (Active Files)</dt>
+        <dd class="num">{{ humanSize .object.PayloadSize }}</dd>
+  
+        <dt>Storage Option</dt>
+        <dd>{{ .object.StorageOption }}</dd>
+      </dl>
+    </div>
   </div>
-  <div class="column column-33">
-    <dl>
-      <dt>Created</dt>
-      <dd>{{ dateUS .object.CreatedAt }}</dd>
-
-      <dt>Modified</dt>
-      <dd>{{ dateUS .object.UpdatedAt }}</dd>
-
-      <dt>Access</dt>
-      <dd>{{ .object.Access }}</dd>
-
-      <dt>Payload File Count</dt>
-      <dd>{{ .object.PayloadFileCount }}</dd>
-
-      <dt>Payload Size (Active Files)</dt>
-      <dd>{{ humanSize .object.PayloadSize }}</dd>
-
-      <dt>Storage Option</dt>
-      <dd>{{ .object.StorageOption }}</dd>
-    </dl>
-  </div>
-</div>
-<div class="row">
-  <div class="column column-100">
-
-    <dl>
-      <dt>Description</dt>
-      <dd>{{ defaultString .object.Description "---" }}</dd>
-    </dl>
-
-  </div>
+  <dl>
+    <dt>Description</dt>
+    <dd>{{ defaultString .object.Description "---" }}</dd>
+  </dl>
 </div>
 
 {{ end }}

@@ -1,0 +1,47 @@
+.single-item-header {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+
+  &-type {
+    @extend .text-label;
+    @extend .text-xs;
+    padding-top: 4px;
+  }
+
+  .action-icon {
+    flex-shrink: 0;
+  }
+}
+
+.single-item-info {
+  &-stats {
+    border-bottom: 1px solid $grey-background;
+    margin-bottom: 0 !important;
+
+    > div {
+      &:first-child {
+        border-right: 1px solid $grey-background;
+      }
+    }
+  }
+
+  dl {
+    padding: 24px;
+  }
+
+  dt {
+    @extend .text-label;
+    @extend .text-xs;
+    color: $grey-1;
+    margin-bottom: 6px;
+  }
+
+  dd {
+    margin-bottom: 16px;
+
+    &:last-child {
+      margin: 0;
+    }
+  }
+}

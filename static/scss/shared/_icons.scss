@@ -35,6 +35,11 @@
     width: 36px;
   }
 
+  &.is-jumbo {
+    height: 56px;
+    width: 56px;
+  }
+
   &.is-dark {
     background-color: $grey-dark;
   }

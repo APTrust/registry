@@ -6314,7 +6314,7 @@ h3,
   line-height: 20px;
 }
 
-.text-label, .table thead th, .button, .badge, .side-nav ul a, .global-search .button {
+.text-label, .single-item-info dt, .single-item-header-type, .table thead th, .button, .badge, .side-nav ul a, .global-search .button {
   font-size: 16px;
   font-weight: 500;
   line-height: 20px;
@@ -6333,7 +6333,7 @@ p,
   line-height: 16px;
 }
 
-.text-xs, .table thead th, .button, .badge {
+.text-xs, .single-item-info dt, .single-item-header-type, .table thead th, .button, .badge {
   font-size: 12px;
   line-height: 14px;
 }
@@ -6656,6 +6656,10 @@ ol {
   height: 36px;
   width: 36px;
 }
+.action-icon.is-jumbo {
+  height: 56px;
+  width: 56px;
+}
 .action-icon.is-dark {
   background-color: #6b6b6b;
 }
@@ -6756,6 +6760,39 @@ ol {
 .pager button:last-child,
 .pager a:last-child {
   margin-left: 18px;
+}
+
+.single-item-header {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.single-item-header-type {
+  padding-top: 4px;
+}
+.single-item-header .action-icon {
+  flex-shrink: 0;
+}
+
+.single-item-info-stats {
+  border-bottom: 1px solid #f7f7f7;
+  margin-bottom: 0 !important;
+}
+.single-item-info-stats > div:first-child {
+  border-right: 1px solid #f7f7f7;
+}
+.single-item-info dl {
+  padding: 24px;
+}
+.single-item-info dt {
+  color: #6b6b6b;
+  margin-bottom: 6px;
+}
+.single-item-info dd {
+  margin-bottom: 16px;
+}
+.single-item-info dd:last-child {
+  margin: 0;
 }
 
 .modal {
