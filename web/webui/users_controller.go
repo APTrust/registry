@@ -433,6 +433,8 @@ func SignInUser(c *gin.Context) (int, string, error) {
 //
 // Note: Unlike most calls in this package, this one returns JSON,
 // not HTML. This is a late addition based on UI mockups.
+//
+// PUT /users/edit_xhr/:id
 func UserUpdateXHR(c *gin.Context) {
 	req := NewRequest(c)
 	userToEdit, err := pgmodels.UserByID(req.Auth.ResourceID)
@@ -445,11 +447,12 @@ func UserUpdateXHR(c *gin.Context) {
 	if strings.TrimSpace(c.PostForm("Email")) != "" {
 		userToEdit.Email = strings.TrimSpace(c.PostForm("Email"))
 	}
-	if strings.TrimSpace(c.PostForm("Phone")) != "" {
-		userToEdit.PhoneNumber = strings.TrimSpace(c.PostForm("Phone"))
+	if strings.TrimSpace(c.PostForm("PhoneNumber")) != "" {
+		userToEdit.PhoneNumber = strings.TrimSpace(c.PostForm("PhoneNumber"))
 	}
+	// Consider routing this to UserChangePassword instead
 	if strings.TrimSpace(c.PostForm("Password")) != "" {
-		encPwd, err := common.EncryptPassword(strings.TrimSpace(c.PostForm("Name")))
+		encPwd, err := common.EncryptPassword(strings.TrimSpace(c.PostForm("Password")))
 		if api.AbortIfError(c, err) {
 			return
 		}
@@ -460,7 +463,7 @@ func UserUpdateXHR(c *gin.Context) {
 		userToEdit.Role = strings.TrimSpace(c.PostForm("Role"))
 	}
 	if strings.TrimSpace(c.PostForm("Status")) != "" {
-		if strings.ToLower(strings.TrimSpace(c.PostForm("Status"))) == "deactivated" {
+		if strings.ToLower(strings.TrimSpace(c.PostForm("Status"))) == "inactive" {
 			userToEdit.DeactivatedAt = time.Now().UTC()
 		} else {
 			userToEdit.DeactivatedAt = time.Time{}
@@ -469,6 +472,7 @@ func UserUpdateXHR(c *gin.Context) {
 	if strings.TrimSpace(c.PostForm("OTPRequiredForLogin")) != "" {
 		otpRequired := strings.TrimSpace(c.PostForm("OTPRequiredForLogin")) == "true"
 		userToEdit.OTPRequiredForLogin = otpRequired
+		userToEdit.GracePeriod = time.Now().UTC().Add(30 * 24 * time.Hour)
 	}
 	if api.AbortIfError(c, userToEdit.Save()) {
 		return

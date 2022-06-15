@@ -224,6 +224,7 @@ func initRoutes(router *gin.Engine) {
 		webRoutes.GET("/users/show/:id", webui.UserShow)
 		webRoutes.GET("/users/edit/:id", webui.UserEdit)
 		webRoutes.PUT("/users/edit/:id", webui.UserUpdate)
+		webRoutes.PUT("/users/edit_xhr/:id", webui.UserUpdateXHR)
 		webRoutes.POST("/users/edit/:id", webui.UserUpdate)
 		webRoutes.GET("/users/my_account", webui.UserMyAccount)
 		webRoutes.GET("/users/change_password/:id", webui.UserShowChangePassword)

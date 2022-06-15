@@ -2,7 +2,6 @@ package admin_api_test
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"testing"
 	"time"
@@ -105,7 +104,6 @@ func createObjectDeletionPreConditions(t *testing.T, obj *pgmodels.IntellectualO
 		WithHeader(constants.APIUserHeader, tu.SysAdmin.Email).
 		WithHeader(constants.APIKeyHeader, "password").
 		Expect()
-	fmt.Println(resp.Body().Raw())
 	resp.Status(http.StatusOK)
 }
 
