@@ -11,6 +11,13 @@
     cursor: pointer;
   }
 
+  &.is-borderless {
+    td,
+    th {
+      border: 0;
+    }
+  }
+
   thead {
     th {
       @extend .text-label;
@@ -22,6 +29,27 @@
   tbody {
     td {
       @extend .text-table;
+
+      &.text-sm {
+        @extend .text-sm;
+      }
     }
   }
+
+  .total {
+    border-top: 1px solid $grey-4;
+
+    td {
+      &.text-sm {
+        font-size: 18px;
+      }
+
+      &:first-child {
+        @extend .text-label;
+        @extend .text-xs;
+        vertical-align: middle;
+      }
+    }
+  }
+  
 }

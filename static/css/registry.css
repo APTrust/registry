@@ -6314,7 +6314,7 @@ h3,
   line-height: 20px;
 }
 
-.text-label, .single-item-info dt, .single-item-header-type, .table thead th, .button, .badge, .side-nav ul a, .global-search .button {
+.text-label, .single-item-info dt, .single-item-header-type, .table .total td:first-child, .table thead th, .button, .badge, .side-nav ul a, .global-search .button {
   font-size: 16px;
   font-weight: 500;
   line-height: 20px;
@@ -6328,12 +6328,12 @@ p,
   line-height: 20px;
 }
 
-.text-sm, .label {
+.text-sm, .table tbody td.text-sm, .table tbody td.label, .label {
   font-size: 14px;
   line-height: 16px;
 }
 
-.text-xs, .single-item-info dt, .single-item-header-type, .table thead th, .button, .badge {
+.text-xs, .single-item-info dt, .single-item-header-type, .table .total td:first-child, .table thead th, .button, .badge {
   font-size: 12px;
   line-height: 14px;
 }
@@ -6745,9 +6745,23 @@ ol {
 .table.is-hoverable tbody tr:not(.is-selected):hover {
   cursor: pointer;
 }
+.table.is-borderless td,
+.table.is-borderless th {
+  border: 0;
+}
 .table thead th {
   color: #6b6b6b;
 }
+.table .total {
+  border-top: 1px solid #d6d6d6;
+}
+.table .total td.text-sm, .table .total td.label {
+  font-size: 18px;
+}
+.table .total td:first-child {
+  vertical-align: middle;
+}
+
 .pager {
   align-items: center;
   display: flex;
