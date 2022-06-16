@@ -6359,6 +6359,10 @@ ol {
   list-style: disc;
 }
 
+.clickable {
+  cursor: pointer;
+}
+
 .page-wrapper {
   display: flex;
   min-height: 100vh;
