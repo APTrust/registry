@@ -6749,6 +6749,41 @@ ol {
 .table.is-borderless th {
   border: 0;
 }
+.table.has-chart-data th:first-child,
+.table.has-chart-data td:first-child {
+  padding-left: 24px;
+}
+.table.has-chart-data tbody tr:not(.total) td:first-child {
+  position: relative;
+}
+.table.has-chart-data tbody tr:not(.total) td:first-child::before {
+  background-color: pink;
+  border-radius: 50%;
+  content: "";
+  height: 16px;
+  left: 0;
+  position: absolute;
+  top: 10px;
+  width: 16px;
+}
+.table.has-chart-data tbody tr:not(.total):nth-child(6n+2) td:first-child::before {
+  background-color: #bb9566;
+}
+.table.has-chart-data tbody tr:not(.total):nth-child(6n+3) td:first-child::before {
+  background-color: #13135c;
+}
+.table.has-chart-data tbody tr:not(.total):nth-child(6n+4) td:first-child::before {
+  background-color: #333030;
+}
+.table.has-chart-data tbody tr:not(.total):nth-child(6n+5) td:first-child::before {
+  background-color: #608292;
+}
+.table.has-chart-data tbody tr:not(.total):nth-child(6n+6) td:first-child::before {
+  background-color: #935a15;
+}
+.table.has-chart-data tbody tr:not(.total):nth-child(6n+7) td:first-child::before {
+  background-color: #6097cd;
+}
 .table thead th {
   color: #6b6b6b;
 }

@@ -18,6 +18,68 @@
     }
   }
 
+  &.has-chart-data {
+    th:first-child, 
+    td:first-child {
+      padding-left: 24px;
+    }
+
+    tbody {
+      tr:not(.total) {
+        td:first-child {
+          position: relative;
+
+          &::before {
+            background-color: pink;
+            border-radius: 50%;
+            content: '';
+            height: 16px;
+            left: 0;
+            position: absolute;
+            top: 10px;
+            width: 16px;
+          }
+        }
+
+        &:nth-child(6n + 2) {
+          td:first-child::before {
+            background-color: $gold;
+          }
+        }
+
+        &:nth-child(6n + 3) {
+          td:first-child::before {
+            background-color: $purple;
+          }
+        }
+
+        &:nth-child(6n + 4) {
+          td:first-child::before {
+            background-color: $grey-dark-brand;
+          }
+        }
+
+        &:nth-child(6n + 5) {
+          td:first-child::before {
+            background-color: $blue-dark;
+          }
+        }
+
+        &:nth-child(6n + 6) {
+          td:first-child::before {
+            background-color: $brown;
+          }
+        }
+        
+        &:nth-child(6n + 7) {
+          td:first-child::before {
+            background-color: $blue-light;
+          }
+        }
+      }
+    }
+  }
+
   thead {
     th {
       @extend .text-label;
