@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"reflect"
 
+	"github.com/APTrust/registry/common"
 	"github.com/stretchr/stew/slice"
 )
 
@@ -58,11 +59,16 @@ type WorkItemCount struct {
 }
 
 func GetCountFromView(query *Query, model interface{}) (int64, error) {
+	typeName, allowedFilters, err := typeNameAndFilterColumns(model)
+	if err != nil {
+		return -1, err
+	}
+
 	// Get a copy of the query, minus order by, limit, offset, and relations.
 	// We want just the where clause.
 	copyOfQuery := query.CopyForCount()
-	whereClauseCols := query.GetColumnsInWhereClause()
-	for _, col := range PremisEventCountFilters {
+	whereClauseCols := copyOfQuery.GetColumnsInWhereClause()
+	for _, col := range allowedFilters {
 		if !slice.Contains(whereClauseCols, col) {
 			// If a view column is not specified,
 			// set it to null to get the rollup value.
@@ -70,8 +76,6 @@ func GetCountFromView(query *Query, model interface{}) (int64, error) {
 		}
 	}
 	var rowCount int64
-	var err error
-	typeName := reflect.TypeOf(model).Name()
 	switch typeName {
 	case "GenericFile", "GenericFileView":
 		obj := GenericFileCount{}
@@ -92,12 +96,44 @@ func GetCountFromView(query *Query, model interface{}) (int64, error) {
 	default:
 		err = fmt.Errorf("type not supported for view count")
 	}
+
+	// NoRowError means our query was valid, but there were
+	// no results. This is a legitimate case indicating a
+	// count of zero. Our select with rollup in the DB's
+	// update_counts() function does not return a row where
+	// counts are zero. For example, some depositors may have
+	// zero WorkItems where action="Delete", or zero events
+	// where event_type="Deletion" and outcome="Failed". For
+	// these, we want to return a zero count and no error.
+	if IsNoRowError(err) {
+		rowCount = 0
+		err = nil
+	}
+
 	return rowCount, err
 }
 
 func CanCountFromView(query *Query, model interface{}) bool {
+	_, allowedFilters, err := typeNameAndFilterColumns(model)
+	if err != nil {
+		return false
+	}
+
+	for _, col := range query.GetColumnsInWhereClause() {
+		if !slice.Contains(allowedFilters, col) {
+			return false
+		}
+	}
+	return true
+}
+
+func typeNameAndFilterColumns(model interface{}) (string, []string, error) {
 	typeName := reflect.TypeOf(model).Name()
+	if typeName == "" {
+		typeName = reflect.ValueOf(model).Elem().Type().Name()
+	}
 	var allowedFilters []string
+	var err error
 	switch typeName {
 	case "GenericFile", "GenericFileView":
 		allowedFilters = GenericFileCountFilters
@@ -107,14 +143,8 @@ func CanCountFromView(query *Query, model interface{}) bool {
 		allowedFilters = PremisEventCountFilters
 	case "WorkItem", "WorkItemView":
 		allowedFilters = WorkItemCountFilters
+	default:
+		err = common.ErrCountTypeNotSupported
 	}
-	if len(allowedFilters) == 0 {
-		return false
-	}
-	for _, col := range query.GetColumnsInWhereClause() {
-		if !slice.Contains(allowedFilters, col) {
-			return false
-		}
-	}
-	return true
+	return typeName, allowedFilters, err
 }

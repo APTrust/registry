@@ -283,10 +283,10 @@ func (q *Query) Count(model interface{}) (int, error) {
 // CopyForCount returns a copy of this query suitable for querying
 // one of our counts views. See pgmodels/counts.go for usage.
 func (q *Query) CopyForCount() *Query {
-	copyOfQuery := q
-	copyOfQuery.relations = []string{}
-	copyOfQuery.orderBy = []string{}
-	copyOfQuery.offset = 0
-	copyOfQuery.limit = 0
-	return q
+	copyOfQuery := NewQuery()
+	copyOfQuery.conditions = append(copyOfQuery.conditions, q.conditions...)
+	copyOfQuery.columns = append(copyOfQuery.columns, q.columns...)
+	copyOfQuery.params = append(copyOfQuery.params, q.params...)
+	copyOfQuery.whereColumns = append(copyOfQuery.whereColumns, q.whereColumns...)
+	return copyOfQuery
 }

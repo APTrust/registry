@@ -361,7 +361,7 @@ create materialized view if not exists generic_file_counts as
 
 -- work_item_counts
 create materialized view if not exists work_item_counts as
-	select institution_id, count(id), "action"
+	select institution_id, count(id) as row_count, "action"
 	from work_items group by rollup(institution_id, "action")
 	order by institution_id, "action";
 

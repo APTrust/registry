@@ -133,6 +133,11 @@ func LoadFixtures() error {
 			ctx.Log.Error().Stack().Err(err).Msg("")
 			return err
 		}
+		// Populate the counts in our *_counts views.
+		_, err := ctx.DB.Exec("select update_counts();")
+		if err != nil {
+			return err
+		}
 		fixturesLoaded = true
 	}
 	return nil

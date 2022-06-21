@@ -162,8 +162,9 @@ func testGetColumnsInWhereClause(t *testing.T, q *pgmodels.Query) {
 
 func testCopyForCount(t *testing.T, q *pgmodels.Query) {
 	copyOfQuery := q.CopyForCount()
-	assert.Empty(t, copyOfQuery.GetLimit())
-	assert.Empty(t, copyOfQuery.GetOffset())
+	require.False(t, q == copyOfQuery)
+	assert.Equal(t, -1, copyOfQuery.GetLimit())
+	assert.Equal(t, -1, copyOfQuery.GetOffset())
 	assert.Empty(t, copyOfQuery.GetRelations())
 	assert.Empty(t, copyOfQuery.GetOrderBy())
 	assert.Equal(t, q.WhereClause(), copyOfQuery.WhereClause())
