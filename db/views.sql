@@ -303,3 +303,79 @@ select cs.id,
        cs.updated_at
 from checksums cs
 left join generic_files gf on cs.generic_file_id = gf.id;
+
+
+---------------------------------------------------------------------------
+--
+-- Count Views
+--
+-- We create these views because count queries on large tables are slow
+-- in postgres. Even if a query can use an index to get a count, it still
+-- has to scan every row in the result set to see if that row is visible
+-- under postgres' mvcc rules. 
+--
+-- If the count returns a million rows, postgres has to scan all million
+-- rows. The result is a query that can take 5-15 seconds. The 
+-- premis_events table is the worst of the lot. It should surpass 200M
+-- rows by the end of 2022. We do not want to scan those rows every time
+-- someone hits the events page or the events API endpoint.
+--
+-- We run count queries all the time to manage paging in both the web UI
+-- and the API. For large counts, such as "all events for an institution",
+-- or "all files for an institution", we'll use the counts in the views
+-- below. 
+--
+-- For smaller counts, such as "all files for my institution created 
+-- within the past week", we'll suck it up and let postgres scan the 
+-- smaller row sets.
+--
+-- These views will be refreshed every hour or so using an async go 
+-- routine so they don't slow down web and API requests.
+--
+-- That means some large counts may be up to an hour out of date, but we
+-- can live with that tradeoff, since this will vastly speed up the loading
+-- of our most commonly hit web and API endpoints.
+--
+-- Note the function update_counts() below. It refreshes all of the count
+-- views.
+-- 
+---------------------------------------------------------------------------
+
+-- premis_event_counts
+create materialized view if not exists premis_event_counts as
+	select institution_id, count(id) as row_count, event_type, outcome
+	from premis_events group by rollup(institution_id, event_type, outcome)
+	order by institution_id, event_type, outcome;
+
+-- intellectual_object_counts
+create materialized view if not exists intellectual_object_counts as
+	select institution_id, count(id) as row_count, state 
+	from intellectual_objects group by rollup(institution_id, state)
+	order by institution_id, state; 
+
+-- generic_file_counts
+create materialized view if not exists generic_file_counts as
+	select institution_id, count(id) as row_count, state 
+	from generic_files group by rollup(institution_id, state)
+	order by institution_id, state; 
+
+-- work_item_counts
+create materialized view if not exists work_item_counts as
+	select institution_id, count(id), "action"
+	from work_items group by rollup(institution_id, "action")
+	order by institution_id, "action";
+
+-- 
+CREATE OR REPLACE FUNCTION update_counts ()
+  RETURNS integer
+AS
+$BODY$
+  begin
+    refresh materialized view premis_event_counts;
+    refresh materialized view intellectual_object_counts;
+    refresh materialized view generic_file_counts;
+    refresh materialized view work_item_counts;    
+    return 1;
+  end;
+$BODY$
+LANGUAGE plpgsql VOLATILE;
