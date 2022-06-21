@@ -17,7 +17,7 @@
           <tbody>
             {{ range $index, $stat := .depositFormatStats }}
               {{ if eq $stat.FileFormat "Total" }}
-               <!-- TODO: move total to the end -->
+               <!-- TODO: move total to the end, which will also require an update to tables.scss  -->
                 <tr class="total">
               {{ else }}
                 <tr>
