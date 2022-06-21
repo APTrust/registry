@@ -349,14 +349,14 @@ create materialized view if not exists premis_event_counts as
 
 -- intellectual_object_counts
 create materialized view if not exists intellectual_object_counts as
-	select institution_id, count(id) as row_count, state 
-	from intellectual_objects group by rollup(institution_id, state)
+	select institution_id, count(id) as row_count, "state" 
+	from intellectual_objects group by rollup(institution_id, "state")
 	order by institution_id, state; 
 
 -- generic_file_counts
 create materialized view if not exists generic_file_counts as
-	select institution_id, count(id) as row_count, state 
-	from generic_files group by rollup(institution_id, state)
+	select institution_id, count(id) as row_count, "state"
+	from generic_files group by rollup(institution_id, "state")
 	order by institution_id, state; 
 
 -- work_item_counts
