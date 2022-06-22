@@ -3,6 +3,7 @@ package pgmodels
 import (
 	"fmt"
 	"reflect"
+	"strings"
 
 	"github.com/APTrust/registry/common"
 	"github.com/stretchr/stew/slice"
@@ -17,7 +18,7 @@ var PremisEventCountFilters = []string{
 type PremisEventCount struct {
 	tableName     struct{} `pg:"premis_event_counts"`
 	InstitutionID int64    `json:"institution_id"`
-	RowCount      int64    `json:"row_count"`
+	RowCount      int      `json:"row_count"`
 	EventType     string   `json:"event_type"`
 	Outcome       string   `json:"outcome"`
 }
@@ -30,7 +31,7 @@ var IntellectualObjectCountFilters = []string{
 type IntellectualObjectCount struct {
 	tableName     struct{} `pg:"intellectual_object_counts"`
 	InstitutionID int64    `json:"institution_id"`
-	RowCount      int64    `json:"row_count"`
+	RowCount      int      `json:"row_count"`
 	State         string   `json:"state"`
 }
 
@@ -42,7 +43,7 @@ var GenericFileCountFilters = []string{
 type GenericFileCount struct {
 	tableName     struct{} `pg:"generic_file_counts"`
 	InstitutionID int64    `json:"institution_id"`
-	RowCount      int64    `json:"row_count"`
+	RowCount      int      `json:"row_count"`
 	State         string   `json:"state"`
 }
 
@@ -54,11 +55,18 @@ var WorkItemCountFilters = []string{
 type WorkItemCount struct {
 	tableName     struct{} `pg:"work_item_counts"`
 	InstitutionID int64    `json:"institution_id"`
-	RowCount      int64    `json:"row_count"`
+	RowCount      int      `json:"row_count"`
 	Action        string   `json:"action"`
 }
 
-func GetCountFromView(query *Query, model interface{}) (int64, error) {
+// GetCountFromView returns a snapshotted count from a materialized view.
+// We do this for some queries that are known to return very large counts,
+// which take a long time in postgres.
+//
+// Ideally, this should return int64, in line with our general practice of
+// using int64. However, it has to be compatible with the pg library's
+// built-in Count() function, which returns int.
+func GetCountFromView(query *Query, model interface{}) (int, error) {
 	typeName, allowedFilters, err := typeNameAndFilterColumns(model)
 	if err != nil {
 		return -1, err
@@ -71,11 +79,11 @@ func GetCountFromView(query *Query, model interface{}) (int64, error) {
 	for _, col := range allowedFilters {
 		if !slice.Contains(whereClauseCols, col) {
 			// If a view column is not specified,
-			// set it to null to get the rollup value.
+			// set it to null to get the cube value.
 			copyOfQuery.IsNull(col)
 		}
 	}
-	var rowCount int64
+	var rowCount int
 	switch typeName {
 	case "GenericFile", "GenericFileView":
 		obj := GenericFileCount{}
@@ -99,7 +107,7 @@ func GetCountFromView(query *Query, model interface{}) (int64, error) {
 
 	// NoRowError means our query was valid, but there were
 	// no results. This is a legitimate case indicating a
-	// count of zero. Our select with rollup in the DB's
+	// count of zero. Our select with cube in the DB's
 	// update_counts() function does not return a row where
 	// counts are zero. For example, some depositors may have
 	// zero WorkItems where action="Delete", or zero events
@@ -114,13 +122,20 @@ func GetCountFromView(query *Query, model interface{}) (int64, error) {
 }
 
 func CanCountFromView(query *Query, model interface{}) bool {
-	_, allowedFilters, err := typeNameAndFilterColumns(model)
+	typeName, allowedFilters, err := typeNameAndFilterColumns(model)
 	if err != nil {
+		common.Context().Log.Info().Msgf("Cannot query count view for type %s: %s", typeName, err.Error())
 		return false
 	}
 
+	// Our views only contain certain counts. If the filters in
+	// the where clause are too specific, the view won't have
+	// counts for them, and we'll have to do a regular SQL count().
+	// Fortunately, specific filters usually return smaller result
+	// sets that are easier to count.
 	for _, col := range query.GetColumnsInWhereClause() {
 		if !slice.Contains(allowedFilters, col) {
+			common.Context().Log.Info().Msgf("Filter too specific for %s: %s -> %s", typeName, col, strings.Join(allowedFilters, ", "))
 			return false
 		}
 	}
@@ -128,10 +143,17 @@ func CanCountFromView(query *Query, model interface{}) bool {
 }
 
 func typeNameAndFilterColumns(model interface{}) (string, []string, error) {
-	typeName := reflect.TypeOf(model).Name()
-	if typeName == "" {
-		typeName = reflect.ValueOf(model).Elem().Type().Name()
+	var typeName string
+	t := reflect.TypeOf(model).String()
+	if len(t) > 1 {
+		typeName = strings.Split(t, ".")[1]
 	}
+	//typeName := reflect.TypeOf(model).String()
+	common.Context().Log.Info().Msgf("TypeName (1): %s", typeName)
+	//if typeName == "" {
+	//	typeName = reflect.TypeOf(model).Elem().Name()
+	//	common.Context().Log.Info().Msgf("TypeName (2): %s", typeName)
+	//}
 	var allowedFilters []string
 	var err error
 	switch typeName {
