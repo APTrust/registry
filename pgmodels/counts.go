@@ -124,7 +124,7 @@ func GetCountFromView(query *Query, model interface{}) (int, error) {
 func CanCountFromView(query *Query, model interface{}) bool {
 	typeName, allowedFilters, err := typeNameAndFilterColumns(model)
 	if err != nil {
-		common.Context().Log.Info().Msgf("Cannot query count view for type %s: %s", typeName, err.Error())
+		common.Context().Log.Debug().Msgf("Cannot query count view for type %s: %s", typeName, err.Error())
 		return false
 	}
 
@@ -135,7 +135,7 @@ func CanCountFromView(query *Query, model interface{}) bool {
 	// sets that are easier to count.
 	for _, col := range query.GetColumnsInWhereClause() {
 		if !slice.Contains(allowedFilters, col) {
-			common.Context().Log.Info().Msgf("Filter too specific for %s: %s -> %s", typeName, col, strings.Join(allowedFilters, ", "))
+			common.Context().Log.Debug().Msgf("Filter too specific for %s: %s -> %s", typeName, col, strings.Join(allowedFilters, ", "))
 			return false
 		}
 	}
