@@ -344,25 +344,25 @@ left join generic_files gf on cs.generic_file_id = gf.id;
 -- premis_event_counts
 create materialized view if not exists premis_event_counts as
 	select institution_id, count(id) as row_count, event_type, outcome
-	from premis_events group by rollup(institution_id, event_type, outcome)
+	from premis_events group by cube(institution_id, event_type, outcome)
 	order by institution_id, event_type, outcome;
 
 -- intellectual_object_counts
 create materialized view if not exists intellectual_object_counts as
 	select institution_id, count(id) as row_count, "state" 
-	from intellectual_objects group by rollup(institution_id, "state")
+	from intellectual_objects group by cube(institution_id, "state")
 	order by institution_id, state; 
 
 -- generic_file_counts
 create materialized view if not exists generic_file_counts as
 	select institution_id, count(id) as row_count, "state"
-	from generic_files group by rollup(institution_id, "state")
+	from generic_files group by cube(institution_id, "state")
 	order by institution_id, state; 
 
 -- work_item_counts
 create materialized view if not exists work_item_counts as
 	select institution_id, count(id) as row_count, "action"
-	from work_items group by rollup(institution_id, "action")
+	from work_items group by cube(institution_id, "action")
 	order by institution_id, "action";
 
 -- 
