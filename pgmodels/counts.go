@@ -148,12 +148,6 @@ func typeNameAndFilterColumns(model interface{}) (string, []string, error) {
 	if len(t) > 1 {
 		typeName = strings.Split(t, ".")[1]
 	}
-	//typeName := reflect.TypeOf(model).String()
-	common.Context().Log.Info().Msgf("TypeName (1): %s", typeName)
-	//if typeName == "" {
-	//	typeName = reflect.TypeOf(model).Elem().Name()
-	//	common.Context().Log.Info().Msgf("TypeName (2): %s", typeName)
-	//}
 	var allowedFilters []string
 	var err error
 	switch typeName {
