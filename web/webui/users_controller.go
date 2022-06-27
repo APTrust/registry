@@ -303,19 +303,56 @@ func UserInitPasswordReset(c *gin.Context) {
 	c.HTML(http.StatusOK, "users/reset_password_initiated.html", req.TemplateData)
 }
 
+// UserCompletePasswordReset allows a user to enter a token to reset
+// their password. Why not embed the password in the URL? Because
+// https://bit.ly/3u9GWEn.
+//
+// Note that this is one of the few pages that does
+// not require a login.
+//
+// GET /users/complete_password_reset/:id
+func UserStartPasswordReset(c *gin.Context) {
+	userID, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if userID == 0 || err != nil {
+		AbortIfError(c, common.ErrInvalidParam)
+		return
+	}
+	user, err := pgmodels.UserByID(userID)
+	if AbortIfError(c, err) {
+		return
+	}
+	if !user.DeactivatedAt.IsZero() {
+		AbortIfError(c, common.ErrAccountDeactivated)
+		return
+	}
+
+	// Assuming user is not logged in if they're hitting this page.
+	// They'll need a CSRF token to post data.
+	err = helpers.SetCSRFCookie(c)
+	if AbortIfError(c, err) {
+		return
+	}
+	templateData := gin.H{
+		"id":              userID,
+		"suppressSideNav": true,
+	}
+	c.HTML(http.StatusOK, "users/enter_password_reset_token.html", templateData)
+}
+
 // UserCompletePasswordReset allows a user to complete the password
 // reset process. Note that this is one of the few pages that does
 // not require a login.
 //
-// GET /users/complete_password_reset/:id
+// POST /users/complete_password_reset/:id
 func UserCompletePasswordReset(c *gin.Context) {
 	userID, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if userID == 0 || err != nil {
 		AbortIfError(c, common.ErrInvalidParam)
 		return
 	}
-	token := c.Query("token")
+	token := c.PostForm("token")
 	if token == "" {
+		common.Context().Log.Error().Msgf("POST /users/complete_password_reset/%d got empty token", userID)
 		AbortIfError(c, common.ErrInvalidToken)
 		return
 	}
@@ -327,7 +364,10 @@ func UserCompletePasswordReset(c *gin.Context) {
 		AbortIfError(c, common.ErrAccountDeactivated)
 		return
 	}
+	// User may not have a token, which means they're not in the reset process.
+	// But we don't want to tell hackers that, so we'll just let them fail.
 	if !common.ComparePasswords(user.ResetPasswordToken, token) {
+		common.Context().Log.Error().Msgf("POST /users/complete_password_reset/%d got wrong token", userID)
 		AbortIfError(c, common.ErrInvalidToken)
 		return
 	}

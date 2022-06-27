@@ -138,7 +138,9 @@ func TestUserCreateEditDeleteUndelete(t *testing.T) {
 	alertView, err := pgmodels.AlertViewGet(query)
 	require.Nil(t, err)
 	require.NotNil(t, alertView)
-	assert.Contains(t, alertView.Content, "?token=")
+
+	reToken := regexp.MustCompile(`this token into the entry box: \w+`)
+	assert.True(t, reToken.Match([]byte(alertView.Content)))
 
 	// Get the edit page for the new user
 	testutil.Inst1AdminClient.GET("/users/edit/{id}", user.ID).
@@ -411,7 +413,7 @@ func TestUserForcePasswordReset(t *testing.T) {
 	require.NotEmpty(t, user.ResetPasswordToken)
 
 	// Extract unencrypted reset token from the URL in the alert message
-	re := regexp.MustCompile(`token=([^\n]+)`)
+	re := regexp.MustCompile(`this token into the entry box: ([^\n]+)`)
 	m := re.FindAllStringSubmatch(alertView.Content, 1)
 	require.True(t, len(m) > 0, "Token is missing from alert")
 	require.True(t, len(m[0]) > 1, "Token is missing from alert")
@@ -422,14 +424,21 @@ func TestUserForcePasswordReset(t *testing.T) {
 	// logging in (because they don't have their password).
 	client := testutil.GetAnonymousClient(t)
 
-	// First: Bad token should result in error
+	// User should be able to get to this page to enter their reset token.
 	client.GET("/users/complete_password_reset/{id}", testutil.Inst1User.ID).
-		WithQuery("token", "BAD_TOKEN").
+		Expect().Status(http.StatusOK)
+
+	// Now check the post route with the reset token
+	// First: Bad token should result in error
+	client.POST("/users/complete_password_reset/{id}", testutil.Inst1User.ID).
+		WithFormField(constants.CSRFTokenName, testutil.Inst1UserToken).
+		WithFormField("token", "BAD_TOKEN").
 		Expect().Status(http.StatusInternalServerError)
 
 	// Good token should succeed.
-	client.GET("/users/complete_password_reset/{id}", testutil.Inst1User.ID).
-		WithQuery("token", unencryptedToken).
+	client.POST("/users/complete_password_reset/{id}", testutil.Inst1User.ID).
+		WithFormField(constants.CSRFTokenName, testutil.Inst1UserToken).
+		WithFormField("token", unencryptedToken).
 		Expect().Status(http.StatusOK)
 
 	// Need to clear this token for the next two tests, so inst1User

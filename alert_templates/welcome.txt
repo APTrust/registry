@@ -4,6 +4,8 @@ Hello from APTrust,
 
 {{ .passwordResetURL }}
 
+When you get there, copy and paste this token into the entry box: {{ .passwordResetToken }}
+
 If you have questions, please contact us at help@aptrust.org.
 
 The APTrust Team
