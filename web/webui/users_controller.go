@@ -524,18 +524,6 @@ func UserUpdateXHR(c *gin.Context) {
 	c.JSON(http.StatusOK, returnValue)
 }
 
-// This is not used. Should it be? Or did we factor something out earlier?
-func getIndexQuery(c *gin.Context) (*pgmodels.Query, error) {
-	allowedFilters := []string{
-		"institution_id",
-	}
-	fc := pgmodels.NewFilterCollection()
-	for _, key := range allowedFilters {
-		fc.Add(key, c.QueryArray(key))
-	}
-	return fc.ToQuery()
-}
-
 func saveUserForm(c *gin.Context) {
 	req := NewRequest(c)
 	userToEdit := &pgmodels.User{}
