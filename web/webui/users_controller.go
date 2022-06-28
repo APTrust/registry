@@ -327,7 +327,9 @@ func UserStartPasswordReset(c *gin.Context) {
 	}
 
 	// Assuming user is not logged in if they're hitting this page.
-	// They'll need a CSRF token to post data.
+	// They'll need a CSRF token to post data. DO NOT set the
+	// CurrentUser session variable until after we have the right
+	// token and user has completed password reset.
 	err = helpers.SetCSRFCookie(c)
 	if AbortIfError(c, err) {
 		return
@@ -356,6 +358,7 @@ func UserCompletePasswordReset(c *gin.Context) {
 		AbortIfError(c, common.ErrInvalidToken)
 		return
 	}
+
 	user, err := pgmodels.UserByID(userID)
 	if AbortIfError(c, err) {
 		return
