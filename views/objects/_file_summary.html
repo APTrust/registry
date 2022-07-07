@@ -1,45 +1,50 @@
 {{ define "objects/_file_summary.html" }}
 
-<div class="row">
-  <div class="column column-100">
+<div class="box">
+  <div class="box-header">
     <h2>File Summary</h2>
   </div>
-</div>
 
-<div class="row">
-  <div class="column column-50">
-    <table>
-      <thead>
-        <th>Format</th>
-        <th>Count</th>
-        <th>Size</th>
-      </thead>
-      <tbody>
-        {{ range $index, $stat := .depositFormatStats }}
-          {{ if eq $stat.FileFormat "Total" }}
-            <tr class="total">
-          {{ else }}
-            <tr>
-          {{ end }}
-              <td>{{ $stat.FileFormat }}</td>
-              <td>{{ $stat.FileCount }}</td>
-              <td>{{ humanSize $stat.TotalBytes }}</td>
-            </tr>
-        {{ end }}
-      </tbody>
-    </table>
+  <div class="box-content">
+    <div class="columns">
+      <div class="column is-two-fifths">
+        <table class="table is-borderless is-fullwidth has-chart-data">
+          <thead>
+            <th>Format</th>
+            <th class="has-text-right">Count</th>
+            <th class="has-text-right">Size</th>
+          </thead>
+          <tbody>
+            {{ range $index, $stat := .depositFormatStats }}
+              {{ if eq $stat.FileFormat "Total" }}
+               <!-- TODO: move total to the end, which will also require an update to tables.scss  -->
+                <tr class="total">
+              {{ else }}
+                <tr>
+              {{ end }}
+                  <td class="is-grey-dark">{{ $stat.FileFormat }}</td>
+                  <td class="is-grey-dark num text-sm has-text-right">{{ $stat.FileCount }}</td>
+                  <td class="is-grey-dark num text-sm has-text-right">{{ humanSize $stat.TotalBytes }}</td>
+                </tr>
+            {{ end }}
+          </tbody>
+        </table>
+      </div>
+    
+      <div class="column">
+        <h5 class="text-label text-xs has-text-centered">Files by Size (GB)</h5>
+        <div><canvas id="sizeChart"></canvas></div>
+      </div>
+    
+      <div class="column">
+        <h5 class="text-label text-xs has-text-centered">Files by Count</h5>
+        <div>
+          <canvas id="countChart"></canvas>
+        </div>
+      </div>
+    
+    </div>
   </div>
-
-  <div class="column column-25">
-    <p>Files by Size (GB)</p>
-    <canvas id="sizeChart"></canvas>
-  </div>
-
-  <div class="column column-25">
-    <p>Files by Count</p>
-    <canvas id="countChart"></canvas>
-  </div>
-
 </div>
 
 

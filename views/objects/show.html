@@ -10,50 +10,45 @@
  }
 </script>
 
-<h1>{{ .object.Title }}</h1>
-
 <!-- https://bencoveney.github.io/Milligrid/#nesting -->
 
-<div class="container object-detail">
+<main class="object-detail page-content">
+
+  <div class="single-item-header">
+    <span class="action-icon is-jumbo is-dark">
+      <span class="material-icons" aria-hidden="true"><span>inventory</span></span>
+    </span>
+    <div>
+      <h5 class="single-item-header-type">Object</h5>
+      <h1 class="single-item-header-title">{{ .object.Title }}</h1>
+    </div>
+  </div>
 
   <!-- First Row: Intellectual Object -->
-  <div class="row">
+  <div class="columns">
     <!-- Top Left Box: Contains object summary -->
-    <div class="column column-67 rounded-box">
+    <div class="column">
       {{ template "objects/_object_summary.html" . }}
     </div>
 
     <!-- Top Right Box: Buttons and events -->
-    <div class="column column-33 rounded-box">
-      <div class="row">
+    <div class="column is-one-third">
         {{ if eq .object.State "A" }}
         {{ template "objects/_delete_restore.html" . }}
         {{ end }}
-      </div>
-      <div class="row">
+      
         {{ template "objects/_events.html" . }}
-      </div>
     </div>
   </div>
 
 
   <!-- Second Row: File Summary -->
-  <div class="row">
-    <div class="column column-100 rounded-box">
-      {{ template "objects/_file_summary.html" . }}
-    </div>
-  </div>
-
+  {{ template "objects/_file_summary.html" . }}
 
   <!-- Third Row: Active Files -->
-  <div class="row">
-    <div class="column column-100 rounded-box" id="objFileList">
-      {{ template "objects/_file_list.html" . }}
-    </div>
-  </div>
+  {{ template "objects/_file_list.html" . }}
 
-
-</div> <!-- end container -->
+</main> <!-- end container -->
 
 
 {{ template "shared/_footer.html" .}}

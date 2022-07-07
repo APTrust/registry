@@ -1,14 +1,12 @@
 {{ define "objects/_delete_restore.html" }}
 
-<div class="column column-50">
-  {{ if userCan .CurrentUser "IntellectualObjectRequestDelete" .object.InstitutionID }}
-  <button class="button button-outline" data-modal="modal-one" data-xhr-url="/objects/request_delete/{{ .object.ID }}">Delete</button>
-  {{ end }}
-</div>
-<div class="column column-50">
-  {{ if userCan .CurrentUser "IntellectualObjectRestore" .object.InstitutionID }}
-  <button class="button button-outline" data-modal="modal-one" data-xhr-url="/objects/request_restore/{{ .object.ID }}">Restore</button>
-  {{ end }}
+<div class="is-flex is-justify-content-space-between mb-5">
+    {{ if userCan .CurrentUser "IntellectualObjectRequestDelete" .object.InstitutionID }}
+    <button class="button is-primary is-outlined" data-modal="modal-one" data-xhr-url="/objects/request_delete/{{ .object.ID }}">Delete</button>
+    {{ end }}
+    {{ if userCan .CurrentUser "IntellectualObjectRestore" .object.InstitutionID }}
+    <button class="button is-primary" data-modal="modal-one" data-xhr-url="/objects/request_restore/{{ .object.ID }}">Restore</button>
+    {{ end }}
 </div>
 
 {{ end }}

@@ -6314,7 +6314,7 @@ h3,
   line-height: 20px;
 }
 
-.text-label, .table thead th, .button, .badge, .side-nav ul a, .global-search .button {
+.text-label, .single-item-info dt, .single-item-header-type, .table .total td:first-child, .table thead th, .button, .badge, .side-nav ul a, .global-search .button {
   font-size: 16px;
   font-weight: 500;
   line-height: 20px;
@@ -6328,12 +6328,12 @@ p,
   line-height: 20px;
 }
 
-.text-sm, .label {
+.text-sm, .table tbody td.text-sm, .table tbody td.label, .label {
   font-size: 14px;
   line-height: 16px;
 }
 
-.text-xs, .table thead th, .button, .badge {
+.text-xs, .single-item-info dt, .single-item-header-type, .table .total td:first-child, .table thead th, .button, .badge {
   font-size: 12px;
   line-height: 14px;
 }
@@ -6357,6 +6357,10 @@ ol {
 }
 .content ul {
   list-style: disc;
+}
+
+.clickable {
+  cursor: pointer;
 }
 
 .page-wrapper {
@@ -6656,6 +6660,10 @@ ol {
   height: 36px;
   width: 36px;
 }
+.action-icon.is-jumbo {
+  height: 56px;
+  width: 56px;
+}
 .action-icon.is-dark {
   background-color: #6b6b6b;
 }
@@ -6737,9 +6745,58 @@ ol {
 .table.is-hoverable tbody tr:not(.is-selected):hover {
   cursor: pointer;
 }
+.table.is-borderless td,
+.table.is-borderless th {
+  border: 0;
+}
+.table.has-chart-data th:first-child,
+.table.has-chart-data td:first-child {
+  padding-left: 24px;
+}
+.table.has-chart-data tbody tr:not(.total) td:first-child {
+  position: relative;
+}
+.table.has-chart-data tbody tr:not(.total) td:first-child::before {
+  background-color: pink;
+  border-radius: 50%;
+  content: "";
+  height: 16px;
+  left: 0;
+  position: absolute;
+  top: 10px;
+  width: 16px;
+}
+.table.has-chart-data tbody tr:not(.total):nth-child(6n+2) td:first-child::before {
+  background-color: #bb9566;
+}
+.table.has-chart-data tbody tr:not(.total):nth-child(6n+3) td:first-child::before {
+  background-color: #13135c;
+}
+.table.has-chart-data tbody tr:not(.total):nth-child(6n+4) td:first-child::before {
+  background-color: #333030;
+}
+.table.has-chart-data tbody tr:not(.total):nth-child(6n+5) td:first-child::before {
+  background-color: #608292;
+}
+.table.has-chart-data tbody tr:not(.total):nth-child(6n+6) td:first-child::before {
+  background-color: #935a15;
+}
+.table.has-chart-data tbody tr:not(.total):nth-child(6n+7) td:first-child::before {
+  background-color: #6097cd;
+}
 .table thead th {
   color: #6b6b6b;
 }
+.table .total {
+  border-top: 1px solid #d6d6d6;
+}
+.table .total td.text-sm, .table .total td.label {
+  font-size: 18px;
+}
+.table .total td:first-child {
+  vertical-align: middle;
+}
+
 .pager {
   align-items: center;
   display: flex;
@@ -6756,6 +6813,54 @@ ol {
 .pager button:last-child,
 .pager a:last-child {
   margin-left: 18px;
+}
+
+.single-item-header {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.single-item-header-type {
+  padding-top: 4px;
+}
+.single-item-header .action-icon {
+  flex-shrink: 0;
+}
+
+.single-item-info-stats {
+  border-bottom: 1px solid #f7f7f7;
+  margin-bottom: 0 !important;
+}
+.single-item-info-stats > div:first-child {
+  border-right: 1px solid #f7f7f7;
+}
+.single-item-info dl {
+  padding: 24px;
+}
+.single-item-info dt {
+  color: #6b6b6b;
+  margin-bottom: 6px;
+}
+.single-item-info dd {
+  margin-bottom: 16px;
+}
+.single-item-info dd:last-child {
+  margin: 0;
+}
+
+.single-item-file-list-accordion {
+  background: #eeeeee;
+  display: none;
+}
+.single-item-file-list-accordion td {
+  padding: 32px 0;
+}
+
+.single-item-file-list-detail {
+  margin-bottom: 24px;
+}
+.single-item-file-list-detail h5 {
+  color: #6b6b6b;
 }
 
 .modal {
