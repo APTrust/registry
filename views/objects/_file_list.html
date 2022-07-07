@@ -85,6 +85,7 @@
             </tbody>
           </table>
 
+          <!-- TODO, hook models back up -->
           {{ if eq $file.State "A"}}
             {{ if userCan $CurrentUser "FileRequestDelete" $file.InstitutionID }}
               <button class="button" data-modal="modal-one" data-xhr-url="/files/request_delete/{{ $file.ID }}">Delete File</button>
