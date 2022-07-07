@@ -6848,6 +6848,21 @@ ol {
   margin: 0;
 }
 
+.single-item-file-list-accordion {
+  background: #eeeeee;
+  display: none;
+}
+.single-item-file-list-accordion td {
+  padding: 32px 0;
+}
+
+.single-item-file-list-detail {
+  margin-bottom: 24px;
+}
+.single-item-file-list-detail h5 {
+  color: #6b6b6b;
+}
+
 .modal {
   display: none;
 }

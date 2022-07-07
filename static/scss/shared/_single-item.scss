@@ -45,3 +45,20 @@
     }
   }
 }
+
+.single-item-file-list-accordion {
+  background: $grey-highlight;
+  display: none;
+
+  td {
+    padding: 32px 0;
+  }
+}
+
+.single-item-file-list-detail {
+  margin-bottom: 24px;
+
+  h5 {
+    color: $grey-1;
+  }
+}

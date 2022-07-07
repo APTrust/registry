@@ -26,7 +26,7 @@
     </div>
   </div>
 
-  <table class="table is-full-width">
+  <table class="table is-full-width single-item-file-list-table">
     <thead>
       <th></th>
       <th>Identifier</th>
@@ -38,6 +38,7 @@
     </thead>
     {{ range $index, $file := .files }}
     <tr>
+      <!-- TODO, make this a - sign when open -->
       <td class="clickable" data-toggle-table-row="file-{{ $file.ID }}">[+]</td>
       <td class="is-grey-dark">{{ truncateStart $file.Identifier 60 }}</td>
       <td class="is-grey-dark">{{ $file.FileFormat }}</td>
@@ -46,27 +47,26 @@
       <td class="is-grey-dark text-sm is-uppercase has-text-right">{{ dateUS $file.UpdatedAt }}</td>
       <td class="is-grey-dark text-sm is-uppercase has-text-right">{{ dateUS $file.LastFixityCheck }}</td>
     </tr>
-    <tr id="file-{{ $file.ID }}" style="display:none;background-color:#eef;">
-      <td colspan="7" style="border:none">
+    <tr id="file-{{ $file.ID }}" class="single-item-file-list-accordion">
+      <td colspan="1"></td>
+      <td colspan="6" style="border:none">
         <div>
-          <table>
-            <tbody>
-              <tr>
-                <th>Identifier</th>
-                <td>{{ $file.Identifier }}</td>
-              </tr>
-              {{ range $index, $sr := $file.StorageRecords }}
-              <tr>
-                <th>URL</th>
-                <td>{{ $sr.URL }}</td>
-              </tr>
-              {{ end }}
-            </tbody>
-          </table>
 
-          <!-- TODO only show this table if checksums exist -->
+          <div class="single-item-file-list-detail">
+            <h5 class="text-label text-xs">Identifier</h5>
+            <p>{{ $file.Identifier }}</p>
+          </div>
+
+          {{ range $index, $sr := $file.StorageRecords }}
+          <div class="single-item-file-list-detail">
+            <h5 class="text-label text-xs">URL</h5>
+            <p><a href="{{ $sr.URL }}">{{ $sr.URL }}</a></p>
+          </div>
+          {{ end }}
+
+          <!-- TODO only show this table if checksums exist, find an example of this with data -->
           <h3>Checksums</h3>
-          <table>
+          <table class="mb-5">
             <thead>
               <tr>
                 <th>Date</th>
@@ -87,15 +87,11 @@
 
           {{ if eq $file.State "A"}}
             {{ if userCan $CurrentUser "FileRequestDelete" $file.InstitutionID }}
-            <div class="float-left">
-              <button class="button button-outline" data-modal="modal-one" data-xhr-url="/files/request_delete/{{ $file.ID }}">Delete File</button>
-            </div>
+              <button class="button" data-modal="modal-one" data-xhr-url="/files/request_delete/{{ $file.ID }}">Delete File</button>
             {{ end }}
 
             {{ if userCan $CurrentUser "FileRestore" $file.InstitutionID }}
-            <div class="float-right">
-              <button class="button button-outline" data-modal="modal-one" data-xhr-url="/files/request_restore/{{ $file.ID }}">Restore File</button>
-            </div>
+              <button class="button" data-modal="modal-one" data-xhr-url="/files/request_restore/{{ $file.ID }}">Restore File</button>
             {{ end }}
           {{ end }}
 
