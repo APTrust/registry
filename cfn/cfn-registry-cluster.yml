@@ -1,0 +1,158 @@
+AWSTemplateFormatVersion: 2010-09-09 
+
+Description: >-
+    Creates the registry cluster of docker containers and related service for the APTrust environments. 
+    These resources may be needed to scale frequently
+    and be updated to be kept secure. 
+
+Parameters:
+  
+  DNS:
+    Description: Staging private Namespace
+    Type: String
+    Default: staging
+  
+  ClusterName: 
+    Description: The Name of the Fargate cluster hosting NSQ services.
+    Type: String
+    Default: ecs-registry-staging
+
+Resources:
+  
+  NSQCapacityProviderAssociation:
+    Type: AWS::ECS::ClusterCapacityProviderAssociations
+    Properties: 
+      CapacityProviders: 
+        - FARGATE
+        - FARGATE_SPOT 
+      Cluster: !Ref Cluster
+      DefaultCapacityProviderStrategy: 
+        - CapacityProvider: FARGATE 
+          Weight: 1
+          Base: 1 
+        - CapacityProvider: FARGATE_SPOT 
+          Weight: 1 
+          Base: 0
+
+  Cluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: !Ref ClusterName 
+      ClusterSettings: 
+        - Name: containerInsights
+          Value: enabled 
+      Configuration: 
+        ExecuteCommandConfiguration: 
+          Logging: DEFAULT 
+      Tags:
+      - Key: Name
+        Value: !Sub 'ecs-registry-${DNS}'
+      - Key: Environment
+        Value: !Ref DNS
+      - Key: Service 
+        Value: registry
+
+  
+  LogGroup:
+    Properties:
+      LogGroupName: /ecs/registry
+    Type: AWS::Logs::LogGroup
+
+  RegistryService:
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster:
+        Fn::GetAtt:
+        - Cluster
+        - Arn
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 100
+      DeploymentController:
+        Type: ECS
+      DesiredCount: 1
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups:
+          - Fn::ImportValue: !Sub "UnifiedSecurityGroup-${DNS}"
+          - Fn::ImportValue: !Sub "RegistrySecurityGroup-${DNS}"
+          Subnets:
+          - Fn::ImportValue: !Sub "PrivateSubnet0-${DNS}"
+          - Fn::ImportValue: !Sub "PrivateSubnet1-${DNS}"
+      PlatformVersion: 1.4.0
+      PropagateTags: SERVICE
+      SchedulingStrategy: REPLICA
+      ServiceName: ecs-registry
+      ServiceRegistries:
+      - RegistryArn:
+          Fn::GetAtt:
+          - RegistryServiceDiscoveryEntry
+          - Arn
+      Tags:  
+      - Key: Service
+        Value: nsq
+      - Key: Environment
+        Value: !Ref "DNS"
+      TaskDefinition: !Ref RegistryTaskDefinition
+   
+  RegistryServiceDiscoveryEntry: 
+    Type: AWS::ServiceDiscovery::Service
+    Properties:
+      Description: '"registry" service discovery entry in Cloud Map'
+      DnsConfig:
+        DnsRecords:
+        - TTL: 60
+          Type: A
+        RoutingPolicy: MULTIVALUE
+      HealthCheckCustomConfig:
+        FailureThreshold: 1
+      Name: registry
+      NamespaceId:
+        Fn::ImportValue: !Sub "NameSpace-${DNS}"
+  
+  RegistryTaskDefinition: 
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      ContainerDefinitions:
+      - Command:
+        - us-east-1.compute.internal
+        - !Ref DNS
+        Essential: false
+        Image: docker/ecs-searchdomain-sidecar:latest
+        LogConfiguration:
+          LogDriver: awslogs
+          Options:
+            awslogs-group: !Ref LogGroup
+            awslogs-region: !Ref AWS::Region
+            awslogs-stream-prefix: sidecar
+        Name: Nsqadmin_ResolvConf_InitContainer
+      - Command:
+        - /main
+        DependsOn:
+        - Condition: SUCCESS
+          ContainerName: Nsqadmin_ResolvConf_InitContainer
+        Essential: true 
+        Image: docker.io/aptrust/registry:multi
+        LinuxParameters: {}
+        LogConfiguration:
+          LogDriver: awslogs
+          Options:
+            awslogs-group: !Ref LogGroup
+            awslogs-region: !Ref AWS::Region
+            awslogs-stream-prefix: registry
+        Name: registry
+        PortMappings:
+        - ContainerPort: 8080
+          HostPort: 80
+          Protocol: tcp
+      Cpu: "256"
+      ExecutionRoleArn: 
+        Fn::ImportValue: !Sub "FargateIAMRole-${DNS}"
+      Memory: "512"
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+      - FARGATE 
+      Family: ecs-registry
+  
