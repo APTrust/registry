@@ -1,0 +1,57 @@
+.modal-detail {
+  background-color: white;
+  border: 1px solid $grey-4;
+  border-radius: 8px;
+  max-height: 90vh;
+  overflow: auto;
+  padding: 22px 54px 32px 20px;
+  width: 775px;
+
+  .modal-detail-title-row,
+  .modal-detail-header-row,
+  .modal-detail-list-row {
+    border-bottom: 1px solid $grey-background;
+    padding: 24px 0;
+
+    &:last-child {
+      border: 0;
+      padding-bottom: 0;
+    }
+  }
+
+  .modal-detail-title-row {
+    margin-bottom: 28px;
+    padding-bottom: 8px;
+    padding-top: 0;
+  }
+
+  dt {
+    margin-bottom: 6px;
+  }
+
+  dd {
+    margin-bottom: 16px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .modal-detail-header-row {
+    margin-bottom: 36px;
+    padding-top: 0;
+
+    dt {
+      margin-bottom: 8px;
+    }
+
+    dd {
+      margin-bottom: 0;
+    }
+  }
+
+  .modal-detail-list-right {
+    border-left: 1px solid $grey-background;
+    padding-left: 32px;
+  }
+}
