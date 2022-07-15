@@ -58,7 +58,8 @@ Resources:
       LogGroupName: /ecs/registry
     Type: AWS::Logs::LogGroup
 
-  RegistryService:
+  RegistryService: 
+    DependsOn: ListenerReg80
     Type: AWS::ECS::Service
     Properties:
       Cluster:
@@ -72,6 +73,10 @@ Resources:
         Type: ECS
       DesiredCount: 1
       LaunchType: FARGATE
+      LoadBalancers:
+        - ContainerName: registry
+          ContainerPort: 80
+          TargetGroupArn: !Ref RegistryTargetGroup
       NetworkConfiguration:
         AwsvpcConfiguration:
           AssignPublicIp: ENABLED
@@ -129,12 +134,13 @@ Resources:
             awslogs-stream-prefix: sidecar
         Name: Nsqadmin_ResolvConf_InitContainer
       - Command:
-        - /main
+        - ''
         DependsOn:
         - Condition: SUCCESS
           ContainerName: Nsqadmin_ResolvConf_InitContainer
         Essential: true 
-        Image: docker.io/aptrust/registry:multi
+        #Image: docker.io/aptrust/registry:multi
+        Image: nginx
         LinuxParameters: {}
         LogConfiguration:
           LogDriver: awslogs
@@ -144,8 +150,7 @@ Resources:
             awslogs-stream-prefix: registry
         Name: registry
         PortMappings:
-        - ContainerPort: 8080
-          HostPort: 80
+        - ContainerPort: 80
           Protocol: tcp
       Cpu: "256"
       ExecutionRoleArn: 
@@ -156,3 +161,44 @@ Resources:
       - FARGATE 
       Family: ecs-registry
   
+
+  ListenerReg80:
+      Type: 'AWS::ElasticLoadBalancingV2::Listener'
+      Properties:
+        DefaultActions:
+          - ForwardConfig:
+              TargetGroups:
+              - TargetGroupArn: !Ref RegistryTargetGroup
+            Type: forward
+        LoadBalancerArn: arn:aws:elasticloadbalancing:us-east-1:997427182289:loadbalancer/app/alb-east-staging/36c77e709ee69d8a
+        Port: '80'
+        Protocol: HTTP
+  
+  ListenerReg443:
+    Type: 'AWS::ElasticLoadBalancingV2::Listener'
+    Properties:
+      DefaultActions:
+        - Type: forward
+          ForwardConfig:
+            TargetGroups: 
+            - TargetGroupArn: !Ref RegistryTargetGroup
+      LoadBalancerArn: 'arn:aws:elasticloadbalancing:us-east-1:997427182289:loadbalancer/app/alb-east-staging/36c77e709ee69d8a'
+      Certificates:
+        - CertificateArn: 'arn:aws:acm:us-east-1:997427182289:certificate/14e2fca8-7668-4c0e-a07a-62a19e9032d9'
+      Port: '443'
+      Protocol: HTTPS
+
+  RegistryTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: !Sub "registry-targetgroup-${DNS}"
+      Port: 80
+      Protocol: HTTP
+      Tags:
+      - Key: Service
+        Value: registry
+      - Key: Environment
+        Value: !Ref 'DNS'
+      TargetType: ip
+      VpcId: 
+        Fn::ImportValue: !Sub "vpc-apt-${DNS}"  

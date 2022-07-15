@@ -24,6 +24,9 @@ FROM golang:1.17.8-alpine
 WORKDIR /app
 
 COPY --from=builder /main /main
+COPY --from=builder /app/static /static
+COPY --from=builder /app/views /views
+COPY --from=builder /app/.env.dev .
 
 #Environment VARS for deployment
 ENV APT_ENV=dev 
