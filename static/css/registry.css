@@ -6876,18 +6876,22 @@ ol {
 .modal-detail .modal-title-row,
 .modal-detail .modal-header-row,
 .modal-detail .modal-list-row,
+.modal-detail .modal-footer-row,
 .modal-edit .modal-title-row,
 .modal-edit .modal-header-row,
-.modal-edit .modal-list-row {
+.modal-edit .modal-list-row,
+.modal-edit .modal-footer-row {
   border-bottom: 1px solid #f7f7f7;
   padding: 24px 0;
 }
 .modal-detail .modal-title-row:last-child,
 .modal-detail .modal-header-row:last-child,
 .modal-detail .modal-list-row:last-child,
+.modal-detail .modal-footer-row:last-child,
 .modal-edit .modal-title-row:last-child,
 .modal-edit .modal-header-row:last-child,
-.modal-edit .modal-list-row:last-child {
+.modal-edit .modal-list-row:last-child,
+.modal-edit .modal-footer-row:last-child {
   border: 0;
   padding-bottom: 0;
 }

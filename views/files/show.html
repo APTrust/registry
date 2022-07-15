@@ -2,92 +2,87 @@
 
 {{ template "shared/_header.html" .}}
 
-{{ if eq .file.State "A" }}
-<div class="row">
-  <div class="column column-50">
+<div class="modal-detail">
+  <div class="modal-title-row is-flex is-justify-content-space-between is-align-items-center">
+    <!-- TODO can this be the filename? -->
+    <h2>Generic File</h2>
+  </div>
+
+  <dl class="modal-header-row is-flex is-justify-content-space-between">
+    <div>
+      <dt class="text-label text-xs is-grey-dark">Identifier</dt>
+      <dd class="text-table">
+        {{ .file.Identifier }}
+      </dd>
+    </div>
+    <div>
+      <dt class="text-label text-xs is-grey-dark">Size</dt>
+      <dd class="text-table">{{ .file.Size }}</dd>
+    </div>
+    <div>
+      <dt class="text-label text-xs is-grey-dark">Format</dt>
+      <dd class="text-table">{{ .file.FileFormat }}</dd>
+    </div>
+    <div>
+      <dt class="text-label text-xs is-grey-dark">State</dt>
+      <dd class="text-table">{{ .file.State }}</dd>
+    </div>
+  </dl>
+
+  <div class="modal-content">
+    <div class="modal-list-row is-flex is-justify-content-space-between">
+      <dl class="modal-list modal-list-left">
+        <!-- TODO: Is there a way to hide empty fields? -->
+        <dt class="text-label text-xs is-grey-dark">Storage Option</dt>
+        <dd class="text-table">{{ .file.StorageOption }}</dd>
+        <dt class="text-label text-xs is-grey-dark">Last Fixity Check</dt>
+        <dd class="text-table">{{ .file.LastFixityCheck }}</dd>
+        <dt class="text-label text-xs is-grey-dark">UUID</dt>
+        <dd class="text-table">{{ .file.UUID }}</dd>
+        <dt class="text-label text-xs is-grey-dark">Parent Object</dt>
+        <dd class="text-table"><a href="/objects/show/{{ .file.IntellectualObject.ID }}">{{ .file.IntellectualObject.Identifier }}</a></dd>
+        <dt class="text-label text-xs is-grey-dark">Storage URLs</dt>
+        <dd class="text-table">
+          {{ range $index, $storageRecord := .file.StorageRecords }}
+            <a href="{{ $storageRecord.URL }}">{{ $storageRecord.URL }}</a><br/>
+          {{ end }}
+        </dd>
+        <!-- TODO: Possible to hide items that aren't in use? -->
+        <dt class="text-label text-xs is-grey-dark">Checksums</dt>
+        <dd class="text-table">
+          {{ range $index, $cs := .file.Checksums }}
+            {{ dateUS $cs.DateTime }} - {{ $cs.Algorithm }}:{{ $cs.Digest }}<br/>
+          {{ end }}
+        </dd>
+        <dt class="text-label text-xs is-grey-dark">PREMIS Events</dt>
+        <dd class="text-table">
+          {{ range $index, $event := .file.PremisEvents }}
+            <a href="#" data-modal="modal-one" data-xhr-url="/events/show_xhr/{{ $event.ID }}">{{ dateUS $event.DateTime }} - {{ $event.EventType }} - {{ $event.Outcome }}</a><br/>
+          {{ end }}
+        </dd>
+      </dl>
+    
+      <dl class="modal-list modal-list-right">
+        <dt class="text-label text-xs is-grey-dark">Created At</dt>
+        <dd class="text-table">{{ dateUS .file.CreatedAt }}</dd>
+        <dt class="text-label text-xs is-grey-dark">Updated At</dt>
+        <dd class="text-table">{{ dateUS .file.UpdatedAt }}</dd>
+      </dl>
+    </div>
+
+
+  {{ if eq .file.State "A" }}
+  <div class="modal-footer-row">
     {{ if userCan .CurrentUser "FileRequestDelete" .file.InstitutionID }}
-    <button class="button button-outline" data-modal="modal-one" data-xhr-url="/files/request_delete/{{ .file.ID }}">Delete</button>
+    <button class="button" data-modal="modal-one" data-xhr-url="/files/request_delete/{{ .file.ID }}">Delete</button>
+    {{ end }}
+    {{ if userCan .CurrentUser "FileRestore" .file.InstitutionID }}
+    <button class="button" data-modal="modal-one" data-xhr-url="/files/request_restore/{{ .file.ID }}">Restore</button>
     {{ end }}
   </div>
-  <div class="column column-50">
-    {{ if userCan .CurrentUser "FileRestore" .file.InstitutionID }}
-    <button class="button button-outline" data-modal="modal-one" data-xhr-url="/files/request_restore/{{ .file.ID }}">Restore</button>
-    {{ end }}
+  {{ end }}
   </div>
 </div>
-{{ end }}
-
-<h1>Generic File</h1>
-
-<table>
-  <tbody>
-    <tr>
-      <th>Identifier</th>
-      <td>{{ .file.Identifier }}</td>
-    </tr>
-    <tr>
-      <th>Size</th>
-      <td>{{ .file.Size }}</td>
-    </tr>
-    <tr>
-      <th>Format</th>
-      <td>{{ .file.FileFormat }}</td>
-    </tr>
-    <tr>
-      <th>State</th>
-      <td>{{ .file.State }}</td>
-    </tr>
-    <tr>
-      <th>Storage Option</th>
-      <td>{{ .file.StorageOption }}</td>
-    </tr>
-    <tr>
-      <th>Created</th>
-      <td>{{ dateUS .file.CreatedAt }}</td>
-    </tr>
-    <tr>
-      <th>Updated</th>
-      <td>{{ dateUS .file.UpdatedAt }}</td>
-    </tr>
-    <tr>
-      <th>Last Fixity Check</th>
-      <td>{{ .file.LastFixityCheck }}</td>
-    </tr>
-    <tr>
-      <th>UUID</th>
-      <td>{{ .file.UUID }}</td>
-    </tr>
-    <tr>
-      <th>Parent Object</th>
-      <td><a href="/objects/show/{{ .file.IntellectualObject.ID }}">{{ .file.IntellectualObject.Identifier }}</a></td>
-    </tr>
-    <tr>
-      <th>Storage URLs</th>
-      <td>
-        {{ range $index, $storageRecord := .file.StorageRecords }}
-            {{ $storageRecord.URL }}<br/>
-        {{ end }}
-      </td>
-    </tr>
-    <tr>
-      <th>Checksums</th>
-      <td>
-        {{ range $index, $cs := .file.Checksums }}
-            {{ dateUS $cs.DateTime }} - {{ $cs.Algorithm }}:{{ $cs.Digest }}<br/>
-        {{ end }}
-      </td>
-    </tr>
-    <tr>
-      <th>PREMIS Events</th>
-      <td>
-        {{ range $index, $event := .file.PremisEvents }}
-            <a href="#" data-modal="modal-one" data-xhr-url="/events/show_xhr/{{ $event.ID }}">{{ dateUS $event.DateTime }} - {{ $event.EventType }} - {{ $event.Outcome }}</a><br/>
-        {{ end }}
-      </td>
-    </tr>
-  </tbody>
-</table>
-
 
 {{ template "shared/_footer.html" .}}
 
