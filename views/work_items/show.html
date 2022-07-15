@@ -3,7 +3,7 @@
 {{ template "shared/_header.html" . }}
 
 <div class="modal-detail">
-  <div class="modal-detail-title-row is-flex is-justify-content-space-between is-align-items-center">
+  <div class="modal-title-row is-flex is-justify-content-space-between is-align-items-center">
     <h2>{{ .item.Name }}</h2>
     {{ if userCan .CurrentUser "WorkItemUpdate" .item.InstitutionID }}
     <a href="/work_items/edit/{{ .item.ID }}">
@@ -19,7 +19,7 @@
     {{ end }}
   {{ end }}
 
-  <dl class="modal-detail-header-row is-flex is-justify-content-space-between">
+  <dl class="modal-header-row is-flex is-justify-content-space-between">
     <div>
       <dt class="text-label text-xs is-grey-dark">Action</dt>
       <dd class="text-table">
@@ -43,9 +43,9 @@
     </div>
   </dl>
 
-  <div class="modal-detail-content">
-    <div class="modal-detail-list-row is-flex is-justify-content-space-between">
-      <dl class="modal-detail-list modal-detail-list-left">
+  <div class="modal-content">
+    <div class="modal-list-row is-flex is-justify-content-space-between">
+      <dl class="modal-list modal-list-left">
         <!-- TODO: Is there a way to hide empty fields? -->
         <dt class="text-label text-xs is-grey-dark">ETag</dt>
         <dd class="text-table">{{ .item.ETag }}</dd>
@@ -73,7 +73,7 @@
         <dd class="text-table">{{ .item.User }}</dd>
       </dl>
     
-      <dl class="modal-detail-list modal-detail-list-right">
+      <dl class="modal-list modal-list-right">
         <dt class="text-label text-xs is-grey-dark">Bag Date</dt>
         <dd class="text-table">{{ dateTimeISO .item.BagDate }}</dd>
         <dt class="text-label text-xs is-grey-dark">Date Processed</dt>
@@ -89,14 +89,14 @@
       </dl>
     </div>
   
-    <dl class="modal-detail-list modal-detail-list-row">
+    <dl class="modal-list modal-list-row">
       <dt class="text-label text-xs is-grey-dark">Note</dt>
       <dd class="text-table">{{ .item.Note }}</dd>
       <dt class="text-label text-xs is-grey-dark">Outcome</dt>
       <dd class="text-table">{{ .item.Outcome }}</dd>
     </dl>
   
-    <dl class="modal-detail-list modal-detail-list-row is-flex">
+    <dl class="modal-list modal-list-row is-flex">
       <div>
         <dt class="text-label text-xs is-grey-dark">Retry</dt>
         <dd class="text-table is-capitalized">{{ .item.Retry }}</dd>

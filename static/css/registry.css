@@ -6863,7 +6863,8 @@ ol {
   color: #6b6b6b;
 }
 
-.modal-detail {
+.modal-detail,
+.modal-edit {
   background-color: white;
   border: 1px solid #d6d6d6;
   border-radius: 8px;
@@ -6872,43 +6873,57 @@ ol {
   padding: 22px 54px 32px 20px;
   width: 775px;
 }
-.modal-detail .modal-detail-title-row,
-.modal-detail .modal-detail-header-row,
-.modal-detail .modal-detail-list-row {
+.modal-detail .modal-title-row,
+.modal-detail .modal-header-row,
+.modal-detail .modal-list-row,
+.modal-edit .modal-title-row,
+.modal-edit .modal-header-row,
+.modal-edit .modal-list-row {
   border-bottom: 1px solid #f7f7f7;
   padding: 24px 0;
 }
-.modal-detail .modal-detail-title-row:last-child,
-.modal-detail .modal-detail-header-row:last-child,
-.modal-detail .modal-detail-list-row:last-child {
+.modal-detail .modal-title-row:last-child,
+.modal-detail .modal-header-row:last-child,
+.modal-detail .modal-list-row:last-child,
+.modal-edit .modal-title-row:last-child,
+.modal-edit .modal-header-row:last-child,
+.modal-edit .modal-list-row:last-child {
   border: 0;
   padding-bottom: 0;
 }
-.modal-detail .modal-detail-title-row {
+.modal-detail .modal-title-row,
+.modal-edit .modal-title-row {
   margin-bottom: 28px;
   padding-bottom: 8px;
   padding-top: 0;
 }
-.modal-detail dt {
+.modal-detail dt,
+.modal-edit dt {
   margin-bottom: 6px;
 }
-.modal-detail dd {
+.modal-detail dd,
+.modal-edit dd {
   margin-bottom: 16px;
 }
-.modal-detail dd:last-child {
+.modal-detail dd:last-child,
+.modal-edit dd:last-child {
   margin-bottom: 0;
 }
-.modal-detail .modal-detail-header-row {
+.modal-detail .modal-header-row,
+.modal-edit .modal-header-row {
   margin-bottom: 36px;
   padding-top: 0;
 }
-.modal-detail .modal-detail-header-row dt {
+.modal-detail .modal-header-row dt,
+.modal-edit .modal-header-row dt {
   margin-bottom: 8px;
 }
-.modal-detail .modal-detail-header-row dd {
+.modal-detail .modal-header-row dd,
+.modal-edit .modal-header-row dd {
   margin-bottom: 0;
 }
-.modal-detail .modal-detail-list-right {
+.modal-detail .modal-list-right,
+.modal-edit .modal-list-right {
   border-left: 1px solid #f7f7f7;
   padding-left: 32px;
 }
