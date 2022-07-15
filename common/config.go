@@ -19,6 +19,7 @@ import (
 var allowedConfigs = []string{
 	"ci",
 	"dev",
+	"docker",
 	"integration",
 	"production",
 	"staging",
