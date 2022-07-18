@@ -43,7 +43,9 @@ Resources:
           Value: enabled 
       Configuration: 
         ExecuteCommandConfiguration: 
-          Logging: DEFAULT 
+          Logging: OVERRIDE
+          LogConfiguration:
+            CloudWatchLogGroupName: /ecs/registry 
       Tags:
       - Key: Name
         Value: !Sub 'ecs-registry-${DNS}'
@@ -71,7 +73,8 @@ Resources:
         MinimumHealthyPercent: 100
       DeploymentController:
         Type: ECS
-      DesiredCount: 1
+      DesiredCount: 1 
+      EnableExecuteCommand: true
       LaunchType: FARGATE
       LoadBalancers:
         - ContainerName: registry
