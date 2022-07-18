@@ -75,7 +75,7 @@ Resources:
       LaunchType: FARGATE
       LoadBalancers:
         - ContainerName: registry
-          ContainerPort: 80
+          ContainerPort: 8080
           TargetGroupArn: !Ref RegistryTargetGroup
       NetworkConfiguration:
         AwsvpcConfiguration:
@@ -232,7 +232,7 @@ Resources:
       Family: ecs-registry
   
 
-  ListenerReg80:
+  ListenerReg80: 
       Type: 'AWS::ElasticLoadBalancingV2::Listener'
       Properties:
         DefaultActions:
