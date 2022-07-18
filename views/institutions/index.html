@@ -4,39 +4,58 @@
 
 <!-- .items type is []*InstitutionView -->
 
-{{ if .CurrentUser.IsAdmin }}
-<div class="float-right"><a class="button" href="/institutions/new">New</a></div>
-{{ template "institutions/_filters.html" . }}
-{{ end }}
+<div class="box">
+  <div class="box-header is-flex is-align-items-center is-justify-content-space-between">
+    <h1 class="h2">Institutions</h1>
+    {{ if .CurrentUser.IsAdmin }}
+    <a class="button is-success ml-6" href="/institutions/new">Create New</a>
+    {{ end }}
+  </div>
 
-<h1>Institutions</h1>
+  <div class="box-content">
+    {{ if .CurrentUser.IsAdmin }}
+    {{ template "institutions/_filters.html" . }}
+    {{ end }}
+  </div>
 
-<table>
-  <thead>
-    <tr>
-      <th>Name</th>
-      <th>Identifier</th>
-      <th>Type</th>
-      <th>Parent</th>
-      <th>Deactivated</th>
-    </tr>
-  </thead>
-  <tbody>
-    {{ range $index, $inst := .items }}
+  <table class="table is-hoverable is-fullwidth has-padding">
+    <thead>
+      <tr>
+        <!-- TODO make table columns sortable -->
+        <th class="pl-5">Name</th>
+        <th>Identifier</th>
+        <th>Type</th>
+        <th>Parent</th>
+        <th>Deactivated</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{ range $index, $item := .deposits }}
+      <tr>
+        <td class="pl-5">{{ $item.InstitutionName }}</td>
+        <td class="is-grey-dark">{{ $item.StorageOption }}</td>
+        <td class="is-grey-dark num text-sm">{{ $item.ObjectCount }}</td>
+        <td class="is-grey-dark num text-sm">{{ $item.FileCount }}</td>
+        <td class="is-grey-dark num text-sm">{{ formatFloat $item.TotalGB 3 }}</td>
+      </tr>
+      {{ end }}
+
+      {{ range $index, $inst := .items }}
       {{ $cssClass := "clickable" }}
       {{ if not $inst.DeactivatedAt.IsZero }}
         {{ $cssClass = "clickable row-disabled" }}
       {{ end }}
-    <tr class="{{ $cssClass }}" onclick="window.location.href='/institutions/show/{{ $inst.ID }}'">
-      <td>{{ $inst.Name }}</td>
-      <td>{{ $inst.Identifier }}</td>
-      <td>{{ replace $inst.Type "Institution" "" 1 }}</td>
-      <td>{{ $inst.ParentIdentifier }}</td>
-      <td>{{ dateUS $inst.DeactivatedAt }}</td>
-    </tr>
-    {{ end }}
-  </tbody>
-</table>
+      <tr class="{{ $cssClass }}" onclick="window.location.href='/institutions/show/{{ $inst.ID }}'">
+        <td class="pl-5">{{ $inst.Name }}</td>
+        <td class="is-grey-dark">{{ $inst.Identifier }}</td>
+        <td class="is-grey-dark">{{ replace $inst.Type "Institution" "" 1 }}</td>
+        <td class="is-grey-dark">{{ $inst.ParentIdentifier }}</td>
+        <td class="is-grey-dark">{{ dateUS $inst.DeactivatedAt }}</td>
+      </tr>
+      {{ end }}
+    </tbody>
+  </table>
+</div>
 
 {{ template "shared/_footer.html" .}}
 

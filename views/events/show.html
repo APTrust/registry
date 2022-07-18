@@ -2,57 +2,41 @@
 
 {{ template "shared/_header.html" .}}
 
-<h1>Premis Event</h1>
+<div class="modal-detail">
+  <div class="modal-title-row is-flex is-justify-content-space-between is-align-items-center">
+    <h2>Premis Event</h2>
+  </div>
 
-<table>
-  <tbody>
-    <tr>
-      <th>Agent</th>
-      <td>{{ .event.Agent }}</td>
-    </tr>
-    <tr>
-      <th>Date/Time</th>
-      <td>{{ .event.DateTime }}</td>
-    </tr>
-    <tr>
-      <th>Detail</th>
-      <td>{{ .event.Detail }}</td>
-    </tr>
-    <tr>
-      <th>Event Type</th>
-      <td>{{ .event.EventType }}</td>
-    </tr>
-    <tr>
-      <th>Generic File</th>
-      <td><a href="/files/show/{{ .event.GenericFileID }}">{{ .event.GenericFileIdentifier }}</a></td>
-    </tr>
-    <tr>
-      <th>Event Identifier</th>
-      <td>{{ .event.Identifier }}</td>
-    </tr>
-    <tr>
-      <th>Institution</th>
-      <td><a href="/institutions/show/{{ .event.InstitutionID }}">{{ .event.InstitutionName }}</a></td>
-    </tr>
-    <tr>
-      <th>Object</th>
-      <td>{{ .event.Object }}</td>
-    </tr>
-    <tr>
-      <th>Outcome</th>
-      <td>{{ .event.Outcome }}</td>
-    </tr>
-    <tr>
-      <th>Outcome Detail</th>
-      <td>{{ .event.OutcomeDetail }}</td>
-    </tr>
-    <tr>
-      <th>Outcome Information</th>
-      <td>{{ .event.OutcomeInformation }}</td>
-    </tr>
-  </tbody>
-</table>
+  <div class="modal-content">
+    <dl class="modal-list modal-list-row">
+      <dt class="text-label text-xs is-grey-dark">Agent</dt>
+      <dd class="text-table">{{ .event.Agent }}</dd>
+      <dt class="text-label text-xs is-grey-dark">Date/Time</dt>
+      <dd class="text-table">{{ .event.DateTime }}</dd>
+      <dt class="text-label text-xs is-grey-dark">Detail</dt>
+      <dd class="text-table">{{ .event.Detail }}</dd>
+      <dt class="text-label text-xs is-grey-dark">Event Type</dt>
+      <dd class="text-table">{{ .event.EventType }}</dd>
+      <dt class="text-label text-xs is-grey-dark">Generic File</dt>
+      <dd class="text-table"><a href="/files/show/{{ .event.GenericFileID }}">{{ .event.GenericFileIdentifier }}</a></dd>
+      <dt class="text-label text-xs is-grey-dark">Event Identifier</dt>
+      <dd class="text-table">{{ .event.Identifier }}</dd>
+      <dt class="text-label text-xs is-grey-dark">Institution</dt>
+      <dd class="text-table"><a href="/institutions/show/{{ .event.InstitutionID }}">{{ .event.InstitutionName }}</a></dd>
+      <dt class="text-label text-xs is-grey-dark">Object</dt>
+      <dd class="text-table">{{ .event.Object }}</dd>
+    </dl>
 
+    <dl class="modal-list modal-list-row">
+      <dt class="text-label text-xs is-grey-dark">Outcome</dt>
+      <dd class="text-table">{{ .event.Outcome }}</dd>
+      <dt class="text-label text-xs is-grey-dark">Outcome Detail</dt>
+      <dd class="text-table">{{ .event.OutcomeDetail }}</dd>
+      <dt class="text-label text-xs is-grey-dark">Outcome Information</dt>
+      <dd class="text-table">{{ .event.OutcomeInformation }}</dd>
+    </dl>
+  </div>
+</div>
 
 {{ template "shared/_footer.html" .}}
 

@@ -6913,6 +6913,10 @@ ol {
 .modal-edit dd:last-child {
   margin-bottom: 0;
 }
+.modal-detail dd + dd,
+.modal-edit dd + dd {
+  margin-top: -16px;
+}
 .modal-detail .modal-header-row,
 .modal-edit .modal-header-row {
   margin-bottom: 36px;

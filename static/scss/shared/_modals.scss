@@ -37,6 +37,10 @@
     &:last-child {
       margin-bottom: 0;
     }
+
+    & + dd {
+      margin-top: -16px;
+    }
   }
 
   .modal-header-row {
