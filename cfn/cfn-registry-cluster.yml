@@ -226,9 +226,11 @@ Resources:
         - ContainerPort: 8080
           Protocol: tcp
       Cpu: "256"
-      ExecutionRoleArn: 
-        Fn::ImportValue: !Sub "FargateIAMRole-${DNS}"
       Memory: "512"
+      TaskRoleArn: 
+        Fn::ImportValue: !Sub "FargateIAMRole-${DNS}" 
+      ExecutionRoleArn: 
+        Fn::ImportValue: !Sub "ECSServiceRole-${DNS}"
       NetworkMode: awsvpc
       RequiresCompatibilities:
       - FARGATE 
