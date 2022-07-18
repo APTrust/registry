@@ -2,85 +2,68 @@
 
 {{ template "shared/_header.html" .}}
 
-{{ if .institution.DeactivatedAt.IsZero }}
-  {{ if userCan .CurrentUser "InstitutionUpdate" .institution.ID }}
-  <div class="float-right"><a class="button" href="/institutions/edit/{{ .institution.ID }}">Edit</a></div>
-  {{ end }}
-  {{ if userCan .CurrentUser "InstitutionDelete" .institution.ID }}
-  <div class="float-right"><a class="button" href="/institutions/delete/{{ .institution.ID }}">Deactivate</a></div>
-  {{ end }}
-{{ else }}
-  {{ if userCan .CurrentUser "InstitutionUpdate" .institution.ID }}
-  <div class="float-right"><a class="button" href="/institutions/undelete/{{ .institution.ID }}">Reactivate</a></div>
-  {{ end }}
-{{ end }}
+<div class="modal-detail">
+  <div class="modal-title-row is-flex is-justify-content-space-between is-align-items-center">
+    <h2>{{ .institution.Name }}</h2>
+  </div>
 
-<h1>{{ .institution.Name }}</h1>
+  {{ if .institution.DeactivatedAt.IsZero }}
+    <div class="is-flex">
+      {{ if userCan .CurrentUser "InstitutionUpdate" .institution.ID }}
+      <a class="button is-primary" href="/institutions/edit/{{ .institution.ID }}">Edit</a>
+      {{ end }}
+      {{ if userCan .CurrentUser "InstitutionDelete" .institution.ID }}
+      <a class="button is-danger ml-4" href="/institutions/delete/{{ .institution.ID }}">Deactivate</a>
+      {{ end }}
+    </div>
+  {{ else }}
+    {{ if userCan .CurrentUser "InstitutionUpdate" .institution.ID }}
+    <a class="button" href="/institutions/undelete/{{ .institution.ID }}">Reactivate</a>
+    {{ end }}
+  {{ end }}
 
-<table>
-  <tbody>
-    <tr>
-      <th>Identifier</th>
-      <td>{{ .institution.Identifier }}</td>
-    </tr>
-    <tr>
-      <th>Type</th>
-      <td>{{ replace .institution.Type "Institution" "" 1 }}</td>
-    </tr>
-    <tr>
-      <th>Parent</th>
-      <td>{{ if .institution.ParentName }}{{ .institution.ParentName }}{{ else }}None{{end}}</td>
-    </tr>
-    <tr>
-      <th>Two-Factor Enabled</th>
-      <td>{{ yesNo .institution.OTPEnabled }}</td>
-    </tr>
-    <tr>
-      <th>Restoration Spot Tests Enabled</th>
-      <td>{{ yesNo .institution.EnableSpotRestore }}</td>
-    </tr>
-    <tr>
-      <th>Active?</th>
-      <td>{{ if eq .institution.State "A" }} Yes {{ else }} No - deactivated {{ dateUS .institution.DeactivatedAt }} {{ end }}</td>
-    </tr>
-    <tr>
-      <th>Receiving Bucket</th>
-      <td>{{ .institution.ReceivingBucket }}</td>
-    </tr>
-    <tr>
-      <th>Restore Bucket</th>
-      <td>{{ .institution.RestoreBucket }}</td>
-    </tr>
-    <tr>
-      <th>Subscribers</th>
-      <td>
-        {{ if .CurrentUser.IsAdmin }}
+  <div class="modal-content">
+    <dl class="modal-list modal-list-row">
+      <dt class="text-label text-xs is-grey-dark">Identifier</dt>
+      <dd class="text-table">{{ .institution.Identifier }}</dd>
+      <dt class="text-label text-xs is-grey-dark">Type</dt>
+      <dd class="text-table">{{ replace .institution.Type "Institution" "" 1 }}</dd>
+      <dt class="text-label text-xs is-grey-dark">Parent</dt>
+      <dd class="text-table">{{ if .institution.ParentName }}{{ .institution.ParentName }}{{ else }}None{{end}}</dd>
+      <dt class="text-label text-xs is-grey-dark">Two-Factor Enabled</dt>
+      <dd class="text-table">{{ yesNo .institution.OTPEnabled }}</dd>
+      <dt class="text-label text-xs is-grey-dark">Restoration Spot Tests Enabled</dt>
+      <dd class="text-table">{{ yesNo .institution.EnableSpotRestore }}</dd>
+      <dt class="text-label text-xs is-grey-dark">Active?</dt>
+      <dd class="text-table">{{ if eq .institution.State "A" }} Yes {{ else }} No - deactivated {{ dateUS .institution.DeactivatedAt }} {{ end }}</dd>
+      <dt class="text-label text-xs is-grey-dark">Receiving Bucket</dt>
+      <dd class="text-table">{{ .institution.ReceivingBucket }}</dd>
+      <dt class="text-label text-xs is-grey-dark">Restore Bucket</dt>
+      <dd class="text-table">{{ .institution.RestoreBucket }}</dd>
+      <!-- TODO: Only show fields when there is data -->
+      <dt class="text-label text-xs is-grey-dark">Subscribers</dt>
+      {{ if .CurrentUser.IsAdmin }}
           {{ range $index, $inst := .subscribers }}
-          <a href="/institutions/show/{{ $inst.ID }}">{{ $inst.Name }}</a><br/>
+          <dd class="text-table"><a href="/institutions/show/{{ $inst.ID }}">{{ $inst.Name }}</a></dd>
           {{ end }}
         {{ else }}
           {{ range $index, $inst := .subscribers }}
-            {{ $inst.Name }}<br/>
+            <dd class="text-table">{{ $inst.Name }}</dd>
           {{ end }}
         {{ end }}
-      </td>
-    </tr>
-    <tr>
-      <th>Users</th>
-      <td>
-        {{ if userCan .CurrentUser "UserUpdate" .institution.ID }}
+      <dt class="text-label text-xs is-grey-dark">Users</dt>
+      {{ if userCan .CurrentUser "UserUpdate" .institution.ID }}
           {{ range $index, $user := .users }}
-          <a href="/users/show/{{ $user.ID }}">{{ $user.Name }} ({{ roleName $user.Role }})</a><br/>
+          <dd class="text-table"><a href="/users/show/{{ $user.ID }}">{{ $user.Name }} ({{ roleName $user.Role }})</a></dd>
           {{ end }}
         {{ else }}
           {{ range $index, $user := .users }}
-          {{ $user.Name }} ({{ roleName $user.Role }})<br/>
+          <dd class="text-table">{{ $user.Name }} ({{ roleName $user.Role }})</dd>
           {{ end }}
         {{ end }}
-      </td>
-    </tr>
-  </tbody>
-</table>
+    </dl>
+  </div>
+</div>
 
 {{ template "shared/_footer.html" .}}
 
