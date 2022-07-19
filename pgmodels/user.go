@@ -381,7 +381,7 @@ func (user *User) IsAuthyOneTouchUser() bool {
 // two factor authentication.
 //
 // Sorry... For now, we have to work with the convoluted logic of the
-// old Rails app. Hence the confusion between this an OTPRequiredForLogin.
+// old Rails app. Hence the confusion between this and OTPRequiredForLogin.
 func (user *User) IsTwoFactorUser() bool {
 	return user.EnabledTwoFactor && user.ConfirmedTwoFactor
 }

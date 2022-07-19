@@ -86,10 +86,10 @@ func TestWorkItemIndex(t *testing.T) {
 		testutil.AssertMatchesAll(t, html, commonFilters)
 		if client == testutil.SysAdminClient {
 			testutil.AssertMatchesAll(t, html, adminFilters)
-			testutil.AssertMatchesResultCount(t, html, 33)
+			testutil.AssertMatchesResultCount(t, html, 32)
 		} else {
 			testutil.AssertMatchesNone(t, html, adminFilters)
-			testutil.AssertMatchesResultCount(t, html, 18)
+			testutil.AssertMatchesResultCount(t, html, 17)
 		}
 	}
 

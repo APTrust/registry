@@ -22,12 +22,7 @@ func Authenticate() gin.HandlerFunc {
 		if !ExemptFromAuth(c) {
 			user, err = GetUser(c)
 			if err != nil {
-				c.HTML(http.StatusUnauthorized, "errors/show.html", gin.H{
-					"suppressSideNav": true,
-					"suppressTopNav":  false,
-					"error":           "Please log in",
-					"redirectURL":     "/",
-				})
+				respondToAuthError(c, err)
 				c.Abort()
 			} else {
 				c.Set("CurrentUser", user)
@@ -161,6 +156,23 @@ func forceCompletionOfTwoFactorAuth(c *gin.Context, currentUser *pgmodels.User) 
 
 func log2FAIncomplete(c *gin.Context, currentUser *pgmodels.User) {
 	common.Context().Log.Warn().Msgf("Two-factor auth incomplete. User %s tried to access URL [%s]. Forcing user to complete two-factor authentication.", currentUser.Email, c.Request.RequestURI)
+}
+
+func respondToAuthError(c *gin.Context, err error) {
+	if err == common.ErrInvalidAPICredentials {
+		obj := map[string]interface{}{
+			"StatusCode": http.StatusUnauthorized,
+			"Error":      "API credentials are missing or invalid.",
+		}
+		c.JSON(http.StatusUnauthorized, obj)
+	} else {
+		c.HTML(http.StatusUnauthorized, "errors/show.html", gin.H{
+			"suppressSideNav": true,
+			"suppressTopNav":  false,
+			"error":           "Please log in",
+			"redirectURL":     "/",
+		})
+	}
 }
 
 func ExemptFromAuth(c *gin.Context) bool {

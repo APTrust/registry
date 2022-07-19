@@ -150,6 +150,25 @@ func TestWithMultipleConditions(t *testing.T) {
 	assert.Equal(t, 2, q.Params()[10])
 	assert.Equal(t, 3, q.Params()[11])
 	assert.Equal(t, 4, q.Params()[12])
+
+	testGetColumnsInWhereClause(t, q)
+	testCopyForCount(t, q)
+}
+
+func testGetColumnsInWhereClause(t *testing.T, q *pgmodels.Query) {
+	whereCols := []string{"org_id", "name", "active", "created_at", "age", "col1", "col2", "col3", "col12", "col99"}
+	assert.Equal(t, whereCols, q.GetColumnsInWhereClause())
+}
+
+func testCopyForCount(t *testing.T, q *pgmodels.Query) {
+	copyOfQuery := q.CopyForCount()
+	require.False(t, q == copyOfQuery)
+	assert.Equal(t, -1, copyOfQuery.GetLimit())
+	assert.Equal(t, -1, copyOfQuery.GetOffset())
+	assert.Empty(t, copyOfQuery.GetRelations())
+	assert.Empty(t, copyOfQuery.GetOrderBy())
+	assert.Equal(t, q.WhereClause(), copyOfQuery.WhereClause())
+	assert.Equal(t, q.Params(), copyOfQuery.Params())
 }
 
 func TestSelect(t *testing.T) {

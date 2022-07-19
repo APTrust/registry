@@ -138,7 +138,9 @@ func TestUserCreateEditDeleteUndelete(t *testing.T) {
 	alertView, err := pgmodels.AlertViewGet(query)
 	require.Nil(t, err)
 	require.NotNil(t, alertView)
-	assert.Contains(t, alertView.Content, "?token=")
+
+	reToken := regexp.MustCompile(`this token into the entry box: \w+`)
+	assert.True(t, reToken.Match([]byte(alertView.Content)))
 
 	// Get the edit page for the new user
 	testutil.Inst1AdminClient.GET("/users/edit/{id}", user.ID).
@@ -159,6 +161,9 @@ func TestUserCreateEditDeleteUndelete(t *testing.T) {
 	assert.Equal(t, formData["Name"], user.Name)
 	assert.Equal(t, formData["PhoneNumber"], user.PhoneNumber)
 
+	// Test XHR updates
+	testUserUpdateXHR(t, user)
+
 	// Delete the user. This winds up with an OK because of redirect.
 	// Note that because it's a delete, there's no form, so we have
 	// to pass the CSRF token in the header.
@@ -173,6 +178,105 @@ func TestUserCreateEditDeleteUndelete(t *testing.T) {
 		WithHeader(constants.CSRFHeaderName, testutil.Inst1AdminToken).
 		Expect().Status(http.StatusOK)
 
+}
+
+func testUserUpdateXHR(t *testing.T, user *pgmodels.User) {
+	// Update the user
+	formData := make(map[string]interface{})
+	formData["Name"] = "Named edited XHR"
+	testutil.Inst1AdminClient.PUT("/users/edit_xhr/{id}", user.ID).
+		WithHeader("Referer", testutil.BaseURL).
+		WithFormField(constants.CSRFTokenName, testutil.Inst1AdminToken).
+		WithForm(formData).Expect().Status(http.StatusOK)
+
+	// Make sure the edits were saved
+	user, err := pgmodels.UserByID(user.ID)
+	require.Nil(t, err)
+	require.NotNil(t, user)
+	assert.Equal(t, formData["Name"], user.Name)
+	delete(formData, "Name")
+
+	formData["Email"] = "xhr@example.com"
+	testutil.Inst1AdminClient.PUT("/users/edit_xhr/{id}", user.ID).
+		WithHeader("Referer", testutil.BaseURL).
+		WithFormField(constants.CSRFTokenName, testutil.Inst1AdminToken).
+		WithForm(formData).Expect().Status(http.StatusOK)
+
+	// Make sure the edits were saved
+	user, err = pgmodels.UserByID(user.ID)
+	require.Nil(t, err)
+	require.NotNil(t, user)
+	assert.Equal(t, formData["Email"], user.Email)
+	delete(formData, "Name")
+
+	oldEncryptedPassword := user.EncryptedPassword
+	formData["PhoneNumber"] = "+13039998888"
+	formData["Password"] = "SuperSekrit1234!"
+	formData["Role"] = constants.RoleInstAdmin
+	testutil.Inst1AdminClient.PUT("/users/edit_xhr/{id}", user.ID).
+		WithHeader("Referer", testutil.BaseURL).
+		WithFormField(constants.CSRFTokenName, testutil.Inst1AdminToken).
+		WithForm(formData).Expect().Status(http.StatusOK)
+
+	// Make sure the edits were saved
+	user, err = pgmodels.UserByID(user.ID)
+	require.Nil(t, err)
+	require.NotNil(t, user)
+	assert.Equal(t, formData["PhoneNumber"], user.PhoneNumber)
+	assert.NotEqual(t, oldEncryptedPassword, user.EncryptedPassword)
+	assert.Equal(t, formData["Role"], user.Role)
+	delete(formData, "PhoneNumber")
+	delete(formData, "Password")
+	delete(formData, "Role")
+
+	formData["Status"] = "inactive"
+	testutil.Inst1AdminClient.PUT("/users/edit_xhr/{id}", user.ID).
+		WithHeader("Referer", testutil.BaseURL).
+		WithFormField(constants.CSRFTokenName, testutil.Inst1AdminToken).
+		WithForm(formData).Expect().Status(http.StatusOK)
+
+	// Make sure the edits were saved
+	user, err = pgmodels.UserByID(user.ID)
+	require.Nil(t, err)
+	require.NotNil(t, user)
+	assert.NotEmpty(t, user.DeactivatedAt)
+
+	formData["Status"] = "active"
+	testutil.Inst1AdminClient.PUT("/users/edit_xhr/{id}", user.ID).
+		WithHeader("Referer", testutil.BaseURL).
+		WithFormField(constants.CSRFTokenName, testutil.Inst1AdminToken).
+		WithForm(formData).Expect().Status(http.StatusOK)
+
+	// Make sure the edits were saved
+	user, err = pgmodels.UserByID(user.ID)
+	require.Nil(t, err)
+	require.NotNil(t, user)
+	assert.Empty(t, user.DeactivatedAt)
+	delete(formData, "Status")
+
+	formData["OTPRequiredForLogin"] = "true"
+	testutil.Inst1AdminClient.PUT("/users/edit_xhr/{id}", user.ID).
+		WithHeader("Referer", testutil.BaseURL).
+		WithFormField(constants.CSRFTokenName, testutil.Inst1AdminToken).
+		WithForm(formData).Expect().Status(http.StatusOK)
+
+	// Make sure the edits were saved
+	user, err = pgmodels.UserByID(user.ID)
+	require.Nil(t, err)
+	require.NotNil(t, user)
+	assert.True(t, user.OTPRequiredForLogin)
+
+	formData["OTPRequiredForLogin"] = "false"
+	testutil.Inst1AdminClient.PUT("/users/edit_xhr/{id}", user.ID).
+		WithHeader("Referer", testutil.BaseURL).
+		WithFormField(constants.CSRFTokenName, testutil.Inst1AdminToken).
+		WithForm(formData).Expect().Status(http.StatusOK)
+
+	// Make sure the edits were saved
+	user, err = pgmodels.UserByID(user.ID)
+	require.Nil(t, err)
+	require.NotNil(t, user)
+	assert.False(t, user.OTPRequiredForLogin)
 }
 
 func TestUserSignInSignOut(t *testing.T) {
@@ -309,7 +413,7 @@ func TestUserForcePasswordReset(t *testing.T) {
 	require.NotEmpty(t, user.ResetPasswordToken)
 
 	// Extract unencrypted reset token from the URL in the alert message
-	re := regexp.MustCompile(`token=([^\n]+)`)
+	re := regexp.MustCompile(`this token into the entry box: ([^\n]+)`)
 	m := re.FindAllStringSubmatch(alertView.Content, 1)
 	require.True(t, len(m) > 0, "Token is missing from alert")
 	require.True(t, len(m[0]) > 1, "Token is missing from alert")
@@ -320,14 +424,21 @@ func TestUserForcePasswordReset(t *testing.T) {
 	// logging in (because they don't have their password).
 	client := testutil.GetAnonymousClient(t)
 
-	// First: Bad token should result in error
+	// User should be able to get to this page to enter their reset token.
 	client.GET("/users/complete_password_reset/{id}", testutil.Inst1User.ID).
-		WithQuery("token", "BAD_TOKEN").
+		Expect().Status(http.StatusOK)
+
+	// Now check the post route with the reset token
+	// First: Bad token should result in error
+	client.POST("/users/complete_password_reset/{id}", testutil.Inst1User.ID).
+		WithFormField(constants.CSRFTokenName, testutil.Inst1UserToken).
+		WithFormField("token", "BAD_TOKEN").
 		Expect().Status(http.StatusInternalServerError)
 
 	// Good token should succeed.
-	client.GET("/users/complete_password_reset/{id}", testutil.Inst1User.ID).
-		WithQuery("token", unencryptedToken).
+	client.POST("/users/complete_password_reset/{id}", testutil.Inst1User.ID).
+		WithFormField(constants.CSRFTokenName, testutil.Inst1UserToken).
+		WithFormField("token", unencryptedToken).
 		Expect().Status(http.StatusOK)
 
 	// Need to clear this token for the next two tests, so inst1User

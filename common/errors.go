@@ -134,6 +134,10 @@ var ErrInternal = errors.New("internal server error")
 // a method inherited from a base class.
 var ErrSubclassMustImplement = errors.New("subclass must implement this method")
 
+// ErrCountTypeNotSupported indicates that we cannot get counts for the
+// given type from the *_counts views. Use a regular SQL count() instead.
+var ErrCountTypeNotSupported = errors.New("type is not supported for view count")
+
 type ValidationError struct {
 	Errors map[string]string
 }
