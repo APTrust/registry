@@ -43,29 +43,32 @@ var QueryOp = map[string]string{
 // already know virtually all of the ways users want to join tables.
 // Views allow us to issue simple queries, which this package supports.
 type Query struct {
-	conditions []string
-	params     []interface{}
-	columns    []string
-	relations  []string
-	orderBy    []string
-	offset     int
-	limit      int
+	conditions   []string
+	params       []interface{}
+	columns      []string
+	whereColumns []string
+	relations    []string
+	orderBy      []string
+	offset       int
+	limit        int
 }
 
 func NewQuery() *Query {
 	return &Query{
-		conditions: make([]string, 0),
-		params:     make([]interface{}, 0),
-		columns:    make([]string, 0),
-		relations:  make([]string, 0),
-		orderBy:    make([]string, 0),
-		offset:     -1,
-		limit:      -1,
+		conditions:   make([]string, 0),
+		params:       make([]interface{}, 0),
+		columns:      make([]string, 0),
+		whereColumns: make([]string, 0),
+		relations:    make([]string, 0),
+		orderBy:      make([]string, 0),
+		offset:       -1,
+		limit:        -1,
 	}
 }
 
 func (q *Query) Where(col, op string, val interface{}) *Query {
 	cond := fmt.Sprintf(`(%s %s ?)`, common.SanitizeIdentifier(col), op)
+	q.whereColumns = append(q.whereColumns, common.SanitizeIdentifier(col))
 	q.conditions = append(q.conditions, cond)
 	q.params = append(q.params, val)
 	return q
@@ -73,12 +76,14 @@ func (q *Query) Where(col, op string, val interface{}) *Query {
 
 func (q *Query) IsNull(col string) *Query {
 	cond := fmt.Sprintf(`(%s is null)`, common.SanitizeIdentifier(col))
+	q.whereColumns = append(q.whereColumns, common.SanitizeIdentifier(col))
 	q.conditions = append(q.conditions, cond)
 	return q
 }
 
 func (q *Query) IsNotNull(col string) *Query {
 	cond := fmt.Sprintf(`(%s is not null)`, common.SanitizeIdentifier(col))
+	q.whereColumns = append(q.whereColumns, common.SanitizeIdentifier(col))
 	q.conditions = append(q.conditions, cond)
 	return q
 }
@@ -99,6 +104,7 @@ func (q *Query) multi(cols, ops []string, vals []interface{}, logicOp string) {
 		for i, col := range cols {
 			conditions[i] = fmt.Sprintf(`%s %s ?`, common.SanitizeIdentifier(col), ops[i])
 			q.params = append(q.params, vals[i])
+			q.whereColumns = append(q.whereColumns, common.SanitizeIdentifier(col))
 		}
 		cond := fmt.Sprintf("(%s)", strings.Join(conditions, logicOp))
 		q.conditions = append(q.conditions, cond)
@@ -107,6 +113,7 @@ func (q *Query) multi(cols, ops []string, vals []interface{}, logicOp string) {
 
 func (q *Query) BetweenInclusive(col string, low, high interface{}) *Query {
 	cond := fmt.Sprintf(`(%s >= ? AND %s <= ?)`, common.SanitizeIdentifier(col), common.SanitizeIdentifier(col))
+	q.whereColumns = append(q.whereColumns, common.SanitizeIdentifier(col))
 	q.conditions = append(q.conditions, cond)
 	q.params = append(q.params, low, high)
 	return q
@@ -114,6 +121,7 @@ func (q *Query) BetweenInclusive(col string, low, high interface{}) *Query {
 
 func (q *Query) BetweenExclusive(col string, low, high interface{}) *Query {
 	cond := fmt.Sprintf(`(%s > ? AND %s < ?)`, common.SanitizeIdentifier(col), common.SanitizeIdentifier(col))
+	q.whereColumns = append(q.whereColumns, common.SanitizeIdentifier(col))
 	q.conditions = append(q.conditions, cond)
 	q.params = append(q.params, low, high)
 	return q
@@ -133,6 +141,7 @@ func (q *Query) inOrNotIn(col, op string, vals ...interface{}) *Query {
 		cond := fmt.Sprintf(`(%s %s (%s))`, common.SanitizeIdentifier(col), op, paramStr)
 		q.conditions = append(q.conditions, cond)
 		q.params = append(q.params, vals...)
+		q.whereColumns = append(q.whereColumns, common.SanitizeIdentifier(col))
 	}
 	return q
 }
@@ -147,7 +156,7 @@ func (q *Query) MakePlaceholders(start, count int) string {
 
 func (q *Query) WhereClause() string {
 	if len(q.conditions) > 0 {
-		return fmt.Sprintf(strings.Join(q.conditions, " AND "))
+		return strings.Join(q.conditions, " AND ")
 	}
 	return ""
 }
@@ -158,6 +167,10 @@ func (q *Query) Params() []interface{} {
 
 func (q *Query) GetColumns() []string {
 	return q.columns
+}
+
+func (q *Query) GetColumnsInWhereClause() []string {
+	return q.whereColumns
 }
 
 func (q *Query) Columns(cols ...string) *Query {
@@ -265,4 +278,15 @@ func (q *Query) Count(model interface{}) (int, error) {
 		orm.Where(q.WhereClause(), q.Params()...)
 	}
 	return orm.Count()
+}
+
+// CopyForCount returns a copy of this query suitable for querying
+// one of our counts views. See pgmodels/counts.go for usage.
+func (q *Query) CopyForCount() *Query {
+	copyOfQuery := NewQuery()
+	copyOfQuery.conditions = append(copyOfQuery.conditions, q.conditions...)
+	copyOfQuery.columns = append(copyOfQuery.columns, q.columns...)
+	copyOfQuery.params = append(copyOfQuery.params, q.params...)
+	copyOfQuery.whereColumns = append(copyOfQuery.whereColumns, q.whereColumns...)
+	return copyOfQuery
 }

@@ -45,7 +45,8 @@ func CreatePasswordChangedAlert(req *Request, userToEdit *pgmodels.User) (*pgmod
 func CreatePasswordResetAlert(req *Request, userToEdit *pgmodels.User, token string) (*pgmodels.Alert, error) {
 	templateName := "alerts/reset_password.txt"
 	alertData := map[string]interface{}{
-		"passwordResetURL": fmt.Sprintf("%s/users/complete_password_reset/%d?token=%s", req.BaseURL(), userToEdit.ID, token),
+		"passwordResetURL":   fmt.Sprintf("%s/users/complete_password_reset/%d", req.BaseURL(), userToEdit.ID),
+		"passwordResetToken": token,
 	}
 	recipients := []*pgmodels.User{userToEdit}
 	alert := &pgmodels.Alert{
@@ -71,8 +72,9 @@ func CreatePasswordResetAlert(req *Request, userToEdit *pgmodels.User, token str
 func CreateNewAccountAlert(req *Request, newUser *pgmodels.User, token string) (*pgmodels.Alert, error) {
 	templateName := "alerts/welcome.txt"
 	alertData := map[string]interface{}{
-		"passwordResetURL": fmt.Sprintf("%s/users/complete_password_reset/%d?token=%s", req.BaseURL(), newUser.ID, token),
-		"adminName":        req.CurrentUser.Name,
+		"passwordResetURL":   fmt.Sprintf("%s/users/complete_password_reset/%d", req.BaseURL(), newUser.ID),
+		"passwordResetToken": token,
+		"adminName":          req.CurrentUser.Name,
 	}
 	recipients := []*pgmodels.User{newUser}
 	alert := &pgmodels.Alert{

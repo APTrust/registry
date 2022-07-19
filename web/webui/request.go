@@ -111,7 +111,15 @@ func (req *Request) LoadResourceList(items interface{}, orderByColumn, direction
 	if err != nil {
 		return err
 	}
-	count, err := query.Count(items)
+	var count int
+	if pgmodels.CanCountFromView(query, items) {
+		common.Context().Log.Info().Msgf("WebUI: Using view to count query '%s'", query.WhereClause())
+		count, err = pgmodels.GetCountFromView(query, items)
+	} else {
+		common.Context().Log.Info().Msgf("WebUI: Using standard count query for '%s'", query.WhereClause())
+		count, err = query.Count(items)
+	}
+
 	if err != nil {
 		return err
 	}

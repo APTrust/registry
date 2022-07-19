@@ -224,12 +224,14 @@ func initRoutes(router *gin.Engine) {
 		webRoutes.GET("/users/show/:id", webui.UserShow)
 		webRoutes.GET("/users/edit/:id", webui.UserEdit)
 		webRoutes.PUT("/users/edit/:id", webui.UserUpdate)
+		webRoutes.PUT("/users/edit_xhr/:id", webui.UserUpdateXHR)
 		webRoutes.POST("/users/edit/:id", webui.UserUpdate)
 		webRoutes.GET("/users/my_account", webui.UserMyAccount)
 		webRoutes.GET("/users/change_password/:id", webui.UserShowChangePassword)
 		webRoutes.POST("/users/change_password/:id", webui.UserChangePassword)
 		webRoutes.GET("/users/init_password_reset/:id", webui.UserInitPasswordReset)
-		webRoutes.GET("/users/complete_password_reset/:id", webui.UserCompletePasswordReset)
+		webRoutes.GET("/users/complete_password_reset/:id", webui.UserStartPasswordReset)
+		webRoutes.POST("/users/complete_password_reset/:id", webui.UserCompletePasswordReset)
 		webRoutes.POST("/users/get_api_key/:id", webui.UserGetAPIKey)
 
 		// User two-factor setup

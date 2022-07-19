@@ -129,6 +129,7 @@ var AuthMap = map[string]AuthMetadata{
 	"UserTwoFactorVerify":                {"User", constants.UserTwoFactorVerify},
 	"UserUndelete":                       {"User", constants.UserUpdate},
 	"UserUpdate":                         {"User", constants.UserUpdate},
+	"UserUpdateXHR":                      {"User", constants.UserUpdate},
 	"UserUpdateSelf":                     {"User", constants.UserUpdateSelf},
 	"WorkItemCreate":                     {"WorkItem", constants.WorkItemCreate},
 	"WorkItemDelete":                     {"WorkItem", constants.WorkItemDelete},

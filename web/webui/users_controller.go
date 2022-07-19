@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/APTrust/registry/common"
@@ -11,6 +12,7 @@ import (
 	"github.com/APTrust/registry/forms"
 	"github.com/APTrust/registry/helpers"
 	"github.com/APTrust/registry/pgmodels"
+	"github.com/APTrust/registry/web/api"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
@@ -301,20 +303,18 @@ func UserInitPasswordReset(c *gin.Context) {
 	c.HTML(http.StatusOK, "users/reset_password_initiated.html", req.TemplateData)
 }
 
-// UserCompletePasswordReset allows a user to complete the password
-// reset process. Note that this is one of the few pages that does
+// UserCompletePasswordReset allows a user to enter a token to reset
+// their password. Why not embed the password in the URL? Because
+// https://bit.ly/3u9GWEn.
+//
+// Note that this is one of the few pages that does
 // not require a login.
 //
 // GET /users/complete_password_reset/:id
-func UserCompletePasswordReset(c *gin.Context) {
+func UserStartPasswordReset(c *gin.Context) {
 	userID, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if userID == 0 || err != nil {
 		AbortIfError(c, common.ErrInvalidParam)
-		return
-	}
-	token := c.Query("token")
-	if token == "" {
-		AbortIfError(c, common.ErrInvalidToken)
 		return
 	}
 	user, err := pgmodels.UserByID(userID)
@@ -325,7 +325,52 @@ func UserCompletePasswordReset(c *gin.Context) {
 		AbortIfError(c, common.ErrAccountDeactivated)
 		return
 	}
+
+	// Assuming user is not logged in if they're hitting this page.
+	// They'll need a CSRF token to post data. DO NOT set the
+	// CurrentUser session variable until after we have the right
+	// token and user has completed password reset.
+	err = helpers.SetCSRFCookie(c)
+	if AbortIfError(c, err) {
+		return
+	}
+	templateData := gin.H{
+		"id":              userID,
+		"suppressSideNav": true,
+	}
+	c.HTML(http.StatusOK, "users/enter_password_reset_token.html", templateData)
+}
+
+// UserCompletePasswordReset allows a user to complete the password
+// reset process. Note that this is one of the few pages that does
+// not require a login.
+//
+// POST /users/complete_password_reset/:id
+func UserCompletePasswordReset(c *gin.Context) {
+	userID, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if userID == 0 || err != nil {
+		AbortIfError(c, common.ErrInvalidParam)
+		return
+	}
+	token := c.PostForm("token")
+	if token == "" {
+		common.Context().Log.Error().Msgf("POST /users/complete_password_reset/%d got empty token", userID)
+		AbortIfError(c, common.ErrInvalidToken)
+		return
+	}
+
+	user, err := pgmodels.UserByID(userID)
+	if AbortIfError(c, err) {
+		return
+	}
+	if !user.DeactivatedAt.IsZero() {
+		AbortIfError(c, common.ErrAccountDeactivated)
+		return
+	}
+	// User may not have a token, which means they're not in the reset process.
+	// But we don't want to tell hackers that, so we'll just let them fail.
 	if !common.ComparePasswords(user.ResetPasswordToken, token) {
+		common.Context().Log.Error().Msgf("POST /users/complete_password_reset/%d got wrong token", userID)
 		AbortIfError(c, common.ErrInvalidToken)
 		return
 	}
@@ -423,16 +468,63 @@ func SignInUser(c *gin.Context) (int, string, error) {
 	return http.StatusFound, redirectTo, nil
 }
 
-// This is not used. Should it be? Or did we factor something out earlier?
-func getIndexQuery(c *gin.Context) (*pgmodels.Query, error) {
-	allowedFilters := []string{
-		"institution_id",
+// UserUpdateXHR handles updates to individual properties of the
+// User object. These come from inline forms on the user view and
+// user list pages. This allows edits to only the following fields:
+//
+// Name, Email, Phone, Password, Role, Status, and OTPRequiredForLogin.
+//
+// Note: Unlike most calls in this package, this one returns JSON,
+// not HTML. This is a late addition based on UI mockups.
+//
+// PUT /users/edit_xhr/:id
+func UserUpdateXHR(c *gin.Context) {
+	req := NewRequest(c)
+	userToEdit, err := pgmodels.UserByID(req.Auth.ResourceID)
+	if api.AbortIfError(c, err) {
+		return
 	}
-	fc := pgmodels.NewFilterCollection()
-	for _, key := range allowedFilters {
-		fc.Add(key, c.QueryArray(key))
+	if strings.TrimSpace(c.PostForm("Name")) != "" {
+		userToEdit.Name = strings.TrimSpace(c.PostForm("Name"))
 	}
-	return fc.ToQuery()
+	if strings.TrimSpace(c.PostForm("Email")) != "" {
+		userToEdit.Email = strings.TrimSpace(c.PostForm("Email"))
+	}
+	if strings.TrimSpace(c.PostForm("PhoneNumber")) != "" {
+		userToEdit.PhoneNumber = strings.TrimSpace(c.PostForm("PhoneNumber"))
+	}
+	// Consider routing this to UserChangePassword instead
+	if strings.TrimSpace(c.PostForm("Password")) != "" {
+		encPwd, err := common.EncryptPassword(strings.TrimSpace(c.PostForm("Password")))
+		if api.AbortIfError(c, err) {
+			return
+		}
+		userToEdit.EncryptedPassword = encPwd
+		userToEdit.PasswordChangedAt = time.Now().UTC()
+	}
+	if strings.TrimSpace(c.PostForm("Role")) != "" {
+		userToEdit.Role = strings.TrimSpace(c.PostForm("Role"))
+	}
+	if strings.TrimSpace(c.PostForm("Status")) != "" {
+		if strings.ToLower(strings.TrimSpace(c.PostForm("Status"))) == "inactive" {
+			userToEdit.DeactivatedAt = time.Now().UTC()
+		} else {
+			userToEdit.DeactivatedAt = time.Time{}
+		}
+	}
+	if strings.TrimSpace(c.PostForm("OTPRequiredForLogin")) != "" {
+		otpRequired := strings.TrimSpace(c.PostForm("OTPRequiredForLogin")) == "true"
+		userToEdit.OTPRequiredForLogin = otpRequired
+		userToEdit.GracePeriod = time.Now().UTC().Add(30 * 24 * time.Hour)
+	}
+	if api.AbortIfError(c, userToEdit.Save()) {
+		return
+	}
+	returnValue := map[string]interface{}{
+		"StatusCode": http.StatusOK,
+		"Message":    "Update succeeded.",
+	}
+	c.JSON(http.StatusOK, returnValue)
 }
 
 func saveUserForm(c *gin.Context) {
