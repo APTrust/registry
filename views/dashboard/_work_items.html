@@ -23,7 +23,7 @@
           <div class="text-label text-xs is-grey-dark is-dashboard-action">{{ $item.Action }}</div>
         </td>
         <td><span class="badge">{{ $item.Status }}</span></td><!-- update class with correct status-->
-        <td class="is-grey-dark text-sm is-uppercase">{{ dateUS $item.DateProcessed }}</td>
+        <td class="is-grey-dark text-sm is-uppercase has-text-right pr-5">{{ dateUS $item.DateProcessed }}</td>
       </tr>
       {{ end }}
     </tbody>
