@@ -3,29 +3,21 @@
 {{ template "shared/_header.html" .}}
 
 <div class="container">
-  <div class="row">
+  <div class="columns">
 
     <!-- Left column -->
-    <div class="column column-50 rounded-box">
+    <div class="column">
       {{ template "dashboard/_work_items.html" . }}
     </div>
 
     <!-- Right column -->
-    <div class="column column-50">
+    <div class="column">
 
       <!-- Notifications -->
-      <div class="row">
-        <div class="column rounded-box">
-          {{ template "dashboard/_alerts.html" . }}
-        </div>
-      </div>
+      {{ template "dashboard/_alerts.html" . }}
 
       <!-- Deposits -->
-      <div class="row">
-        <div class="column rounded-box">
-          {{ template "dashboard/_deposits.html" . }}
-        </div>
-      </div>
+      {{ template "dashboard/_deposits.html" . }}
 
     </div>
 

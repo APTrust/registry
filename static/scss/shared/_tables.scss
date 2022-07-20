@@ -96,6 +96,10 @@
         @extend .text-sm;
       }
     }
+
+    .is-dashboard-action {
+      padding-left: calc(28px + 0.75rem);
+    }
   }
 
   .total {

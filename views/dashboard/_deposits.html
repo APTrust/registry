@@ -1,50 +1,38 @@
 {{ define "dashboard/_deposits.html" }}
 
-<div class="row">
-  <div class="column column-100">
-    <h2>Deposits by Storage Option</h2>
+<div class="box">
+  <div class="box-header">
+    <h1 class="h2">Deposits by Storage Option</h1>
   </div>
-</div>
 
-<div class="row">
-  <div class="column column-100">
+  <canvas id="depositChart" width="240" height="240"></canvas>
 
-    <!-- Chart -->
-    <div class="row">
-      <canvas id="depositChart" width="240" height="240"></canvas>
-    </div>
-
-    <!-- Stats -->
-    <div class="row">
-      <table>
-        <thead>
-          <th>Storage Option</th>
-          <th>Files</th>
-          <th>Size</th>
-        </thead>
-        <tbody>
-          {{ range $index, $stat := .depositStats }}
-          {{ if eq $stat.StorageOption "Total" }}
-            <tr class="total">
-          {{ else }}
-            <tr>
-          {{ end }}
-              <td>
-                {{ if eq $stat.StorageOption "" }}
-                Total
-                {{ else }}
-                {{ $stat.StorageOption }}
-                {{ end }}
-              </td>
-              <td>{{ $stat.FileCount }}</td>
-              <td>{{ humanSize $stat.TotalBytes }}</td>
-            </tr>
+  <table>
+    <thead>
+      <th>Storage Option</th>
+      <th>Files</th>
+      <th>Size</th>
+    </thead>
+    <tbody>
+      {{ range $index, $stat := .depositStats }}
+      {{ if eq $stat.StorageOption "Total" }}
+        <tr class="total">
+      {{ else }}
+        <tr>
+      {{ end }}
+          <td>
+            {{ if eq $stat.StorageOption "" }}
+            Total
+            {{ else }}
+            {{ $stat.StorageOption }}
             {{ end }}
-        </tbody>
-      </table>
-    </div>
-  </div>
-
+          </td>
+          <td>{{ $stat.FileCount }}</td>
+          <td>{{ humanSize $stat.TotalBytes }}</td>
+        </tr>
+        {{ end }}
+    </tbody>
+  </table>
 </div>
 
 <script>
