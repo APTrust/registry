@@ -2,45 +2,48 @@
 
 {{ template "shared/_header.html" .}}
 
-<h1>Deletion Request</h1>
+<!-- TODO: Make this an actual modal instead of a page -->
+<div class="modal-detail">
+  <div class="modal-title-row">
+    <h2>Deletion Request</h2>
+  </div>
 
-<p>
-  Requested By: {{ .deletionRequest.RequestedBy.Name }} <br/>
-  Requested At: {{ dateUS .deletionRequest.RequestedAt }} <br/>
+  <dl class="modal-list modal-list-row">
+    <dt class="text-label text-xs is-grey-dark">Requested By</dt>
+    <dd class="text-table">{{ .deletionRequest.RequestedBy.Name }}</dd>
+    <dt class="text-label text-xs is-grey-dark">Requested At</dt>
+    <dd class="text-table">{{ dateUS .deletionRequest.RequestedAt }}</dd>
+    {{ if .deletionRequest.ConfirmedBy }}
+    <dt class="text-label text-xs is-grey-dark">Confirmed By</dt>
+    <dd class="text-table">{{ .deletionRequest.ConfirmedBy.Name }}</dd>
+    <dt class="text-label text-xs is-grey-dark">Confirmed On</dt>
+    <dd class="text-table">{{ dateUS .deletionRequest.ConfirmedAt }}</dd>
+    {{ end }}
+    {{ if .deletionRequest.CancelledBy }}
+    <dt class="text-label text-xs is-grey-dark">Cancelled By</dt>
+    <dd class="text-table">{{ .deletionRequest.CancelledBy.Name }}</dd>
+    <dt class="text-label text-xs is-grey-dark">Cancelled On</dt>
+    <dd class="text-table">{{ dateUS .deletionRequest.CancelledAt }}</dd>
+    {{ end }}
+    {{ if .workItemURL }}
+    <dt class="text-label text-xs is-grey-dark">Work Item</dt>
+    <dd class="text-table"><a href="{{ .workItemURL }}">Work Item #{{ .deletionRequest.WorkItemID }}</a></dd>
+    {{ end }}
+    {{ if .deletionRequest.IntellectualObjects }}
+    <dt class="text-label text-xs is-grey-dark">Objects</dt>
+    {{ range $index, $obj := .deletionRequest.IntellectualObjects }}
+      <dd class="text-table"><a href="/objects/show/{{ $obj.ID }}" target="_blank">{{ $obj.Identifier }}</a></dd>
+    {{ end }}
+    {{ end }}
+    {{ if .deletionRequest.GenericFiles }}
+    <dt class="text-label text-xs is-grey-dark">Files</dt>
+    {{ range $index, $gf := .deletionRequest.GenericFiles }}
+      <dd class="text-table"><a href="/files/show/{{ $gf.ID }}" target="_blank">{{ $gf.Identifier }}</a></dd>
+    {{ end }}
+    {{ end }}
+  </dl>
+</div>
 
-  {{ if .deletionRequest.ConfirmedBy }}
-  Confirmed By: {{ .deletionRequest.ConfirmedBy.Name }} <br/>
-  Confirmed On: {{ dateUS .deletionRequest.ConfirmedAt }} <br/>
-  {{ end }}
-
-  {{ if .deletionRequest.CancelledBy }}
-  Cancelled By: {{ .deletionRequest.CancelledBy.Name }} <br/>
-  Cancelled On: {{ dateUS .deletionRequest.CancelledAt }} <br/>
-  {{ end }}
-
-  {{ if .workItemURL }}
-  Work Item: <a href="{{ .workItemURL }}">Work Item #{{ .deletionRequest.WorkItemID }}</a>
-  {{ end }}
-
-  {{ if .deletionRequest.IntellectualObjects }}
-  <h2>Objects</h2>
-  <ol>
-  {{ range $index, $obj := .deletionRequest.IntellectualObjects }}
-    <li><a href="/objects/show/{{ $obj.ID }}" target="_blank">{{ $obj.Identifier }}</a></li>
-  {{ end }}
-  </ol>
-  {{ end }}
-
-  {{ if .deletionRequest.GenericFiles }}
-  <h2>Files</h2>
-  <ol>
-  {{ range $index, $gf := .deletionRequest.GenericFiles }}
-    <li><a href="/files/show/{{ $gf.ID }}" target="_blank">{{ $gf.Identifier }}</a></li>
-  {{ end }}
-  </ol>
-  {{ end }}
-
-
-</p>
+{{ template "shared/_footer.html" . }}
 
 {{ end }}

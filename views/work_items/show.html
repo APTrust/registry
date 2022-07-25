@@ -2,138 +2,129 @@
 
 {{ template "shared/_header.html" . }}
 
+<!-- TODO: Make this an actual modal instead of a page -->
+<div class="modal-detail">
+  <div class="modal-title-row is-flex is-justify-content-space-between is-align-items-center">
+    <h2>{{ .item.Name }}</h2>
+    {{ if userCan .CurrentUser "WorkItemUpdate" .item.InstitutionID }}
+    <a href="/work_items/edit/{{ .item.ID }}">
+      <span class="material-icons" aria-hidden="true">edit</span>
+      <span class="is-sr-only">Edit</span>
+    </a>
+   {{ end }}
+  </div>
 
-{{ if userCan .CurrentUser "WorkItemRequeue" .item.InstitutionID }}
-  {{ if not .item.HasCompleted }}
-    {{ template "work_items/requeue_form.html" . }}
+  {{ if userCan .CurrentUser "WorkItemRequeue" .item.InstitutionID }}
+    {{ if not .item.HasCompleted }}
+      {{ template "work_items/requeue_form.html" . }}
+    {{ end }}
   {{ end }}
-{{ end }}
 
-{{ if userCan .CurrentUser "WorkItemUpdate" .item.InstitutionID }}
-  <div class="float-right"><a class="button" href="/work_items/edit/{{ .item.ID }}">Edit</a></div>
-{{ end }}
+  <dl class="modal-header-row is-flex is-justify-content-space-between">
+    <div>
+      <dt class="text-label text-xs is-grey-dark">Action</dt>
+      <dd class="text-table">
+        <span class="action-icon">
+          <span class="material-icons md-16" aria-hidden="true"><span>check</span></span>
+        </span>
+        {{ .item.Action }}
+      </dd>
+    </div>
+    <div>
+      <dt class="text-label text-xs is-grey-dark">Size</dt>
+      <dd class="text-table">{{ .item.Size }}</dd>
+    </div>
+    <div>
+      <dt class="text-label text-xs is-grey-dark">Stage</dt>
+      <dd class="text-table">{{ .item.Stage }}</dd>
+    </div>
+    <div>
+      <dt class="text-label text-xs is-grey-dark">Status</dt>
+      <dd class="badge">{{ .item.Status }}</dd>
+    </div>
+  </dl>
 
-
-<h1>{{ .item.Name }}</h1>
-
-<table>
-  <tbody>
-    <tr>
-      <th>ETag</th>
-      <td>{{ .item.ETag }}</td>
-    </tr>
-    <tr>
-      <th>Intellectual Object</th>
-      <td>
-        {{ if .item.IntellectualObjectID }}
-        <a href="/objects/show/{{ .item.IntellectualObjectID }}">{{ .item.ObjectIdentifier }}</a>
-        {{ else }}
-        {{ .item.ObjectIdentifier }}
-        {{ end }}
-      </td>
-    </tr>
-    <tr>
-      <th>Generic File</th>
-      <td>{{ .item.GenericFileIdentifier }}</td>
-    </tr>
-    <tr>
-      <th>Bucket</th>
-      <td>{{ .item.Bucket }}</td>
-    </tr>
-    <tr>
-      <th>User</th>
-      <td>{{ .item.User }}</td>
-    </tr>
-    <tr>
-      <th>Action</th>
-      <td>{{ .item.Action }}</td>
-    </tr>
-    <tr>
-      <th>Stage</th>
-      <td>{{ .item.Stage }}</td>
-    </tr>
-    <tr>
-      <th>Status</th>
-      <td>{{ .item.Status }}</td>
-    </tr>
-    <tr>
-      <th>Note</th>
-      <td>{{ .item.Note }}</td>
-    </tr>
-    <tr>
-      <th>Outcome</th>
-      <td>{{ .item.Outcome }}</td>
-    </tr>
-    <tr>
-      <th>Bag Date</th>
-      <td>{{ dateTimeISO .item.BagDate }}</td>
-    </tr>
-    <tr>
-      <th>Date Processed</th>
-      <td>{{ dateTimeISO .item.DateProcessed }}</td>
-    </tr>
-    <tr>
-      <th>Retry</th>
-      <td>{{ .item.Retry }}</td>
-    </tr>
-    <tr>
-      <th>Node</th>
-      <td>{{ .item.Node }}</td>
-    </tr>
-    <tr>
-      <th>Pid</th>
-      <td>{{ .item.PID }}</td>
-    </tr>
-    <tr>
-      <th>Needs Admin Review</th>
-      <td>{{ .item.NeedsAdminReview }}</td>
-    </tr>
-    <tr>
-      <th>Queued At</th>
-      <td>{{ dateTimeISO .item.QueuedAt }}</td>
-    </tr>
-    <tr>
-      <th>Size</th>
-      <td>{{ .item.Size }}</td>
-    </tr>
-    <tr>
-      <th>Stage Started At</th>
-      <td>{{ dateTimeISO .item.StageStartedAt }}</td>
-    </tr>
-    <tr>
-      <th>APTrust Approver</th>
-      <td>{{ .item.APTrustApprover }}</td>
-    </tr>
-    <tr>
-      <th>Intitutional Approver</th>
-      <td>{{ .item.InstApprover }}</td>
-    </tr>
-    <tr>
-      <th>Created At</th>
-      <td>{{ dateTimeISO .item.CreatedAt }}</td>
-    </tr>
-    <tr>
-      <th>Updated At</th>
-      <td>{{ dateTimeISO .item.UpdatedAt }}</td>
-    </tr>
-  </tbody>
-</table>
-
-{{ if .redisInfo }}
-<!-- Show raw json data. For sys admin only. -->
-<p><b>Redis Data</b></p>
-<textarea style="min-height: 300px;">
-{{ .redisInfo }}
-</textarea>
-{{ end }}
-
-
-{{ if .showRedisDelete }}
-<form id="redisDelete" method="post" action="/work_items/redis_delete/{{ .item.ID }}" onsubmit='return confirm("Delete Redis record? If in doubt, cancel!")'>
-  {{ template "forms/csrf_token.html" . }}
-  <input type="submit" value="Delete Redis Data"></input>
-</form>
-{{ end }}
+  <div class="modal-content">
+    <div class="modal-list-row is-flex is-justify-content-space-between">
+      <dl class="modal-list modal-list-left">
+        <!-- TODO: Is there a way to hide empty fields? -->
+        <dt class="text-label text-xs is-grey-dark">ETag</dt>
+        <dd class="text-table">{{ .item.ETag }}</dd>
+        <dt class="text-label text-xs is-grey-dark">Object Identifier</dt>
+        <dd class="text-table">
+          {{ if .item.IntellectualObjectID }}
+          <a href="/objects/show/{{ .item.IntellectualObjectID }}">{{ .item.ObjectIdentifier }}</a>
+          {{ else }}
+          {{ .item.ObjectIdentifier }}
+          {{ end }}
+        </dd>
+        <dt class="text-label text-xs is-grey-dark">Bucket</dt>
+        <dd class="text-table">{{ .item.Bucket }}</dd>
+        <dt class="text-label text-xs is-grey-dark">Generic File</dt>
+        <dd class="text-table">{{ .item.GenericFileIdentifier }}</dd>
+        <dt class="text-label text-xs is-grey-dark">User</dt>
+        <dd class="text-table">{{ .item.User }}</dd>
+        <dt class="text-label text-xs is-grey-dark">Node</dt>
+        <dd class="text-table">{{ .item.Node }}</dd>
+        <dt class="text-label text-xs is-grey-dark">PID</dt>
+        <dd class="text-table">{{ .item.PID }}</dd>
+        <dt class="text-label text-xs is-grey-dark">APTrust Approver</dt>
+        <dd class="text-table">{{ .item.APTrustApprover }}</dd>
+        <dt class="text-label text-xs is-grey-dark">Intitutional Approver</dt>
+        <dd class="text-table">{{ .item.User }}</dd>
+      </dl>
+    
+      <dl class="modal-list modal-list-right">
+        <dt class="text-label text-xs is-grey-dark">Bag Date</dt>
+        <dd class="text-table">{{ dateTimeISO .item.BagDate }}</dd>
+        <dt class="text-label text-xs is-grey-dark">Date Processed</dt>
+        <dd class="text-table">{{ dateTimeISO .item.DateProcessed }}</dd>
+        <dt class="text-label text-xs is-grey-dark">Queued At</dt>
+        <dd class="text-table">{{ dateTimeISO .item.QueuedAt }}</dd>
+        <dt class="text-label text-xs is-grey-dark">Stage Started At</dt>
+        <dd class="text-table">{{ dateTimeISO .item.StageStartedAt }}</dd>
+        <dt class="text-label text-xs is-grey-dark">Created At</dt>
+        <dd class="text-table">{{ dateTimeISO .item.CreatedAt }}</dd>
+        <dt class="text-label text-xs is-grey-dark">Updated At</dt>
+        <dd class="text-table">{{ dateTimeISO .item.UpdatedAt }}</dd>
+      </dl>
+    </div>
+  
+    <dl class="modal-list modal-list-row">
+      <dt class="text-label text-xs is-grey-dark">Note</dt>
+      <dd class="text-table">{{ .item.Note }}</dd>
+      <dt class="text-label text-xs is-grey-dark">Outcome</dt>
+      <dd class="text-table">{{ .item.Outcome }}</dd>
+    </dl>
+  
+    <dl class="modal-list modal-list-row is-flex">
+      <div>
+        <dt class="text-label text-xs is-grey-dark">Retry</dt>
+        <dd class="text-table is-capitalized">{{ .item.Retry }}</dd>
+      </div>
+      <div class="ml-6">
+        <dt class="text-label text-xs is-grey-dark">Needs Admin Review</dt>
+       <dd class="text-table is-capitalized">{{ .item.NeedsAdminReview }}</dd>
+      </div>
+    </dl>
+  
+    {{ if .redisInfo }}
+    <!-- Show raw json data. For sys admin only. -->
+    <p><b>Redis Data</b></p>
+    <textarea style="min-height: 300px;">
+    {{ .redisInfo }}
+    </textarea>
+    {{ end }}
+  
+  
+    {{ if .showRedisDelete }}
+    <form id="redisDelete" method="post" action="/work_items/redis_delete/{{ .item.ID }}" onsubmit='return confirm("Delete Redis record? If in doubt, cancel!")'>
+      {{ template "forms/csrf_token.html" . }}
+      <input type="submit" value="Delete Redis Data"></input>
+    </form>
+    {{ end }}
+  </div>
+</div>
 
 
 {{ template "shared/_footer.html" . }}
