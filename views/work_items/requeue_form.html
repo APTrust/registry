@@ -1,26 +1,17 @@
 {{ define "work_items/requeue_form.html" }}
 
-<form action="{{ .form.Action }}" id="workItemRequeueForm" method="post">
+<form class="mb-5" action="{{ .form.Action }}" id="workItemRequeueForm" method="post">
+  {{ if .FormError }}
+  <div class="row form-error">
+    {{ .FormError }}
+  </div>
+  {{ end }}
 
-  <table class="no-borders">
-    <tr>
-      <td>
-        {{ if .FormError }}
-        <div class="row form-error">
-          {{ .FormError }}
-        </div>
-        {{ end }}
+  {{ template "forms/select.html" .form.Fields.Stage }}
 
-        {{ template "forms/select.html" .form.Fields.Stage }}
+  {{ template "forms/csrf_token.html" . }}
 
-        {{ template "forms/csrf_token.html" . }}
-      </td>
-      <td>
-        <input type="submit" value="Requeue">
-      </td>
-    </tr>
-  </table>
-
+  <input class="button" type="submit" value="Requeue">
 </form>
 
 <script>

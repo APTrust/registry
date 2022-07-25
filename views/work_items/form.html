@@ -2,38 +2,53 @@
 
 {{ template "shared/_header.html" .}}
 
-<form action="{{ .form.Action }}" id="workItemForm" method="post">
-
-  {{ if .FormError }}
-  <div class="row form-error">
-    {{ .FormError }}
-  </div>
-  {{ end }}
-
-  {{ template "forms/select.html" .form.Fields.Stage }}
-
-  {{ template "forms/select.html" .form.Fields.Status }}
-
-  {{ template "forms/select.html" .form.Fields.Retry }}
-
-  {{ template "forms/select.html" .form.Fields.NeedsAdminReview }}
-
-  {{ template "forms/textarea.html" .form.Fields.Note }}
-
-  {{ template "forms/text_input.html" .form.Fields.Node }}
-
-  {{ template "forms/number.html" .form.Fields.PID }}
-
-  {{ template "forms/csrf_token.html" . }}
-
-  <div class="float-right">
-    <input type="submit" value="Submit">
-  </div>
-  <div class="float-left">
-    <a class="button button-outline" href="javascript:history.back()">Cancel</a>
+<!-- TODO: Make this an actual modal instead of a page -->
+<div class="modal-edit">
+  <div class="modal-title-row is-flex is-justify-content-space-between is-align-items-center">
+    <!-- TODO Pass name of item -->
+    <h2>Name of item</h2>
+    <a href="javascript:history.back()">
+      <span class="material-icons" aria-hidden="true">close</span>
+      <span class="is-sr-only">Close</span>
+    </a>
   </div>
 
-</form>
+  <form action="{{ .form.Action }}" id="workItemForm" method="post">
+
+    {{ if .FormError }}
+    <div class="row form-error">
+      {{ .FormError }}
+    </div>
+    {{ end }}
+    
+    <div class="columns">
+      <div class="column">{{ template "forms/select.html" .form.Fields.Stage }}</div>
+      <div class="column">{{ template "forms/select.html" .form.Fields.Status }}</div>
+    </div>
+    
+    <div class="columns">
+      <div class="column">{{ template "forms/select.html" .form.Fields.Retry }}</div>
+      <div class="column">{{ template "forms/select.html" .form.Fields.NeedsAdminReview }}</div>
+    </div>
+  
+    <div class="columns">
+      <div class="column">{{ template "forms/textarea.html" .form.Fields.Note }}</div>
+    </div>
+
+    <div class="columns">
+      <div class="column">{{ template "forms/text_input.html" .form.Fields.Node }}</div>
+      <div class="column">{{ template "forms/number.html" .form.Fields.PID }}</div>
+    </div>
+  
+    {{ template "forms/csrf_token.html" . }}
+    
+    <div class="is-flex is-justify-content-space-between">
+      <a class="button" href="javascript:history.back()">Cancel</a>
+      <input class="button is-dark" type="submit" value="Submit">
+    </div>
+  
+  </form>
+</div>
 
 {{ template "shared/_footer.html" .}}
 
