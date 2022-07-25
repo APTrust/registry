@@ -6322,6 +6322,10 @@ h3,
   text-transform: uppercase;
 }
 
+.text-lg {
+  font-size: 20px;
+}
+
 p,
 .text-md {
   font-size: 16px;
@@ -6786,6 +6790,9 @@ ol {
 }
 .table thead th {
   color: #6b6b6b;
+}
+.table tbody .is-dashboard-action {
+  padding-left: calc(28px + 0.75rem);
 }
 .table .total {
   border-top: 1px solid #d6d6d6;

@@ -1,50 +1,68 @@
 {{ define "dashboard/_deposits.html" }}
 
-<div class="row">
-  <div class="column column-100">
-    <h2>Deposits by Storage Option</h2>
+<div class="box">
+  <div class="box-header">
+    <h1 class="h2">Deposits by Storage Option</h1>
   </div>
-</div>
 
-<div class="row">
-  <div class="column column-100">
+  <div class="box-content">
+    <div class="columns">
+      <div class="column">
+        <canvas id="depositChart" width="240" height="240"></canvas>
+      </div>
 
-    <!-- Chart -->
-    <div class="row">
-      <canvas id="depositChart" width="240" height="240"></canvas>
-    </div>
-
-    <!-- Stats -->
-    <div class="row">
-      <table>
-        <thead>
-          <th>Storage Option</th>
-          <th>Files</th>
-          <th>Size</th>
-        </thead>
-        <tbody>
-          {{ range $index, $stat := .depositStats }}
-          {{ if eq $stat.StorageOption "Total" }}
-            <tr class="total">
-          {{ else }}
-            <tr>
-          {{ end }}
-              <td>
-                {{ if eq $stat.StorageOption "" }}
-                Total
-                {{ else }}
-                {{ $stat.StorageOption }}
+      <div class="column">
+        <!-- TODO Chart table css is set with total first per the single object view
+              we should make them consistent one way or another.
+              Leaving this broken until we address it -->
+          <table class="table is-borderless is-fullwidth has-chart-data">
+            <thead>
+              <th>Storage Option</th>
+              <th>Files</th>
+              <th>Size</th>
+            </thead>
+            <tbody>
+              {{ range $index, $stat := .depositStats }}
+              {{ if eq $stat.StorageOption "Total" }}
+                <tr class="total">
+              {{ else }}
+                <tr>
+              {{ end }}
+                  <td class="text-sm">
+                    {{ if eq $stat.StorageOption "" }}
+                    Total
+                    {{ else }}
+                    {{ $stat.StorageOption }}
+                    {{ end }}
+                  </td>
+                  <td class="is-grey-dark num text-sm has-text-right">{{ $stat.FileCount }}</td>
+                  <td class="is-grey-dark num text-sm has-text-right">{{ humanSize $stat.TotalBytes }}</td>
+                </tr>
                 {{ end }}
-              </td>
-              <td>{{ $stat.FileCount }}</td>
-              <td>{{ humanSize $stat.TotalBytes }}</td>
-            </tr>
-            {{ end }}
-        </tbody>
-      </table>
+            </tbody>
+          </table>
+      </div>
     </div>
   </div>
-
+  <hr>
+  <!-- TODO: Make this dynamic -->
+  <div class="box-content">
+    <div class="columns">
+      <div class="column">
+        <h5 class="text-label text-xs mb-2">Objects</h5>
+        <p class="num text-lg">48,883</p>
+      </div>
+      <div class="column">
+        <h5 class="text-label text-xs mb-2">Files</h5>
+        <p class="num text-lg">6,663,871</p>
+      </div>
+      <div class="column">
+        <h5 class="text-label text-xs mb-2">Fixety Checks</h5>
+        <p class="num text-lg">8,771</p>
+        <p class="text-sm is-italic">this week</p>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
