@@ -46,10 +46,11 @@
         <td class="pl-5">{{ $user.Name }}</td>
         <td class="is-grey-dark">{{ $user.Email }}</td>
         <td class="is-grey-dark">{{ $user.InstitutionName }}</td>
-        <td class="is-grey-dark">{{ roleName $user.Role }}</td>
+        <td class="is-grey-dark">{{ roleName $user.Role }}</td><!-- TODO Are we making this switchable here? -->
         <td class="is-grey-dark">{{ dateUS $user.LastSignInAt }}</td>
-        <td class="is-grey-dark">{{ yesNo $user.EnabledTwoFactor }}</td>
+        <td class="is-grey-dark">{{ yesNo $user.EnabledTwoFactor }}</td><!-- TODO Are we making this switchable here? -->
         <td class="is-grey-dark">{{ dateUS $user.DeactivatedAt }}</td>
+        <!-- TODO: Add edit button? -->
       </tr>
       {{ end }}
     </tbody>
