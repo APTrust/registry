@@ -26,14 +26,14 @@ WORKDIR /app
 COPY --from=builder /app/main /app/main
 COPY --from=builder /app/static /app/static
 COPY --from=builder /app/views /app/views
-COPY --from=builder /app/.env.dev /app/.env.dev
+COPY --from=builder /app/.env.docker /app/.env.docker
 
 #Environment VARS for deployment
-ENV APT_ENV=dev 
+ENV APT_ENV=docker
 
 ENV DB_DRIVER="postgres"
 ENV DB_HOST="localhost"
-ENV DB_NAME="apt_registry_development"
+ENV DB_NAME="apt_registry_staging"
 ENV DB_USER="dev_user"
 ENV DB_PASSWORD="password"
 ENV DB_PORT=5432
