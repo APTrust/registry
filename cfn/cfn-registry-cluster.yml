@@ -45,7 +45,7 @@ Resources:
         ExecuteCommandConfiguration: 
           Logging: OVERRIDE
           LogConfiguration:
-            CloudWatchLogGroupName: /ecs/registry 
+            CloudWatchLogGroupName: !Sub '/ecs/${DNS}/registry 
       Tags:
       - Key: Name
         Value: !Sub 'ecs-registry-${DNS}'
@@ -176,6 +176,8 @@ Resources:
           ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/DB_ROOT_USER
         - Name: DB_USER
           ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/DB_USER
+        - Name: DB_NAME
+          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/DB_NAME
         - Name: DB_USE_SSL
           ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/DB_USE_SSL
         - Name: EMAIL_ENABLED
