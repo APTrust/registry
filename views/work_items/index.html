@@ -18,11 +18,11 @@
       <tr><!-- TODO make table columns sortable -->
         <th class="pl-5">Action</th>
         <th>Object</th>
-        <th>Institution*</th><!-- TODO This was not in the designs, should it stay? -->
-        <th>Size*</th><!-- TODO This was in the designs, should it be added? -->
+        <th>Institution</th>
+        <th>Size*</th>
         <th>Stage</th>
         <th>Status</th>
-        <th>Updated*</th><!-- TODO This was in the designs, should it be added? -->
+        <th>Updated*</th>
       </tr>
     </thead>
     <tbody>
@@ -37,11 +37,11 @@
           </div>
         </td>
         <td>{{ $item.Name }}</td>
-        <td class="is-grey-dark">{{ $item.InstitutionName }}*</td><!-- TODO See above -->
-        <td class="is-grey-dark num text-sm">2.5GB*</td><!-- TODO See above -->
+        <td class="is-grey-dark">{{ $item.InstitutionName }}*</td>
+        <td class="is-grey-dark num text-sm">2.5GB*</td>
         <td class="is-grey-dark">{{ $item.Stage }}</td>
         <td><span class="badge">{{ $item.Status }}</span></td><!-- TODO Make status change classes -->
-        <td class="is-grey-dark text-sm is-uppercase">January 1, 2022*</td><!-- TODO See above -->
+        <td class="is-grey-dark text-sm is-uppercase">January 1, 2022*</td>
       </tr>
       {{ end }}
     </tbody>
