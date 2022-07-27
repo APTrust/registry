@@ -17,16 +17,16 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o /main 
+RUN go build -o ./main 
 
 FROM golang:1.17.8-alpine
 
 WORKDIR /app
 
-COPY --from=builder /main /main
-COPY --from=builder /app/static /static
-COPY --from=builder /app/views /views
-COPY --from=builder /app/.env.dev .
+COPY --from=builder /app/main /app/main
+COPY --from=builder /app/static /app/static
+COPY --from=builder /app/views /app/views
+COPY --from=builder /app/.env.dev /app/.env.dev
 
 #Environment VARS for deployment
 ENV APT_ENV=dev 
@@ -78,4 +78,4 @@ ENV LOG_SQL=false
 
 EXPOSE 8080
 
-CMD [ "/main" ]
+CMD ["./main" ]

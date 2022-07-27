@@ -57,7 +57,7 @@ Resources:
   
   LogGroup:
     Properties:
-      LogGroupName: /ecs/registry
+      LogGroupName: !Sub '/ecs/${DNS}/registry'
     Type: AWS::Logs::LogGroup
 
   RegistryService: 
@@ -137,7 +137,7 @@ Resources:
             awslogs-stream-prefix: sidecar
         Name: Nsqadmin_ResolvConf_InitContainer
       - Command:
-        - /main
+        - ./main
         DependsOn:
         - Condition: SUCCESS
           ContainerName: Nsqadmin_ResolvConf_InitContainer
