@@ -1,7 +1,7 @@
 {{ define "shared/_pager.html" }}
 
 <div class="pager">
-  <p>Rows per page: 20</p><!-- TODO Make this dynamic? -->
+  <p>Rows per page: {{ .pager.PerPage }}</p>
   <p>{{ .pager.ItemFirst }} - {{ .pager.ItemLast }} of {{ .pager.TotalItems }}</p>
 
   <!--
