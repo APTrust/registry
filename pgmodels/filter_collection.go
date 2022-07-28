@@ -30,13 +30,13 @@ func NewFilterCollection() *FilterCollection {
 // Key: name__in
 // Values: ["Bart", "Lisa", "Maggie"]
 //
-func (fc *FilterCollection) Add(key string, values []string) error {
+func (fc *FilterCollection) Add(key string, values []string) (*ParamFilter, error) {
 	filter, err := NewParamFilter(key, values)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	fc.filters = append(fc.filters, filter)
-	return nil
+	return filter, nil
 }
 
 // AddOrderBy adds sort columns to the filters. Param colAndDir should
@@ -132,6 +132,19 @@ func NewParamFilter(key string, values []string) (*ParamFilter, error) {
 		SQLOp:  sqlOp,
 		Values: values,
 	}, nil
+}
+
+// ChipLabelAndValue returns a label and value to display on filter chips
+// in the web UI.
+func (p *ParamFilter) ChipLabelAndValue() (string, string) {
+	label := strings.Title(p.Column)
+	value := ""
+	if p.SQLOp == "IS NULL" || p.SQLOp == "IS NOT NULL" {
+		value = p.SQLOp
+	} else {
+		value = fmt.Sprintf("%s %s", p.SQLOp, strings.Join(p.Values, ", "))
+	}
+	return label, value
 }
 
 // NewSortParam creates a new sort parameter to add to a query.
