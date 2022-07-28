@@ -23,3 +23,6 @@
 
 # Node dependencies
 node_modules/
+
+# Temp data used for seeing empty staging db
+db/seed
