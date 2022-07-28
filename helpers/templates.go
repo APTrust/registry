@@ -126,6 +126,12 @@ func IconFor(str string) template.HTML {
 	return template.HTML(icon)
 }
 
+// BadgeClass returns the css class for the specified string, where
+// string is a work item status or other value defined in Constants.
+func BadgeClass(str string) template.HTML {
+	return template.HTML(BadgeClassMap[str])
+}
+
 // TruncateStart trims str to maxLen by removing them from the
 // middle of the string. It adds dots to the middle of the string
 // to indicate text was trimmed.

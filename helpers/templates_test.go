@@ -186,3 +186,9 @@ func TestToJSON(t *testing.T) {
 func TestUnixToISO(t *testing.T) {
 	assert.Equal(t, "2022-05-09T14:33:24-04:00", helpers.UnixToISO(1652121204))
 }
+
+func TestBadgeClass(t *testing.T) {
+	assert.Equal(t, template.HTML("is-cancelled"), helpers.BadgeClass(constants.StatusCancelled))
+	assert.Equal(t, template.HTML("is-pending"), helpers.BadgeClass(constants.StatusPending))
+	assert.Equal(t, template.HTML(""), helpers.BadgeClass("no such class"))
+}

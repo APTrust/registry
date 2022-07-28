@@ -61,6 +61,7 @@ func InitAppEngine(discardStdOut bool) *gin.Engine {
 // parser will error out.
 func initTemplates(router *gin.Engine) {
 	router.SetFuncMap(template.FuncMap{
+		"badgeClass":     helpers.BadgeClass,
 		"dateISO":        helpers.DateISO,
 		"dateTimeISO":    helpers.DateTimeISO,
 		"dateUS":         helpers.DateUS,

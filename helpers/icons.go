@@ -24,3 +24,14 @@ var IconMap = map[string]string{
 	constants.EventIngestion:            `file_upload`,
 	constants.EventReplication:          `library_books`,
 }
+
+// BadgeClassMap maps work item status and other constant values
+// to css badge classes.
+var BadgeClassMap = map[string]string{
+	constants.StatusCancelled: "is-cancelled",
+	constants.StatusFailed:    "is-failed",
+	constants.StatusPending:   "is-pending",
+	constants.StatusStarted:   "is-started",
+	constants.StatusSuccess:   "is-success",
+	constants.StatusSuspended: "is-suspended",
+}
