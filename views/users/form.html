@@ -8,7 +8,7 @@
   <form action="{{ .form.Action }}" id="userForm" method="post">
 
     {{ if .FormError }}
-    <div class="row form-error">
+    <div class="notification is-danger is-light">
       {{ .FormError }}
     </div>
     {{ end }}
