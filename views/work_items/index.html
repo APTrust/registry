@@ -18,30 +18,37 @@
       <tr><!-- TODO make table columns sortable -->
         <th class="pl-5">Action</th>
         <th>Object</th>
+        {{ if .CurrentUser.IsAdmin }}
         <th>Institution</th>
-        <th>Size*</th>
+        {{ end }}
+        <th>Size</th>
         <th>Stage</th>
         <th>Status</th>
-        <th>Updated*</th>
+        <th>Updated</th>
       </tr>
     </thead>
     <tbody>
+      {{ $cu := .CurrentUser }}
       {{ range $index, $item := .items }}
       <tr class="clickable" onclick="window.location.href='/work_items/show/{{ $item.ID }}'">
         <td class="pl-5">
           <div class="is-flex is-align-items-center">
             <span class="action-icon mr-3"><!-- TODO Make this update with correct icon-->
-              <span class="material-icons md-16" aria-hidden="true"><span>check</span></span>
+              <span class="material-icons md-16" aria-hidden="true"><span>{{ iconFor $item.Action }}</span></span>
             </span>
             <span class="is-grey-dark">{{ $item.Action }}</span>
           </div>
         </td>
         <td>{{ $item.Name }}</td>
-        <td class="is-grey-dark">{{ $item.InstitutionName }}*</td>
+
+        {{ if $cu.IsAdmin }}
+        <td class="is-grey-dark">{{ $item.InstitutionName }}</td>
+        {{ end }}
+
         <td class="is-grey-dark num text-sm">2.5GB*</td>
         <td class="is-grey-dark">{{ $item.Stage }}</td>
         <td><span class="badge {{ badgeClass $item.Status }}">{{ $item.Status }}</span></td><!-- TODO Make status change classes -->
-        <td class="is-grey-dark text-sm is-uppercase">January 1, 2022*</td>
+        <td class="is-grey-dark text-sm is-uppercase">{{ dateUS $item.DateProcessed }}</td>
       </tr>
       {{ end }}
     </tbody>
