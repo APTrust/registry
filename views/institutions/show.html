@@ -41,17 +41,21 @@
       <dd class="text-table">{{ .institution.ReceivingBucket }}</dd>
       <dt class="text-label text-xs is-grey-dark">Restore Bucket</dt>
       <dd class="text-table">{{ .institution.RestoreBucket }}</dd>
-      <!-- TODO: Only show fields when there is data -->
+
+      {{ if .subscribers }}
       <dt class="text-label text-xs is-grey-dark">Subscribers</dt>
-      {{ if .CurrentUser.IsAdmin }}
-          {{ range $index, $inst := .subscribers }}
-          <dd class="text-table"><a href="/institutions/show/{{ $inst.ID }}">{{ $inst.Name }}</a></dd>
-          {{ end }}
-        {{ else }}
-          {{ range $index, $inst := .subscribers }}
-            <dd class="text-table">{{ $inst.Name }}</dd>
-          {{ end }}
-        {{ end }}
+        {{ if .CurrentUser.IsAdmin }}
+            {{ range $index, $inst := .subscribers }}
+            <dd class="text-table"><a href="/institutions/show/{{ $inst.ID }}">{{ $inst.Name }}</a></dd>
+            {{ end }}
+          {{ else }}
+            {{ range $index, $inst := .subscribers }}
+              <dd class="text-table">{{ $inst.Name }}</dd>
+            {{ end }}
+          {{ end }}    <!-- end if .CurrentUser.IsAdmin -->
+        {{ end }}  <!-- end if .subscribers -->
+
+      {{ if .users }}
       <dt class="text-label text-xs is-grey-dark">Users</dt>
       {{ if userCan .CurrentUser "UserUpdate" .institution.ID }}
           {{ range $index, $user := .users }}
@@ -61,7 +65,8 @@
           {{ range $index, $user := .users }}
           <dd class="text-table">{{ $user.Name }} ({{ roleName $user.Role }})</dd>
           {{ end }}
-        {{ end }}
+        {{ end }}  <!-- end if userCan -->
+      {{ end }}    <!-- end if .users -->
     </dl>
   </div>
 </div>
