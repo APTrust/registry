@@ -1,9 +1,11 @@
 {{ define "forms/email.html" }}
 
-<label>{{ .Label }}
-  <input type="email" name="Email" value="{{ .Value }}" placeholder="{{ .Placeholder }}" {{ template "forms/attrs.html" . }}>
-</label>
-
-{{ if .DisplayError }}<div class="row form-error">{{ .ErrMsg }}</div>{{ end }}
+<div class="field">
+  <label class="label" for="{{ .Value }}">{{ .Label }}</label>
+  <div class="control">
+    <input class="input" type="email" name="Email" id="{{ .Value }}" value="{{ .Value }}" placeholder="{{ .Placeholder }}" {{ template "forms/attrs.html" . }}>
+  </div>
+  {{ if .DisplayError }}<p class="help is-danger">{{ .ErrMsg }}</p>{{ end }}
+</div>
 
 {{ end }}

@@ -2,94 +2,93 @@
 
 {{ template "shared/_header.html" .}}
 
-{{ if .user.DeactivatedAt.IsZero }}
-  {{ if userCan .CurrentUser "UserCreate" .user.InstitutionID }}
-  <div class="float-right"><a class="button" href="/users/edit/{{ .user.ID }}">Edit</a></div>
-  {{ end }}
-  {{ if userCan .CurrentUser "UserDelete" .user.InstitutionID }}
-  <button class="button" onclick="document.forms['userDeleteForm'].submit()">Deactivate</button>
-  <form method="post" id="userDeleteForm" action="/users/delete/{{ .user.ID }}">
-    <input type="hidden" name="id" value="{{ .user.ID }}"/>
-    {{ template "forms/csrf_token.html" . }}
-  </form>
+<!-- TODO: Make this an actual modal instead of a page -->
+<div class="modal-detail">
+  <div class="modal-title-row is-flex is-justify-content-space-between is-align-items-center">
+    <div>
+      <h2>{{ .user.Name }}</h2>
+      <h4>{{ roleName .user.Role }} at {{ .user.Institution.Name }}</h4>
+    </div>
+  </div>
 
-  {{ end }}
-  {{ if userCan .CurrentUser "UserUpdate" .user.InstitutionID }}
-  <div class="float-right"><a class="button" href="/users/change_password/{{ .user.ID }}">Change Password</a></div>
-  <div class="float-right"><a class="button" href="javascript:forcePasswordReset()">Force Password Reset</a></div>
-  {{ end }}
+  <div class="modal-content">
+    <div>
+      {{ if .user.DeactivatedAt.IsZero }}
+      <div class="is-flex is-justify-content-space-between mb-5">
+        {{ if userCan .CurrentUser "UserCreate" .user.InstitutionID }}
+        <a class="button" href="/users/edit/{{ .user.ID }}">Edit</a>
+        {{ end }}
+        {{ if userCan .CurrentUser "UserDelete" .user.InstitutionID }}
+        <button class="button" onclick="document.forms['userDeleteForm'].submit()">Deactivate</button>
+        <form method="post" class="is-hidden" id="userDeleteForm" action="/users/delete/{{ .user.ID }}">
+          <input type="hidden" name="id" value="{{ .user.ID }}"/>
+          {{ template "forms/csrf_token.html" . }}
+        </form>
+      </div>
+        {{ end }}
+        <div class="is-flex is-justify-content-space-between">
+        {{ if userCan .CurrentUser "UserUpdate" .user.InstitutionID }}
+        <a class="button" href="/users/change_password/{{ .user.ID }}">Change Password</a>
+        <a class="button" href="javascript:forcePasswordReset()">Force Password Reset</a>
+        {{ end }}
 
-{{ else }} <!-- User is deactivated. Just show reactivation button. -->
-  {{ if userCan .CurrentUser "UserUpdate" .user.InstitutionID }}
-  <button class="button" onclick="document.forms['userReactivateForm'].submit()">Reactivate</button>
-  <form method="post" id="userReactivateForm" action="/users/undelete/{{ .user.ID }}">
-    <input type="hidden" name="id" value="{{ .user.ID }}"/>
-    {{ template "forms/csrf_token.html" . }}
-  </form>
+      {{ else }} <!-- User is deactivated. Just show reactivation button. -->
+        {{ if userCan .CurrentUser "UserUpdate" .user.InstitutionID }}
+        <button class="button" onclick="document.forms['userReactivateForm'].submit()">Reactivate</button>
+        <form method="post" class="is-hidden" id="userReactivateForm" action="/users/undelete/{{ .user.ID }}">
+          <input type="hidden" name="id" value="{{ .user.ID }}"/>
+          {{ template "forms/csrf_token.html" . }}
+        </form>
 
 
-  {{ end }}
-{{ end }}
-
-<h1>{{ .user.Name }}</h1>
-<h3>{{ roleName .user.Role }} at {{ .user.Institution.Name }}</h3>
-
-<table>
-  <tbody>
-    <tr>
-      <th>Email</th><td>{{ .user.Email }}</td>
-    </tr>
-    <tr>
-      <th>Verified</th><td>{{ yesNo .user.EmailVerified }}</td>
-    </tr>
-    <tr>
-      <th>Phone</th><td>{{ .user.PhoneNumber }}</td>
-    </tr>
-    <tr>
-      <th>Last Updated</th><td>{{ dateUS .user.UpdatedAt }}</td>
-    </tr>
-    <tr>
-      <th>Sign In Count</th><td>{{ .user.SignInCount }}</td>
-    </tr>
-    <tr>
-      <th>Current Sign In</th><td>{{ dateUS .user.CurrentSignInAt }} from {{ .user.CurrentSignInIP }}</td>
-    </tr>
-    <tr>
-      <th>Last Sign In</th><td>{{ dateUS .user.LastSignInAt }} from {{ .user.LastSignInIP }}</td>
-    </tr>
-    <tr>
-      <th>Initial Password Updated</th><td>{{ yesNo .user.InitialPasswordUpdated }}</td>
-    </tr>
-    <tr>
-      <th>Force Password Update?</th><td>{{ yesNo .user.ForcePasswordUpdate }}</td>
-    </tr>
-    <tr>
-      <th>Deactivated</th><td>{{ dateUS .user.DeactivatedAt }}</td>
-    </tr>
-    <tr>
-      <th>2FA Required</th><td>{{ yesNo .user.OTPRequiredForLogin }}</td>
-    </tr>
-    <tr>
-      <th>2FA Enabled</th><td>{{ yesNo .user.EnabledTwoFactor }}</td>
-    </tr>
-    <tr>
-      <th>2FA Confirmed</th><td>{{ yesNo .user.ConfirmedTwoFactor }}</td>
-    </tr>
-    <tr>
-      <th>2FA Required By</th><td>{{ dateUS .user.GracePeriod }}</td>
-    </tr>
-    <tr>
-      <th>Authy Status</th><td>{{ .user.AuthyStatus }}</td>
-    </tr>
-    <tr>
-      <th>Authy ID</th><td>{{ .user.AuthyID }}</td>
-    </tr>
-    <tr>
-      <th>Last Authy SignIn</th><td>{{ dateUS .user.LastSignInWithAuthy }}</td>
-    </tr>
-    <tr>
-  </tbody>
-</table>
+        {{ end }}
+      </div>
+      {{ end }}
+    </div>
+    <div class="modal-list-row is-flex is-justify-content-space-between">
+      <dl class="modal-list modal-list-left">
+        <!-- TODO: Is there a way to hide empty fields? -->
+        <dt class="text-label text-xs is-grey-dark">Email</dt>
+        <dd class="text-table">{{ .user.Email }}</dd>
+        <dt class="text-label text-xs is-grey-dark">Verified</dt>
+        <dd class="text-table">{{ yesNo .user.EmailVerified }}</dd>
+        <dt class="text-label text-xs is-grey-dark">Phone</dt>
+        <dd class="text-table">{{ .user.PhoneNumber }}</dd>
+        <dt class="text-label text-xs is-grey-dark">Sign In Count</dt>
+        <dd class="text-table">{{ .user.SignInCount }}</dd>
+        <dt class="text-label text-xs is-grey-dark">Current Sign In</dt>
+        <dd class="text-table">{{ dateUS .user.CurrentSignInAt }} from {{ .user.CurrentSignInIP }}</dd>
+        <dt class="text-label text-xs is-grey-dark">Last Sign In</dt>
+        <dd class="text-table">{{ dateUS .user.LastSignInAt }} from {{ .user.LastSignInIP }}</dd>
+        <dt class="text-label text-xs is-grey-dark">Initial Password Updated</dt>
+        <dd class="text-table">{{ yesNo .user.InitialPasswordUpdated }}</dd>
+        <dt class="text-label text-xs is-grey-dark">Force Password Update?</dt>
+        <dd class="text-table">{{ yesNo .user.ForcePasswordUpdate }}</dd>
+        <dt class="text-label text-xs is-grey-dark">2FA Required</dt>
+        <dd class="text-table">{{ yesNo .user.OTPRequiredForLogin }}</dd>
+        <dt class="text-label text-xs is-grey-dark">2FA Enabled</dt>
+        <dd class="text-table">{{ yesNo .user.EnabledTwoFactor }}</dd>
+        <dt class="text-label text-xs is-grey-dark">2FA Confirmed</dt>
+        <dd class="text-table">{{ yesNo .user.ConfirmedTwoFactor }}</dd>
+        <dt class="text-label text-xs is-grey-dark">2FA Required By</dt>
+        <dd class="text-table">{{ dateUS .user.GracePeriod }}</dd>
+        <dt class="text-label text-xs is-grey-dark">Authy Status</dt>
+        <dd class="text-table">{{ .user.AuthyStatus }}</dd>
+        <dt class="text-label text-xs is-grey-dark">Authy ID</dt>
+        <dd class="text-table">{{ .user.AuthyID }}</dd>
+        <dt class="text-label text-xs is-grey-dark">Last Authy SignIn</dt>
+        <dd class="text-table">{{ dateUS .user.LastSignInWithAuthy }}</dd>
+      </dl>
+    
+      <dl class="modal-list modal-list-right">
+        <dt class="text-label text-xs is-grey-dark">Last Updated</dt>
+        <dd class="text-table">{{ dateUS .user.UpdatedAt }}</dd>
+        <dt class="text-label text-xs is-grey-dark">Deactivated</dt>
+        <dd class="text-table">{{ dateUS .user.DeactivatedAt }}</dd>
+      </dl>
+    </div>
+  </div>
+</div>
 
 <script>
  function forcePasswordReset() {
