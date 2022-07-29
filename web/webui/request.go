@@ -1,6 +1,7 @@
 package webui
 
 import (
+	"encoding/json"
 	"fmt"
 	"reflect"
 	"strings"
@@ -41,6 +42,7 @@ func NewRequest(c *gin.Context) *Request {
 		TemplateData: gin.H{
 			"CurrentUser":           currentUser,
 			"filterChips":           make([]*pgmodels.ParamFilter, 0),
+			"filterChipJson": "",
 			"flash":                 flash,
 			constants.CSRFTokenName: csrfToken,
 		},
@@ -68,6 +70,8 @@ func (req *Request) GetFilterCollection() *pgmodels.FilterCollection {
 		fc.AddOrderBy(value)
 	}
 	req.TemplateData["filterChips"] = chips
+	chipJson, _ := json.Marshal(chips)
+	req.TemplateData["filterChipJson"] = string(chipJson)
 	return fc
 }
 

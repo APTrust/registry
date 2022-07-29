@@ -105,19 +105,8 @@
       </div>
     </form>
 
-    <div class="filters-grid-clear">
-      <!-- TODO Example filter chips below, not wired up yet -->
-      <!-- The example below is working. You can apply this to other filter templates, or abstract to its own template. -->
+    {{ template "shared/_filter_chips.html" . }}
 
-      {{ range $index, $chip := .filterChips }}
-      <button class="badge filter-chip mb-3">
-        <strong class="mr-1">{{ $chip.ChipLabel }}:</strong> {{ $chip.ChipValue }}
-        <span class="icon material-icons md-16" aria-hidden="true">cancel</span>
-      </button>
-      {{ end }}
-
-      <button class="filter-clear button is-compact is-white">Clear Filters</button>
-    </div>
   </div>
 </div>
 

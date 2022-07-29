@@ -1,0 +1,44 @@
+{{ define "shared/_filter_chips.html" }}
+
+<div class="filters-grid-clear">
+    {{ range $index, $chip := .filterChips }}
+    <button class="badge filter-chip mb-3">
+      <strong class="mr-1">{{ $chip.ChipLabel }}:</strong> {{ $chip.ChipValue }}
+      <span class="icon material-icons md-16" aria-hidden="true" onclick="removeFilter({{ $index }})">cancel</span>
+    </button>
+    {{ end }}
+
+    <button class="filter-clear button is-compact is-white">Clear Filters</button>
+  </div>
+
+
+<script>
+let filterChips = {{ .filterChipJson }}
+function removeFilter(index) {
+    let chips = JSON.parse(filterChips)
+    let chip = chips[index]
+    console.log(chip.Key)
+    console.log(location.href)
+
+    let parts = location.href.split('?');
+    let url = parts[0]
+    let queryString = parts[1]
+    let params = new URLSearchParams(queryString);
+    let newParams = new URLSearchParams()
+    for (let pair of params.entries()) {
+        if (chip.Key == pair[0] && chip.Values[0] == pair[1]) {
+            // This is the filter the user wants to remove.
+            continue
+        }
+        if (pair[1] == '') {
+            // Remove the filter because it's empty
+            continue
+        }
+        // Filter is not empty and is not being removed, so keep it.
+        newParams.append(pair[0], pair[1])
+    }
+    let newUrl = url + '?' + newParams.toString()
+    window.location = newUrl
+}
+</script>
+{{ end }}
