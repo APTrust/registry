@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/APTrust/registry/common"
+	"github.com/APTrust/registry/constants"
 )
 
 // FilterCollection converts query string params such as name__eq=Homer to
@@ -30,13 +31,13 @@ func NewFilterCollection() *FilterCollection {
 // Key: name__in
 // Values: ["Bart", "Lisa", "Maggie"]
 //
-func (fc *FilterCollection) Add(key string, values []string) error {
+func (fc *FilterCollection) Add(key string, values []string) (*ParamFilter, error) {
 	filter, err := NewParamFilter(key, values)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	fc.filters = append(fc.filters, filter)
-	return nil
+	return filter, nil
 }
 
 // AddOrderBy adds sort columns to the filters. Param colAndDir should
@@ -132,6 +133,24 @@ func NewParamFilter(key string, values []string) (*ParamFilter, error) {
 		SQLOp:  sqlOp,
 		Values: values,
 	}, nil
+}
+
+// ChipLabel returns a label to display on filter chips in the web UI.
+func (p *ParamFilter) ChipLabel() string {
+	return strings.Title(p.Column)
+}
+
+// ChipValue returns a value to display on filter chips in the web UI.
+func (p *ParamFilter) ChipValue() string {
+	if p.SQLOp == "IS NULL" || p.SQLOp == "IS NOT NULL" {
+		return p.SQLOp
+	} else if len(p.Values) > 0 && p.Values[0] == constants.DefaultProfileIdentifier {
+		return "APTrust"
+	} else if len(p.Values) > 0 && p.Values[0] == constants.BTRProfileIdentifier {
+		return "BTR"
+	} else {
+		return fmt.Sprintf("%s %s", p.SQLOp, strings.Join(p.Values, ", "))
+	}
 }
 
 // NewSortParam creates a new sort parameter to add to a query.

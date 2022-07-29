@@ -55,13 +55,13 @@
           {{ if .item.IntellectualObjectID }}
           <a href="/objects/show/{{ .item.IntellectualObjectID }}">{{ .item.ObjectIdentifier }}</a>
           {{ else }}
-          {{ .item.ObjectIdentifier }}
+          {{ defaultString .item.ObjectIdentifier "Not yet assigned" }}
           {{ end }}
         </dd>
         <dt class="text-label text-xs is-grey-dark">Bucket</dt>
         <dd class="text-table">{{ .item.Bucket }}</dd>
         <dt class="text-label text-xs is-grey-dark">Generic File</dt>
-        <dd class="text-table">{{ .item.GenericFileIdentifier }}</dd>
+        <dd class="text-table">{{ defaultString .item.GenericFileIdentifier "N/A" }}</dd>
         <dt class="text-label text-xs is-grey-dark">User</dt>
         <dd class="text-table">{{ .item.User }}</dd>
         <dt class="text-label text-xs is-grey-dark">Node</dt>
@@ -69,11 +69,11 @@
         <dt class="text-label text-xs is-grey-dark">PID</dt>
         <dd class="text-table">{{ .item.PID }}</dd>
         <dt class="text-label text-xs is-grey-dark">APTrust Approver</dt>
-        <dd class="text-table">{{ .item.APTrustApprover }}</dd>
+        <dd class="text-table">{{ defaultString .item.APTrustApprover "None" }}</dd>
         <dt class="text-label text-xs is-grey-dark">Intitutional Approver</dt>
-        <dd class="text-table">{{ .item.User }}</dd>
+        <dd class="text-table">{{ defaultString .item.User "None" }}</dd>
       </dl>
-    
+
       <dl class="modal-list modal-list-right">
         <dt class="text-label text-xs is-grey-dark">Bag Date</dt>
         <dd class="text-table">{{ dateTimeISO .item.BagDate }}</dd>
@@ -89,14 +89,14 @@
         <dd class="text-table">{{ dateTimeISO .item.UpdatedAt }}</dd>
       </dl>
     </div>
-  
+
     <dl class="modal-list modal-list-row">
       <dt class="text-label text-xs is-grey-dark">Note</dt>
       <dd class="text-table">{{ .item.Note }}</dd>
       <dt class="text-label text-xs is-grey-dark">Outcome</dt>
       <dd class="text-table">{{ .item.Outcome }}</dd>
     </dl>
-  
+
     <dl class="modal-list modal-list-row is-flex">
       <div>
         <dt class="text-label text-xs is-grey-dark">Retry</dt>
@@ -107,7 +107,7 @@
        <dd class="text-table is-capitalized">{{ .item.NeedsAdminReview }}</dd>
       </div>
     </dl>
-  
+
     {{ if .redisInfo }}
     <!-- Show raw json data. For sys admin only. -->
     <p><b>Redis Data</b></p>
@@ -115,8 +115,8 @@
     {{ .redisInfo }}
     </textarea>
     {{ end }}
-  
-  
+
+
     {{ if .showRedisDelete }}
     <form id="redisDelete" method="post" action="/work_items/redis_delete/{{ .item.ID }}" onsubmit='return confirm("Delete Redis record? If in doubt, cancel!")'>
       {{ template "forms/csrf_token.html" . }}

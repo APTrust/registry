@@ -15,12 +15,30 @@ var IconMap = map[string]string{
 	// Premis Event Icons.
 	// Note that we use only 7 or so event types,
 	// so we don't define an icon for every type.
-	constants.EventAccessAssignment:     `admin_panel_settings`,
-	constants.EventCreate:               `add_circle_outline`,
-	constants.EventDeletion:             `delete_forever`,
-	constants.EventDigestCalculation:    `description`,
-	constants.EventFixityCheck:          `fingerprint`,
-	constants.EventIdentifierAssignment: `search`,
-	constants.EventIngestion:            `file_upload`,
-	constants.EventReplication:          `library_books`,
+	constants.EventAccessAssignment:     "admin_panel_settings",
+	constants.EventCreate:               "add_circle_outline",
+	constants.EventDeletion:             "delete_forever",
+	constants.EventDigestCalculation:    "description",
+	constants.EventFixityCheck:          "fingerprint",
+	constants.EventIdentifierAssignment: "search",
+	constants.EventIngestion:            "file_upload",
+	constants.EventReplication:          "library_books",
+
+	// WorkItem actions
+	constants.ActionDelete:         "delete_forever",
+	constants.ActionIngest:         "file_upload",
+	constants.ActionRestoreFile:    "file_download",
+	constants.ActionRestoreObject:  "file_download",
+	constants.ActionGlacierRestore: "file_download",
+}
+
+// BadgeClassMap maps work item status and other constant values
+// to css badge classes.
+var BadgeClassMap = map[string]string{
+	constants.StatusCancelled: "is-cancelled",
+	constants.StatusFailed:    "is-failed",
+	constants.StatusPending:   "is-pending",
+	constants.StatusStarted:   "is-started",
+	constants.StatusSuccess:   "is-success",
+	constants.StatusSuspended: "is-suspended",
 }

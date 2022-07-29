@@ -1,6 +1,7 @@
 package webui
 
 import (
+	"encoding/json"
 	"fmt"
 	"reflect"
 	"strings"
@@ -40,6 +41,8 @@ func NewRequest(c *gin.Context) *Request {
 		Auth:         auth.(*middleware.ResourceAuthorization),
 		TemplateData: gin.H{
 			"CurrentUser":           currentUser,
+			"filterChips":           make([]*pgmodels.ParamFilter, 0),
+			"filterChipJson": "",
 			"flash":                 flash,
 			constants.CSRFTokenName: csrfToken,
 		},
@@ -53,14 +56,22 @@ func NewRequest(c *gin.Context) *Request {
 // query string. Call the ToQuery() method of the returned
 // FilterCollection to translate query string params to SQL.
 func (req *Request) GetFilterCollection() *pgmodels.FilterCollection {
+	chips := make([]*pgmodels.ParamFilter, 0)
 	allowedFilters := pgmodels.FiltersFor(req.Auth.ResourceType)
 	fc := pgmodels.NewFilterCollection()
 	for _, key := range allowedFilters {
-		fc.Add(key, req.GinContext.QueryArray(key))
+		queryValues := req.GinContext.QueryArray(key)
+		filter, _ := fc.Add(key, queryValues)
+		if !common.ListIsEmpty(queryValues) {
+			chips = append(chips, filter)
+		}
 	}
 	for _, value := range req.GinContext.QueryArray("sort") {
 		fc.AddOrderBy(value)
 	}
+	req.TemplateData["filterChips"] = chips
+	chipJson, _ := json.Marshal(chips)
+	req.TemplateData["filterChipJson"] = string(chipJson)
 	return fc
 }
 

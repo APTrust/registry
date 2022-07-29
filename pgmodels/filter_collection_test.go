@@ -186,8 +186,9 @@ func TestInterfaceValues(t *testing.T) {
 func TestFilterCollection(t *testing.T) {
 	fc := pgmodels.NewFilterCollection()
 	for _, obj := range valid {
-		err := fc.Add(obj.Key, obj.Values)
+		filter, err := fc.Add(obj.Key, obj.Values)
 		require.Nil(t, err)
+		require.NotNil(t, filter)
 	}
 	query, err := fc.ToQuery()
 	require.Nil(t, err)
@@ -199,8 +200,9 @@ func TestFilterCollection(t *testing.T) {
 
 func TestFCOrderBy(t *testing.T) {
 	fc := pgmodels.NewFilterCollection()
-	err := fc.Add("name", []string{"Homer"})
+	filter, err := fc.Add("name", []string{"Homer"})
 	require.Nil(t, err)
+	require.NotNil(t, filter)
 
 	assert.False(t, fc.HasExplicitSorting())
 
@@ -216,4 +218,47 @@ func TestFCOrderBy(t *testing.T) {
 	assert.Equal(t, `(name = ?)`, query.WhereClause())
 	assert.Equal(t, []interface{}{"Homer"}, query.Params())
 	assert.Equal(t, []string{"name asc", "email asc", "created_at desc"}, query.GetOrderBy())
+}
+
+func TestFilterString(t *testing.T) {
+	fc := pgmodels.NewFilterCollection()
+	filter, err := fc.Add("name", []string{"Homer"})
+	require.Nil(t, err)
+	require.NotNil(t, filter)
+	label := filter.ChipLabel()
+	value := filter.ChipValue()
+	assert.Equal(t, "Name", label)
+	assert.Equal(t, "= Homer", value)
+
+	filter, err = fc.Add("age__gteq", []string{"33"})
+	require.Nil(t, err)
+	require.NotNil(t, filter)
+	label = filter.ChipLabel()
+	value = filter.ChipValue()
+	assert.Equal(t, "Age", label)
+	assert.Equal(t, ">= 33", value)
+
+	filter, err = fc.Add("age__in", []string{"33", "44", "55"})
+	require.Nil(t, err)
+	require.NotNil(t, filter)
+	label = filter.ChipLabel()
+	value = filter.ChipValue()
+	assert.Equal(t, "Age", label)
+	assert.Equal(t, "IN 33, 44, 55", value)
+
+	filter, err = fc.Add("age__is_null", []string{"true"})
+	require.Nil(t, err)
+	require.NotNil(t, filter)
+	label = filter.ChipLabel()
+	value = filter.ChipValue()
+	assert.Equal(t, "Age", label)
+	assert.Equal(t, "IS NULL", value)
+
+	filter, err = fc.Add("age__not_null", []string{"true"})
+	require.Nil(t, err)
+	require.NotNil(t, filter)
+	label = filter.ChipLabel()
+	value = filter.ChipValue()
+	assert.Equal(t, "Age", label)
+	assert.Equal(t, "IS NOT NULL", value)
 }

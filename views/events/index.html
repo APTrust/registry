@@ -29,13 +29,13 @@
         <td class="pl-5">
           <div class="is-flex is-align-items-center">
             <span class="action-icon mr-3"><!-- TODO Make this update with correct icon-->
-              <span class="material-icons md-16" aria-hidden="true"><span>check</span></span>
+              <span class="material-icons md-16" aria-hidden="true"><span>{{ iconFor $event.EventType }}</span></span>
             </span>
             <span class="is-grey-dark">{{ $event.EventType }}</span>
           </div>
         </td>
         <td class="is-grey-dark text-sm is-uppercase">{{ dateUS $event.DateTime }}</td>
-        <td><span class="badge">{{ $event.Outcome }}</span></td><!-- TODO Make status change classes -->
+        <td><span class="badge {{ badgeClass $event.Outcome }}">{{ $event.Outcome }}</span></td><!-- TODO Make status change classes -->
         <td class="is-grey-dark">{{ truncate $event.IntellectualObjectIdentifier 80 }}</td>
         <td class="is-grey-dark">{{ truncate $event.GenericFileIdentifier 80 }}</td>
       </tr>

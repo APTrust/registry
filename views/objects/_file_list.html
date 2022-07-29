@@ -64,7 +64,7 @@
           </div>
           {{ end }}
 
-          <!-- TODO only show this table if checksums exist, find an example of this with data -->
+          <!-- TODO - Note that checksums will always be present for real data. Try http://localhost:8080/objects/show/8 for an example of fixture data that does include checksums -->
           <h3>Checksums</h3>
           <table class="mb-5">
             <thead>
@@ -79,7 +79,7 @@
               <tr>
                 <td>{{ dateUS $c.DateTime }}</td>
                 <td>{{ $c.Algorithm }}</td>
-                <td>{{ $c.Digest }}</td>
+                <td style="word-break: break-all;">{{ $c.Digest }}</td>
               </tr>
               {{ end }}
             </tbody>
