@@ -2,6 +2,6 @@
 
 <input class="is-hidden" type="hidden" name="{{ .Name }}" value="{{ .Value }}" {{ template "forms/attrs.html" . }}>
 
-{{ if .DisplayError }}<div class="row form-error">{{ .ErrMsg }}</div>{{ end }}
+{{ if .DisplayError }}<div class="notification is-danger is-light">{{ .ErrMsg }}</div>{{ end }}
 
 {{ end }}
