@@ -5,7 +5,6 @@
 <!-- TODO: Make this an actual modal instead of a page -->
 <div class="modal-detail">
   <div class="modal-title-row is-flex is-justify-content-space-between is-align-items-center">
-    <!-- TODO can this be the filename? -->
     <h2>Generic File</h2>
   </div>
 
@@ -33,7 +32,6 @@
   <div class="modal-content">
     <div class="modal-list-row is-flex is-justify-content-space-between">
       <dl class="modal-list modal-list-left">
-        <!-- TODO: Is there a way to hide empty fields? -->
         <dt class="text-label text-xs is-grey-dark">Storage Option</dt>
         <dd class="text-table">{{ .file.StorageOption }}</dd>
         <dt class="text-label text-xs is-grey-dark">Last Fixity Check</dt>
@@ -48,7 +46,6 @@
             <a href="{{ $storageRecord.URL }}">{{ $storageRecord.URL }}</a><br/>
           {{ end }}
         </dd>
-        <!-- TODO: Possible to hide items that aren't in use? -->
         <dt class="text-label text-xs is-grey-dark">Checksums</dt>
         <dd class="text-table">
           {{ range $index, $cs := .file.Checksums }}
