@@ -8,26 +8,33 @@
      preferred two-factor auth method, see init_2fa_setup.html
 -->
 
-<h1>Multi-Factor Authentication Required</h1>
+<!-- TODO: Make this an actual modal instead of a page -->
+<div class="modal-detail">
+  <div class="modal-title-row is-flex is-justify-content-space-between is-align-items-center">
+    <h2>Multi-Factor Authentication Required</h2>
+  </div>
 
-<p>How would you like to complete your login?</p>
+  <div class="modal-content">
+    <p>How would you like to complete your login?</p>
 
-<div class="two-factor-option clickable" onclick="submitSecondFactor('authy')">
-  Authy <br/>
-  <span id="two-factor-method-authy" class="two-factor-message" style="display:none"> <i class="fas fa-spinner"></i> Sent push notification.</span>
+    <div class="two-factor-option clickable" onclick="submitSecondFactor('authy')">
+        Authy <br/>
+        <span id="two-factor-method-authy" class="two-factor-message" style="display:none"> Sent push notification.</span>
+      </div>
+      <div class="two-factor-option clickable" onclick="submitSecondFactor('sms')">
+        Text Message <br/>
+        <span id="two-factor-method-sms" class="two-factor-message" style="display:none;"> Sent code via SMS.</span>
+      </div>
+      <div class="two-factor-option clickable" onclick="submitSecondFactor('backup')">
+        Backup Code
+      </div>
+      
+      <form name="twoFactorChoiceForm" method="post" action="">
+        <input class="is-hidden" type="hidden" name="two_factor_method" value="" />
+        <!-- CSRF token is in script below -->
+      </form>
+  </div>
 </div>
-<div class="two-factor-option clickable" onclick="submitSecondFactor('sms')">
-  Text Message <br/>
-  <span id="two-factor-method-sms" class="two-factor-message" style="display:none;"> <i class="fas fa-spinner"></i> Sent code via SMS.</span>
-</div>
-<div class="two-factor-option clickable" onclick="submitSecondFactor('backup')">
-  Backup Code
-</div>
-
-<form name="twoFactorChoiceForm" method="post" action="">
-  <input type="hidden" name="two_factor_method" value="" />
-  <!-- CSRF token is in script below -->
-</form>
 
 <script>
  // Set everything explicitly on each click. If user uses

@@ -2,11 +2,16 @@
 
 {{ template "shared/_header.html" .}}
 
-<h1>Authy Registration Complete</h1>
+<!-- TODO: Make this an actual modal instead of a page -->
+<div class="modal-detail">
+  <div class="modal-title-row is-flex is-justify-content-space-between is-align-items-center">
+    <h2>Authy Registration Complete</h2>
+  </div>
 
-<p>Your Authy registration is complete. You can now use Authy OneTouch to log in.</p>
+  <p>Your Authy registration is complete. You can now use Authy OneTouch to log in.</p>
 
-<div class="float-right"><a class="button" href="/dashboard">Go to Dashboard</a></div>
+  <a class="button" href="/dashboard">Go to Dashboard</a>
+</div>
 
 {{ template "shared/_footer.html" .}}
 

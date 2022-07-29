@@ -3,12 +3,14 @@
 {{ $field := . }}
 {{ $value := .Value }}
 
-{{ range $index, $option := .Options }}
-<label>
-  <input type="radio" name="{{ $field.Name }}" value="{{ $option.Value }}" {{ if strEq $option.Value $value }}checked{{ end }}  {{ template "forms/attrs.html" $field }}>{{ .Text }}
-</label>
-{{ end }}
-
-{{ if .DisplayError }}<div class="row form-error">{{ .ErrMsg }}</div>{{ end }}
+<div class="control">
+  {{ range $index, $option := .Options }}
+  <label class="radio">
+    <input type="radio" name="{{ $field.Name }}" value="{{ $option.Value }}" {{ if strEq $option.Value $value }}checked{{ end }}  {{ template "forms/attrs.html" $field }}>
+    {{ .Text }}
+  </label>
+  {{ end }}
+  {{ if .DisplayError }}<p class="help is-danger">{{ .ErrMsg }}</p>{{ end }}
+</div>
 
 {{ end }}

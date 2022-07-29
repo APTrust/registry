@@ -2,37 +2,49 @@
 
 {{ template "shared/_header.html" .}}
 
-<h1>Enter {{if (eq .twoFactorMethod "sms") }} SMS Code {{ else }} Backup Code {{ end }}</h1>
+<!-- TODO: Make this an actual modal instead of a page -->
+<div class="modal-detail">
+  <div class="modal-title-row is-flex is-justify-content-space-between is-align-items-center">
+    <h2>Enter {{if (eq .twoFactorMethod "sms") }} SMS Code {{ else }} Backup Code {{ end }}</h2>
+  </div>
 
-<form name="twoFactorTokenForm" method="post" action="/users/2fa_verify/">
-  <input type="text" name="otp"/>
-  <input type="hidden" name="two_factor_method" value="{{ .twoFactorMethod }}" />
-  {{ template "forms/csrf_token.html" . }}
-  <input type="submit" value="Submit">
-</form>
+  <div class="modal-content">
+    <form name="twoFactorTokenForm" method="post" action="/users/2fa_verify/">
+      <div class="field">
+        <div class="control">
+          <input class="input" type="text" id="otp" name="otp">
+        </div>
+      </div>
+      <input type="text" name="otp"/>
+      <input class="is-hidden" type="hidden" name="two_factor_method" value="{{ .twoFactorMethod }}" />
+      {{ template "forms/csrf_token.html" . }}
+      <input class="button" type="submit" value="Submit">
+    </form>
 
-<p>Not working? <a href="/users/2fa_choose">Try another method.</a>
+    <p>Not working? <a href="/users/2fa_choose">Try another method.</a></p>
 
-{{ if (eq .twoFactorMethod "sms") }}
-
-<form name="twoFactorResendForm" method="post" action="/users/2fa_sms/">
-  <input type="hidden" name="two_factor_method" value="sms" />
-  {{ template "forms/csrf_token.html" . }}
-  <p>
-    Didn't get your password?
-    <a href="javascript:resendSMSPassword()">Send a new one.</a>
-  </p>
-</form>
-
-<script>
- function resendSMSPassword() {
-     if (confirm("Send a new password now?")) {
-         document.forms['twoFactorResendForm'].submit()
-     }
- }
-</script>
-
-{{ end }}
+      {{ if (eq .twoFactorMethod "sms") }}
+      
+      <form name="twoFactorResendForm" method="post" action="/users/2fa_sms/">
+        <input class="is-hidden" type="hidden" name="two_factor_method" value="sms" />
+        {{ template "forms/csrf_token.html" . }}
+        <p>
+          Didn't get your password?
+          <a href="javascript:resendSMSPassword()">Send a new one.</a>
+        </p>
+      </form>
+      
+      <script>
+       function resendSMSPassword() {
+           if (confirm("Send a new password now?")) {
+               document.forms['twoFactorResendForm'].submit()
+           }
+       }
+      </script>
+      
+      {{ end }}
+  </div>
+</div>
 
 {{ template "shared/_footer.html" .}}
 
