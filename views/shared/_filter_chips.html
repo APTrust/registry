@@ -8,12 +8,15 @@
     </button>
     {{ end }}
 
-    <button class="filter-clear button is-compact is-white">Clear Filters</button>
+    {{ if .filterChips }}
+    <button class="filter-clear button is-compact is-white" onclick="removeAllFilters()">Clear Filters</button>
+    {{ end }}
   </div>
 
 
 <script>
 let filterChips = {{ .filterChipJson }}
+
 function removeFilter(index) {
     let chips = JSON.parse(filterChips)
     let chip = chips[index]
@@ -30,12 +33,30 @@ function removeFilter(index) {
             // This is the filter the user wants to remove.
             continue
         }
-        if (pair[1] == '') {
-            // Remove the filter because it's empty
+        if (pair[0] == "page" || pair[1] == '') {
+            // Remove the filter because it's empty.
+            // Remove page number because filter change changes number of results.
             continue
         }
         // Filter is not empty and is not being removed, so keep it.
         newParams.append(pair[0], pair[1])
+    }
+    let newUrl = url + '?' + newParams.toString()
+    window.location = newUrl
+}
+
+function removeAllFilters() {
+    let parts = location.href.split('?');
+    let url = parts[0]
+    let queryString = parts[1]
+    let params = new URLSearchParams(queryString);
+    let newParams = new URLSearchParams()
+    for (let pair of params.entries()) {
+        // Remove all filters, but keep per_page and sort.
+        // Page number should reset to 1 on filter change.
+        if (pair[0] == "per_page" || pair[0] == "sort") {
+           newParams.append(pair[0], pair[1])
+        }
     }
     let newUrl = url + '?' + newParams.toString()
     window.location = newUrl
