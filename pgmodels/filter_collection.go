@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/APTrust/registry/common"
+	"github.com/APTrust/registry/constants"
 )
 
 // FilterCollection converts query string params such as name__eq=Homer to
@@ -143,6 +144,10 @@ func (p *ParamFilter) ChipLabel() string {
 func (p *ParamFilter) ChipValue() string {
 	if p.SQLOp == "IS NULL" || p.SQLOp == "IS NOT NULL" {
 		return p.SQLOp
+	} else if len(p.Values) > 0 && p.Values[0] == constants.DefaultProfileIdentifier {
+		return "APTrust"
+	} else if len(p.Values) > 0 && p.Values[0] == constants.BTRProfileIdentifier {
+		return "BTR"
 	} else {
 		return fmt.Sprintf("%s %s", p.SQLOp, strings.Join(p.Values, ", "))
 	}

@@ -14,6 +14,14 @@
   </div>
 
 
+<!-- NOTE: VS Code may show the first line of the following script,
+
+    let filterChips = {{ .filterChipJson }}
+
+    as an error, but it's not. Go templates know how to properly escape
+    the value of filterChipJson within the context of script tags.
+    Don't put quotes around {{ .filterChipJson }}, just leave as is.
+-->
 <script>
 let filterChips = {{ .filterChipJson }}
 
