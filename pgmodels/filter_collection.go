@@ -134,17 +134,18 @@ func NewParamFilter(key string, values []string) (*ParamFilter, error) {
 	}, nil
 }
 
-// ChipLabelAndValue returns a label and value to display on filter chips
-// in the web UI.
-func (p *ParamFilter) ChipLabelAndValue() (string, string) {
-	label := strings.Title(p.Column)
-	value := ""
+// ChipLabel returns a label to display on filter chips in the web UI.
+func (p *ParamFilter) ChipLabel() string {
+	return strings.Title(p.Column)
+}
+
+// ChipValue returns a value to display on filter chips in the web UI.
+func (p *ParamFilter) ChipValue() string {
 	if p.SQLOp == "IS NULL" || p.SQLOp == "IS NOT NULL" {
-		value = p.SQLOp
+		return p.SQLOp
 	} else {
-		value = fmt.Sprintf("%s %s", p.SQLOp, strings.Join(p.Values, ", "))
+		return fmt.Sprintf("%s %s", p.SQLOp, strings.Join(p.Values, ", "))
 	}
-	return label, value
 }
 
 // NewSortParam creates a new sort parameter to add to a query.

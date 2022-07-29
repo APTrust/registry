@@ -40,7 +40,7 @@ func NewRequest(c *gin.Context) *Request {
 		Auth:         auth.(*middleware.ResourceAuthorization),
 		TemplateData: gin.H{
 			"CurrentUser":           currentUser,
-			"filterChips":           make([]forms.ListOption, 0),
+			"filterChips":           make([]*pgmodels.ParamFilter, 0),
 			"flash":                 flash,
 			constants.CSRFTokenName: csrfToken,
 		},
@@ -54,19 +54,14 @@ func NewRequest(c *gin.Context) *Request {
 // query string. Call the ToQuery() method of the returned
 // FilterCollection to translate query string params to SQL.
 func (req *Request) GetFilterCollection() *pgmodels.FilterCollection {
-	chips := make([]forms.ListOption, 0)
+	chips := make([]*pgmodels.ParamFilter, 0)
 	allowedFilters := pgmodels.FiltersFor(req.Auth.ResourceType)
 	fc := pgmodels.NewFilterCollection()
 	for _, key := range allowedFilters {
 		queryValues := req.GinContext.QueryArray(key)
 		filter, _ := fc.Add(key, queryValues)
-		chipLabel, chipValue := filter.ChipLabelAndValue()
 		if !common.ListIsEmpty(queryValues) {
-			chip := forms.ListOption{
-				Text:  chipLabel,
-				Value: chipValue,
-			}
-			chips = append(chips, chip)
+			chips = append(chips, filter)
 		}
 	}
 	for _, value := range req.GinContext.QueryArray("sort") {

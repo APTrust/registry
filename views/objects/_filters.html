@@ -111,7 +111,7 @@
 
       {{ range $index, $chip := .filterChips }}
       <button class="badge filter-chip mb-3">
-        <strong class="mr-1">{{ $chip.Text }}:</strong> {{ $chip.Value }}
+        <strong class="mr-1">{{ $chip.ChipLabel }}:</strong> {{ $chip.ChipValue }}
         <span class="icon material-icons md-16" aria-hidden="true">cancel</span>
       </button>
       {{ end }}
