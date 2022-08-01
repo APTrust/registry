@@ -6573,6 +6573,10 @@ ol {
   margin-bottom: 0;
 }
 
+.filter-button-offset {
+  margin-top: 22px;
+}
+
 .filter-toggle:hover, .filter-toggle.is-hovered {
   background-color: transparent !important;
 }

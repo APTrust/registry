@@ -2,18 +2,23 @@
 
 {{ template "shared/_header.html" .}}
 
-<h1>Backup Codes</h1>
+<!-- TODO: Make this an actual modal instead of a page -->
+<div class="modal-detail">
+  <div class="modal-title-row is-flex is-justify-content-space-between is-align-items-center">
+    <h2>Backup Codes</h2>
+  </div>
 
-<p>Please copy the backup codes below. You can use these for two-factor login when you don't have access to Authy or text messages. These backup codes supersede all previously-generated codes.</p>
+  <p>Please copy the backup codes below. You can use these for two-factor login when you don't have access to Authy or text messages. These backup codes supersede all previously-generated codes.</p>
 
-<!--
-     Note that two_factor_controller_test.go looks for these span tags
-     to extract backup codes during testing.
--->
+  <!--
+      Note that two_factor_controller_test.go looks for these span tags
+      to extract backup codes during testing.
+  -->
 
-{{ range $index, $code := .backupCodes }}
-  <span class="backup-code">{{ $code }}</span> <br />
-{{ end }}
+  {{ range $index, $code := .backupCodes }}
+  <p class="backup-code">{{ $code }}</p> 
+  {{ end }}
+</div>
 
 {{ template "shared/_footer.html" .}}
 

@@ -2,9 +2,14 @@
 
 {{ template "shared/_header.html" .}}
 
-<h1>API Key</h1>
+<!-- TODO: Make this an actual modal instead of a page -->
+<div class="modal-detail">
+  <div class="modal-title-row is-flex is-justify-content-space-between is-align-items-center">
+    <h2>API Key</h2>
+  </div>
 
-<p>Your new API key is <b>{{ .apiKey }}</b>. Copy it now, as we cannot display it again. This key replaces any previous API keys.</p>
+  <p>Your new API key is <b>{{ .apiKey }}</b>. Copy it now, as we cannot display it again. This key replaces any previous API keys.</p>
+</div>
 
 {{ template "shared/_footer.html" .}}
 

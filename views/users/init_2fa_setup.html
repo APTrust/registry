@@ -2,21 +2,32 @@
 
 {{ template "shared/_header.html" .}}
 
-<h1>Two-Factor Method</h1>
+<!-- TODO: Make this an actual modal instead of a page -->
+<div class="modal-detail">
+  <div class="modal-title-row is-flex is-justify-content-space-between is-align-items-center">
+    <h2>Two-Factor Method</h2>
+  </div>
 
-<p>Please ensure your phone number is correct and choose your preferred method for two-factor authentication.</p>
+  <div class="modal-content">
+    <p class="mb-5">Please ensure your phone number is correct and choose your preferred method for two-factor authentication.</p>
 
-<form name="twoFactorSetupForm" method="post" onsubmit="confirmChange()" action="/users/2fa_setup">
+    <form name="twoFactorSetupForm" method="post" onsubmit="confirmChange()" action="/users/2fa_setup">
 
-  {{ template "forms/tel.html" .form.Fields.PhoneNumber }}
+      <div class="columns">
+        <div class="column is-one-third">{{ template "forms/tel.html" .form.Fields.PhoneNumber }}</div>
+      </div>
 
-  {{ template "forms/radio.html" .form.Fields.AuthyStatus }}
-
-  {{ template "forms/csrf_token.html" . }}
-
-  <input type="submit" value="Submit">
-
-</form>
+      <div class="columns">
+        <div class="column">{{ template "forms/radio.html" .form.Fields.AuthyStatus }}</div>
+      </div>
+    
+      {{ template "forms/csrf_token.html" . }}
+    
+      <input class="button" type="submit" value="Submit">
+    
+    </form>
+  </div>
+</div>
 
 <script>
  let currentMethod = '{{ .CurrentUser.AuthyStatus }}'
