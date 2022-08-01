@@ -81,21 +81,21 @@ func TestObjectList(t *testing.T) {
 	}
 
 	commonFilters := []string{
-		`type="text" name="identifier"`,
-		`type="text" name="bag_name"`,
-		`type="text" name="alt_identifier"`,
-		`type="text" name="bag_group_identifier"`,
-		`type="text" name="internal_sender_identifier"`,
+		`type="text" id="identifier" name="identifier"`,
+		`type="text" id="bag_name" name="bag_name"`,
+		`type="text" id="alt_identifier" name="alt_identifier"`,
+		`type="text" id="bag_group_identifier" name="bag_group_identifier"`,
+		`type="text" id="internal_sender_identifier" name="internal_sender_identifier"`,
 		`select name="bagit_profile_identifier"`,
 		`select name="access"`,
-		`type="number" name="size__gteq"`,
-		`type="number" name="size__lteq"`,
-		`type="number" name="file_count__gteq"`,
-		`type="number" name="file_count__lteq"`,
-		`type="date" name="created_at__gteq"`,
-		`type="date" name="created_at__lteq"`,
-		`type="date" name="updated_at__gteq"`,
-		`type="date" name="updated_at__lteq"`,
+		`type="number" id="size__gteq" name="size__gteq"`,
+		`type="number" id="size__lteq" name="size__lteq"`,
+		`type="number" id="file_count__gteq" name="file_count__gteq"`,
+		`type="number" id="file_count__lteq" name="file_count__lteq"`,
+		`type="date" id="created_at__gteq" name="created_at__gteq"`,
+		`type="date" id="created_at__lteq" name="created_at__lteq"`,
+		`type="date" id="updated_at__gteq" name="updated_at__gteq"`,
+		`type="date" id="updated_at__lteq" name="updated_at__lteq"`,
 	}
 
 	adminFilters := []string{
@@ -289,7 +289,7 @@ func TestIntellectualObjectEvents(t *testing.T) {
 	expect.Status(http.StatusOK)
 
 	expected := []string{
-		"Events History",
+		"Object Event History",
 		"ingestion",
 		"Aug 26, 2016",
 	}

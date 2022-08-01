@@ -162,8 +162,8 @@ func TestInstitutionEdit(t *testing.T) {
 	testutil.InitHTTPTests(t)
 
 	instLinks := []string{
-		`input type="text" name="Name" value="Institution One"`,
-		`type="text" name="Identifier" value="institution1.edu"`,
+		`name="Name" value="Institution One"`,
+		`name="Identifier" value="institution1.edu"`,
 		"aptrust.receiving.test.institution1.edu",
 	}
 

@@ -19,13 +19,13 @@ func TestDepositReportShow(t *testing.T) {
 		Status(http.StatusOK).Body().Raw()
 
 	expected := []string{
-		"<td>Institution One</td>",
-		"<td>Standard</td>",
-		"<td>3</td>",
-		"<td>10</td>",
-		"<td>72.810</td>",
-		"<td>0.071</td>",
-		"<td>$1.97</td>",
+		"Institution One</td>",
+		"Standard</td>",
+		"3</td>",
+		"10</td>",
+		"72.810</td>",
+		"0.071</td>",
+		"$1.97</td>",
 	}
 	testutil.AssertMatchesAll(t, html, expected)
 
@@ -51,17 +51,17 @@ func TestDepositReportShow(t *testing.T) {
 	// Since we're not specifying storage option either, this should
 	// include all options.
 	expectedForInst0 := []string{
-		"<td>Institution One</td>",
-		"<td>Institution Two</td>",
-		"<td>Test Institution (for integration tests)</td>",
-		"<td>Standard</td>",
-		"<td>Wasabi-OR</td>",
-		"<td>Wasabi-VA</td>",
-		"<td>Glacier-OR</td>",
-		"<td>Glacier-Deep-OH</td>",
-		"<td>Glacier-Deep-VA</td>",
-		"<td>Wasabi-OR</td>",
-		"<td>Total</td>",
+		"Institution One</td>",
+		"Institution Two</td>",
+		"Test Institution (for integration tests)</td>",
+		"Standard</td>",
+		"Wasabi-OR</td>",
+		"Wasabi-VA</td>",
+		"Glacier-OR</td>",
+		"Glacier-Deep-OH</td>",
+		"Glacier-Deep-VA</td>",
+		"Wasabi-OR</td>",
+		"Total</td>",
 	}
 
 	html = testutil.SysAdminClient.GET("/reports/deposits").

@@ -49,7 +49,7 @@ func TestUserIndex(t *testing.T) {
 	testutil.InitHTTPTests(t)
 
 	items := []string{
-		"New",
+		"Add new user",
 		"Name",
 		"Email",
 	}
@@ -69,8 +69,8 @@ func TestUserIndex(t *testing.T) {
 	// Inst admin does not see filters, because most institutions
 	// have only 4-6 users.
 	adminFilters := []string{
-		`type="text" name="name__contains"`,
-		`type="text" name="email__contains"`,
+		`type="text" id="name__contains" name="name__contains"`,
+		`type="text" id="email__contains" name="email__contains"`,
 		`select name="role"`,
 		`select name="institution_id"`,
 		"Filter",

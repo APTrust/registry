@@ -307,7 +307,7 @@ func TestUserBackupCodes(t *testing.T) {
 }
 
 func extractBackupCodes(t *testing.T, html string) []string {
-	re := regexp.MustCompile(`<span class="backup-code">(\w+)</span>`)
+	re := regexp.MustCompile(`<p class="backup-code">(\w+)</p>`)
 	m := re.FindAllStringSubmatch(html, -1)
 	require.True(t, len(m) > 0)
 	require.True(t, len(m[0]) > 0)

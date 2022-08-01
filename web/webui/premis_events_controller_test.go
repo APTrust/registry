@@ -53,17 +53,17 @@ func TestEventList(t *testing.T) {
 	}
 
 	commonFilters := []string{
-		`type="text" name="identifier"`,
-		`type="text" name="intellectual_object_identifier"`,
-		`type="text" name="generic_file_identifier"`,
-		`select name="event_type"`,
-		`select name="outcome"`,
-		`type="date" name="date_time__gteq"`,
-		`type="date" name="date_time__lteq"`,
+		`type="text" id="identifier" name="identifier"`,
+		`type="text" id="intellectual_object_identifier" name="intellectual_object_identifier"`,
+		`type="text" id="generic_file_identifier" name="generic_file_identifier"`,
+		`select name="event_type" id="event_type"`,
+		`select name="outcome" id="outcome"`,
+		`type="date" id="date_time__gteq" name="date_time__gteq"`,
+		`type="date" id="date_time__lteq" name="date_time__lteq"`,
 	}
 
 	adminFilters := []string{
-		`select name="institution_id"`,
+		`select name="institution_id" id="institution_id"`,
 	}
 
 	for _, client := range testutil.AllClients {
