@@ -8,7 +8,7 @@
   <div class="box-header is-flex is-align-items-center is-justify-content-space-between">
     <h1 class="h2">Institutions</h1>
     {{ if .CurrentUser.IsAdmin }}
-    <a class="button is-success ml-6" href="/institutions/new">Create New</a>
+    <a class="button is-success ml-6" data-modal="modal-one" data-xhr-url="/institutions/new?modal=true">Create New</a>
     {{ end }}
   </div>
 
