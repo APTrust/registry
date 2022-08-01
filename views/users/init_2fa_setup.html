@@ -1,6 +1,10 @@
 {{ define "users/init_2fa_setup.html" }}
 
-{{ template "shared/_header.html" .}}
+<!-- Show the header unless query string says modal=true -->
+{{ if not .showAsModal }}
+  {{ template "shared/_header.html" .}}
+{{ end }}
+
 
 <!-- TODO: Make this an actual modal instead of a page -->
 <div class="modal-detail">
@@ -20,11 +24,11 @@
       <div class="columns">
         <div class="column">{{ template "forms/radio.html" .form.Fields.AuthyStatus }}</div>
       </div>
-    
+
       {{ template "forms/csrf_token.html" . }}
-    
+
       <input class="button" type="submit" value="Submit">
-    
+
     </form>
   </div>
 </div>
@@ -40,6 +44,10 @@
  }
 </script>
 
-{{ template "shared/_footer.html" .}}
+<!-- Show the footer unless query string says modal=true -->
+{{ if not .showAsModal }}
+  {{ template "shared/_footer.html" .}}
+{{ end }}
+
 
 {{ end }}

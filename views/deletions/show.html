@@ -1,6 +1,10 @@
 {{ define "deletions/show.html" }}
 
-{{ template "shared/_header.html" .}}
+<!-- Show the header unless query string says modal=true -->
+{{ if not .showAsModal }}
+  {{ template "shared/_header.html" .}}
+{{ end }}
+
 
 <!-- TODO: Make this an actual modal instead of a page -->
 <div class="modal-detail">
@@ -44,6 +48,10 @@
   </dl>
 </div>
 
-{{ template "shared/_footer.html" . }}
+<!-- Show the footer unless query string says modal=true -->
+{{ if not .showAsModal }}
+  {{ template "shared/_footer.html" .}}
+{{ end }}
+
 
 {{ end }}

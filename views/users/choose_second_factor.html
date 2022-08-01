@@ -1,6 +1,9 @@
 {{ define "users/choose_second_factor.html" }}
 
-{{ template "shared/_header.html" .}}
+<!-- Show the header unless query string says modal=true -->
+{{ if not .showAsModal }}
+  {{ template "shared/_header.html" .}}
+{{ end }}
 
 <!--
      Note: This page is for choosing how to complete a login
@@ -28,7 +31,7 @@
       <div class="two-factor-option clickable" onclick="submitSecondFactor('backup')">
         Backup Code
       </div>
-      
+
       <form name="twoFactorChoiceForm" method="post" action="">
         <input class="is-hidden" type="hidden" name="two_factor_method" value="" />
         <!-- CSRF token is in script below -->
@@ -82,6 +85,10 @@
  }
 </script>
 
-{{ template "shared/_footer.html" .}}
+<!-- Show the footer unless query string says modal=true -->
+{{ if not .showAsModal }}
+  {{ template "shared/_footer.html" .}}
+{{ end }}
+
 
 {{ end }}

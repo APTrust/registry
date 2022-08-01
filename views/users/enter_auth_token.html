@@ -1,6 +1,10 @@
 {{ define "users/enter_auth_token.html" }}
 
-{{ template "shared/_header.html" .}}
+<!-- Show the header unless query string says modal=true -->
+{{ if not .showAsModal }}
+  {{ template "shared/_header.html" .}}
+{{ end }}
+
 
 <!-- TODO: Make this an actual modal instead of a page -->
 <div class="modal-detail">
@@ -24,7 +28,7 @@
     <p>Not working? <a href="/users/2fa_choose">Try another method.</a></p>
 
       {{ if (eq .twoFactorMethod "sms") }}
-      
+
       <form name="twoFactorResendForm" method="post" action="/users/2fa_sms/">
         <input class="is-hidden" type="hidden" name="two_factor_method" value="sms" />
         {{ template "forms/csrf_token.html" . }}
@@ -33,7 +37,7 @@
           <a href="javascript:resendSMSPassword()">Send a new one.</a>
         </p>
       </form>
-      
+
       <script>
        function resendSMSPassword() {
            if (confirm("Send a new password now?")) {
@@ -41,11 +45,15 @@
            }
        }
       </script>
-      
+
       {{ end }}
   </div>
 </div>
 
-{{ template "shared/_footer.html" .}}
+<!-- Show the footer unless query string says modal=true -->
+{{ if not .showAsModal }}
+  {{ template "shared/_footer.html" .}}
+{{ end }}
+
 
 {{ end }}

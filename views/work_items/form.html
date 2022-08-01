@@ -1,6 +1,10 @@
 {{ define "work_items/form.html" }}
 
-{{ template "shared/_header.html" .}}
+<!-- Show the header unless query string says modal=true -->
+{{ if not .showAsModal }}
+  {{ template "shared/_header.html" .}}
+{{ end }}
+
 
 <!-- TODO: Make this an actual modal instead of a page -->
 <div class="modal-edit">
@@ -20,17 +24,17 @@
       {{ .FormError }}
     </div>
     {{ end }}
-    
+
     <div class="columns">
       <div class="column">{{ template "forms/select.html" .form.Fields.Stage }}</div>
       <div class="column">{{ template "forms/select.html" .form.Fields.Status }}</div>
     </div>
-    
+
     <div class="columns">
       <div class="column">{{ template "forms/select.html" .form.Fields.Retry }}</div>
       <div class="column">{{ template "forms/select.html" .form.Fields.NeedsAdminReview }}</div>
     </div>
-  
+
     <div class="columns">
       <div class="column">{{ template "forms/textarea.html" .form.Fields.Note }}</div>
     </div>
@@ -39,17 +43,21 @@
       <div class="column">{{ template "forms/text_input.html" .form.Fields.Node }}</div>
       <div class="column">{{ template "forms/number.html" .form.Fields.PID }}</div>
     </div>
-  
+
     {{ template "forms/csrf_token.html" . }}
-    
+
     <div class="is-flex is-justify-content-space-between">
       <a class="button" href="javascript:history.back()">Cancel</a>
       <input class="button is-dark" type="submit" value="Submit">
     </div>
-  
+
   </form>
 </div>
 
-{{ template "shared/_footer.html" .}}
+<!-- Show the footer unless query string says modal=true -->
+{{ if not .showAsModal }}
+  {{ template "shared/_footer.html" .}}
+{{ end }}
+
 
 {{ end }}

@@ -1,6 +1,9 @@
 {{ define "users/show.html" }}
 
-{{ template "shared/_header.html" .}}
+<!-- Show the header unless query string says modal=true -->
+{{ if not .showAsModal }}
+  {{ template "shared/_header.html" .}}
+{{ end }}
 
 <!-- TODO: Make this an actual modal instead of a page -->
 <div class="modal-detail">
@@ -79,7 +82,7 @@
         <dt class="text-label text-xs is-grey-dark">Last Authy SignIn</dt>
         <dd class="text-table">{{ dateUS .user.LastSignInWithAuthy }}</dd>
       </dl>
-    
+
       <dl class="modal-list modal-list-right">
         <dt class="text-label text-xs is-grey-dark">Last Updated</dt>
         <dd class="text-table">{{ dateUS .user.UpdatedAt }}</dd>
@@ -98,7 +101,11 @@
  }
 </script>
 
-{{ template "shared/_footer.html" .}}
+<!-- Show the footer unless query string says modal=true -->
+{{ if not .showAsModal }}
+  {{ template "shared/_footer.html" .}}
+{{ end }}
+
 
 
 {{ end }}

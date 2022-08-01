@@ -1,6 +1,10 @@
 {{ define "users/show_api_key.html" }}
 
-{{ template "shared/_header.html" .}}
+<!-- Show the header unless query string says modal=true -->
+{{ if not .showAsModal }}
+  {{ template "shared/_header.html" .}}
+{{ end }}
+
 
 <!-- TODO: Make this an actual modal instead of a page -->
 <div class="modal-detail">
@@ -11,6 +15,10 @@
   <p>Your new API key is <b>{{ .apiKey }}</b>. Copy it now, as we cannot display it again. This key replaces any previous API keys.</p>
 </div>
 
-{{ template "shared/_footer.html" .}}
+<!-- Show the footer unless query string says modal=true -->
+{{ if not .showAsModal }}
+  {{ template "shared/_footer.html" .}}
+{{ end }}
+
 
 {{ end }}
