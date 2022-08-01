@@ -8,11 +8,11 @@
   </div>
 
   <div class="box-content">
-    
+
 
     <div class="is-flex">
       {{ if .CurrentUser.IsAdmin }}
-      <a class="button is-primary mr-6 filter-button-offset" href="/users/new">Add new user</a>
+      <button class="button is-primary mr-6 filter-button-offset" data-modal="modal-one" data-xhr-url="/users/new?modal=true">Add new user</button>
       {{ else if userCan .CurrentUser "UserCreate" .CurrentUser.InstitutionID }}
       <a class="button is-primary mr-6" href="/users/new?institution_id={{ .CurrentUser.InstitutionID }}">Add new user</a>
       {{ end }}

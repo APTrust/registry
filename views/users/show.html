@@ -19,7 +19,7 @@
       {{ if .user.DeactivatedAt.IsZero }}
       <div class="is-flex is-justify-content-space-between mb-5">
         {{ if userCan .CurrentUser "UserCreate" .user.InstitutionID }}
-        <a class="button" href="/users/edit/{{ .user.ID }}">Edit</a>
+        <button class="button" data-modal="modal-one" data-xhr-url="/users/edit/{{ .user.ID }}?modal=true">Edit</button>
         {{ end }}
         {{ if userCan .CurrentUser "UserDelete" .user.InstitutionID }}
         <button class="button" onclick="document.forms['userDeleteForm'].submit()">Deactivate</button>
