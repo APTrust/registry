@@ -25,7 +25,7 @@
     </thead>
     <tbody>
       {{ range $index, $event := .items }}
-      <tr class="clickable" onclick="window.location.href='/events/show/{{ $event.ID }}'">
+      <tr class="clickable" data-modal="modal-one" data-xhr-url="/events/show/{{ $event.ID }}?modal=true">
         <td class="pl-5">
           <div class="is-flex is-align-items-center">
             <span class="action-icon mr-3"><!-- TODO Make this update with correct icon-->

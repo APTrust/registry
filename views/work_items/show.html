@@ -11,7 +11,7 @@
   <div class="modal-title-row is-flex is-justify-content-space-between is-align-items-center">
     <h2>{{ .item.Name }}</h2>
     {{ if userCan .CurrentUser "WorkItemUpdate" .item.InstitutionID }}
-    <a href="/work_items/edit/{{ .item.ID }}">
+    <a data-modal="modal-one" data-xhr-url="/work_items/edit/{{ .item.ID }}?modal=true" href="#">
       <span class="material-icons" aria-hidden="true">edit</span>
       <span class="is-sr-only">Edit</span>
     </a>

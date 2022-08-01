@@ -28,7 +28,7 @@
   </thead>
   <tbody>
     {{ range $index, $deletion := .items }}
-    <tr class="clickable" onclick="window.location.href='/deletions/show/{{ $deletion.ID }}'">
+    <tr class="clickable" data-modal="modal-one" data-xhr-url="/deletions/show/{{ $deletion.ID }}?modal=true">
       <td class="pl-5">
         <div class="is-flex is-align-items-center">
           <span class="action-icon mr-3">

@@ -30,7 +30,7 @@
     <tbody>
       {{ $cu := .CurrentUser }}
       {{ range $index, $item := .items }}
-      <tr class="clickable" onclick="window.location.href='/work_items/show/{{ $item.ID }}'">
+      <tr class="clickable" data-modal="modal-one" data-xhr-url="/work_items/show/{{ $item.ID }}?modal=true">
         <td class="pl-5">
           <div class="is-flex is-align-items-center">
             <span class="action-icon mr-3"><!-- TODO Make this update with correct icon-->
