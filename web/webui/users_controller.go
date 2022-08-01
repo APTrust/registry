@@ -337,6 +337,7 @@ func UserStartPasswordReset(c *gin.Context) {
 	templateData := gin.H{
 		"id":              userID,
 		"suppressSideNav": true,
+		"suppressTopNav":  true,
 	}
 	c.HTML(http.StatusOK, "users/enter_password_reset_token.html", templateData)
 }

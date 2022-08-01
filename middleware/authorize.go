@@ -104,7 +104,7 @@ func showError(c *gin.Context, auth *ResourceAuthorization, errMsg string, statu
 	} else {
 		c.HTML(status, "errors/show.html", gin.H{
 			"suppressSideNav": true,
-			"suppressTopNav":  false,
+			"suppressTopNav":  true,
 			"error":           errMsg,
 		})
 	}

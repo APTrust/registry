@@ -32,7 +32,7 @@ func Authenticate() gin.HandlerFunc {
 			logPasswordChangeIncomplete(c, user)
 			c.HTML(http.StatusUnauthorized, "errors/show.html", gin.H{
 				"suppressSideNav": true,
-				"suppressTopNav":  false,
+				"suppressTopNav":  true,
 				"error":           "Please finish changing your password",
 			})
 			c.Abort()
@@ -168,7 +168,7 @@ func respondToAuthError(c *gin.Context, err error) {
 	} else {
 		c.HTML(http.StatusUnauthorized, "errors/show.html", gin.H{
 			"suppressSideNav": true,
-			"suppressTopNav":  false,
+			"suppressTopNav":  true,
 			"error":           "Please log in",
 			"redirectURL":     "/",
 		})
