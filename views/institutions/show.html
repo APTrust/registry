@@ -1,6 +1,9 @@
 {{ define "institutions/show.html" }}
 
-{{ template "shared/_header.html" .}}
+<!-- Show the header unless query string says modal=true -->
+{{ if not .showAsModal }}
+  {{ template "shared/_header.html" .}}
+{{ end }}
 
 <!-- TODO: Make this an actual modal instead of a page -->
 <div class="modal-detail">
@@ -11,7 +14,7 @@
   {{ if .institution.DeactivatedAt.IsZero }}
     <div class="is-flex">
       {{ if userCan .CurrentUser "InstitutionUpdate" .institution.ID }}
-      <a class="button is-primary" href="/institutions/edit/{{ .institution.ID }}">Edit</a>
+      <button class="button is-primary" data-modal="modal-one" data-xhr-url="/institutions/edit/{{ .institution.ID }}?modal=true">Edit</button>
       {{ end }}
       {{ if userCan .CurrentUser "InstitutionDelete" .institution.ID }}
       <a class="button is-danger ml-4" href="/institutions/delete/{{ .institution.ID }}">Deactivate</a>
@@ -71,7 +74,10 @@
   </div>
 </div>
 
-{{ template "shared/_footer.html" .}}
 
+<!-- Show the footer unless query string says modal=true -->
+{{ if not .showAsModal }}
+  {{ template "shared/_footer.html" .}}
+{{ end }}
 
 {{ end }}

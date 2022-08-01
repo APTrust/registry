@@ -210,3 +210,11 @@ func SanitizeIdentifier(str string) string {
 func LooksLikeUUID(uuid string) bool {
 	return reUUID.Match([]byte(uuid))
 }
+
+// IsTrueString returns true if param s is "true", "yes", or "1".
+// The test is case-insensitive. Use this for parsing query string
+// params.
+func IsTrueString(s string) bool {
+	lc := strings.ToLower(s)
+	return lc == "true" || lc == "yes" || lc == "1"
+}

@@ -42,8 +42,9 @@ func NewRequest(c *gin.Context) *Request {
 		TemplateData: gin.H{
 			"CurrentUser":           currentUser,
 			"filterChips":           make([]*pgmodels.ParamFilter, 0),
-			"filterChipJson": "",
+			"filterChipJson":        "",
 			"flash":                 flash,
+			"showAsModal":           common.IsTrueString(c.Query("modal")),
 			constants.CSRFTokenName: csrfToken,
 		},
 	}

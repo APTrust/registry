@@ -131,3 +131,21 @@ func TestLooksLikeUUID(t *testing.T) {
 	assert.False(t, common.LooksLikeUUID("88198c5a-ec91-4ce1-bfcc-0f6c"))
 	assert.False(t, common.LooksLikeUUID(""))
 }
+
+func TestIsTrueString(t *testing.T) {
+	assert.True(t, common.IsTrueString("true"))
+	assert.True(t, common.IsTrueString("TRUE"))
+	assert.True(t, common.IsTrueString("yes"))
+	assert.True(t, common.IsTrueString("YES"))
+	assert.True(t, common.IsTrueString("1"))
+
+	assert.False(t, common.IsTrueString("no"))
+	assert.False(t, common.IsTrueString("NO"))
+	assert.False(t, common.IsTrueString("nope"))
+	assert.False(t, common.IsTrueString("no sir"))
+	assert.False(t, common.IsTrueString("false"))
+	assert.False(t, common.IsTrueString("FALSE"))
+	assert.False(t, common.IsTrueString("0"))
+	assert.False(t, common.IsTrueString("10"))
+	assert.False(t, common.IsTrueString("plantains"))
+}

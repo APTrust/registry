@@ -45,7 +45,7 @@
       {{ if not $inst.DeactivatedAt.IsZero }}
         {{ $cssClass = "clickable row-disabled" }}
       {{ end }}
-      <tr class="{{ $cssClass }}" onclick="window.location.href='/institutions/show/{{ $inst.ID }}'">
+      <tr class="{{ $cssClass }}" data-modal="modal-one" data-xhr-url="/institutions/show/{{ $inst.ID }}?modal=true">
         <td class="pl-5">{{ $inst.Name }}</td>
         <td class="is-grey-dark">{{ $inst.Identifier }}</td>
         <td class="is-grey-dark">{{ replace $inst.Type "Institution" "" 1 }}</td>

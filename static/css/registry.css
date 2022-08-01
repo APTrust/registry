@@ -6951,4 +6951,13 @@ ol {
   display: none;
 }
 
+/*
+  .modal.open added by A.D. to see if modals are displaying
+  in response to clicks. Feel free to change or delete this.
+  For now, it makes modal content appear at the bottom of the screen.
+*/
+.modal.open {
+  display: block;
+}
+
 /*# sourceMappingURL=registry.css.map */
