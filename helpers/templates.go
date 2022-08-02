@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
+	"net/url"
 	"strings"
 	"time"
 
@@ -195,4 +196,17 @@ func FormatFloat(value float64, scale int) string {
 func ToJSON(v interface{}) template.JS {
 	jsonString, _ := json.Marshal(v)
 	return template.JS(jsonString)
+}
+
+// SortUrl returns the url to sort results by the specified column.
+// This is used in table column headers on index pages.
+func SortUrl(currentUrl *url.URL, colName string) string {
+	newSort := fmt.Sprintf("%s__asc", colName)
+	vals := currentUrl.Query()
+	currentSort := vals.Get("sort")
+	if currentSort == fmt.Sprintf("%s__asc", colName) {
+		newSort = fmt.Sprintf("%s__desc", colName)
+	}
+	vals.Set("sort", newSort)
+	return fmt.Sprintf("%s?%s", currentUrl.Path, vals.Encode())
 }

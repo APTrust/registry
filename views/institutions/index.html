@@ -22,24 +22,14 @@
     <thead>
       <tr>
         <!-- TODO make table columns sortable -->
-        <th class="pl-5">Name</th>
-        <th>Identifier</th>
-        <th>Type</th>
-        <th>Parent</th>
-        <th>Deactivated</th>
+        <th class="pl-5"><a href="{{ sortUrl .currentUrl `name` }}">Name</a></th>
+        <th><a href="{{ sortUrl .currentUrl `identifier` }}">Identifier</a></th>
+        <th><a href="{{ sortUrl .currentUrl `type` }}">Type</a></th>
+        <th><a href="{{ sortUrl .currentUrl `parent_identifier` }}">Parent</a></th>
+        <th><a href="{{ sortUrl .currentUrl `deactivated_at` }}">Deactivated</a></th>
       </tr>
     </thead>
     <tbody>
-      {{ range $index, $item := .deposits }}
-      <tr>
-        <td class="pl-5">{{ $item.InstitutionName }}</td>
-        <td class="is-grey-dark">{{ $item.StorageOption }}</td>
-        <td class="is-grey-dark num text-sm">{{ $item.ObjectCount }}</td>
-        <td class="is-grey-dark num text-sm">{{ $item.FileCount }}</td>
-        <td class="is-grey-dark num text-sm">{{ formatFloat $item.TotalGB 3 }}</td>
-      </tr>
-      {{ end }}
-
       {{ range $index, $inst := .items }}
       {{ $cssClass := "clickable" }}
       {{ if not $inst.DeactivatedAt.IsZero }}

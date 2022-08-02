@@ -74,6 +74,7 @@ func initTemplates(router *gin.Engine) {
 		"iconFor":        helpers.IconFor,
 		"replace":        strings.Replace,
 		"roleName":       helpers.RoleName,
+		"sortUrl":        helpers.SortUrl,
 		"strEq":          helpers.StrEq,
 		"titleCase":      strings.Title,
 		"toJSON":         helpers.ToJSON,

@@ -18,11 +18,11 @@
     <thead>
       <tr>
         <!-- TODO make table columns sortable -->
-        <th class="pl-5">Title/Identifier</th>
-        <th>Storage Option</th>
-        <th>File Count</th>
-        <th>Size</th>
-        <th>Modified</th>
+        <th class="pl-5"><a href="{{ sortUrl .currentUrl `identifier` }}">Title/Identifier</a></th>
+        <th><a href="{{ sortUrl .currentUrl `storage_option` }}">Storage Option</a></th>
+        <th><a href="{{ sortUrl .currentUrl `file_count` }}">File Count</a></th>
+        <th><a href="{{ sortUrl .currentUrl `size` }}">Size</a></th>
+        <th><a href="{{ sortUrl .currentUrl `updated_at` }}">Modified</a></th>
       </tr>
     </thead>
     <tbody>

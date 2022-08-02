@@ -16,11 +16,11 @@
   <table class="table is-hoverable is-fullwidth has-padding">
     <thead>
       <tr><!-- TODO make table columns sortable -->
-        <th class="pl-5">Type</th>
-        <th>Date</th>
-        <th>Outcome</th>
-        <th>Object Identifier</th>
-        <th>File Identifier</th>
+        <th class="pl-5"><a href="{{ sortUrl .currentUrl `event_type` }}">Type</a></th>
+        <th><a href="{{ sortUrl .currentUrl `date_time` }}">Date</a></th>
+        <th><a href="{{ sortUrl .currentUrl `outcome` }}">Outcome</a></th>
+        <th><a href="{{ sortUrl .currentUrl `intellectual_object_identifier` }}">Object Identifier</a></th>
+        <th><a href="{{ sortUrl .currentUrl `generic_file_identifier` }}">File Identifier</a></th>
       </tr>
     </thead>
     <tbody>

@@ -16,11 +16,11 @@
   <table class="table is-hoverable is-fullwidth has-padding">
     <thead>
       <tr><!-- TODO make table columns sortable -->
-        <th class="pl-5">Identifier</th>
-        <th>Size</th>
-        <th>Storage Option</th>
-        <th>Modified</th>
-        <th>Last Fixity</th>
+        <th class="pl-5"><a href="{{ sortUrl .currentUrl `identifier` }}">Identifier</a></th>
+        <th><a href="{{ sortUrl .currentUrl `size` }}">Size</a></th>
+        <th><a href="{{ sortUrl .currentUrl `storage_option` }}">Storage Option</a></th>
+        <th><a href="{{ sortUrl .currentUrl `updated_at` }}">Modified</a></th>
+        <th><a href="{{ sortUrl .currentUrl `last_fixity_check` }}">Last Fixity</a></th>
       </tr>
     </thead>
     <tbody>

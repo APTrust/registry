@@ -18,12 +18,12 @@
 <table class="table is-hoverable is-fullwidth has-padding">
   <thead>
     <tr>
-      <th class="pl-5">Requested By</th>
-      <th>Request Date</th>
-      <th>Confirmed At</th>
-      <th>Files</th>
-      <th>Objects</th>
-      <th>Status</th>
+      <th class="pl-5"><a href="{{ sortUrl .currentUrl `requested_by_name` }}">Requested By</a></th>
+      <th><a href="{{ sortUrl .currentUrl `requested_at` }}">Request Date</a></th>
+      <th><a href="{{ sortUrl .currentUrl `confirmed_at` }}">Confirmed At</a></th>
+      <th><a href="{{ sortUrl .currentUrl `file_count` }}">Files</a></th>
+      <th><a href="{{ sortUrl .currentUrl `object_count` }}">Objects</a></th>
+      <th><a href="{{ sortUrl .currentUrl `status` }}">Status</a></th>
     </tr>
   </thead>
   <tbody>

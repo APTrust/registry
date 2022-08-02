@@ -16,15 +16,15 @@
   <table class="table is-hoverable is-fullwidth has-padding">
     <thead>
       <tr><!-- TODO make table columns sortable -->
-        <th class="pl-5">Action</th>
-        <th>Object</th>
+        <th class="pl-5"><a href="{{ sortUrl .currentUrl `action` }}">Action</a></th>
+        <th><a href="{{ sortUrl .currentUrl `name` }}">Object</a></th>
         {{ if .CurrentUser.IsAdmin }}
-        <th>Institution</th>
+        <th><a href="{{ sortUrl .currentUrl `institution_name` }}">Institution</a></th>
         {{ end }}
-        <th>Size</th>
-        <th>Stage</th>
-        <th>Status</th>
-        <th>Updated</th>
+        <th><a href="{{ sortUrl .currentUrl `size` }}">Size</a></th>
+        <th><a href="{{ sortUrl .currentUrl `stage` }}">Stage</a></th>
+        <th><a href="{{ sortUrl .currentUrl `status` }}">Status</a></th>
+        <th><a href="{{ sortUrl .currentUrl `updated_at` }}">Updated</a></th>
       </tr>
     </thead>
     <tbody>
@@ -45,7 +45,7 @@
         <td class="is-grey-dark">{{ $item.InstitutionName }}</td>
         {{ end }}
 
-        <td class="is-grey-dark num text-sm">2.5GB*</td>
+        <td class="is-grey-dark num text-sm">{{ humanSize $item.Size }}</td>
         <td class="is-grey-dark">{{ $item.Stage }}</td>
         <td><span class="badge {{ badgeClass $item.Status }}">{{ $item.Status }}</span></td><!-- TODO Make status change classes -->
         <td class="is-grey-dark text-sm is-uppercase">{{ dateUS $item.DateProcessed }}</td>

@@ -14,12 +14,12 @@
   <thead>
     <tr>
       {{ if $isAdmin }}
-      <th>Recipient</th>
+      <th><a href="{{ sortUrl .currentUrl `user_name` }}">Recipient</a></th>
       {{ end }}
-      <th>Type</th>
-      <th>Subject</th>
-      <th>Created</th>
-      <th>Read</th>
+      <th><a href="{{ sortUrl .currentUrl `type` }}">Type</a></th>
+      <th><a href="{{ sortUrl .currentUrl `subject` }}">Subject</a></th>
+      <th><a href="{{ sortUrl .currentUrl `created_at` }}">Created</a></th>
+      <th><a href="{{ sortUrl .currentUrl `read_at` }}">Read</a></th>
     </tr>
   </thead>
   <tbody>

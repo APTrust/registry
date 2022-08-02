@@ -45,6 +45,7 @@ func NewRequest(c *gin.Context) *Request {
 			"filterChipJson":        "",
 			"flash":                 flash,
 			"showAsModal":           common.IsTrueString(c.Query("modal")),
+			"currentUrl":            c.Request.URL,
 			constants.CSRFTokenName: csrfToken,
 		},
 	}

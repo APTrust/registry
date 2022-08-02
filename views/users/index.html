@@ -26,13 +26,13 @@
   <table class="table is-fullwidth has-padding is-hoverable">
     <thead>
       <tr>
-        <th class="pl-5">Name</th>
-        <th>Email</th>
-        <th>Institution</th>
-        <th>Role</th>
-        <th>Last Sign In</th>
-        <th>2FA</th>
-        <th>Disabled</th>
+        <th class="pl-5"><a href="{{ sortUrl .currentUrl `name` }}">Name</a></th>
+        <th><a href="{{ sortUrl .currentUrl `email` }}">Email</a></th>
+        <th><a href="{{ sortUrl .currentUrl `institution_name` }}">Institution</a></th>
+        <th><a href="{{ sortUrl .currentUrl `role` }}">Role</a></th>
+        <th><a href="{{ sortUrl .currentUrl `last_sign_in_at` }}">Last Sign In</a></th>
+        <th><a href="{{ sortUrl .currentUrl `enabled_two_factor` }}">2FA</a></th>
+        <th><a href="{{ sortUrl .currentUrl `deactivated_at` }}">Disabled</a></th>
       </tr>
     </thead>
     <tbody>
