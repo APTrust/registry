@@ -36,22 +36,8 @@
 
     </form>
 
-    <div class="filters-grid-clear">
-      <!-- TODO Example filter chips below, not wired up yet -->
-      <button class="badge filter-chip mb-3">
-        <strong class="mr-1">Action:</strong> Restore File
-        <span class="icon material-icons md-16" aria-hidden="true">cancel</span>
-      </button>
-      <button class="badge filter-chip mb-3">
-        <strong class="mr-1">Action:</strong> Restore File
-        <span class="icon material-icons md-16" aria-hidden="true">cancel</span>
-      </button>
-      <button class="badge filter-chip mb-3">
-        <strong class="mr-1">Action:</strong> Restore File
-        <span class="icon material-icons md-16" aria-hidden="true">cancel</span>
-      </button>
-      <button class="filter-clear button is-compact is-white">Clear Filters</button>
-    </div>
+    {{ template "shared/_filter_chips.html" . }}
+
   </div>
 </div>
 
