@@ -200,6 +200,8 @@ func ToJSON(v interface{}) template.JS {
 
 // SortUrl returns the url to sort results by the specified column.
 // This is used in table column headers on index pages.
+// Note that this returns a URL path and query string only. There's
+// no hostname, port, or scheme.
 func SortUrl(currentUrl *url.URL, colName string) string {
 	newSort := fmt.Sprintf("%s__asc", colName)
 	vals := currentUrl.Query()

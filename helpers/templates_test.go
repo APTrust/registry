@@ -2,6 +2,7 @@ package helpers_test
 
 import (
 	"html/template"
+	"net/url"
 	"testing"
 	"time"
 
@@ -191,4 +192,12 @@ func TestBadgeClass(t *testing.T) {
 	assert.Equal(t, template.HTML("is-cancelled"), helpers.BadgeClass(constants.StatusCancelled))
 	assert.Equal(t, template.HTML("is-pending"), helpers.BadgeClass(constants.StatusPending))
 	assert.Equal(t, template.HTML(""), helpers.BadgeClass("no such class"))
+}
+
+func TestSortURL(t *testing.T) {
+	currentUrl, err := url.Parse("https://example.com/objects?name=homer&age=39&sort=salary__asc")
+	require.Nil(t, err)
+
+	assert.Equal(t, "/objects?age=39&name=homer&sort=salary__desc", helpers.SortUrl(currentUrl, "salary"))
+	assert.Equal(t, "/objects?age=39&name=homer&sort=zip_code__asc", helpers.SortUrl(currentUrl, "zip_code"))
 }
