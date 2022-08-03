@@ -15,7 +15,7 @@
   <table class="table is-hoverable is-fullwidth has-padding is-borderless">
     <tbody>
       {{ range $index, $alert := .alerts }}
-      <tr class="clickable" onclick="window.location.href='/alerts/show/{{ $alert.ID }}'">
+      <tr class="clickable" onclick="window.location.href='/alerts/show/{{ $alert.ID }}/{{ $alert.UserID }}'">
         <td class="pl-5">
           <div class="is-flex is-align-items-center">
             <span class="action-icon mr-3"><!-- TODO Make this update with correct icon-->
