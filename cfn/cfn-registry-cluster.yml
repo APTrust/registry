@@ -11,11 +11,28 @@ Parameters:
     Description: Staging private Namespace
     Type: String
     Default: staging
+    AllowedValues: 
+      - staging 
+      - demo 
+      - prod
+  
+  FamTag:
+    Description: Provides a family tag based on the environment for the family of each container/task definition; (p)rod, (s)taging, (d)emo.
+    Type: String
+    Default: s 
+    AllowedValues: 
+      - s 
+      - d 
+      - p
   
   ClusterName: 
     Description: The Name of the Fargate cluster hosting NSQ services.
     Type: String
-    Default: ecs-registry-staging
+    Default: ecs-registry-staging 
+    AllowedValues: 
+      - ecs-registry-staging
+      - ecs-registry-demo
+      - ecs-registry-prod
 
 Resources:
   
@@ -45,7 +62,7 @@ Resources:
         ExecuteCommandConfiguration: 
           Logging: OVERRIDE
           LogConfiguration:
-            CloudWatchLogGroupName: !Sub '/ecs/${DNS}/registry 
+            CloudWatchLogGroupName: !Sub '/ecs/${DNS}/registry'
       Tags:
       - Key: Name
         Value: !Sub 'ecs-registry-${DNS}'
@@ -57,7 +74,12 @@ Resources:
   
   LogGroup:
     Properties:
-      LogGroupName: !Sub '/ecs/${DNS}/registry'
+      LogGroupName: !Sub '/ecs/${DNS}/registry' 
+      Tags: 
+      - Key: Environment 
+        Value: !Ref DNS
+      - Key: Service 
+        Value: registry 
     Type: AWS::Logs::LogGroup
 
   RegistryService: 
@@ -236,19 +258,22 @@ Resources:
       NetworkMode: awsvpc
       RequiresCompatibilities:
       - FARGATE 
-      Family: ecs-registry
+      Family: !Sub 'ecs-registry-${FamTag}'
   
 
   ListenerReg80: 
       Type: 'AWS::ElasticLoadBalancingV2::Listener'
       Properties:
         DefaultActions:
-          - ForwardConfig:
-              TargetGroups:
-              - TargetGroupArn: !Ref RegistryTargetGroup
-            Type: forward
-        LoadBalancerArn: arn:aws:elasticloadbalancing:us-east-1:997427182289:loadbalancer/app/alb-east-staging/36c77e709ee69d8a
-        Port: 8080
+          - RedirectConfig:
+              Host: "#{host}"
+              Port: 443
+              StatusCode: "HTTP_301"
+              Protocol: "HTTPS"
+            Type: redirect
+        LoadBalancerArn: 
+          Fn::ImportValue: !Sub 'AppLoad-${DNS}'
+        Port: 80
         Protocol: HTTP
   
   ListenerReg443:
@@ -259,7 +284,8 @@ Resources:
           ForwardConfig:
             TargetGroups: 
             - TargetGroupArn: !Ref RegistryTargetGroup
-      LoadBalancerArn: 'arn:aws:elasticloadbalancing:us-east-1:997427182289:loadbalancer/app/alb-east-staging/36c77e709ee69d8a'
+      LoadBalancerArn: 
+        Fn::ImportValue: !Sub 'AppLoad-${DNS}'
       Certificates:
         - CertificateArn: 'arn:aws:acm:us-east-1:997427182289:certificate/14e2fca8-7668-4c0e-a07a-62a19e9032d9'
       Port: 443
