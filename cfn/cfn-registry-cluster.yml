@@ -14,7 +14,16 @@ Parameters:
     AllowedValues: 
       - staging 
       - demo 
-      - prod
+      - prod 
+  
+  Envn:
+    Description: The environment for the parameter store nomenclature. 
+    Type: String
+    Default: STAGING
+    AllowedValues:
+        - STAGING
+        - DEMO
+        - PROD
   
   FamTag:
     Description: Provides a family tag based on the environment for the family of each container/task definition; (p)rod, (s)taging, (d)emo.
@@ -167,77 +176,77 @@ Resources:
         Image: docker.io/aptrust/registry:multi 
         Secrets:
         - Name: APT_ENV
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/APT_ENV
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/APT_ENV'
         - Name: LOG_DIR
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/LOG_DIR
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/LOG_DIR'
         - Name: AUTHY_API_KEY
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/AUTHY_API_KEY
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/AUTHY_API_KEY'
         - Name: AWS_ACCESS_KEY_ID
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/AWS_ACCESS_KEY_ID
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/AWS_ACCESS_KEY_ID'
         - Name: AWS_REGION
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/AWS_REGION
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/AWS_REGION'
         - Name: AWS_SECRET_ACCESS_KEY
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/AWS_SECRET_ACCESS_KEY
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/AWS_SECRET_ACCESS_KEY'
         - Name: COOKIE_BLOCK_KEY
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/COOKIE_BLOCK_KEY
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/COOKIE_BLOCK_KEY'
         - Name: COOKIE_DOMAIN
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/COOKIE_DOMAIN
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/COOKIE_DOMAIN'
         - Name: COOKIE_HASH_KEY
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/COOKIE_HASH_KEY
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/COOKIE_HASH_KEY'
         - Name: DB_DRIVER
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/DB_DRIVER
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/DB_DRIVER'
         - Name: DB_HOST
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/DB_HOST
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/DB_HOST'
         - Name: DB_PASSWORD
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/DB_PASSWORD
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/DB_PASSWORD'
         - Name: DB_PORT
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/DB_PORT
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/DB_PORT'
         - Name: DB_ROOT_PASSWORD
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/DB_ROOT_PASSWORD
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/DB_ROOT_PASSWORD'
         - Name: DB_ROOT_USER
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/DB_ROOT_USER
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/DB_ROOT_USER'
         - Name: DB_USER
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/DB_USER
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/DB_USER'
         - Name: DB_NAME
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/DB_NAME
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/DB_NAME'
         - Name: DB_USE_SSL
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/DB_USE_SSL
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/DB_USE_SSL'
         - Name: EMAIL_ENABLED
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/EMAIL_ENABLED
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/EMAIL_ENABLED'
         - Name: EMAIL_FROM_ADDRESS
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/EMAIL_FROM_ADDRESS
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/EMAIL_FROM_ADDRESS'
         - Name: ENABLE_TWO_FACTOR_AUTHY
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/ENABLE_TWO_FACTOR_AUTHY
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/ENABLE_TWO_FACTOR_AUTHY'
         - Name: ENABLE_TWO_FACTOR_SMS
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/ENABLE_TWO_FACTOR_SMS
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/ENABLE_TWO_FACTOR_SMS'
         - Name: FLASH_COOKIE_NAME
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/FLASH_COOKIE_NAME
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/FLASH_COOKIE_NAME'
         - Name: HTTPS_COOKIES
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/HTTPS_COOKIES
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/HTTPS_COOKIES'
         - Name: LOG_CALLER
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/LOG_CALLER
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/LOG_CALLER'
         - Name: LOG_FILE
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/LOG_FILE
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/LOG_FILE'
         - Name: LOG_LEVEL
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/LOG_LEVEL
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/LOG_LEVEL'
         - Name: LOG_SQL
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/LOG_SQL
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/LOG_SQL'
         - Name: LOG_TO_CONSOLE
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/LOG_TO_CONSOLE
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/LOG_TO_CONSOLE'
         - Name: OTP_EXPIRATION
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/OTP_EXPIRATION
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/OTP_EXPIRATION'
         - Name: PREFS_COOKIE_NAME
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/PREFS_COOKIE_NAME
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/PREFS_COOKIE_NAME'
         - Name: REDIS_DEFAULT_DB
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/REDIS_DEFAULT_DB
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/REDIS_DEFAULT_DB'
         - Name: SESSION_COOKIE_NAME
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/SESSION_COOKIE_NAME
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/SESSION_COOKIE_NAME'
         - Name: SESSION_MAX_AGE
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/SESSION_MAX_AGE
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/SESSION_MAX_AGE'
         - Name: NSQ_URL
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/PRESERV/NSQ_URL
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/PRESERV/NSQ_URL'
         - Name: REDIS_URL
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/PRESERV/REDIS_URL
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/PRESERV/REDIS_URL'
         LinuxParameters: {}
         LogConfiguration:
           LogDriver: awslogs
