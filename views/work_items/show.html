@@ -10,13 +10,15 @@
 <div class="modal-detail">
   <div class="modal-title-row is-flex is-justify-content-space-between is-align-items-center">
     <h2>{{ .item.Name }}</h2>
-    {{ if userCan .CurrentUser "WorkItemUpdate" .item.InstitutionID }}
-    <a data-modal="modal-one" data-xhr-url="/work_items/edit/{{ .item.ID }}?modal=true" href="#">
-      <span class="material-icons" aria-hidden="true">edit</span>
-      <span class="is-sr-only">Edit</span>
+    <a class="modal-exit" href="#">
+      <span class="material-icons" aria-hidden="true">close</span>
+      <span class="is-sr-only">Close</span>
     </a>
-   {{ end }}
   </div>
+
+  {{ if userCan .CurrentUser "WorkItemUpdate" .item.InstitutionID }}
+  <div><a href="#" class="button" data-modal="modal-one" data-xhr-url="/work_items/edit/{{ .item.ID }}?modal=true">Edit</a></div>
+  {{ end }}
 
   {{ if userCan .CurrentUser "WorkItemRequeue" .item.InstitutionID }}
     {{ if not .item.HasCompleted }}

@@ -11,7 +11,7 @@
   <div class="modal-title-row is-flex is-justify-content-space-between is-align-items-center">
     <!-- TODO Pass name of item -->
     <h2>Name of item</h2>
-    <a href="javascript:history.back()">
+    <a class="modal-exit" href="#">
       <span class="material-icons" aria-hidden="true">close</span>
       <span class="is-sr-only">Close</span>
     </a>
@@ -47,7 +47,7 @@
     {{ template "forms/csrf_token.html" . }}
 
     <div class="is-flex is-justify-content-space-between">
-      <a class="button" href="javascript:history.back()">Cancel</a>
+      <a class="button modal-exit" href="#">Cancel</a>
       <input class="button is-dark" type="submit" value="Submit">
     </div>
 

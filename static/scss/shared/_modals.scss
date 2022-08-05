@@ -1,3 +1,31 @@
+body {
+  &.freeze {
+    height: 100vh;
+    overflow: hidden;
+  }
+}
+
+.modal {
+  display: none;
+
+  &.open {
+    display: block;
+  }
+}
+
+.modal-container {
+  align-items: center;
+  background: rgba($grey-dark-brand, 0.75);
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  left: 0;
+  position: fixed;
+  right: 0;
+  top: 0;
+  z-index: 10;
+}
+
 .modal-detail,
 .modal-edit {
   background-color: white;

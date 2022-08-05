@@ -6874,6 +6874,31 @@ ol {
   color: #6b6b6b;
 }
 
+body.freeze {
+  height: 100vh;
+  overflow: hidden;
+}
+
+.modal {
+  display: none;
+}
+.modal.open {
+  display: block;
+}
+
+.modal-container {
+  align-items: center;
+  background: rgba(51, 48, 48, 0.75);
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  left: 0;
+  position: fixed;
+  right: 0;
+  top: 0;
+  z-index: 10;
+}
+
 .modal-detail,
 .modal-edit {
   background-color: white;
@@ -6945,19 +6970,6 @@ ol {
 .modal-edit .modal-list-right {
   border-left: 1px solid #f7f7f7;
   padding-left: 32px;
-}
-
-.modal {
-  display: none;
-}
-
-/*
-  .modal.open added by A.D. to see if modals are displaying
-  in response to clicks. Feel free to change or delete this.
-  For now, it makes modal content appear at the bottom of the screen.
-*/
-.modal.open {
-  display: block;
 }
 
 /*# sourceMappingURL=registry.css.map */

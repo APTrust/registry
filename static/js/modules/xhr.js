@@ -113,7 +113,7 @@ export function initXHR() {
 	modalItems.forEach(function(item){
 		//console.log(item.dataset.xhrUrl, item.dataset.xhrTarget)
         let modal = document.getElementById(item.dataset.modal)
-        let modalContentDiv = modal.querySelector('.modal-content');
+        let modalContentDiv = modal.querySelector('.modal-container');
         let method = item.dataset.xhrMethod || "get"
         if (item.dataset.initialized != "true") {
 		    item.addEventListener("click", function (event) {

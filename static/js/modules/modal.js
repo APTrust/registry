@@ -14,11 +14,14 @@ export function initModals() {
             c.addEventListener("click", function (event) {
                 event.preventDefault();
                 var modal = document.getElementById(c.dataset.modal);
+                var body = document.body;
+                body.classList.add("freeze");
                 modal.classList.add("open");
-                var exits = modal.querySelectorAll(".modal-exit");
+                var exits = document.querySelectorAll(".modal-exit");
                 exits.forEach(function (exit) {
                     exit.addEventListener("click", function (event) {
                         event.preventDefault();
+                        body.classList.remove("freeze");
                         modal.classList.remove("open");
                     });
                 });
