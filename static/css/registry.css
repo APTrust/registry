@@ -6874,6 +6874,23 @@ ol {
   color: #6b6b6b;
 }
 
+.data-list-wrapper {
+  max-width: 700px;
+}
+
+.data-list dt {
+  margin-bottom: 6px;
+}
+.data-list dd {
+  margin-bottom: 16px;
+}
+.data-list dd:last-child {
+  margin-bottom: 0;
+}
+.data-list dd + dd {
+  margin-top: -16px;
+}
+
 body.freeze {
   height: 100vh;
   overflow: hidden;

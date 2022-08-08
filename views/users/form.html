@@ -7,9 +7,9 @@
 
 
 <!-- TODO: Make this an actual modal instead of a page -->
-<div class="modal-edit">
+<div class="box">
 
-  <form action="{{ .form.Action }}" id="userForm" method="post">
+  <form class="box-content" action="{{ .form.Action }}" id="userForm" method="post">
 
     {{ if .FormError }}
     <div class="notification is-danger is-light">

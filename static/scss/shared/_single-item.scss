@@ -62,3 +62,25 @@
     color: $grey-1;
   }
 }
+
+.data-list-wrapper {
+  max-width: 700px;
+}
+
+.data-list {
+  dt {
+    margin-bottom: 6px;
+  }
+
+  dd {
+    margin-bottom: 16px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    & + dd {
+      margin-top: -16px;
+    }
+  }
+}

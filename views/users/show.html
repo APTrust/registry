@@ -5,34 +5,31 @@
   {{ template "shared/_header.html" .}}
 {{ end }}
 
-<!-- TODO: Make this an actual modal instead of a page -->
-<div class="modal-detail">
-  <div class="modal-title-row is-flex is-justify-content-space-between is-align-items-center">
-    <div>
-      <h2>{{ .user.Name }}</h2>
-      <h4>{{ roleName .user.Role }} at {{ .user.Institution.Name }}</h4>
-    </div>
+<div class="box">
+  <div class="box-header">
+    <h1 class="h2">{{ .user.Name }}</h1>
+    <h4>{{ roleName .user.Role }} at {{ .user.Institution.Name }}</h4>
   </div>
 
-  <div class="modal-content">
-    <div>
+  <div class="box-content">
+    <div class="mb-5">
       {{ if .user.DeactivatedAt.IsZero }}
-      <div class="is-flex is-justify-content-space-between mb-5">
+      <div class="is-flex mb-5">
         {{ if userCan .CurrentUser "UserCreate" .user.InstitutionID }}
-        <button class="button" data-modal="modal-one" data-xhr-url="/users/edit/{{ .user.ID }}?modal=true">Edit</button>
+        <a class="button mr-3" href="/users/edit/{{ .user.ID }}">Edit</a>
         {{ end }}
         {{ if userCan .CurrentUser "UserDelete" .user.InstitutionID }}
-        <button class="button" onclick="document.forms['userDeleteForm'].submit()">Deactivate</button>
+        <button class="button mr-3" onclick="document.forms['userDeleteForm'].submit()">Deactivate</button>
         <form method="post" class="is-hidden" id="userDeleteForm" action="/users/delete/{{ .user.ID }}">
           <input type="hidden" name="id" value="{{ .user.ID }}"/>
           {{ template "forms/csrf_token.html" . }}
         </form>
       </div>
         {{ end }}
-        <div class="is-flex is-justify-content-space-between">
+        <div class="is-flex">
         {{ if userCan .CurrentUser "UserUpdate" .user.InstitutionID }}
-        <a class="button" href="/users/change_password/{{ .user.ID }}">Change Password</a>
-        <a class="button" href="javascript:forcePasswordReset()">Force Password Reset</a>
+        <a class="button mr-3" href="/users/change_password/{{ .user.ID }}">Change Password</a>
+        <a class="button mr-3" href="javascript:forcePasswordReset()">Force Password Reset</a>
         {{ end }}
 
       {{ else }} <!-- User is deactivated. Just show reactivation button. -->
@@ -43,13 +40,14 @@
           {{ template "forms/csrf_token.html" . }}
         </form>
 
-
         {{ end }}
       </div>
       {{ end }}
     </div>
-    <div class="modal-list-row is-flex is-justify-content-space-between">
-      <dl class="modal-list modal-list-left">
+    </div>
+
+    <div class="data-list-wrapper is-flex is-justify-content-space-between">
+      <dl class="data-list">
         <!-- TODO: Is there a way to hide empty fields? -->
         <dt class="text-label text-xs is-grey-dark">Email</dt>
         <dd class="text-table">{{ .user.Email }}</dd>
@@ -83,7 +81,7 @@
         <dd class="text-table">{{ dateUS .user.LastSignInWithAuthy }}</dd>
       </dl>
 
-      <dl class="modal-list modal-list-right">
+      <dl class="data-list">
         <dt class="text-label text-xs is-grey-dark">Last Updated</dt>
         <dd class="text-table">{{ dateUS .user.UpdatedAt }}</dd>
         <dt class="text-label text-xs is-grey-dark">Deactivated</dt>
