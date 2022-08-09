@@ -10,23 +10,31 @@
 export function initModals() {
     var modalControllers = document.querySelectorAll("[data-modal]");
     modalControllers.forEach(function (c) {
-        if (c.dataset.modalInitialized != "true") {
-            c.addEventListener("click", function (event) {
-                event.preventDefault();
-                var modal = document.getElementById(c.dataset.modal);
-                var body = document.body;
-                body.classList.add("freeze");
-                modal.classList.add("open");
-                var exits = document.querySelectorAll(".modal-exit");
-                exits.forEach(function (exit) {
-                    exit.addEventListener("click", function (event) {
-                        event.preventDefault();
-                        body.classList.remove("freeze");
-                        modal.classList.remove("open");
-                    });
-                });
-            });
-            c.dataset.modalInitialized = "true"
-        }
+        c.removeEventListener("click", modalOpen)
+        c.addEventListener("click", modalOpen)
+    });
+}
+
+function modalOpen(event) {
+    let modal = document.getElementById(event.currentTarget.dataset.modal);
+    event.preventDefault();
+    document.body.classList.add("freeze");
+    modal.classList.add("open");
+    // This is a hack, but we have to wait for children to load,
+    // and there's no way to attach an onload event to an item
+    // that isn't present yet. This does not work without the timeout.
+    // Ideally, we use a mutation observer for this. We'll get back
+    // to this when we actually have some time.
+    window.setTimeout(function() { attachModalClose(modal) }, 350)
+}
+
+function attachModalClose(modal) {
+    var exits = modal.querySelectorAll(".modal-exit");
+    exits.forEach(function (exit) {
+        exit.addEventListener("click", function (event) {
+            event.preventDefault();
+            document.body.classList.remove("freeze");
+            modal.classList.remove("open");
+        });
     });
 }
