@@ -258,8 +258,8 @@ Resources:
         PortMappings:
         - ContainerPort: 8080
           Protocol: tcp
-      Cpu: "256"
-      Memory: "512"
+      Cpu: "512"
+      Memory: "1024"
       TaskRoleArn: 
         Fn::ImportValue: !Sub "FargateIAMRole-${DNS}" 
       ExecutionRoleArn: 
@@ -296,7 +296,7 @@ Resources:
       LoadBalancerArn: 
         Fn::ImportValue: !Sub 'AppLoad-${DNS}'
       Certificates:
-        - CertificateArn: 'arn:aws:acm:us-east-1:997427182289:certificate/14e2fca8-7668-4c0e-a07a-62a19e9032d9'
+        - CertificateArn: 'arn:aws:acm:us-east-1:997427182289:certificate/42b47e24-6194-482d-ae4a-8f62a3d719ae'
       Port: 443
       Protocol: HTTPS
 
