@@ -89,7 +89,7 @@ func getLogger(config *Config) zerolog.Logger {
 	if config.Logging.LogToConsole {
 		consoleWriter := zerolog.ConsoleWriter{
 			Out:     os.Stderr,
-			NoColor: false,
+			NoColor: true,
 		}
 		multiWriter = zerolog.MultiLevelWriter(consoleWriter, fileWriter)
 	}
