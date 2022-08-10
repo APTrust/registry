@@ -41,7 +41,12 @@ Parameters:
     AllowedValues: 
       - ecs-registry-staging
       - ecs-registry-demo
-      - ecs-registry-prod
+      - ecs-registry-prod 
+  
+  MaxContainers:
+    Description: Maximum number of containers desired for the scaling services.
+    Type: Number
+    Default: 3
 
 Resources:
   
@@ -314,3 +319,75 @@ Resources:
       TargetType: ip
       VpcId: 
         Fn::ImportValue: !Sub "vpc-apt-${DNS}"  
+
+  # Alarms for CPU usage. 
+
+  AutoScalingRegistryTarget:
+    Type: AWS::ApplicationAutoScaling::ScalableTarget
+    Properties:
+      MinCapacity: 1
+      MaxCapacity: !Ref MaxContainers
+      ResourceId: !Join
+        - '/'
+        - - service
+          - !Ref Cluster
+          - !GetAtt RegistryService.Name
+      ScalableDimension: ecs:service:DesiredCount
+      ServiceNamespace: ecs
+      RoleARN:
+        Fn::ImportValue: !Sub "AutoScalingRole-${DNS}"
+  
+  ScaleRegistryPolicy:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    Properties:
+      PolicyName: !Sub '${RegistryService}MemoryScaleUpPolicy'
+      PolicyType: StepScaling
+      ScalingTargetId: !Ref AutoScalingRegistryTarget
+      StepScalingPolicyConfiguration:
+        AdjustmentType: ChangeInCapacity
+        Cooldown: 120
+        MetricAggregationType: Average
+        StepAdjustments:
+          - MetricIntervalLowerBound: 0
+            ScalingAdjustment: 1 
+  
+  ScaleDownRegistryPolicy:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    Properties:
+      PolicyName: !Sub '${RegistryService}MemoryScaleDownPolicy'
+      PolicyType: StepScaling
+      ScalingTargetId: !Ref AutoScalingRegistryTarget
+      StepScalingPolicyConfiguration:
+        AdjustmentType: ChangeInCapacity
+        Cooldown: 120
+        MetricAggregationType: Average
+        StepAdjustments:
+          - MetricIntervalUpperBound: 0
+            ScalingAdjustment: -1 
+  
+  AlarmHighCPUPrefetch:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      ActionsEnabled: TRUE
+      AlarmActions:
+        - !Ref ScaleRegistryPolicy
+      AlarmDescription: 'Scaling alarm based on cpu usage for ecs-prefetch'
+      ComparisonOperator: GreaterThanThreshold
+      DatapointsToAlarm: 2
+      # the dimensions can be found in the console after selecting a namespace to filter by
+      Dimensions:
+        - Name: ClusterName
+          Value: !Sub "ecs-registry-${DNS}"
+        - Name: ServiceName
+          Value: ecs-registry
+      EvaluationPeriods: 3
+      # the metric name can be found in the console on the screen before a metric is graphed
+      MetricName: CpuUtilized
+     # the namespace can be found in the console on the first screen before filtering metrics
+      Namespace: ECS/ContainerInsights
+      OKActions:
+       - !Ref ScaleRegistryPolicy
+      Statistic: Sum
+      Period: 60
+      Threshold: 75
+      TreatMissingData: ignore
