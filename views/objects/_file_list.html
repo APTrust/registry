@@ -65,25 +65,19 @@
           {{ end }}
 
           <!-- TODO - Note that checksums will always be present for real data. Try http://localhost:8080/objects/show/8 for an example of fixture data that does include checksums -->
-          <h3>Checksums</h3>
-          <table class="mb-5">
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Algorithm</th>
-                <th>Digest</th>
-              </tr>
-            </thead>
-            <tbody>
-              {{ range $index, $c := $file.Checksums }}
-              <tr>
-                <td>{{ dateUS $c.DateTime }}</td>
-                <td>{{ $c.Algorithm }}</td>
-                <td style="word-break: break-all;">{{ $c.Digest }}</td>
-              </tr>
-              {{ end }}
-            </tbody>
-          </table>
+          <h3 class="mb-4">Checksums</h3>
+
+          <dl class="data-list">
+            {{ range $index, $c := $file.Checksums }}
+            <dt class="text-label text-xs is-grey-dark">Date</dt>
+            <dd class="text-table">{{ dateUS $c.DateTime }}</dd>
+            <dt class="text-label text-xs is-grey-dark">Algorithm</dt>
+            <dd class="text-table">{{ $c.Algorithm }}</dd>
+            <dt class="text-label text-xs is-grey-dark">Digest</dt>
+            <dd class="text-table">{{ $c.Digest }}</dd>
+            <hr>
+            {{ end }}
+          </dl>
 
           <!-- TODO, hook models back up -->
           {{ if eq $file.State "A"}}

@@ -2,28 +2,31 @@
 
 {{ template "shared/_header.html" .}}
 
-<h1>Oops!</h1>
+<div class="box">
+    <div class="box-header"><h1 class="h2">Oops!</h1></div>
+    <div class="box-content">
+        <div class="notification is-danger is-light">{{ .error }}</div>
 
-<p>{{ .error }}</p>
-
-{{ if .redirectURL }}
-<p>You will be redirected automatically in <span id="time"></span> seconds...</p>
-<script type="text/javascript">
- let redirTime = 4;
- function showSeconds(s) {
-     document.getElementById("time").innerHTML = s.toString()
- }
- setInterval(function () {
-     showSeconds(--redirTime);
-     if (redirTime == 0) {
-         window.location = "{{ .redirectURL }}"
-     }
- }, 1000);
- showSeconds(redirTime)
-</script>
-{{ else }}
-<button class="button button-outline" onclick="history.back()">&lt;&lt; Back</button>
-{{ end }}
+        {{ if .redirectURL }}
+        <p>You will be redirected automatically in <span id="time"></span> seconds...</p>
+        <script type="text/javascript">
+        let redirTime = 4;
+        function showSeconds(s) {
+            document.getElementById("time").innerHTML = s.toString()
+        }
+        setInterval(function () {
+            showSeconds(--redirTime);
+            if (redirTime == 0) {
+                window.location = "{{ .redirectURL }}"
+            }
+        }, 1000);
+        showSeconds(redirTime)
+        </script>
+        {{ else }}
+        <button class="button button-outline" onclick="history.back()">&lt;&lt; Back</button>
+        {{ end }}
+    </div>
+</div>
 
 {{ template "shared/_footer.html" .}}
 

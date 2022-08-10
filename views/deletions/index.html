@@ -32,7 +32,7 @@
       <td class="pl-5">
         <div class="is-flex is-align-items-center">
           <span class="action-icon mr-3">
-            <span class="material-icons md-16" aria-hidden="true"><span>delete_forever</span></span><!-- TODO wire up icon -->
+            <span class="material-icons md-16" aria-hidden="true"><span>delete_forever</span></span>
           </span>
           <span class="is-grey-dark">{{ $deletion.RequestedByName }}</span>
         </div>
@@ -41,7 +41,7 @@
       <td class="is-grey-dark text-sm is-uppercase">{{ dateUS $deletion.ConfirmedAt }}</td>
       <td class="is-grey-dark num text-sm">{{ $deletion.FileCount }}</td>
       <td class="is-grey-dark num text-sm">{{ $deletion.ObjectCount }}</td>
-      <td><span class="badge">{{ $deletion.DisplayStatus }}</span></td><!-- TODO Make status change classes -->
+      <td><span class="badge {{ badgeClass $deletion.DisplayStatus }}">{{ $deletion.DisplayStatus }}</span></td><!-- TODO Make status change classes -->
     </tr>
     {{ end }}
   </tbody>
