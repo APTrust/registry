@@ -60,3 +60,7 @@ func (a *AlertView) Save() error {
 func (a *AlertView) GetID() int64 {
 	return a.ID
 }
+
+func (a *AlertView) HasBeenRead() bool {
+	return !a.ReadAt.IsZero()
+}

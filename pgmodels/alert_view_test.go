@@ -2,6 +2,7 @@ package pgmodels_test
 
 import (
 	"testing"
+	"time"
 
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/db"
@@ -26,4 +27,11 @@ func TestAlertView(t *testing.T) {
 	alerts, err := pgmodels.AlertViewSelect(query)
 	require.Nil(t, err)
 	assert.Equal(t, 6, len(alerts))
+}
+
+func TestAlertViewHasBeenRead(t *testing.T) {
+	a := &pgmodels.AlertView{}
+	assert.False(t, a.HasBeenRead())
+	a.ReadAt = time.Now().UTC()
+	assert.True(t, a.HasBeenRead())
 }
