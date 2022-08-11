@@ -74,9 +74,9 @@
         <dt class="text-label text-xs is-grey-dark">2FA Required By</dt>
         <dd class="text-table">{{ dateUS .user.GracePeriod }}</dd>
         <dt class="text-label text-xs is-grey-dark">Authy Status</dt>
-        <dd class="text-table">{{ .user.AuthyStatus }}</dd>
+        <dd class="text-table">{{ defaultString .user.AuthyStatus "N/A" }}</dd>
         <dt class="text-label text-xs is-grey-dark">Authy ID</dt>
-        <dd class="text-table">{{ .user.AuthyID }}</dd>
+        <dd class="text-table">{{ defaultString .user.AuthyID "N/A" }}</dd>
         <dt class="text-label text-xs is-grey-dark">Last Authy SignIn</dt>
         <dd class="text-table">{{ dateUS .user.LastSignInWithAuthy }}</dd>
       </dl>
