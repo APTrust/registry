@@ -2,42 +2,68 @@
 
 {{ template "shared/_header.html" .}}
 
-{{ template "alerts/_filters.html" . }}
-
 {{ $isAdmin := .CurrentUser.IsAdmin }}
 
 <!-- .items type is []*AlertView -->
 
-<h1>Alerts</h1>
+<div class="box">
+  <div class="box-header">
+    <h1 class="h2">Alerts</h1>
+  </div>
 
-<table>
-  <thead>
-    <tr>
-      {{ if $isAdmin }}
-      <th><a href="{{ sortUrl .currentUrl `user_name` }}">Recipient</a></th>
-      {{ end }}
-      <th><a href="{{ sortUrl .currentUrl `type` }}">Type</a></th>
-      <th><a href="{{ sortUrl .currentUrl `subject` }}">Subject</a></th>
-      <th><a href="{{ sortUrl .currentUrl `created_at` }}">Created</a></th>
-      <th><a href="{{ sortUrl .currentUrl `read_at` }}">Read</a></th>
-    </tr>
-  </thead>
-  <tbody>
-    {{ range $index, $alert := .items }}
-    <tr class="clickable" onclick="window.location.href='/alerts/show/{{ $alert.ID }}/{{ $alert.UserID }}'">
-      {{ if $isAdmin }}
-      <td>{{ $alert.UserName }}</td>
-      {{ end }}
-      <td>{{ $alert.Type }}</td>
-      <td>{{ $alert.Subject }}</td>
-      <td>{{ dateUS $alert.CreatedAt }}</td>
-      <td>{{ dateUS $alert.ReadAt }}</td>
-    </tr>
-    {{ end }}
-  </tbody>
-</table>
+  <div class="box-content">
+    {{ template "alerts/_filters.html" . }}
 
-{{ template "shared/_pager.html" dict "pager" .pager }}
+    <div class="mt-5"><a href="#" class="is-underlined">Mark all as read</a></div><!-- TODO: Hook this up -->
+  </div>
+
+  <table class="table is-hoverable is-fullwidth has-padding">
+    <thead>
+      <tr>
+        <th class="pl-5"><a href="{{ sortUrl .currentUrl `type` }}">Type</a></th>
+        {{ if $isAdmin }}
+        <th><a href="{{ sortUrl .currentUrl `user_name` }}">Recipient</a></th>
+        {{ end }}
+        <th><a href="{{ sortUrl .currentUrl `created_at` }}">Created</a></th>
+        <th><a href="{{ sortUrl .currentUrl `read_at` }}">Read</a></th>
+        <th>Read Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{ range $index, $alert := .items }}
+      <tr class="clickable" onclick="window.location.href='/alerts/show/{{ $alert.ID }}/{{ $alert.UserID }}'">
+        <td class="pl-5">
+          <div class="is-flex is-align-items-center">
+            <span class="action-icon mr-3"><!-- TODO Make this update with correct icon-->
+              <span class="material-icons md-16" aria-hidden="true"><span>check</span></span>
+            </span>
+            <span class="is-grey-dark">{{ $alert.Type }}</span>
+          </div>
+          <div class="text-xs is-grey-dark is-dashboard-action">{{ $alert.Subject }}</div>
+        </td>
+        {{ if $isAdmin }}
+        <td>{{ defaultString $alert.UserName "N/A" }}</td>
+        {{ end }}
+        <td>{{ dateUS $alert.CreatedAt }}</td>
+        <td>{{ dateUS $alert.ReadAt }}</td>
+        <td class="has-text-centered">
+          <a href="#"><!-- TODO: Hook this up-->
+            {{ if $alert.HasBeenRead }}
+            <span class="material-icons" aria-hidden="true">mail</span>
+            <span class="is-sr-only">Mark as Read</span>
+            {{ else }}
+            <span class="material-icons is-grey" aria-hidden="true">drafts</span>
+            <span class="is-sr-only">Mark as Unread</span>
+            {{ end }}
+          </a>
+        </td>
+      </tr>
+      {{ end }}
+    </tbody>
+  </table>
+
+  {{ template "shared/_pager.html" dict "pager" .pager }}
+</div>
 
 {{ template "shared/_footer.html" .}}
 
