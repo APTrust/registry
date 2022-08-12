@@ -19,7 +19,11 @@
         <td class="pl-5">
           <div class="is-flex is-align-items-center">
             <span class="action-icon mr-3"><!-- TODO Make this update with correct icon-->
+              {{ if $alert.HasBeenRead }}
               <span class="material-icons md-16" aria-hidden="true"><span>check</span></span>
+              {{ else }} <!-- TODO Replace star with something more appropriate -->
+              <span class="material-icons md-16" aria-hidden="true"><span>star</span></span>
+              {{ end }}
             </span>
             <span class="is-grey-dark">{{ $alert.Type }}</span>
           </div>

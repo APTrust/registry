@@ -71,7 +71,7 @@
         <dt class="text-label text-xs is-grey-dark">User</dt>
         <dd class="text-table">{{ .item.User }}</dd>
         <dt class="text-label text-xs is-grey-dark">Node</dt>
-        <dd class="text-table">{{ .item.Node }}</dd>
+        <dd class="text-table">{{ defaultString .item.Node "N/A" }}</dd>
         <dt class="text-label text-xs is-grey-dark">PID</dt>
         <dd class="text-table">{{ .item.PID }}</dd>
         <dt class="text-label text-xs is-grey-dark">APTrust Approver</dt>

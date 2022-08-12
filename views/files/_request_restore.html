@@ -1,35 +1,29 @@
 {{ define "files/_request_restore.html" }}
 
-<div class="container">
-
-  <h1>Restore File</h1>
-
-  <div class="row">
-    <div class="column column-30">
-    <p>This file will be restored to your institution's receiving bucket and you'll receive an email at {{ .CurrentUser.Email }} when it's ready.</p>
-
-    <p>Restoration times vary. Large files take longer than smaller files. Items restored from Glacier and Glacier Deep Archive take longer than items restored from S3 and Wasabi.</p>
-    </div>
+<div class="modal-detail">
+  <div class="modal-title-row is-flex is-justify-content-space-between is-align-items-center">
+    <h2>Restore File</h2>
+    <a class="modal-exit" href="#">
+      <span class="material-icons" aria-hidden="true">close</span>
+      <span class="is-sr-only">Close</span>
+    </a>
   </div>
 
-  <div class="row">
-    <div class="column column-30">
-      <button class="button button-outline" onclick="document.getElementById('modal-one').classList.remove('open')">Cancel</button>
-    </div>
-    <div class="column column-40">
+  <div class="modal-content">
+    <p class="mb-3">This file will be restored to your institution's receiving bucket and you'll receive an email at {{ .CurrentUser.Email }} when it's ready.</p>
 
+    <p class="mb-5">Restoration times vary. Large files take longer than smaller files. Items restored from Glacier and Glacier Deep Archive take longer than items restored from S3 and Wasabi.</p>
+    
+    <div class="is-flex">
+        <button class="button modal-exit mr-5">Cancel</button>
+        <button class="button is-primary" onclick="document.forms['fileRestoreForm'].submit()">Confirm</button> 
     </div>
-    <div class="column column-30">
-      <button class="button" onclick="document.forms['fileRestoreForm'].submit()">Confirm</button>
-    </div>
+  
+    <form method="post" id="fileRestoreForm" action="/files/init_restore/{{ .file.ID }}">
+      <input type="hidden" name="id" value="{{ .file.ID }}"/>
+      {{ template "forms/csrf_token.html" . }}
+    </form>
   </div>
-
-  <form method="post" id="fileRestoreForm" action="/files/init_restore/{{ .file.ID }}">
-    <input type="hidden" name="id" value="{{ .file.ID }}"/>
-    {{ template "forms/csrf_token.html" . }}
-  </form>
-
-
 </div>
 
 {{ end }}

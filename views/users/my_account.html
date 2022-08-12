@@ -13,6 +13,10 @@
       <h2>{{ .CurrentUser.Name }}</h2>
       <h4>{{ roleName .CurrentUser.Role }} at {{ .CurrentUser.Institution.Name }}</h4>
     </div>
+    <a class="modal-exit" href="#">
+      <span class="material-icons" aria-hidden="true">close</span>
+      <span class="is-sr-only">Close</span>
+    </a>
   </div>
   <div class="modal-content">
     {{ if userCan .CurrentUser "UserUpdateSelf" .CurrentUser.InstitutionID }}

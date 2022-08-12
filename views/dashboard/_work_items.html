@@ -15,14 +15,14 @@
       <tr class="clickable" onclick="window.location.href='/work_items/show/{{ $item.ID }}'">
         <td class="pl-5">
           <div class="is-flex is-align-items-center">
-            <span class="action-icon mr-3"><!-- TODO Make this update with correct icon-->
-              <span class="material-icons md-16" aria-hidden="true"><span>check</span></span>
+            <span class="action-icon mr-3">
+              <span class="material-icons md-16" aria-hidden="true"><span>{{ iconFor $item.Action }}</span></span>
             </span>
             <span class="is-grey-dark">{{ $item.Name }}</span>
           </div>
           <div class="text-label text-xs is-grey-dark is-dashboard-action">{{ $item.Action }}</div>
         </td>
-        <td><span class="badge">{{ $item.Status }}</span></td><!-- TODO update class with correct status-->
+        <td><span class="badge {{ badgeClass $item.Status }}">{{ $item.Status }}</span></td>
         <td class="is-grey-dark text-sm is-uppercase has-text-right pr-5">{{ dateUS $item.DateProcessed }}</td>
       </tr>
       {{ end }}

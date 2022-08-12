@@ -30,10 +30,6 @@
       <tr class="clickable" onclick="window.location.href='/objects/show/{{ $obj.ID }}'">
         <td class="pl-5">
           <div class="is-flex is-align-items-center">
-            <span class="action-icon mr-3">
-              <!-- TODO Make this update with correct icon-->
-              <span class="material-icons md-16" aria-hidden="true"><span>check</span></span>
-            </span>
             <span class="is-grey-dark">
               {{ truncate $obj.Title 80 }}<br />
               {{ truncate $obj.Identifier 80 }}<br />
