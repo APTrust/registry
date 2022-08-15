@@ -31,7 +31,7 @@
     </thead>
     <tbody>
       {{ range $index, $alert := .items }}
-      <tr class="clickable" onclick="window.location.href='/alerts/show/{{ $alert.ID }}/{{ $alert.UserID }}'">
+      <tr class="clickable" data-modal="modal-one" data-xhr-url="/alerts/show/{{ $alert.ID }}/{{ $alert.UserID }}?modal=true">
         <td class="pl-5">
           <div class="is-flex is-align-items-center">
             <span class="action-icon mr-3"><!-- TODO Make this update with correct icon-->
@@ -49,11 +49,11 @@
         <td class="has-text-centered">
           <a href="#"><!-- TODO: Hook this up-->
             {{ if $alert.HasBeenRead }}
-            <span class="material-icons" aria-hidden="true">mail</span>
-            <span class="is-sr-only">Mark as Read</span>
-            {{ else }}
             <span class="material-icons is-grey" aria-hidden="true">drafts</span>
             <span class="is-sr-only">Mark as Unread</span>
+            {{ else }}
+            <span class="material-icons is-gold" aria-hidden="true">mail</span>
+            <span class="is-sr-only">Mark as Read</span>
             {{ end }}
           </a>
         </td>

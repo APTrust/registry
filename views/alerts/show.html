@@ -1,32 +1,36 @@
 {{ define "alerts/show.html" }}
 
-{{ template "shared/_header.html" . }}
+<!-- Show the header unless query string says modal=true -->
+{{ if not .showAsModal }}
+  {{ template "shared/_header.html" .}}
+{{ end }}
 
 <!-- Note: The object here is AlertView, not Alert. -->
 
-<h1>Alert</h1>
+<div class="modal-detail">
+  <div class="modal-title-row is-flex is-justify-content-space-between is-align-items-center">
+    <h2>Alert</h2>
+    <a class="modal-exit" href="#">
+      <span class="material-icons" aria-hidden="true">close</span>
+      <span class="is-sr-only">Close</span>
+    </a>
+  </div>
 
-<table>
-  <tbody>
-    <tr>
-      <th>To</th>
-      <td>{{ .alert.UserName }} - {{ dateUS .alert.CreatedAt }}</td>
-    </tr>
-    <tr>
-      <th>Subject</th>
-      <td>{{ .alert.Subject }}</td>
-    </tr>
-    <tr>
-      <th>Content</th>
-      <td>
-        <pre class="with-wrap">{{ .alert.Content }}
-        </pre>
-      </td>
-    </tr>
-  </tbody>
-</table>
+  <div class="modal-content">
+    <dl class="data-list">
+      <dt class="text-label text-xs is-grey-dark">To</dt>
+      <dd class="text-table">{{ .alert.UserName }} - {{ dateUS .alert.CreatedAt }}</dd>
+      <dt class="text-label text-xs is-grey-dark">Subject</dt>
+      <dd class="text-table">{{ .alert.Subject }}</dd>
+      <dt class="text-label text-xs is-grey-dark">Content</dt>
+      <dd><pre class="with-wrap">{{ .alert.Content }}</pre></dd>
+    </dl>
+  </div>
+</div>
 
-{{ template "shared/_footer.html" . }}
-
+<!-- Show the footer unless query string says modal=true -->
+{{ if not .showAsModal }}
+  {{ template "shared/_footer.html" .}}
+{{ end }}
 
 {{ end }}
