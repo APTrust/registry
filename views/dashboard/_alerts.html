@@ -18,7 +18,7 @@
       <tr class="clickable" onclick="window.location.href='/alerts/show/{{ $alert.ID }}/{{ $alert.UserID }}'">
         <td class="pl-5">
           <div class="is-flex is-align-items-center">
-            <span class="action-icon mr-3"><!-- TODO Make this update with correct icon-->
+            <span class="action-icon mr-3"><!-- TODO Make this update with correct icon, the icon is for the notification type, not read status  -->
               {{ if $alert.HasBeenRead }}
               <span class="material-icons md-16" aria-hidden="true"><span>check</span></span>
               {{ else }} <!-- TODO Replace star with something more appropriate -->
@@ -27,7 +27,7 @@
             </span>
             <span class="is-grey-dark">{{ $alert.Type }}</span>
           </div>
-          <div class="text-xs is-grey-dark is-dashboard-action">{{ $alert.Subject }}</div><!-- TODO Make this the filename instead? Subject and Type often match -->
+          <div class="text-xs is-grey-dark is-dashboard-action">{{ $alert.Subject }}</div>
         </td>
         <td class="is-grey-dark text-sm is-uppercase has-text-right pr-5">{{ dateUS $alert.CreatedAt }}</td>
       </tr>

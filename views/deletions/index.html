@@ -41,7 +41,7 @@
       <td class="is-grey-dark text-sm is-uppercase">{{ dateUS $deletion.ConfirmedAt }}</td>
       <td class="is-grey-dark num text-sm">{{ $deletion.FileCount }}</td>
       <td class="is-grey-dark num text-sm">{{ $deletion.ObjectCount }}</td>
-      <td><span class="badge {{ badgeClass $deletion.DisplayStatus }}">{{ $deletion.DisplayStatus }}</span></td><!-- TODO Make status change classes -->
+      <td><span class="badge {{ badgeClass $deletion.DisplayStatus }}">{{ $deletion.DisplayStatus }}</span></td><!-- TODO Make status change classes, these statuses don't appear to be in the constants -->
     </tr>
     {{ end }}
   </tbody>
