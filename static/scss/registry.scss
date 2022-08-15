@@ -49,6 +49,10 @@ $brown: #935a15;
 $blue-dark: #608292;
 $blue-light: #6097cd;
 
+.is-gold {
+  color: $gold;
+}
+
 // Override bulma variables as needed
 $body-background-color: $grey-background;
 $body-color: $grey-darker;

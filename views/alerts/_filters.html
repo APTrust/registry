@@ -1,37 +1,46 @@
 {{ define "alerts/_filters.html" }}
 
-<form id="alertFilterForm" method="get">
+<div class="filters-grid">
+  <h3 class="filters-grid-label text-label text-xs">Filter</h3>
+  <div class="filters-grid-content">
 
-  <div class="row">
-    <div class="column col-30">
-      {{ template "forms/select.html" .filterForm.Fields.type }}
-    </div>
-    <div class="column col-30">
-      {{ template "forms/date.html" .filterForm.Fields.created_at__gteq }}
-    </div>
-    <div class="column col-30">
-      {{ template "forms/date.html" .filterForm.Fields.created_at__lteq }}
-    </div>
+    <form id="alertFilterForm" method="get">
+
+      <div class="columns">
+        <div class="column">
+          {{ template "forms/select.html" .filterForm.Fields.type }}
+        </div>
+        <div class="column">
+          {{ template "forms/date.html" .filterForm.Fields.created_at__gteq }}
+        </div>
+        <div class="column">
+          {{ template "forms/date.html" .filterForm.Fields.created_at__lteq }}
+        </div>
+        <div class="column is-align-self-flex-end">
+          <div class="filters-grid-controls">
+            <input class="filter-button button is-primary" type="submit" value="Filter">
+          </div>
+        </div>
+      </div>
+
+      <div class="columns">
+        <div class="column is-one-quarter">
+          {{ if .CurrentUser.IsAdmin }}
+          {{ template "forms/select.html" .filterForm.Fields.user_id }}
+          {{ end }}
+        </div>
+        <div class="column is-one-quarter">
+          {{ if .CurrentUser.IsAdmin }}
+          {{ template "forms/select.html" .filterForm.Fields.institution_id }}
+          {{ end }}
+        </div>
+      </div>
+
+    </form>
+
+    {{ template "shared/_filter_chips.html" . }}
+
   </div>
-
-  <div class="row">
-    <div class="column col-30">
-      {{ if .CurrentUser.IsAdmin }}
-      {{ template "forms/select.html" .filterForm.Fields.user_id }}
-      {{ end }}
-    </div>
-    <div class="column col-30">
-      {{ if .CurrentUser.IsAdmin }}
-      {{ template "forms/select.html" .filterForm.Fields.institution_id }}
-      {{ end }}
-    </div>
-    <div class="column col-30">
-      <input type="submit" value="Filter">
-    </div>
-  </div>
-
-</form>
-
-{{ template "shared/_filter_chips.html" . }}
+</div>
 
 {{ end }}
