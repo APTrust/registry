@@ -7,6 +7,7 @@
 <nav>
   <ul>
 
+    <!-- TODO Add `active` classname to nav items when on current page -->
     {{ if userCan .CurrentUser "DashboardShow" .CurrentUser.InstitutionID }}
     <li><a href="/dashboard"><span class="material-icons" aria-hidden="true">home</span> Dashboard</a></li>
     {{ end }}
