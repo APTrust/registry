@@ -2,11 +2,14 @@
 
 {{ template "shared/_header.html" .}}
 
-<h1>Deletion Previously Cancelled</h1>
+<div class="box">
+  <div class="box-header"><h1>Deletion Previously Cancelled</h1></div>
+  <div class="box-content">
+    <p>The deletion of file <b>{{ .itemIdentifier }}</b> was cancelled by {{ .deletionRequest.CancelledBy.Name }} ({{ .deletionRequest.CancelledBy.Email }} on {{ dateUS .deletionRequest.CancelledAt }}.</p>
 
-<p>The deletion of file <b>{{ .itemIdentifier }}</b> was cancelled by {{ .deletionRequest.CancelledBy.Name }} ({{ .deletionRequest.CancelledBy.Email }} on {{ dateUS .deletionRequest.CancelledAt }}.</p>
-
-<p>This deletion request will not be executed. Unless the file was deleted by a subsequent request, this file should still exist.</p>
+    <p>This deletion request will not be executed. Unless the file was deleted by a subsequent request, this file should still exist.</p>
+  </div>
+</div>
 
 {{ template "shared/_footer.html" .}}
 
