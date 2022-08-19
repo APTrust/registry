@@ -109,7 +109,7 @@ Resources:
         MinimumHealthyPercent: 100
       DeploymentController:
         Type: ECS
-      DesiredCount: 1 
+      DesiredCount: 2 
       EnableExecuteCommand: true
       LaunchType: FARGATE
       LoadBalancers:
@@ -149,7 +149,7 @@ Resources:
         DnsRecords:
         - TTL: 60
           Type: A
-        RoutingPolicy: MULTIVALUE
+        RoutingPolicy: WEIGHTED
       HealthCheckCustomConfig:
         FailureThreshold: 1
       Name: registry
@@ -340,7 +340,7 @@ Resources:
   ScaleRegistryPolicy:
     Type: AWS::ApplicationAutoScaling::ScalingPolicy
     Properties:
-      PolicyName: !Sub '${RegistryService}MemoryScaleUpPolicy'
+      PolicyName: !Sub '${RegistryService}CPUScaleUpPolicy'
       PolicyType: StepScaling
       ScalingTargetId: !Ref AutoScalingRegistryTarget
       StepScalingPolicyConfiguration:
@@ -354,7 +354,7 @@ Resources:
   ScaleDownRegistryPolicy:
     Type: AWS::ApplicationAutoScaling::ScalingPolicy
     Properties:
-      PolicyName: !Sub '${RegistryService}MemoryScaleDownPolicy'
+      PolicyName: !Sub '${RegistryService}CPUScaleDownPolicy'
       PolicyType: StepScaling
       ScalingTargetId: !Ref AutoScalingRegistryTarget
       StepScalingPolicyConfiguration:
@@ -365,29 +365,30 @@ Resources:
           - MetricIntervalUpperBound: 0
             ScalingAdjustment: -1 
   
-  AlarmHighCPUPrefetch:
+  AlarmHighCPURegistry:
     Type: AWS::CloudWatch::Alarm
     Properties:
       ActionsEnabled: TRUE
       AlarmActions:
         - !Ref ScaleRegistryPolicy
+        - !Ref ScaleDownRegistryPolicy
       AlarmDescription: 'Scaling alarm based on cpu usage for ecs-prefetch'
       ComparisonOperator: GreaterThanThreshold
       DatapointsToAlarm: 2
-      # the dimensions can be found in the console after selecting a namespace to filter by
+  #    # the dimensions can be found in the console after selecting a namespace to filter by
       Dimensions:
         - Name: ClusterName
           Value: !Sub "ecs-registry-${DNS}"
         - Name: ServiceName
           Value: ecs-registry
       EvaluationPeriods: 3
-      # the metric name can be found in the console on the screen before a metric is graphed
+     # the metric name can be found in the console on the screen before a metric is graphed
       MetricName: CpuUtilized
      # the namespace can be found in the console on the first screen before filtering metrics
       Namespace: ECS/ContainerInsights
       OKActions:
-       - !Ref ScaleRegistryPolicy
-      Statistic: Sum
+        - !Ref ScaleRegistryPolicy
+      Statistic: Average
       Period: 60
-      Threshold: 75
+      Threshold: 500
       TreatMissingData: ignore
