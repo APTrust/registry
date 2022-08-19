@@ -136,7 +136,7 @@ Resources:
           - Arn
       Tags:  
       - Key: Service
-        Value: nsq
+        Value: registry
       - Key: Environment
         Value: !Ref "DNS"
       TaskDefinition: !Ref RegistryTaskDefinition
@@ -147,14 +147,20 @@ Resources:
       Description: '"registry" service discovery entry in Cloud Map'
       DnsConfig:
         DnsRecords:
-        - TTL: 60
+        - TTL: 20
           Type: A
         RoutingPolicy: WEIGHTED
       HealthCheckCustomConfig:
         FailureThreshold: 1
       Name: registry
       NamespaceId:
-        Fn::ImportValue: !Sub "NameSpace-${DNS}"
+        Fn::ImportValue: !Sub "NameSpace-${DNS}" 
+      Tags:
+        - Key: Environment
+          Value: !Ref DNS
+        - Key: Service
+          Value: registry
+
   
   RegistryTaskDefinition: 
     Type: AWS::ECS::TaskDefinition
@@ -273,6 +279,11 @@ Resources:
       RequiresCompatibilities:
       - FARGATE 
       Family: !Sub 'ecs-registry-${FamTag}'
+      Tags:
+        - Key: Environment 
+          Value: !Ref DNS
+        - Key: Service
+          Value: registry
   
 
   ListenerReg80: 
@@ -325,7 +336,7 @@ Resources:
   AutoScalingRegistryTarget:
     Type: AWS::ApplicationAutoScaling::ScalableTarget
     Properties:
-      MinCapacity: 1
+      MinCapacity: 2
       MaxCapacity: !Ref MaxContainers
       ResourceId: !Join
         - '/'
@@ -371,7 +382,6 @@ Resources:
       ActionsEnabled: TRUE
       AlarmActions:
         - !Ref ScaleRegistryPolicy
-        - !Ref ScaleDownRegistryPolicy
       AlarmDescription: 'Scaling alarm based on cpu usage for ecs-prefetch'
       ComparisonOperator: GreaterThanThreshold
       DatapointsToAlarm: 2
@@ -387,8 +397,8 @@ Resources:
      # the namespace can be found in the console on the first screen before filtering metrics
       Namespace: ECS/ContainerInsights
       OKActions:
-        - !Ref ScaleRegistryPolicy
+        - !Ref ScaleDownRegistryPolicy
       Statistic: Average
       Period: 60
-      Threshold: 500
-      TreatMissingData: ignore
+      Threshold: 60
+      TreatMissingData: missing
