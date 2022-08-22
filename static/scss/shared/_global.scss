@@ -81,3 +81,14 @@
   margin-top: 24px;
   text-align: center;
 }
+
+pre.with-wrap {
+  background: transparent;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  white-space: -moz-pre-wrap;
+  white-space: -pre-wrap;
+  white-space: -o-pre-wrap;
+  word-wrap: break-word;
+  padding: 0;
+}
