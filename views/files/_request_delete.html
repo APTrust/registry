@@ -19,13 +19,13 @@
 
     <p class="mb-5">Confirming will mark this file for deletion and notify
       institutional admins to review the request.</p>
-    
+
     <div class="is-flex">
         <button class="button modal-exit mr-5">Cancel</button>
-        <button class="button is-primary" onclick="document.forms['fileDeleteForm'].submit()">Confirm</button> 
+        <button class="button is-primary" onclick="document.forms['fileDeleteForm'].submit()">Confirm</button>
     </div>
-  
-    <form method="post" id="fileRestoreForm" action="/files/init_restore/{{ .file.ID }}">
+
+    <form method="post" id="fileDeleteForm" action="/files/init_delete/{{ .file.ID }}">
       <input type="hidden" name="id" value="{{ .file.ID }}"/>
       {{ template "forms/csrf_token.html" . }}
     </form>
