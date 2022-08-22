@@ -1,9 +1,11 @@
 {{ define "forms/checkbox.html" }}
 
-<label>{{ .Label }}
-  <input type="checkbox" name="{{ .Name }}" value="true" {{ if .Value }}checked{{ end }}  {{ template "forms/attrs.html" . }}>
-</label>
-
-{{ if .DisplayError }}<div class="row form-error">{{ .ErrMsg }}</div>{{ end }}
+<div class="control">
+  <label class="checkbox">
+    <input type="checkbox" name="{{ .Name }}" value="true" {{ if .Value }}checked{{ end }}  {{ template "forms/attrs.html" . }}>
+    {{ .Label }}
+  </label>
+  {{ if .DisplayError }}<p class="help is-danger">{{ .ErrMsg }}</p>{{ end }}
+</div>
 
 {{ end }}

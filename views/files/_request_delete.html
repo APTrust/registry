@@ -1,46 +1,35 @@
 {{ define "files/_request_delete.html" }}
 
-<div class="container">
-
-  <h1>Delete File</h1>
-
-  <div class="row">
-    <p>Are you sure you want to delete this file?</p>
+<div class="modal-detail">
+  <div class="modal-title-row is-flex is-justify-content-space-between is-align-items-center">
+    <h2>Delete File</h2>
+    <a class="modal-exit" href="#">
+      <span class="material-icons" aria-hidden="true">close</span>
+      <span class="is-sr-only">Close</span>
+    </a>
   </div>
 
-  <div class="row">
-    <dl>
+  <div class="modal-content">
+    <p class="mb-3">Are you sure you want to delete this file?</p>
+
+    <dl class="mb-3">
       <dt>Identifier</dt>
       <dd>{{ .file.Identifier }}</dd>
     </dl>
-  </div>
 
-  <div class="row">
-
-    <p>Confirming will mark this file for deletion and notify
+    <p class="mb-5">Confirming will mark this file for deletion and notify
       institutional admins to review the request.</p>
-
+    
+    <div class="is-flex">
+        <button class="button modal-exit mr-5">Cancel</button>
+        <button class="button is-primary" onclick="document.forms['fileDeleteForm'].submit()">Confirm</button> 
+    </div>
+  
+    <form method="post" id="fileRestoreForm" action="/files/init_restore/{{ .file.ID }}">
+      <input type="hidden" name="id" value="{{ .file.ID }}"/>
+      {{ template "forms/csrf_token.html" . }}
+    </form>
   </div>
-
-
-  <div class="row">
-    <div class="column column-30">
-      <button class="button button-outline" onclick="document.getElementById('modal-one').classList.remove('open')">Cancel</button>
-    </div>
-    <div class="column column-40">
-
-    </div>
-    <div class="column column-30">
-      <button class="button" onclick="document.forms['fileDeleteForm'].submit()">Confirm</button>
-    </div>
-  </div>
-
-  <form method="post" id="fileDeleteForm" action="/files/init_delete/{{ .file.ID }}">
-    <input type="hidden" name="id" value="{{ .file.ID }}"/>
-    {{ template "forms/csrf_token.html" . }}
-  </form>
-
-
 </div>
 
 {{ end }}

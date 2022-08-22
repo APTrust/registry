@@ -6830,6 +6830,26 @@ pre.with-wrap {
   margin-bottom: 1.5rem;
   padding: 0 40px;
 }
+.pager.pager-small {
+  justify-content: space-between;
+  padding: 0 24px;
+}
+.pager.pager-small .pager-rows {
+  display: none;
+}
+.pager.pager-small .pager-items {
+  margin-right: auto;
+}
+.pager.pager-small p,
+.pager.pager-small button,
+.pager.pager-small a {
+  margin-left: 0;
+}
+.pager.pager-small p:last-child,
+.pager.pager-small button:last-child,
+.pager.pager-small a:last-child {
+  margin-left: 18px;
+}
 .pager p,
 .pager button,
 .pager a {

@@ -15,12 +15,27 @@
 
   <table class="table is-hoverable is-fullwidth has-padding">
     <thead>
-      <tr><!-- TODO make table columns sortable -->
-        <th class="pl-5"><a href="{{ sortUrl .currentUrl `event_type` }}">Type</a></th>
-        <th><a href="{{ sortUrl .currentUrl `date_time` }}">Date</a></th>
-        <th><a href="{{ sortUrl .currentUrl `outcome` }}">Outcome</a></th>
-        <th><a href="{{ sortUrl .currentUrl `intellectual_object_identifier` }}">Object Identifier</a></th>
-        <th><a href="{{ sortUrl .currentUrl `generic_file_identifier` }}">File Identifier</a></th>
+      <tr><!-- TODO make icons change direction based on sort direction -->
+        <th class="pl-5"><a href="{{ sortUrl .currentUrl `event_type` }}" class="is-flex is-align-items-center">
+          Type
+          <span class="material-icons" aria-hidden="true">keyboard_arrow_down</span>
+        </a></th>
+        <th><a href="{{ sortUrl .currentUrl `date_time` }}" class="is-flex is-align-items-center">
+          Date
+          <span class="material-icons" aria-hidden="true">keyboard_arrow_down</span>
+        </a></th>
+        <th><a href="{{ sortUrl .currentUrl `outcome` }}" class="is-flex is-align-items-center">
+          Outcome
+          <span class="material-icons" aria-hidden="true">keyboard_arrow_down</span>
+        </a></th>
+        <th><a href="{{ sortUrl .currentUrl `intellectual_object_identifier` }}" class="is-flex is-align-items-center">
+          Object Identifier
+          <span class="material-icons" aria-hidden="true">keyboard_arrow_down</span>
+        </a></th>
+        <th><a href="{{ sortUrl .currentUrl `generic_file_identifier` }}" class="is-flex is-align-items-center">
+          File Identifier
+          <span class="material-icons" aria-hidden="true">keyboard_arrow_down</span>
+        </a></th>
       </tr>
     </thead>
     <tbody>
@@ -28,14 +43,14 @@
       <tr class="clickable" data-modal="modal-one" data-xhr-url="/events/show/{{ $event.ID }}?modal=true">
         <td class="pl-5">
           <div class="is-flex is-align-items-center">
-            <span class="action-icon mr-3"><!-- TODO Make this update with correct icon-->
+            <span class="action-icon mr-3">
               <span class="material-icons md-16" aria-hidden="true"><span>{{ iconFor $event.EventType }}</span></span>
             </span>
             <span class="is-grey-dark">{{ $event.EventType }}</span>
           </div>
         </td>
         <td class="is-grey-dark text-sm is-uppercase">{{ dateUS $event.DateTime }}</td>
-        <td><span class="badge {{ badgeClass $event.Outcome }}">{{ $event.Outcome }}</span></td><!-- TODO Make status change classes -->
+        <td><span class="badge {{ badgeClass $event.Outcome }}">{{ $event.Outcome }}</span></td>
         <td class="is-grey-dark">{{ truncate $event.IntellectualObjectIdentifier 80 }}</td>
         <td class="is-grey-dark">{{ truncate $event.GenericFileIdentifier 80 }}</td>
       </tr>

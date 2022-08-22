@@ -4,20 +4,24 @@
 
 {{ $gf := (index .deletionRequest.GenericFiles 0) }}
 
-<h1>Deletion Cancelled</h1>
+<div class="box">
+  <div class="box-header"><h1>Deletion Cancelled</h1></div>
+  <div class="box-content">
+    <p>You have cancelled deletion of the following file:</p>
 
-<p>You have cancelled deletion of the following file:</p>
+    <p>
+      <b>{{ $gf.Identifier }}</b><br/>
+      Size: {{ humanSize $gf.Size }} <br/>
+      Created: {{ dateUS $gf.CreatedAt }} <br/>
+      Updated: {{ dateUS $gf.UpdatedAt }} <br/>
+      Requested: {{ .deletionRequest.RequestedBy.Name }} on {{ dateUS .deletionRequest.RequestedAt }} <br/>
+      Cancelled: {{ .deletionRequest.CancelledBy.Name }}  on {{ dateUS .deletionRequest.CancelledAt }} <br/>
+    </p>
 
-<p>
-  <b>{{ $gf.Identifier }}</b><br/>
-  Size: {{ humanSize $gf.Size }} <br/>
-  Created: {{ dateUS $gf.CreatedAt }} <br/>
-  Updated: {{ dateUS $gf.UpdatedAt }} <br/>
-  Requested: {{ .deletionRequest.RequestedBy.Name }} on {{ dateUS .deletionRequest.RequestedAt }} <br/>
-  Cancelled: {{ .deletionRequest.CancelledBy.Name }}  on {{ dateUS .deletionRequest.CancelledAt }} <br/>
-</p>
+    <p>This file will <b>NOT</b> be deleted from preservation storage, and no one else will be able to approve this deletion request. If anyone wants to delete this file, they'll need to submit a new request.</p>
 
-<p>This file will <b>NOT</b> be deleted from preservation storage, and no one else will be able to approve this deletion request. If anyone wants to delete this file, they'll need to submit a new request.</p>
+  </div>
+</div>
 
 {{ template "shared/_footer.html" .}}
 

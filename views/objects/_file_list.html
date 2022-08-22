@@ -64,7 +64,6 @@
           </div>
           {{ end }}
 
-          <!-- TODO - Note that checksums will always be present for real data. Try http://localhost:8080/objects/show/8 for an example of fixture data that does include checksums -->
           <h3 class="mb-4">Checksums</h3>
 
           <dl class="data-list">
@@ -79,7 +78,6 @@
             {{ end }}
           </dl>
 
-          <!-- TODO, hook models back up -->
           {{ if eq $file.State "A"}}
             {{ if userCan $CurrentUser "FileRequestDelete" $file.InstitutionID }}
               <button class="button" data-modal="modal-one" data-xhr-url="/files/request_delete/{{ $file.ID }}">Delete File</button>

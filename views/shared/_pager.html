@@ -1,8 +1,8 @@
 {{ define "shared/_pager.html" }}
 
-<div class="pager">
-  <p>Rows per page: {{ .pager.PerPage }}</p>
-  <p>{{ .pager.ItemFirst }} - {{ .pager.ItemLast }} of {{ .pager.TotalItems }}</p>
+<div class="pager pager-{{ .pagerSize }}">
+  <p class="pager-rows">Rows per page: {{ .pager.PerPage }}</p>
+  <p class="pager-items">{{ .pager.ItemFirst }} - {{ .pager.ItemLast }} of {{ .pager.TotalItems }}</p>
 
   <!--
        Previous and Next links.

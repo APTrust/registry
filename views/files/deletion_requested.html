@@ -2,14 +2,17 @@
 
 {{ template "shared/_header.html" .}}
 
-<h1>Deletion Requested</h1>
+<div class="box">
+  <div class="box-header"><h1>Deletion Requested</h1></div>
+  <div class="box-content">
+    <p>Thanks. We have received your request to delete the following file:</p>
 
-<p>Thanks. We have received your request to delete the following file:</p>
+    <p><b>{{ .fileIdentifier }}</b></p>
 
-<p><b>{{ .fileIdentifier }}</b></p>
-
-<p>The APTrust administrators at your institution will soon receive an email
-asking them to approve the deletion.</p>
+    <p>The APTrust administrators at your institution will soon receive an email
+    asking them to approve the deletion.</p>
+  </div>
+</div>
 
 {{ template "shared/_footer.html" .}}
 

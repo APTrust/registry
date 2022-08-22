@@ -6,6 +6,29 @@
   margin-bottom: 1.5rem;
   padding: 0 40px;
 
+  &.pager-small {
+    justify-content: space-between;
+    padding: 0 24px;
+
+    .pager-rows {
+      display: none;
+    }
+
+    .pager-items {
+      margin-right: auto;
+    }
+
+    p,
+    button,
+    a {
+      margin-left: 0;
+
+      &:last-child {
+        margin-left: 18px;
+      }
+    }
+  }
+
   p,
   button,
   a {

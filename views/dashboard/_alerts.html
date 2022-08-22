@@ -18,7 +18,7 @@
       <tr class="clickable" onclick="window.location.href='/alerts/show/{{ $alert.ID }}/{{ $alert.UserID }}'">
         <td class="pl-5">
           <div class="is-flex is-align-items-center">
-            <span class="action-icon mr-3"><!-- TODO Make this update with correct icon-->
+            <span class="action-icon mr-3"><!-- TODO Make this update with correct icon, the icon is for the notification type, not read status  -->
               {{ if $alert.HasBeenRead }}
               <span class="material-icons md-16" aria-hidden="true"><span>check</span></span>
               {{ else }} <!-- TODO Replace star with something more appropriate -->

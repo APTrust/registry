@@ -5,6 +5,7 @@
 <div class="field">
     <label class="label" for="{{ .Name }}">{{ .Label }}</label>
     <div class="control">
+        <!-- TODO Add `is-danger` classname to div on error -->
         <div class="select">
             <select name="{{ .Name }}" id="{{ .Name }}" {{ template "forms/attrs.html" . }}>
                 <option value="">Any</option>

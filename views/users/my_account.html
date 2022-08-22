@@ -6,7 +6,6 @@
 {{ end }}
 
 
-<!-- TODO: Make this an actual modal instead of a page -->
 <div class="modal-detail">
   <div class="modal-title-row is-flex is-justify-content-space-between is-align-items-center">
     <div>
@@ -32,7 +31,6 @@
 
     <div class="modal-list-row is-flex is-justify-content-space-between">
       <dl class="modal-list modal-list-left">
-        <!-- TODO: Is there a way to hide empty fields? -->
         <dt class="text-label text-xs is-grey-dark">Email</dt>
         <dd class="text-table">{{ .CurrentUser.Email }}</dd>
         <dt class="text-label text-xs is-grey-dark">Verified</dt>
@@ -58,9 +56,9 @@
         <dt class="text-label text-xs is-grey-dark">2FA Required By</dt>
         <dd class="text-table">{{ dateUS .CurrentUser.GracePeriod }}</dd>
         <dt class="text-label text-xs is-grey-dark">Authy Status</dt>
-        <dd class="text-table">{{ .CurrentUser.AuthyStatus }}</dd>
+        <dd class="text-table">{{ defaultString .CurrentUser.AuthyStatus "N/A" }}</dd>
         <dt class="text-label text-xs is-grey-dark">Authy ID</dt>
-        <dd class="text-table">{{ .CurrentUser.AuthyID }}</dd>
+        <dd class="text-table">{{ defaultString .CurrentUser.AuthyID "N/A" }}</dd>
         <dt class="text-label text-xs is-grey-dark">Last Authy SignIn</dt>
         <dd class="text-table">{{ dateUS .CurrentUser.LastSignInWithAuthy }}</dd>
       </dl>

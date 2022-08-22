@@ -3,6 +3,7 @@
 <div class="field">
   <label class="label" for="{{ .Name }}">{{ .Label }}</label>
   <div class="control">
+    <!-- TODO Add `is-danger` classname to form field on error -->
     <textarea class="textarea" name="{{ .Name }}" placeholder="{{ .Placeholder }}" {{ template "forms/attrs.html" . }}>{{ .Value }}</textarea>
   </div>
   {{ if .DisplayError }}<p class="help is-danger">{{ .ErrMsg }}</p>{{ end }}
