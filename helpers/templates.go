@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"html/template"
 	"net/url"
+	"regexp"
+	"sort"
 	"strings"
 	"time"
 
@@ -20,6 +22,9 @@ import (
 //
 // These are loaded in t2m.go (main) by r.SetFuncMap()
 // -------------------------------------------------------------------------
+
+// Define this here so it's not recompiled on every call to LinkifyUrls.
+var reUrl = regexp.MustCompile(`((https?://)[^\s]+)`)
 
 // Truncate truncates the value to the given length, appending
 // an ellipses to the end. If value contains HTML tags, they
@@ -211,4 +216,75 @@ func SortUrl(currentUrl *url.URL, colName string) string {
 	}
 	vals.Set("sort", newSort)
 	return fmt.Sprintf("%s?%s", currentUrl.Path, vals.Encode())
+}
+
+// LinkifyUrls converts urls in text to clickable links. That is,
+// it replaces https://example.com with 
+// <a href="https://example.com">https://example.com</a>
+// 
+// URLs outside the current domain will open in a new tab
+// (i.e. will have target="_blank").
+//
+// This also replaces newlines with <br/> tags.
+func LinkifyUrls(text string) template.HTML {	
+	alreadyReplaced := make(map[string]bool)
+	matches := reUrl.FindAllStringSubmatch(text, -1)
+
+	urls := make([]string, len(matches))
+	for i, _ := range matches {
+		urls[i] = matches[i][0]
+	}
+	// Sort matches by length, and then reverse so longest is first
+	sort.Sort(ByLen(urls))
+	reverse(urls)
+
+	// Replace urls with links. Do longest urls first, so we don't
+	// double replace items like "https://example.com" and
+	// "https://example.com/sub-page"
+	for _, u := range urls {
+		if strings.HasSuffix(u, ".") || strings.HasSuffix(u, ",") {
+			u = u[0 : len(u)-1]
+		}
+		if alreadyReplaced[u] {
+			continue
+		}
+
+		// Link should open in new tab, unless it's in our same domain.
+		link := fmt.Sprintf(`<a href="%s" target="_blank">%s</a>`, u, u)
+		parsedUrl, err := url.Parse(u)
+		if err == nil && parsedUrl.Hostname() == common.Context().Config.Cookies.Domain {
+			link = fmt.Sprintf(`<a href="%s">%s</a>`, u, u)
+		}
+		text = strings.Replace(text, u, link, -1)
+		alreadyReplaced[u] = true
+	}
+
+	text = strings.ReplaceAll(text, "\n", "<br/>")
+
+	return template.HTML(text)
+}
+
+// ByLen implements sorting by length
+type ByLen []string
+
+// Let returns the length of slice a.
+func (a ByLen) Len() int {
+	return len(a)
+}
+
+// Less return true if i is less than j.
+func (a ByLen) Less(i, j int) bool {
+	return len(a[i]) < len(a[j])
+}
+
+// Swap i and j in slice.
+func (a ByLen) Swap(i, j int) {
+	a[i], a[j] = a[j], a[i]
+}
+
+// reverse reverses order of items in slice s
+func reverse(s []string) {
+	for i, j := 0, len(s)-1; i < j; i, j = i+1, j-1 {
+		s[i], s[j] = s[j], s[i]
+	}
 }

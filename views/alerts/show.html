@@ -23,7 +23,7 @@
       <dt class="text-label text-xs is-grey-dark">Subject</dt>
       <dd class="text-table">{{ .alert.Subject }}</dd>
       <dt class="text-label text-xs is-grey-dark">Content</dt>
-      <dd><pre class="with-wrap">{{ .alert.Content }}</pre></dd>
+      <dd>{{ linkifyUrls .alert.Content }}</dd>
     </dl>
   </div>
 </div>

@@ -72,6 +72,7 @@ func initTemplates(router *gin.Engine) {
 		"formatFloat":    helpers.FormatFloat,
 		"humanSize":      helpers.HumanSize,
 		"iconFor":        helpers.IconFor,
+		"linkifyUrls":    helpers.LinkifyUrls,
 		"replace":        strings.Replace,
 		"roleName":       helpers.RoleName,
 		"sortUrl":        helpers.SortUrl,
