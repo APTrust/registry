@@ -14,7 +14,10 @@
   <div class="box-content">
     {{ template "alerts/_filters.html" . }}
 
-    <div class="mt-5"><a href="#" class="is-underlined">Mark all as read</a></div><!-- TODO: Hook this up -->
+    <div class="mt-5"><a href="javascript:document.forms['alertsMarkAllAsRead'].submit()" class="is-underlined">Mark all as read</a></div>
+    <form name="alertsMarkAllAsRead" action="/alerts/mark_all_as_read" method="post">
+      {{ template "forms/csrf_token.html" . }}
+    </form>
   </div>
 
   <table class="table is-hoverable is-fullwidth has-padding">

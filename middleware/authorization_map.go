@@ -38,7 +38,7 @@ var AuthMap = map[string]AuthMetadata{
 	"AlertShow":                   {"Alert", constants.AlertRead},
 	"AlertUpdate":                 {"Alert", constants.AlertUpdate},
 	"AlertMarkAsReadXHR":          {"Alert", constants.AlertUpdate},
-	"AlertMarkAllAsReadXHR":       {"Alert", constants.AlertUpdate},
+	"AlertMarkAllAsRead":          {"Alert", constants.AlertUpdate},
 	"AlertMarkAsUnreadXHR":        {"Alert", constants.AlertUpdate},
 	"ChecksumCreate":              {"Checksum", constants.ChecksumCreate},
 	"ChecksumDelete":              {"Checksum", constants.ChecksumDelete},

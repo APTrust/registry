@@ -149,7 +149,7 @@ func initRoutes(router *gin.Engine) {
 		webRoutes.GET("/alerts", webui.AlertIndex)
 		webRoutes.GET("/alerts/show/:id/:user_id", webui.AlertShow)
 		webRoutes.PUT("/alerts/mark_as_read", webui.AlertMarkAsReadXHR)
-		webRoutes.PUT("/alerts/mark_all_as_read", webui.AlertMarkAllAsReadXHR)
+		webRoutes.POST("/alerts/mark_all_as_read", webui.AlertMarkAllAsRead)
 		webRoutes.PUT("/alerts/mark_as_unread", webui.AlertMarkAsUnreadXHR)
 
 		// Deletion Requests
