@@ -15,6 +15,7 @@ script:
 - "./registry cover"
 after_script:
 - "./bin/linux/cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT"
+- echo "$DOCKER_PWD" | docker login -u "$DOCKER_USER" --password-stdin
 - make build
 - make publish
 notifications:
