@@ -66,7 +66,7 @@ registry_login: ## Log in to Docker Registry
 	#docker login $(REGISTRY)
 	# Docker Hub
 	docker login docker.io
-	docker push aptrust/registry
+#	docker push aptrust/registry:$(REVISION)-$(BRANCH)
 
 publish: registry_login
 	# GITLAB
