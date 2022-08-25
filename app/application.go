@@ -75,6 +75,7 @@ func initTemplates(router *gin.Engine) {
 		"linkifyUrls":    helpers.LinkifyUrls,
 		"replace":        strings.Replace,
 		"roleName":       helpers.RoleName,
+		"sortIcon":       helpers.SortIcon,
 		"sortUrl":        helpers.SortUrl,
 		"strEq":          helpers.StrEq,
 		"titleCase":      strings.Title,

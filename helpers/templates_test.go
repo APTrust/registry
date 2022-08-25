@@ -210,3 +210,18 @@ func TestLinkifyUrl(t *testing.T) {
 	expected := "Sample alert text.<br/>\tThis is a local link: <a href=\"http://localhost/alerts/yadda\">http://localhost/alerts/yadda</a> and this<br/>\tis an external link: <a href=\"https://example.com/page\" target=\"_blank\">https://example.com/page</a> and nothing else<br/>\tshould be linked."
 	assert.Equal(t, template.HTML(expected), helpers.LinkifyUrls(text))
 }
+
+func TestSortIcon(t *testing.T) {
+	url, _ := url.Parse("https://example.com?sort=")
+	assert.Empty(t, helpers.SortIcon(url, "col1"))
+
+	url, _ = url.Parse("https://example.com?sort=col1__asc")
+	assert.Equal(t, "keyboard_arrow_up", helpers.SortIcon(url, "col1"))
+	
+	url, _ = url.Parse("https://example.com?sort=col1__desc")
+	assert.Equal(t, "keyboard_arrow_down", helpers.SortIcon(url, "col1"))
+
+	// No icon, because we're not sorting on this column.
+	assert.Empty(t, helpers.SortIcon(url, "col2"))
+	assert.Empty(t, helpers.SortIcon(url, "col3"))
+}

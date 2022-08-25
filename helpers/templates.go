@@ -218,6 +218,21 @@ func SortUrl(currentUrl *url.URL, colName string) string {
 	return fmt.Sprintf("%s?%s", currentUrl.Path, vals.Encode())
 }
 
+// SortIcon returns the name of the sort icon to display at the
+// top of a table column. This will be either "keyboard_arrow_up"
+// or "keyboard_arrow_down"
+func SortIcon(currentUrl *url.URL, colName string) string {
+	vals := currentUrl.Query()
+	currentSort := vals.Get("sort")
+	icon := ""
+	if currentSort == fmt.Sprintf("%s__desc", colName) {
+		icon = "keyboard_arrow_down"
+	} else if currentSort == fmt.Sprintf("%s__asc", colName) {
+		icon = "keyboard_arrow_up"
+	}
+	return icon
+}
+
 // LinkifyUrls converts urls in text to clickable links. That is,
 // it replaces https://example.com with 
 // <a href="https://example.com">https://example.com</a>
