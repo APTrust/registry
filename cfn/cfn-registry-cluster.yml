@@ -11,11 +11,42 @@ Parameters:
     Description: Staging private Namespace
     Type: String
     Default: staging
+    AllowedValues: 
+      - staging 
+      - demo 
+      - prod 
+  
+  Envn:
+    Description: The environment for the parameter store nomenclature. 
+    Type: String
+    Default: STAGING
+    AllowedValues:
+        - STAGING
+        - DEMO
+        - PROD
+  
+  FamTag:
+    Description: Provides a family tag based on the environment for the family of each container/task definition; (p)rod, (s)taging, (d)emo.
+    Type: String
+    Default: s 
+    AllowedValues: 
+      - s 
+      - d 
+      - p
   
   ClusterName: 
     Description: The Name of the Fargate cluster hosting NSQ services.
     Type: String
-    Default: ecs-registry-staging
+    Default: ecs-registry-staging 
+    AllowedValues: 
+      - ecs-registry-staging
+      - ecs-registry-demo
+      - ecs-registry-prod 
+  
+  MaxContainers:
+    Description: Maximum number of containers desired for the scaling services.
+    Type: Number
+    Default: 3
 
 Resources:
   
@@ -45,7 +76,7 @@ Resources:
         ExecuteCommandConfiguration: 
           Logging: OVERRIDE
           LogConfiguration:
-            CloudWatchLogGroupName: /ecs/registry 
+            CloudWatchLogGroupName: !Sub '/ecs/${DNS}/registry'
       Tags:
       - Key: Name
         Value: !Sub 'ecs-registry-${DNS}'
@@ -57,7 +88,12 @@ Resources:
   
   LogGroup:
     Properties:
-      LogGroupName: /ecs/registry
+      LogGroupName: !Sub '/ecs/${DNS}/registry' 
+      Tags: 
+      - Key: Environment 
+        Value: !Ref DNS
+      - Key: Service 
+        Value: registry 
     Type: AWS::Logs::LogGroup
 
   RegistryService: 
@@ -137,7 +173,7 @@ Resources:
             awslogs-stream-prefix: sidecar
         Name: Nsqadmin_ResolvConf_InitContainer
       - Command:
-        - /main
+        - ./main
         DependsOn:
         - Condition: SUCCESS
           ContainerName: Nsqadmin_ResolvConf_InitContainer
@@ -145,75 +181,77 @@ Resources:
         Image: docker.io/aptrust/registry:multi 
         Secrets:
         - Name: APT_ENV
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/APT_ENV
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/APT_ENV'
         - Name: LOG_DIR
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/LOG_DIR
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/LOG_DIR'
         - Name: AUTHY_API_KEY
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/AUTHY_API_KEY
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/AUTHY_API_KEY'
         - Name: AWS_ACCESS_KEY_ID
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/AWS_ACCESS_KEY_ID
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/AWS_ACCESS_KEY_ID'
         - Name: AWS_REGION
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/AWS_REGION
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/AWS_REGION'
         - Name: AWS_SECRET_ACCESS_KEY
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/AWS_SECRET_ACCESS_KEY
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/AWS_SECRET_ACCESS_KEY'
         - Name: COOKIE_BLOCK_KEY
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/COOKIE_BLOCK_KEY
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/COOKIE_BLOCK_KEY'
         - Name: COOKIE_DOMAIN
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/COOKIE_DOMAIN
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/COOKIE_DOMAIN'
         - Name: COOKIE_HASH_KEY
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/COOKIE_HASH_KEY
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/COOKIE_HASH_KEY'
         - Name: DB_DRIVER
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/DB_DRIVER
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/DB_DRIVER'
         - Name: DB_HOST
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/DB_HOST
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/DB_HOST'
         - Name: DB_PASSWORD
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/DB_PASSWORD
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/DB_PASSWORD'
         - Name: DB_PORT
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/DB_PORT
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/DB_PORT'
         - Name: DB_ROOT_PASSWORD
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/DB_ROOT_PASSWORD
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/DB_ROOT_PASSWORD'
         - Name: DB_ROOT_USER
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/DB_ROOT_USER
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/DB_ROOT_USER'
         - Name: DB_USER
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/DB_USER
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/DB_USER'
+        - Name: DB_NAME
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/DB_NAME'
         - Name: DB_USE_SSL
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/DB_USE_SSL
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/DB_USE_SSL'
         - Name: EMAIL_ENABLED
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/EMAIL_ENABLED
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/EMAIL_ENABLED'
         - Name: EMAIL_FROM_ADDRESS
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/EMAIL_FROM_ADDRESS
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/EMAIL_FROM_ADDRESS'
         - Name: ENABLE_TWO_FACTOR_AUTHY
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/ENABLE_TWO_FACTOR_AUTHY
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/ENABLE_TWO_FACTOR_AUTHY'
         - Name: ENABLE_TWO_FACTOR_SMS
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/ENABLE_TWO_FACTOR_SMS
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/ENABLE_TWO_FACTOR_SMS'
         - Name: FLASH_COOKIE_NAME
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/FLASH_COOKIE_NAME
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/FLASH_COOKIE_NAME'
         - Name: HTTPS_COOKIES
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/HTTPS_COOKIES
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/HTTPS_COOKIES'
         - Name: LOG_CALLER
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/LOG_CALLER
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/LOG_CALLER'
         - Name: LOG_FILE
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/LOG_FILE
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/LOG_FILE'
         - Name: LOG_LEVEL
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/LOG_LEVEL
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/LOG_LEVEL'
         - Name: LOG_SQL
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/LOG_SQL
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/LOG_SQL'
         - Name: LOG_TO_CONSOLE
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/LOG_TO_CONSOLE
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/LOG_TO_CONSOLE'
         - Name: OTP_EXPIRATION
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/OTP_EXPIRATION
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/OTP_EXPIRATION'
         - Name: PREFS_COOKIE_NAME
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/PREFS_COOKIE_NAME
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/PREFS_COOKIE_NAME'
         - Name: REDIS_DEFAULT_DB
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/REDIS_DEFAULT_DB
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/REDIS_DEFAULT_DB'
         - Name: SESSION_COOKIE_NAME
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/SESSION_COOKIE_NAME
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/SESSION_COOKIE_NAME'
         - Name: SESSION_MAX_AGE
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/REGISTRY/SESSION_MAX_AGE
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/SESSION_MAX_AGE'
         - Name: NSQ_URL
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/PRESERV/NSQ_URL
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/PRESERV/NSQ_URL'
         - Name: REDIS_URL
-          ValueFrom: arn:aws:ssm:us-east-1:997427182289:parameter/STAGING/PRESERV/REDIS_URL
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/PRESERV/REDIS_URL'
         LinuxParameters: {}
         LogConfiguration:
           LogDriver: awslogs
@@ -225,8 +263,8 @@ Resources:
         PortMappings:
         - ContainerPort: 8080
           Protocol: tcp
-      Cpu: "256"
-      Memory: "512"
+      Cpu: "512"
+      Memory: "1024"
       TaskRoleArn: 
         Fn::ImportValue: !Sub "FargateIAMRole-${DNS}" 
       ExecutionRoleArn: 
@@ -234,19 +272,22 @@ Resources:
       NetworkMode: awsvpc
       RequiresCompatibilities:
       - FARGATE 
-      Family: ecs-registry
+      Family: !Sub 'ecs-registry-${FamTag}'
   
 
   ListenerReg80: 
       Type: 'AWS::ElasticLoadBalancingV2::Listener'
       Properties:
         DefaultActions:
-          - ForwardConfig:
-              TargetGroups:
-              - TargetGroupArn: !Ref RegistryTargetGroup
-            Type: forward
-        LoadBalancerArn: arn:aws:elasticloadbalancing:us-east-1:997427182289:loadbalancer/app/alb-east-staging/36c77e709ee69d8a
-        Port: 8080
+          - RedirectConfig:
+              Host: "#{host}"
+              Port: 443
+              StatusCode: "HTTP_301"
+              Protocol: "HTTPS"
+            Type: redirect
+        LoadBalancerArn: 
+          Fn::ImportValue: !Sub 'AppLoad-${DNS}'
+        Port: 80
         Protocol: HTTP
   
   ListenerReg443:
@@ -257,9 +298,10 @@ Resources:
           ForwardConfig:
             TargetGroups: 
             - TargetGroupArn: !Ref RegistryTargetGroup
-      LoadBalancerArn: 'arn:aws:elasticloadbalancing:us-east-1:997427182289:loadbalancer/app/alb-east-staging/36c77e709ee69d8a'
+      LoadBalancerArn: 
+        Fn::ImportValue: !Sub 'AppLoad-${DNS}'
       Certificates:
-        - CertificateArn: 'arn:aws:acm:us-east-1:997427182289:certificate/14e2fca8-7668-4c0e-a07a-62a19e9032d9'
+        - CertificateArn: 'arn:aws:acm:us-east-1:997427182289:certificate/42b47e24-6194-482d-ae4a-8f62a3d719ae'
       Port: 443
       Protocol: HTTPS
 
@@ -277,3 +319,75 @@ Resources:
       TargetType: ip
       VpcId: 
         Fn::ImportValue: !Sub "vpc-apt-${DNS}"  
+
+  # Alarms for CPU usage. 
+
+  AutoScalingRegistryTarget:
+    Type: AWS::ApplicationAutoScaling::ScalableTarget
+    Properties:
+      MinCapacity: 1
+      MaxCapacity: !Ref MaxContainers
+      ResourceId: !Join
+        - '/'
+        - - service
+          - !Ref Cluster
+          - !GetAtt RegistryService.Name
+      ScalableDimension: ecs:service:DesiredCount
+      ServiceNamespace: ecs
+      RoleARN:
+        Fn::ImportValue: !Sub "AutoScalingRole-${DNS}"
+  
+  ScaleRegistryPolicy:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    Properties:
+      PolicyName: !Sub '${RegistryService}MemoryScaleUpPolicy'
+      PolicyType: StepScaling
+      ScalingTargetId: !Ref AutoScalingRegistryTarget
+      StepScalingPolicyConfiguration:
+        AdjustmentType: ChangeInCapacity
+        Cooldown: 120
+        MetricAggregationType: Average
+        StepAdjustments:
+          - MetricIntervalLowerBound: 0
+            ScalingAdjustment: 1 
+  
+  ScaleDownRegistryPolicy:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    Properties:
+      PolicyName: !Sub '${RegistryService}MemoryScaleDownPolicy'
+      PolicyType: StepScaling
+      ScalingTargetId: !Ref AutoScalingRegistryTarget
+      StepScalingPolicyConfiguration:
+        AdjustmentType: ChangeInCapacity
+        Cooldown: 120
+        MetricAggregationType: Average
+        StepAdjustments:
+          - MetricIntervalUpperBound: 0
+            ScalingAdjustment: -1 
+  
+  AlarmHighCPUPrefetch:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      ActionsEnabled: TRUE
+      AlarmActions:
+        - !Ref ScaleRegistryPolicy
+      AlarmDescription: 'Scaling alarm based on cpu usage for ecs-prefetch'
+      ComparisonOperator: GreaterThanThreshold
+      DatapointsToAlarm: 2
+      # the dimensions can be found in the console after selecting a namespace to filter by
+      Dimensions:
+        - Name: ClusterName
+          Value: !Sub "ecs-registry-${DNS}"
+        - Name: ServiceName
+          Value: ecs-registry
+      EvaluationPeriods: 3
+      # the metric name can be found in the console on the screen before a metric is graphed
+      MetricName: CpuUtilized
+     # the namespace can be found in the console on the first screen before filtering metrics
+      Namespace: ECS/ContainerInsights
+      OKActions:
+       - !Ref ScaleRegistryPolicy
+      Statistic: Sum
+      Period: 60
+      Threshold: 75
+      TreatMissingData: ignore
