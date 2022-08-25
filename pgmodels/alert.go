@@ -181,10 +181,10 @@ func (alert *Alert) MarkAsSent(userID int64) error {
 	return err
 }
 
-// MarkAsRead marks an alert as read.
+// MarkAsRead marks an alert as read if its current ReadAt date is null.
 func (alert *Alert) MarkAsRead(userID int64) error {
 	now := time.Now().UTC()
-	sql := "update alerts_users set read_at = ? where alert_id = ? and user_id = ?"
+	sql := "update alerts_users set read_at = ? where alert_id = ? and user_id = ? and read_at is null"
 	_, err := common.Context().DB.Exec(sql, now, alert.ID, userID)
 	return err
 }
