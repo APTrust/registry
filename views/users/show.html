@@ -12,9 +12,8 @@
   </div>
 
   <div class="box-content">
-    <div class="mb-5">
+    <div class="is-flex mb-5">
       {{ if .user.DeactivatedAt.IsZero }}
-      <div class="is-flex mb-5">
         {{ if userCan .CurrentUser "UserCreate" .user.InstitutionID }}
         <a class="button mr-3" href="/users/edit/{{ .user.ID }}">Edit</a>
         {{ end }}
@@ -24,14 +23,11 @@
           <input type="hidden" name="id" value="{{ .user.ID }}"/>
           {{ template "forms/csrf_token.html" . }}
         </form>
-      </div>
+          {{ if userCan .CurrentUser "UserUpdate" .user.InstitutionID }}
+          <a class="button mr-3" href="/users/change_password/{{ .user.ID }}">Change Password</a>
+          <a class="button mr-3" href="javascript:forcePasswordReset()">Force Password Reset</a>
+          {{ end }}
         {{ end }}
-        <div class="is-flex">
-        {{ if userCan .CurrentUser "UserUpdate" .user.InstitutionID }}
-        <a class="button mr-3" href="/users/change_password/{{ .user.ID }}">Change Password</a>
-        <a class="button mr-3" href="javascript:forcePasswordReset()">Force Password Reset</a>
-        {{ end }}
-
       {{ else }} <!-- User is deactivated. Just show reactivation button. -->
         {{ if userCan .CurrentUser "UserUpdate" .user.InstitutionID }}
         <button class="button" onclick="document.forms['userReactivateForm'].submit()">Reactivate</button>
@@ -41,9 +37,7 @@
         </form>
 
         {{ end }}
-      </div>
       {{ end }}
-    </div>
     </div>
 
     <div class="data-list-wrapper is-flex is-justify-content-space-between">
