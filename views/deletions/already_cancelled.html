@@ -8,6 +8,8 @@
     <p>The deletion of file <b>{{ .itemIdentifier }}</b> was cancelled by {{ .deletionRequest.CancelledBy.Name }} ({{ .deletionRequest.CancelledBy.Email }} on {{ dateUS .deletionRequest.CancelledAt }}.</p>
 
     <p>This deletion request will not be executed. Unless the file was deleted by a subsequent request, this file should still exist.</p>
+
+    <a class="button mr-3" href="/deletions">Back to Deletions List</a>
   </div>
 </div>
 
