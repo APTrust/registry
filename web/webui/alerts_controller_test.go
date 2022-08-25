@@ -2,7 +2,6 @@ package webui_test
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"testing"
 
@@ -202,27 +201,26 @@ func testMarkAlertsUnread(t *testing.T, alerts []*pgmodels.Alert, alertIDs []int
 }
 
 func testMarkAllAlertsRead(t *testing.T, alerts []*pgmodels.Alert, alertIDs []int64) {
+	// Make sure this user has unread alerts
 	resetAlertsToUnread(t, alerts)
-	resp := testutil.Inst1AdminClient.PUT("/alerts/mark_all_as_read").
+	query := pgmodels.NewQuery().
+	Columns("id").
+	Where("user_id", "=", testutil.Inst1Admin.ID).
+	IsNull("read_at")
+	alertViews, err := pgmodels.AlertViewSelect(query)
+	require.Nil(t, err)
+	require.NotEmpty(t, alertViews)
+
+	// Hit the endpoint that marks them all as read
+	// and verify that we get an OK response.
+	resp := testutil.Inst1AdminClient.POST("/alerts/mark_all_as_read").
 		WithHeader("Referer", testutil.BaseURL).
 		WithFormField(constants.CSRFTokenName, testutil.Inst1AdminToken).
 		Expect()
-	body := resp.Body().Raw()
-	fmt.Println(body)
 	resp.Status(http.StatusOK)
-	result := &webui.AlertReadResult{}
-	err := json.Unmarshal([]byte(body), result)
-	require.Nil(t, err)
-	assert.Equal(t, len(alerts), len(result.Succeeded))
-	assert.Empty(t, result.Failed)
-	assert.Empty(t, result.Error)
 
-	// Make sure controller marked these as succeeded
-	// and they were really changed in the database.
-	for _, id := range alertIDs {
-		assert.Contains(t, result.Succeeded, id)
-		alertView, err := pgmodels.AlertViewForUser(id, testutil.Inst1Admin.ID)
-		require.Nil(t, err)
-		assert.NotEmpty(t, alertView.ReadAt)
-	}
+	// Make sure they really are marked as read
+	alertViews, err = pgmodels.AlertViewSelect(query)
+	require.Nil(t, err)
+	require.Empty(t, alertViews)
 }

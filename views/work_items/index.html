@@ -18,33 +18,33 @@
       <tr><!-- TODO make icons change direction based on sort direction -->
         <th class="pl-5"><a href="{{ sortUrl .currentUrl `action` }}" class="is-flex is-align-items-center">
           Action
-          <span class="material-icons" aria-hidden="true">keyboard_arrow_down</span>
+          <span class="material-icons" aria-hidden="true">{{ sortIcon .currentUrl `action` }}</span>
         </a></th>
         <th><a href="{{ sortUrl .currentUrl `name` }}" class="is-flex is-align-items-center">
           Object
-          <span class="material-icons" aria-hidden="true">keyboard_arrow_down</span>
+          <span class="material-icons" aria-hidden="true">{{ sortIcon .currentUrl `name` }}</span>
         </a></th>
         {{ if .CurrentUser.IsAdmin }}
         <th><a href="{{ sortUrl .currentUrl `institution_name` }}" class="is-flex is-align-items-center">
           Institution
-          <span class="material-icons" aria-hidden="true">keyboard_arrow_down</span>
+          <span class="material-icons" aria-hidden="true">{{ sortIcon .currentUrl `institution_name` }}</span>
         </a></th>
         {{ end }}
         <th><a href="{{ sortUrl .currentUrl `size` }}" class="is-flex is-align-items-center">
           Size
-          <span class="material-icons" aria-hidden="true">keyboard_arrow_down</span>
+          <span class="material-icons" aria-hidden="true">{{ sortIcon .currentUrl `size` }}</span>
         </a></th>
         <th><a href="{{ sortUrl .currentUrl `stage` }}" class="is-flex is-align-items-center">
           Stage
-          <span class="material-icons" aria-hidden="true">keyboard_arrow_down</span>
+          <span class="material-icons" aria-hidden="true">{{ sortIcon .currentUrl `stage` }}</span>
         </a></th>
         <th><a href="{{ sortUrl .currentUrl `status` }}" class="is-flex is-align-items-center">
           Status
-          <span class="material-icons" aria-hidden="true">keyboard_arrow_down</span>
+          <span class="material-icons" aria-hidden="true">{{ sortIcon .currentUrl `status` }}</span>
         </a></th>
         <th><a href="{{ sortUrl .currentUrl `updated_at` }}" class="is-flex is-align-items-center">
           Updated
-          <span class="material-icons" aria-hidden="true">keyboard_arrow_down</span>
+          <span class="material-icons" aria-hidden="true">{{ sortIcon .currentUrl `updated_at` }}</span>
         </a></th>
       </tr>
     </thead>

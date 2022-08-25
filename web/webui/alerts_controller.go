@@ -90,10 +90,10 @@ func AlertMarkAsUnreadXHR(c *gin.Context) {
 // user, it's impossible for one user to mark another user's alerts
 // as read. (Unless the user logs in under someone else's account.)
 //
-// PUT /alerts/mark_all_as_read
-func AlertMarkAllAsReadXHR(c *gin.Context) {
+// POST /alerts/mark_all_as_read
+func AlertMarkAllAsRead(c *gin.Context) {
 	req := NewRequest(c)
-	status := http.StatusOK
+	status := http.StatusFound
 	result := NewAlertReadResult()
 	query := pgmodels.NewQuery().
 		Columns("id").
@@ -116,7 +116,11 @@ func AlertMarkAllAsReadXHR(c *gin.Context) {
 			result.Succeeded = append(result.Succeeded, alertView.ID)
 		}
 	}
-	c.JSON(status, result)
+	redirectUrl := c.Request.Referer()
+	if redirectUrl == "" {
+		redirectUrl = "/alerts"
+	}
+	c.Redirect(status, redirectUrl)
 }
 
 func markAlerts(c *gin.Context, markThemHow string) {

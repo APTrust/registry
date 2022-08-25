@@ -14,7 +14,10 @@
   <div class="box-content">
     {{ template "alerts/_filters.html" . }}
 
-    <div class="mt-5"><a href="#" class="is-underlined">Mark all as read</a></div><!-- TODO: Hook this up -->
+    <div class="mt-5"><a href="javascript:document.forms['alertsMarkAllAsRead'].submit()" class="is-underlined">Mark all as read</a></div>
+    <form name="alertsMarkAllAsRead" action="/alerts/mark_all_as_read" method="post">
+      {{ template "forms/csrf_token.html" . }}
+    </form>
   </div>
 
   <table class="table is-hoverable is-fullwidth has-padding">
@@ -31,7 +34,7 @@
     </thead>
     <tbody>
       {{ range $index, $alert := .items }}
-      <tr class="clickable" data-modal="modal-one" data-xhr-url="/alerts/show/{{ $alert.ID }}/{{ $alert.UserID }}?modal=true">
+      <tr class="clickable" data-modal="modal-one" data-xhr-url="/alerts/show/{{ $alert.ID }}/{{ $alert.UserID }}?modal=true" data-alert-id="{{ $alert.ID }}.{{ $alert.UserID }}">
         <td class="pl-5">
           <div class="is-flex is-align-items-center">
             <span class="action-icon mr-3"><!-- TODO Make this update with correct icon-->
@@ -45,14 +48,14 @@
         <td>{{ defaultString $alert.UserName "N/A" }}</td>
         {{ end }}
         <td>{{ dateUS $alert.CreatedAt }}</td>
-        <td>{{ dateUS $alert.ReadAt }}</td>
+        <td data-name="alertReadAt">{{ dateUS $alert.ReadAt }}</td>
         <td class="has-text-centered">
           <a href="#"><!-- TODO: Hook this up-->
             {{ if $alert.HasBeenRead }}
-            <span class="material-icons is-grey" aria-hidden="true">drafts</span>
+            <span data-name="alertReadIcon" class="material-icons is-grey" aria-hidden="true">drafts</span>
             <span class="is-sr-only">Mark as Unread</span>
             {{ else }}
-            <span class="material-icons is-gold" aria-hidden="true">mail</span>
+            <span data-name="alertReadIcon" class="material-icons is-gold" aria-hidden="true">mail</span>
             <span class="is-sr-only">Mark as Read</span>
             {{ end }}
           </a>
@@ -64,6 +67,28 @@
 
   {{ template "shared/_pager.html" dict "pager" .pager }}
 </div>
+
+<script>
+  function markAlertRead(alertId) {
+    var row = document.querySelector(`tr[data-alert-id="${alertId}"]`)
+    var readAt = row.querySelector('[data-name="alertReadAt"]')
+    var icon = row.querySelector('[data-name="alertReadIcon"]') 
+    if (icon.innerText == 'drafts') {
+      return // alread marked as read
+    }
+    readAt.innerText = new Date().toLocaleDateString('en-us', { year:"numeric", month:"short", day:"numeric"})
+    icon.innerText = 'drafts' 
+    icon.classList.remove('is-gold')
+    icon.classList.add('is-grey')
+  }
+  function addAlertEventListeners() {
+    document.querySelectorAll('tr[data-alert-id]').forEach(function(row) {
+      var id = row.getAttribute('data-alert-id')
+      row.addEventListener('click', function() { markAlertRead(id) })
+    })
+  }
+  addAlertEventListeners()
+</script>
 
 {{ template "shared/_footer.html" .}}
 

@@ -13,6 +13,7 @@ import (
 	"github.com/APTrust/registry/middleware"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/gin-gonic/gin"
+	"github.com/stretchr/stew/slice"
 )
 
 type Request struct {
@@ -45,12 +46,28 @@ func NewRequest(c *gin.Context) *Request {
 			"filterChipJson":        "",
 			"flash":                 flash,
 			"showAsModal":           common.IsTrueString(c.Query("modal")),
+			"openSubMenu":           ShowOpenSubMenu(auth.(*middleware.ResourceAuthorization)),
 			"currentUrl":            c.Request.URL,
 			constants.CSRFTokenName: csrfToken,
 		},
 	}
 	helpers.DeleteFlashCookie(c)
 	return req
+}
+
+func ShowOpenSubMenu(auth *middleware.ResourceAuthorization) bool {
+	submenuItems := []string {
+		"AlertIndex",
+		"DeletionRequestIndex",
+		"GenericFileIndex",
+		"InstitutionIndex",
+		"InstitutionShow",
+		"PremisEventIndex",
+		"NsqShow",
+		"NsqInit",
+		"NsqAdmin",
+	}
+	return slice.Contains(submenuItems, auth.Handler)
 }
 
 // GetFilterCollection returns a collection of filters the user

@@ -72,8 +72,10 @@ func initTemplates(router *gin.Engine) {
 		"formatFloat":    helpers.FormatFloat,
 		"humanSize":      helpers.HumanSize,
 		"iconFor":        helpers.IconFor,
+		"linkifyUrls":    helpers.LinkifyUrls,
 		"replace":        strings.Replace,
 		"roleName":       helpers.RoleName,
+		"sortIcon":       helpers.SortIcon,
 		"sortUrl":        helpers.SortUrl,
 		"strEq":          helpers.StrEq,
 		"titleCase":      strings.Title,
@@ -149,7 +151,7 @@ func initRoutes(router *gin.Engine) {
 		webRoutes.GET("/alerts", webui.AlertIndex)
 		webRoutes.GET("/alerts/show/:id/:user_id", webui.AlertShow)
 		webRoutes.PUT("/alerts/mark_as_read", webui.AlertMarkAsReadXHR)
-		webRoutes.PUT("/alerts/mark_all_as_read", webui.AlertMarkAllAsReadXHR)
+		webRoutes.POST("/alerts/mark_all_as_read", webui.AlertMarkAllAsRead)
 		webRoutes.PUT("/alerts/mark_as_unread", webui.AlertMarkAsUnreadXHR)
 
 		// Deletion Requests
