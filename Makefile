@@ -47,7 +47,7 @@ down: ## Stop containers for Pharos, Postgresql, Nginx
 run: ## Just run Registry in foreground
 	docker run -p 8080:8080 $(TAG)
 
-runshell: ## Run Pharos container with interactive shell
+runshell: ## Run Registry container with interactive shell
 	docker run -it --rm --env-file=.env $(REGISTRY)/$(REPOSITORY)/pharos:$(REVISION)-$(BRANCH) bash
 
 #runconsole: ## Run Rails Console
@@ -96,4 +96,10 @@ release: build publish ## Make a release by building and publishing the `{versio
 push: ## Push the Docker image up to the registry
 	docker push  $(REGISTRY)/$(REPOSITORY)/$(TAG)
 
+update-template: ## Update Cloudformation template with latest container version
+	sed 's/registry:multi/registry:$(REVISION)-$(BRANCH)/g' cfn/cfn-registry-cluster.tmpl > cfn/cfn-registry-cluster.tmpl2
+
 clean: ## Clean the generated/compiles files
+
+
+  
