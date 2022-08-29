@@ -1,6 +1,6 @@
 // xhr module
 
-import { initModals } from './modal.js';
+import { initModals, attachModalClose } from './modal.js';
 import { initToggles } from './toggle.js';
 
 //
@@ -17,6 +17,7 @@ import { initToggles } from './toggle.js';
 const callback = function(mutationsList, observer) {
     initXHR()
     initModals()
+	initModalPosts()
     initToggles()
 }
 const observer = new MutationObserver(callback);
@@ -123,3 +124,33 @@ export function initXHR() {
         }
 	});
 }
+
+// Post a form via XHR and load the result into modal with targetId.
+// This does assume that the target is a modal.
+function modalPost(formName, modalId){
+	var form = document.forms[formName]
+	var data = new FormData(form)
+
+	function resultToModal() { 
+		let modal = document.getElementById(modalId)
+		let modalContentDiv = modal.querySelector('.modal-container')
+		modalContentDiv.innerHTML = xhr.responseText 
+		attachModalClose(modal)
+	}
+
+	var xhr = new XMLHttpRequest()
+	xhr.open(form.method, form.action)
+	xhr.onload = resultToModal
+	xhr.onerror = resultToModal
+	xhr.send(data);
+}
+
+function initModalPosts() {
+	let modalPostItems = document.querySelectorAll("[data-modal-post-form][data-modal-post-target]");
+	modalPostItems.forEach(function(item){
+		let formName = item.dataset.modalPostForm
+		let modalId = item.dataset.modalPostTarget
+		item.addEventListener('click', () => { modalPost(formName, modalId) })
+	});
+}
+

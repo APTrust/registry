@@ -47,7 +47,7 @@ func abortWithError(c *gin.Context, err error) {
 	templateVars := gin.H{
 		"error":           err.Error(),
 		"suppressSideNav": true,
-		"suppressTopNav":  false,
+		"suppressTopNav":  true,
 	}
 	c.HTML(http.StatusUnauthorized, "errors/show.html", templateVars)
 	c.Abort()

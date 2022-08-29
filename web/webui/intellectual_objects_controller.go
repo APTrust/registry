@@ -45,7 +45,7 @@ func IntellectualObjectInitDelete(c *gin.Context) {
 	}
 	req.TemplateData["objIdentifier"] = del.DeletionRequest.FirstObject().Identifier
 	c.HTML(http.StatusCreated, "objects/deletion_requested.html", req.TemplateData)
-}
+} 
 
 // IntellectualObjectRequestRestore shows a message asking if the user
 // really wants to delete this object.

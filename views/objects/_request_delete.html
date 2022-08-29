@@ -35,12 +35,12 @@
 
     <div class="is-flex">
         <button class="button modal-exit mr-5">Cancel</button>
-        <button class="button is-primary" onclick="document.forms['objDeleteForm'].submit()">Confirm</button>
+        <button class="button is-primary" data-modal-post-form="objDeleteForm" data-modal-post-target="modal-one">Confirm</button>
     </div>
   
     <form name="objDeleteForm" action="/objects/init_delete/{{ .object.ID }}" method="post">
       <input type="hidden" name="id" value="{{ .object.ID }}" />
-      {{ template "forms/csrf_token.html" . }}
+      {{ template "forms/csrf_token.html" . }} 
     </form>
   </div>
 </div>

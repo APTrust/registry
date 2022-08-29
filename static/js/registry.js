@@ -7,8 +7,9 @@ import { initFiltersGrid } from './modules/filters-grid.js'
 import { chartColors } from './modules/charts.js'
 
 let APT = {}
-APT.loadIntoElement = loadIntoElement
 APT.chartColors = chartColors
+APT.loadIntoElement = loadIntoElement
+//APT.modalPost = modalPost
 
 window.addEventListener('load', (event) => {
     initXHR()

@@ -28,7 +28,7 @@ function modalOpen(event) {
     window.setTimeout(function() { attachModalClose(modal) }, 350)
 }
 
-function attachModalClose(modal) {
+export function attachModalClose(modal) {
     var exits = modal.querySelectorAll(".modal-exit");
     exits.forEach(function (exit) {
         exit.addEventListener("click", function (event) {

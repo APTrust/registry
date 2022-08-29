@@ -13,9 +13,13 @@
     <p class="mb-3">Thanks. We have received your request to delete the following object:</p>
     <p class="mb-3"><b>{{ .objIdentifier }}</b></p>
 
-    <p>The APTrust administrators at your institution will soon receive an email
+    <p class="mb-3">The APTrust administrators at your institution will soon receive an email
       asking them to approve the deletion.</p>
+
+    <div class="is-flex">
+      <button class="button modal-exit mr-5">OK</button>
+    </div>      
   </div>
 </div>
 
-{{ end }}
+{{ end }} 
