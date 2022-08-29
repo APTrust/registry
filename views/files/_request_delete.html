@@ -22,7 +22,7 @@
 
     <div class="is-flex">
         <button class="button modal-exit mr-5">Cancel</button>
-        <button class="button is-primary" onclick="document.forms['fileDeleteForm'].submit()">Confirm</button>
+        <button class="button is-primary" data-modal-post-form="fileDeleteForm" data-modal-post-target="modal-one">Confirm</button>
     </div>
 
     <form method="post" id="fileDeleteForm" action="/files/init_delete/{{ .file.ID }}">

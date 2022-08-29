@@ -233,7 +233,7 @@ func TestGenericFileInitRestore(t *testing.T) {
 	testutil.InitHTTPTests(t)
 
 	items := []string{
-		"File institution1.edu/photos/picture2 has been queued for restoration",
+		"File <b>institution1.edu/photos/picture2</b> has been queued for restoration",
 	}
 
 	// User should see flash message saying item is queued for restoration.
@@ -241,7 +241,7 @@ func TestGenericFileInitRestore(t *testing.T) {
 	html := testutil.Inst1UserClient.POST("/files/init_restore/2").
 		WithHeader("Referer", testutil.BaseURL).
 		WithFormField(constants.CSRFTokenName, testutil.Inst1UserToken).
-		Expect().Status(http.StatusOK).Body().Raw()
+		Expect().Status(http.StatusCreated).Body().Raw()
 	testutil.AssertMatchesAll(t, html, items)
 
 	query := pgmodels.NewQuery().

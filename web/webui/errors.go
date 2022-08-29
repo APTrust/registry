@@ -17,7 +17,12 @@ func AbortIfError(c *gin.Context, err error) bool {
 	if err != nil {
 		c.Error(err)
 		c.Set("err", err)
-		ErrorShow(c)
+		_, showErrorInModal := c.Get("showErrorInModal")
+		if showErrorInModal {
+			ErrorShowModal(c)
+		} else {
+			ErrorShow(c)
+		}
 		c.Abort()
 		return true
 	}
@@ -43,6 +48,17 @@ func ErrorShow(c *gin.Context) {
 		status = StatusCodeForError(err.(error))
 	}
 	c.HTML(status, "errors/show.html", templateData)
+}
+
+func ErrorShowModal(c *gin.Context) {
+	status := http.StatusInternalServerError
+	err, _ := c.Get("err")
+	templateData := gin.H{}
+	if err != nil {
+		templateData["error"] = err.(error).Error()
+		status = StatusCodeForError(err.(error))
+	}
+	c.HTML(status, "errors/show_modal.html", templateData)
 }
 
 // StatusCodeForError returns the http.StatusCode for the specified

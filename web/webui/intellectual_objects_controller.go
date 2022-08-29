@@ -9,7 +9,6 @@ import (
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/forms"
-	"github.com/APTrust/registry/helpers"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/gin-gonic/gin"
 )
@@ -35,6 +34,7 @@ func IntellectualObjectRequestDelete(c *gin.Context) {
 // POST /objects/init_delete/:id
 func IntellectualObjectInitDelete(c *gin.Context) {
 	req := NewRequest(c)
+	c.Set("showErrorInModal", true)
 	del, err := NewDeletionForObject(req.Auth.ResourceID, req.CurrentUser, req.BaseURL())
 	if AbortIfError(c, err) {
 		return
@@ -45,7 +45,7 @@ func IntellectualObjectInitDelete(c *gin.Context) {
 	}
 	req.TemplateData["objIdentifier"] = del.DeletionRequest.FirstObject().Identifier
 	c.HTML(http.StatusCreated, "objects/deletion_requested.html", req.TemplateData)
-} 
+}
 
 // IntellectualObjectRequestRestore shows a message asking if the user
 // really wants to delete this object.
@@ -67,6 +67,7 @@ func IntellectualObjectRequestRestore(c *gin.Context) {
 // POST /objects/init_restore/:id
 func IntellectualObjectInitRestore(c *gin.Context) {
 	req := NewRequest(c)
+	c.Set("showErrorInModal", true)
 	obj, err := pgmodels.IntellectualObjectByID(req.Auth.ResourceID)
 	if AbortIfError(c, err) {
 		return
@@ -106,9 +107,8 @@ func IntellectualObjectInitRestore(c *gin.Context) {
 	}
 
 	// Respond
-	helpers.SetFlashCookie(c, "Object has been queued for restoration.")
-	redirectUrl := fmt.Sprintf("/objects/show/%d", obj.ID)
-	c.Redirect(http.StatusFound, redirectUrl)
+	req.TemplateData["objIdentifier"] = obj.Identifier
+	c.HTML(http.StatusCreated, "objects/restoration_requested.html", req.TemplateData)
 }
 
 // IntellectualObjectIndex shows list of objects.

@@ -251,7 +251,7 @@ func TestObjectInitRestore(t *testing.T) {
 	testutil.InitHTTPTests(t)
 
 	items := []string{
-		"Object has been queued for restoration",
+		"Object <b>institution1.edu/pdfs</b> has been queued for restoration.",
 	}
 
 	// User should see flash message saying object is queued for restoration.
@@ -259,7 +259,7 @@ func TestObjectInitRestore(t *testing.T) {
 	html := testutil.Inst1UserClient.POST("/objects/init_restore/2").
 		WithHeader("Referer", testutil.BaseURL).
 		WithFormField(constants.CSRFTokenName, testutil.Inst1UserToken).
-		Expect().Status(http.StatusOK).Body().Raw()
+		Expect().Status(http.StatusCreated).Body().Raw()
 	testutil.AssertMatchesAll(t, html, items)
 
 	query := pgmodels.NewQuery().

@@ -72,15 +72,16 @@ func GenericFileRequestRestore(c *gin.Context) {
 // POST /files/init_restore/:id
 func GenericFileInitRestore(c *gin.Context) {
 	req := NewRequest(c)
-	gf, obj, _, err := genericFileInitRestore(req)
+	c.Set("showErrorInModal", true)
+	gf, _, _, err := genericFileInitRestore(req)
 	if AbortIfError(c, err) {
 		return
 	}
 	// Respond
 	msg := fmt.Sprintf("File %s has been queued for restoration.", gf.Identifier)
 	helpers.SetFlashCookie(c, msg)
-	redirectUrl := fmt.Sprintf("/objects/show/%d", obj.ID)
-	c.Redirect(http.StatusFound, redirectUrl)
+	req.TemplateData["fileIdentifier"] = gf.Identifier
+	c.HTML(http.StatusCreated, "files/restoration_requested.html", req.TemplateData)
 }
 
 // GenericFileInitDelete occurs when user clicks the button confirming
@@ -90,6 +91,7 @@ func GenericFileInitRestore(c *gin.Context) {
 // POST /files/init_delete/:id
 func GenericFileInitDelete(c *gin.Context) {
 	req := NewRequest(c)
+	c.Set("showErrorInModal", true)
 	del, err := NewDeletionForFile(req.Auth.ResourceID, req.CurrentUser, req.BaseURL())
 	if AbortIfError(c, err) {
 		return

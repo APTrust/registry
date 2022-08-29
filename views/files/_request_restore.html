@@ -16,7 +16,7 @@
     
     <div class="is-flex">
         <button class="button modal-exit mr-5">Cancel</button>
-        <button class="button is-primary" onclick="document.forms['fileRestoreForm'].submit()">Confirm</button> 
+        <button class="button is-primary" data-modal-post-form="fileRestoreForm" data-modal-post-target="modal-one">Confirm</button> 
     </div>
   
     <form method="post" id="fileRestoreForm" action="/files/init_restore/{{ .file.ID }}">

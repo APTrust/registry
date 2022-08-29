@@ -1,0 +1,28 @@
+{{ define "objects/restoration_requested.html" }}
+
+
+<div class="modal-detail">
+  <div class="modal-title-row is-flex is-justify-content-space-between is-align-items-center">
+    <h2>Restoration Requested</h2>
+    <a class="modal-exit" href="#">
+      <span class="material-icons" aria-hidden="true">close</span>
+      <span class="is-sr-only">Close</span>
+    </a>
+  </div>
+
+  <div class="modal-content">
+
+    <p class="mb-3">Object <b>{{ .objIdentifier }}</b> has been queued for restoration.</p>
+
+    <p class="mb-3">This object will be restored to your institution's restoration bucket. Restoration time
+        depends on object size (larger items take longer to restore) and storage option (items in Glacier
+        and Glacier Deep Archive take longer to restore).
+    </p>
+
+    <div class="is-flex">
+      <button class="button modal-exit mr-5">OK</button>
+    </div>      
+  </div>
+</div>
+
+{{ end }}

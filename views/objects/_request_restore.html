@@ -16,7 +16,7 @@
 
     <div class="is-flex">
         <button class="button modal-exit mr-5">Cancel</button>
-        <button class="button is-primary" onclick="document.forms['objRestoreForm'].submit()">Confirm</button>
+        <button class="button is-primary" data-modal-post-form="objRestoreForm" data-modal-post-target="modal-one">Confirm</button>
     </div>
   
     <form method="post" id="objRestoreForm" action="/objects/init_restore/{{ .object.ID }}">
