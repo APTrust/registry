@@ -28,7 +28,7 @@ help: ## This help.
 
 revision: ## Show me the git hash
 	@echo "Revision: $(REVISION)"
-	@echo "Branch: $(BRANCH)""
+	@echo "Branch: $(BRANCH)"
 
 build: ## Build the Registry container from current repo. Make sure to commit all changes beforehand
 	docker build --build-arg REGISTRY_RELEASE=$(REVISION) -t registry:multi -t $(TAG) -t aptrust/$(TAG)-$(BRANCH) -t $(REGISTRY)/$(REPOSITORY)/$(TAG) -t $(REGISTRY)/$(REPOSITORY)/registry:$(REVISION)-$(BRANCH) -f Dockerfile.multi .
@@ -49,14 +49,6 @@ run: ## Just run Registry in foreground
 runshell: ## Run Registry container with interactive shell
 	docker run -it --rm --env-file=.env $(REGISTRY)/$(REPOSITORY)/pharos:$(REVISION)-$(BRANCH) bash
 	
-runcmd: ## Start Pharos container, run command and exit.
-	docker run -it --rm --env-file=.env $(REGISTRY)/$(REPOSITORY)/registry:$(REVISION)-$(BRANCH) $(filter-out $@, $(MAKECMDGOALS))
-
-%:
-	@true
-
-
-
 registry_login: ## Log in to Docker Registry temporarily Docker Hub
 	# GITLAB
 	#docker login $(REGISTRY)
@@ -84,7 +76,7 @@ push: ## Push the Docker image up to the registry
 	docker push  $(REGISTRY)/$(REPOSITORY)/$(TAG)-$(BRANCH)
 
 update-template: ## Update Cloudformation template with latest container version
-    @echo " Overwriting container revision and branch from the CFN template to the CFN deployment YAML document."
+	@echo "Overwriting container revision and branch from the CFN template to the CFN deployment YAML document."
 	sed 's/registry:multi/registry:$(REVISION)-$(BRANCH)/g' cfn/cfn-registry-cluster.tmpl > cfn/cfn-registry-cluster.tmpl2
 
 clean: ## Clean the generated/compiles files
