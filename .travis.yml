@@ -16,8 +16,6 @@ script:
 after_script:
 - "./bin/linux/cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT"
 - echo "$DOCKER_PWD" | docker login -u "$DOCKER_USER" --password-stdin
-- make release
-- make update-template
 notifications:
   slack:
     secure: YPJEEuB1xIfdcMCXsDGuaOCsjQS38rgDIens19qoSyncNGu5ocwpW3a2Mkg1CQo9VUMzQd+01lvCsXw7XdTG7C4iCmul596YT5omcshfnzjo6z4KyQWeJ1bFBSUFBarmYH7jauN64DjFlgnjrDCZ6WYZFxj23VLq3QEA5hh3273hkgPBzjgTBwiglMo+ELPM8R5XCiO0PL8TpT4Gq0jGxhU60R0T73ORbkADFvAFXx7C/B2voHmch0Yj5r99LGHfIDQChqeTwdxFC7O9qR+SuHKNkKBf+XSM12ipnMzHz5WOShnCp+wQ8YxJOkfTHqoGjbiIEUZyEGMI6lDx8zdyajg9p0kXoJnM1jwpLJisGf5tx9un5vLDk0NRh5iyECnx5RzaCbd4qlURqpvHro60hMV4+COqeU0DooXTZyflI6j9GML4CKg0EzJgkSu7RNFit6x4cbaoy3k7h4hDpLHybDqmVG0m60iTwm9eaLFVfnVLGhz1TkujSKuaKqIaR+lqcffrOBpJq0+U/rhqPIfPDtfVuXnxpRbzsBzaQXLfn9lfZ9rV5m3sERL35cdoHDMzHVijQ5DoONlO4qq42UyzcM/sO9wydNBq31sNsNwitoef8k4Lp8JWymGTi44mZTfXkvi6ZFilmCJ/rDC16afW9rmJRkPUJGqPZZy2FPhx7e0=
