@@ -184,7 +184,7 @@ Resources:
         - Condition: SUCCESS
           ContainerName: Nsqadmin_ResolvConf_InitContainer
         Essential: true 
-        Image: docker.io/aptrust/registry:9d72f11-makefile-test 
+        Image: docker.io/aptrust/registry:c119593-makefile-test 
         Secrets:
         - Name: APT_ENV
           ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/APT_ENV'
