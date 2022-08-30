@@ -1,0 +1,404 @@
+AWSTemplateFormatVersion: 2010-09-09 
+
+Description: >-
+    Creates the registry cluster of docker containers and related service for the APTrust environments. 
+    These resources may be needed to scale frequently
+    and be updated to be kept secure. 
+
+Parameters:
+  
+  DNS:
+    Description: Staging private Namespace
+    Type: String
+    Default: staging
+    AllowedValues: 
+      - staging 
+      - demo 
+      - prod 
+  
+  Envn:
+    Description: The environment for the parameter store nomenclature. 
+    Type: String
+    Default: STAGING
+    AllowedValues:
+        - STAGING
+        - DEMO
+        - PROD
+  
+  FamTag:
+    Description: Provides a family tag based on the environment for the family of each container/task definition; (p)rod, (s)taging, (d)emo.
+    Type: String
+    Default: s 
+    AllowedValues: 
+      - s 
+      - d 
+      - p
+  
+  ClusterName: 
+    Description: The Name of the Fargate cluster hosting NSQ services.
+    Type: String
+    Default: ecs-registry-staging 
+    AllowedValues: 
+      - ecs-registry-staging
+      - ecs-registry-demo
+      - ecs-registry-prod 
+  
+  MaxContainers:
+    Description: Maximum number of containers desired for the scaling services.
+    Type: Number
+    Default: 3
+
+Resources:
+  
+  NSQCapacityProviderAssociation:
+    Type: AWS::ECS::ClusterCapacityProviderAssociations
+    Properties: 
+      CapacityProviders: 
+        - FARGATE
+        - FARGATE_SPOT 
+      Cluster: !Ref Cluster
+      DefaultCapacityProviderStrategy: 
+        - CapacityProvider: FARGATE 
+          Weight: 1
+          Base: 1 
+        - CapacityProvider: FARGATE_SPOT 
+          Weight: 1 
+          Base: 0
+
+  Cluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: !Ref ClusterName 
+      ClusterSettings: 
+        - Name: containerInsights
+          Value: enabled 
+      Configuration: 
+        ExecuteCommandConfiguration: 
+          Logging: OVERRIDE
+          LogConfiguration:
+            CloudWatchLogGroupName: !Sub '/ecs/${DNS}/registry'
+      Tags:
+      - Key: Name
+        Value: !Sub 'ecs-registry-${DNS}'
+      - Key: Environment
+        Value: !Ref DNS
+      - Key: Service 
+        Value: registry
+
+  
+  LogGroup:
+    Properties:
+      LogGroupName: !Sub '/ecs/${DNS}/registry' 
+      Tags: 
+      - Key: Environment 
+        Value: !Ref DNS
+      - Key: Service 
+        Value: registry 
+    Type: AWS::Logs::LogGroup
+
+  RegistryService: 
+    DependsOn: ListenerReg80 
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster:
+        Fn::GetAtt:
+        - Cluster
+        - Arn
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 100
+      DeploymentController:
+        Type: ECS
+      DesiredCount: 2 
+      EnableExecuteCommand: true
+      LaunchType: FARGATE
+      LoadBalancers:
+        - ContainerName: registry
+          ContainerPort: 8080
+          TargetGroupArn: !Ref RegistryTargetGroup
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups:
+          - Fn::ImportValue: !Sub "UnifiedSecurityGroup-${DNS}"
+          - Fn::ImportValue: !Sub "RegistrySecurityGroup-${DNS}"
+          Subnets:
+          - Fn::ImportValue: !Sub "PrivateSubnet0-${DNS}"
+          - Fn::ImportValue: !Sub "PrivateSubnet1-${DNS}"
+      PlatformVersion: 1.4.0
+      PropagateTags: SERVICE
+      SchedulingStrategy: REPLICA
+      ServiceName: ecs-registry
+      ServiceRegistries:
+      - RegistryArn:
+          Fn::GetAtt:
+          - RegistryServiceDiscoveryEntry
+          - Arn
+      Tags:  
+      - Key: Service
+        Value: registry
+      - Key: Environment
+        Value: !Ref "DNS"
+      TaskDefinition: !Ref RegistryTaskDefinition
+   
+  RegistryServiceDiscoveryEntry: 
+    Type: AWS::ServiceDiscovery::Service
+    Properties:
+      Description: '"registry" service discovery entry in Cloud Map'
+      DnsConfig:
+        DnsRecords:
+        - TTL: 20
+          Type: A
+        RoutingPolicy: WEIGHTED
+      HealthCheckCustomConfig:
+        FailureThreshold: 1
+      Name: registry
+      NamespaceId:
+        Fn::ImportValue: !Sub "NameSpace-${DNS}" 
+      Tags:
+        - Key: Environment
+          Value: !Ref DNS
+        - Key: Service
+          Value: registry
+
+  
+  RegistryTaskDefinition: 
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      ContainerDefinitions:
+      - Command:
+        - us-east-1.compute.internal
+        - !Ref DNS
+        Essential: false
+        Image: docker/ecs-searchdomain-sidecar:latest
+        LogConfiguration:
+          LogDriver: awslogs
+          Options:
+            awslogs-group: !Ref LogGroup
+            awslogs-region: !Ref AWS::Region
+            awslogs-stream-prefix: sidecar
+        Name: Nsqadmin_ResolvConf_InitContainer
+      - Command:
+        - ./main
+        DependsOn:
+        - Condition: SUCCESS
+          ContainerName: Nsqadmin_ResolvConf_InitContainer
+        Essential: true 
+        Image: docker.io/aptrust/registry:c119593-makefile-test 
+        Secrets:
+        - Name: APT_ENV
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/APT_ENV'
+        - Name: LOG_DIR
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/LOG_DIR'
+        - Name: AUTHY_API_KEY
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/AUTHY_API_KEY'
+        - Name: AWS_ACCESS_KEY_ID
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/AWS_ACCESS_KEY_ID'
+        - Name: AWS_REGION
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/AWS_REGION'
+        - Name: AWS_SECRET_ACCESS_KEY
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/AWS_SECRET_ACCESS_KEY'
+        - Name: COOKIE_BLOCK_KEY
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/COOKIE_BLOCK_KEY'
+        - Name: COOKIE_DOMAIN
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/COOKIE_DOMAIN'
+        - Name: COOKIE_HASH_KEY
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/COOKIE_HASH_KEY'
+        - Name: DB_DRIVER
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/DB_DRIVER'
+        - Name: DB_HOST
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/DB_HOST'
+        - Name: DB_PASSWORD
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/DB_PASSWORD'
+        - Name: DB_PORT
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/DB_PORT'
+        - Name: DB_ROOT_PASSWORD
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/DB_ROOT_PASSWORD'
+        - Name: DB_ROOT_USER
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/DB_ROOT_USER'
+        - Name: DB_USER
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/DB_USER'
+        - Name: DB_NAME
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/DB_NAME'
+        - Name: DB_USE_SSL
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/DB_USE_SSL'
+        - Name: EMAIL_ENABLED
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/EMAIL_ENABLED'
+        - Name: EMAIL_FROM_ADDRESS
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/EMAIL_FROM_ADDRESS'
+        - Name: ENABLE_TWO_FACTOR_AUTHY
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/ENABLE_TWO_FACTOR_AUTHY'
+        - Name: ENABLE_TWO_FACTOR_SMS
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/ENABLE_TWO_FACTOR_SMS'
+        - Name: FLASH_COOKIE_NAME
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/FLASH_COOKIE_NAME'
+        - Name: HTTPS_COOKIES
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/HTTPS_COOKIES'
+        - Name: LOG_CALLER
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/LOG_CALLER'
+        - Name: LOG_FILE
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/LOG_FILE'
+        - Name: LOG_LEVEL
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/LOG_LEVEL'
+        - Name: LOG_SQL
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/LOG_SQL'
+        - Name: LOG_TO_CONSOLE
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/LOG_TO_CONSOLE'
+        - Name: OTP_EXPIRATION
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/OTP_EXPIRATION'
+        - Name: PREFS_COOKIE_NAME
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/PREFS_COOKIE_NAME'
+        - Name: REDIS_DEFAULT_DB
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/REDIS_DEFAULT_DB'
+        - Name: SESSION_COOKIE_NAME
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/SESSION_COOKIE_NAME'
+        - Name: SESSION_MAX_AGE
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/SESSION_MAX_AGE'
+        - Name: NSQ_URL
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/PRESERV/NSQ_URL'
+        - Name: REDIS_URL
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/PRESERV/REDIS_URL'
+        LinuxParameters: {}
+        LogConfiguration:
+          LogDriver: awslogs
+          Options:
+            awslogs-group: !Ref LogGroup
+            awslogs-region: !Ref AWS::Region
+            awslogs-stream-prefix: registry
+        Name: registry
+        PortMappings:
+        - ContainerPort: 8080
+          Protocol: tcp
+      Cpu: "512"
+      Memory: "1024"
+      TaskRoleArn: 
+        Fn::ImportValue: !Sub "FargateIAMRole-${DNS}" 
+      ExecutionRoleArn: 
+        Fn::ImportValue: !Sub "ECSServiceRole-${DNS}"
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+      - FARGATE 
+      Family: !Sub 'ecs-registry-${FamTag}'
+      Tags:
+        - Key: Environment 
+          Value: !Ref DNS
+        - Key: Service
+          Value: registry
+  
+
+  ListenerReg80: 
+      Type: 'AWS::ElasticLoadBalancingV2::Listener'
+      Properties:
+        DefaultActions:
+          - RedirectConfig:
+              Host: "#{host}"
+              Port: 443
+              StatusCode: "HTTP_301"
+              Protocol: "HTTPS"
+            Type: redirect
+        LoadBalancerArn: 
+          Fn::ImportValue: !Sub 'AppLoad-${DNS}'
+        Port: 80
+        Protocol: HTTP
+  
+  ListenerReg443:
+    Type: 'AWS::ElasticLoadBalancingV2::Listener'
+    Properties:
+      DefaultActions:
+        - Type: forward
+          ForwardConfig:
+            TargetGroups: 
+            - TargetGroupArn: !Ref RegistryTargetGroup
+      LoadBalancerArn: 
+        Fn::ImportValue: !Sub 'AppLoad-${DNS}'
+      Certificates:
+        - CertificateArn: 'arn:aws:acm:us-east-1:997427182289:certificate/42b47e24-6194-482d-ae4a-8f62a3d719ae'
+      Port: 443
+      Protocol: HTTPS
+
+  RegistryTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: !Sub "registry-targetgroup-${DNS}"
+      Port: 8080
+      Protocol: HTTP
+      Tags:
+      - Key: Service
+        Value: registry
+      - Key: Environment
+        Value: !Ref 'DNS'
+      TargetType: ip
+      VpcId: 
+        Fn::ImportValue: !Sub "vpc-apt-${DNS}"  
+
+  # Alarms for CPU usage. 
+
+  AutoScalingRegistryTarget:
+    Type: AWS::ApplicationAutoScaling::ScalableTarget
+    Properties:
+      MinCapacity: 2
+      MaxCapacity: !Ref MaxContainers
+      ResourceId: !Join
+        - '/'
+        - - service
+          - !Ref Cluster
+          - !GetAtt RegistryService.Name
+      ScalableDimension: ecs:service:DesiredCount
+      ServiceNamespace: ecs
+      RoleARN:
+        Fn::ImportValue: !Sub "AutoScalingRole-${DNS}"
+  
+  ScaleRegistryPolicy:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    Properties:
+      PolicyName: !Sub '${RegistryService}CPUScaleUpPolicy'
+      PolicyType: StepScaling
+      ScalingTargetId: !Ref AutoScalingRegistryTarget
+      StepScalingPolicyConfiguration:
+        AdjustmentType: ChangeInCapacity
+        Cooldown: 120
+        MetricAggregationType: Average
+        StepAdjustments:
+          - MetricIntervalLowerBound: 0
+            ScalingAdjustment: 1 
+  
+  ScaleDownRegistryPolicy:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    Properties:
+      PolicyName: !Sub '${RegistryService}CPUScaleDownPolicy'
+      PolicyType: StepScaling
+      ScalingTargetId: !Ref AutoScalingRegistryTarget
+      StepScalingPolicyConfiguration:
+        AdjustmentType: ChangeInCapacity
+        Cooldown: 120
+        MetricAggregationType: Average
+        StepAdjustments:
+          - MetricIntervalUpperBound: 0
+            ScalingAdjustment: -1 
+  
+  AlarmHighCPURegistry:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      ActionsEnabled: TRUE
+      AlarmActions:
+        - !Ref ScaleRegistryPolicy
+      AlarmDescription: 'Scaling alarm based on cpu usage for ecs-prefetch'
+      ComparisonOperator: GreaterThanThreshold
+      DatapointsToAlarm: 2
+  #    # the dimensions can be found in the console after selecting a namespace to filter by
+      Dimensions:
+        - Name: ClusterName
+          Value: !Sub "ecs-registry-${DNS}"
+        - Name: ServiceName
+          Value: ecs-registry
+      EvaluationPeriods: 3
+     # the metric name can be found in the console on the screen before a metric is graphed
+      MetricName: CpuUtilized
+     # the namespace can be found in the console on the first screen before filtering metrics
+      Namespace: ECS/ContainerInsights
+      OKActions:
+        - !Ref ScaleDownRegistryPolicy
+      Statistic: Average
+      Period: 60
+      Threshold: 60
+      TreatMissingData: missing

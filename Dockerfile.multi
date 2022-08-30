@@ -75,7 +75,7 @@ ENV LOG_LEVEL=0
 ENV LOG_CALLER=false
 ENV LOG_TO_CONSOLE=true
 ENV LOG_SQL=false
-
+# Making a note for a new dockerfile test. 
 EXPOSE 8080
 
 CMD ["./main" ]
