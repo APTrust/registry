@@ -7,8 +7,8 @@
 #	 	Mac OS `brew cask install docker`
 #    	Linux: `apt-get install docker`
 
-REGISTRY = hub.docker.com
-REPOSITORY = container-registry
+REGISTRY = docker.io
+REPOSITORY = registry
 NAME=$(shell basename $(CURDIR))
 REVISION=$(shell git log -1 --pretty=%h)
 REVISION=$(shell git rev-parse --short=7 HEAD)
@@ -27,8 +27,8 @@ help: ## This help.
 .DEFAULT_GOAL := help
 
 revision: ## Show me the git hash
-	@echo $(REVISION)
-	@echo $(BRANCH)
+	@echo "Revision: $(REVISION)"
+	@echo "Branch: $(BRANCH)""
 
 build: ## Build the Registry container from current repo. Make sure to commit all changes beforehand
 	docker build --build-arg REGISTRY_RELEASE=$(REVISION) -t registry:multi -t $(TAG) -t aptrust/$(TAG)-$(BRANCH) -t $(REGISTRY)/$(REPOSITORY)/$(TAG) -t $(REGISTRY)/$(REPOSITORY)/registry:$(REVISION)-$(BRANCH) -f Dockerfile.multi .
@@ -78,6 +78,8 @@ publish: registry_login
 	# Docker Hub
 	docker login docker.io
 	docker push aptrust/registry:$(REVISION)-$(BRANCH)
+	@echo "Pushing aptrust/$(TAG)-$(PUSHBRANCH)"
+	docker push aptrust/$(TAG)-$(PUSHBRANCH)
 
 publish-ci:
 	@echo $(DOCKER_PWD) | docker login -u $(DOCKER_USER) --password-stdin $(REGISTRY)
