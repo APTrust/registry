@@ -2,7 +2,7 @@
 
 <!-- Show the header unless query string says modal=true -->
 {{ if not .showAsModal }}
-  {{ template "shared/_header.html" .}}
+{{ template "shared/_header.html" .}}
 {{ end }}
 
 <div class="box">
@@ -14,29 +14,30 @@
   <div class="box-content">
     <div class="is-flex mb-5">
       {{ if .user.DeactivatedAt.IsZero }}
-        {{ if userCan .CurrentUser "UserCreate" .user.InstitutionID }}
-        <a class="button mr-3" href="/users/edit/{{ .user.ID }}">Edit</a>
-        {{ end }}
-        {{ if userCan .CurrentUser "UserDelete" .user.InstitutionID }}
-        <button class="button mr-3" onclick="document.forms['userDeleteForm'].submit()">Deactivate</button>
-        <form method="post" class="is-hidden" id="userDeleteForm" action="/users/delete/{{ .user.ID }}">
-          <input type="hidden" name="id" value="{{ .user.ID }}"/>
-          {{ template "forms/csrf_token.html" . }}
-        </form>
-          {{ if userCan .CurrentUser "UserUpdate" .user.InstitutionID }}
-          <a class="button mr-3" href="/users/change_password/{{ .user.ID }}">Change Password</a>
-          <a class="button mr-3" href="javascript:forcePasswordReset()">Force Password Reset</a>
-          {{ end }}
-        {{ end }}
-      {{ else }} <!-- User is deactivated. Just show reactivation button. -->
-        {{ if userCan .CurrentUser "UserUpdate" .user.InstitutionID }}
-        <button class="button" onclick="document.forms['userReactivateForm'].submit()">Reactivate</button>
-        <form method="post" class="is-hidden" id="userReactivateForm" action="/users/undelete/{{ .user.ID }}">
-          <input type="hidden" name="id" value="{{ .user.ID }}"/>
-          {{ template "forms/csrf_token.html" . }}
-        </form>
+      {{ if userCan .CurrentUser "UserCreate" .user.InstitutionID }}
+      <a class="button mr-3" href="/users/edit/{{ .user.ID }}">Edit</a>
+      {{ end }}
+      {{ if userCan .CurrentUser "UserDelete" .user.InstitutionID }}
+      <button class="button mr-3" onclick="document.forms['userDeleteForm'].submit()">Deactivate</button>
+      <form method="post" class="is-hidden" id="userDeleteForm" action="/users/delete/{{ .user.ID }}">
+        <input type="hidden" name="id" value="{{ .user.ID }}" />
+        {{ template "forms/csrf_token.html" . }}
+      </form>
+      {{ if userCan .CurrentUser "UserUpdate" .user.InstitutionID }}
+      <a class="button mr-3" href="/users/change_password/{{ .user.ID }}">Change Password</a>
+      <a class="button mr-3" href="javascript:forcePasswordReset()">Force Password Reset</a>
+      {{ end }}
+      {{ end }}
+      {{ else }}
+      <!-- User is deactivated. Just show reactivation button. -->
+      {{ if userCan .CurrentUser "UserUpdate" .user.InstitutionID }}
+      <button class="button" onclick="document.forms['userReactivateForm'].submit()">Reactivate</button>
+      <form method="post" class="is-hidden" id="userReactivateForm" action="/users/undelete/{{ .user.ID }}">
+        <input type="hidden" name="id" value="{{ .user.ID }}" />
+        {{ template "forms/csrf_token.html" . }}
+      </form>
 
-        {{ end }}
+      {{ end }}
       {{ end }}
     </div>
 
@@ -85,16 +86,16 @@
 </div>
 
 <script>
- function forcePasswordReset() {
-     if (confirm("Do you want to force this user to reset their password?")) {
-         window.location.href = "/users/init_password_reset/{{ .user.ID }}"
-     }
- }
+  function forcePasswordReset() {
+    if (confirm("Do you want to force this user to reset their password?")) {
+      window.location.href = "/users/init_password_reset/{{ .user.ID }}"
+    }
+  }
 </script>
 
 <!-- Show the footer unless query string says modal=true -->
 {{ if not .showAsModal }}
-  {{ template "shared/_footer.html" .}}
+{{ template "shared/_footer.html" .}}
 {{ end }}
 
 

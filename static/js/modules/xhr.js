@@ -134,8 +134,6 @@ export function modalPost(formName, modalId){
 	function resultToModal() { 
 		let modal = document.getElementById(modalId)
 		let modalContentDiv = modal.querySelector('.modal-container')
-		console.log(xhr.responseText)
-		console.log(modalContentDiv)
 		modalContentDiv.innerHTML = xhr.responseText 
 		document.body.classList.add("freeze");
 		modal.classList.add("open")
