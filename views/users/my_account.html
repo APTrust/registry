@@ -16,10 +16,13 @@
   <div class="box-content">
     {{ if userCan .CurrentUser "UserUpdateSelf" .CurrentUser.InstitutionID }}
     <div class="is-flex mb-5">
-      <a class="button mr-3" href="/users/change_password/{{ .CurrentUser.ID }}">Change Password</a>
+      <button class="button mr-3" data-xhr-url="/users/change_password/{{ .CurrentUser.ID }}?modal=true"
+        data-modal="modal-one">Change Password</button>
       <a class="button mr-3" href="javascript:getAPIKey()">Get API Key</a>
       <a class="button mr-3" href="javascript:generateBackupCodes()">Generate Backup Codes</a>
-      <a class="button mr-3" href="/users/2fa_setup">Set Up Two-Factor Auth</a>
+      <button class="button mr-3" data-xhr-url="/users/2fa_setup?modal=true" data-modal="modal-one">Set Up
+        Two-Factor
+        Auth</button>
     </div>
     {{ end }}
 
@@ -80,13 +83,11 @@
 <script>
   function getAPIKey() {
     if (confirm("Do you want to get a new API key? This will invalidate your existing key if you have one.")) {
-      //document.forms["apiKeyForm"].submit()
       APT.modalPost("apiKeyForm", "modal-one")
     }
   }
   function generateBackupCodes() {
     if (confirm("Do you want to generate backup codes? This will invalidate your existing backup codes.")) {
-      //document.forms["backupCodeForm"].submit()
       APT.modalPost("backupCodeForm", "modal-one")
     }
   }

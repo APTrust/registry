@@ -229,10 +229,10 @@ func UserChangePassword(c *gin.Context) {
 		common.Context().Log.Error().Msgf("UserChangePassword error: %v", err)
 	}
 
-	helpers.SetFlashCookie(c, "Password changed.")
+	helpers.SetFlashCookie(c, "Your password has been changed.")
 	redirectURL := fmt.Sprintf("/users/show/%d", userToEdit.ID)
 	if !req.CurrentUser.HasPermission(constants.UserRead, userToEdit.InstitutionID) {
-		redirectURL = "/dashboard"
+		redirectURL = "/users/my_account"
 	}
 	c.Redirect(http.StatusFound, redirectURL)
 }
