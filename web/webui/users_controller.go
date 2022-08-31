@@ -422,6 +422,7 @@ func UserGetAPIKey(c *gin.Context) {
 
 	req.TemplateData["user"] = req.CurrentUser
 	req.TemplateData["apiKey"] = apiKey
+	req.TemplateData["showAsModal"] = true
 	c.HTML(http.StatusOK, "users/show_api_key.html", req.TemplateData)
 }
 

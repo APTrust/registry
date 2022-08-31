@@ -287,6 +287,7 @@ func UserGenerateBackupCodes(c *gin.Context) {
 		return
 	}
 	req.TemplateData["backupCodes"] = backupCodes
+	req.TemplateData["showAsModal"] = true
 	c.HTML(http.StatusOK, "users/backup_codes.html", req.TemplateData)
 }
 

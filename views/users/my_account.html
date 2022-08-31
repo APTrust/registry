@@ -2,35 +2,29 @@
 
 <!-- Show the header unless query string says modal=true -->
 {{ if not .showAsModal }}
-  {{ template "shared/_header.html" .}}
+{{ template "shared/_header.html" .}}
 {{ end }}
 
 
-<div class="modal-detail">
-  <div class="modal-title-row is-flex is-justify-content-space-between is-align-items-center">
+<div class="box">
+  <div class="box-header">
     <div>
       <h2>{{ .CurrentUser.Name }}</h2>
       <h4>{{ roleName .CurrentUser.Role }} at {{ .CurrentUser.Institution.Name }}</h4>
     </div>
-    <a class="modal-exit" href="#">
-      <span class="material-icons" aria-hidden="true">close</span>
-      <span class="is-sr-only">Close</span>
-    </a>
   </div>
-  <div class="modal-content">
+  <div class="box-content">
     {{ if userCan .CurrentUser "UserUpdateSelf" .CurrentUser.InstitutionID }}
-    <div class="is-flex is-justify-content-space-between mb-5">
-      <a class="button" href="/users/change_password/{{ .CurrentUser.ID }}">Change Password</a>
-      <a class="button" href="javascript:getAPIKey()">Get API Key</a>
-    </div>
-    <div class="is-flex is-justify-content-space-between mb-5">
-      <a class="button" href="javascript:generateBackupCodes()">Generate Backup Codes</a>
-      <a class="button" href="/users/2fa_setup">Set Up Two-Factor Auth</a>
+    <div class="is-flex mb-5">
+      <a class="button mr-3" href="/users/change_password/{{ .CurrentUser.ID }}">Change Password</a>
+      <a class="button mr-3" href="javascript:getAPIKey()">Get API Key</a>
+      <a class="button mr-3" href="javascript:generateBackupCodes()">Generate Backup Codes</a>
+      <a class="button mr-3" href="/users/2fa_setup">Set Up Two-Factor Auth</a>
     </div>
     {{ end }}
 
-    <div class="modal-list-row is-flex is-justify-content-space-between">
-      <dl class="modal-list modal-list-left">
+    <div class="data-list-wrapper is-flex is-justify-content-space-between">
+      <dl class="data-list">
         <dt class="text-label text-xs is-grey-dark">Email</dt>
         <dd class="text-table">{{ .CurrentUser.Email }}</dd>
         <dt class="text-label text-xs is-grey-dark">Verified</dt>
@@ -63,7 +57,7 @@
         <dd class="text-table">{{ dateUS .CurrentUser.LastSignInWithAuthy }}</dd>
       </dl>
 
-      <dl class="modal-list modal-list-right">
+      <dl class="data-list">
         <dt class="text-label text-xs is-grey-dark">Last Updated</dt>
         <dd class="text-table">{{ dateUS .CurrentUser.UpdatedAt }}</dd>
         <dt class="text-label text-xs is-grey-dark">Deactivated</dt>
@@ -84,22 +78,24 @@
 </form>
 
 <script>
- function getAPIKey() {
-     if (confirm("Do you want to get a new API key? This will invalidate your existing key if you have one.")) {
-         document.forms["apiKeyForm"].submit()
-     }
- }
- function generateBackupCodes() {
-     if (confirm("Do you want to generate backup codes? This will invalidate your existing backup codes.")) {
-         document.forms["backupCodeForm"].submit()
-     }
- }
+  function getAPIKey() {
+    if (confirm("Do you want to get a new API key? This will invalidate your existing key if you have one.")) {
+      //document.forms["apiKeyForm"].submit()
+      APT.modalPost("apiKeyForm", "modal-one")
+    }
+  }
+  function generateBackupCodes() {
+    if (confirm("Do you want to generate backup codes? This will invalidate your existing backup codes.")) {
+      //document.forms["backupCodeForm"].submit()
+      APT.modalPost("backupCodeForm", "modal-one")
+    }
+  }
 </script>
 
 
 <!-- Show the footer unless query string says modal=true -->
 {{ if not .showAsModal }}
-  {{ template "shared/_footer.html" .}}
+{{ template "shared/_footer.html" .}}
 {{ end }}
 
 

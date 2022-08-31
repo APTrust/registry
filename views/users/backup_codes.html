@@ -2,7 +2,7 @@
 
 <!-- Show the header unless query string says modal=true -->
 {{ if not .showAsModal }}
-  {{ template "shared/_header.html" .}}
+{{ template "shared/_header.html" .}}
 {{ end }}
 
 <div class="modal-detail">
@@ -14,7 +14,8 @@
     </a>
   </div>
 
-  <p>Please copy the backup codes below. You can use these for two-factor login when you don't have access to Authy or text messages. These backup codes supersede all previously-generated codes.</p>
+  <p class="mb-5">Please copy the backup codes below. You can use these for two-factor login when you don't have access
+    to Authy or text messages. These backup codes supersede all previously-generated codes.</p>
 
   <!--
       Note that two_factor_controller_test.go looks for these span tags
@@ -28,7 +29,7 @@
 
 <!-- Show the footer unless query string says modal=true -->
 {{ if not .showAsModal }}
-  {{ template "shared/_footer.html" .}}
+{{ template "shared/_footer.html" .}}
 {{ end }}
 
 

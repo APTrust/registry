@@ -127,14 +127,18 @@ export function initXHR() {
 
 // Post a form via XHR and load the result into modal with targetId.
 // This does assume that the target is a modal.
-function modalPost(formName, modalId){
+export function modalPost(formName, modalId){
 	var form = document.forms[formName]
 	var data = new FormData(form)
 
 	function resultToModal() { 
 		let modal = document.getElementById(modalId)
 		let modalContentDiv = modal.querySelector('.modal-container')
+		console.log(xhr.responseText)
+		console.log(modalContentDiv)
 		modalContentDiv.innerHTML = xhr.responseText 
+		document.body.classList.add("freeze");
+		modal.classList.add("open")
 		attachModalClose(modal)
 	}
 
@@ -142,7 +146,7 @@ function modalPost(formName, modalId){
 	xhr.open(form.method, form.action)
 	xhr.onload = resultToModal
 	xhr.onerror = resultToModal
-	xhr.send(data);
+	xhr.send(data); 
 }
 
 function initModalPosts() {
