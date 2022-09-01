@@ -185,7 +185,8 @@ func TestToJSON(t *testing.T) {
 }
 
 func TestUnixToISO(t *testing.T) {
-	assert.Equal(t, "2022-05-09T14:33:24-04:00", helpers.UnixToISO(1652121204))
+	ts := time.Date(2022, 5, 9, 14, 33, 24, 0, time.Local)
+	assert.Equal(t, ts.Format(time.RFC3339), helpers.UnixToISO(1652121204))
 }
 
 func TestBadgeClass(t *testing.T) {
@@ -217,7 +218,7 @@ func TestSortIcon(t *testing.T) {
 
 	url, _ = url.Parse("https://example.com?sort=col1__asc")
 	assert.Equal(t, "keyboard_arrow_up", helpers.SortIcon(url, "col1"))
-	
+
 	url, _ = url.Parse("https://example.com?sort=col1__desc")
 	assert.Equal(t, "keyboard_arrow_down", helpers.SortIcon(url, "col1"))
 
