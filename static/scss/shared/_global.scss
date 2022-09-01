@@ -92,3 +92,17 @@ pre.with-wrap {
   word-wrap: break-word;
   padding: 0;
 }
+
+/* TODO: This is not too pretty, but serviceable for now. */
+.flash {
+  padding: 8px;
+  background-color: $blue-light;
+  margin-bottom: 1rem;
+  border-radius: 4px;
+}
+
+/* Make line height match accompanying text. */
+.sort-icon {
+  line-height: 14px;
+  font-size: 12px;
+}

@@ -23,23 +23,24 @@
       <tr>
         <th class="pl-5"><a href="{{ sortUrl .currentUrl `name` }}" class="is-flex is-align-items-center">
             Name
-            <span class="material-icons" aria-hidden="true">{{ sortIcon .currentUrl `name` }}</span>
+            <span class="material-icons sort-icon" aria-hidden="true">{{ sortIcon .currentUrl `name` }}</span>
           </a></th>
         <th><a href="{{ sortUrl .currentUrl `identifier` }}" class="is-flex is-align-items-center">
             Identifier
-            <span class="material-icons" aria-hidden="true">{{ sortIcon .currentUrl `identifier` }}</span>
+            <span class="material-icons sort-icon" aria-hidden="true">{{ sortIcon .currentUrl `identifier` }}</span>
           </a></th>
         <th><a href="{{ sortUrl .currentUrl `type` }}" class="is-flex is-align-items-center">
             Type
-            <span class="material-icons" aria-hidden="true">{{ sortIcon .currentUrl `type` }}</span>
+            <span class="material-icons sort-icon" aria-hidden="true">{{ sortIcon .currentUrl `type` }}</span>
           </a></th>
         <th><a href="{{ sortUrl .currentUrl `parent_identifier` }}" class="is-flex is-align-items-center">
             Parent
-            <span class="material-icons" aria-hidden="true">{{ sortIcon .currentUrl `parent_identifier` }}</span>
+            <span class="material-icons sort-icon" aria-hidden="true">{{ sortIcon .currentUrl `parent_identifier`
+              }}</span>
           </a></th>
         <th><a href="{{ sortUrl .currentUrl `deactivated_at` }}" class="is-flex is-align-items-center">
             Deactivated
-            <span class="material-icons" aria-hidden="true">{{ sortIcon .currentUrl `deactivated_at` }}</span>
+            <span class="material-icons sort-icon" aria-hidden="true">{{ sortIcon .currentUrl `deactivated_at` }}</span>
           </a></th>
       </tr>
     </thead>

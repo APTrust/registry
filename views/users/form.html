@@ -2,7 +2,7 @@
 
 <!-- Show the header unless query string says modal=true -->
 {{ if not .showAsModal }}
-  {{ template "shared/_header.html" .}}
+{{ template "shared/_header.html" .}}
 {{ end }}
 
 <div class="box">
@@ -48,26 +48,26 @@
 </div>
 
 <script>
-// Set 2FA date if 2FA is mandatory and no date is set
-window.addEventListener('load', (event) => {
-     let otpList = document.forms['userForm'].elements.OTPRequiredForLogin
-     let graceDate = document.forms['userForm'].elements.GracePeriod
-     otpList.addEventListener('change', (e) => {
-         if (otpList.value == "true") {
-             let today = new Date()
-             let deadline = new Date(today.setDate(today.getDate() + 60))
-             graceDate.value = deadline.toISOString().substring(0,10)
-         } else if (otpList.value == "false") {
-             graceDate.value = ''
-         }
-     })
-});
+  // Set 2FA date if 2FA is mandatory and no date is set
+  window.addEventListener('load', (event) => {
+    let otpList = document.forms['userForm'].elements.OTPRequiredForLogin
+    let graceDate = document.forms['userForm'].elements.GracePeriod
+    otpList.addEventListener('change', (e) => {
+      if (otpList.value == "true") {
+        let today = new Date()
+        let deadline = new Date(today.setDate(today.getDate() + 60))
+        graceDate.value = deadline.toISOString().substring(0, 10)
+      } else if (otpList.value == "false") {
+        graceDate.value = ''
+      }
+    })
+  });
 </script>
 
 
 <!-- Show the footer unless query string says modal=true -->
 {{ if not .showAsModal }}
-  {{ template "shared/_footer.html" .}}
+{{ template "shared/_footer.html" .}}
 {{ end }}
 
 

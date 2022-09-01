@@ -17,13 +17,13 @@ If you're looking for our member API documentation, check out our [interactive S
 
 To run the registry on your local dev machine, you will need the following for ALL operations:
 
-* [Go](https://golang.org/dl/) 1.16 or higher
-* [Postgres](https://www.postgresql.org/download/) 11 or higher
+- [Go](https://golang.org/dl/) 1.16 or higher
+- [Postgres](https://www.postgresql.org/download/) 11 or higher
 
 You will also need the following for some Admin operations:
 
-* [Redis](https://redis.io/download) 5.07 or higher
-* [NSQ](https://nsq.io/deployment/installing.html) version 1.20 or higher
+- [Redis](https://redis.io/download) 5.07 or higher
+- [NSQ](https://nsq.io/deployment/installing.html) version 1.20 or higher
 
 If you're running on Linux or OSX, you'll find the required Redis and NSQ binaries in this repo's .bin/linux and ./bin/osx directories. The registry script automatically starts them when it runs the server and tests.
 
@@ -33,7 +33,7 @@ As a developer, you generally won't need to send Authy or SMS messages for two-f
 
 The AWS SNS library, which sends two-factor auth codes via text/SMS, requires the following config files:
 
-* ~/.aws/credentials should contain the following:
+- ~/.aws/credentials should contain the following:
 
 ```
 [default]
@@ -41,14 +41,13 @@ aws_access_key_id=<valid access key id>
 aws_secret_access_key=<valid secret key>
 ```
 
-* ~/.aws/config should contain the following:
+- ~/.aws/config should contain the following:
 
 ```
 [default]
 region=us-east-2
 output=json
 ```
-
 
 # Database Setup
 
@@ -96,15 +95,21 @@ The run.sh script starts Redis and NSQ in addition to the registry. These servic
 
 You'll have some minimal data available in the DB, including a number of user accounts. You can log in with any of the following:
 
-| Email                | Password | Role                            |
-| -------------------- | -------- | ------------------------------- |
-| system@aptrust.org   | password | Sys Admin                       |
-| admin@inst1.edu      | password | Institutional Admin at Inst 1   |
-| user@inst1.edu       | password | Institutional User at Inst 1    |
-| inactive@inst1.edu   | password | Deactivated Inst User at Inst 1 |
-| admin@inst2.edu      | password | Institutional User at Inst 2    |
+| Email              | Password | Role                            |
+| ------------------ | -------- | ------------------------------- |
+| system@aptrust.org | password | Sys Admin                       |
+| admin@inst1.edu    | password | Institutional Admin at Inst 1   |
+| user@inst1.edu     | password | Institutional User at Inst 1    |
+| inactive@inst1.edu | password | Deactivated Inst User at Inst 1 |
+| admin@inst2.edu    | password | Institutional User at Inst 2    |
 
 Note that in the test fixtures, the API secret key for all users is `password`.
+
+# CSS Changes
+
+Install sass using `npm install sass` from the top level of the project directory. Edit styles in the static/scss/shared directory.
+
+To update styles dynamically during development, use `npm run sass-dev`. To compile a new stylesheet for production, run `npm run sass-build`.
 
 # Testing
 
@@ -166,7 +171,7 @@ To use Authy for OTP, set the `AUTHY_API_KEY` environment variable.
 
 Registry routes deviate somewhat from standard REST patterns for two reasons.
 
-1. When this project started, conflicts in the Gin router prevented the use of some standard REST patterns. See  [issue #1681](https://github.com/gin-gonic/gin/issues/1681), which has since been resolved.
+1. When this project started, conflicts in the Gin router prevented the use of some standard REST patterns. See [issue #1681](https://github.com/gin-gonic/gin/issues/1681), which has since been resolved.
 2. Gin did not include the Rails `_method` hack, which told the backend to interpret a POST as a PUT, DELETE, or other method. While XHR and API clients support all HTTP methods, browsers only support GET and POST, so routes in the Web UI use those methods.
 3. While a typical web app nests routes under a resource's parent ID, Registry nests sometimes nests routes under `institution_id`. This is because all of the Registry's permissions are based on a combination of user role and institution id.
 
@@ -186,12 +191,12 @@ With the exception of a few whitelisted pages, the middleware will not permit an
 
 Routes excepted from auth checks include:
 
-* The login page
-* The log off page
-* The "forgot password" landing page, which comes from a link in the "forgot password" email
-* The "complete password reset" page, which comes from a link in the "password reset" email
-* The general error page
-* Static files, such as scripts, stylesheets, images, favicon, etc.
+- The login page
+- The log off page
+- The "forgot password" landing page, which comes from a link in the "forgot password" email
+- The "complete password reset" page, which comes from a link in the "password reset" email
+- The general error page
+- Static files, such as scripts, stylesheets, images, favicon, etc.
 
 The "forgot password" and "password reset" pages both use a secure token in the query string to identify the user.
 

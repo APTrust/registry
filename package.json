@@ -22,7 +22,9 @@
   "homepage": "https://github.com/APTrust/registry#readme",
   "devDependencies": {
     "bulma": "^0.9.4",
-    "normalize.css": "^8.0.1",
-    "sass": "^1.51.0"
+    "normalize.css": "^8.0.1"
+  },
+  "dependencies": {
+    "sass": "^1.54.8"
   }
 }

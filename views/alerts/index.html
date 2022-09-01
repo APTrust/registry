@@ -1,8 +1,5 @@
-{{ define "alerts/index.html" }}
-
-{{ template "shared/_header.html" .}}
-
-{{ $isAdmin := .CurrentUser.IsAdmin }}
+{{ define "alerts/index.html" }} {{ template "shared/_header.html" .}} {{
+$isAdmin := .CurrentUser.IsAdmin }}
 
 <!-- .items type is []*AlertView -->
 
@@ -14,8 +11,9 @@
   <div class="box-content">
     {{ template "alerts/_filters.html" . }}
 
-    <div class="mt-5"><a href="javascript:document.forms['alertsMarkAllAsRead'].submit()" class="is-underlined">Mark all
-        as read</a></div>
+    <div class="mt-5">
+      <a href="javascript:document.forms['alertsMarkAllAsRead'].submit()" class="is-underlined">Mark all as read</a>
+    </div>
     <form name="alertsMarkAllAsRead" action="/alerts/mark_all_as_read" method="post">
       {{ template "forms/csrf_token.html" . }}
     </form>
@@ -24,16 +22,24 @@
   <table class="table is-hoverable is-fullwidth has-padding">
     <thead>
       <tr>
-        <th class="pl-5"><a href="{{ sortUrl .currentUrl `type` }}">Type <span class="material-icons"
-              aria-hidden="true">{{ sortIcon .currentUrl `type` }}</span></a></th>
+        <th class="pl-5">
+          <a href="{{ sortUrl .currentUrl `type` }}">Type
+            <span class="material-icons sort-icon" aria-hidden="true">{{ sortIcon .currentUrl `type` }}</span></a>
+        </th>
         {{ if $isAdmin }}
-        <th><a href="{{ sortUrl .currentUrl `user_name` }}">Recipient <span class="material-icons" aria-hidden="true">{{
-              sortIcon .currentUrl `user_name` }}</span></a></th>
+        <th>
+          <a href="{{ sortUrl .currentUrl `user_name` }}">Recipient
+            <span class="material-icons sort-icon" aria-hidden="true">{{ sortIcon .currentUrl `user_name` }}</span></a>
+        </th>
         {{ end }}
-        <th><a href="{{ sortUrl .currentUrl `created_at` }}">Created<span class="material-icons" aria-hidden="true">{{
-              sortIcon .currentUrl `created_at` }}</span></a></th>
-        <th><a href="{{ sortUrl .currentUrl `read_at` }}">Read <span class="material-icons" aria-hidden="true">{{
-              sortIcon .currentUrl `read_at` }}</span></a></th>
+        <th>
+          <a href="{{ sortUrl .currentUrl `created_at` }}">Created
+            <span class="material-icons sort-icon" aria-hidden="true">{{ sortIcon .currentUrl `created_at` }}</span></a>
+        </th>
+        <th>
+          <a href="{{ sortUrl .currentUrl `read_at` }}">Read
+            <span class="material-icons sort-icon" aria-hidden="true">{{ sortIcon .currentUrl `read_at` }}</span></a>
+        </th>
         <th>Read Status</th>
       </tr>
     </thead>
@@ -50,7 +56,9 @@
             </span>
             <span class="is-grey-dark">{{ $alert.Type }}</span>
           </div>
-          <div class="text-xs is-grey-dark is-dashboard-action">{{ $alert.Subject }}</div>
+          <div class="text-xs is-grey-dark is-dashboard-action">
+            {{ $alert.Subject }}
+          </div>
         </td>
         {{ if $isAdmin }}
         <td>{{ defaultString $alert.UserName "N/A" }}</td>
@@ -79,26 +87,30 @@
 
 <script>
   function markAlertRead(alertId) {
-    var row = document.querySelector(`tr[data-alert-id="${alertId}"]`)
-    var readAt = row.querySelector('[data-name="alertReadAt"]')
-    var icon = row.querySelector('[data-name="alertReadIcon"]')
-    if (icon.innerText == 'drafts') {
-      return // alread marked as read
+    var row = document.querySelector(`tr[data-alert-id="${alertId}"]`);
+    var readAt = row.querySelector('[data-name="alertReadAt"]');
+    var icon = row.querySelector('[data-name="alertReadIcon"]');
+    if (icon.innerText == "drafts") {
+      return; // alread marked as read
     }
-    readAt.innerText = new Date().toLocaleDateString('en-us', { year: "numeric", month: "short", day: "numeric" })
-    icon.innerText = 'drafts'
-    icon.classList.remove('is-gold')
-    icon.classList.add('is-grey')
+    readAt.innerText = new Date().toLocaleDateString("en-us", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+    icon.innerText = "drafts";
+    icon.classList.remove("is-gold");
+    icon.classList.add("is-grey");
   }
   function addAlertEventListeners() {
-    document.querySelectorAll('tr[data-alert-id]').forEach(function (row) {
-      var id = row.getAttribute('data-alert-id')
-      row.addEventListener('click', function () { markAlertRead(id) })
-    })
+    document.querySelectorAll("tr[data-alert-id]").forEach(function (row) {
+      var id = row.getAttribute("data-alert-id");
+      row.addEventListener("click", function () {
+        markAlertRead(id);
+      });
+    });
   }
-  addAlertEventListeners()
+  addAlertEventListeners();
 </script>
 
-{{ template "shared/_footer.html" .}}
-
-{{ end }}
+{{ template "shared/_footer.html" .}} {{ end }}
