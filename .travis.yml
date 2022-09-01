@@ -8,7 +8,7 @@ env:
 #services:
 #  - postgresql
 addons:
-  postgresql: "13.4"
+  postgresql: "13"
 before_script:
   - psql -c "create database apt_registry_travis with LC_COLLATE='en_US.UTF-8';" -U postgres -p 5433
   - psql -U postgres -d apt_registry_travis -a -f ./db/schema.sql
