@@ -48,6 +48,13 @@ Parameters:
     Type: Number
     Default: 3
 
+  LogDays:
+    Description: 'Sets the number of days for retaining logs. Can be set according to Cluster'
+    Type: Number
+    AllowedValues: [1, 7, 14, 30, 90] 
+    Default: 30
+
+
 Resources:
   
   NSQCapacityProviderAssociation:
@@ -88,6 +95,7 @@ Resources:
   
   LogGroup:
     Properties:
+      RetenionInDays: !Ref 'LogDays'
       LogGroupName: !Sub '/ecs/${DNS}/registry' 
       Tags: 
       - Key: Environment 
@@ -95,6 +103,7 @@ Resources:
       - Key: Service 
         Value: registry 
     Type: AWS::Logs::LogGroup
+    DeletionPolicy: Retain
 
   RegistryService: 
     DependsOn: ListenerReg80 
