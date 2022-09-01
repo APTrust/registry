@@ -6,10 +6,7 @@ go:
 env:
   global:
     - PGPORT=5433
-    - PGUSER=travis
     - APT_ENV=travis
-#services:
-#  - postgresql
 addons:
   postgresql: "13"
   apt:
@@ -17,8 +14,8 @@ addons:
       - postgresql-13
       - postgresql-client-13
 before_script:
-  - psql -c "create database apt_registry_travis with LC_COLLATE='en_US.UTF-8';"
-  - psql -d apt_registry_travis -a -f ./db/schema.sql
+  - psql -c "create database apt_registry_travis with LC_COLLATE='en_US.UTF-8';" -U postgres
+  - psql -U postgres -d apt_registry_travis -a -f ./db/schema.sql
   - "./bin/linux/cc-test-reporter before-build"
 script:
   - "./registry cover"
