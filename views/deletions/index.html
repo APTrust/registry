@@ -13,41 +13,48 @@
 
 
 
-<!-- .items type is []DeletionRequestView -->
+  <!-- .items type is []DeletionRequestView -->
 
-<table class="table is-hoverable is-fullwidth has-padding">
-  <thead>
-    <tr>
-      <th class="pl-5"><a href="{{ sortUrl .currentUrl `requested_by_name` }}">Requested By</a></th>
-      <th><a href="{{ sortUrl .currentUrl `requested_at` }}">Request Date</a></th>
-      <th><a href="{{ sortUrl .currentUrl `confirmed_at` }}">Confirmed At</a></th>
-      <th><a href="{{ sortUrl .currentUrl `file_count` }}">Files</a></th>
-      <th><a href="{{ sortUrl .currentUrl `object_count` }}">Objects</a></th>
-      <th><a href="{{ sortUrl .currentUrl `status` }}">Status</a></th>
-    </tr>
-  </thead>
-  <tbody>
-    {{ range $index, $deletion := .items }}
-    <tr class="clickable" data-modal="modal-one" data-xhr-url="/deletions/show/{{ $deletion.ID }}?modal=true">
-      <td class="pl-5">
-        <div class="is-flex is-align-items-center">
-          <span class="action-icon mr-3">
-            <span class="material-icons md-16" aria-hidden="true"><span>delete_forever</span></span>
-          </span>
-          <span class="is-grey-dark">{{ $deletion.RequestedByName }}</span>
-        </div>
-      </td>
-      <td class="is-grey-dark text-sm is-uppercase">{{ dateUS $deletion.RequestedAt }}</td>
-      <td class="is-grey-dark text-sm is-uppercase">{{ dateUS $deletion.ConfirmedAt }}</td>
-      <td class="is-grey-dark num text-sm">{{ $deletion.FileCount }}</td>
-      <td class="is-grey-dark num text-sm">{{ $deletion.ObjectCount }}</td>
-      <td><span class="badge {{ badgeClass $deletion.DisplayStatus }}">{{ $deletion.DisplayStatus }}</span></td><!-- TODO Make status change classes, these statuses don't appear to be in the constants -->
-    </tr>
-    {{ end }}
-  </tbody>
-</table>
+  <table class="table is-hoverable is-fullwidth has-padding">
+    <thead>
+      <tr>
+        <th class="pl-5"><a href="{{ sortUrl .currentUrl `requested_by_name` }}">Requested By <span
+              class="material-icons" aria-hidden="true">{{ sortIcon .currentUrl `requested_by_name` }}</span></a></th>
+        <th><a href="{{ sortUrl .currentUrl `requested_at` }}">Request Date <span class="material-icons"
+              aria-hidden="true">{{ sortIcon .currentUrl `requested_at` }}</span></a></th>
+        <th><a href="{{ sortUrl .currentUrl `confirmed_at` }}">Confirmed At <span class="material-icons"
+              aria-hidden="true">{{ sortIcon .currentUrl `confirmed_at` }}</span></a></th>
+        <th><a href="{{ sortUrl .currentUrl `file_count` }}">Files <span class="material-icons" aria-hidden="true">{{
+              sortIcon .currentUrl `file_count` }}</span></a></th>
+        <th><a href="{{ sortUrl .currentUrl `object_count` }}">Objects <span class="material-icons"
+              aria-hidden="true">{{ sortIcon .currentUrl `object_count` }}</span></a></th>
+        <th><a href="{{ sortUrl .currentUrl `status` }}">Status <span class="material-icons" aria-hidden="true">{{
+              sortIcon .currentUrl `status` }}</span></a></th>
+      </tr>
+    </thead>
+    <tbody>
+      {{ range $index, $deletion := .items }}
+      <tr class="clickable" data-modal="modal-one" data-xhr-url="/deletions/show/{{ $deletion.ID }}?modal=true">
+        <td class="pl-5">
+          <div class="is-flex is-align-items-center">
+            <span class="action-icon mr-3">
+              <span class="material-icons md-16" aria-hidden="true"><span>delete_forever</span></span>
+            </span>
+            <span class="is-grey-dark">{{ $deletion.RequestedByName }}</span>
+          </div>
+        </td>
+        <td class="is-grey-dark text-sm is-uppercase">{{ dateUS $deletion.RequestedAt }}</td>
+        <td class="is-grey-dark text-sm is-uppercase">{{ dateUS $deletion.ConfirmedAt }}</td>
+        <td class="is-grey-dark num text-sm">{{ $deletion.FileCount }}</td>
+        <td class="is-grey-dark num text-sm">{{ $deletion.ObjectCount }}</td>
+        <td><span class="badge {{ badgeClass $deletion.DisplayStatus }}">{{ $deletion.DisplayStatus }}</span></td>
+        <!-- TODO Make status change classes, these statuses don't appear to be in the constants -->
+      </tr>
+      {{ end }}
+    </tbody>
+  </table>
 
-{{ template "shared/_pager.html" dict "pager" .pager }}
+  {{ template "shared/_pager.html" dict "pager" .pager }}
 </div>
 
 {{ template "shared/_footer.html" .}}

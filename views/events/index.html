@@ -15,27 +15,28 @@
 
   <table class="table is-hoverable is-fullwidth has-padding">
     <thead>
-      <tr><!-- TODO make icons change direction based on sort direction -->
+      <tr>
         <th class="pl-5"><a href="{{ sortUrl .currentUrl `event_type` }}" class="is-flex is-align-items-center">
-          Type
-          <span class="material-icons" aria-hidden="true">keyboard_arrow_down</span>
-        </a></th>
+            Type
+            <span class="material-icons" aria-hidden="true">{{ sortIcon .currentUrl `event_type` }}</span>
+          </a></th>
         <th><a href="{{ sortUrl .currentUrl `date_time` }}" class="is-flex is-align-items-center">
-          Date
-          <span class="material-icons" aria-hidden="true">keyboard_arrow_down</span>
-        </a></th>
+            Date
+            <span class="material-icons" aria-hidden="true">{{ sortIcon .currentUrl `date_time` }}</span>
+          </a></th>
         <th><a href="{{ sortUrl .currentUrl `outcome` }}" class="is-flex is-align-items-center">
-          Outcome
-          <span class="material-icons" aria-hidden="true">keyboard_arrow_down</span>
-        </a></th>
+            Outcome
+            <span class="material-icons" aria-hidden="true">{{ sortIcon .currentUrl `outcome` }}</span>
+          </a></th>
         <th><a href="{{ sortUrl .currentUrl `intellectual_object_identifier` }}" class="is-flex is-align-items-center">
-          Object Identifier
-          <span class="material-icons" aria-hidden="true">keyboard_arrow_down</span>
-        </a></th>
+            Object Identifier
+            <span class="material-icons" aria-hidden="true">{{ sortIcon .currentUrl `intellectual_object_identifier`
+              }}</span>
+          </a></th>
         <th><a href="{{ sortUrl .currentUrl `generic_file_identifier` }}" class="is-flex is-align-items-center">
-          File Identifier
-          <span class="material-icons" aria-hidden="true">keyboard_arrow_down</span>
-        </a></th>
+            File Identifier
+            <span class="material-icons" aria-hidden="true">{{ sortIcon .currentUrl `generic_file_identifier` }}</span>
+          </a></th>
       </tr>
     </thead>
     <tbody>

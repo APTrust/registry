@@ -14,7 +14,8 @@
   <div class="box-content">
     {{ template "alerts/_filters.html" . }}
 
-    <div class="mt-5"><a href="javascript:document.forms['alertsMarkAllAsRead'].submit()" class="is-underlined">Mark all as read</a></div>
+    <div class="mt-5"><a href="javascript:document.forms['alertsMarkAllAsRead'].submit()" class="is-underlined">Mark all
+        as read</a></div>
     <form name="alertsMarkAllAsRead" action="/alerts/mark_all_as_read" method="post">
       {{ template "forms/csrf_token.html" . }}
     </form>
@@ -23,21 +24,28 @@
   <table class="table is-hoverable is-fullwidth has-padding">
     <thead>
       <tr>
-        <th class="pl-5"><a href="{{ sortUrl .currentUrl `type` }}">Type</a></th>
+        <th class="pl-5"><a href="{{ sortUrl .currentUrl `type` }}">Type <span class="material-icons"
+              aria-hidden="true">{{ sortIcon .currentUrl `type` }}</span></a></th>
         {{ if $isAdmin }}
-        <th><a href="{{ sortUrl .currentUrl `user_name` }}">Recipient</a></th>
+        <th><a href="{{ sortUrl .currentUrl `user_name` }}">Recipient <span class="material-icons" aria-hidden="true">{{
+              sortIcon .currentUrl `user_name` }}</span></a></th>
         {{ end }}
-        <th><a href="{{ sortUrl .currentUrl `created_at` }}">Created</a></th>
-        <th><a href="{{ sortUrl .currentUrl `read_at` }}">Read</a></th>
+        <th><a href="{{ sortUrl .currentUrl `created_at` }}">Created<span class="material-icons" aria-hidden="true">{{
+              sortIcon .currentUrl `created_at` }}</span></a></th>
+        <th><a href="{{ sortUrl .currentUrl `read_at` }}">Read <span class="material-icons" aria-hidden="true">{{
+              sortIcon .currentUrl `read_at` }}</span></a></th>
         <th>Read Status</th>
       </tr>
     </thead>
     <tbody>
       {{ range $index, $alert := .items }}
-      <tr class="clickable" data-modal="modal-one" data-xhr-url="/alerts/show/{{ $alert.ID }}/{{ $alert.UserID }}?modal=true" data-alert-id="{{ $alert.ID }}.{{ $alert.UserID }}">
+      <tr class="clickable" data-modal="modal-one"
+        data-xhr-url="/alerts/show/{{ $alert.ID }}/{{ $alert.UserID }}?modal=true"
+        data-alert-id="{{ $alert.ID }}.{{ $alert.UserID }}">
         <td class="pl-5">
           <div class="is-flex is-align-items-center">
-            <span class="action-icon mr-3"><!-- TODO Make this update with correct icon-->
+            <span class="action-icon mr-3">
+              <!-- TODO Make this update with correct icon-->
               <span class="material-icons md-16" aria-hidden="true"><span>check</span></span>
             </span>
             <span class="is-grey-dark">{{ $alert.Type }}</span>
@@ -50,7 +58,8 @@
         <td>{{ dateUS $alert.CreatedAt }}</td>
         <td data-name="alertReadAt">{{ dateUS $alert.ReadAt }}</td>
         <td class="has-text-centered">
-          <a href="#"><!-- TODO: Hook this up-->
+          <a href="#">
+            <!-- TODO: Hook this up-->
             {{ if $alert.HasBeenRead }}
             <span data-name="alertReadIcon" class="material-icons is-grey" aria-hidden="true">drafts</span>
             <span class="is-sr-only">Mark as Unread</span>
@@ -72,19 +81,19 @@
   function markAlertRead(alertId) {
     var row = document.querySelector(`tr[data-alert-id="${alertId}"]`)
     var readAt = row.querySelector('[data-name="alertReadAt"]')
-    var icon = row.querySelector('[data-name="alertReadIcon"]') 
+    var icon = row.querySelector('[data-name="alertReadIcon"]')
     if (icon.innerText == 'drafts') {
       return // alread marked as read
     }
-    readAt.innerText = new Date().toLocaleDateString('en-us', { year:"numeric", month:"short", day:"numeric"})
-    icon.innerText = 'drafts' 
+    readAt.innerText = new Date().toLocaleDateString('en-us', { year: "numeric", month: "short", day: "numeric" })
+    icon.innerText = 'drafts'
     icon.classList.remove('is-gold')
     icon.classList.add('is-grey')
   }
   function addAlertEventListeners() {
-    document.querySelectorAll('tr[data-alert-id]').forEach(function(row) {
+    document.querySelectorAll('tr[data-alert-id]').forEach(function (row) {
       var id = row.getAttribute('data-alert-id')
-      row.addEventListener('click', function() { markAlertRead(id) })
+      row.addEventListener('click', function () { markAlertRead(id) })
     })
   }
   addAlertEventListeners()

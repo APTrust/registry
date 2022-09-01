@@ -1,6 +1,4 @@
-{{ define "users/index.html" }}
-
-{{ template "shared/_header.html" .}}
+{{ define "users/index.html" }} {{ template "shared/_header.html" .}}
 
 <div class="box">
   <div class="box-header">
@@ -8,13 +6,16 @@
   </div>
 
   <div class="box-content">
-
-
     <div class="is-flex">
       {{ if .CurrentUser.IsAdmin }}
-      <button class="button is-primary mr-6 filter-button-offset" data-modal="modal-one" data-xhr-url="/users/new?modal=true">Add new user</button>
+      <button class="button is-primary mr-6 filter-button-offset" data-modal="modal-one"
+        data-xhr-url="/users/new?modal=true">
+        Add new user
+      </button>
       {{ else if userCan .CurrentUser "UserCreate" .CurrentUser.InstitutionID }}
-      <a class="button is-primary mr-6" href="/users/new?institution_id={{ .CurrentUser.InstitutionID }}">Add new user</a>
+      <a class="button is-primary mr-6" href="/users/new?institution_id={{ .CurrentUser.InstitutionID }}">
+        Add new user
+      </a>
       {{ end }}
 
       {{ if .CurrentUser.IsAdmin }}
@@ -26,22 +27,41 @@
   <table class="table is-fullwidth has-padding is-hoverable">
     <thead>
       <tr>
-        <th class="pl-5"><a href="{{ sortUrl .currentUrl `name` }}">Name</a></th>
-        <th><a href="{{ sortUrl .currentUrl `email` }}">Email</a></th>
-        <th><a href="{{ sortUrl .currentUrl `institution_name` }}">Institution</a></th>
-        <th><a href="{{ sortUrl .currentUrl `role` }}">Role</a></th>
-        <th><a href="{{ sortUrl .currentUrl `last_sign_in_at` }}">Last Sign In</a></th>
-        <th><a href="{{ sortUrl .currentUrl `enabled_two_factor` }}">2FA</a></th>
-        <th><a href="{{ sortUrl .currentUrl `deactivated_at` }}">Disabled</a></th>
+        <th class="pl-5">
+          <a href="{{ sortUrl .currentUrl `name` }}">Name<span class="material-icons" aria-hidden="true">
+              {{ sortIcon .currentUrl `name` }}</span></a>
+        </th>
+        <th>
+          <a href="{{ sortUrl .currentUrl `email` }}">Email<span class="material-icons" aria-hidden="true">
+              {{ sortIcon .currentUrl `email` }}</span></a>
+        </th>
+        <th>
+          <a href="{{ sortUrl .currentUrl `institution_name` }}">Institution<span class="material-icons"
+              aria-hidden="true">{{ sortIcon .currentUrl `institution_name` }}</span></a>
+        </th>
+        <th>
+          <a href="{{ sortUrl .currentUrl `role` }}">Role<span class="material-icons" aria-hidden="true">
+              {{ sortIcon .currentUrl `role` }}</span></a>
+        </th>
+        <th>
+          <a href="{{ sortUrl .currentUrl `last_sign_in_at` }}">Last Sign In
+            <span class="material-icons" aria-hidden="true">{{ sortIcon .currentUrl `last_sign_in_at` }}</span></a>
+        </th>
+        <th>
+          <a href="{{ sortUrl .currentUrl `enabled_two_factor` }}">2FA
+            <span class="material-icons" aria-hidden="true">{{ sortIcon .currentUrl `enabled_two_factor` }}</span></a>
+        </th>
+        <th>
+          <a href="{{ sortUrl .currentUrl `deactivated_at` }}">Disabled
+            <span class="material-icons" aria-hidden="true">{{ sortIcon .currentUrl `deactivated_at` }}</span></a>
+        </th>
       </tr>
     </thead>
     <tbody>
-          <!-- .items type is UsersView, not User -->
-        {{ range $index, $user := .items }}
-        {{ $cssClass := "clickable" }}
-        {{ if not $user.DeactivatedAt.IsZero }}
-          {{ $cssClass = "clickable row-disabled" }}
-        {{ end }}
+      <!-- .items type is UsersView, not User -->
+      {{ range $index, $user := .items }} {{ $cssClass := "clickable" }} {{ if
+      not $user.DeactivatedAt.IsZero }} {{ $cssClass = "clickable row-disabled"
+      }} {{ end }}
       <tr class="{{ $cssClass }}" onclick="window.location.href='/users/show/{{ $user.ID }}'">
         <td class="pl-5">{{ $user.Name }}</td>
         <td class="is-grey-dark">{{ $user.Email }}</td>
@@ -58,7 +78,4 @@
   {{ template "shared/_pager.html" dict "pager" .pager }}
 </div>
 
-{{ template "shared/_footer.html" .}}
-
-
-{{ end }}
+{{ template "shared/_footer.html" .}} {{ end }}

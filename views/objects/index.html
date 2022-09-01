@@ -16,27 +16,27 @@
 
   <table class="table is-hoverable is-fullwidth has-padding">
     <thead>
-      <tr><!-- TODO make icons change direction based on sort direction -->
+      <tr>
         <th class="pl-5"><a href="{{ sortUrl .currentUrl `identifier` }}" class="is-flex is-align-items-center">
-          Title/Identifier
-          <span class="material-icons" aria-hidden="true">keyboard_arrow_down</span>
-        </a></th>
+            Title/Identifier
+            <span class="material-icons" aria-hidden="true">{{ sortIcon .currentUrl `identifier` }}</span>
+          </a></th>
         <th><a href="{{ sortUrl .currentUrl `storage_option` }}" class="is-flex is-align-items-center">
-          Storage Option
-          <span class="material-icons" aria-hidden="true">keyboard_arrow_down</span>
-        </a></th>
+            Storage Option
+            <span class="material-icons" aria-hidden="true">{{ sortIcon .currentUrl `storage_option` }}</span>
+          </a></th>
         <th><a href="{{ sortUrl .currentUrl `file_count` }}" class="is-flex is-align-items-center">
-          File Count
-          <span class="material-icons" aria-hidden="true">keyboard_arrow_down</span>
-        </a></th>
+            File Count
+            <span class="material-icons" aria-hidden="true">{{ sortIcon .currentUrl `file_count` }}</span>
+          </a></th>
         <th><a href="{{ sortUrl .currentUrl `size` }}" class="is-flex is-align-items-center">
-          Size
-          <span class="material-icons" aria-hidden="true">keyboard_arrow_down</span>
-        </a></th>
+            Size
+            <span class="material-icons" aria-hidden="true">{{ sortIcon .currentUrl `size` }}</span>
+          </a></th>
         <th><a href="{{ sortUrl .currentUrl `updated_at` }}" class="is-flex is-align-items-center">
-          Modified
-          <span class="material-icons" aria-hidden="true">keyboard_arrow_down</span>
-        </a></th>
+            Modified
+            <span class="material-icons" aria-hidden="true">{{ sortIcon .currentUrl `updated_at` }}</span>
+          </a></th>
       </tr>
     </thead>
     <tbody>

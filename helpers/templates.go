@@ -234,14 +234,14 @@ func SortIcon(currentUrl *url.URL, colName string) string {
 }
 
 // LinkifyUrls converts urls in text to clickable links. That is,
-// it replaces https://example.com with 
+// it replaces https://example.com with
 // <a href="https://example.com">https://example.com</a>
-// 
+//
 // URLs outside the current domain will open in a new tab
 // (i.e. will have target="_blank").
 //
 // This also replaces newlines with <br/> tags.
-func LinkifyUrls(text string) template.HTML {	
+func LinkifyUrls(text string) template.HTML {
 	alreadyReplaced := make(map[string]bool)
 	matches := reUrl.FindAllStringSubmatch(text, -1)
 
