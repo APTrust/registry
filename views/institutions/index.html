@@ -8,7 +8,7 @@
   <div class="box-header is-flex is-align-items-center is-justify-content-space-between">
     <h1 class="h2">Institutions</h1>
     {{ if .CurrentUser.IsAdmin }}
-    <a class="button is-success ml-6" data-modal="modal-one" data-xhr-url="/institutions/new?modal=true">Create New</a>
+    <a class="button is-success ml-6" href="/institutions/new">Create New</a>
     {{ end }}
   </div>
 
@@ -20,36 +20,37 @@
 
   <table class="table is-hoverable is-fullwidth has-padding">
     <thead>
-      <tr><!-- TODO make icons change direction based on sort direction -->
+      <tr>
+        <!-- TODO make icons change direction based on sort direction -->
         <th class="pl-5"><a href="{{ sortUrl .currentUrl `name` }}" class="is-flex is-align-items-center">
-          Name
-          <span class="material-icons" aria-hidden="true">keyboard_arrow_down</span>
-        </a></th>
+            Name
+            <span class="material-icons" aria-hidden="true">keyboard_arrow_down</span>
+          </a></th>
         <th><a href="{{ sortUrl .currentUrl `identifier` }}" class="is-flex is-align-items-center">
-          Identifier
-          <span class="material-icons" aria-hidden="true">keyboard_arrow_down</span>
-        </a></th>
+            Identifier
+            <span class="material-icons" aria-hidden="true">keyboard_arrow_down</span>
+          </a></th>
         <th><a href="{{ sortUrl .currentUrl `type` }}" class="is-flex is-align-items-center">
-          Type
-          <span class="material-icons" aria-hidden="true">keyboard_arrow_down</span>
-        </a></th>
+            Type
+            <span class="material-icons" aria-hidden="true">keyboard_arrow_down</span>
+          </a></th>
         <th><a href="{{ sortUrl .currentUrl `parent_identifier` }}" class="is-flex is-align-items-center">
-          Parent
-          <span class="material-icons" aria-hidden="true">keyboard_arrow_down</span>
-        </a></th>
+            Parent
+            <span class="material-icons" aria-hidden="true">keyboard_arrow_down</span>
+          </a></th>
         <th><a href="{{ sortUrl .currentUrl `deactivated_at` }}" class="is-flex is-align-items-center">
-          Deactivated
-          <span class="material-icons" aria-hidden="true">keyboard_arrow_down</span>
-        </a></th>
+            Deactivated
+            <span class="material-icons" aria-hidden="true">keyboard_arrow_down</span>
+          </a></th>
       </tr>
     </thead>
     <tbody>
       {{ range $index, $inst := .items }}
       {{ $cssClass := "clickable" }}
       {{ if not $inst.DeactivatedAt.IsZero }}
-        {{ $cssClass = "clickable row-disabled" }}
+      {{ $cssClass = "clickable row-disabled" }}
       {{ end }}
-      <tr class="{{ $cssClass }}" data-modal="modal-one" data-xhr-url="/institutions/show/{{ $inst.ID }}?modal=true">
+      <tr class="{{ $cssClass }}" onclick="window.location.href='/institutions/show/{{ $inst.ID }}'">
         <td class="pl-5">{{ $inst.Name }}</td>
         <td class="is-grey-dark">{{ $inst.Identifier }}</td>
         <td class="is-grey-dark">{{ replace $inst.Type "Institution" "" 1 }}</td>

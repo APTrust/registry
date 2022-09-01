@@ -29,7 +29,8 @@ func InstitutionDelete(c *gin.Context) {
 	if AbortIfError(c, err) {
 		return
 	}
-	c.Redirect(http.StatusFound, "/institutions")
+	redirectUrl := fmt.Sprintf("/institutions/show/%d", inst.ID)
+	c.Redirect(http.StatusFound, redirectUrl)
 }
 
 // InstitutionUndelete reactivates an institution.
