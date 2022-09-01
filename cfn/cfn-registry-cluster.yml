@@ -46,7 +46,14 @@ Parameters:
   MaxContainers:
     Description: Maximum number of containers desired for the scaling services.
     Type: Number
+    AllowedValues: [1, 2, 3, 4]
     Default: 3
+
+  LogDays:
+    Description: 'Sets the number of days to retain logs'
+    Type: Number
+    AllowedValues: [1, 7, 14, 30, 90] 
+    Default: 30
 
 Resources:
   
@@ -87,14 +94,16 @@ Resources:
 
   
   LogGroup:
-    Properties:
+    Properties: 
       LogGroupName: !Sub '/ecs/${DNS}/registry' 
+      RetentionInDays: !Ref 'LogDays'
       Tags: 
       - Key: Environment 
         Value: !Ref DNS
       - Key: Service 
         Value: registry 
     Type: AWS::Logs::LogGroup
+    DeletionPolicy: Retain
 
   RegistryService: 
     DependsOn: ListenerReg80 
@@ -269,8 +278,8 @@ Resources:
         PortMappings:
         - ContainerPort: 8080
           Protocol: tcp
-      Cpu: "512"
-      Memory: "1024"
+      Cpu: "256"
+      Memory: "512"
       TaskRoleArn: 
         Fn::ImportValue: !Sub "FargateIAMRole-${DNS}" 
       ExecutionRoleArn: 
