@@ -12,7 +12,7 @@ before_script:
   - psql -U postgres -d apt_registry_travis -a -f ./db/schema.sql
   - "./bin/linux/cc-test-reporter before-build"
 script:
-  - "./registry test"
+  - "./registry cover"
 after_script:
   - "./bin/linux/cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT"
   - echo "$DOCKER_PWD" | docker login -u "$DOCKER_USER" --password-stdin
