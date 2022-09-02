@@ -14,8 +14,7 @@
     <div class="is-flex mb-5">
       {{ if .institution.DeactivatedAt.IsZero }}
       {{ if userCan .CurrentUser "InstitutionUpdate" .institution.ID }}
-      <button class="button is-primary" data-modal="modal-one"
-        data-xhr-url="/institutions/edit/{{ .institution.ID }}?modal=true">Edit</button>
+      <a class="button is-primary" href="/institutions/edit/{{ .institution.ID }}">Edit</a>
       {{ end }}
       {{ if userCan .CurrentUser "InstitutionDelete" .institution.ID }}
       <a class="button is-danger ml-4" href="/institutions/delete/{{ .institution.ID }}">Deactivate</a>
