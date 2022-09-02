@@ -111,18 +111,20 @@
 
     {{ if .redisInfo }}
     <!-- Show raw json data. For sys admin only. -->
-    <p><b>Redis Data</b></p>
-    <textarea style="min-height: 300px;">
+    <p class="mt-5"><b>Redis Data</b></p>
+    <div class="control mt-3 mb-3">
+      <textarea class="textarea">
     {{ .redisInfo }}
     </textarea>
+    </div>
     {{ end }}
 
 
     {{ if .showRedisDelete }}
     <form id="redisDelete" method="post" action="/work_items/redis_delete/{{ .item.ID }}"
-      onsubmit='return confirm("Delete Redis record? If in doubt, cancel!")'>
+      onsubmit='return confirm("Delete Redis record? We generally do this only when pushing an item back to Receive. If in doubt, cancel!")'>
       {{ template "forms/csrf_token.html" . }}
-      <input type="submit" value="Delete Redis Data"></input>
+      <input class="button" type="submit" value="Delete Redis Data"></input>
     </form>
     {{ end }}
   </div>
