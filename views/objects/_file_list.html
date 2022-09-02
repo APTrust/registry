@@ -7,12 +7,14 @@
     <h2>Active Files</h2>
     {{ if eq .state "A" }}
     <button type="button" class="button is-white is-compact is-lowercase has-text-weight-normal"
-      data-xhr-url="/objects/files/{{ .object.ID }}?state=D&page=1&per_page=10" data-xhr-target="objFileList">Show
-      Deleted Files</button>
+      data-xhr-url="/objects/files/{{ .object.ID }}?state=D&page=1&per_page=10" data-xhr-target="objFileList">
+      Show Deleted Files
+    </button>
     {{ else }}
     <button type="button" class="button is-white is-compact is-lowercase has-text-weight-normal"
-      data-xhr-url="/objects/files/{{ .object.ID }}?state=A&page=1&per_page=10" data-xhr-target="objFileList">Show
-      Active Files</button>
+      data-xhr-url="/objects/files/{{ .object.ID }}?state=A&page=1&per_page=10" data-xhr-target="objFileList">
+      Show Active Files
+    </button>
     {{ end }}
   </div>
 
