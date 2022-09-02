@@ -201,6 +201,7 @@ func getFormAndRequest(c *gin.Context) (*forms.WorkItemForm, *Request, error) {
 	c.ShouldBind(workItem)
 	form := forms.NewWorkItemForm(workItem)
 	req.TemplateData["form"] = form
+	req.TemplateData["item"] = workItem
 	return form, req, nil
 }
 

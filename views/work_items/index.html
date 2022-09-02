@@ -52,7 +52,7 @@
     <tbody>
       {{ $cu := .CurrentUser }}
       {{ range $index, $item := .items }}
-      <tr class="clickable" data-modal="modal-one" data-xhr-url="/work_items/show/{{ $item.ID }}?modal=true">
+      <tr class="clickable" onclick='document.location.href="/work_items/show/{{ $item.ID }}"'>
         <td class="pl-5">
           <div class="is-flex is-align-items-center">
             <span class="action-icon mr-3">

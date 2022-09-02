@@ -46,6 +46,14 @@ func DateUS(date time.Time) string {
 	return date.Format("Jan _2, 2006")
 }
 
+// DateUS returns a date in format "Jan 2, 2006 15:04:05"
+func DateTimeUS(date time.Time) string {
+	if date.IsZero() {
+		return ""
+	}
+	return date.Format("Jan _2, 2006 15:04:05")
+}
+
 // DateISO returns a date in format "2006-01-02"
 func DateISO(date time.Time) string {
 	if date.IsZero() {

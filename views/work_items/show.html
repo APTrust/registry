@@ -2,55 +2,53 @@
 
 <!-- Show the header unless query string says modal=true -->
 {{ if not .showAsModal }}
-  {{ template "shared/_header.html" .}}
+{{ template "shared/_header.html" .}}
 {{ end }}
 
-<div class="modal-detail">
-  <div class="modal-title-row is-flex is-justify-content-space-between is-align-items-center">
+<div class="box">
+  <div class="box-header is-flex is-align-items-center is-justify-content-space-between">
     <h2>{{ .item.Name }}</h2>
-    <a class="modal-exit" href="#">
-      <span class="material-icons" aria-hidden="true">close</span>
-      <span class="is-sr-only">Close</span>
-    </a>
+    {{ if userCan .CurrentUser "WorkItemUpdate" .item.InstitutionID }}
+    <div><a class="button" href="/work_items/edit/{{ .item.ID }}">Edit</a></div>
+    {{ end }}
   </div>
 
-  {{ if userCan .CurrentUser "WorkItemUpdate" .item.InstitutionID }}
-  <div><a href="#" class="button" data-modal="modal-one" data-xhr-url="/work_items/edit/{{ .item.ID }}?modal=true">Edit</a></div>
-  {{ end }}
-
-  {{ if userCan .CurrentUser "WorkItemRequeue" .item.InstitutionID }}
-    {{ if not .item.HasCompleted }}
+  <div class="box-content">
+    <div class="mb-5">
+      {{ if userCan .CurrentUser "WorkItemRequeue" .item.InstitutionID }}
+      {{ if not .item.HasCompleted }}
       {{ template "work_items/requeue_form.html" . }}
-    {{ end }}
-  {{ end }}
+      {{ end }}
+      {{ end }}
+    </div>
 
-  <dl class="modal-header-row is-flex is-justify-content-space-between">
-    <div>
-      <dt class="text-label text-xs is-grey-dark">Action</dt>
-      <dd class="text-table">
-        <span class="action-icon">
-          <span class="material-icons md-16" aria-hidden="true"><span>check</span></span>
-        </span>
-        {{ .item.Action }}
-      </dd>
-    </div>
-    <div>
-      <dt class="text-label text-xs is-grey-dark">Size</dt>
-      <dd class="text-table">{{ .item.Size }}</dd>
-    </div>
-    <div>
-      <dt class="text-label text-xs is-grey-dark">Stage</dt>
-      <dd class="text-table">{{ .item.Stage }}</dd>
-    </div>
-    <div>
-      <dt class="text-label text-xs is-grey-dark">Status</dt>
-      <dd class="badge">{{ .item.Status }}</dd>
-    </div>
-  </dl>
+    <dl class="data-header-row is-flex is-justify-content-space-between mb-5">
+      <div>
+        <dt class="text-label text-xs is-grey-dark mb-2">Action</dt>
+        <dd class="text-table">
+          <span class="action-icon">
+            <span class="material-icons md-16" aria-hidden="true"><span>check</span></span>
+          </span>
+          {{ .item.Action }}
+        </dd>
+      </div>
+      <div>
+        <dt class="text-label text-xs is-grey-dark mb-2">Size</dt>
+        <dd class="text-table">{{ .item.Size }}</dd>
+      </div>
+      <div>
+        <dt class="text-label text-xs is-grey-dark mb-2">Stage</dt>
+        <dd class="text-table">{{ .item.Stage }}</dd>
+      </div>
+      <div>
+        <dt class="text-label text-xs is-grey-dark mb-2">Status</dt>
+        <dd class="badge">{{ .item.Status }}</dd>
+      </div>
+    </dl>
 
-  <div class="modal-content">
-    <div class="modal-list-row is-flex is-justify-content-space-between">
-      <dl class="modal-list modal-list-left">
+
+    <div class="data-list-wrapper is-flex is-justify-content-space-between">
+      <dl class="data-list data-list-left">
         <dt class="text-label text-xs is-grey-dark">ETag</dt>
         <dd class="text-table">{{ .item.ETag }}</dd>
         <dt class="text-label text-xs is-grey-dark">Object Identifier</dt>
@@ -77,37 +75,37 @@
         <dd class="text-table">{{ defaultString .item.User "None" }}</dd>
       </dl>
 
-      <dl class="modal-list modal-list-right">
+      <dl class="data-list data-list-right">
         <dt class="text-label text-xs is-grey-dark">Bag Date</dt>
-        <dd class="text-table">{{ dateTimeISO .item.BagDate }}</dd>
+        <dd class="text-table">{{ dateTimeUS .item.BagDate }}</dd>
         <dt class="text-label text-xs is-grey-dark">Date Processed</dt>
-        <dd class="text-table">{{ dateTimeISO .item.DateProcessed }}</dd>
+        <dd class="text-table">{{ dateTimeUS .item.DateProcessed }}</dd>
         <dt class="text-label text-xs is-grey-dark">Queued At</dt>
-        <dd class="text-table">{{ dateTimeISO .item.QueuedAt }}</dd>
+        <dd class="text-table">{{ dateTimeUS .item.QueuedAt }}</dd>
         <dt class="text-label text-xs is-grey-dark">Stage Started At</dt>
-        <dd class="text-table">{{ dateTimeISO .item.StageStartedAt }}</dd>
+        <dd class="text-table">{{ dateTimeUS .item.StageStartedAt }}</dd>
         <dt class="text-label text-xs is-grey-dark">Created At</dt>
-        <dd class="text-table">{{ dateTimeISO .item.CreatedAt }}</dd>
+        <dd class="text-table">{{ dateTimeUS .item.CreatedAt }}</dd>
         <dt class="text-label text-xs is-grey-dark">Updated At</dt>
-        <dd class="text-table">{{ dateTimeISO .item.UpdatedAt }}</dd>
+        <dd class="text-table">{{ dateTimeUS .item.UpdatedAt }}</dd>
       </dl>
     </div>
 
-    <dl class="modal-list modal-list-row">
+    <dl class="data-list data-list-row">
       <dt class="text-label text-xs is-grey-dark">Note</dt>
       <dd class="text-table">{{ .item.Note }}</dd>
       <dt class="text-label text-xs is-grey-dark">Outcome</dt>
       <dd class="text-table">{{ .item.Outcome }}</dd>
     </dl>
 
-    <dl class="modal-list modal-list-row is-flex">
+    <dl class="data-list data-list-row is-flex">
       <div>
         <dt class="text-label text-xs is-grey-dark">Retry</dt>
         <dd class="text-table is-capitalized">{{ .item.Retry }}</dd>
       </div>
       <div class="ml-6">
         <dt class="text-label text-xs is-grey-dark">Needs Admin Review</dt>
-       <dd class="text-table is-capitalized">{{ .item.NeedsAdminReview }}</dd>
+        <dd class="text-table is-capitalized">{{ .item.NeedsAdminReview }}</dd>
       </div>
     </dl>
 
@@ -121,19 +119,19 @@
 
 
     {{ if .showRedisDelete }}
-    <form id="redisDelete" method="post" action="/work_items/redis_delete/{{ .item.ID }}" onsubmit='return confirm("Delete Redis record? If in doubt, cancel!")'>
+    <form id="redisDelete" method="post" action="/work_items/redis_delete/{{ .item.ID }}"
+      onsubmit='return confirm("Delete Redis record? If in doubt, cancel!")'>
       {{ template "forms/csrf_token.html" . }}
       <input type="submit" value="Delete Redis Data"></input>
     </form>
     {{ end }}
   </div>
-</div>
 
 
-<!-- Show the footer unless query string says modal=true -->
-{{ if not .showAsModal }}
+  <!-- Show the footer unless query string says modal=true -->
+  {{ if not .showAsModal }}
   {{ template "shared/_footer.html" .}}
-{{ end }}
+  {{ end }}
 
 
-{{ end }}
+  {{ end }}

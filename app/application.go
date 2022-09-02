@@ -65,6 +65,7 @@ func initTemplates(router *gin.Engine) {
 		"dateISO":        helpers.DateISO,
 		"dateTimeISO":    helpers.DateTimeISO,
 		"dateUS":         helpers.DateUS,
+		"dateTimeUS":     helpers.DateTimeUS,
 		"defaultString":  helpers.DefaultString,
 		"dict":           helpers.Dict,
 		"escapeAttr":     helpers.EscapeAttr,

@@ -28,6 +28,11 @@ func TestDateUS(t *testing.T) {
 	assert.Equal(t, "", helpers.DateUS(time.Time{}))
 }
 
+func TestDateTimeUS(t *testing.T) {
+	assert.Equal(t, "Apr 16, 2021 12:24:16", helpers.DateTimeUS(testDate))
+	assert.Equal(t, "", helpers.DateUS(time.Time{}))
+}
+
 func TestDateISO(t *testing.T) {
 	assert.Equal(t, "2021-04-16", helpers.DateISO(testDate))
 	assert.Equal(t, "", helpers.DateISO(time.Time{}))
