@@ -238,9 +238,9 @@ func (config *Config) makeDirs() error {
 // we'll be reading from and writing to buckets in which we explicitly
 // guarantee no permanance.
 func (config *Config) BucketQualifier() string {
-	if config.EnvName == "production" {
+	if config.Cookies.Domain == "repo.aptrust.org" {
 		return ""
-	} else if config.EnvName == "staging" {
+	} else if config.Cookies.Domain == "staging.aptrust.org" {
 		return ".staging"
 	}
 	return ".test"

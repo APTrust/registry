@@ -53,19 +53,22 @@ func TestConfigBucketQualifier(t *testing.T) {
 	config := common.NewConfig()
 	assert.Equal(t, ".test", config.BucketQualifier())
 
-	config.EnvName = "test"
+	config.Cookies.Domain = "demo.aptrust.org"
 	assert.Equal(t, ".test", config.BucketQualifier())
 
-	config.EnvName = "ci"
+	config.Cookies.Domain = "test.aptrust.org"
 	assert.Equal(t, ".test", config.BucketQualifier())
 
-	config.EnvName = "production"
+	config.Cookies.Domain = "repo.aptrust.org"
 	assert.Equal(t, "", config.BucketQualifier())
 
-	config.EnvName = "staging"
+	config.Cookies.Domain = "staging.aptrust.org"
 	assert.Equal(t, ".staging", config.BucketQualifier())
 
-	config.EnvName = "invalid-name"
+	config.Cookies.Domain = "localhost"
+	assert.Equal(t, ".test", config.BucketQualifier())
+
+	config.Cookies.Domain = "example.com"
 	assert.Equal(t, ".test", config.BucketQualifier())
 }
 
