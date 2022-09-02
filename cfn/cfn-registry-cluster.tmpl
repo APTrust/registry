@@ -95,7 +95,7 @@ Resources:
   
   LogGroup:
     Properties:
-      RetenionInDays: !Ref 'LogDays'
+      RetentionInDays: !Ref 'LogDays'
       LogGroupName: !Sub '/ecs/${DNS}/registry' 
       Tags: 
       - Key: Environment 

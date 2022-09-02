@@ -51,8 +51,9 @@ Parameters:
   LogDays:
     Description: 'Sets the number of days for retaining logs. Can be set according to Cluster'
     Type: Number
-    AllowedValues: [1, 7, 14, 30, 90]
+    AllowedValues: [1, 7, 14, 30, 90] 
     Default: 30
+
 
 Resources:
   
@@ -192,7 +193,7 @@ Resources:
         - Condition: SUCCESS
           ContainerName: Nsqadmin_ResolvConf_InitContainer
         Essential: true 
-        Image: docker.io/aptrust/registry:0b3f76c-master 
+        Image: docker.io/aptrust/registry:9c9477f-master 
         Secrets:
         - Name: APT_ENV
           ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/APT_ENV'
