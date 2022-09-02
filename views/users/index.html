@@ -4,10 +4,9 @@
   <div class="box-header is-flex is-align-items-center is-justify-content-space-between">
     <h1 class="h2">Users</h1>
     {{ if .CurrentUser.IsAdmin }}
-    <button class="button is-success mr-6 filter-button-offset" data-modal="modal-one"
-      data-xhr-url="/users/new?modal=true">
+    <a class="button is-success mr-6" href="/users/new">
       Add new user
-    </button>
+    </a>
     {{ else if userCan .CurrentUser "UserCreate" .CurrentUser.InstitutionID }}
     <a class="button is-success mr-6" href="/users/new?institution_id={{ .CurrentUser.InstitutionID }}">
       Add new user
