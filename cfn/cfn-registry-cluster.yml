@@ -46,13 +46,12 @@ Parameters:
   MaxContainers:
     Description: Maximum number of containers desired for the scaling services.
     Type: Number
-    AllowedValues: [1, 2, 3, 4]
     Default: 3
 
   LogDays:
-    Description: 'Sets the number of days to retain logs'
+    Description: 'Sets the number of days for retaining logs. Can be set according to Cluster'
     Type: Number
-    AllowedValues: [1, 7, 14, 30, 90] 
+    AllowedValues: [1, 7, 14, 30, 90]
     Default: 30
 
 Resources:
@@ -94,9 +93,9 @@ Resources:
 
   
   LogGroup:
-    Properties: 
-      LogGroupName: !Sub '/ecs/${DNS}/registry' 
+    Properties:
       RetentionInDays: !Ref 'LogDays'
+      LogGroupName: !Sub '/ecs/${DNS}/registry' 
       Tags: 
       - Key: Environment 
         Value: !Ref DNS
@@ -193,7 +192,7 @@ Resources:
         - Condition: SUCCESS
           ContainerName: Nsqadmin_ResolvConf_InitContainer
         Essential: true 
-        Image: docker.io/aptrust/registry:multi 
+        Image: docker.io/aptrust/registry:0b3f76c-master 
         Secrets:
         - Name: APT_ENV
           ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/APT_ENV'
@@ -278,8 +277,8 @@ Resources:
         PortMappings:
         - ContainerPort: 8080
           Protocol: tcp
-      Cpu: "256"
-      Memory: "512"
+      Cpu: "512"
+      Memory: "1024"
       TaskRoleArn: 
         Fn::ImportValue: !Sub "FargateIAMRole-${DNS}" 
       ExecutionRoleArn: 
