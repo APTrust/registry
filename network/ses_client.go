@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ses"
 	"github.com/rs/zerolog"
@@ -17,15 +18,16 @@ type SESClient struct {
 	Service        *ses.SES
 }
 
-func NewSESClient(serviceEnabled bool, awsRegion, fromAddress string, logger zerolog.Logger) *SESClient {
+func NewSESClient(serviceEnabled bool, awsRegion, sesUser, sesPassword, fromAddress string, logger zerolog.Logger) *SESClient {
 	client := &SESClient{
 		logger:         logger,
 		ServiceEnabled: serviceEnabled,
 	}
 	if serviceEnabled {
 		client.Session = session.Must(session.NewSession(&aws.Config{
-			Region: aws.String(awsRegion)},
-		))
+			Region:      aws.String(awsRegion),
+			Credentials: credentials.NewStaticCredentials(sesUser, sesPassword, ""),
+		}))
 		client.Service = ses.New(client.Session)
 		logger.Info().Msg("Email service is enabled. Alerts will be sent through AWS SES service.")
 	} else {

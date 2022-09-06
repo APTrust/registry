@@ -68,6 +68,8 @@ type EmailConfig struct {
 	AWSRegion   string
 	Enabled     bool
 	FromAddress string
+	SesUser     string
+	SesPassword string
 }
 
 type RedisConfig struct {
@@ -141,6 +143,15 @@ func loadConfig() *Config {
 		PrintAndExit("NSQ_URL is missing or invalid")
 	}
 
+	sesUser := v.GetString("AWS_SES_USER")
+	sesPassword := v.GetString("AWS_SES_PASSWD")
+	if sesUser == "" {
+		sesUser = v.GetString("AWS_ACCESS_KEY_ID")
+	}
+	if sesPassword == "" {
+		sesPassword = v.GetString("AWS_SECRET_ACCESS_KEY")
+	}
+
 	return &Config{
 		Logging: &LoggingConfig{
 			File:         v.GetString("LOG_FILE"),
@@ -180,6 +191,8 @@ func loadConfig() *Config {
 			AWSRegion:   v.GetString("AWS_REGION"),
 			Enabled:     v.GetBool("EMAIL_ENABLED"),
 			FromAddress: v.GetString("EMAIL_FROM_ADDRESS"),
+			SesUser:     sesUser,
+			SesPassword: sesPassword,
 		},
 		Redis: &RedisConfig{
 			DefaultDB: v.GetInt("REDIS_DEFAULT_DB"),
