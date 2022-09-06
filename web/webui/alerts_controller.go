@@ -34,9 +34,14 @@ func AlertShow(c *gin.Context) {
 	if AbortIfError(c, err) {
 		return
 	}
-	err = alertMarkAsRead(alertView.ID, alertView.UserID)
-	if AbortIfError(c, err) {
-		return
+	// Automatically mark this alert as read if it's being viewed
+	// by the intended user. Sys admin can also view this alert, but
+	// it should not be marked read unless viewed by intended recipient.
+	if req.CurrentUser.ID == alertView.UserID {
+		err = alertMarkAsRead(alertView.ID, alertView.UserID)
+		if AbortIfError(c, err) {
+			return
+		}
 	}
 	req.TemplateData["alert"] = alertView
 	c.HTML(http.StatusOK, "alerts/show.html", req.TemplateData)
