@@ -76,6 +76,8 @@ ENV LOG_LEVEL=0
 ENV LOG_CALLER=false
 ENV LOG_TO_CONSOLE=true
 ENV LOG_SQL=false
+ENV AWS_SES_PWD=password
+ENV AWS_SES_USER=system@user.org
 # Making a note for a new dockerfile test. 
 EXPOSE 8080
 

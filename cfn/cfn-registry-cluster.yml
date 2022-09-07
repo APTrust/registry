@@ -193,7 +193,7 @@ Resources:
         - Condition: SUCCESS
           ContainerName: Nsqadmin_ResolvConf_InitContainer
         Essential: true 
-        Image: docker.io/aptrust/registry:c538234-master 
+        Image: docker.io/aptrust/registry:1b30209-master 
         Secrets:
         - Name: APT_ENV
           ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/APT_ENV'
@@ -267,6 +267,10 @@ Resources:
           ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/PRESERV/NSQ_URL'
         - Name: REDIS_URL
           ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/PRESERV/REDIS_URL'
+        - Name: AWS_SES_PWD
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/AWS_SES_PWD'
+        - Name: AWS_SES_USER
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/AWS_SES_USER'
         LinuxParameters: {}
         LogConfiguration:
           LogDriver: awslogs
@@ -321,7 +325,7 @@ Resources:
       LoadBalancerArn: 
         Fn::ImportValue: !Sub 'AppLoad-${DNS}'
       Certificates:
-        - CertificateArn: 'arn:aws:acm:us-east-1:997427182289:certificate/42b47e24-6194-482d-ae4a-8f62a3d719ae'
+        - CertificateArn: 'arn:aws:acm:us-east-1:997427182289:certificate/da1d8b64-3898-4585-b559-94617e423b51'
       Port: 443
       Protocol: HTTPS
 
