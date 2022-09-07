@@ -9,88 +9,97 @@
 -->
 
 <html>
-  <head>
-    <title>APTrust Registry</title>
-    <link rel="icon" type="image/png" sizes="16x16" href="/static/img/favicon.png">
-    <link rel="stylesheet" href="/static/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/static/css/milligram.css">
-    <script src="/static/js/registry.js"></script>
-    <style>
-     body {
-         background-image: url("/static/img/covers/{{ .cover.Source }}");
-         height: 100%;
-         background-position: center;
-         background-repeat: no-repeat;
-         background-size: cover;
-     }
-     form {
-         margin-bottom: 1rem;
-     }
-     .sign-in {
-         position: absolute;
-         top: 50%;
-         left: 50%;
-         transform: translate(-50%, -50%);
-         background-color: white;
-         opacity: 0.90;
-         padding: 3rem;
-         border: 1px solid #9b4dca;
-         border-radius: 20px;
-     }
-     .sign-in-submit {
-         width: 100%;
-         text-align: center;
-     }
-     .sign-in-error {
-         margin-top: 2rem;
-         display: none;
-         color: red;
-         text-align:center;
-     }
-     .sign-in-forgot {
-         text-align: center;
-     }
-     .credit {
-         color: #999;
-         font-size: 0.9rem;
-     }
-    </style>
-  </head>
 
-  <body>
-    <div class="sign-in">
-      <img src="/static/img/APTrustLogo.gif">
-      <form action="/users/sign_in/" method="post">
-        {{ if .preFillTestLogins }} 
-        <select name="email" id="emailInput">
-          <option value="system@aptrust.org">system@aptrust.org (Sys Admin)</option>
-          <option value="admin@inst1.edu">admin@inst1.edu (Inst One Admin)</option>
-          <option value="user@inst1.edu">user@inst1.edu (Inst One User)</option>
-          <option value="admin@inst2.edu">admin@inst2.edu (Inst Two Admin)</option>
-          <option value="admin@test.edu">admin@test.edu (Test.edu Admin)</option>
-          <option value="user@test.edu">user@test.edu (Test.edu User)</option>
-        </select>
-        <input type="password" name="password" placeholder="Password" value="password">
-        {{ else }}
-        <input type="text" name="email" id="emailInput" placeholder="Email address">
-        <input type="password" name="password" placeholder="Password">
-        {{ end }}
-        <div class="sign-in-submit">
-          <input type="submit" value="Sign In">
-        </div>
-        <div class="sign-in-error" {{ if .error }}style="display:block"{{ end }}>{{ .error }}</div>
-      </form>
-      <div class="sign-in-forgot">
-        <a href="javascript:alert('Too bad!');">Forgot your password?</a>
-        <div class="credit">
-          Photo by <a class="item" href="{{ .cover.CreditURL }}" target="_blank">{{ .cover.Photographer }}</a>
-        </div>
+<head>
+  <title>APTrust Registry</title>
+  <link rel="icon" type="image/png" sizes="16x16" href="/static/img/favicon.png">
+  <link rel="stylesheet" href="/static/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/static/css/milligram.css">
+  <script src="/static/js/registry.js"></script>
+  <style>
+    body {
+      background-image: url("/static/img/covers/{{ .cover.Source }}");
+      height: 100%;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: cover;
+    }
+
+    form {
+      margin-bottom: 1rem;
+    }
+
+    .sign-in {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: white;
+      opacity: 0.90;
+      padding: 3rem;
+      border: 1px solid #9b4dca;
+      border-radius: 20px;
+    }
+
+    .sign-in-submit {
+      width: 100%;
+      text-align: center;
+    }
+
+    .sign-in-error {
+      margin-top: 2rem;
+      display: none;
+      color: red;
+      text-align: center;
+    }
+
+    .sign-in-forgot {
+      text-align: center;
+    }
+
+    .credit {
+      color: #999;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="sign-in">
+    <img src="/static/img/APTrustLogo.gif">
+    <form action="/users/sign_in/" method="post">
+      {{ if .preFillTestLogins }}
+      <select name="email" id="emailInput">
+        <option value="system@aptrust.org">system@aptrust.org (Sys Admin)</option>
+        <option value="admin@inst1.edu">admin@inst1.edu (Inst One Admin)</option>
+        <option value="user@inst1.edu">user@inst1.edu (Inst One User)</option>
+        <option value="admin@inst2.edu">admin@inst2.edu (Inst Two Admin)</option>
+        <option value="admin@test.edu">admin@test.edu (Test.edu Admin)</option>
+        <option value="user@test.edu">user@test.edu (Test.edu User)</option>
+      </select>
+      <input type="password" name="password" placeholder="Password" value="password">
+      {{ else }}
+      <input type="text" name="email" id="emailInput" placeholder="Email address">
+      <input type="password" name="password" placeholder="Password">
+      {{ end }}
+      <div class="sign-in-submit">
+        <input type="submit" value="Sign In">
+      </div>
+      <div class="sign-in-error" {{ if .error }}style="display:block" {{ end }}>{{ .error }}</div>
+    </form>
+    <div class="sign-in-forgot">
+      <a href="javascript:alert('This feature is not connected yet. Contact help@aptrust.org.');">Forgot your
+        password?</a>
+      <div class="credit">
+        Photo by <a class="item" href="{{ .cover.CreditURL }}" target="_blank">{{ .cover.Photographer }}</a>
       </div>
     </div>
-    <script>
-      document.getElementById('emailInput').focus()
-    </script>
-  </body>
+  </div>
+  <script>
+    document.getElementById('emailInput').focus()
+  </script>
+</body>
+
 </html>
 
 {{ end }}
