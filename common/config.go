@@ -144,7 +144,7 @@ func loadConfig() *Config {
 	}
 
 	sesUser := v.GetString("AWS_SES_USER")
-	sesPassword := v.GetString("AWS_SES_PASSWD")
+	sesPassword := v.GetString("AWS_SES_PWD")
 	if sesUser == "" {
 		sesUser = v.GetString("AWS_ACCESS_KEY_ID")
 	}
