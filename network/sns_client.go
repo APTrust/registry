@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sns"
 	"github.com/rs/zerolog"
@@ -16,15 +17,16 @@ type SNSClient struct {
 	Service        *sns.SNS
 }
 
-func NewSNSClient(serviceEnabled bool, awsRegion string, logger zerolog.Logger) *SNSClient {
+func NewSNSClient(serviceEnabled bool, awsRegion, sesUser, sesPassword string, logger zerolog.Logger) *SNSClient {
 	client := &SNSClient{
 		logger:         logger,
 		ServiceEnabled: serviceEnabled,
 	}
 	if serviceEnabled {
 		client.Session = session.Must(session.NewSession(&aws.Config{
-			Region: aws.String(awsRegion)},
-		))
+			Region:      aws.String(awsRegion),
+			Credentials: credentials.NewStaticCredentials(sesUser, sesPassword, ""),
+		}))
 		client.Service = sns.New(client.Session)
 		logger.Info().Msg("Two-factor SMS is enabled. OTP codes will be sent through AWS SNS service.")
 	} else {
