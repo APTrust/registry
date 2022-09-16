@@ -57,25 +57,19 @@ Parameters:
 
 Resources:
   
-  NSQCapacityProviderAssociation:
-    Type: AWS::ECS::ClusterCapacityProviderAssociations
-    Properties: 
-      CapacityProviders: 
-        - FARGATE
-        - FARGATE_SPOT 
-      Cluster: !Ref Cluster
-      DefaultCapacityProviderStrategy: 
-        - CapacityProvider: FARGATE 
-          Weight: 1
-          Base: 1 
-        - CapacityProvider: FARGATE_SPOT 
-          Weight: 1 
-          Base: 0
-
   Cluster:
     Type: AWS::ECS::Cluster
     Properties:
-      ClusterName: !Ref ClusterName 
+      ClusterName: !Ref ClusterName
+      CapacityProviders:
+        - FARGATE  
+        - FARGATE_SPOT
+      DefaultCapacityProviderStrategy:
+        - CapacityProvider: FARGATE 
+          Weight: 1
+          Base: 1
+        - CapacityProvider: FARGATE_SPOT
+          Weight: 2
       ClusterSettings: 
         - Name: containerInsights
           Value: enabled 
@@ -120,7 +114,7 @@ Resources:
         Type: ECS
       DesiredCount: 2 
       EnableExecuteCommand: true
-      LaunchType: FARGATE
+      #LaunchType: FARGATE
       LoadBalancers:
         - ContainerName: registry
           ContainerPort: 8080
@@ -158,7 +152,7 @@ Resources:
         DnsRecords:
         - TTL: 20
           Type: A
-        RoutingPolicy: WEIGHTED
+        RoutingPolicy: MULTIVALUE
       HealthCheckCustomConfig:
         FailureThreshold: 1
       Name: registry
@@ -264,9 +258,9 @@ Resources:
         - Name: SESSION_MAX_AGE
           ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/SESSION_MAX_AGE'
         - Name: NSQ_URL
-          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/PRESERV/NSQ_URL'
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/NSQ_URL'
         - Name: REDIS_URL
-          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/PRESERV/REDIS_URL'
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/REDIS_URL'
         - Name: AWS_SES_PWD
           ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/AWS_SES_PWD'
         - Name: AWS_SES_USER
