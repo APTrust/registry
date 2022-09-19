@@ -146,9 +146,11 @@ func loadConfig() *Config {
 	sesUser := v.GetString("AWS_SES_USER")
 	sesPassword := v.GetString("AWS_SES_PWD")
 	if sesUser == "" {
+		fmt.Fprintln(os.Stderr, "AWS_SES_USER not set. Defaulting to AWS_ACCESS_KEY_ID for sending email and text messages.")
 		sesUser = v.GetString("AWS_ACCESS_KEY_ID")
 	}
 	if sesPassword == "" {
+		fmt.Fprintln(os.Stderr, "AWS_SES_PWD not set. Defaulting to AWS_SECRET_ACCESS_KEY for sending email and text messages.")
 		sesPassword = v.GetString("AWS_SECRET_ACCESS_KEY")
 	}
 
