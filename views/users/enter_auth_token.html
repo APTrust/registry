@@ -2,7 +2,7 @@
 
 <!-- Show the header unless query string says modal=true -->
 {{ if not .showAsModal }}
-  {{ template "shared/_header.html" .}}
+{{ template "shared/_header.html" .}}
 {{ end }}
 
 <div class="modal-detail">
@@ -21,7 +21,6 @@
           <input class="input" type="text" id="otp" name="otp">
         </div>
       </div>
-      <input type="text" name="otp"/>
       <input class="is-hidden" type="hidden" name="two_factor_method" value="{{ .twoFactorMethod }}" />
       {{ template "forms/csrf_token.html" . }}
       <input class="button" type="submit" value="Submit">
@@ -29,32 +28,32 @@
 
     <p>Not working? <a href="/users/2fa_choose">Try another method.</a></p>
 
-      {{ if (eq .twoFactorMethod "sms") }}
+    {{ if (eq .twoFactorMethod "sms") }}
 
-      <form name="twoFactorResendForm" method="post" action="/users/2fa_sms/">
-        <input class="is-hidden" type="hidden" name="two_factor_method" value="sms" />
-        {{ template "forms/csrf_token.html" . }}
-        <p>
-          Didn't get your password?
-          <a href="javascript:resendSMSPassword()">Send a new one.</a>
-        </p>
-      </form>
+    <form name="twoFactorResendForm" method="post" action="/users/2fa_sms/">
+      <input class="is-hidden" type="hidden" name="two_factor_method" value="sms" />
+      {{ template "forms/csrf_token.html" . }}
+      <p>
+        Didn't get your password?
+        <a href="javascript:resendSMSPassword()">Send a new one.</a>
+      </p>
+    </form>
 
-      <script>
-       function resendSMSPassword() {
-           if (confirm("Send a new password now?")) {
-               document.forms['twoFactorResendForm'].submit()
-           }
-       }
-      </script>
+    <script>
+      function resendSMSPassword() {
+        if (confirm("Send a new password now?")) {
+          document.forms['twoFactorResendForm'].submit()
+        }
+      }
+    </script>
 
-      {{ end }}
+    {{ end }}
   </div>
 </div>
 
 <!-- Show the footer unless query string says modal=true -->
 {{ if not .showAsModal }}
-  {{ template "shared/_footer.html" .}}
+{{ template "shared/_footer.html" .}}
 {{ end }}
 
 
