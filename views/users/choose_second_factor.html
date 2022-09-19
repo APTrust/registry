@@ -21,17 +21,17 @@
   </div>
 
   <div class="modal-content">
-    <p>How would you like to complete your login?</p>
+    <p class="mb-3">How would you like to complete your login?</p>
 
-    <div class="two-factor-option clickable" onclick="submitSecondFactor('authy')">
-      Authy <br /> <br />
+    <div class="two-factor-option mb-3 clickable" onclick="submitSecondFactor('authy')">
+      Authy <br />
       <span id="two-factor-method-authy" class="two-factor-message" style="display:none"> Sent push notification.</span>
     </div>
-    <div class="two-factor-option clickable" onclick="submitSecondFactor('sms')">
-      Text Message <br /> <br />
+    <div class="two-factor-option mb-3 clickable" onclick="submitSecondFactor('sms')">
+      Text Message <br />
       <span id="two-factor-method-sms" class="two-factor-message" style="display:none;"> Sent code via SMS.</span>
     </div>
-    <div class="two-factor-option clickable" onclick="submitSecondFactor('backup')">
+    <div class="two-factor-option mb-3 clickable" onclick="submitSecondFactor('backup')">
       Backup Code <br />
     </div>
 
