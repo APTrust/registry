@@ -2,7 +2,7 @@
 
 <!-- Show the header unless query string says modal=true -->
 {{ if not .showAsModal }}
-  {{ template "shared/_header.html" .}}
+{{ template "shared/_header.html" .}}
 {{ end }}
 
 <!--
@@ -24,73 +24,73 @@
     <p>How would you like to complete your login?</p>
 
     <div class="two-factor-option clickable" onclick="submitSecondFactor('authy')">
-        Authy <br/>
-        <span id="two-factor-method-authy" class="two-factor-message" style="display:none"> Sent push notification.</span>
-      </div>
-      <div class="two-factor-option clickable" onclick="submitSecondFactor('sms')">
-        Text Message <br/>
-        <span id="two-factor-method-sms" class="two-factor-message" style="display:none;"> Sent code via SMS.</span>
-      </div>
-      <div class="two-factor-option clickable" onclick="submitSecondFactor('backup')">
-        Backup Code
-      </div>
+      Authy <br /> <br />
+      <span id="two-factor-method-authy" class="two-factor-message" style="display:none"> Sent push notification.</span>
+    </div>
+    <div class="two-factor-option clickable" onclick="submitSecondFactor('sms')">
+      Text Message <br /> <br />
+      <span id="two-factor-method-sms" class="two-factor-message" style="display:none;"> Sent code via SMS.</span>
+    </div>
+    <div class="two-factor-option clickable" onclick="submitSecondFactor('backup')">
+      Backup Code <br />
+    </div>
 
-      <form name="twoFactorChoiceForm" method="post" action="">
-        <input class="is-hidden" type="hidden" name="two_factor_method" value="" />
-        <!-- CSRF token is in script below -->
-      </form>
+    <form name="twoFactorChoiceForm" method="post" action="">
+      <input class="is-hidden" type="hidden" name="two_factor_method" value="" />
+      <!-- CSRF token is in script below -->
+    </form>
   </div>
 </div>
 
 <script>
- // Set everything explicitly on each click. If user uses
- // back button to return to this page, we need to be sure
- // csrf and form action are set correctly.
- function submitSecondFactor(twoFactorMethod) {
-     let form = document.forms["twoFactorChoiceForm"]
-     let csrfToken = "{{ .csrf_token }}"
-     form["two_factor_method"].value = twoFactorMethod
+  // Set everything explicitly on each click. If user uses
+  // back button to return to this page, we need to be sure
+  // csrf and form action are set correctly.
+  function submitSecondFactor(twoFactorMethod) {
+    let form = document.forms["twoFactorChoiceForm"]
+    let csrfToken = "{{ .csrf_token }}"
+    form["two_factor_method"].value = twoFactorMethod
 
-     if (twoFactorMethod == "backup") {
-         form["csrf_token"] = null
-         form.method = "get"
-         form.action = "/users/2fa_backup/"
-     } else if (twoFactorMethod == "authy") {
-         addCsrf(form, csrfToken)
-         form.method = "post"
-         form.action = "/users/2fa_push/"
-     } else if (twoFactorMethod == "sms") {
-         addCsrf(form, csrfToken)
-         form.method = "post"
-         form.action = "/users/2fa_sms/"
-     }
-     showTwoFactorMessage(twoFactorMethod)
-     form.submit()
- }
- function addCsrf(form, token) {
-     if (form["csrf_token"] == null) {
-         let input = document.createElement("input");
-         input.setAttribute("type", "hidden");
-         input.setAttribute("name", "csrf_token");
-         input.setAttribute("value", token);
-         form.appendChild(input);
-     }
- }
- function showTwoFactorMessage(twoFactorMethod) {
-     document.querySelectorAll('.two-factor-message').forEach(function (element) {
-         element.style.display = 'none'
-     });
-     try {
-         document.getElementById('two-factor-method-' + twoFactorMethod).style.display = 'inline'
-     } catch (ex) {
+    if (twoFactorMethod == "backup") {
+      form["csrf_token"] = null
+      form.method = "get"
+      form.action = "/users/2fa_backup/"
+    } else if (twoFactorMethod == "authy") {
+      addCsrf(form, csrfToken)
+      form.method = "post"
+      form.action = "/users/2fa_push/"
+    } else if (twoFactorMethod == "sms") {
+      addCsrf(form, csrfToken)
+      form.method = "post"
+      form.action = "/users/2fa_sms/"
+    }
+    showTwoFactorMessage(twoFactorMethod)
+    form.submit()
+  }
+  function addCsrf(form, token) {
+    if (form["csrf_token"] == null) {
+      let input = document.createElement("input");
+      input.setAttribute("type", "hidden");
+      input.setAttribute("name", "csrf_token");
+      input.setAttribute("value", token);
+      form.appendChild(input);
+    }
+  }
+  function showTwoFactorMessage(twoFactorMethod) {
+    document.querySelectorAll('.two-factor-message').forEach(function (element) {
+      element.style.display = 'none'
+    });
+    try {
+      document.getElementById('two-factor-method-' + twoFactorMethod).style.display = 'inline'
+    } catch (ex) {
 
-     }
- }
+    }
+  }
 </script>
 
 <!-- Show the footer unless query string says modal=true -->
 {{ if not .showAsModal }}
-  {{ template "shared/_footer.html" .}}
+{{ template "shared/_footer.html" .}}
 {{ end }}
 
 
