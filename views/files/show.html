@@ -2,16 +2,18 @@
 
 <!-- Show the header unless query string says modal=true -->
 {{ if not .showAsModal }}
-  {{ template "shared/_header.html" .}}
+{{ template "shared/_header.html" .}}
 {{ end }}
 
 <div class="modal-detail">
   <div class="modal-title-row is-flex is-justify-content-space-between is-align-items-center">
     <h2>Generic File</h2>
+    {{ if .showAsModal }}
     <a class="modal-exit" href="#">
       <span class="material-icons" aria-hidden="true">close</span>
       <span class="is-sr-only">Close</span>
     </a>
+    {{ end }}
   </div>
 
   <dl class="modal-header-row is-flex is-justify-content-space-between">
@@ -45,23 +47,25 @@
         <dt class="text-label text-xs is-grey-dark">UUID</dt>
         <dd class="text-table">{{ .file.UUID }}</dd>
         <dt class="text-label text-xs is-grey-dark">Parent Object</dt>
-        <dd class="text-table"><a href="/objects/show/{{ .file.IntellectualObject.ID }}">{{ .file.IntellectualObject.Identifier }}</a></dd>
+        <dd class="text-table"><a href="/objects/show/{{ .file.IntellectualObject.ID }}">{{
+            .file.IntellectualObject.Identifier }}</a></dd>
         <dt class="text-label text-xs is-grey-dark">Storage URLs</dt>
         <dd class="text-table">
           {{ range $index, $storageRecord := .file.StorageRecords }}
-            <a href="{{ $storageRecord.URL }}">{{ $storageRecord.URL }}</a><br/>
+          <a href="{{ $storageRecord.URL }}">{{ $storageRecord.URL }}</a><br />
           {{ end }}
         </dd>
         <dt class="text-label text-xs is-grey-dark">Checksums</dt>
         <dd class="text-table">
           {{ range $index, $cs := .file.Checksums }}
-            {{ dateUS $cs.DateTime }} - {{ $cs.Algorithm }}:{{ $cs.Digest }}<br/>
+          {{ dateUS $cs.DateTime }} - {{ $cs.Algorithm }}:{{ $cs.Digest }}<br />
           {{ end }}
         </dd>
         <dt class="text-label text-xs is-grey-dark">PREMIS Events</dt>
         <dd class="text-table">
           {{ range $index, $event := .file.PremisEvents }}
-            <a href="#" data-modal="modal-one" data-xhr-url="/events/show_xhr/{{ $event.ID }}">{{ dateUS $event.DateTime }} - {{ $event.EventType }} - {{ $event.Outcome }}</a><br/>
+          <a href="#" data-modal="modal-one" data-xhr-url="/events/show_xhr/{{ $event.ID }}">{{ dateUS $event.DateTime
+            }} - {{ $event.EventType }} - {{ $event.Outcome }}</a><br />
           {{ end }}
         </dd>
       </dl>
@@ -75,22 +79,23 @@
     </div>
 
 
-  {{ if eq .file.State "A" }}
-  <div class="modal-footer-row">
-    {{ if userCan .CurrentUser "FileRequestDelete" .file.InstitutionID }}
-    <button class="button" data-modal="modal-one" data-xhr-url="/files/request_delete/{{ .file.ID }}">Delete</button>
+    {{ if eq .file.State "A" }}
+    <div class="modal-footer-row">
+      {{ if userCan .CurrentUser "FileRequestDelete" .file.InstitutionID }}
+      <button class="button" data-modal="modal-one" data-xhr-url="/files/request_delete/{{ .file.ID }}">Delete</button>
+      {{ end }}
+      {{ if userCan .CurrentUser "FileRestore" .file.InstitutionID }}
+      <button class="button" data-modal="modal-one"
+        data-xhr-url="/files/request_restore/{{ .file.ID }}">Restore</button>
+      {{ end }}
+    </div>
     {{ end }}
-    {{ if userCan .CurrentUser "FileRestore" .file.InstitutionID }}
-    <button class="button" data-modal="modal-one" data-xhr-url="/files/request_restore/{{ .file.ID }}">Restore</button>
-    {{ end }}
-  </div>
-  {{ end }}
   </div>
 </div>
 
 <!-- Show the footer unless query string says modal=true -->
 {{ if not .showAsModal }}
-  {{ template "shared/_footer.html" .}}
+{{ template "shared/_footer.html" .}}
 {{ end }}
 
 

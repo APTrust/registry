@@ -41,7 +41,7 @@
     </thead>
     <tbody>
       {{ range $index, $gf := .items }}
-      <tr class="clickable" data-modal="modal-one" data-xhr-url="/files/show/{{ $gf.ID }}?modal=true">
+      <tr class="clickable" onclick='location.href="/files/show/{{ $gf.ID }}"'>
         <td class="pl-5">
           <div class="is-flex is-align-items-center">
             <span class="is-grey-dark">{{ truncate $gf.Identifier 80 }}</span>
