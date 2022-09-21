@@ -123,7 +123,7 @@ Note that Go does not rerun tests that passed on the prior run. If you want to f
 
 This may be necessary if the tests passed on the prior run, but you want to force a reload of the schema or the fixtures.
 
-## Building
+## Building the Docker Container
 
 ```
 make release
