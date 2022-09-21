@@ -2,7 +2,7 @@
 
 <!-- Show the header unless query string says modal=true -->
 {{ if not .showAsModal }}
-  {{ template "shared/_header.html" .}}
+{{ template "shared/_header.html" .}}
 {{ end }}
 
 <div class="modal-detail">
@@ -16,27 +16,30 @@
 
   <div class="modal-content">
     <dl class="modal-list modal-list-row">
-      <dt class="text-label text-xs is-grey-dark">Agent</dt>
-      <dd class="text-table">{{ .event.Agent }}</dd>
+      <dt class="text-label text-xs is-grey-dark">Identifier</dt>
+      <dd class="text-table">{{ .event.Identifier }}</dd>
+      <dt class="text-label text-xs is-grey-dark">Event Type</dt>
+      <dd class="text-table">{{ .event.EventType }}</dd>
+      <dt class="text-label text-xs is-grey-dark">Outcome</dt>
+      <dd class="text-table">{{ .event.Outcome }}</dd>
       <dt class="text-label text-xs is-grey-dark">Date/Time</dt>
       <dd class="text-table">{{ .event.DateTime }}</dd>
       <dt class="text-label text-xs is-grey-dark">Detail</dt>
       <dd class="text-table">{{ .event.Detail }}</dd>
-      <dt class="text-label text-xs is-grey-dark">Event Type</dt>
-      <dd class="text-table">{{ .event.EventType }}</dd>
       <dt class="text-label text-xs is-grey-dark">Generic File</dt>
-      <dd class="text-table"><a href="/files/show/{{ .event.GenericFileID }}">{{ defaultString .event.GenericFileIdentifier "N/A" }}</a></dd>
-      <dt class="text-label text-xs is-grey-dark">Event Identifier</dt>
-      <dd class="text-table">{{ .event.Identifier }}</dd>
-      <dt class="text-label text-xs is-grey-dark">Institution</dt>
-      <dd class="text-table"><a href="/institutions/show/{{ .event.InstitutionID }}">{{ .event.InstitutionName }}</a></dd>
+      <dd class="text-table"><a href="/files/show/{{ .event.GenericFileID }}">{{ defaultString
+          .event.GenericFileIdentifier "N/A" }}</a></dd>
       <dt class="text-label text-xs is-grey-dark">Object</dt>
-      <dd class="text-table">{{ .event.Object }}</dd>
+      <dd class="text-table"><a href="/objects/show/{{ .event.IntellectualObjectID }}">{{
+          .event.IntellectualObjectIdentifier }}</a></dd>
+      <dt class="text-label text-xs is-grey-dark">Institution</dt>
+      <dd class="text-table"><a href="/institutions/show/{{ .event.InstitutionID }}">{{ .event.InstitutionName }}</a>
+      </dd>
     </dl>
 
     <dl class="modal-list modal-list-row">
-      <dt class="text-label text-xs is-grey-dark">Outcome</dt>
-      <dd class="text-table">{{ .event.Outcome }}</dd>
+      <dt class="text-label text-xs is-grey-dark">Agent</dt>
+      <dd class="text-table">{{ .event.Agent }}</dd>
       <dt class="text-label text-xs is-grey-dark">Outcome Detail</dt>
       <dd class="text-table">{{ .event.OutcomeDetail }}</dd>
       <dt class="text-label text-xs is-grey-dark">Outcome Information</dt>
@@ -47,7 +50,7 @@
 
 <!-- Show the footer unless query string says modal=true -->
 {{ if not .showAsModal }}
-  {{ template "shared/_footer.html" .}}
+{{ template "shared/_footer.html" .}}
 {{ end }}
 
 {{ end }}

@@ -21,7 +21,8 @@ func PremisEventShowXHR(c *gin.Context) {
 		return
 	}
 	req.TemplateData["event"] = event
-	c.HTML(http.StatusOK, "events/_show.html", req.TemplateData)
+	req.TemplateData["showAsModal"] = true
+	c.HTML(http.StatusOK, "events/show.html", req.TemplateData)
 }
 
 // PremisEventIndex shows list of objects.
