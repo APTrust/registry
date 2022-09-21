@@ -123,6 +123,13 @@ Note that Go does not rerun tests that passed on the prior run. If you want to f
 
 This may be necessary if the tests passed on the prior run, but you want to force a reload of the schema or the fixtures.
 
+## Building
+
+```
+make release
+make update-template
+```
+
 ## Fixtures
 
 The test script automatically loads fixtures when tests begin. Fixtures for Inst 1 and Inst 2 are stable. Tests don't add objects, files, etc. to those institutions. That means you can test for a certain number of items (e.g. the index page should return 4 objects, or 6 files) and you should get that number.
