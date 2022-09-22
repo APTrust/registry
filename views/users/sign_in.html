@@ -88,8 +88,7 @@
       <div class="sign-in-error" {{ if .error }}style="display:block" {{ end }}>{{ .error }}</div>
     </form>
     <div class="sign-in-forgot">
-      <a href="javascript:alert('This feature is not connected yet. Contact help@aptrust.org.');">Forgot your
-        password?</a>
+      <a href="/users/forgot_password">Forgot your password?</a>
       <div class="credit">
         Photo by <a class="item" href="{{ .cover.CreditURL }}" target="_blank">{{ .cover.Photographer }}</a>
       </div>

@@ -252,6 +252,10 @@ func initRoutes(router *gin.Engine) {
 		webRoutes.POST("/users/2fa_push", webui.UserTwoFactorPush)
 		webRoutes.POST("/users/2fa_verify", webui.UserTwoFactorVerify)
 
+		// User forgot password
+		webRoutes.GET("/users/forgot_password", webui.UserShowForgotPasswordForm)
+		webRoutes.POST("/users/forgot_password", webui.UserSendForgotPasswordMessage)
+
 		// User Sign In
 		webRoutes.GET("/users/sign_in", webui.UserSignInShow)
 		webRoutes.POST("/users/sign_in", webui.UserSignIn)

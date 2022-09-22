@@ -283,22 +283,10 @@ func UserInitPasswordReset(c *gin.Context) {
 	if AbortIfError(c, err) {
 		return
 	}
-	token := common.RandomToken()
-	encryptedToken, err := common.EncryptPassword(token)
+	err = initPasswordReset(req, userToEdit)
 	if AbortIfError(c, err) {
 		return
 	}
-	userToEdit.ResetPasswordToken = encryptedToken
-	userToEdit.ForcePasswordUpdate = true
-	err = userToEdit.Save()
-	if AbortIfError(c, err) {
-		return
-	}
-	_, err = CreatePasswordResetAlert(req, userToEdit, token)
-	if AbortIfError(c, err) {
-		return
-	}
-
 	req.TemplateData["user"] = userToEdit
 	c.HTML(http.StatusOK, "users/reset_password_initiated.html", req.TemplateData)
 }
@@ -433,6 +421,44 @@ func UserGetAPIKey(c *gin.Context) {
 func UserMyAccount(c *gin.Context) {
 	req := NewRequest(c)
 	c.HTML(http.StatusOK, "users/my_account.html", req.TemplateData)
+}
+
+// GET /users/forgot_password
+func UserShowForgotPasswordForm(c *gin.Context) {
+	req := NewRequest(c)
+	req.TemplateData["suppressTopNav"] = true
+	req.TemplateData["suppressSideNav"] = true
+	err := helpers.SetCSRFCookie(c)
+	if AbortIfError(c, err) {
+		return
+	}
+	c.HTML(http.StatusOK, "users/forgot_password.html", req.TemplateData)
+}
+
+// POST /users/forgot_password
+func UserSendForgotPasswordMessage(c *gin.Context) {
+	req := NewRequest(c)
+	req.TemplateData["suppressTopNav"] = true
+	req.TemplateData["suppressSideNav"] = true
+	email := c.PostForm("email")
+	userToEdit, err := pgmodels.UserByEmail(email)
+	if userToEdit == nil || userToEdit.ID == 0 || pgmodels.IsNoRowError(err) {
+		AbortIfError(c, fmt.Errorf("We have no account associated with that email address."))
+		return
+	}
+	if !userToEdit.DeactivatedAt.IsZero() {
+		AbortIfError(c, fmt.Errorf("That account has been deactivated. Contact your local APTrust administrator."))
+		return
+	}
+	// Handle unknown error
+	if AbortIfError(c, err) {
+		return
+	}
+	err = initPasswordReset(req, userToEdit)
+	if AbortIfError(c, err) {
+		return
+	}
+	c.HTML(http.StatusOK, "users/forgot_password_confirmation.html", req.TemplateData)
 }
 
 // SignInUser signs the user in with email and password.
@@ -585,5 +611,21 @@ func createNewUserAlert(req *Request, newUser *pgmodels.User) error {
 		return err
 	}
 	_, err = CreateNewAccountAlert(req, newUser, token)
+	return err
+}
+
+func initPasswordReset(req *Request, userToEdit *pgmodels.User) error {
+	token := common.RandomToken()
+	encryptedToken, err := common.EncryptPassword(token)
+	if err != nil {
+		return err
+	}
+	userToEdit.ResetPasswordToken = encryptedToken
+	userToEdit.ForcePasswordUpdate = true
+	err = userToEdit.Save()
+	if err != nil {
+		return err
+	}
+	_, err = CreatePasswordResetAlert(req, userToEdit, token)
 	return err
 }
