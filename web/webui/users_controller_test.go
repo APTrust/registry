@@ -504,6 +504,71 @@ func TestUserMyAccount(t *testing.T) {
 	}
 }
 
+func TestUserForgotPassword(t *testing.T) {
+	testutil.InitHTTPTests(t)
+
+	defer restorePassword(t, testutil.Inst2User)
+
+	// Anonymous client should be able to reach the
+	// forgot password form.
+	client := testutil.GetAnonymousClient(t)
+	resp := client.GET("/users/forgot_password").Expect().Status(http.StatusOK)
+
+	// Get the CSRF token from that page and submit
+	// the form with token and email address
+	// fmt.Println(resp.Body().Raw())
+	csrfToken := testutil.ExtractCSRFToken(t, resp.Body().Raw())
+
+	client.POST("/users/forgot_password").
+		WithHeader("Referer", testutil.BaseURL).
+		WithFormField(constants.CSRFTokenName, csrfToken).
+		WithFormField("email", testutil.Inst2User.Email).
+		Expect().Status(http.StatusOK)
+
+	// The POST abouve should have created an alert for the user.
+	query := pgmodels.NewQuery().
+		Where("type", "=", constants.AlertPasswordReset).
+		Where("user_id", "=", testutil.Inst2User.ID)
+	alertView, err := pgmodels.AlertViewGet(query)
+	require.Nil(t, err)
+	require.NotNil(t, alertView)
+
+	// It should also set a password reset token
+	user, err := pgmodels.UserByID(testutil.Inst2User.ID)
+	require.Nil(t, err)
+	require.NotNil(t, user)
+	require.NotEmpty(t, user.ResetPasswordToken)
+
+	// Extract unencrypted reset token from the URL in the alert message
+	re := regexp.MustCompile(`this token into the entry box: ([^\n]+)`)
+	m := re.FindAllStringSubmatch(alertView.Content, 1)
+	require.True(t, len(m) > 0, "Token is missing from alert")
+	require.True(t, len(m[0]) > 1, "Token is missing from alert")
+	unencryptedToken := m[0][1]
+
+	// User should be able to get to this page to enter their reset token.
+	client.GET("/users/complete_password_reset/{id}", testutil.Inst2User.ID).
+		Expect().Status(http.StatusOK)
+
+	// Now check the post route with the reset token
+	// First: Bad token should result in error
+	client.POST("/users/complete_password_reset/{id}", testutil.Inst2User.ID).
+		WithFormField(constants.CSRFTokenName, testutil.Inst1UserToken).
+		WithFormField("token", "BAD_TOKEN").
+		Expect().Status(http.StatusInternalServerError)
+
+	// Good token should succeed.
+	client.POST("/users/complete_password_reset/{id}", testutil.Inst2User.ID).
+		WithFormField(constants.CSRFTokenName, testutil.Inst1UserToken).
+		WithFormField("token", unencryptedToken).
+		Expect().Status(http.StatusOK)
+
+	// Need to clear this token for the next two tests, so inst1User
+	// isn't being forced to complete their own password reset.
+	testutil.Inst2User.ResetPasswordToken = ""
+	require.Nil(t, testutil.Inst2User.Save())
+}
+
 func restorePassword(t *testing.T, user *pgmodels.User) {
 	encPwd, err := common.EncryptPassword("password")
 	require.Nil(t, err, "After tests, error restoring password for user %s", user.Name)

@@ -103,7 +103,9 @@ func TestPrefsCookie(t *testing.T) {
 
 func TestCSRFCookie(t *testing.T) {
 	setter := getSetter(t)
-	helpers.SetCSRFCookie(setter)
+	token, err := helpers.SetCSRFCookie(setter)
+	assert.NotEmpty(t, token)
+	assert.Nil(t, err)
 
 	name := constants.CSRFCookieName
 	cookie := setter.Cookies[name]

@@ -318,14 +318,15 @@ func UserStartPasswordReset(c *gin.Context) {
 	// They'll need a CSRF token to post data. DO NOT set the
 	// CurrentUser session variable until after we have the right
 	// token and user has completed password reset.
-	err = helpers.SetCSRFCookie(c)
+	token, err := helpers.SetCSRFCookie(c)
 	if AbortIfError(c, err) {
 		return
 	}
 	templateData := gin.H{
-		"id":              userID,
-		"suppressSideNav": true,
-		"suppressTopNav":  true,
+		"id":                    userID,
+		"suppressSideNav":       true,
+		"suppressTopNav":        true,
+		constants.CSRFTokenName: token,
 	}
 	c.HTML(http.StatusOK, "users/enter_password_reset_token.html", templateData)
 }
@@ -428,10 +429,11 @@ func UserShowForgotPasswordForm(c *gin.Context) {
 	req := NewRequest(c)
 	req.TemplateData["suppressTopNav"] = true
 	req.TemplateData["suppressSideNav"] = true
-	err := helpers.SetCSRFCookie(c)
+	token, err := helpers.SetCSRFCookie(c)
 	if AbortIfError(c, err) {
 		return
 	}
+	req.TemplateData[constants.CSRFTokenName] = token
 	c.HTML(http.StatusOK, "users/forgot_password.html", req.TemplateData)
 }
 
@@ -483,7 +485,7 @@ func SignInUser(c *gin.Context) (int, string, error) {
 	if err != nil {
 		return http.StatusInternalServerError, redirectTo, err
 	}
-	err = helpers.SetCSRFCookie(c)
+	_, err = helpers.SetCSRFCookie(c)
 	if AbortIfError(c, err) {
 		return http.StatusInternalServerError, redirectTo, err
 	}
