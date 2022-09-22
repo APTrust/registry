@@ -22,6 +22,7 @@ func NewSESClient(serviceEnabled bool, awsRegion, sesUser, sesPassword, fromAddr
 	client := &SESClient{
 		logger:         logger,
 		ServiceEnabled: serviceEnabled,
+		FromAddress:    fromAddress,
 	}
 	if serviceEnabled {
 		client.Session = session.Must(session.NewSession(&aws.Config{
@@ -29,7 +30,7 @@ func NewSESClient(serviceEnabled bool, awsRegion, sesUser, sesPassword, fromAddr
 			Credentials: credentials.NewStaticCredentials(sesUser, sesPassword, ""),
 		}))
 		client.Service = ses.New(client.Session)
-		logger.Info().Msg("Email service is enabled. Alerts will be sent through AWS SES service.")
+		logger.Info().Msgf("Email service is enabled. Alerts will be sent through AWS SES service with from address %s.", fromAddress)
 	} else {
 		logger.Info().Msg("Email service is disabled. Alerts will be written to the log file.")
 	}
@@ -68,7 +69,7 @@ func (client *SESClient) sendRealEmail(emailAddress, subject, message string) er
 		Source:     aws.String(client.FromAddress),
 	}
 	output, err := client.Service.SendEmail(input)
-	msg := fmt.Sprintf("SMS to %s: %s", emailAddress, output.String())
+	msg := fmt.Sprintf("SES to %s: %s", emailAddress, output.String())
 	if err == nil {
 		client.logger.Info().Msg(msg)
 	} else {
