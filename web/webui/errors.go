@@ -35,17 +35,15 @@ func ErrorShow(c *gin.Context) {
 		"CurrentUser": currentUser,
 	}
 
-	// Do this or the side nav template throws an error
-	if currentUser == nil {
-		templateData["suppressSideNav"] = true
-		templateData["suppressTopNav"] = true
-	}
-
 	status := http.StatusInternalServerError
 	err, _ := c.Get("err")
 	if err != nil {
 		templateData["error"] = err.(error).Error()
 		status = StatusCodeForError(err.(error))
+	}
+	if currentUser == nil || err == common.ErrMustCompleteReset {
+		templateData["suppressSideNav"] = true
+		templateData["suppressTopNav"] = true
 	}
 	c.HTML(status, "errors/show.html", templateData)
 }
@@ -70,7 +68,7 @@ func StatusCodeForError(err error) (status int) {
 		status = http.StatusUnauthorized
 	case common.ErrAccountDeactivated:
 		status = http.StatusForbidden
-	case common.ErrPermissionDenied:
+	case common.ErrPermissionDenied, common.ErrMustCompleteReset:
 		status = http.StatusForbidden
 	case common.ErrParentRecordNotFound:
 		status = http.StatusNotFound

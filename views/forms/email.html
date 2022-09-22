@@ -4,7 +4,8 @@
   <label class="label" for="{{ .Value }}">{{ .Label }}</label>
   <div class="control">
     <!-- TODO Add `is-danger` classname to form field on error -->
-    <input class="input" type="email" name="Email" id="{{ .Value }}" value="{{ .Value }}" placeholder="{{ .Placeholder }}" {{ template "forms/attrs.html" . }}>
+    <input class="input" type="email" name="{{ .Name }}" id="{{ .Name }}" value="{{ .Value }}"
+      placeholder="{{ .Placeholder }}" {{ template "forms/attrs.html" . }}>
   </div>
   {{ if .DisplayError }}<p class="help is-danger">{{ .ErrMsg }}</p>{{ end }}
 </div>

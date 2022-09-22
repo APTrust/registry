@@ -163,7 +163,8 @@ func UserSignOut(c *gin.Context) {
 // GET /users/change_password/:id
 func UserShowChangePassword(c *gin.Context) {
 	req, userToEdit, err := reqAndUserForPwdEdit(c)
-	if AbortIfError(c, err) {
+	if err != nil {
+		AbortIfError(c, err)
 		return
 	}
 	form := forms.NewPasswordResetForm(userToEdit)
@@ -194,9 +195,11 @@ func UserShowChangePassword(c *gin.Context) {
 // POST /users/change_password/:id
 func UserChangePassword(c *gin.Context) {
 	req, userToEdit, err := reqAndUserForPwdEdit(c)
-	if AbortIfError(c, err) {
+	if err != nil {
+		AbortIfError(c, err)
 		return
 	}
+
 	pwd := c.PostForm("NewPassword")
 	confirm := c.PostForm("ConfirmNewPassword")
 	if pwd != confirm {
@@ -265,6 +268,13 @@ func reqAndUserForPwdEdit(c *gin.Context) (*Request, *pgmodels.User, error) {
 		return nil, nil, common.ErrPermissionDenied
 	}
 
+	// If the current user has a password reset token, they should
+	// be resetting their own password, not someone else's... even
+	// if they are otherwise allowed to perform this kind of edit.
+	if req.CurrentUser.ResetPasswordToken != "" && req.CurrentUser.ID != req.Auth.ResourceID {
+		return nil, nil, common.ErrMustCompleteReset
+	}
+
 	return req, userToEdit, err
 }
 
@@ -280,25 +290,14 @@ func UserInitPasswordReset(c *gin.Context) {
 	// This is admin triggering a password reset for another user,
 	// so current user id does not need to match subject user id.
 	req, userToEdit, err := reqAndUserForPwdEdit(c)
+	if err != nil {
+		AbortIfError(c, err)
+		return
+	}
+	err = initPasswordReset(req, userToEdit)
 	if AbortIfError(c, err) {
 		return
 	}
-	token := common.RandomToken()
-	encryptedToken, err := common.EncryptPassword(token)
-	if AbortIfError(c, err) {
-		return
-	}
-	userToEdit.ResetPasswordToken = encryptedToken
-	userToEdit.ForcePasswordUpdate = true
-	err = userToEdit.Save()
-	if AbortIfError(c, err) {
-		return
-	}
-	_, err = CreatePasswordResetAlert(req, userToEdit, token)
-	if AbortIfError(c, err) {
-		return
-	}
-
 	req.TemplateData["user"] = userToEdit
 	c.HTML(http.StatusOK, "users/reset_password_initiated.html", req.TemplateData)
 }
@@ -327,17 +326,18 @@ func UserStartPasswordReset(c *gin.Context) {
 	}
 
 	// Assuming user is not logged in if they're hitting this page.
-	// They'll need a CSRF token to post data. DO NOT set the
+	// They'll need a CSRF csrfToken to post data. DO NOT set the
 	// CurrentUser session variable until after we have the right
-	// token and user has completed password reset.
-	err = helpers.SetCSRFCookie(c)
+	// csrfToken and user has completed password reset.
+	csrfToken, err := helpers.SetCSRFCookie(c)
 	if AbortIfError(c, err) {
 		return
 	}
 	templateData := gin.H{
-		"id":              userID,
-		"suppressSideNav": true,
-		"suppressTopNav":  true,
+		"id":                    userID,
+		"suppressSideNav":       true,
+		"suppressTopNav":        true,
+		constants.CSRFTokenName: csrfToken,
 	}
 	c.HTML(http.StatusOK, "users/enter_password_reset_token.html", templateData)
 }
@@ -435,6 +435,45 @@ func UserMyAccount(c *gin.Context) {
 	c.HTML(http.StatusOK, "users/my_account.html", req.TemplateData)
 }
 
+// GET /users/forgot_password
+func UserShowForgotPasswordForm(c *gin.Context) {
+	req := NewRequest(c)
+	req.TemplateData["suppressTopNav"] = true
+	req.TemplateData["suppressSideNav"] = true
+	token, err := helpers.SetCSRFCookie(c)
+	if AbortIfError(c, err) {
+		return
+	}
+	req.TemplateData[constants.CSRFTokenName] = token
+	c.HTML(http.StatusOK, "users/forgot_password.html", req.TemplateData)
+}
+
+// POST /users/forgot_password
+func UserSendForgotPasswordMessage(c *gin.Context) {
+	req := NewRequest(c)
+	req.TemplateData["suppressTopNav"] = true
+	req.TemplateData["suppressSideNav"] = true
+	email := c.PostForm("email")
+	userToEdit, err := pgmodels.UserByEmail(email)
+	if userToEdit == nil || userToEdit.ID == 0 || pgmodels.IsNoRowError(err) {
+		AbortIfError(c, fmt.Errorf("We have no account associated with that email address."))
+		return
+	}
+	if !userToEdit.DeactivatedAt.IsZero() {
+		AbortIfError(c, fmt.Errorf("That account has been deactivated. Contact your local APTrust administrator."))
+		return
+	}
+	// Handle unknown error
+	if AbortIfError(c, err) {
+		return
+	}
+	err = initPasswordReset(req, userToEdit)
+	if AbortIfError(c, err) {
+		return
+	}
+	c.HTML(http.StatusOK, "users/forgot_password_confirmation.html", req.TemplateData)
+}
+
 // SignInUser signs the user in with email and password.
 // If user has two-factor auth, this is the first step of login.
 func SignInUser(c *gin.Context) (int, string, error) {
@@ -457,7 +496,7 @@ func SignInUser(c *gin.Context) (int, string, error) {
 	if err != nil {
 		return http.StatusInternalServerError, redirectTo, err
 	}
-	err = helpers.SetCSRFCookie(c)
+	_, err = helpers.SetCSRFCookie(c)
 	if AbortIfError(c, err) {
 		return http.StatusInternalServerError, redirectTo, err
 	}
@@ -585,5 +624,21 @@ func createNewUserAlert(req *Request, newUser *pgmodels.User) error {
 		return err
 	}
 	_, err = CreateNewAccountAlert(req, newUser, token)
+	return err
+}
+
+func initPasswordReset(req *Request, userToEdit *pgmodels.User) error {
+	token := common.RandomToken()
+	encryptedToken, err := common.EncryptPassword(token)
+	if err != nil {
+		return err
+	}
+	userToEdit.ResetPasswordToken = encryptedToken
+	userToEdit.ForcePasswordUpdate = true
+	err = userToEdit.Save()
+	if err != nil {
+		return err
+	}
+	_, err = CreatePasswordResetAlert(req, userToEdit, token)
 	return err
 }

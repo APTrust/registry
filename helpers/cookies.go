@@ -84,9 +84,9 @@ func DeletePrefsCookie(c CookieSetter) {
 	DeleteCookie(c, ctx.Config.Cookies.PrefsCookie)
 }
 
-func SetCSRFCookie(c CookieSetter) error {
+func SetCSRFCookie(c CookieSetter) (string, error) {
 	token := common.RandomToken()
-	return SetCookie(c, constants.CSRFCookieName, token)
+	return token, SetCookie(c, constants.CSRFCookieName, token)
 }
 
 func DeleteCSRFCookie(c CookieSetter) {
