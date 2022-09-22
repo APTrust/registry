@@ -23,13 +23,15 @@
       <dt class="text-label text-xs is-grey-dark">Outcome</dt>
       <dd class="text-table">{{ .event.Outcome }}</dd>
       <dt class="text-label text-xs is-grey-dark">Date/Time</dt>
-      <dd class="text-table">{{ .event.DateTime }}</dd>
+      <dd class="text-table">{{ dateTimeUS .event.DateTime }}</dd>
+      <dt class="text-label text-xs is-grey-dark">Object</dt>
+      <dd class="text-table">{{ .event.Object }}</dd>
       <dt class="text-label text-xs is-grey-dark">Detail</dt>
       <dd class="text-table">{{ .event.Detail }}</dd>
       <dt class="text-label text-xs is-grey-dark">Generic File</dt>
       <dd class="text-table"><a href="/files/show/{{ .event.GenericFileID }}">{{ defaultString
           .event.GenericFileIdentifier "N/A" }}</a></dd>
-      <dt class="text-label text-xs is-grey-dark">Object</dt>
+      <dt class="text-label text-xs is-grey-dark">Intellectual Object</dt>
       <dd class="text-table"><a href="/objects/show/{{ .event.IntellectualObjectID }}">{{
           .event.IntellectualObjectIdentifier }}</a></dd>
       <dt class="text-label text-xs is-grey-dark">Institution</dt>

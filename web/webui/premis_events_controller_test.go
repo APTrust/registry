@@ -12,7 +12,7 @@ func TestEventShow(t *testing.T) {
 
 	items := []string{
 		"https://github.com/APTrust/exchange",
-		"2016-08-26 18:53:32",
+		"Aug 26, 2016 18:53:32",
 		"Calculated new fixity value",
 		"message digest calculation",
 		"institution1.edu/photos/picture1",
@@ -92,7 +92,7 @@ func TestEventShowXHR(t *testing.T) {
 	items := []string{
 		"e2b0e887-d54d-4fd2-b4bc-71ea9311afd5",
 		"message digest calculation",
-		"Aug 26, 2016",
+		"Aug 26, 2016 18:53:32",
 		"Success",
 		"12e6a5fc3c144b31bcf1d781912beb00",
 		"New fixididdly",
