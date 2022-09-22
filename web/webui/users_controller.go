@@ -163,7 +163,8 @@ func UserSignOut(c *gin.Context) {
 // GET /users/change_password/:id
 func UserShowChangePassword(c *gin.Context) {
 	req, userToEdit, err := reqAndUserForPwdEdit(c)
-	if AbortIfError(c, err) {
+	if err != nil {
+		AbortIfError(c, err)
 		return
 	}
 	form := forms.NewPasswordResetForm(userToEdit)
@@ -194,9 +195,11 @@ func UserShowChangePassword(c *gin.Context) {
 // POST /users/change_password/:id
 func UserChangePassword(c *gin.Context) {
 	req, userToEdit, err := reqAndUserForPwdEdit(c)
-	if AbortIfError(c, err) {
+	if err != nil {
+		AbortIfError(c, err)
 		return
 	}
+
 	pwd := c.PostForm("NewPassword")
 	confirm := c.PostForm("ConfirmNewPassword")
 	if pwd != confirm {
@@ -265,6 +268,13 @@ func reqAndUserForPwdEdit(c *gin.Context) (*Request, *pgmodels.User, error) {
 		return nil, nil, common.ErrPermissionDenied
 	}
 
+	// If the current user has a password reset token, they should
+	// be resetting their own password, not someone else's... even
+	// if they are otherwise allowed to perform this kind of edit.
+	if req.CurrentUser.ResetPasswordToken != "" && req.CurrentUser.ID != req.Auth.ResourceID {
+		return nil, nil, common.ErrMustCompleteReset
+	}
+
 	return req, userToEdit, err
 }
 
@@ -280,7 +290,8 @@ func UserInitPasswordReset(c *gin.Context) {
 	// This is admin triggering a password reset for another user,
 	// so current user id does not need to match subject user id.
 	req, userToEdit, err := reqAndUserForPwdEdit(c)
-	if AbortIfError(c, err) {
+	if err != nil {
+		AbortIfError(c, err)
 		return
 	}
 	err = initPasswordReset(req, userToEdit)
@@ -315,10 +326,10 @@ func UserStartPasswordReset(c *gin.Context) {
 	}
 
 	// Assuming user is not logged in if they're hitting this page.
-	// They'll need a CSRF token to post data. DO NOT set the
+	// They'll need a CSRF csrfToken to post data. DO NOT set the
 	// CurrentUser session variable until after we have the right
-	// token and user has completed password reset.
-	token, err := helpers.SetCSRFCookie(c)
+	// csrfToken and user has completed password reset.
+	csrfToken, err := helpers.SetCSRFCookie(c)
 	if AbortIfError(c, err) {
 		return
 	}
@@ -326,7 +337,7 @@ func UserStartPasswordReset(c *gin.Context) {
 		"id":                    userID,
 		"suppressSideNav":       true,
 		"suppressTopNav":        true,
-		constants.CSRFTokenName: token,
+		constants.CSRFTokenName: csrfToken,
 	}
 	c.HTML(http.StatusOK, "users/enter_password_reset_token.html", templateData)
 }

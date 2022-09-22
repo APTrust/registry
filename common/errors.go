@@ -138,6 +138,12 @@ var ErrSubclassMustImplement = errors.New("subclass must implement this method")
 // given type from the *_counts views. Use a regular SQL count() instead.
 var ErrCountTypeNotSupported = errors.New("type is not supported for view count")
 
+// ErrMustCompleteReset occurs when a user is supposed to be resetting
+// their own password but tries instead to reset someone else's.
+// SysAdmin and Inst admins can legitimately reset others' passwords,
+// but they shouldn't be doing it in this context.
+var ErrMustCompleteReset = errors.New("you must complete your own password reset")
+
 type ValidationError struct {
 	Errors map[string]string
 }
