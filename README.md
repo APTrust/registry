@@ -1,7 +1,11 @@
 [![Build Status](https://travis-ci.com/APTrust/registry.svg?branch=master)](https://travis-ci.com/APTrust/registry)
 [![Maintainability](https://api.codeclimate.com/v1/badges/e4c7cfd351d6bae759e3/maintainability)](https://codeclimate.com/github/APTrust/registry/maintainability)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/e4c7cfd351d6bae759e3/test_coverage)](https://codeclimate.com/github/APTrust/registry/test_coverage)
 [![REST API Documentation](https://img.shields.io/badge/documentation-REST%20API-blue)](https://aptrust.github.io/registry/)
+<!---
+Test coverage report is incorrect because Travis blows up and reports incorrect numbers.
+Actual coverage is around 80%. We can uncomment this when we move away from Travis.
+[![Test Coverage](https://api.codeclimate.com/v1/badges/e4c7cfd351d6bae759e3/test_coverage)](https://codeclimate.com/github/APTrust/registry/test_coverage)
+-->
 
 # Registry
 
