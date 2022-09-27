@@ -187,7 +187,7 @@ Resources:
         - Condition: SUCCESS
           ContainerName: Nsqadmin_ResolvConf_InitContainer
         Essential: true 
-        Image: docker.io/aptrust/registry:2998af0-master 
+        Image: docker.io/aptrust/registry:eeab455-master 
         Secrets:
         - Name: APT_ENV
           ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/APT_ENV'
@@ -407,5 +407,5 @@ Resources:
         - !Ref ScaleDownRegistryPolicy
       Statistic: Average
       Period: 60
-      Threshold: 350
+      Threshold: 60
       TreatMissingData: missing
