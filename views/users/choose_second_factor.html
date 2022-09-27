@@ -25,16 +25,16 @@
   <div class="modal-content">
     <p class="mb-3">How would you like to complete your login?</p>
 
-    <div class="two-factor-option mb-3 clickable" onclick="submitSecondFactor('authy')">
-      Authy <br />
+    <div class="two-factor-option mb-3">
+      <button class="button is-primary" onclick="submitSecondFactor('authy')">Authy</button> <br />
       <span id="two-factor-method-authy" class="two-factor-message" style="display:none"> Sent push notification.</span>
     </div>
-    <div class="two-factor-option mb-3 clickable" onclick="submitSecondFactor('sms')">
-      Text Message <br />
+    <div class="two-factor-option mb-3">
+      <button class="button is-primary" onclick="submitSecondFactor('sms')">Text Message</button> <br />
       <span id="two-factor-method-sms" class="two-factor-message" style="display:none;"> Sent code via SMS.</span>
     </div>
-    <div class="two-factor-option mb-3 clickable" onclick="submitSecondFactor('backup')">
-      Backup Code <br />
+    <div class="two-factor-option mb-3">
+      <button class="button is-primary" onclick="submitSecondFactor('backup')">Backup Code</button> <br />
     </div>
 
     <form name="twoFactorChoiceForm" method="post" action="">
