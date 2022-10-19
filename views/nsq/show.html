@@ -4,42 +4,56 @@
 
 <h1>NSQ</h1>
 
-<p>Version {{ .stats.Info.Version }} running at <b>{{ .stats.Info.BroadcastAddress }}:{{ .stats.Info.HttpPort }}</b> (TCP port {{ .stats.Info.TcpPort }}). <br/>
-Started {{ unixToISO .stats.Info.StartTime }}. Health: {{ .stats.Health }}.</p>
+<p>Version {{ .stats.Info.Version }} running at <b>{{ .stats.Info.BroadcastAddress }}:{{ .stats.Info.HttpPort }}</b>
+  (TCP port {{ .stats.Info.TcpPort }}). <br />
+  Started {{ unixToISO .stats.Info.StartTime }}. Health: {{ .stats.Health }}.</p>
 
-<h4><a href="#" data-toggle="nsqActionList">Show Actions</a></h4>
-<div id="nsqActionList" style="display:none">
-  <ul>
-    <li><a href="javascript:nsqInit()">Create Default Topics</a></li>
-    <li><a href="javascript:nsqPost('pause', '', '', 'topic', true)" title="Pause all topics">Pause All Topics</a></li>
-    <li><a href="javascript:nsqPost('unpause', '', '', 'topic', true)">Unpause All Topics</a></li>
-    <li><a href="javascript:nsqPost('empty', '', '', 'topic', true)">Empty All Topics</a></li>
-    <li><a href="javascript:nsqPost('delete', '', '', 'topic', true)">Delete All Topics</a></li>
+<div id="nsqActionList" class="nsq-action-list">
+  <a class="button is-primary is-outlined is-compact" href="javascript:nsqInit()">Create Default Topics</a> <br /><br />
 
-    <li><a href="javascript:nsqPost('pause', '', '', 'channel', true)" title="Pause all channels">Pause All Channels</a></li>
-    <li><a href="javascript:nsqPost('unpause', '', '', 'channel', true)">Unpause All Channels</a></li>
-    <li><a href="javascript:nsqPost('empty', '', '', 'channel', true)">Empty All Channels</a></li>
-    <li><a href="javascript:nsqPost('delete', '', '', 'channel', true)">Delete All Channels</a></li>
-  </ul>
+  <a class="button is-primary is-outlined is-compact" href="javascript:nsqPost('pause', '', '', 'topic', true)"
+    title="Pause all topics">Pause All Topics</a>
+  <a class="button is-primary is-outlined is-compact"
+    href="javascript:nsqPost('unpause', '', '', 'topic', true)">Unpause All Topics</a>
+  <a class="button is-danger is-outlined is-compact" href="javascript:nsqPost('empty', '', '', 'topic', true)">Empty
+    All Topics</a>
+  <a class="button is-danger is-outlined is-compact" href="javascript:nsqPost('delete', '', '', 'topic', true)">Delete
+    All Topics</a> <br /><br />
+
+  <a class="button is-primary is-outlined is-compact" href="javascript:nsqPost('pause', '', '', 'channel', true)"
+    title="Pause all channels">Pause All Channels</a>
+  <a class="button is-primary is-outlined is-compact"
+    href="javascript:nsqPost('unpause', '', '', 'channel', true)">Unpause All Channels</a>
+  <a class="button is-danger is-outlined is-compact" href="javascript:nsqPost('empty', '', '', 'channel', true)">Empty
+    All Channels</a>
+  <a class="button is-danger is-outlined is-compact" href="javascript:nsqPost('delete', '', '', 'channel', true)">Delete
+    All Channels</a>
 </div>
 
-<hr style="margin-bottom: 50px"/>
+<hr style="margin-bottom: 50px" />
 
 {{ range $index, $topic := .stats.Topics }}
-<h2>{{ $topic.TopicName }}</h2>
+<h2>{{ $topic.TopicName }} {{ if $topic.Paused }} <span class="badge is-failed">Paused</span> {{ else }} <span
+    class="badge is-success">Running</span> {{ end }} </h2>
 <p>
   {{ if $topic.Paused }}
-  <a href="javascript:nsqPost('unpause', '{{ $topic.TopicName }}', '', 'topic', false)" title="Unpause topic {{ $topic.TopicName }}">Unpause</a>
+  <a class="button is-primary is-outlined is-tiny-button mr-2 mt-2"
+    href="javascript:nsqPost('unpause', '{{ $topic.TopicName }}', '', 'topic', false)"
+    title="Unpause topic {{ $topic.TopicName }}">Unpause Topic</a>
   {{ else }}
-  <a href="javascript:nsqPost('pause', '{{ $topic.TopicName }}', '', 'topic', false)" title="Pause topic {{ $topic.TopicName }}">Pause</a>
+  <a class="button is-primary is-outlined is-tiny-button mr-2 mt-2"
+    href="javascript:nsqPost('pause', '{{ $topic.TopicName }}', '', 'topic', false)"
+    title="Pause topic {{ $topic.TopicName }}">Pause Topic</a>
   {{ end }}
-  |
-  <a href="javascript:nsqPost('empty', '{{ $topic.TopicName }}', '', 'topic', false)" title="Empty topic {{ $topic.TopicName }}">Empty</a>
-  |
-  <a href="javascript:nsqPost('delete', '{{ $topic.TopicName }}', '', 'topic', false)" title="Delete topic {{ $topic.TopicName }}">Delete</a>
+  <a class="button is-danger is-outlined is-tiny-button mr-2 mt-2"
+    href="javascript:nsqPost('empty', '{{ $topic.TopicName }}', '', 'topic', false)"
+    title="Empty topic {{ $topic.TopicName }}">Empty Topic</a>
+  <a class="button is-danger is-outlined is-tiny-button mr-2 mt-2"
+    href="javascript:nsqPost('delete', '{{ $topic.TopicName }}', '', 'topic', false)"
+    title="Delete topic {{ $topic.TopicName }}">Delete Topic</a>
 </p>
 
-<table style="margin-bottom: 160px;">
+<table class="nsq-data mt-2">
   <tr>
     <th></th>
     <th>Depth</th>
@@ -65,14 +79,23 @@ Started {{ unixToISO .stats.Info.StartTime }}. Health: {{ .stats.Health }}.</p>
   {{ range $chIndex, $channel := $topic.Channels }}
   <tr>
     <td>
-      {{ $channel.ChannelName }} <br/>
       {{ if $channel.Paused }}
-      <a href="javascript:nsqPost('unpause', '{{ $topic.TopicName }}', '{{ $channel.ChannelName }}', 'channel', false)" title="Unpause channel {{ $channel.ChannelName }}">Unpause</a>
+      <span class="badge is-failed">{{ $channel.ChannelName }}</span> <br />
+      <a class="button is-primary is-outlined is-tiny-button mr-2 mt-2"
+        href="javascript:nsqPost('unpause', '{{ $topic.TopicName }}', '{{ $channel.ChannelName }}', 'channel', false)"
+        title="Unpause channel {{ $channel.ChannelName }}">Unpause Channel</a>
       {{ else }}
-      <a href="javascript:nsqPost('pause', '{{ $topic.TopicName }}', '{{ $channel.ChannelName }}', 'channel', false)" title="Pause channel {{ $channel.ChannelName }}">Pause</button>
-      {{ end }} |
-        <a href="javascript:nsqPost('empty', '{{ $topic.TopicName }}', '{{ $channel.ChannelName }}', 'channel', false)" title="Empty channel {{ $channel.ChannelName }}">Empty</a> |
-        <a href="javascript:nsqPost('delete', '{{ $topic.TopicName }}', '{{ $channel.ChannelName }}', 'channel', false)" title="Delete channel {{ $channel.ChannelName }}">Delete</a>
+      <span class="badge is-success">{{ $channel.ChannelName }}</span> <br />
+      <a class="button is-primary is-outlined is-tiny-button mr-2 mt-2"
+        href="javascript:nsqPost('pause', '{{ $topic.TopicName }}', '{{ $channel.ChannelName }}', 'channel', false)"
+        title="Pause channel {{ $channel.ChannelName }}">Pause Channel</button>
+        {{ end }}
+        <a class="button is-danger is-outlined is-tiny-button mr-2 mt-2"
+          href="javascript:nsqPost('empty', '{{ $topic.TopicName }}', '{{ $channel.ChannelName }}', 'channel', false)"
+          title="Empty channel {{ $channel.ChannelName }}">Empty Channel</a>
+        <a class="button is-danger is-outlined is-tiny-button mr-2 mt-2"
+          href="javascript:nsqPost('delete', '{{ $topic.TopicName }}', '{{ $channel.ChannelName }}', 'channel', false)"
+          title="Delete channel {{ $channel.ChannelName }}">Delete Channel</a>
     </td>
     <td>{{ $channel.Depth }}</td>
     <td>{{ $channel.BackendDepth }}</td>
@@ -127,45 +150,76 @@ Started {{ unixToISO .stats.Info.StartTime }}. Health: {{ .stats.Health }}.</p>
 </form>
 
 <script>
- function nsqPost(operation, topicName, channelName, targetType, applyToAll) {
-     let form = document.forms['nsqForm']
-     let msg = getMessage(operation, topicName, channelName, applyToAll)
-     console.log(msg)
-     if (msg && !confirm(msg)) {
-         return
-     }
-     form.elements['operation'].value = operation
-     form.elements['targetType'].value = targetType
-     form.elements['topicName'].value = topicName
-     form.elements['channelName'].value = channelName
-     form.elements['applyToAll'].value = applyToAll ? 'true' : 'false'
-     form.submit()
- }
+  function nsqPost(operation, topicName, channelName, targetType, applyToAll) {
+    let form = document.forms['nsqForm']
+    let msg = getMessage(operation, topicName, channelName, applyToAll)
+    console.log(msg)
+    if (msg && !confirm(msg)) {
+      return
+    }
+    form.elements['operation'].value = operation
+    form.elements['targetType'].value = targetType
+    form.elements['topicName'].value = topicName
+    form.elements['channelName'].value = channelName
+    form.elements['applyToAll'].value = applyToAll ? 'true' : 'false'
+    form.submit()
+  }
 
- function nsqInit() {
-     let form = document.forms['nsqForm']
-     form.action = '/nsq/init'
-     form.submit()
- }
+  function nsqInit() {
+    let form = document.forms['nsqForm']
+    form.action = '/nsq/init'
+    form.submit()
+  }
 
- function getMessage(operation, topicName, channelName, applyToAll) {
-     if (!applyToAll && (operation == 'pause' || operation == 'unpause')) {
-         return null
-     }
-     let target = topicName
-     if (channelName) {
-         target = `${channelName} in topic ${topicName}`
-     }
-     if (applyToAll) {
-         if (channelName) {
-             target = 'all channels'
-         } else {
-             target = 'all topics'
-         }
-     }
-     return `Do you want to ${operation} ${target}?`
- }
+  function getMessage(operation, topicName, channelName, applyToAll) {
+    if (!applyToAll && (operation == 'pause' || operation == 'unpause')) {
+      return null
+    }
+    let target = topicName
+    if (channelName) {
+      target = `${channelName} in topic ${topicName}`
+    }
+    if (applyToAll) {
+      if (channelName) {
+        target = 'all channels'
+      } else {
+        target = 'all topics'
+      }
+    }
+    return `Do you want to ${operation} ${target}?`
+  }
 </script>
+
+<style>
+  .nsq-action-list {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    padding: 1rem;
+  }
+
+  .nsq-action-list a {
+    width: 170px;
+    margin-right: 20px;
+  }
+
+  .nsq-data {
+    margin-bottom: 160px;
+  }
+
+  .nsq-data td,
+  .nsq-data th {
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-collapse: collapse;
+  }
+
+  .is-tiny-button {
+    height: 25px;
+    padding: 0.4rem !important;
+    font-size: 10px;
+    line-height: 10px;
+  }
+</style>
 
 {{ template "shared/_footer.html" .}}
 
