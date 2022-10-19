@@ -18,7 +18,7 @@
     <form name="twoFactorTokenForm" method="post" action="/users/2fa_verify/">
       <div class="field">
         <div class="control">
-          <input class="input" type="text" id="otp" name="otp">
+          <input class="input" type="text" id="otp" name="otp" autofocus>
         </div>
       </div>
       <input class="is-hidden" type="hidden" name="two_factor_method" value="{{ .twoFactorMethod }}" />
@@ -44,7 +44,7 @@
         if (confirm("Send a new password now?")) {
           document.forms['twoFactorResendForm'].submit()
         }
-      }
+      }    
     </script>
 
     {{ end }}

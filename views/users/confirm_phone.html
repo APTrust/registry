@@ -2,7 +2,7 @@
 
 <!-- Show the header unless query string says modal=true -->
 {{ if not .showAsModal }}
-  {{ template "shared/_header.html" .}}
+{{ template "shared/_header.html" .}}
 {{ end }}
 
 <div class="modal-detail">
@@ -20,7 +20,7 @@
     <form name="confirmPhoneForm" method="post" action="/users/confirm_phone">
       <div class="field">
         <div class="control">
-          <input class="input" type="text" name="otp" value="">
+          <input class="input" type="text" name="otp" value="" autofocus>
         </div>
       </div>
       {{ template "forms/csrf_token.html" . }}
@@ -31,7 +31,7 @@
 
     <script>
       window.addEventListener('load', (event) => {
-          document.forms['confirmPhoneForm']['otp'].focus()
+        document.forms['confirmPhoneForm']['otp'].focus()
       })
     </script>
   </div>
@@ -39,7 +39,7 @@
 
 <!-- Show the footer unless query string says modal=true -->
 {{ if not .showAsModal }}
-  {{ template "shared/_footer.html" .}}
+{{ template "shared/_footer.html" .}}
 {{ end }}
 
 
