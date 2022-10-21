@@ -150,7 +150,7 @@ func testObjectUpdate(t *testing.T, obj *pgmodels.IntellectualObject) *pgmodels.
 	assert.Equal(t, copyOfObj.Access, updatedObj.Access)
 	assert.Equal(t, copyOfObj.Title, updatedObj.Title)
 	assert.Equal(t, copyOfObj.ETag, updatedObj.ETag)
-	assert.Equal(t, obj.CreatedAt, updatedObj.CreatedAt)
+	assert.InDelta(t, obj.CreatedAt.Unix(), updatedObj.CreatedAt.Unix(), 1)
 	assert.True(t, updatedObj.UpdatedAt.After(origUpdatedAt))
 
 	return updatedObj

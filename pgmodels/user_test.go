@@ -202,7 +202,10 @@ func testUserSignOut(t *testing.T, user *pgmodels.User) {
 	assert.Empty(t, savedUser.EncryptedOTPSecret)
 	assert.Empty(t, savedUser.EncryptedOTPSentAt)
 	assert.Equal(t, signInIP, savedUser.LastSignInIP)
-	assert.Equal(t, signInTime, savedUser.LastSignInAt)
+
+	// On Mac, these times should be identical.
+	// On Linux, they can drift by a fraction of a second.
+	assert.InDelta(t, signInTime.Unix(), savedUser.LastSignInAt.Unix(), 1)
 }
 
 func TestUserSignIn_Invalid(t *testing.T) {

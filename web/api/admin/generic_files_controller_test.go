@@ -190,7 +190,7 @@ func testFileUpdate(t *testing.T, gf *pgmodels.GenericFile) *pgmodels.GenericFil
 
 	assert.Equal(t, copyOfGf.Size, updatedGf.Size)
 	assert.Equal(t, copyOfGf.FileFormat, updatedGf.FileFormat)
-	assert.Equal(t, gf.CreatedAt, updatedGf.CreatedAt)
+	assert.InDelta(t, gf.CreatedAt.Unix(), updatedGf.CreatedAt.Unix(), 1)
 	assert.True(t, updatedGf.UpdatedAt.After(origUpdatedAt))
 
 	return updatedGf

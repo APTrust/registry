@@ -108,5 +108,5 @@ func TestPremisEventFixityCheck(t *testing.T) {
 	gf, err = pgmodels.GenericFileByID(21)
 	require.Nil(t, err)
 	require.NotNil(t, gf)
-	assert.Equal(t, now, gf.LastFixityCheck)
+	assert.InDelta(t, now.Unix(), gf.LastFixityCheck.Unix(), 1)
 }

@@ -16,6 +16,9 @@ type DepositFormatStats struct {
 // files belonging to the specified institution and/or object.
 // Specify object ID for object status, Institution ID for
 // institution status.
+//
+// Note that stats come back in different order on MacOs vs Linux.
+// https://dba.stackexchange.com/questions/106964/why-is-my-postgresql-order-by-case-insensitive
 func DepositFormatStatsSelect(institutionID, intellectualObjectID int64) ([]*DepositFormatStats, error) {
 	var stats []*DepositFormatStats
 	_, err := common.Context().DB.Query(&stats, depositFormatQuery,
@@ -41,3 +44,14 @@ const depositFormatQuery = `
         group by rollup(file_format)
         order by file_format
 `
+
+// StatsByFormat returns the stats for the specified format, or nil
+// if not found.
+func StatsByFormat(stats []*DepositFormatStats, format string) *DepositFormatStats {
+	for _, s := range stats {
+		if s.FileFormat == format {
+			return s
+		}
+	}
+	return nil
+}

@@ -1,6 +1,8 @@
 package pgmodels_test
 
 import (
+	"encoding/json"
+	"fmt"
 	"testing"
 
 	"github.com/APTrust/registry/db"
@@ -17,9 +19,11 @@ func TestDepositFormatStats(t *testing.T) {
 	require.Nil(t, err)
 	require.NotNil(t, stats)
 
+	j, _ := json.MarshalIndent(stats, "", "  ")
+	fmt.Println(string(j))
+
 	require.Equal(t, 5, len(stats))
-	assert.Equal(t, "Total", stats[0].FileFormat)
-	assert.EqualValues(t, 24, stats[0].FileCount)
+	assert.EqualValues(t, 24, pgmodels.StatsByFormat(stats, "Total").FileCount)
 
 	// By Obj ID, without Inst ID
 	stats, err = pgmodels.DepositFormatStatsSelect(0, 6)
@@ -27,8 +31,7 @@ func TestDepositFormatStats(t *testing.T) {
 	require.NotNil(t, stats)
 
 	require.Equal(t, 5, len(stats))
-	assert.Equal(t, "Total", stats[0].FileFormat)
-	assert.EqualValues(t, 24, stats[0].FileCount)
+	assert.EqualValues(t, 24, pgmodels.StatsByFormat(stats, "Total").FileCount)
 
 	// By Inst ID only - all files for inst 3
 	stats, err = pgmodels.DepositFormatStatsSelect(3, 0)
@@ -36,6 +39,5 @@ func TestDepositFormatStats(t *testing.T) {
 	require.NotNil(t, stats)
 
 	require.Equal(t, 9, len(stats))
-	assert.Equal(t, "Total", stats[0].FileFormat)
-	assert.EqualValues(t, 35, stats[0].FileCount)
+	assert.EqualValues(t, 35, pgmodels.StatsByFormat(stats, "Total").FileCount)
 }
