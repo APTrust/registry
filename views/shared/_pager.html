@@ -1,7 +1,17 @@
 {{ define "shared/_pager.html" }}
 
 <div class="pager pager-{{ .pagerSize }}">
-  <p class="pager-rows">Rows per page: {{ .pager.PerPage }}</p>
+  <p class="pager-rows">Rows per page:
+    {{ if .xhrTarget }}
+    {{ .pager.PerPage }}
+    {{ else }}
+    <select id="selRowsPerPage" name="selRowsPerPage">
+      <option value="20" {{ if strEq .pager.PerPage 20 }}selected{{ end }}>20</option>
+      <option value="50" {{ if strEq .pager.PerPage 50 }}selected{{ end }}>50</option>
+      <option value="100" {{ if strEq .pager.PerPage 100 }}selected{{ end }}>100</option>
+    </select>
+    {{ end }}
+  </p>
   <p class="pager-items">{{ .pager.ItemFirst }} - {{ .pager.ItemLast }} of {{ .pager.TotalItems }}</p>
 
   <!--
@@ -19,17 +29,18 @@
   -->
 
   {{ if .pager.PreviousLink }}
-    {{ if .xhrTarget }}
-    <button class="button is-compact is-white" type="button" data-xhr-url="{{ .pager.PreviousLink }}" data-xhr-target="{{ .xhrTarget }}">
-      <span class="material-icons" aria-hidden="true">chevron_left</span>
-      <span class="is-sr-only">Previous</span>
-    </button>
-    {{ else }}
-    <a class="button is-compact is-white" href="{{ .pager.PreviousLink }}">
-      <span class="material-icons" aria-hidden="true">chevron_left</span>
-      <span class="is-sr-only">Previous</span>
-    </a>
-    {{ end }}
+  {{ if .xhrTarget }}
+  <button class="button is-compact is-white" type="button" data-xhr-url="{{ .pager.PreviousLink }}"
+    data-xhr-target="{{ .xhrTarget }}">
+    <span class="material-icons" aria-hidden="true">chevron_left</span>
+    <span class="is-sr-only">Previous</span>
+  </button>
+  {{ else }}
+  <a class="button is-compact is-white" href="{{ .pager.PreviousLink }}">
+    <span class="material-icons" aria-hidden="true">chevron_left</span>
+    <span class="is-sr-only">Previous</span>
+  </a>
+  {{ end }}
   {{ else }}
   <button class="button is-compact is-white" type="button" disabled>
     <span class="material-icons" aria-hidden="true">chevron_left</span>
@@ -38,17 +49,18 @@
   {{ end }}
 
   {{ if .pager.NextLink }}
-    {{ if .xhrTarget }}
-    <button class="button is-compact is-white" type="button" data-xhr-url="{{ .pager.NextLink }}" data-xhr-target="{{ .xhrTarget }}">
-      <span class="material-icons" aria-hidden="true">chevron_right</span>
-      <span class="is-sr-only">Next</span>
-    </button>
-    {{ else }}
-    <a class="button is-compact is-white" href="{{ .pager.NextLink }}">
-      <span class="material-icons" aria-hidden="true">chevron_right</span>
-      <span class="is-sr-only">Next</span>
-    </a>
-    {{ end }}
+  {{ if .xhrTarget }}
+  <button class="button is-compact is-white" type="button" data-xhr-url="{{ .pager.NextLink }}"
+    data-xhr-target="{{ .xhrTarget }}">
+    <span class="material-icons" aria-hidden="true">chevron_right</span>
+    <span class="is-sr-only">Next</span>
+  </button>
+  {{ else }}
+  <a class="button is-compact is-white" href="{{ .pager.NextLink }}">
+    <span class="material-icons" aria-hidden="true">chevron_right</span>
+    <span class="is-sr-only">Next</span>
+  </a>
+  {{ end }}
   {{ else }}
   <button class="button is-compact is-white" type="button" disabled>
     <span class="material-icons" aria-hidden="true">chevron_right</span>
@@ -56,5 +68,15 @@
   </button>
   {{ end }}
 </div>
+
+<script>
+  document.getElementById("selRowsPerPage").addEventListener("change", function (event) {
+    let rows = document.getElementById("selRowsPerPage").value
+    let urlParams = new URLSearchParams(location.search);
+    urlParams.set("per_page", rows)
+    urlParams.set("page", "1")
+    location = location.pathname + "?" + urlParams.toString()
+  })
+</script>
 
 {{ end }}
