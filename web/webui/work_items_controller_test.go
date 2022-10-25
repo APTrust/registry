@@ -89,7 +89,7 @@ func TestWorkItemIndex(t *testing.T) {
 			testutil.AssertMatchesResultCount(t, html, 32)
 		} else {
 			testutil.AssertMatchesNone(t, html, adminFilters)
-			testutil.AssertMatchesResultCount(t, html, 17)
+			testutil.AssertMatchesResultCount(t, html, 16)
 		}
 	}
 

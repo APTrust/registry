@@ -73,8 +73,8 @@ func TestWorkItemIndex(t *testing.T) {
 	list = api.WorkItemViewList{}
 	err = json.Unmarshal([]byte(resp.Body().Raw()), &list)
 	require.Nil(t, err)
-	assert.Equal(t, 15, list.Count)
-	assert.Equal(t, 15, len(list.Results))
+	assert.Equal(t, 16, list.Count)
+	assert.Equal(t, 16, len(list.Results))
 	for _, item := range list.Results {
 		assert.Equal(t, tu.Inst2Admin.InstitutionID, item.InstitutionID)
 		assert.Equal(t, "institution2.edu", item.InstitutionIdentifier)

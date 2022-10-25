@@ -52,7 +52,7 @@ func TestObjectShow(t *testing.T) {
 		html := client.GET("/objects/show/1").Expect().
 			Status(http.StatusOK).Body().Raw()
 		testutil.AssertMatchesAll(t, html, items)
-		if client == testutil.Inst1AdminClient {
+		if client == testutil.Inst2AdminClient {
 			testutil.AssertMatchesAll(t, html, adminOnlyItems)
 		}
 	}
