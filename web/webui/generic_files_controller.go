@@ -49,6 +49,9 @@ func GenericFileShow(c *gin.Context) {
 	if AbortIfError(c, err) {
 		return
 	}
+	pendingFileWorkItems, _ := pgmodels.WorkItemsPendingForFile(file.ID)
+	req.TemplateData["hasPendingWorkItems"] = len(pendingFileWorkItems) > 0
+
 	c.HTML(http.StatusOK, "files/show.html", req.TemplateData)
 }
 

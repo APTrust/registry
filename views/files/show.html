@@ -82,11 +82,12 @@
     {{ if eq .file.State "A" }}
     <div class="modal-footer-row">
       {{ if userCan .CurrentUser "FileRequestDelete" .file.InstitutionID }}
-      <button class="button" data-modal="modal-one" data-xhr-url="/files/request_delete/{{ .file.ID }}">Delete</button>
+      <button class="button" data-modal="modal-one" data-xhr-url="/files/request_delete/{{ .file.ID }}" {{ if
+        .hasPendingWorkItems }} disabled title="This file cannot be deleted until pending work items complete." {{ end }}>Delete</button>
       {{ end }}
       {{ if userCan .CurrentUser "FileRestore" .file.InstitutionID }}
-      <button class="button" data-modal="modal-one"
-        data-xhr-url="/files/request_restore/{{ .file.ID }}">Restore</button>
+      <button class="button" data-modal="modal-one" data-xhr-url="/files/request_restore/{{ .file.ID }}" {{ if
+        .hasPendingWorkItems }} disabled title="This file cannot be restored until pending work items complete." {{ end }}>Restore</button>
       {{ end }}
     </div>
     {{ end }}
