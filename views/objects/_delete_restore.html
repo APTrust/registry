@@ -2,11 +2,21 @@
 
 <div class="is-flex is-justify-content-space-between mb-5">
     {{ if userCan .CurrentUser "IntellectualObjectRequestDelete" .object.InstitutionID }}
-    <button class="button is-primary is-outlined" data-modal="modal-one" data-xhr-url="/objects/request_delete/{{ .object.ID }}">Delete</button>
+      {{ if .hasPendingWorkItems }}
+        <button class="button" disabled title="Object cannot be deleted until pending work items are complete.">Delete</button>
+      {{ else }}
+        <button class="button is-primary is-outlined" data-modal="modal-one" data-xhr-url="/objects/request_delete/{{ .object.ID }}">Delete</button>
+      {{ end }}
     {{ end }}
+
     {{ if userCan .CurrentUser "IntellectualObjectRestore" .object.InstitutionID }}
-    <button class="button is-primary" data-modal="modal-one" data-xhr-url="/objects/request_restore/{{ .object.ID }}">Restore</button>
+      {{ if .hasPendingWorkItems }}
+      <button class="button" disabled title="Object cannot be restored until pending work items are complete.">Restore</button>
+      {{ else }}
+        <button class="button is-primary" data-modal="modal-one" data-xhr-url="/objects/request_restore/{{ .object.ID }}">Restore</button>
+      {{ end }}
     {{ end }}
+
 </div>
 
 {{ end }}

@@ -146,6 +146,10 @@ func IntellectualObjectShow(c *gin.Context) {
 		return
 	}
 	req.TemplateData["depositFormatStats"] = stats
+
+	pendingWorkItems, err := pgmodels.WorkItemsPendingForObject(object.InstitutionID, object.BagName)
+	req.TemplateData["hasPendingWorkItems"] = pendingWorkItems != nil && len(pendingWorkItems) > 0
+
 	c.HTML(http.StatusOK, "objects/show.html", req.TemplateData)
 }
 
