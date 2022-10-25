@@ -48,6 +48,7 @@ func DepositReportShow(c *gin.Context) {
 	storageOptionsList := depositStorageOptions(deposits)
 
 	req.TemplateData["deposits"] = deposits
+	req.TemplateData["isSingleInstitutionReport"] = params.InstitutionID > 0
 	req.TemplateData["filterForm"] = filterForm
 	req.TemplateData["reportParams"] = params
 	req.TemplateData["depositInstitutions"] = instList
