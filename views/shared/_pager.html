@@ -70,13 +70,15 @@
 </div>
 
 <script>
-  document.getElementById("selRowsPerPage").addEventListener("change", function (event) {
-    let rows = document.getElementById("selRowsPerPage").value
-    let urlParams = new URLSearchParams(location.search);
-    urlParams.set("per_page", rows)
-    urlParams.set("page", "1")
-    location = location.pathname + "?" + urlParams.toString()
-  })
+  if (document.getElementById("selRowsPerPage") != null) {
+    document.getElementById("selRowsPerPage").addEventListener("change", function (event) {
+      let rows = document.getElementById("selRowsPerPage").value
+      let urlParams = new URLSearchParams(location.search);
+      urlParams.set("per_page", rows)
+      urlParams.set("page", "1")
+      location = location.pathname + "?" + urlParams.toString()
+    })
+  }
 </script>
 
 {{ end }}
