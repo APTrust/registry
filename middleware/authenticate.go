@@ -17,6 +17,7 @@ import (
 func Authenticate() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		LoadCookies(c)
+		SetDefaultHeaders(c)
 		var user *pgmodels.User
 		var err error
 		if !ExemptFromAuth(c) {
@@ -126,6 +127,18 @@ func LoadCookie(c *gin.Context, name string) error {
 	}
 	c.Set(name, value)
 	return nil
+}
+
+// SetDefaultHeaders sets headers that we want to include with every response.
+// Note that it's OK for client to cache and store static resources such as
+// images, scripts and stylesheets. Those are public resources containing no
+// sensitive info. All other resources must use no-cache/no-store.
+func SetDefaultHeaders(c *gin.Context) {
+	p := c.FullPath()
+	if !strings.HasPrefix(p, "/static") && !strings.HasPrefix(p, "/favicon") {
+		c.Writer.Header().Set("Cache-Control", "no-cache")
+		c.Writer.Header().Set("Pragma", "no-store")
+	}
 }
 
 func forceCompletionOfPasswordChange(c *gin.Context, currentUser *pgmodels.User) bool {
