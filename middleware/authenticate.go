@@ -139,7 +139,18 @@ func SetDefaultHeaders(c *gin.Context) {
 		c.Writer.Header().Set("Cache-Control", "no-cache")
 		c.Writer.Header().Set("Pragma", "no-store")
 	}
-	c.Writer.Header().Set("Content-Security-Policy", "default-src 'self';font-src fonts.gstatic.com;style-src 'self' fonts.googleapis.com")
+
+	// This header tells the client to use HTTPS only. We can only set
+	// this on systems that have certificates (staging, demo, production);
+	// it won't work on dev/localhost setups, so check to see if config
+	// says to run in HTTPSOnly mode.
+	if common.Context().Config.Cookies.HTTPSOnly {
+		c.Writer.Header().Set("Strict-Transport-Security", "max-age=31536000")
+	}
+
+	// Set these security headers on all responses.
+	c.Writer.Header().Set("X-XSS-Protection", "1")
+	c.Writer.Header().Set("Content-Security-Policy", "default-src 'self'; font-src 'self' fonts.gstatic.com; style-src 'self' 'unsafe-inline' fonts.googleapis.com; script-src 'self' 'unsafe-inline'")
 }
 
 func forceCompletionOfPasswordChange(c *gin.Context, currentUser *pgmodels.User) bool {
