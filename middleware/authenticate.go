@@ -139,6 +139,7 @@ func SetDefaultHeaders(c *gin.Context) {
 		c.Writer.Header().Set("Cache-Control", "no-cache")
 		c.Writer.Header().Set("Pragma", "no-store")
 	}
+	c.Writer.Header().Set("Content-Security-Policy", "default-src 'self';font-src fonts.gstatic.com;style-src 'self' fonts.googleapis.com")
 }
 
 func forceCompletionOfPasswordChange(c *gin.Context, currentUser *pgmodels.User) bool {
