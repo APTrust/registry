@@ -153,10 +153,10 @@ func TestGetCountFromView(t *testing.T) {
 
 	count, err = pgmodels.GetCountFromView(q, pgmodels.WorkItem{})
 	require.Nil(t, err)
-	assert.EqualValues(t, 15, count)
+	assert.EqualValues(t, 16, count)
 	count, err = pgmodels.GetCountFromView(q, pgmodels.WorkItemView{})
 	require.Nil(t, err)
-	assert.EqualValues(t, 15, count)
+	assert.EqualValues(t, 16, count)
 
 	q.Where("state", "=", "A")
 	count, err = pgmodels.GetCountFromView(q, pgmodels.GenericFile{})
@@ -186,10 +186,10 @@ func TestGetCountFromView(t *testing.T) {
 	q2 := pgmodels.NewQuery().Where("institution_id", "=", 2).Where("action", "=", constants.ActionIngest)
 	count, err = pgmodels.GetCountFromView(q2, pgmodels.WorkItem{})
 	require.Nil(t, err)
-	assert.EqualValues(t, 14, count)
+	assert.EqualValues(t, 13, count)
 	count, err = pgmodels.GetCountFromView(q2, pgmodels.WorkItemView{})
 	require.Nil(t, err)
-	assert.EqualValues(t, 14, count)
+	assert.EqualValues(t, 13, count)
 
 	// GenericFile doesn't have the "action" column.
 	_, err = pgmodels.GetCountFromView(q2, pgmodels.GenericFile{})
