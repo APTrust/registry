@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"html/template"
 	"io"
-	"os"
 	"strings"
 
 	"github.com/APTrust/registry/common"
@@ -15,7 +14,6 @@ import (
 	common_api "github.com/APTrust/registry/web/api/common"
 	"github.com/APTrust/registry/web/webui"
 	"github.com/gin-contrib/logger"
-	"github.com/gin-gonic/autotls"
 	"github.com/gin-gonic/gin"
 )
 
@@ -23,15 +21,7 @@ import (
 // the app.
 func Run() {
 	r := InitAppEngine(false)
-	ctx := common.Context()
-	if ctx.Config.Cookies.HTTPSOnly && ctx.Config.Cookies.Domain != "localhost" {
-		err := autotls.Run(r, ctx.Config.Cookies.Domain)
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err.Error())
-		}
-	} else {
-		r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
-	}
+	r.Run()
 }
 
 // InitAppEngine sets up the whole Gin application, loading templates and
