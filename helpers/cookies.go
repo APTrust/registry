@@ -41,6 +41,7 @@ func SetCookie(c CookieSetter, name, value string) error {
 }
 
 func DeleteCookie(c CookieSetter, name string) {
+	c.SetSameSite(http.SameSiteStrictMode)
 	ctx := common.Context()
 	c.SetCookie(
 		name,
