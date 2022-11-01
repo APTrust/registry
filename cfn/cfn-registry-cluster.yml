@@ -187,7 +187,7 @@ Resources:
         - Condition: SUCCESS
           ContainerName: Nsqadmin_ResolvConf_InitContainer
         Essential: true 
-        Image: docker.io/aptrust/registry:0838702-master 
+        Image: docker.io/aptrust/registry:eebdbfb-master 
         Secrets:
         - Name: APT_ENV
           ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/APT_ENV'
@@ -322,6 +322,7 @@ Resources:
         - CertificateArn: 'arn:aws:acm:us-east-1:997427182289:certificate/da1d8b64-3898-4585-b559-94617e423b51'
       Port: 443
       Protocol: HTTPS
+      SslPolicy: 'ELBSecurityPolicy-FS-1-2-2019-08'
 
   RegistryTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
