@@ -448,11 +448,6 @@ components:
         sha512:
           type: string
           description: The most recent sha512 digest for this file.
-        storage_records:
-          description: A list of storage records for this file. Each record points to a copy of this file in a preservation storage bucket.
-          type: array
-          items:
-            $ref: '#/components/schemas/StorageRecord'
         created_at:
           type: string
           format: date-time
