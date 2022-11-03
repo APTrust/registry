@@ -162,8 +162,11 @@ fi
 
 echo "Killing Redis pid $REDIS_PID"
 kill $REDIS_PID
+sleep 1
 
-#rm *.dat
+echo "Cleaning up NSQ data files"
+rm nsqd.dat
+rm *diskqueue*.dat
 
 if [[ $1 == "test" && $EXIT_CODE == 0 ]]; then
     echo "**** 😁 PASS 😁 ****"
