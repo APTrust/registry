@@ -297,7 +297,7 @@ func TestUserSignInSignOut(t *testing.T) {
 	dashboardItems := []string{
 		"Recent Work Items",
 		"Notifications",
-		"Deposits by Storage Option",
+		// "Deposits by Storage Option",  // Temporarily turned off due to performance issue in prod
 	}
 	testutil.AssertMatchesAll(t, html, dashboardItems)
 

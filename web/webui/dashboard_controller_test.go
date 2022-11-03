@@ -14,7 +14,7 @@ func TestDashboardShow(t *testing.T) {
 	sections := []string{
 		"Recent Work Items",
 		"Notifications",
-		"Deposits by Storage Option",
+		// "Deposits by Storage Option",  // --> Temporarily turned off due to performance on prod
 	}
 	for _, client := range testutil.AllClients {
 		html := client.GET("/dashboard").Expect().
