@@ -214,6 +214,7 @@ drop index if exists index_work_items_on_institution_id_and_date;
 
 create index if not exists index_work_items_on_date_processed on work_items(date_processed);
 create index if not exists index_work_items_on_inst_id_and_date_processed on work_items(institution_id, date_processed);
+create index if not exists index_work_items_etag_instid_and_name on work_items(etag, institution_id, name);
 
 -- These columns are unnecessary in the premis_events table.
 -- We can get them by joining other tables in a view.
