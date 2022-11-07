@@ -169,7 +169,7 @@ func dropEverything(db *pg.DB) error {
 // Views will be loaded separately below.
 func loadSchema(db *pg.DB) error {
 	panicOnWrongEnv()
-	file := filepath.Join("db", "schema.sql")
+	file := filepath.Join("db", "pharos", "schema.sql")
 	ddl, err := common.LoadRelativeFile(file)
 	if err != nil {
 		return fmt.Errorf("File %s: %v", file, err)
@@ -180,7 +180,7 @@ func loadSchema(db *pg.DB) error {
 // Run all db migrations
 func runMigrations(db *pg.DB) error {
 	panicOnWrongEnv()
-	file := filepath.Join("db", "migrations.sql")
+	file := filepath.Join("db", "pharos", "migrations.sql")
 	ddl, err := common.LoadRelativeFile(file)
 	if err != nil {
 		return fmt.Errorf("File %s: %v", file, err)
@@ -191,7 +191,7 @@ func runMigrations(db *pg.DB) error {
 // Recreate the views.
 func loadViews(db *pg.DB) error {
 	panicOnWrongEnv()
-	file := filepath.Join("db", "views.sql")
+	file := filepath.Join("db", "pharos", "views.sql")
 	ddl, err := common.LoadRelativeFile(file)
 	if err != nil {
 		return fmt.Errorf("File %s: %v", file, err)
