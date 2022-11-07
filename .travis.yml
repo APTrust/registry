@@ -16,7 +16,7 @@ addons:
       - postgresql-client-13
 before_script:
   - psql -c "create database apt_registry_travis with LC_COLLATE='en_US.UTF-8';"
-  - psql -d apt_registry_travis -a -f ./db/schema.sql
+  - psql -d apt_registry_travis -a -f ./db/pharos/schema.sql
   - "./bin/linux/cc-test-reporter before-build"
 script:
   - "./registry cover"
