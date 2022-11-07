@@ -70,7 +70,7 @@
         <td class="is-grey-dark num text-sm">{{ humanSize $item.Size }}</td>
         <td class="is-grey-dark">{{ $item.Stage }}</td>
         <td><span class="badge {{ badgeClass $item.Status }}">{{ $item.Status }}</span></td>
-        <td class="is-grey-dark text-sm is-uppercase">{{ dateUS $item.DateProcessed }}</td>
+        <td class="is-grey-dark text-sm is-uppercase">{{ dateUS $item.UpdatedAt }}</td>
       </tr>
       {{ end }}
     </tbody>
