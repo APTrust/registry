@@ -1,8 +1,8 @@
 -- migration_001.sql
 --
 -- This migration improves support for reporting and deposit stats
--- by created cached reports and a materialized view that can be 
--- updated offline. It also makes changes to the existing 
+-- by creating cached reports and a materialized view that can be 
+-- updated asynchronously. It also makes changes to the existing 
 -- "slow count" materialized views, to avoid updating them unnecessarily.
 
 -- historical_deposit_stats contains a snapshot of deposits for each
