@@ -2,6 +2,7 @@ package db
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -121,10 +122,6 @@ func LoadFixtures() error {
 			ctx.Log.Error().Stack().Err(err).Msg("")
 			return err
 		}
-		// if err := loadViews(ctx.DB); err != nil {
-		// 	ctx.Log.Error().Stack().Err(err).Msg("")
-		// 	return err
-		// }
 		if err := loadCSVFiles(ctx.DB); err != nil {
 			ctx.Log.Error().Stack().Err(err).Msg("")
 			return err
@@ -185,24 +182,26 @@ func loadSchema(db *pg.DB) error {
 // Run all db migrations
 func runMigrations(db *pg.DB) error {
 	panicOnWrongEnv()
-	file := filepath.Join("db", "migrations", "001_deposit_stats.sql")
-	ddl, err := common.LoadRelativeFile(file)
-	if err != nil {
-		return fmt.Errorf("File %s: %v", file, err)
-	}
-	return runTransaction(db, string(ddl))
+	dir := filepath.Join(common.ProjectRoot(), "db", "migrations")
+	return filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		file := info.Name()
+		if info.Mode().IsRegular() && strings.HasSuffix(file, ".sql") {
+			absPath := filepath.Join(dir, file)
+			ddl, err := ioutil.ReadFile(absPath)
+			if err != nil {
+				return fmt.Errorf("File %s: %v", file, err)
+			}
+			err = runTransaction(db, string(ddl))
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	})
 }
-
-// // Recreate the views.
-// func loadViews(db *pg.DB) error {
-// 	panicOnWrongEnv()
-// 	file := filepath.Join("db", "pharos", "views.sql")
-// 	ddl, err := common.LoadRelativeFile(file)
-// 	if err != nil {
-// 		return fmt.Errorf("File %s: %v", file, err)
-// 	}
-// 	return runTransaction(db, string(ddl))
-// }
 
 // Load all fixture data from CSV files.
 func loadCSVFiles(db *pg.DB) error {
