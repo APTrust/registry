@@ -133,8 +133,13 @@ func LoadFixtures() error {
 			ctx.Log.Error().Stack().Err(err).Msg("")
 			return err
 		}
-		// Populate the counts in our *_counts views.
+		// Populate the counts in our *_counts (materialized views).
 		_, err := ctx.DB.Exec("select update_counts();")
+		if err != nil {
+			return err
+		}
+		// Populate current deposit stats (materialized view).
+		_, err = ctx.DB.Exec("select update_current_deposit_stats();")
 		if err != nil {
 			return err
 		}

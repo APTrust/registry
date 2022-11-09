@@ -110,3 +110,86 @@ from
 left join storage_options so on so."name" = stats.storage_option
 left join institutions i2 on i2."name" = stats.institution_name
 order by stats.institution_name, stats.storage_option;
+
+
+-- We also want to add a timestamp to the slow counts views
+-- to include a timestamp, so we know when they were last updated.
+-- This helps prevent excessive refreshing of these views.
+-- The refresh is slow and expensive in terms of read operations.
+
+
+-- premis_event_counts
+drop materialized view premis_event_counts;
+create materialized view premis_event_counts as
+	select institution_id, count(id) as row_count, event_type, outcome, current_timestamp as updated_at
+	from premis_events group by cube(institution_id, event_type, outcome)
+	order by institution_id, event_type, outcome;
+
+-- intellectual_object_counts
+drop materialized view intellectual_object_counts;
+create materialized view intellectual_object_counts as
+	select institution_id, count(id) as row_count, "state", current_timestamp as updated_at 
+	from intellectual_objects group by cube(institution_id, "state")
+	order by institution_id, state; 
+
+-- generic_file_counts
+drop materialized view generic_file_counts;
+create materialized view generic_file_counts as
+	select institution_id, count(id) as row_count, "state", current_timestamp as updated_at
+	from generic_files group by cube(institution_id, "state")
+	order by institution_id, state; 
+
+-- work_item_counts
+drop materialized view work_item_counts;
+create materialized view work_item_counts as
+	select institution_id, count(id) as row_count, "action", current_timestamp as updated_at
+	from work_items group by cube(institution_id, "action")
+	order by institution_id, "action";
+
+-- Update counts at most once per hour.
+-- The second part of the if condition tests to see if the view
+-- is essentially empty, which happens after setup for local 
+-- development and testing. This doesn't happen in staging, demo,
+-- or production.
+CREATE OR REPLACE FUNCTION update_counts()
+  RETURNS integer
+AS
+$BODY$
+  begin
+    if exists (select 1 from work_item_counts where updated_at < (current_timestamp - interval '60 minutes')) or not exists (select * from work_item_counts where institution_id is not null limit 1) then
+	    refresh materialized view premis_event_counts;
+    	refresh materialized view intellectual_object_counts;
+    	refresh materialized view generic_file_counts;
+    	refresh materialized view work_item_counts;    
+	    return 1;
+	end if;
+	return 0;
+  end;
+$BODY$
+LANGUAGE plpgsql VOLATILE;
+
+-- Update deposit stats at most once per hour.
+-- See note for update_counts() for info on the second if condition.
+CREATE OR REPLACE FUNCTION update_current_deposit_stats()
+  RETURNS integer
+AS
+$BODY$
+  begin
+    if exists (select 1 from current_deposit_stats where end_date < (current_timestamp - interval '60 minutes')) or not exists (select * from current_deposit_stats where institution_id is not null limit 1) then
+    	refresh materialized view current_deposit_stats;
+	    return 1;
+	end if;
+	return 0;
+  end;
+$BODY$
+LANGUAGE plpgsql VOLATILE;
+
+
+-- Now populate the materialized views.
+-- In staging, demo and production systems, this will populate
+-- the views with actual data. In dev and test systems, the 
+-- views will remain empty because there's not data until we
+-- load the fixtures, so we'll have to call these functions
+-- again from within our tests to properly populate the views.
+select update_counts();
+select update_current_deposit_stats();
