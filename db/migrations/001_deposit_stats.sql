@@ -14,7 +14,7 @@
 --
 -- We insert into this table once a month using the function
 -- populate_historical_deposit_stats().
-create table if not exists historical_deposit_stats (
+create table historical_deposit_stats (
 	institution_id     bigint,
 	institution_name   varchar(80),
 	storage_option     varchar(40),
@@ -83,7 +83,7 @@ LANGUAGE plpgsql VOLATILE;
 -- 
 -- We can refresh this at any time using
 -- refresh materialized view current_deposit_stats
-create materialized view if not exists current_deposit_stats as
+create materialized view current_deposit_stats as
 select
   i2.id as institution_id,
   coalesce(stats.institution_name, 'Total') as institution_name,
@@ -116,31 +116,32 @@ order by stats.institution_name, stats.storage_option;
 -- to include a timestamp, so we know when they were last updated.
 -- This helps prevent excessive refreshing of these views.
 -- The refresh is slow and expensive in terms of read operations.
-
+--
+-- We need to drop these views first, then re-create them.
 
 -- premis_event_counts
-drop materialized view premis_event_counts;
+drop materialized view if exists premis_event_counts;
 create materialized view premis_event_counts as
 	select institution_id, count(id) as row_count, event_type, outcome, current_timestamp as updated_at
 	from premis_events group by cube(institution_id, event_type, outcome)
 	order by institution_id, event_type, outcome;
 
 -- intellectual_object_counts
-drop materialized view intellectual_object_counts;
+drop materialized view if exists intellectual_object_counts;
 create materialized view intellectual_object_counts as
 	select institution_id, count(id) as row_count, "state", current_timestamp as updated_at 
 	from intellectual_objects group by cube(institution_id, "state")
 	order by institution_id, state; 
 
 -- generic_file_counts
-drop materialized view generic_file_counts;
+drop materialized view if exists generic_file_counts;
 create materialized view generic_file_counts as
 	select institution_id, count(id) as row_count, "state", current_timestamp as updated_at
 	from generic_files group by cube(institution_id, "state")
 	order by institution_id, state; 
 
 -- work_item_counts
-drop materialized view work_item_counts;
+drop materialized view if exists work_item_counts;
 create materialized view work_item_counts as
 	select institution_id, count(id) as row_count, "action", current_timestamp as updated_at
 	from work_items group by cube(institution_id, "action")

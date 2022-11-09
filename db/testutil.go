@@ -94,6 +94,15 @@ var DropOrder = []string{
 	"institutions",
 	"roles",
 	"storage_options",
+	"historical_deposit_stats",
+}
+
+var MaterializedViewDropOrder = []string{
+	"current_deposit_stats",
+	"premis_event_counts",
+	"intellectual_object_counts",
+	"generic_file_counts",
+	"work_item_counts",
 }
 
 // LoadFixtures wipes out and resets the test database, loading
@@ -159,6 +168,13 @@ func dropEverything(db *pg.DB) error {
 	// Drop all tables
 	for _, table := range DropOrder {
 		sql := fmt.Sprintf(`drop table if exists "%s" cascade`, table)
+		err := runTransaction(db, sql)
+		if err != nil {
+			return err
+		}
+	}
+	for _, materializedView := range MaterializedViewDropOrder {
+		sql := fmt.Sprintf(`drop materialized view if exists "%s"`, materializedView)
 		err := runTransaction(db, sql)
 		if err != nil {
 			return err
