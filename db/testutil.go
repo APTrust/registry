@@ -121,10 +121,10 @@ func LoadFixtures() error {
 			ctx.Log.Error().Stack().Err(err).Msg("")
 			return err
 		}
-		if err := loadViews(ctx.DB); err != nil {
-			ctx.Log.Error().Stack().Err(err).Msg("")
-			return err
-		}
+		// if err := loadViews(ctx.DB); err != nil {
+		// 	ctx.Log.Error().Stack().Err(err).Msg("")
+		// 	return err
+		// }
 		if err := loadCSVFiles(ctx.DB); err != nil {
 			ctx.Log.Error().Stack().Err(err).Msg("")
 			return err
@@ -169,7 +169,7 @@ func dropEverything(db *pg.DB) error {
 // Views will be loaded separately below.
 func loadSchema(db *pg.DB) error {
 	panicOnWrongEnv()
-	file := filepath.Join("db", "pharos", "schema.sql")
+	file := filepath.Join("db", "initial_launch_schema.sql")
 	ddl, err := common.LoadRelativeFile(file)
 	if err != nil {
 		return fmt.Errorf("File %s: %v", file, err)
@@ -180,7 +180,7 @@ func loadSchema(db *pg.DB) error {
 // Run all db migrations
 func runMigrations(db *pg.DB) error {
 	panicOnWrongEnv()
-	file := filepath.Join("db", "pharos", "migrations.sql")
+	file := filepath.Join("db", "migrations", "001_deposit_stats.sql")
 	ddl, err := common.LoadRelativeFile(file)
 	if err != nil {
 		return fmt.Errorf("File %s: %v", file, err)
@@ -188,16 +188,16 @@ func runMigrations(db *pg.DB) error {
 	return runTransaction(db, string(ddl))
 }
 
-// Recreate the views.
-func loadViews(db *pg.DB) error {
-	panicOnWrongEnv()
-	file := filepath.Join("db", "pharos", "views.sql")
-	ddl, err := common.LoadRelativeFile(file)
-	if err != nil {
-		return fmt.Errorf("File %s: %v", file, err)
-	}
-	return runTransaction(db, string(ddl))
-}
+// // Recreate the views.
+// func loadViews(db *pg.DB) error {
+// 	panicOnWrongEnv()
+// 	file := filepath.Join("db", "pharos", "views.sql")
+// 	ddl, err := common.LoadRelativeFile(file)
+// 	if err != nil {
+// 		return fmt.Errorf("File %s: %v", file, err)
+// 	}
+// 	return runTransaction(db, string(ddl))
+// }
 
 // Load all fixture data from CSV files.
 func loadCSVFiles(db *pg.DB) error {
