@@ -11,6 +11,7 @@ func initCronJobs(ctx *APTContext) {
 	if !cronJobsInitialized {
 		ctx.Log.Info().Msg("Initializing cron jobs")
 		updateSlowCounts(ctx)
+		updateDepositStats(ctx)
 		cronJobsInitialized = true
 	}
 }
@@ -29,7 +30,10 @@ func initCronJobs(ctx *APTContext) {
 // every hour in an async go routine that will not block requests.
 //
 // In all our use cases, hour-old counts are tolerable. For more on these
-// views, see db/views.sql.
+// views, see db/migrations/001_deposit_stats.sql.
+//
+// If we have multiple instance of Registry running in multiple containers,
+// the DB ensures that this function runs no more than once per hour.
 func updateSlowCounts(ctx *APTContext) {
 	if !cronJobsInitialized {
 		go func() {
@@ -42,7 +46,34 @@ func updateSlowCounts(ctx *APTContext) {
 				if err != nil {
 					ctx.Log.Error().Msgf("cron: update_counts failed after %f seconds: %s", duration, err.Error())
 				} else {
-					ctx.Log.Info().Msgf("cron: update_counts completed after %f seconds", duration)
+					ctx.Log.Info().Msgf("cron: update_counts completed after %f seconds.  (Less than one second indicates counts did not need to be updated.)", duration)
+				}
+				time.Sleep(1 * time.Hour)
+			}
+		}()
+	}
+}
+
+// updateDepositStats updates info about the quantity of depositor
+// data in the system. This data appears on the dashboard after login,
+// and in the "Reports" section. These queries take way too long to run,
+// so we run them asynchronously once every hour.
+//
+// If we have multiple instance of Registry running in multiple containers,
+// the DB ensures that this function runs no more than once per hour.
+func updateDepositStats(ctx *APTContext) {
+	if !cronJobsInitialized {
+		go func() {
+			for {
+				ctx.Log.Info().Msg("cron: starting update_current_deposit_stats()")
+				start := time.Now().UTC()
+				_, err := ctx.DB.Exec("select update_current_deposit_stats()")
+				end := time.Now().UTC()
+				duration := end.Sub(start).Seconds()
+				if err != nil {
+					ctx.Log.Error().Msgf("cron: update_current_deposit_stats failed after %f seconds: %s", duration, err.Error())
+				} else {
+					ctx.Log.Info().Msgf("cron: update_current_deposit_stats completed after %f seconds. (Less than one second indicates stats did not need to be updated.)", duration)
 				}
 				time.Sleep(1 * time.Hour)
 			}
