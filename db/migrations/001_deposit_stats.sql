@@ -4,6 +4,19 @@
 -- by creating cached reports and a materialized view that can be 
 -- updated asynchronously. It also makes changes to the existing 
 -- "slow count" materialized views, to avoid updating them unnecessarily.
+--
+-- It also adds support for tracking migrations and tracking whether
+-- some long-running queries/functions are currently running.
+
+
+-- Let's start tracking our schema migrations.
+alter table schema_migrations add column if not exists started_at timestamp not null;
+alter table schema_migrations add column if not exists finished_at timestamp null;
+
+-- Note that we're starting the migration.
+insert into schema_migrations ("version", started_at) values ('001_deposit_stats', now())
+on conflict ("version") do update set started_at = now();
+
 
 -- historical_deposit_stats contains a snapshot of deposits for each
 -- month, going back to 2014, when APTrust first launched. The end_date
@@ -199,6 +212,7 @@ create materialized view work_item_counts as
 	from work_items group by cube(institution_id, "action")
 	order by institution_id, "action";
 
+
 -- Update counts at most once per hour.
 -- The second part of the if condition tests to see if the view
 -- is essentially empty, which happens after setup for local 
@@ -210,16 +224,30 @@ AS
 $BODY$
   begin
     if exists (select 1 from work_item_counts where updated_at < (current_timestamp - interval '60 minutes')) or not exists (select * from work_item_counts where institution_id is not null limit 1) then
-	    refresh materialized view premis_event_counts;
-    	refresh materialized view intellectual_object_counts;
-    	refresh materialized view generic_file_counts;
-    	refresh materialized view work_item_counts;    
-	    return 1;
+    	if not exists (select 1 from ar_internal_metadata where "key"='update counts is running' and "value" = 'true') then 
+
+			-- Use ar_internal_metadata to track whether this function is running.
+			-- These are some long-running queries, especially for premis events.
+			-- we want to avoid the case where this function gets kicked off while
+			-- a previous iteration is still in progress.
+    		insert into ar_internal_metadata ("key", "value", created_at, updated_at) values ('update counts is running', 'true', now(), now())
+    		on conflict("key") do update set "value" = 'true';
+    	
+	    	refresh materialized view premis_event_counts;
+    		refresh materialized view intellectual_object_counts;
+    		refresh materialized view generic_file_counts;
+    		refresh materialized view work_item_counts;    
+
+    		update ar_internal_metadata set "value" = 'false', updated_at = now() where "key" = 'update counts is running';
+
+    		return 1;
+	   	end if;
 	end if;
 	return 0;
   end;
 $BODY$
 LANGUAGE plpgsql VOLATILE;
+
 
 -- Update deposit stats at most once per hour.
 -- See note for update_counts() for info on the second if condition.
@@ -237,14 +265,6 @@ $BODY$
 $BODY$
 LANGUAGE plpgsql VOLATILE;
 
-
--- Let's start tracking our schema migrations.
-alter table schema_migrations add column if not exists started_at timestamp not null;
-alter table schema_migrations add column if not exists finished_at timestamp null;
-
--- Note that we're starting the migration.
-insert into schema_migrations ("version", started_at) values ('001_deposit_stats', now())
-on conflict ("version") do update set started_at = now();
 
 -- Now populate the materialized views.
 -- In staging, demo and production systems, this will populate
