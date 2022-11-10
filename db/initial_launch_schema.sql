@@ -6,7 +6,8 @@
 -- tables.
 -- 
 -- We may drop some of these in future, though we may need to keep the
--- bulk delete tables for auditing.
+-- bulk delete tables for auditing. And we will keep ar_internal_metadata
+-- and schema_migrations because they're useful.
 
 
 

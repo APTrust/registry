@@ -238,6 +238,14 @@ $BODY$
 LANGUAGE plpgsql VOLATILE;
 
 
+-- Let's start tracking our schema migrations.
+alter table schema_migrations add column if not exists started_at timestamp not null;
+alter table schema_migrations add column if not exists finished_at timestamp null;
+
+-- Note that we're starting the migration.
+insert into schema_migrations ("version", started_at) values ('001_deposit_stats', now())
+on conflict ("version") do update set started_at = now();
+
 -- Now populate the materialized views.
 -- In staging, demo and production systems, this will populate
 -- the views with actual data. This will take several minutes,
@@ -250,3 +258,6 @@ LANGUAGE plpgsql VOLATILE;
 select update_counts();
 select update_current_deposit_stats();
 select populate_all_historical_deposit_stats();
+
+-- Now note that the migration is complete.
+update schema_migrations set finished_at = now() where "version" = '001_deposit_stats';
