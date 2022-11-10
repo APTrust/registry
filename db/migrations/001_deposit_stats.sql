@@ -97,14 +97,32 @@ DECLARE
    current_month   INTEGER := date_part('month', now());
    start_year      INTEGER := 2014;
    start_month     INTEGER := 1;
+   already_populating VARCHAR;
 BEGIN 
-	for year in start_year..current_year loop
-   		for month in 1..12 loop
-	   		if make_timestamp(year, month,1,0,0,0) < now() then
-	   			perform populate_historical_deposit_stats(make_timestamp(year, month,1,0,0,0));
-    		end if;
+	select "value" into already_populating from ar_internal_metadata where "key" = 'historical deposit stats is running';
+	raise notice '%', already_populating;
+	if (already_populating is null or already_populating != 'true') then	
+		-- Set a flag in ar_internal_metadata so know this process is running.
+		-- We do this because multiple Registry containers may call this function 
+		-- while it's already running (on the first of the month). This is a long-running
+		-- select/insert query, and we don't want to overtax the DB, nor do we want
+		-- to end up with duplicate rows in the historical_deposit_stats table.
+		insert into ar_internal_metadata ("key", "value", created_at, updated_at) 
+		values ('historical deposit stats is running', 'true', now(), now())
+		on conflict ("key") do 
+		update set "value" = 'true', updated_at = now();
+		
+		for year in start_year..current_year loop
+   			for month in 1..12 loop
+	   			if make_timestamp(year, month,1,0,0,0) < now() then
+	   				perform populate_historical_deposit_stats(make_timestamp(year, month,1,0,0,0));
+	    		end if;
+   			end loop;
    		end loop;
-   	end loop;
+   	
+   		-- Now clear the metadata flag.
+   		update ar_internal_metadata set "value" = 'false' where key = 'historical deposit stats is running';
+   	end if;
 end; 
 $BODY$
 LANGUAGE plpgsql VOLATILE;
