@@ -27,7 +27,9 @@ create table historical_deposit_stats (
 	monthly_cost       double precision,
 	end_date           timestamp
 );		
-
+create index ix_historical_deposit_stats_inst_id on historical_deposit_stats(institution_id);
+create index ix_historical_deposit_stats_storage_option on historical_deposit_stats(storage_option);
+create index ix_historical_deposit_stats_end_date on historical_deposit_stats(end_date);
 
 -- This function populates the historical_deposit_stats table with 
 -- numbers up to the end of the prior month. E.g. If end_date
@@ -44,13 +46,13 @@ $BODY$
 			  i2.id as institution_id,
 			  coalesce(stats.institution_name, 'Total') as institution_name,
 			  coalesce(stats.storage_option, 'Total') as storage_option,
-			  stats.file_count,
-			  stats.object_count,
-			  stats.total_bytes,
-			  (stats.total_bytes / 1073741824) as total_gb,
-			  (stats.total_bytes / 1099511627776) as total_tb,
-			  so.cost_gb_per_month,
-			  ((stats.total_bytes / 1073741824) * so.cost_gb_per_month) as monthly_cost,
+			  coalesce(stats.file_count, 0) as file_count,
+			  coalesce(stats.object_count, 0) as object_count,
+			  coalesce(stats.total_bytes, 0) as total_bytes,
+			  coalesce((stats.total_bytes / 1073741824), 0) as total_gb,
+			  coalesce((stats.total_bytes / 1099511627776), 0) as total_tb,
+			  coalesce(so.cost_gb_per_month, 0) as cost_gb_per_month,
+			  coalesce(((stats.total_bytes / 1073741824) * so.cost_gb_per_month), 0) as monthly_cost,
 			  stop_date as end_date
 			from
 			  (select
@@ -76,6 +78,38 @@ $BODY$
 LANGUAGE plpgsql VOLATILE;
 
 
+-- populate_all_historical_deposit_stats fills in historical deposit stats
+-- for every month between January, 2014 and last month. We call this as a 
+-- cron job from the Registry. Note that the underlying function, 
+-- populate_historical_deposit_stats does no work if the stats for the
+-- requested date already exist in the historical_deposit_stats table.
+-- The stats queries are expensive, so we want to avoid running them when
+-- they're not necessary.
+--
+-- Since Registry runs this as a cron job in the background, it will not
+-- slow requests from users.
+create or replace function populate_all_historical_deposit_stats() 
+	returns void
+as 
+$BODY$
+DECLARE
+   current_year    INTEGER := date_part('year', now());
+   current_month   INTEGER := date_part('month', now());
+   start_year      INTEGER := 2014;
+   start_month     INTEGER := 1;
+BEGIN 
+	for year in start_year..current_year loop
+   		for month in 1..12 loop
+	   		if make_timestamp(year, month,1,0,0,0) < now() then
+	   			perform populate_historical_deposit_stats(make_timestamp(year, month,1,0,0,0));
+    		end if;
+   		end loop;
+   	end loop;
+end; 
+$BODY$
+LANGUAGE plpgsql VOLATILE;
+
+
 -- current_deposit_stats contains current deposit stats.
 -- We update this hourly. These stats take a few minutes to
 -- gather, and we don't want to collect them while a user
@@ -83,7 +117,7 @@ LANGUAGE plpgsql VOLATILE;
 -- 
 -- We can refresh this at any time using
 -- refresh materialized view current_deposit_stats
-create materialized view current_deposit_stats as
+create materialized view if not exists current_deposit_stats as
 select
   i2.id as institution_id,
   coalesce(stats.institution_name, 'Total') as institution_name,
@@ -188,9 +222,13 @@ LANGUAGE plpgsql VOLATILE;
 
 -- Now populate the materialized views.
 -- In staging, demo and production systems, this will populate
--- the views with actual data. In dev and test systems, the 
--- views will remain empty because there's not data until we
--- load the fixtures, so we'll have to call these functions
--- again from within our tests to properly populate the views.
+-- the views with actual data. This will take several minutes,
+-- and possible up to an hour to run on the production system.
+-- 
+-- In dev and test systems, the views will remain empty because 
+-- there's no data until we load the fixtures, so we'll have to 
+-- call these functions again from within our tests to properly 
+-- populate the views.
 select update_counts();
 select update_current_deposit_stats();
+select populate_all_historical_deposit_stats();

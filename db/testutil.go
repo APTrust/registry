@@ -139,14 +139,8 @@ func LoadFixtures() error {
 			ctx.Log.Error().Stack().Err(err).Msg("")
 			return err
 		}
-		// Populate the counts in our *_counts (materialized views).
-		_, err := ctx.DB.Exec("select update_counts();")
-		if err != nil {
-			return err
-		}
-		// Populate current deposit stats (materialized view).
-		_, err = ctx.DB.Exec("select update_current_deposit_stats();")
-		if err != nil {
+		if err := populateCountsAndStats(ctx.DB); err != nil {
+			ctx.Log.Error().Stack().Err(err).Msg("")
 			return err
 		}
 		fixturesLoaded = true
@@ -301,6 +295,37 @@ func runTransaction(db *pg.DB, sql string, params ...interface{}) error {
 		_, err := db.Exec(sql, params)
 		return err
 	})
+}
+
+// populate tables and materialized views that cache data from
+// expensive queries: counts and deposit stats.
+func populateCountsAndStats(db *pg.DB) error {
+	// Populate the counts in our *_counts (materialized views).
+	_, err := db.Exec("select update_counts();")
+	if err != nil {
+		return err
+	}
+
+	// Populate current deposit stats (materialized view).
+	_, err = db.Exec("select update_current_deposit_stats();")
+	if err != nil {
+		return err
+	}
+
+	// Since historical_deposit_stats is a table and not a
+	// materialized view, we need to empty it before re-populating it.
+	// This table is initially populated by the migration 001_deposit_stats.sql
+	// before the fixtures are loaded, so it will be full of zeroes.
+	// We want to empty and re-populate it after fixtures are loaded,
+	// so it has non-zero values.
+	_, err = db.Exec("delete from historical_deposit_stats")
+	if err != nil {
+		return err
+	}
+
+	// Populate all historical deposit stats (data goes into a table).
+	_, err = db.Exec("select populate_all_historical_deposit_stats();")
+	return err
 }
 
 // Blow up and die if this is run in any environment other than "test",
