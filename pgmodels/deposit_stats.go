@@ -41,7 +41,6 @@ type DepositStats struct {
 func DepositStatsSelect(institutionID int64, storageOption string, endDate time.Time) ([]*DepositStats, error) {
 	var stats []*DepositStats
 	statsQuery := getDepositStatsQuery(institutionID, storageOption, endDate)
-	fmt.Println(statsQuery, "INST", institutionID, "STOR", storageOption, "END", endDate)
 	_, err := common.Context().DB.Query(&stats, statsQuery,
 		institutionID, institutionID,
 		storageOption, storageOption,
@@ -92,40 +91,3 @@ func getDepositStatsQuery(institutionID int64, storageOption string, endDate tim
 	}
 	return fmt.Sprintf(q, tableName)
 }
-
-// Basic depost stats query. Use the "is null / or" trick to deal with
-// filters that may or may not be present.
-//
-// This is used on the deposits report page.
-//
-// TODO: Consider filtering on created_at instead of updated_at.
-const depositStatsQuery = `
-		select
-		  coalesce(stats.institution_name, 'Total') as institution_name,
-		  i2.id as institution_id,
-		  coalesce(stats.storage_option, 'Total') as storage_option,
-		  stats.file_count,
-		  stats.object_count,
-		  stats.total_bytes,
-		  (stats.total_bytes / 1073741824) as total_gb,
-		  (stats.total_bytes / 1099511627776) as total_tb,
-		  so.cost_gb_per_month,
-		  ((stats.total_bytes / 1073741824) * so.cost_gb_per_month) as monthly_cost
-		from
-		  (select
-			i."name" as institution_name,
-			count(gf.id) as file_count,
-			count(distinct(gf.intellectual_object_id)) as object_count,
-			sum(gf.size) as total_bytes,
-			gf.storage_option
-		  from generic_files gf
-		  left join institutions i on i.id = gf.institution_id
-		  where gf.state = 'A'
-		  and (? = 0 or i.id = ?)
-		  and (? = '' or gf.storage_option = ?)
-		  and (? = '0001-01-01 00:00:00+00:00:00' or gf.updated_at < ?)
-		  group by cube (i."name", gf.storage_option)) stats
-		left join storage_options so on so."name" = stats.storage_option
-		left join institutions i2 on i2."name" = stats.institution_name
-		order by stats.institution_name, stats.storage_option
-`

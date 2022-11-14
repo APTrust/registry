@@ -25,7 +25,7 @@ func loadDashData(r *Request) error {
 	if err != nil {
 		return err
 	}
-	//err = loadDashDeposits(r)
+	err = loadDashDeposits(r)
 	return err
 }
 
