@@ -3,8 +3,11 @@ package webui
 import (
 	"time"
 
+	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/gin-gonic/gin"
+	"golang.org/x/text/language"
+	"golang.org/x/text/message"
 )
 
 func DashboardShow(c *gin.Context) {
@@ -25,6 +28,7 @@ func loadDashData(r *Request) error {
 	if err != nil {
 		return err
 	}
+	loadDashStats(r)
 	err = loadDashDeposits(r)
 	return err
 }
@@ -73,4 +77,36 @@ func loadDashDeposits(r *Request) error {
 
 	r.TemplateData["depositStats"] = filteredStats
 	return nil
+}
+
+func loadDashStats(r *Request) {
+
+	p := message.NewPrinter(language.English)
+
+	query := pgmodels.NewQuery()
+	if !r.Auth.CurrentUser().IsAdmin() {
+		query.Where("institution_id", "=", r.Auth.CurrentUser().InstitutionID)
+	}
+
+	var objs []*pgmodels.IntellectualObjectView
+	objCount, err := pgmodels.GetCountFromView(query, objs)
+	if err != nil {
+		common.Context().Log.Warn().Msgf("error running object count query for dashboard: %v", err)
+	}
+	r.TemplateData["objectCount"] = p.Sprintf("%d", objCount)
+
+	var files []*pgmodels.GenericFileView
+	fileCount, err := pgmodels.GetCountFromView(query, files)
+	if err != nil {
+		common.Context().Log.Warn().Msgf("error running file count query for dashboard: %v", err)
+	}
+	r.TemplateData["fileCount"] = p.Sprintf("%d", fileCount)
+
+	var events []*pgmodels.PremisEventView
+	eventCount, err := pgmodels.GetCountFromView(query, events)
+	if err != nil {
+		common.Context().Log.Warn().Msgf("error running premis event count query for dashboard: %v", err)
+	}
+	r.TemplateData["eventCount"] = p.Sprintf("%d", eventCount)
+
 }

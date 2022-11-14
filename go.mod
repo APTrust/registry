@@ -9,7 +9,6 @@ require (
 	github.com/dcu/go-authy v1.0.1
 	github.com/gavv/httpexpect/v2 v2.3.1
 	github.com/gin-contrib/logger v0.0.2
-	github.com/gin-gonic/autotls v0.0.3
 	github.com/gin-gonic/gin v1.7.7
 	github.com/go-pg/pg/v10 v10.9.1
 	github.com/go-redis/redis/v7 v7.4.1
@@ -25,5 +24,6 @@ require (
 	github.com/stretchr/stew v0.0.0-20130812190256-80ef0842b48b
 	github.com/stretchr/testify v1.7.0
 	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519
+	golang.org/x/text v0.3.6
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 )

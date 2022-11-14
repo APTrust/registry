@@ -43,26 +43,25 @@
     </div>
   </div>
   <hr>
-  <!-- TODO: Make this dynamic -->
-  <!--
+
   <div class="box-content">
     <div class="columns">
       <div class="column">
         <h5 class="text-label text-xs mb-2">Objects</h5>
-        <p class="num text-lg">48,883</p>
+        <p class="num text-lg">{{ .objectCount }}</p>
       </div>
       <div class="column">
         <h5 class="text-label text-xs mb-2">Files</h5>
-        <p class="num text-lg">6,663,871</p>
+        <p class="num text-lg">{{ .fileCount }}</p>
       </div>
       <div class="column">
-        <h5 class="text-label text-xs mb-2">Fixity Checks</h5>
-        <p class="num text-lg">8,771</p>
-        <p class="text-sm is-italic">this week</p>
+        <h5 class="text-label text-xs mb-2">Events</h5>
+        <p class="num text-lg">{{ .eventCount }}</p>
+        <p class="text-sm is-italic"></p>
       </div>
     </div>
   </div>
--->
+
 </div>
 
 <script>
