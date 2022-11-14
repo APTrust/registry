@@ -403,6 +403,7 @@ CREATE TABLE public.work_items (
 CREATE INDEX index_work_items_on_action ON public.work_items USING btree (action);
 CREATE INDEX index_work_items_on_date ON public.work_items USING btree (date_processed);
 CREATE INDEX index_work_items_on_etag_and_name ON public.work_items USING btree (etag, name);
+CREATE INDEX index_work_items_etag_instid_and_name ON work_items USING btree(etag, institution_id, name);
 CREATE INDEX index_work_items_on_generic_file_id ON public.work_items USING btree (generic_file_id);
 CREATE INDEX index_work_items_on_institution_id ON public.work_items USING btree (institution_id);
 CREATE INDEX index_work_items_on_institution_id_and_date ON public.work_items USING btree (institution_id, date_processed);

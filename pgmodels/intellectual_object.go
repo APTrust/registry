@@ -212,9 +212,6 @@ func (obj *IntellectualObject) Validate() *common.ValidationError {
 	if common.IsEmptyString(obj.BagItProfileIdentifier) {
 		errors["BagItProfileIdentifier"] = "BagItProfileIdentifier is required"
 	}
-	if common.IsEmptyString(obj.SourceOrganization) {
-		errors["SourceOrganization"] = "SourceOrganization is required"
-	}
 	if len(errors) > 0 {
 		return &common.ValidationError{Errors: errors}
 	}
