@@ -39,10 +39,12 @@ func Context() *APTContext {
 	if ctx == nil {
 		config := NewConfig()
 		db := pg.Connect(&pg.Options{
-			Addr:     fmt.Sprintf("%s:%d", config.DB.Host, config.DB.Port),
-			User:     config.DB.User,
-			Password: config.DB.Password,
-			Database: config.DB.Name,
+			Addr:         fmt.Sprintf("%s:%d", config.DB.Host, config.DB.Port),
+			User:         config.DB.User,
+			Password:     config.DB.Password,
+			Database:     config.DB.Name,
+			MinIdleConns: 2,
+			PoolSize:     10,
 		})
 		zlogger := getLogger(config)
 		if config.Logging.LogSql {
