@@ -68,5 +68,8 @@ func (f *DepositReportFilterForm) SetValues() {
 			continue
 		}
 		f.Fields[fieldName].Value = f.FilterCollection.ValueOf(fieldName)
+		if fieldName == "end_date" && f.FilterCollection.ValueOf(fieldName) == "" {
+			f.Fields[fieldName].Value = f.Fields[fieldName].Options[0].Value
+		}
 	}
 }

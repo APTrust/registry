@@ -2,6 +2,7 @@ package forms_test
 
 import (
 	"testing"
+	"time"
 
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/forms"
@@ -31,6 +32,7 @@ func getDepositReportFilterForm(t *testing.T, user *pgmodels.User) (*pgmodels.Fi
 func TestDepositReportFilterFormSysAdmin(t *testing.T) {
 	sysAdmin := testutil.InitUser(t, "system@aptrust.org")
 	fc, form := getDepositReportFilterForm(t, sysAdmin)
+	form.SetValues()
 	fields := form.GetFields()
 	testDepositReportFields(t, fc, fields)
 	assert.True(t, len(fields["institution_id"].Options) > 1)
@@ -44,6 +46,7 @@ func TestDepositReportFilterFormNonAdmin(t *testing.T) {
 	for _, email := range nonSysAdmins {
 		user := testutil.InitUser(t, email)
 		fc, form := getDepositReportFilterForm(t, user)
+		form.SetValues()
 		fields := form.GetFields()
 		testDepositReportFields(t, fc, fields)
 		// Non sysadmin can see only their own alerts, so
@@ -53,7 +56,8 @@ func TestDepositReportFilterFormNonAdmin(t *testing.T) {
 }
 
 func testDepositReportFields(t *testing.T, fc *pgmodels.FilterCollection, fields map[string]*forms.Field) {
-	assert.Equal(t, fc.ValueOf("end_date"), fields["end_date"].Value)
+
+	assert.Equal(t, time.Now().UTC().Format("2006-01-02"), fields["end_date"].Value)
 	assert.Equal(t, fc.ValueOf("institution_id"), fields["institution_id"].Value)
 	assert.Equal(t, fc.ValueOf("storage_option"), fields["storage_option"].Value)
 	assert.Equal(t, fc.ValueOf("chart_metric"), fields["chart_metric"].Value)
