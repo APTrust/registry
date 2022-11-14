@@ -80,7 +80,7 @@ func depositStorageOptions(deposits []*pgmodels.DepositStats) []string {
 // deposit report. It ignores parse errors for updatedBefore and
 // institutionID because these fields can legitimately be empty.
 func getDepositReportParams(c *gin.Context) DepositReportParams {
-	updatedBefore, _ := time.Parse("2006-01-02", c.Query("updated_at__lteq"))
+	updatedBefore, _ := time.Parse("2006-01-02", c.Query("end_date"))
 	if updatedBefore.IsZero() {
 		updatedBefore = time.Now().UTC()
 	}

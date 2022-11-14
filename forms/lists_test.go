@@ -2,6 +2,7 @@ package forms_test
 
 import (
 	"testing"
+	"time"
 
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/db"
@@ -53,4 +54,16 @@ func TestListUsers(t *testing.T) {
 		assert.Equal(t, expected[i].Value, option.Value)
 		assert.Equal(t, expected[i].Text, option.Text)
 	}
+}
+
+func TestListDepositReportDates(t *testing.T) {
+	options := forms.ListDepositReportDates()
+
+	today := time.Now().UTC().Format("2006-01-02")
+	assert.Equal(t, "Today", options[0].Text)
+	assert.Equal(t, today, options[0].Value)
+	assert.True(t, len(options) > 80)
+	earliestOption := options[len(options)-1]
+	assert.Equal(t, "2015-01-01", earliestOption.Value)
+	assert.Equal(t, "December 2014", earliestOption.Text)
 }

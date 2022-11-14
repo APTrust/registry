@@ -34,10 +34,11 @@ func NewDepositReportFilterForm(fc *pgmodels.FilterCollection, actingUser *pgmod
 }
 
 func (f *DepositReportFilterForm) init() {
-	f.Fields["updated_at__lteq"] = &Field{
-		Name:        "updated_at__lteq",
-		Label:       "Updated Before",
-		Placeholder: "Updated Before",
+	f.Fields["end_date"] = &Field{
+		Name:        "end_date",
+		Label:       "Deposits Through",
+		Placeholder: "Deposits Through",
+		Options:     ListDepositReportDates(),
 	}
 	f.Fields["institution_id"] = &Field{
 		Name:        "institution_id",

@@ -57,7 +57,7 @@ $BODY$
 			insert into historical_deposit_stats
 			select
 			  i2.id as institution_id,
-			  coalesce(stats.institution_name, 'Total') as institution_name,
+			  coalesce(stats.institution_name, 'All Institutions') as institution_name,
 			  coalesce(stats.storage_option, 'Total') as storage_option,
 			  coalesce(stats.file_count, 0) as file_count,
 			  coalesce(stats.object_count, 0) as object_count,
@@ -148,10 +148,11 @@ LANGUAGE plpgsql VOLATILE;
 -- 
 -- We can refresh this at any time using
 -- refresh materialized view current_deposit_stats
-create materialized view if not exists current_deposit_stats as
+drop materialized view if exists current_deposit_stats;
+create materialized view current_deposit_stats as
 select
   i2.id as institution_id,
-  coalesce(stats.institution_name, 'Total') as institution_name,
+  coalesce(stats.institution_name, 'All Institutions') as institution_name,
   coalesce(stats.storage_option, 'Total') as storage_option,
   stats.file_count,
   stats.object_count,

@@ -53,7 +53,7 @@ func TestDepositReportFilterFormNonAdmin(t *testing.T) {
 }
 
 func testDepositReportFields(t *testing.T, fc *pgmodels.FilterCollection, fields map[string]*forms.Field) {
-	assert.Equal(t, fc.ValueOf("updated_at__lteq"), fields["updated_at__lteq"].Value)
+	assert.Equal(t, fc.ValueOf("end_date"), fields["end_date"].Value)
 	assert.Equal(t, fc.ValueOf("institution_id"), fields["institution_id"].Value)
 	assert.Equal(t, fc.ValueOf("storage_option"), fields["storage_option"].Value)
 	assert.Equal(t, fc.ValueOf("chart_metric"), fields["chart_metric"].Value)

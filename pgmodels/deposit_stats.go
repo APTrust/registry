@@ -10,7 +10,7 @@ import (
 // Note: chart_metric is ignored by backend. Used only in front-end.
 var DepositStatsFilters = []string{
 	"chart_metric",
-	"updated_at__lteq",
+	"end_date",
 	"institution_id",
 	"storage_option",
 }
@@ -41,6 +41,7 @@ type DepositStats struct {
 func DepositStatsSelect(institutionID int64, storageOption string, endDate time.Time) ([]*DepositStats, error) {
 	var stats []*DepositStats
 	statsQuery := getDepositStatsQuery(institutionID, storageOption, endDate)
+	// fmt.Println(statsQuery, "INST", institutionID, "STOR", storageOption, "END", endDate)
 	_, err := common.Context().DB.Query(&stats, statsQuery,
 		institutionID, institutionID,
 		storageOption, storageOption,
@@ -64,7 +65,9 @@ func DepositStatsSelect(institutionID int64, storageOption string, endDate time.
 
 func getDepositStatsQuery(institutionID int64, storageOption string, endDate time.Time) string {
 	// Basic depost stats query. Use the "is null / or" trick to deal with
-	// filters that may or may not be present.
+	// filters that may or may not be present. Also note that historical
+	// deposit stats uses EXACT FIRST-OF-MONTH dates, so we look for
+	// "end_date = " not "<" or "<=".
 	q := `select institution_id, 
 				institution_name, 
 				storage_option, 
@@ -77,17 +80,20 @@ func getDepositStatsQuery(institutionID int64, storageOption string, endDate tim
 				monthly_cost, 
 				end_date from %s 
 				where (? = 0 or institution_id = ?)
-				and (? = '' or storage_option = ?)
-				and (? = '0001-01-01 00:00:00+00:00:00' or end_date < ?)`
+				and (? = '' or storage_option = ?) `
 	tableName := "historical_deposit_stats"
 
 	// Current stats report, which displays on dashboard, passes in
 	// time.Now() as end date. In this case, we want to query the
-	// current stats table, not historical stats. Realistically,
-	// end_data will be within a few milliseconds of time.Now(),
-	// let's allow 60 seconds of drift.
-	if endDate.After(time.Now().Add(-60 * time.Second)) {
+	// current stats table, not historical stats.
+	now := time.Now().UTC()
+	firstOfThisMonth := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.UTC)
+	if endDate.After(firstOfThisMonth) || endDate == firstOfThisMonth {
+		// current stats view does not need end_date
 		tableName = "current_deposit_stats"
+	} else {
+		// historical stats has exact cache dates
+		q += "and (? = '0001-01-01 00:00:00+00:00:00' or end_date = ?)"
 	}
 	return fmt.Sprintf(q, tableName)
 }

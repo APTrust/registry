@@ -1,11 +1,29 @@
 package forms
 
 import (
+	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/pgmodels"
 )
+
+var Months = []string{
+	"",
+	"January",
+	"February",
+	"March",
+	"April",
+	"May",
+	"June",
+	"July",
+	"August",
+	"September",
+	"October",
+	"November",
+	"December",
+}
 
 // AllRolesList is a list of assignable user roles. Hard-coded instead
 // of using Options() function for formatting reasons and because we
@@ -100,6 +118,44 @@ func ListUsers(institutionID int64) ([]ListOption, error) {
 		options[i] = ListOption{strconv.FormatInt(user.ID, 10), user.Name}
 	}
 	return options, nil
+}
+
+// ListDepositReportDates returns a list of dates for deposit reports.
+// Note that for each option except "Today", the label is a month and
+// year and the value is the first day of the following month. For example,
+// if the label is August 2022, the value is 2022-09-01. This would give
+// you a report for deposits through the end of August, 2022. In the
+// database, the query amounts to "all files created BEFORE 2022-09-01".
+//
+// Note that past deposit stats are stored in the historical_deposit_stats
+// table, and we store month-end reports only. Thus, ALL of the dates in
+// that table will be first-of-month dates. Stats go back to December 2014,
+// which was APTrust's initial launch (though the system was empty then),
+//
+// If user chooses the "Today" option, the data will come from the
+// current_deposit_stats view, which is updated hourly.
+func ListDepositReportDates() []ListOption {
+	now := time.Now().UTC()
+	options := make([]ListOption, 1)
+	options[0] = ListOption{now.Format("2006-01-02"), "Today"}
+	thisYear, thisMonth, _ := now.Date()
+	for year := thisYear; year > 2014; year-- {
+		for month := int(time.December); month > 0; month-- {
+			if year == thisYear && month >= int(thisMonth) {
+				continue
+			}
+			displayYear := year
+			displayMonth := Months[month]
+			if month == int(time.January) {
+				displayMonth = Months[12]
+				displayYear = year - 1
+			}
+			displayDate := fmt.Sprintf("%s %d", displayMonth, displayYear)
+			dateValue := time.Date(year, time.Month(month), 1, 0, 0, 0, 0, time.UTC)
+			options = append(options, ListOption{dateValue.Format("2006-01-02"), displayDate})
+		}
+	}
+	return options
 }
 
 // Options returns a list of options for the given string list.
