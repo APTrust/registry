@@ -10,7 +10,7 @@
 
 
 -- Let's start tracking our schema migrations.
-alter table schema_migrations add column if not exists started_at timestamp not null;
+alter table schema_migrations add column if not exists started_at timestamp null;
 alter table schema_migrations add column if not exists finished_at timestamp null;
 
 -- Note that we're starting the migration.
