@@ -88,6 +88,16 @@ func loadDashStats(r *Request) {
 		query.Where("institution_id", "=", r.Auth.CurrentUser().InstitutionID)
 	}
 
+	var events []*pgmodels.PremisEventView
+	eventCount, err := pgmodels.GetCountFromView(query, events)
+	if err != nil {
+		common.Context().Log.Warn().Msgf("error running premis event count query for dashboard: %v", err)
+	}
+	r.TemplateData["eventCount"] = p.Sprintf("%d", eventCount)
+
+	// For objects and files, we want to count only Active items
+	query.Where("state", "=", "A")
+
 	var objs []*pgmodels.IntellectualObjectView
 	objCount, err := pgmodels.GetCountFromView(query, objs)
 	if err != nil {
@@ -95,21 +105,11 @@ func loadDashStats(r *Request) {
 	}
 	r.TemplateData["objectCount"] = p.Sprintf("%d", objCount)
 
-	// For objects and files, we want to count only Active items
-	query.Where("state", "=", "A")
-
 	var files []*pgmodels.GenericFileView
 	fileCount, err := pgmodels.GetCountFromView(query, files)
 	if err != nil {
 		common.Context().Log.Warn().Msgf("error running file count query for dashboard: %v", err)
 	}
 	r.TemplateData["fileCount"] = p.Sprintf("%d", fileCount)
-
-	var events []*pgmodels.PremisEventView
-	eventCount, err := pgmodels.GetCountFromView(query, events)
-	if err != nil {
-		common.Context().Log.Warn().Msgf("error running premis event count query for dashboard: %v", err)
-	}
-	r.TemplateData["eventCount"] = p.Sprintf("%d", eventCount)
 
 }
