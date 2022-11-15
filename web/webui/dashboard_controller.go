@@ -95,6 +95,9 @@ func loadDashStats(r *Request) {
 	}
 	r.TemplateData["objectCount"] = p.Sprintf("%d", objCount)
 
+	// For objects and files, we want to count only Active items
+	query.Where("state", "=", "A")
+
 	var files []*pgmodels.GenericFileView
 	fileCount, err := pgmodels.GetCountFromView(query, files)
 	if err != nil {
