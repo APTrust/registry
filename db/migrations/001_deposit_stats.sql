@@ -147,7 +147,13 @@ LANGUAGE plpgsql VOLATILE;
 -- is waiting for a page to load.
 -- 
 -- We can refresh this at any time using
--- refresh materialized view current_deposit_stats
+-- refresh materialized view current_deposit_stats.
+--
+-- Note that this drop statement may generate a warning saying 
+-- "materialized view "current_deposit_stats" does not exist, skipping"
+--
+-- That's fine. It just means it skipped this step because there
+-- was nothing to do.
 drop materialized view if exists current_deposit_stats;
 create materialized view current_deposit_stats as
 select
