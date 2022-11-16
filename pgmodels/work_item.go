@@ -160,6 +160,7 @@ func (item *WorkItem) SetForRequeue(stage string) error {
 	item.Retry = true
 	item.NeedsAdminReview = false
 	item.Node = ""
+	item.Outcome = ""
 	item.PID = 0
 	item.Note = fmt.Sprintf("Requeued for %s", item.Stage)
 	return item.Save()

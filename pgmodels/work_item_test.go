@@ -175,6 +175,7 @@ func TestWorkItemSetForRequeue(t *testing.T) {
 	assert.True(t, item.Retry)
 	assert.False(t, item.NeedsAdminReview)
 	assert.Empty(t, item.Node)
+	assert.Empty(t, item.Outcome)
 	assert.Empty(t, item.PID)
 	assert.Equal(t, "Requeued for Format Identification", item.Note)
 
