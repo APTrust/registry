@@ -66,7 +66,7 @@
         <td class="is-grey-dark">{{ $user.Email }}</td>
         <td class="is-grey-dark">{{ $user.InstitutionName }}</td>
         <td class="is-grey-dark">{{ roleName $user.Role }}</td>
-        <td class="is-grey-dark">{{ dateUS $user.LastSignInAt }}</td>
+        <td class="is-grey-dark">{{ dateUS $user.CurrentSignInAt }}</td>
         <td class="is-grey-dark">{{ yesNo $user.EnabledTwoFactor }}</td>
         <td class="is-grey-dark">{{ dateUS $user.DeactivatedAt }}</td>
       </tr>
