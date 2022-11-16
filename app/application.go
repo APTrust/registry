@@ -129,9 +129,13 @@ func initMiddleware(router *gin.Engine) {
 // anything".
 func initRoutes(router *gin.Engine) {
 
-	// This ensures that routes match with or without trailing slash.
-	router.RedirectTrailingSlash = true
-	router.RedirectFixedPath = false
+	// This ensures that routes match even when they contain
+	// extraneous slashes. Watch out for POST/PUT redirects.
+	// If we run into problems with those, we will have to
+	// add route definitions for POST and PUT URLs with and
+	// without trailing slashes. See this:
+	// https://softwareengineering.stackexchange.com/questions/99894/why-doesnt-http-have-post-redirect
+	router.RedirectFixedPath = true
 
 	router.Static("/static", "./static")
 	router.Static("/favicon.ico", "./static/img/favicon.png")
