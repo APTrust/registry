@@ -34,7 +34,7 @@
       </div>
       <div>
         <dt class="text-label text-xs is-grey-dark mb-2">Size</dt>
-        <dd class="text-table">{{ .item.Size }}</dd>
+        <dd class="text-table">{{ formatInt64 .item.Size }} ({{ humanSize .item.Size }})</dd>
       </div>
       <div>
         <dt class="text-label text-xs is-grey-dark mb-2">Stage</dt>
@@ -113,9 +113,9 @@
     <!-- Show raw json data. For sys admin only. -->
     <p class="mt-5"><b>Redis Data</b></p>
     <div class="control mt-3 mb-3">
-      <textarea class="textarea">
+      <pre>
     {{ .redisInfo }}
-    </textarea>
+      </pre>
     </div>
     {{ end }}
 
