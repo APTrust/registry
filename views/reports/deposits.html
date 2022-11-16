@@ -37,8 +37,8 @@
       <tr>
         <td class="pl-5">{{ $item.InstitutionName }}</td>
         <td class="is-grey-dark">{{ $item.StorageOption }}</td>
-        <td class="is-grey-dark num text-sm">{{ $item.ObjectCount }}</td>
-        <td class="is-grey-dark num text-sm">{{ $item.FileCount }}</td>
+        <td class="is-grey-dark num text-sm">{{ formatInt64 $item.ObjectCount }}</td>
+        <td class="is-grey-dark num text-sm">{{ formatInt64 $item.FileCount }}</td>
         <td class="is-grey-dark num text-sm">{{ formatFloat $item.TotalGB 3 }}</td>
         <td class="is-grey-dark num text-sm">{{ formatFloat $item.TotalTB 3 }}</td>
         <td class="is-grey-dark num text-sm">${{ formatFloat $item.MonthlyCost 2 }}</td>

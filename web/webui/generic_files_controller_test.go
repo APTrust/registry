@@ -18,7 +18,7 @@ func TestGenericFileShow(t *testing.T) {
 
 	items := []string{
 		"institution1.edu/photos/picture1",
-		"243855000",
+		"243,855,000",
 		"image/jpeg",
 		"Standard",
 		"https://localhost:9899/preservation-va/25452f41-1b18-47b7-b334-751dfd5d011e",

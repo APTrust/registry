@@ -12,7 +12,7 @@
     </select>
     {{ end }}
   </p>
-  <p class="pager-items">{{ .pager.ItemFirst }} - {{ .pager.ItemLast }} of {{ .pager.TotalItems }}</p>
+  <p class="pager-items">{{ .pager.ItemFirst }} - {{ .pager.ItemLast }} of {{ formatInt .pager.TotalItems }}</p>
 
   <!--
        Previous and Next links.

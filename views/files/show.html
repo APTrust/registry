@@ -25,7 +25,7 @@
     </div>
     <div>
       <dt class="text-label text-xs is-grey-dark">Size</dt>
-      <dd class="text-table">{{ .file.Size }}</dd>
+      <dd class="text-table">{{ formatInt64 .file.Size }} ({{ humanSize .file.Size }})</dd>
     </div>
     <div>
       <dt class="text-label text-xs is-grey-dark">Format</dt>
