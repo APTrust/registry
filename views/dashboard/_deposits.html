@@ -33,7 +33,7 @@
                     {{ $stat.StorageOption }}
                     {{ end }}
                   </td>
-                  <td class="is-grey-dark num text-sm has-text-right">{{ $stat.FileCount }}</td>
+                  <td class="is-grey-dark num text-sm has-text-right">{{ formatInt64 $stat.FileCount }}</td>
                   <td class="is-grey-dark num text-sm has-text-right">{{ humanSize $stat.TotalBytes }}</td>
                 </tr>
                 {{ end }}
