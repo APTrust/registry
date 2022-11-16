@@ -60,6 +60,9 @@
       {{ end }}
     </tbody>
   </table>
+
+  {{ template "shared/_pager.html" dict "pager" .pager }}
+    
 </div>
 
 {{ template "shared/_footer.html" .}}

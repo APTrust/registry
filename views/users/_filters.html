@@ -5,6 +5,9 @@
   <div class="filters-grid-content">
     <form id="userFilterForm" method="get">
 
+      <!-- Include this, so we don't lose it when user changes filters. -->
+      <input type="hidden" name="per_page" value="{{ .pager.PerPage }}">
+
       <div class="columns">
         <div class="column is-one-quarter">
           {{ template "forms/text_input.html" .filterForm.Fields.name__contains }}

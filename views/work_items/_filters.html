@@ -5,6 +5,9 @@
   <div class="filters-grid-content">
     <form class="filters-grid-form" id="itemFilterForm" method="get" onsubmit="chooseEndpoint()">
 
+      <!-- Include this, so we don't lose it when user changes filters. -->
+      <input type="hidden" name="per_page" value="{{ .pager.PerPage }}">
+
       <div class="columns filters-grid-header">
         <div class="column">
           {{ template "forms/select.html" .filterForm.Fields.action }}
