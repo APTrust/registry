@@ -1,6 +1,7 @@
 package common_test
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -12,9 +13,9 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func getPager(t *testing.T) *common.Pager {
+func getPager(t *testing.T, perPage int) *common.Pager {
 	var err error
-	var _url = "http://example.com/objects?page=4&per_page=10"
+	var _url = fmt.Sprintf("http://example.com/objects?page=4&per_page=%d", perPage)
 	c, _ := gin.CreateTestContext(httptest.NewRecorder())
 	c.Request = &http.Request{}
 	c.Request.URL, err = url.Parse(_url)
@@ -25,7 +26,7 @@ func getPager(t *testing.T) *common.Pager {
 }
 
 func TestNewPager(t *testing.T) {
-	pager := getPager(t)
+	pager := getPager(t, 10)
 	require.NotNil(t, pager)
 
 	assert.Equal(t, 4, pager.Page)
@@ -35,7 +36,7 @@ func TestNewPager(t *testing.T) {
 }
 
 func TestPagerSetCounts(t *testing.T) {
-	pager := getPager(t)
+	pager := getPager(t, 10)
 	require.NotNil(t, pager)
 
 	pager.SetCounts(200, 10)
@@ -44,4 +45,15 @@ func TestPagerSetCounts(t *testing.T) {
 	assert.Equal(t, 40, pager.ItemLast)
 	assert.Equal(t, "/objects?page=3&per_page=10", pager.PreviousLink)
 	assert.Equal(t, "/objects?page=5&per_page=10", pager.NextLink)
+}
+
+func TestPagerPerPageLimit(t *testing.T) {
+	pager := getPager(t, 100)
+	assert.Equal(t, 100, pager.PerPage)
+
+	// Max per page is 1000. Pager should
+	// enforce this if user requests too
+	// many items at once.
+	pager = getPager(t, 999999)
+	assert.Equal(t, 1000, pager.PerPage)
 }

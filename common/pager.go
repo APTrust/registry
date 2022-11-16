@@ -36,6 +36,10 @@ func NewPager(c *gin.Context, baseURL string, defaultPerPage int) (*Pager, error
 	if pager.Page > 1 {
 		pager.QueryOffset = (pager.Page - 1) * pager.PerPage
 	}
+	// Do not let users request hundreds of thousands of items at once.
+	if pager.PerPage > 1000 {
+		pager.PerPage = 1000
+	}
 	pager.ItemFirst = pager.QueryOffset + 1
 	return pager, nil
 }
