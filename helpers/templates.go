@@ -13,6 +13,8 @@ import (
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/pgmodels"
+	"golang.org/x/text/language"
+	"golang.org/x/text/message"
 )
 
 // https://curtisvermeeren.github.io/2017/09/14/Golang-Templates-Cheatsheet
@@ -25,6 +27,12 @@ import (
 
 // Define this here so it's not recompiled on every call to LinkifyUrls.
 var reUrl = regexp.MustCompile(`((https?://)[^\s]+)`)
+
+var printFormatter *message.Printer
+
+func init() {
+	printFormatter = message.NewPrinter(language.English)
+}
 
 // Truncate truncates the value to the given length, appending
 // an ellipses to the end. If value contains HTML tags, they
@@ -202,7 +210,19 @@ func DefaultString(value, _default string) string {
 // digits after the decimal point.
 func FormatFloat(value float64, scale int) string {
 	fmtString := fmt.Sprintf("%%.%df", scale)
-	return fmt.Sprintf(fmtString, value)
+	return printFormatter.Sprintf(fmtString, value)
+}
+
+// FormatInt formats an integer value to include commas.
+// 28635177 becomes 28,635,177
+func FormatInt(value int) string {
+	return printFormatter.Sprintf("%d", value)
+}
+
+// FormatInt64 formats a 64-bit integer value to include commas.
+// 28635177 becomes 28,635,177
+func FormatInt64(value int64) string {
+	return printFormatter.Sprintf("%d", value)
 }
 
 // ToJSON converts an interface to JSON.

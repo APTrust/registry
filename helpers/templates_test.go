@@ -171,10 +171,18 @@ func TestDefaultString(t *testing.T) {
 }
 
 func TestFormatFloat(t *testing.T) {
-	f := float64(2137.9786534)
-	assert.Equal(t, "2137.98", helpers.FormatFloat(f, 2))
-	assert.Equal(t, "2137.979", helpers.FormatFloat(f, 3))
-	assert.Equal(t, "2137.9787", helpers.FormatFloat(f, 4))
+	f := float64(86352137.9786534)
+	assert.Equal(t, "86,352,137.98", helpers.FormatFloat(f, 2))
+	assert.Equal(t, "86,352,137.979", helpers.FormatFloat(f, 3))
+	assert.Equal(t, "86,352,137.9787", helpers.FormatFloat(f, 4))
+}
+
+func TestFormatInt(t *testing.T) {
+	assert.Equal(t, "1,234,567,890", helpers.FormatInt(1234567890))
+}
+
+func TestFormatInt64(t *testing.T) {
+	assert.Equal(t, "1,234,567,890", helpers.FormatInt64(1234567890))
 }
 
 func TestToJSON(t *testing.T) {

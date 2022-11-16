@@ -61,6 +61,8 @@ func initTemplates(router *gin.Engine) {
 		"escapeAttr":     helpers.EscapeAttr,
 		"escapeHTML":     helpers.EscapeHTML,
 		"formatFloat":    helpers.FormatFloat,
+		"formatInt":      helpers.FormatInt,
+		"formatInt64":    helpers.FormatInt64,
 		"humanSize":      helpers.HumanSize,
 		"iconFor":        helpers.IconFor,
 		"linkifyUrls":    helpers.LinkifyUrls,
