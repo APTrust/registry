@@ -6,8 +6,6 @@ import (
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/gin-gonic/gin"
-	"golang.org/x/text/language"
-	"golang.org/x/text/message"
 )
 
 func DashboardShow(c *gin.Context) {
@@ -81,8 +79,6 @@ func loadDashDeposits(r *Request) error {
 
 func loadDashStats(r *Request) {
 
-	p := message.NewPrinter(language.English)
-
 	query := pgmodels.NewQuery()
 	if !r.Auth.CurrentUser().IsAdmin() {
 		query.Where("institution_id", "=", r.Auth.CurrentUser().InstitutionID)
@@ -93,7 +89,7 @@ func loadDashStats(r *Request) {
 	if err != nil {
 		common.Context().Log.Warn().Msgf("error running premis event count query for dashboard: %v", err)
 	}
-	r.TemplateData["eventCount"] = p.Sprintf("%d", eventCount)
+	r.TemplateData["eventCount"] = eventCount
 
 	// For objects and files, we want to count only Active items
 	query.Where("state", "=", "A")
@@ -103,13 +99,13 @@ func loadDashStats(r *Request) {
 	if err != nil {
 		common.Context().Log.Warn().Msgf("error running object count query for dashboard: %v", err)
 	}
-	r.TemplateData["objectCount"] = p.Sprintf("%d", objCount)
+	r.TemplateData["objectCount"] = objCount
 
 	var files []*pgmodels.GenericFileView
 	fileCount, err := pgmodels.GetCountFromView(query, files)
 	if err != nil {
 		common.Context().Log.Warn().Msgf("error running file count query for dashboard: %v", err)
 	}
-	r.TemplateData["fileCount"] = p.Sprintf("%d", fileCount)
+	r.TemplateData["fileCount"] = fileCount
 
 }
