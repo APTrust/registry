@@ -286,10 +286,10 @@ var UserActions = []string{
 
 var WorkItemActions = []string{
 	ActionDelete,
-	ActionRestoreObject,
-	ActionRestoreFile,
 	ActionGlacierRestore,
 	ActionIngest,
+	ActionRestoreFile,
+	ActionRestoreObject,
 }
 
 var NonIngestTopics = []string{
