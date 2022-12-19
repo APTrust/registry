@@ -11,8 +11,10 @@ info:
     url: https://raw.githubusercontent.com/APTrust/registry/master/LICENSE
 
 servers:
+  - url: http://demo.aptrust.org/member-api/v3
+    description: "APTrust demo server. This is generally a safe sandbox for testing out new code and workflows. Materials in this system may be deleted at any time."
   - url: http://registry.aptrust.org/member-api/v3
-    description: APTrust staging server. Currently not open to members or the public.
+    description: "APTrust production server. This is our long-term preservation system. If you're not sure of your code, test it against demo first."
 
 tags:
   - name: Alerts
@@ -59,11 +61,11 @@ components:
           type: string
         type:
           type: string
-          description: The type of alert. 
+          description: The type of alert.
           enum: ["Deletion Cancelled", "Deletion Completed", "Deletion Confirmed", "Deletion Requested", "Failed Fixity Check", "Password Changed", "Password Reset", "Restoration Completed", "Stalled Work Items", "Welcome New User"]
         subject:
           type: string
-        content: 
+        content:
           type: string
           description: The main body of the alert message.
         deletion_request_id:
@@ -98,10 +100,10 @@ components:
           type: integer
           format: int64
           description: The total number of results matching your query.
-        next: 
+        next:
           type: string
           description: The URL for the next page of results.
-        previous: 
+        previous:
           type: string
           description: The URL for the previous page of results.
         items:
@@ -127,10 +129,10 @@ components:
         digest:
           type: string
           description: The checksum.
-        generic_file_id: 
+        generic_file_id:
           type: integer
           format: int64
-          description: The unique id of the GenericFile to which this checksum pertains. 
+          description: The unique id of the GenericFile to which this checksum pertains.
     ChecksumView:
       type: object
       properties:
@@ -151,12 +153,12 @@ components:
         state:
           type: string
           enum: ["A", "D"]
-          description: The state of the GenericFile to which this checksum pertains. A = Active, D = Deleted 
+          description: The state of the GenericFile to which this checksum pertains. A = Active, D = Deleted
         generic_file_identifier:
           type: string
-          description: "The identifier of the GenericFile to which this checksum pertains. GenericFile identifiers follow a semantic format: <instution_identifier>/<bag_name>/<path_in_bag>" 
+          description: "The identifier of the GenericFile to which this checksum pertains. GenericFile identifiers follow a semantic format: <instution_identifier>/<bag_name>/<path_in_bag>"
           example: test.edu/SampleBag/data/document.pdf
-        generic_file_id: 
+        generic_file_id:
           type: integer
           format: int64
           description: The unique id of the GenericFile to which this checksum pertains.
@@ -182,123 +184,123 @@ components:
           type: integer
           format: int64
           description: The total number of results matching your query.
-        next: 
+        next:
           type: string
           description: The URL for the next page of results.
-        previous: 
+        previous:
           type: string
           description: The URL for the previous page of results.
         items:
           type: array
           description: An array of ChecksumView objects matching your query.
           items:
-            $ref: '#/components/schemas/ChecksumView'            
+            $ref: '#/components/schemas/ChecksumView'
 
     DeletionRequestView:
       type: object
       properties:
-        id: 
+        id:
           type: integer
           format: int64
-        institution_id: 
+        institution_id:
           type: integer
           format: int64
           description: The ID of the institution that owns the files or objects to which this deletion request pertains.
-        institution_name: 
+        institution_name:
           type: string
           description: The name of the institution that owns the files or objects to which this deletion request pertains.
-        institution_identifier: 
+        institution_identifier:
           type: string
           description: The identifier (domain name) of the institution that owns the files or objects to which this deletion request pertains.
-        requested_by_id: 
+        requested_by_id:
           type: integer
           format: int64
           description: The id of the user who requested the deletion.
-        requested_by_name: 
+        requested_by_name:
           type: string
           description: The name of the user who requested this deletion.
-        requested_by_email: 
+        requested_by_email:
           type: string
           description: The email address of the user who requested this deletion.
           format: email
-        requested_at: 
+        requested_at:
           type: string
           format: date-time
           description: The date and time at which this deletion was requested.
-        confirmed_by_id: 
+        confirmed_by_id:
           type: integer
           format: int64
           description: The id of the user who confirmed (approved) this deletion. This will be null if the deletion has not yet been approved or was cancelled.
           nullable: true
-        confirmed_by_name: 
+        confirmed_by_name:
           type: string
           description: The name of the user who confirmed (approved) this deletion.
           nullable: true
-        confirmed_by_email: 
+        confirmed_by_email:
           type: string
           description: The email address of the user who confirmed (approved) this deletion.
           format: email
           nullable: true
-        confirmed_at: 
+        confirmed_at:
           type: string
           format: date-time
           description: The date and time at which this deletion was approved.
           nullable: true
-        cancelled_by_id: 
+        cancelled_by_id:
           type: integer
           format: int64
           description: The id of the user who cancelled (rejected) this deletion.
           nullable: true
-        cancelled_by_name: 
+        cancelled_by_name:
           type: string
           description: The name of the user who cancelled (rejected) this deletion.
           nullable: true
-        cancelled_by_email: 
+        cancelled_by_email:
           type: string
           description: The email address of the user who cancelled (rejected) this deletion.
           format: email
           nullable: true
-        cancelled_at: 
+        cancelled_at:
           type: string
           format: date-time
           description: The date and time at which this deletion was cancelled (rejected).
           nullable: true
-        file_count: 
+        file_count:
           type: integer
           format: int64
           description: The total number of files to be deleted in this request. If zero, this is an object deletion request.
           minimum: 0
-        object_count: 
+        object_count:
           type: integer
           format: int64
           description: The total number of objects to be deleted in this request. If zero, this is a file deletion request.
           minimum: 0
-        work_item_id: 
+        work_item_id:
           type: integer
           format: int64
           description: The ID of the WorkItem for this deletion request. The WorkItem will not exist until the deletion request is approved and will never be created if the deletion request is rejected.
           nullable: true
-        stage: 
+        stage:
           type: string
           description: The stage of the deletion WorkItem, if it exists. This describes how far along the deletion worker is in the deletion process.
           enum: ["Requested", "Resolve"]
           nullable: true
-        status: 
+        status:
           type: string
           description: The status of the deletion WorkItem, if it exists. This describes whether the deletion operation has started, completed, etc.
           enum: ["Cancelled", "Failed", "Pending", "Started", "Success"]
           nullable: true
-        date_processed: 
+        date_processed:
           type: string
           format: date-time
           description: Timestamp of the last activity on this deletion's WorkItem (assuming the deletion was approved).
           nullable: true
-        size: 
+        size:
           type: integer
           format: int64
-          description: Total size, in bytes, of items to be deleted. This will be empty if the deletion request was not approved.  
-          nullable: true 
-        note: 
+          description: Total size, in bytes, of items to be deleted. This will be empty if the deletion request was not approved.
+          nullable: true
+        note:
           type: string
           description: A brief, human-readable summary of the current state of the deletion WorkItem. This will be null if the deletion request was not approved.
           nullable: true
@@ -308,10 +310,10 @@ components:
           type: integer
           format: int64
           description: The total number of results matching your query.
-        next: 
+        next:
           type: string
           description: The URL for the next page of results.
-        previous: 
+        previous:
           type: string
           description: The URL for the previous page of results.
         items:
@@ -320,7 +322,7 @@ components:
           items:
             $ref: '#/components/schemas/DeletionRequestView'
 
-    GenericFile: 
+    GenericFile:
       type: object
       properties:
         id:
@@ -385,7 +387,7 @@ components:
           description: The date and time at which the generic file was last updated. Updates may indicate re-ingest or changes to last fixity check date.
     GenericFileView:
       type: object
-      properties:        
+      properties:
         id:
           type: integer
           format: int64
@@ -408,7 +410,7 @@ components:
           description: The semantic identifier of the file's parent object, in the format <instution_identifier>/<bag_name>
         access:
           type: string
-          description: Describes whether this files's metadata can be accessed by the APTrust consortia, by the institution, or only by admins at the institution (restricted). This is vestigial field. Access settings have never been fully implemented, and all objects are treated as access-level "institution". 
+          description: Describes whether this files's metadata can be accessed by the APTrust consortia, by the institution, or only by admins at the institution (restricted). This is vestigial field. Access settings have never been fully implemented, and all objects are treated as access-level "institution".
           enum: ["consortia", "institution", "restricted"]
         state:
           type: string
@@ -462,10 +464,10 @@ components:
           type: integer
           format: int64
           description: The total number of results matching your query.
-        next: 
+        next:
           type: string
           description: The URL for the next page of results.
-        previous: 
+        previous:
           type: string
           description: The URL for the previous page of results.
         items:
@@ -495,7 +497,7 @@ components:
           nullable: true
         access:
           type: string
-          description: Describes whether this object's metadata can be accessed by the APTrust consortia, by the institution, or only by admins at the institution (restricted). This is vestigial field. Access settings have never been fully implemented, and all objects are treated as access-level "institution". 
+          description: Describes whether this object's metadata can be accessed by the APTrust consortia, by the institution, or only by admins at the institution (restricted). This is vestigial field. Access settings have never been fully implemented, and all objects are treated as access-level "institution".
           enum: ["consortia", "institution", "restricted"]
         bag_name:
           type: string
@@ -518,7 +520,7 @@ components:
           enum: ["A", "D"]
         etag:
           type: string
-          description: The etag of last ingested version of this object. The etag is assinged by S3 upon upload to the depositor's receiving bucket. 
+          description: The etag of last ingested version of this object. The etag is assinged by S3 upon upload to the depositor's receiving bucket.
           nullable: false
         bag_group_identifier:
           type: string
@@ -537,7 +539,7 @@ components:
           description: The name of the institution that submitted the object for ingest.
         internal_sender_identifier:
           type: string
-          description: An optional identifier for internal use by the depositor. 
+          description: An optional identifier for internal use by the depositor.
           nullable: true
         internal_sender_description:
           type: string
@@ -583,10 +585,10 @@ components:
           type: integer
           format: int64
           description: The total number of results matching your query.
-        next: 
+        next:
           type: string
           description: The URL for the next page of results.
-        previous: 
+        previous:
           type: string
           description: The URL for the previous page of results.
         items:
@@ -650,7 +652,7 @@ components:
           nullable: true
         outcome:
           type: string
-          description: Indicates the outcome of the action. 
+          description: Indicates the outcome of the action.
           enum: ["Failure", "Success"]
         outcome_detail:
           type: string
@@ -735,7 +737,7 @@ components:
           nullable: true
         outcome:
           type: string
-          description: Indicates the outcome of the action. 
+          description: Indicates the outcome of the action.
           enum: ["Failure", "Success"]
         outcome_detail:
           type: string
@@ -753,10 +755,10 @@ components:
           type: integer
           format: int64
           description: The total number of results matching your query.
-        next: 
+        next:
           type: string
           description: The URL for the next page of results.
-        previous: 
+        previous:
           type: string
           description: The URL for the previous page of results.
         items:
@@ -767,7 +769,7 @@ components:
 
     StorageRecord:
       type: object
-      properties:        
+      properties:
         id:
           type: integer
           format: int64
@@ -805,7 +807,7 @@ components:
         bag_date:
           type: string
           format: date-time
-          description: The date on which the originally submitted bag appeared in the receiving bucket. 
+          description: The date on which the originally submitted bag appeared in the receiving bucket.
         bag_group_identifier:
           type: string
           description: An optional identifier naming the logical group to which this object belongs. For instance, if ten bags are all part of the same collection, the collection name may be used as the group identifier associating all ten bags.
@@ -830,7 +832,7 @@ components:
           type: integer
           format: int64
           description: The ID of the GenericFile this work item pertains to. This will be null if the WorkItem pertains to an object.
-          nullable: true 
+          nullable: true
         generic_file_identifier:
           type: string
           description: The file's semantic identifier in the format <instution_identifier>/<bag_name>/<path_in_bag>.
@@ -839,10 +841,10 @@ components:
           type: integer
           format: int64
           description: The ID of the institution that owns the file or object that is the subject of this work item.
-        institution_name: 
+        institution_name:
           type: string
           description: The name of the institution that owns the files or objects to which this work item pertains.
-        institution_identifier: 
+        institution_identifier:
           type: string
           description: The identifier (domain name) of the institution that owns the files or objects to which this work item pertains.
         inst_approver:
@@ -857,7 +859,7 @@ components:
           nullable: true
         internal_sender_identifier:
           type: string
-          description: An optional identifier for internal use by the depositor. 
+          description: An optional identifier for internal use by the depositor.
           nullable: true
         name:
           type: string
@@ -889,7 +891,7 @@ components:
         queued_at:
           type: string
           format: date-time
-          description: The date and time this item was queued for processing. 
+          description: The date and time this item was queued for processing.
           nullable: true
         retry:
           type: boolean
@@ -905,7 +907,7 @@ components:
         stage:
           type: string
           description: The stage of processing.
-          enum: 
+          enum:
             - Available in S3
             - Cleanup
             - Copy To Staging
@@ -956,10 +958,10 @@ components:
           type: integer
           format: int64
           description: The total number of results matching your query.
-        next: 
+        next:
           type: string
           description: The URL for the next page of results.
-        previous: 
+        previous:
           type: string
           description: The URL for the previous page of results.
         items:
@@ -971,8 +973,8 @@ components:
 paths:
   /member-api/v3/alerts:
     get:
-      summary: Returns a list of alerts for the currently authenticated user. 
-      tags: 
+      summary: Returns a list of alerts for the currently authenticated user.
+      tags:
         - Alerts
       parameters:
         - name: page
@@ -982,7 +984,7 @@ paths:
           schema:
             type: integer
             default: 1
-            format: int32      
+            format: int32
         - name: per_page
           in: query
           description: The number of results to fetch per page.
@@ -990,13 +992,13 @@ paths:
           schema:
             type: integer
             default: 20
-            format: int32      
+            format: int32
         - name: sort
           in: query
           description: Sort the results in the specified column and direction. The format for this param is column__direction, where column is the column name and direction is either "asc" or "desc".
           required: false
           schema:
-            type: string            
+            type: string
             enum: ["created_at__asc", "created_at__desc", "type__asc", "type__desc"]
         - name: created_at__gteq
           in: query
@@ -1017,7 +1019,7 @@ paths:
           description: Return alerts of the specified type.
           required: false
           schema:
-            type: string 
+            type: string
             enum: ["Deletion Cancelled", "Deletion Completed", "Deletion Confirmed", "Deletion Requested", "Failed Fixity Check", "Password Changed", "Password Reset", "Restoration Completed", "Stalled Work Items", "Welcome New User"]
       responses:
         '200':
@@ -1033,7 +1035,7 @@ paths:
   /member-api/v3/alerts/show/{id}/{user_id}:
     get:
       summary: Returns an alert with the specified id for the specified user.
-      tags: 
+      tags:
         - Alerts
       parameters:
         - name: id
@@ -1043,15 +1045,15 @@ paths:
           schema:
             type: integer
             format: int64
-            minimum: 1 
-        - name: user_id 
+            minimum: 1
+        - name: user_id
           in: path
           required: true
           description: The id of the alert.
           schema:
             type: integer
             format: int64
-            minimum: 1 
+            minimum: 1
       responses:
         '200':
           description: An alert object with the requested user_id.
@@ -1071,7 +1073,7 @@ paths:
   /member-api/v3/checksums:
     get:
       summary: Returns a list of checksums. Results are automatically limited to checksums for files that belong the current user's institution.
-      tags: 
+      tags:
         - Checksums
       parameters:
         - name: page
@@ -1081,7 +1083,7 @@ paths:
           schema:
             type: integer
             default: 1
-            format: int32      
+            format: int32
         - name: per_page
           in: query
           description: The number of results to fetch per page.
@@ -1089,20 +1091,20 @@ paths:
           schema:
             type: integer
             default: 20
-            format: int32      
+            format: int32
         - name: sort
           in: query
           description: Sort the results in the specified column and direction. The format for this param is column__direction, where column is the column name and direction is either "asc" or "desc".
           required: false
           schema:
-            type: string            
+            type: string
             enum: ["algorithm__asc", "algorithm__desc", "datetime__asc", "datetime__desc", "digest__asc", "digest__desc", "generic_file_id__asc", "generic_file_id__desc", "generic_file_identfier__asc", "generic_file_identfier__desc", "intellectual_object_id__asc", "intellectual_object_id__desc", "state__asc", "state__desc"]
             default: datetime__desc
-        - name: algorithm 
+        - name: algorithm
           in: query
           description: Show only checksums using the specified algorithm.
           required: false
-          schema: 
+          schema:
             type: string
             enum: ["md5", "sha1", "sha256", "sha512"]
         - name: datetime__gteq
@@ -1152,7 +1154,7 @@ paths:
           schema:
             type: string
             enum: ["A", "D"]
-            default: empty 
+            default: empty
       responses:
         '200':
           description: A list of checksums for files belonging to the currently authenticated user's institution.
@@ -1167,7 +1169,7 @@ paths:
   /member-api/v3/checksums/show/{id}:
     get:
       summary: Returns the checksum with the specified id.
-      tags: 
+      tags:
         - Checksums
       parameters:
         - name: id
@@ -1177,7 +1179,7 @@ paths:
           schema:
             type: integer
             format: int64
-            minimum: 1 
+            minimum: 1
       responses:
         '200':
           description: An checksum object with the requested id.
@@ -1195,11 +1197,11 @@ paths:
           description: There is no checksum with this ID.
 
   /member-api/v3/deletions:
-    get: 
+    get:
       summary: Returns a list of deletion requests.
-      tags: 
+      tags:
         - Deletion Requests
-      parameters: 
+      parameters:
         - name: page
           in: query
           description: The page of results to fetch
@@ -1207,7 +1209,7 @@ paths:
           schema:
             type: integer
             default: 1
-            format: int32      
+            format: int32
         - name: per_page
           in: query
           description: The number of results to fetch per page.
@@ -1215,13 +1217,13 @@ paths:
           schema:
             type: integer
             default: 20
-            format: int32      
+            format: int32
         - name: sort
           in: query
           description: Sort the results in the specified column and direction. The format for this param is column__direction, where column is the column name and direction is either "asc" or "desc".
           required: false
           schema:
-            type: string            
+            type: string
             enum: ["requested_at__asc", "requested_at__desc", "stage__asc", "stage__desc", "status__asc", "status__desc"]
         - name: requested_at__gteq
           in: query
@@ -1263,9 +1265,9 @@ paths:
         '403':
           description: The current user does not have permission to view the requested deletion requests.
   /member-api/v3/deletions/show/{id}:
-    get: 
+    get:
       summary: Returns the deletion request with the specified id.
-      tags: 
+      tags:
         - Deletion Requests
       parameters:
         - name: id
@@ -1275,7 +1277,7 @@ paths:
           schema:
             type: integer
             format: int64
-            minimum: 1 
+            minimum: 1
       responses:
         '200':
           description: The deletion request with the requested id.
@@ -1293,11 +1295,11 @@ paths:
           description: There is no deletion request with this ID.
 
   /member-api/v3/files:
-    get: 
+    get:
       summary: Returns a list of GenericFiles.
-      tags: 
+      tags:
         - Generic Files
-      parameters: 
+      parameters:
         - name: page
           in: query
           description: The page of results to fetch
@@ -1305,7 +1307,7 @@ paths:
           schema:
             type: integer
             default: 1
-            format: int32      
+            format: int32
         - name: per_page
           in: query
           description: The number of results to fetch per page.
@@ -1313,26 +1315,26 @@ paths:
           schema:
             type: integer
             default: 20
-            format: int32      
+            format: int32
         - name: sort
           in: query
           description: Sort the results in the specified column and direction. The format for this param is column__direction, where column is the column name and direction is either "asc" or "desc".
           required: false
           schema:
-            type: string            
-            enum: 
+            type: string
+            enum:
               - created_at__asc
               - created_at__desc
               - identifier__asc
               - identifier__desc
               - intellectual_object_id__asc
-              - intellectual_object_id__desc 
+              - intellectual_object_id__desc
               - last_fixity_check__asc
               - last_fixity_check__desc
               - size__asc
               - size__desc
               - state__asc
-              - state__desc 
+              - state__desc
               - storage_option__asc
               - storage_option__desc
               - updated_at__asc
@@ -1441,9 +1443,9 @@ paths:
         '403':
           description: The current user does not have permission to view the requested files.
   /member-api/v3/files/show/{id}:
-    get: 
+    get:
       summary: Returns the generic file with the speficied id.
-      tags: 
+      tags:
         - Generic Files
       parameters:
         - name: id
@@ -1453,7 +1455,7 @@ paths:
           schema:
             type: integer
             format: int64
-            minimum: 1       
+            minimum: 1
       responses:
         '200':
           description: The generic file with the requested id.
@@ -1471,11 +1473,11 @@ paths:
           description: There is no generic file with this ID.
 
   /member-api/v3/objects:
-    get: 
+    get:
       summary: Returns a list of intellectual objects.
-      tags: 
+      tags:
         - Intellectual Objects
-      parameters: 
+      parameters:
         - name: page
           in: query
           description: The page of results to fetch
@@ -1483,7 +1485,7 @@ paths:
           schema:
             type: integer
             default: 1
-            format: int32      
+            format: int32
         - name: per_page
           in: query
           description: The number of results to fetch per page.
@@ -1491,14 +1493,14 @@ paths:
           schema:
             type: integer
             default: 20
-            format: int32      
+            format: int32
         - name: sort
           in: query
           description: Sort the results in the specified column and direction. The format for this param is column__direction, where column is the column name and direction is either "asc" or "desc".
           required: false
           schema:
-            type: string            
-            enum: 
+            type: string
+            enum:
               - access__asc
               - access__desc
               - alt_identifier__asc
@@ -1516,11 +1518,11 @@ paths:
               - identifier__asc
               - identifier__desc
               - internal_sender_identifier__asc
-              - internal_sender_identifier__desc 
+              - internal_sender_identifier__desc
               - size__asc
               - size__desc
               - state__asc
-              - state__desc 
+              - state__desc
               - storage_option__asc
               - storage_option__desc
               - updated_at__asc
@@ -1590,7 +1592,7 @@ paths:
           description: Return the object with this identifier.
           required: false
           schema:
-            type: string            
+            type: string
         - name: internal_sender_identifier
           in: query
           description: Return objects with this internal sender identifier.
@@ -1651,9 +1653,9 @@ paths:
         '403':
           description: The current user does not have permission to view the requested objects.
   /member-api/v3/objects/show/{id}:
-    get: 
+    get:
       summary: Returns the intellectual object with the specified id.
-      tags: 
+      tags:
         - Intellectual Objects
       parameters:
         - name: id
@@ -1663,7 +1665,7 @@ paths:
           schema:
             type: integer
             format: int64
-            minimum: 1 
+            minimum: 1
       responses:
         '200':
           description: The intellectual object with the requested id.
@@ -1681,11 +1683,11 @@ paths:
           description: There is no object with this ID.
 
   /member-api/v3/events:
-    get: 
+    get:
       summary: Returns a list of premis events.
-      tags: 
+      tags:
         - Premis Events
-      parameters: 
+      parameters:
         - name: page
           in: query
           description: The page of results to fetch
@@ -1693,7 +1695,7 @@ paths:
           schema:
             type: integer
             default: 1
-            format: int32      
+            format: int32
         - name: per_page
           in: query
           description: The number of results to fetch per page.
@@ -1701,14 +1703,14 @@ paths:
           schema:
             type: integer
             default: 20
-            format: int32      
+            format: int32
         - name: sort
           in: query
           description: Sort the results in the specified column and direction. The format for this param is column__direction, where column is the column name and direction is either "asc" or "desc".
           required: false
           schema:
-            type: string            
-            enum: 
+            type: string
+            enum:
               - date_time__asc
               - date_time__desc
               - event_type__asc
@@ -1745,7 +1747,7 @@ paths:
           required: false
           schema:
             type: string
-            enum: 
+            enum:
               - access assignment
               - creation
               - deletion
@@ -1773,7 +1775,7 @@ paths:
           description: Return events for the file with this identifier.
           required: false
           schema:
-            type: string            
+            type: string
         - name: identifier
           in: query
           description: Return the event with this identifier (uuid).
@@ -1793,7 +1795,7 @@ paths:
           description: Return events for the object with this identifier. This will include both object- and file-level events.
           required: false
           schema:
-            type: string            
+            type: string
         - name: outcome
           in: query
           description: Return events with the specified outcome.
@@ -1813,9 +1815,9 @@ paths:
         '403':
           description: The current user does not have permission to view the requested events.
   /member-api/v3/events/show/{id}:
-    get: 
+    get:
       summary: Returns the premis event with the specified id.
-      tags: 
+      tags:
         - Premis Events
       parameters:
         - name: id
@@ -1825,7 +1827,7 @@ paths:
           schema:
             type: integer
             format: int64
-            minimum: 1 
+            minimum: 1
       responses:
         '200':
           description: The premis event with the requested id.
@@ -1843,11 +1845,11 @@ paths:
           description: There is no event with this ID.
 
   /member-api/v3/items:
-    get: 
+    get:
       summary: Returns a list of work items
-      tags: 
+      tags:
         - Work Items
-      parameters: 
+      parameters:
         - name: page
           in: query
           description: The page of results to fetch
@@ -1855,7 +1857,7 @@ paths:
           schema:
             type: integer
             default: 1
-            format: int32      
+            format: int32
         - name: per_page
           in: query
           description: The number of results to fetch per page.
@@ -1863,18 +1865,18 @@ paths:
           schema:
             type: integer
             default: 20
-            format: int32      
+            format: int32
         - name: sort
           in: query
           description: Sort the results in the specified column and direction. The format for this param is column__direction, where column is the column name and direction is either "asc" or "desc".
           required: false
           schema:
-            type: string            
-            enum: 
+            type: string
+            enum:
               - action__asc
               - action__desc
               - alt_identifier__asc
-              - alt_identifier__desc              
+              - alt_identifier__desc
               - bag_date__asc
               - bag_date__desc
               - bag_group_identifier__asc
@@ -1900,13 +1902,13 @@ paths:
               - queued_at__asc
               - queued_at__desc
               - size__asc
-              - size__desc 
-              - stage__asc 
-              - stage__desc 
-              - status__asc  
+              - size__desc
+              - stage__asc
+              - stage__desc
+              - status__asc
               - status__desc
-              - storage_option__asc 
-              - storage_option__desc 
+              - storage_option__asc
+              - storage_option__desc
         - name: action
           in: query
           description: Return items with the specified action.
@@ -1986,7 +1988,7 @@ paths:
           description: Return work items for the file with this identifier.
           required: false
           schema:
-            type: string 
+            type: string
         - name: intellectual_object_id
           in: query
           description: Return items related to the specified object.
@@ -1999,7 +2001,7 @@ paths:
           description: Return items for bags with the specified name. Name is the name of the original tar file uploaded to the receiving bucket for ingest.
           required: false
           schema:
-            type: string            
+            type: string
         - name: node__is_null
           in: query
           description: Return work items that are not currently being processed by any ingest, restoration, or deletion worker.
@@ -2019,7 +2021,7 @@ paths:
           description: Return work items for the object with this identifier.
           required: false
           schema:
-            type: string 
+            type: string
         - name: queued_at__is_null
           in: query
           description: Return work items that have not yet been queued for processing.
@@ -2036,7 +2038,7 @@ paths:
             enum: ["true"]
         - name: retry
           in: query
-          description: Return work items that are cleared for processing. 
+          description: Return work items that are cleared for processing.
           required: false
           schema:
             type: string
@@ -2057,7 +2059,7 @@ paths:
             format: int64
         - name: stage
           in: query
-          description: Return work items in this stage of processing. 
+          description: Return work items in this stage of processing.
           required: false
           schema:
             type: string
@@ -2080,7 +2082,7 @@ paths:
               - Validate
         - name: status
           in: query
-          description: Return work items with the specified status. 
+          description: Return work items with the specified status.
           required: false
           schema:
             type: string
@@ -2093,14 +2095,14 @@ paths:
               - Suspended
         - name: storage_option
           in: query
-          description: Return work items enacted on files or objects with the specified storage option. 
+          description: Return work items enacted on files or objects with the specified storage option.
           required: false
           schema:
             type: string
             enum: ["Glacier-Deep-OH", "Glacier-Deep-OR", "Glacier-Deep-VA", "Glacier-OH", "Glacier-OR", "Glacier-VA", "Standard", "Wasabi-OR", "Wasabi-VA"]
         - name: user
           in: query
-          description: Return work items initiated by the specified user. 
+          description: Return work items initiated by the specified user.
           required: false
           schema:
             type: string
@@ -2117,9 +2119,9 @@ paths:
         '403':
           description: The current user does not have permission to view the requested work items.
   /member-api/v3/items/show/{id}:
-    get: 
+    get:
       summary: Returns the work item with the specified id.
-      tags: 
+      tags:
         - Work Items
       parameters:
         - name: id
@@ -2129,7 +2131,7 @@ paths:
           schema:
             type: integer
             format: int64
-            minimum: 1 
+            minimum: 1
       responses:
         '200':
           description: The work item with the requested id.
@@ -2145,4 +2147,3 @@ paths:
           description: The current user does not have permission to view this work item.
         '404':
           description: There is no work item with this ID.
-
