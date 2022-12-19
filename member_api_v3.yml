@@ -12,9 +12,9 @@ info:
 
 servers:
   - url: http://demo.aptrust.org/member-api/v3
-    description: "APTrust demo server. This is generally a safe sandbox for testing out new code and workflows. Materials in this system may be deleted at any time."
+    description: "APTrust demo server. Use this for testing."
   - url: http://registry.aptrust.org/member-api/v3
-    description: "APTrust production server. This is our long-term preservation system. If you're not sure of your code, test it against demo first."
+    description: "APTrust production server."
 
 tags:
   - name: Alerts
