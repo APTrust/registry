@@ -187,7 +187,7 @@ Resources:
         - Condition: SUCCESS
           ContainerName: Nsqadmin_ResolvConf_InitContainer
         Essential: true 
-        Image: docker.io/aptrust/registry:3b1c88c-master 
+        Image: docker.io/aptrust/registry:e77ac8c-master
         Secrets:
         - Name: APT_ENV
           ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/APT_ENV'
@@ -330,6 +330,9 @@ Resources:
       Name: !Sub "registry-targetgroup-${DNS}"
       Port: 8080
       Protocol: HTTP
+      TargetGroupAttributes:
+        - Key: 'deregistration_delay.timeout_seconds'
+          Value: 110
       Tags:
       - Key: Service
         Value: registry
