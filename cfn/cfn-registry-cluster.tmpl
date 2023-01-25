@@ -330,6 +330,9 @@ Resources:
       Name: !Sub "registry-targetgroup-${DNS}"
       Port: 8080
       Protocol: HTTP
+      TargetGroupAttributes:
+        - Key: 'deregistration_delay.timeout_seconds'
+          Value: 110
       Tags:
       - Key: Service
         Value: registry
