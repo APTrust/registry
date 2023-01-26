@@ -1,6 +1,7 @@
 package pgmodels_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/APTrust/registry/constants"
@@ -151,4 +152,44 @@ func TestIdForInstIdentifier(t *testing.T) {
 
 	id, err = pgmodels.IdForInstIdentifier("bad identifier")
 	require.NotNil(t, err)
+}
+
+func TestInstitutionGetAssociateMembers(t *testing.T) {
+	db.LoadFixtures()
+	defer db.ForceFixtureReload()
+
+	inst, err := pgmodels.InstitutionByIdentifier("institution1.edu")
+	require.Nil(t, err)
+	require.NotNil(t, inst)
+
+	for i := 0; i < 5; i++ {
+		inst := pgmodels.Institution{
+			Name:                fmt.Sprintf("SubAccount %d", i),
+			Identifier:          fmt.Sprintf("subacct%d.edu", i),
+			State:               constants.StateActive,
+			Type:                constants.InstTypeSubscriber,
+			MemberInstitutionID: inst.ID,
+			ReceivingBucket:     fmt.Sprintf("aptrust.receiving.text.subacct%d.edu", i),
+			RestoreBucket:       fmt.Sprintf("aptrust.restore.text.subacct%d.edu", i),
+		}
+		require.Nil(t, inst.Save())
+	}
+
+	// Should be 5 active sub accounts
+	associateAccounts, err := inst.GetAssociateMembers()
+	require.Nil(t, err)
+	assert.Equal(t, 5, len(associateAccounts))
+	for i, acct := range associateAccounts {
+		expectedName := fmt.Sprintf("SubAccount %d", i)
+		assert.Equal(t, expectedName, acct.Name)
+		if i == 2 {
+			acct.State = constants.StateDeleted
+			require.Nil(t, acct.Save())
+		}
+	}
+
+	// Should be 4 active sub accounts
+	associateAccounts, err = inst.GetAssociateMembers()
+	require.Nil(t, err)
+	assert.Equal(t, 4, len(associateAccounts))
 }

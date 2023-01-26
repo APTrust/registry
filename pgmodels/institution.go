@@ -110,6 +110,14 @@ func (inst *Institution) Undelete() error {
 	return update(inst)
 }
 
+// GetAssociateMembers returns a list of the associate members
+// (aka sub-accounts) belonging to this subscribing member. This
+// will return an empty list if the institution itself is an
+// associate account, or if it has zero subscribing members.
+func (inst *Institution) GetAssociateMembers() ([]*Institution, error) {
+	return InstitutionSelect(NewQuery().Where("member_institution_id", "=", inst.ID).Where("state", "=", constants.StateActive))
+}
+
 // bucket returns a valid bucket name for this institution.
 // Param name should be "receiving" or "restore"
 func (inst *Institution) bucket(name string) string {

@@ -12,7 +12,7 @@ import (
 )
 
 func TestInstitutionView(t *testing.T) {
-	db.LoadFixtures()
+	db.ForceFixtureReload()
 	instView, err := pgmodels.InstitutionViewByID(1)
 	require.Nil(t, err)
 	require.NotNil(t, instView)
@@ -26,5 +26,5 @@ func TestInstitutionView(t *testing.T) {
 		OrderBy("created_at", "asc")
 	instViews, err := pgmodels.InstitutionViewSelect(query)
 	require.Nil(t, err)
-	assert.Equal(t, 7, len(instViews))
+	assert.Equal(t, 5, len(instViews))
 }
