@@ -1,8 +1,6 @@
 package pgmodels_test
 
 import (
-	"encoding/json"
-	"fmt"
 	"testing"
 
 	"github.com/APTrust/registry/db"
@@ -19,8 +17,8 @@ func TestDepositFormatStats(t *testing.T) {
 	require.Nil(t, err)
 	require.NotNil(t, stats)
 
-	j, _ := json.MarshalIndent(stats, "", "  ")
-	fmt.Println(string(j))
+	//j, _ := json.MarshalIndent(stats, "", "  ")
+	//fmt.Println(string(j))
 
 	require.Equal(t, 5, len(stats))
 	assert.EqualValues(t, 24, pgmodels.StatsByFormat(stats, "Total").FileCount)

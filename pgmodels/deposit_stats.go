@@ -20,17 +20,18 @@ var DepositStatsFilters = []string{
 // interface, nor does it map to a single underlying table or view.
 // This struct merely represents to the output of a reporting query.
 type DepositStats struct {
-	InstitutionID   int64     `json:"institution_id"`
-	InstitutionName string    `json:"institution_name"`
-	StorageOption   string    `json:"storage_option"`
-	ObjectCount     int64     `json:"object_count"`
-	FileCount       int64     `json:"file_count"`
-	TotalBytes      int64     `json:"total_bytes"`
-	TotalGB         float64   `json:"total_gb" pg:"total_gb"`
-	TotalTB         float64   `json:"total_tb" pg:"total_tb"`
-	CostGBPerMonth  float64   `json:"cost_gb_per_month" pg:"cost_gb_per_month"`
-	MonthlyCost     float64   `json:"monthly_cost"`
-	EndDate         time.Time `json:"end_date"`
+	InstitutionID       int64     `json:"institution_id"`
+	MemberInstitutionID int64     `json:"member_institution_id"`
+	InstitutionName     string    `json:"institution_name"`
+	StorageOption       string    `json:"storage_option"`
+	ObjectCount         int64     `json:"object_count"`
+	FileCount           int64     `json:"file_count"`
+	TotalBytes          int64     `json:"total_bytes"`
+	TotalGB             float64   `json:"total_gb" pg:"total_gb"`
+	TotalTB             float64   `json:"total_tb" pg:"total_tb"`
+	CostGBPerMonth      float64   `json:"cost_gb_per_month" pg:"cost_gb_per_month"`
+	MonthlyCost         float64   `json:"monthly_cost"`
+	EndDate             time.Time `json:"end_date"`
 }
 
 // DepositStatsSelect returns info about materials a depositor updated
@@ -42,8 +43,9 @@ func DepositStatsSelect(institutionID int64, storageOption string, endDate time.
 	var stats []*DepositStats
 	statsQuery := getDepositStatsQuery(institutionID, storageOption, endDate)
 	// fmt.Println(statsQuery, "INST", institutionID, "STOR", storageOption, "END", endDate)
+	// fmt.Println(statsQuery)
 	_, err := common.Context().DB.Query(&stats, statsQuery,
-		institutionID, institutionID,
+		institutionID, institutionID, institutionID,
 		storageOption, storageOption,
 		endDate, endDate)
 
@@ -63,6 +65,11 @@ func DepositStatsSelect(institutionID int64, storageOption string, endDate time.
 	return stats, err
 }
 
+// TODO: Change the query below to use a union, so primary depositor
+//       is on top. We'll also need to add a rollup. This may best be
+//       done in a stored procedure or function, or in the stats tables
+//       themselves.
+
 func getDepositStatsQuery(institutionID int64, storageOption string, endDate time.Time) string {
 	// Basic depost stats query. Use the "is null / or" trick to deal with
 	// filters that may or may not be present. Also note that historical
@@ -79,7 +86,7 @@ func getDepositStatsQuery(institutionID int64, storageOption string, endDate tim
 				cost_gb_per_month,
 				monthly_cost, 
 				end_date from %s 
-				where (? = 0 or institution_id = ?)
+				where (? = 0 or institution_id = ? or member_institution_id = ?)
 				and (? = '' or storage_option = ?) `
 	tableName := "historical_deposit_stats"
 
@@ -95,5 +102,6 @@ func getDepositStatsQuery(institutionID int64, storageOption string, endDate tim
 		// historical stats has exact cache dates
 		q += "and (? = '0001-01-01 00:00:00+00:00:00' or end_date = ?)"
 	}
+	q += " order by primary_sort, secondary_sort"
 	return fmt.Sprintf(q, tableName)
 }
