@@ -88,6 +88,8 @@ func DepositStatsSelect(institutionID int64, storageOption string, endDate time.
 		stats = append(stats, subAcctStats...)
 	}
 
+	calculateMontlyTotals(stats)
+
 	return stats, err
 }
 
@@ -186,4 +188,15 @@ func getTableNameAndDateClause(endDate time.Time) (string, string) {
 		dateClause = " and (? = '0001-01-01 00:00:00+00:00:00' or end_date = ?) "
 	}
 	return tableName, dateClause
+}
+
+func calculateMontlyTotals(stats []*DepositStats) {
+	instTotal := 0.0
+	for _, stat := range stats {
+		instTotal += stat.MonthlyCost
+		if stat.StorageOption == "Total" {
+			stat.MonthlyCost = instTotal
+			instTotal = 0.0
+		}
+	}
 }
