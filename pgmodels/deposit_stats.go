@@ -62,6 +62,16 @@ func DepositStatsSelect(institutionID int64, storageOption string, endDate time.
 			EndDate:         endDate,
 		}
 	}
+	if err != nil {
+		return stats, err
+	}
+
+	// We have to get these separately
+	subAcctStats, err := calculateSubAccountRollup(institutionID, storageOption, endDate)
+	if err == nil && subAcctStats != nil {
+		stats = append(stats, subAcctStats...)
+	}
+
 	return stats, err
 }
 
@@ -103,5 +113,60 @@ func getDepositStatsQuery(institutionID int64, storageOption string, endDate tim
 		q += "and (? = '0001-01-01 00:00:00+00:00:00' or end_date = ?)"
 	}
 	q += " order by primary_sort, secondary_sort"
+	return fmt.Sprintf(q, tableName)
+}
+
+func calculateSubAccountRollup(institutionID int64, storageOption string, endDate time.Time) ([]*DepositStats, error) {
+	inst, err := InstitutionByID(institutionID)
+	if err != nil {
+		return nil, err
+	}
+	hasSubAccounts, err := inst.HasSubAccounts()
+	if err != nil {
+		return nil, err
+	}
+	if !hasSubAccounts {
+		return nil, nil
+	}
+	var stats []*DepositStats
+	rollupQuery := getSubAccountRollupQuery(institutionID, storageOption, endDate)
+	_, err = common.Context().DB.Query(&stats, rollupQuery,
+		institutionID, institutionID,
+		storageOption, storageOption,
+		endDate, endDate)
+	return stats, err
+}
+
+func getSubAccountRollupQuery(institutionID int64, storageOption string, endDate time.Time) string {
+	q := `select 0 as institution_id, 
+	'All Institutions' as institution_name, 
+	storage_option, 
+	sum(file_count) as file_count, 
+	sum(object_count) as object_count, 
+	sum(total_bytes) as total_bytes, 
+	sum(total_gb) as total_gb, 
+	sum(total_tb) as total_tb, 
+	sum(cost_gb_per_month) as cost_gb_per_month,
+	sum(monthly_cost) as monthly_cost, 
+	end_date 
+	from %s 
+	where (institution_id = ? or member_institution_id = ?)
+	and (? = '' or storage_option = ?) `
+
+	tableName := "historical_deposit_stats"
+
+	// Current stats report, which displays on dashboard, passes in
+	// time.Now() as end date. In this case, we want to query the
+	// current stats table, not historical stats.
+	now := time.Now().UTC()
+	firstOfThisMonth := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.UTC)
+	if endDate.After(firstOfThisMonth) || endDate == firstOfThisMonth {
+		// current stats view does not need end_date
+		tableName = "current_deposit_stats"
+	} else {
+		// historical stats has exact cache dates
+		q += "and (? = '0001-01-01 00:00:00+00:00:00' or end_date = ?) "
+	}
+	q += " group by storage_option, end_date, secondary_sort order by secondary_sort "
 	return fmt.Sprintf(q, tableName)
 }
