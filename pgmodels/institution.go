@@ -118,6 +118,15 @@ func (inst *Institution) GetAssociateMembers() ([]*Institution, error) {
 	return InstitutionSelect(NewQuery().Where("member_institution_id", "=", inst.ID).Where("state", "=", constants.StateActive))
 }
 
+// HasSubAccounts returns true if this insitution has active
+// sub-accounts, aka associate members.
+func (inst *Institution) HasSubAccounts() (bool, error) {
+	return common.Context().DB.Model(&Institution{}).
+		Column("id").
+		Where("member_institution_id = ? and state = ?", inst.ID, constants.StateActive).
+		Exists()
+}
+
 // bucket returns a valid bucket name for this institution.
 // Param name should be "receiving" or "restore"
 func (inst *Institution) bucket(name string) string {

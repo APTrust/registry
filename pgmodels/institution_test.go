@@ -193,3 +193,30 @@ func TestInstitutionGetAssociateMembers(t *testing.T) {
 	require.Nil(t, err)
 	assert.Equal(t, 4, len(associateAccounts))
 }
+
+func TestInstitutionHasSubAccounts(t *testing.T) {
+	db.LoadFixtures()
+	defer db.ForceFixtureReload()
+
+	inst1, err := pgmodels.InstitutionByIdentifier("institution1.edu")
+	require.Nil(t, err)
+	require.NotNil(t, inst1)
+	hasKids, err := inst1.HasSubAccounts()
+	require.Nil(t, err)
+	assert.False(t, hasKids)
+
+	// Temporarily make Inst2 a subaccount of Inst1
+	// We'll reload fixtures at the end of this test
+	// so we don't mess up other tests.
+	inst2, err := pgmodels.InstitutionByIdentifier("institution2.edu")
+	require.Nil(t, err)
+	require.NotNil(t, inst2)
+	inst2.MemberInstitutionID = inst1.ID
+	require.Nil(t, inst2.Save())
+
+	// Now this should be true, because inst2 is a sub-account
+	// of inst1.
+	hasKids, err = inst1.HasSubAccounts()
+	require.Nil(t, err)
+	assert.True(t, hasKids)
+}
