@@ -34,6 +34,22 @@ type DepositStats struct {
 	EndDate             time.Time `json:"end_date"`
 }
 
+// ----------------------------------------------------------------------------
+//
+// Why is this so complicated? Because deposit stats, being extremely
+// expensive to calculate, are stored in a one table (historical_deposit_stats)
+// and one materialized view (current_deposit_stats), both of which are
+// populated periodically in the background through a fairly complex
+// query that already includes a number of sums and rollups.
+//
+// If we roll up sub account subtotals into these tables/materialized views,
+// it becomes difficult to query the data without returning extranous rows.
+//
+// So the not-too-pretty solution here is run a second query to
+// calculate sub-account totals. C'est la guerre. Ne pleurez pas.
+//
+// ----------------------------------------------------------------------------
+
 // DepositStatsSelect returns info about materials a depositor updated
 // in our system before a given date. This breaks down deposits by
 // storage option and institution. To report on all institutions, use
@@ -75,11 +91,6 @@ func DepositStatsSelect(institutionID int64, storageOption string, endDate time.
 	return stats, err
 }
 
-// TODO: Change the query below to use a union, so primary depositor
-//       is on top. We'll also need to add a rollup. This may best be
-//       done in a stored procedure or function, or in the stats tables
-//       themselves.
-
 func getDepositStatsQuery(institutionID int64, storageOption string, endDate time.Time) string {
 	// Basic depost stats query. Use the "is null / or" trick to deal with
 	// filters that may or may not be present. Also note that historical
@@ -98,25 +109,17 @@ func getDepositStatsQuery(institutionID int64, storageOption string, endDate tim
 				end_date from %s 
 				where (? = 0 or institution_id = ? or member_institution_id = ?)
 				and (? = '' or storage_option = ?) `
-	tableName := "historical_deposit_stats"
 
-	// Current stats report, which displays on dashboard, passes in
-	// time.Now() as end date. In this case, we want to query the
-	// current stats table, not historical stats.
-	now := time.Now().UTC()
-	firstOfThisMonth := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.UTC)
-	if endDate.After(firstOfThisMonth) || endDate == firstOfThisMonth {
-		// current stats view does not need end_date
-		tableName = "current_deposit_stats"
-	} else {
-		// historical stats has exact cache dates
-		q += "and (? = '0001-01-01 00:00:00+00:00:00' or end_date = ?)"
-	}
+	tableName, dateClause := getTableNameAndDateClause(endDate)
+	q += dateClause
 	q += " order by primary_sort, secondary_sort"
 	return fmt.Sprintf(q, tableName)
 }
 
 func calculateSubAccountRollup(institutionID int64, storageOption string, endDate time.Time) ([]*DepositStats, error) {
+	if institutionID < 1 {
+		return nil, nil
+	}
 	inst, err := InstitutionByID(institutionID)
 	if err != nil {
 		return nil, err
@@ -134,6 +137,13 @@ func calculateSubAccountRollup(institutionID int64, storageOption string, endDat
 		institutionID, institutionID,
 		storageOption, storageOption,
 		endDate, endDate)
+
+	// Empty result set is OK, because sub accounts often
+	// exist for weeks or months before making a deposit.
+	// So don't consider empty result set an error.
+	if IsNoRowError(err) {
+		return stats, nil
+	}
 	return stats, err
 }
 
@@ -153,7 +163,15 @@ func getSubAccountRollupQuery(institutionID int64, storageOption string, endDate
 	where (institution_id = ? or member_institution_id = ?)
 	and (? = '' or storage_option = ?) `
 
+	tableName, dateClause := getTableNameAndDateClause(endDate)
+	q += dateClause
+	q += " group by storage_option, end_date, secondary_sort order by secondary_sort "
+	return fmt.Sprintf(q, tableName)
+}
+
+func getTableNameAndDateClause(endDate time.Time) (string, string) {
 	tableName := "historical_deposit_stats"
+	dateClause := ""
 
 	// Current stats report, which displays on dashboard, passes in
 	// time.Now() as end date. In this case, we want to query the
@@ -165,8 +183,7 @@ func getSubAccountRollupQuery(institutionID int64, storageOption string, endDate
 		tableName = "current_deposit_stats"
 	} else {
 		// historical stats has exact cache dates
-		q += "and (? = '0001-01-01 00:00:00+00:00:00' or end_date = ?) "
+		dateClause = " and (? = '0001-01-01 00:00:00+00:00:00' or end_date = ?) "
 	}
-	q += " group by storage_option, end_date, secondary_sort order by secondary_sort "
-	return fmt.Sprintf(q, tableName)
+	return tableName, dateClause
 }
