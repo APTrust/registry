@@ -39,7 +39,9 @@ var WorkItemFilters = []string{
 	"size__gteq",
 	"size__lteq",
 	"stage",
+	"stage__in",
 	"status",
+	"status__in",
 	"storage_option",
 	"user",
 }

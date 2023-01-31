@@ -30,7 +30,6 @@ func NewFilterCollection() *FilterCollection {
 //
 // Key: name__in
 // Values: ["Bart", "Lisa", "Maggie"]
-//
 func (fc *FilterCollection) Add(key string, values []string) (*ParamFilter, error) {
 	filter, err := NewParamFilter(key, values)
 	if err != nil {
@@ -87,6 +86,16 @@ func (fc *FilterCollection) ValueOf(filterName string) string {
 		}
 	}
 	return ""
+}
+
+// ValuesOf returns all selected values for the specified filter.
+func (fc *FilterCollection) ValuesOf(filterName string) []string {
+	for _, pf := range fc.filters {
+		if pf.Key == filterName && len(pf.Values) > 0 {
+			return pf.Values
+		}
+	}
+	return make([]string, 0)
 }
 
 // ParamFilter parses query string params into filters that can be added
