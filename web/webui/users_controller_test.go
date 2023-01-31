@@ -576,3 +576,22 @@ func restorePassword(t *testing.T, user *pgmodels.User) {
 	err = user.Save()
 	assert.Nil(t, err, "After tests, error restoring password for user %s", user.Name)
 }
+
+func TestUserSignInShow(t *testing.T) {
+	testutil.InitHTTPTests(t)
+
+	// Anonymous client should see the login screen when requesting "/""
+	client := testutil.GetAnonymousClient(t)
+	resp := client.GET("/").Expect().Status(http.StatusOK)
+	html := resp.Body().Raw()
+	assert.Contains(t, html, `<form action="/users/sign_in/" method="post">`)
+	assert.Contains(t, html, `<input type="submit" value="Sign In">`)
+
+	// If user is already signed in, they should go to the dashboard.
+	for _, client := range testutil.AllClients {
+		resp = client.GET("/").Expect().Status(http.StatusOK)
+		html = resp.Body().Raw()
+		assert.Contains(t, html, "Recent Work Items")
+		assert.Contains(t, html, "Deposits by Storage Option")
+	}
+}

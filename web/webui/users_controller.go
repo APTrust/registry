@@ -11,6 +11,7 @@ import (
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/forms"
 	"github.com/APTrust/registry/helpers"
+	"github.com/APTrust/registry/middleware"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/APTrust/registry/web/api"
 	"github.com/gin-gonic/gin"
@@ -116,6 +117,18 @@ func UserEdit(c *gin.Context) {
 // UserSignInShow shows the user sign-in form.
 // GET /users/sign_in
 func UserSignInShow(c *gin.Context) {
+	// Check to see if the user is already logged in.
+	// If they are, send them to the dashboard.
+	// We do this because users often bookmark the root url
+	// and go there when they still have a valid session.
+	// Instead of forcing them to sign in again, just push
+	// them to the dashboard.
+	user, _ := middleware.GetUser(c)
+	if user != nil && user.InstitutionID > 0 {
+		common.Context().Log.Info().Msgf("User %s is already logged in. Redirecting to dashboard.", user.Email)
+		c.Redirect(http.StatusFound, "/dashboard")
+	}
+
 	// For these environments, prefill logins defined in fixtures
 	// to make dev's life easier. These envs contain only fixture
 	// and test data.
