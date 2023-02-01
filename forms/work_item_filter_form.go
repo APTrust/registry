@@ -1,8 +1,6 @@
 package forms
 
 import (
-	"fmt"
-
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/pgmodels"
@@ -36,12 +34,6 @@ func NewWorkItemFilterForm(fc *pgmodels.FilterCollection, actingUser *pgmodels.U
 }
 
 func (f *WorkItemFilterForm) init() {
-	// f.Fields["action"] = &Field{
-	// 	Name:        "action",
-	// 	Label:       "Action",
-	// 	Placeholder: "Action",
-	// 	Options:     Options(constants.WorkItemActions),
-	// }
 	f.Fields["action__in"] = &Field{
 		Name:        "action__in",
 		Label:       "Action",
@@ -131,19 +123,16 @@ func (f *WorkItemFilterForm) init() {
 		Placeholder: "Object Identifier",
 	}
 	// Special field for admin reporting.
-	// Ideally, we'd use HTML select elements with
-	// multiple=true, but this completely breaks and uglifies
-	// the front-end layout.
-	// f.Fields["report"] = &Field{
-	// 	Name:        "report",
-	// 	Label:       "Report",
-	// 	Placeholder: "Report",
-	// 	Options: []ListOption{
-	// 		{"in_process", "In Process", false},
-	// 		{"canceled_failed", "Canceled/Failed", false},
-	// 		{"active_restorations", "Active Restorations", false},
-	// 	},
-	// }
+	f.Fields["report"] = &Field{
+		Name:        "report",
+		Label:       "Quick Reports",
+		Placeholder: "Quick Reports",
+		Options: []*ListOption{
+			{"in_process", "In Process - Last 30 Days", false},
+			{"cancelled_failed", "Canceled/Failed - Last 30 Days", false},
+			{"active_restorations", "Active Restorations", false},
+		},
+	}
 	f.Fields["size__gteq"] = &Field{
 		Name:        "size__gteq",
 		Label:       "Min Size",
@@ -163,12 +152,6 @@ func (f *WorkItemFilterForm) init() {
 			"multiple": "multiple",
 		},
 	}
-	// f.Fields["status"] = &Field{
-	// 	Name:        "status",
-	// 	Label:       "Work Item Status",
-	// 	Placeholder: "Work Item Status",
-	// 	Options:     Options(constants.Statuses),
-	// }
 	f.Fields["status__in"] = &Field{
 		Name:        "status__in",
 		Label:       "Status",
@@ -216,19 +199,11 @@ func (f *WorkItemFilterForm) SetValues() {
 					option := f.Fields[fieldName].Options[i]
 					if option.Value == val {
 						option.Selected = true
-						fmt.Println(">>>", option.Value, "is selected")
 					}
 				}
 			}
 		} else {
 			f.Fields[fieldName].Value = f.FilterCollection.ValueOf(fieldName)
 		}
-
-		for _, option := range f.Fields[fieldName].Options {
-			if option.Selected {
-				fmt.Println("*** Selection stuck for", option.Value)
-			}
-		}
-
 	}
 }

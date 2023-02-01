@@ -53,7 +53,7 @@ func InitHTTPTests(t *testing.T) {
 	// Force fixture reload to get rid of any records
 	// that the pgmodels tests may have inserted or changed.
 	// This gives us a known set of fixtures to work with.
-	if fixturesReloaded == false {
+	if !fixturesReloaded {
 		err := db.ForceFixtureReload()
 		require.Nil(t, err)
 		fixturesReloaded = true

@@ -109,6 +109,9 @@
             {{ template "forms/number.html" .filterForm.Fields.size__lteq }}
           </div>
           <div class="column is-one-quarter">
+            {{ if .CurrentUser.IsAdmin }}
+            {{ template "forms/select.html" .filterForm.Fields.report }}
+            {{ end }}
           </div>          
         </div>
       </div>
@@ -130,6 +133,32 @@
      }
      {{ end }}
      return true
+ }
+
+ document.getElementById("report").addEventListener("change", function() {
+  let form = document.forms['itemFilterForm']
+  let report = form['report'].value
+  if (report == "") {
+    return
+  }
+  let date = thirtyDaysAgo().toISOString()
+  switch(report) {
+    case "in_process":
+      location = `${location.pathname}?status__in=Pending&status__in=Started&date_processed__gteq=${date}`
+      break
+    case "cancelled_failed":
+      location = `${location.pathname}?status__in=Cancelled&status__in=Failed&date_processed__gteq=${date}`
+      break
+    case "active_restorations": 
+      location = `${location.pathname}?action__in=Glacier+Restore&action__in=Restore+File&action__in=Restore+Object&date_processed__gteq=${date}`
+      break
+  }
+ });
+
+ function thirtyDaysAgo() {
+  var d = new Date();
+  d.setDate(d.getDate() - 30);
+  return d;
  }
 </script>
 
