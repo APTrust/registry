@@ -14,6 +14,7 @@ var tarExtension = regexp.MustCompile("\\.tar$")
 
 var WorkItemFilters = []string{
 	"action",
+	"action__in",
 	"alt_identifier",
 	"bag_date__gteq",
 	"bag_date__lteq",

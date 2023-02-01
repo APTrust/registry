@@ -10,7 +10,7 @@ type FileFilterForm struct {
 	Form
 	FilterCollection  *pgmodels.FilterCollection
 	actingUserIsAdmin bool
-	instOptions       []ListOption
+	instOptions       []*ListOption
 }
 
 func NewFileFilterForm(fc *pgmodels.FilterCollection, actingUser *pgmodels.User) (FilterForm, error) {

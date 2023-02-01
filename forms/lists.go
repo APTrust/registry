@@ -28,67 +28,67 @@ var Months = []string{
 // AllRolesList is a list of assignable user roles. Hard-coded instead
 // of using Options() function for formatting reasons and because we
 // don't want to include the "none" role.
-var AllRolesList = []ListOption{
-	{constants.RoleInstAdmin, "Institutional Admin"},
-	{constants.RoleInstUser, "Institutional User"},
-	{constants.RoleSysAdmin, "APTrust System Administrator"},
+var AllRolesList = []*ListOption{
+	{constants.RoleInstAdmin, "Institutional Admin", false},
+	{constants.RoleInstUser, "Institutional User", false},
+	{constants.RoleSysAdmin, "APTrust System Administrator", false},
 }
 
-var BagItProfileIdentifiers = []ListOption{
-	{constants.DefaultProfileIdentifier, "APTrust"},
-	{constants.BTRProfileIdentifier, "BTR"},
+var BagItProfileIdentifiers = []*ListOption{
+	{constants.DefaultProfileIdentifier, "APTrust", false},
+	{constants.BTRProfileIdentifier, "BTR", false},
 }
 
 // DepositChartMetrics come from names of pgmodels.DepositStats properties
-var DepositChartMetrics = []ListOption{
-	{"object_count", "Object Count"},
-	{"file_count", "File Count"},
-	{"total_bytes", "Total Bytes"},
-	{"total_gb", "Total Gigabytes"},
-	{"total_tb", "Total Terabytes"},
-	{"monthly_cost", "Monthly Cost"},
+var DepositChartMetrics = []*ListOption{
+	{"object_count", "Object Count", false},
+	{"file_count", "File Count", false},
+	{"total_bytes", "Total Bytes", false},
+	{"total_gb", "Total Gigabytes", false},
+	{"total_tb", "Total Terabytes", false},
+	{"monthly_cost", "Monthly Cost", false},
 }
 
 // InstRolesList is a list of user roles for institutions.
-var InstRolesList = []ListOption{
-	{constants.RoleInstAdmin, "Institutional Admin"},
-	{constants.RoleInstUser, "Institutional User"},
+var InstRolesList = []*ListOption{
+	{constants.RoleInstAdmin, "Institutional Admin", false},
+	{constants.RoleInstUser, "Institutional User", false},
 }
 
-var InstTypeList = []ListOption{
-	{constants.InstTypeMember, "Member"},
-	{constants.InstTypeSubscriber, "Subscriber (Sub-Account)"},
+var InstTypeList = []*ListOption{
+	{constants.InstTypeMember, "Member", false},
+	{constants.InstTypeSubscriber, "Subscriber (Sub-Account)", false},
 }
 
-var ObjectStateList = []ListOption{
-	{constants.StateActive, "Active"},
-	{constants.StateDeleted, "Deleted"},
+var ObjectStateList = []*ListOption{
+	{constants.StateActive, "Active", false},
+	{constants.StateDeleted, "Deleted", false},
 }
 
-var StorageOptionList = []ListOption{
-	{constants.StorageOptionGlacierDeepOH, "Glacier Deep - Ohio"},
-	{constants.StorageOptionGlacierDeepOR, "Glacier Deep - Oregon"},
-	{constants.StorageOptionGlacierDeepVA, "Glacier Deep - Virginia"},
-	{constants.StorageOptionGlacierOH, "Glacier - Ohio"},
-	{constants.StorageOptionGlacierOR, "Glacier - Oregon"},
-	{constants.StorageOptionGlacierVA, "Glacier - Virginia"},
-	{constants.StorageOptionStandard, "Standard"},
-	{constants.StorageOptionWasabiOR, "Wasabi - Oregon"},
-	{constants.StorageOptionWasabiVA, "Wasabi - Virginia"},
+var StorageOptionList = []*ListOption{
+	{constants.StorageOptionGlacierDeepOH, "Glacier Deep - Ohio", false},
+	{constants.StorageOptionGlacierDeepOR, "Glacier Deep - Oregon", false},
+	{constants.StorageOptionGlacierDeepVA, "Glacier Deep - Virginia", false},
+	{constants.StorageOptionGlacierOH, "Glacier - Ohio", false},
+	{constants.StorageOptionGlacierOR, "Glacier - Oregon", false},
+	{constants.StorageOptionGlacierVA, "Glacier - Virginia", false},
+	{constants.StorageOptionStandard, "Standard", false},
+	{constants.StorageOptionWasabiOR, "Wasabi - Oregon", false},
+	{constants.StorageOptionWasabiVA, "Wasabi - Virginia", false},
 }
 
-var TwoFactorMethodList = []ListOption{
-	{constants.TwoFactorNone, "None (Turn Off Two-Factor Authentication)"},
-	{constants.TwoFactorAuthy, "Authy OneTouch"},
-	{constants.TwoFactorSMS, "Text Message"},
+var TwoFactorMethodList = []*ListOption{
+	{constants.TwoFactorNone, "None (Turn Off Two-Factor Authentication)", false},
+	{constants.TwoFactorAuthy, "Authy OneTouch", false},
+	{constants.TwoFactorSMS, "Text Message", false},
 }
 
-var YesNoList = []ListOption{
-	{"true", "Yes"},
-	{"false", "No"},
+var YesNoList = []*ListOption{
+	{"true", "Yes", false},
+	{"false", "No", false},
 }
 
-func ListInstitutions(membersOnly bool) ([]ListOption, error) {
+func ListInstitutions(membersOnly bool) ([]*ListOption, error) {
 	instQuery := pgmodels.NewQuery().Columns("id", "name").OrderBy("name", "asc").Limit(100).Offset(0)
 	if membersOnly {
 		instQuery.Where("type", "=", constants.InstTypeMember)
@@ -97,14 +97,14 @@ func ListInstitutions(membersOnly bool) ([]ListOption, error) {
 	if err != nil {
 		return nil, err
 	}
-	options := make([]ListOption, len(institutions))
+	options := make([]*ListOption, len(institutions))
 	for i, inst := range institutions {
-		options[i] = ListOption{strconv.FormatInt(inst.ID, 10), inst.Name}
+		options[i] = &ListOption{strconv.FormatInt(inst.ID, 10), inst.Name, false}
 	}
 	return options, nil
 }
 
-func ListUsers(institutionID int64) ([]ListOption, error) {
+func ListUsers(institutionID int64) ([]*ListOption, error) {
 	query := pgmodels.NewQuery().Columns("id", "name").OrderBy("name", "asc").Limit(200).Offset(0)
 	if institutionID > 0 {
 		query.Where("institution_id", "=", institutionID)
@@ -113,9 +113,9 @@ func ListUsers(institutionID int64) ([]ListOption, error) {
 	if err != nil {
 		return nil, err
 	}
-	options := make([]ListOption, len(users))
+	options := make([]*ListOption, len(users))
 	for i, user := range users {
-		options[i] = ListOption{strconv.FormatInt(user.ID, 10), user.Name}
+		options[i] = &ListOption{strconv.FormatInt(user.ID, 10), user.Name, false}
 	}
 	return options, nil
 }
@@ -134,10 +134,10 @@ func ListUsers(institutionID int64) ([]ListOption, error) {
 //
 // If user chooses the "Today" option, the data will come from the
 // current_deposit_stats view, which is updated hourly.
-func ListDepositReportDates() []ListOption {
+func ListDepositReportDates() []*ListOption {
 	now := time.Now().UTC()
-	options := make([]ListOption, 1)
-	options[0] = ListOption{now.Format("2006-01-02"), "Today"}
+	options := make([]*ListOption, 1)
+	options[0] = &ListOption{now.Format("2006-01-02"), "Today", false}
 	thisYear, thisMonth, _ := now.Date()
 	for year := thisYear; year > 2014; year-- {
 		for month := int(time.December); month > 0; month-- {
@@ -152,7 +152,7 @@ func ListDepositReportDates() []ListOption {
 			}
 			displayDate := fmt.Sprintf("%s %d", displayMonth, displayYear)
 			dateValue := time.Date(year, time.Month(month), 1, 0, 0, 0, 0, time.UTC)
-			options = append(options, ListOption{dateValue.Format("2006-01-02"), displayDate})
+			options = append(options, &ListOption{dateValue.Format("2006-01-02"), displayDate, false})
 		}
 	}
 	return options
@@ -169,10 +169,10 @@ func ListDepositReportDates() []ListOption {
 // Statuses
 // StorageOptions
 // WorkItemActions
-func Options(items []string) []ListOption {
-	options := make([]ListOption, len(items))
+func Options(items []string) []*ListOption {
+	options := make([]*ListOption, len(items))
 	for i, item := range items {
-		options[i] = ListOption{item, item}
+		options[i] = &ListOption{item, item, false}
 	}
 	return options
 }

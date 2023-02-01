@@ -2,6 +2,7 @@ package forms
 
 import (
 	"fmt"
+
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/pgmodels"
@@ -27,8 +28,8 @@ func NewWorkItemRequeueForm(workItem *pgmodels.WorkItem) (*WorkItemRequeueForm, 
 }
 
 func (f *WorkItemRequeueForm) init() {
-	options := []ListOption{
-		{constants.StageRequested, constants.StageRequested},
+	options := []*ListOption{
+		{constants.StageRequested, constants.StageRequested, false},
 	}
 	f.Fields["Stage"] = &Field{
 		Name:        "Stage",
@@ -56,12 +57,12 @@ func (f *WorkItemRequeueForm) Action() string {
 // the storage stage if the item hasn't even been validated yet.
 func (f *WorkItemRequeueForm) setIngestStages() {
 	item := f.Model.(*pgmodels.WorkItem)
-	stages := make([]ListOption, 0)
+	stages := make([]*ListOption, 0)
 	for _, stage := range constants.IngestStagesInOrder {
 		if item.Stage != stage {
-			stages = append(stages, ListOption{stage, stage})
+			stages = append(stages, &ListOption{stage, stage, false})
 		} else {
-			stages = append(stages, ListOption{stage, stage})
+			stages = append(stages, &ListOption{stage, stage, false})
 			break
 		}
 	}

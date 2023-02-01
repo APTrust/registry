@@ -8,7 +8,7 @@ import (
 
 type UserForm struct {
 	Form
-	instOptions       []ListOption
+	instOptions       []*ListOption
 	actingUserIsAdmin bool
 }
 
@@ -27,8 +27,8 @@ func NewUserForm(userToEdit *pgmodels.User, actingUser *pgmodels.User) (*UserFor
 		}
 	} else {
 		// Non-sysadmin (inst admin) can add/edit local users only.
-		userForm.instOptions = []ListOption{
-			{strconv.FormatInt(actingUser.InstitutionID, 10), actingUser.Institution.Name},
+		userForm.instOptions = []*ListOption{
+			{strconv.FormatInt(actingUser.InstitutionID, 10), actingUser.Institution.Name, false},
 		}
 		userToEdit.InstitutionID = actingUser.InstitutionID
 	}

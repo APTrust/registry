@@ -1,6 +1,8 @@
 package forms
 
 import (
+	"fmt"
+
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/pgmodels"
@@ -12,7 +14,7 @@ type WorkItemFilterForm struct {
 	Form
 	FilterCollection  *pgmodels.FilterCollection
 	actingUserIsAdmin bool
-	instOptions       []ListOption
+	instOptions       []*ListOption
 }
 
 func NewWorkItemFilterForm(fc *pgmodels.FilterCollection, actingUser *pgmodels.User) (FilterForm, error) {
@@ -34,11 +36,20 @@ func NewWorkItemFilterForm(fc *pgmodels.FilterCollection, actingUser *pgmodels.U
 }
 
 func (f *WorkItemFilterForm) init() {
-	f.Fields["action"] = &Field{
-		Name:        "action",
+	// f.Fields["action"] = &Field{
+	// 	Name:        "action",
+	// 	Label:       "Action",
+	// 	Placeholder: "Action",
+	// 	Options:     Options(constants.WorkItemActions),
+	// }
+	f.Fields["action__in"] = &Field{
+		Name:        "action__in",
 		Label:       "Action",
 		Placeholder: "Action",
 		Options:     Options(constants.WorkItemActions),
+		Attrs: map[string]string{
+			"multiple": "multiple",
+		},
 	}
 	f.Fields["alt_identifier"] = &Field{
 		Name:        "alt_identifier",
@@ -119,6 +130,20 @@ func (f *WorkItemFilterForm) init() {
 		Label:       "Object Identifier",
 		Placeholder: "Object Identifier",
 	}
+	// Special field for admin reporting.
+	// Ideally, we'd use HTML select elements with
+	// multiple=true, but this completely breaks and uglifies
+	// the front-end layout.
+	// f.Fields["report"] = &Field{
+	// 	Name:        "report",
+	// 	Label:       "Report",
+	// 	Placeholder: "Report",
+	// 	Options: []ListOption{
+	// 		{"in_process", "In Process", false},
+	// 		{"canceled_failed", "Canceled/Failed", false},
+	// 		{"active_restorations", "Active Restorations", false},
+	// 	},
+	// }
 	f.Fields["size__gteq"] = &Field{
 		Name:        "size__gteq",
 		Label:       "Min Size",
@@ -129,17 +154,29 @@ func (f *WorkItemFilterForm) init() {
 		Label:       "Max Size",
 		Placeholder: "Max Size",
 	}
-	f.Fields["stage"] = &Field{
-		Name:        "stage",
+	f.Fields["stage__in"] = &Field{
+		Name:        "stage__in",
 		Label:       "Work Item Stage",
 		Placeholder: "Work Item Stage",
 		Options:     Options(constants.Stages),
+		Attrs: map[string]string{
+			"multiple": "multiple",
+		},
 	}
-	f.Fields["status"] = &Field{
-		Name:        "status",
-		Label:       "Work Item Status",
-		Placeholder: "Work Item Status",
+	// f.Fields["status"] = &Field{
+	// 	Name:        "status",
+	// 	Label:       "Work Item Status",
+	// 	Placeholder: "Work Item Status",
+	// 	Options:     Options(constants.Statuses),
+	// }
+	f.Fields["status__in"] = &Field{
+		Name:        "status__in",
+		Label:       "Status",
+		Placeholder: "Status",
 		Options:     Options(constants.Statuses),
+		Attrs: map[string]string{
+			"multiple": "multiple",
+		},
 	}
 	f.Fields["storage_option"] = &Field{
 		Name:        "storage_option",
@@ -171,6 +208,27 @@ func (f *WorkItemFilterForm) SetValues() {
 			}
 			continue
 		}
-		f.Fields[fieldName].Value = f.FilterCollection.ValueOf(fieldName)
+		// This is currently the only form that uses multiselect.
+		values := f.FilterCollection.ValuesOf(fieldName)
+		if len(values) > 1 {
+			for _, val := range values {
+				for i := 0; i < len(f.Fields[fieldName].Options); i++ {
+					option := f.Fields[fieldName].Options[i]
+					if option.Value == val {
+						option.Selected = true
+						fmt.Println(">>>", option.Value, "is selected")
+					}
+				}
+			}
+		} else {
+			f.Fields[fieldName].Value = f.FilterCollection.ValueOf(fieldName)
+		}
+
+		for _, option := range f.Fields[fieldName].Options {
+			if option.Selected {
+				fmt.Println("*** Selection stuck for", option.Value)
+			}
+		}
+
 	}
 }

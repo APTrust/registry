@@ -56,9 +56,9 @@ func TestWorkItemIndex(t *testing.T) {
 	}
 
 	commonFilters := []string{
-		`select name="action"`,
-		`select name="stage"`,
-		`select name="status"`,
+		`select name="action__in"`,
+		`select name="stage__in"`,
+		`select name="status__in"`,
 		`type="text" id="name" name="name"`,
 		`type="text" id="etag" name="etag"`,
 		`type="date" id="date_processed__gteq" name="date_processed__gteq"`,

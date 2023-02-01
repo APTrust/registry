@@ -104,11 +104,12 @@ type Field struct {
 	Value        interface{}
 	ErrMsg       string
 	DisplayError bool
-	Options      []ListOption
+	Options      []*ListOption
 	Attrs        map[string]string
 }
 
 type ListOption struct {
-	Value string
-	Text  string
+	Value    string
+	Text     string
+	Selected bool
 }

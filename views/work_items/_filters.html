@@ -3,20 +3,20 @@
 <div class="filters-grid">
   <h3 class="filters-grid-label text-label text-xs">Filter</h3>
   <div class="filters-grid-content">
-    <form class="filters-grid-form" id="itemFilterForm" method="get" onsubmit="chooseEndpoint()">
+    <form class="filters-grid-form" id="itemFilterForm" method="get" onsubmit="filterFormOnSubmit()">
 
       <!-- Include this, so we don't lose it when user changes filters. -->
       <input type="hidden" name="per_page" value="{{ .pager.PerPage }}">
 
-      <div class="columns filters-grid-header">
+      <div class="columns filters-grid-header" style="min-height: 200px;">
         <div class="column">
-          {{ template "forms/select.html" .filterForm.Fields.action }}
+          {{ template "forms/select.html" .filterForm.Fields.action__in }}
         </div>
         <div class="column">
-          {{ template "forms/select.html" .filterForm.Fields.stage }}
+          {{ template "forms/select.html" .filterForm.Fields.stage__in }}
         </div>
         <div class="column">
-          {{ template "forms/select.html" .filterForm.Fields.status }}
+          {{ template "forms/select.html" .filterForm.Fields.status__in }}
         </div>
         <div class="column is-align-self-flex-end">
           <div class="filters-grid-controls">
@@ -108,6 +108,8 @@
           <div class="column is-one-quarter">
             {{ template "forms/number.html" .filterForm.Fields.size__lteq }}
           </div>
+          <div class="column is-one-quarter">
+          </div>          
         </div>
       </div>
     </form>
@@ -117,7 +119,7 @@
 </div>
 
 <script>
- function chooseEndpoint() {
+ function filterFormOnSubmit() {
      {{ if .CurrentUser.IsAdmin }}
      let form = document.forms['itemFilterForm']
      let redisOnly = form['redis_only'].value

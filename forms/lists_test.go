@@ -18,12 +18,12 @@ func TestListInstitutions(t *testing.T) {
 	require.NotEmpty(t, options)
 	assert.True(t, len(options) >= 4)
 	expected := []forms.ListOption{
-		{"1", "APTrust"},
-		{"5", "Example Institution (for integration tests)"},
-		{"2", "Institution One"},
-		{"3", "Institution Two"},
-		{"4", "Test Institution (for integration tests)"},
-		{"6", "Unit Test Institution"},
+		{"1", "APTrust", false},
+		{"5", "Example Institution (for integration tests)", false},
+		{"2", "Institution One", false},
+		{"3", "Institution Two", false},
+		{"4", "Test Institution (for integration tests)", false},
+		{"6", "Unit Test Institution", false},
 	}
 	for i, option := range options {
 		assert.Equal(t, expected[i].Value, option.Value)
@@ -47,8 +47,8 @@ func TestListUsers(t *testing.T) {
 	require.NotEmpty(t, options)
 	assert.Equal(t, 2, len(options))
 	expected := []forms.ListOption{
-		{"5", "Inst Two Admin"},
-		{"7", "Inst Two User"},
+		{"5", "Inst Two Admin", false},
+		{"7", "Inst Two User", false},
 	}
 	for i, option := range options {
 		assert.Equal(t, expected[i].Value, option.Value)

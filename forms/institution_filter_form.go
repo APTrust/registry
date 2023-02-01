@@ -11,7 +11,7 @@ type InstitutionFilterForm struct {
 	Form
 	FilterCollection  *pgmodels.FilterCollection
 	actingUserIsAdmin bool
-	instOptions       []ListOption
+	instOptions       []*ListOption
 }
 
 func NewInstitutionFilterForm(fc *pgmodels.FilterCollection, actingUser *pgmodels.User) (FilterForm, error) {

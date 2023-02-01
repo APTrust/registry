@@ -7,7 +7,7 @@ import (
 
 type InstitutionForm struct {
 	Form
-	instOptions []ListOption
+	instOptions []*ListOption
 }
 
 func NewInstitutionForm(institution *pgmodels.Institution) (*InstitutionForm, error) {

@@ -158,7 +158,7 @@ func ExtractCSRFToken(t *testing.T, html string) string {
 }
 
 // OptionLabels returns the text labels from a list of HTML options.
-func OptionLabels(options []forms.ListOption) []string {
+func OptionLabels(options []*forms.ListOption) []string {
 	labels := make([]string, len(options))
 	for i, opt := range options {
 		labels[i] = opt.Text

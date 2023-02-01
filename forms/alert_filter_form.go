@@ -12,8 +12,8 @@ type AlertFilterForm struct {
 	Form
 	FilterCollection  *pgmodels.FilterCollection
 	actingUserIsAdmin bool
-	instOptions       []ListOption
-	userOptions       []ListOption
+	instOptions       []*ListOption
+	userOptions       []*ListOption
 }
 
 func NewAlertFilterForm(fc *pgmodels.FilterCollection, actingUser *pgmodels.User) (FilterForm, error) {

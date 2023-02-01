@@ -13,7 +13,7 @@ import (
 
 func getWorkItemFilters() *pgmodels.FilterCollection {
 	fc := pgmodels.NewFilterCollection()
-	fc.Add("action", []string{constants.ActionGlacierRestore})
+	fc.Add("action__in", []string{constants.ActionGlacierRestore})
 	fc.Add("alt_identifier", []string{"blah-blah-blah"})
 	fc.Add("bag_date__gteq", []string{"2021-01-01"})
 	fc.Add("bag_date__lteq", []string{"2022-01-01"})
@@ -31,8 +31,8 @@ func getWorkItemFilters() *pgmodels.FilterCollection {
 	fc.Add("object_identifier", []string{"test.edu/bag"})
 	fc.Add("size__gteq", []string{"800"})
 	fc.Add("size__lteq", []string{"1600"})
-	fc.Add("stage", []string{constants.StageReceive})
-	fc.Add("status", []string{constants.StatusPending})
+	fc.Add("stage__in", []string{constants.StageReceive})
+	fc.Add("status__in", []string{constants.StatusPending})
 	fc.Add("storage_option", []string{constants.StorageOptionGlacierOR})
 	fc.Add("user", []string{"barney@example.com"})
 	return fc
@@ -71,18 +71,18 @@ func TestWorkItemFilterFormNonAdmin(t *testing.T) {
 }
 
 func assertListsNotEmpty(t *testing.T, fields map[string]*forms.Field) {
-	assert.True(t, len(fields["action"].Options) > 1)
+	assert.True(t, len(fields["action__in"].Options) > 1)
 	assert.True(t, len(fields["bagit_profile_identifier"].Options) > 1)
 	assert.True(t, len(fields["needs_admin_review"].Options) > 1)
 	assert.True(t, len(fields["node__not_null"].Options) > 1)
-	assert.True(t, len(fields["stage"].Options) > 1)
-	assert.True(t, len(fields["status"].Options) > 1)
+	assert.True(t, len(fields["stage__in"].Options) > 1)
+	assert.True(t, len(fields["status__in"].Options) > 1)
 	assert.True(t, len(fields["storage_option"].Options) > 1)
 }
 
 func testWorkItemFields(t *testing.T, fc *pgmodels.FilterCollection, fields map[string]*forms.Field) {
 	fieldNames := []string{
-		"action",
+		"action__in",
 		"alt_identifier",
 		"bag_date__gteq",
 		"bag_date__lteq",
@@ -100,8 +100,8 @@ func testWorkItemFields(t *testing.T, fc *pgmodels.FilterCollection, fields map[
 		"object_identifier",
 		"size__gteq",
 		"size__lteq",
-		"stage",
-		"status",
+		"stage__in",
+		"status__in",
 		"storage_option",
 		"user",
 	}
