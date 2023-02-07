@@ -107,6 +107,9 @@ func TestDeletionRequestValidate(t *testing.T) {
 	assert.Equal(t, pgmodels.ErrDeletionUserNotFound, valErr.Errors["CancelledByID"])
 
 	// User role cannot approve or cancel deletions
+	req.RequestedBy = nil
+	req.ConfirmedBy = nil
+	req.CancelledBy = nil
 	req.InstitutionID = inst1ID
 	req.RequestedByID = inst1UserID
 	req.ConfirmedByID = inst1UserID
@@ -118,6 +121,9 @@ func TestDeletionRequestValidate(t *testing.T) {
 
 	// Admin can approve & cancel deletions, but only at their
 	// own institution.
+	req.RequestedBy = nil
+	req.ConfirmedBy = nil
+	req.CancelledBy = nil
 	req.InstitutionID = inst1ID
 	req.RequestedByID = inst2AdminID
 	req.ConfirmedByID = inst2AdminID

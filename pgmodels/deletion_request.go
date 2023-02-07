@@ -1,6 +1,7 @@
 package pgmodels
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/APTrust/registry/common"
@@ -17,7 +18,9 @@ const (
 	ErrDeletionUserNotFound  = "User does not exist."
 	ErrDeletionUserInactive  = "User has been deactivated."
 	ErrTokenNotEncrypted     = "Token must be encrypted."
-	ErrDeletionIllegalObject = "User cannot delete files or objects belonging to other institutions"
+	ErrDeletionIllegalObject = "User cannot delete files or objects belonging to other institutions."
+	ErrDeletionBadAdmin      = "Admin cannot confirm deletion they requested. This must be approved by a second admin."
+	ErrDeletionBadQuery      = "Cannot get admin list for this institution."
 )
 
 // init does some setup work so go-pg can recognize many-to-many
@@ -181,15 +184,27 @@ func (request *DeletionRequest) validateRequestedBy(errors map[string]string) {
 func (request *DeletionRequest) validateConfirmedBy(errors map[string]string) {
 	// Make sure approver has admin role at the right institution
 	if request.ConfirmedByID > 0 {
-		if request.ConfirmedBy == nil {
-			user, err := UserByID(request.ConfirmedByID)
-			if err != nil || user.ID == 0 {
+		var err error
+		if request.ConfirmedBy == nil || request.ConfirmedBy.ID == 0 {
+			request.ConfirmedBy, err = UserByID(request.ConfirmedByID)
+			if err != nil || request.ConfirmedBy == nil || request.ConfirmedBy.ID == 0 {
 				errors["ConfirmedByID"] = ErrDeletionUserNotFound
-			} else if user.InstitutionID != request.InstitutionID {
-				errors["ConfirmedByID"] = ErrDeletionWrongInst
-			} else if user.Role != constants.RoleInstAdmin {
-				errors["ConfirmedByID"] = ErrDeletionWrongRole
+				return
 			}
+		}
+		instAdmins, err := UserSelect(NewQuery().Where("institution_id", "=", request.ConfirmedBy.InstitutionID).Where("role", "=", constants.RoleInstAdmin))
+		if err != nil {
+			errors["ConfirmedByID"] = ErrDeletionBadQuery
+			return
+		}
+		if request.ConfirmedBy.InstitutionID != request.InstitutionID {
+			errors["ConfirmedByID"] = ErrDeletionWrongInst
+		} else if request.ConfirmedBy.Role != constants.RoleInstAdmin {
+			fmt.Println("Req Inst:", request.InstitutionID, "Conf Inst:", request.ConfirmedBy.InstitutionID)
+			fmt.Println(request.ConfirmedBy)
+			errors["ConfirmedByID"] = ErrDeletionWrongRole
+		} else if request.ConfirmedBy.ID == request.RequestedByID && len(instAdmins) > 1 {
+			errors["ConfirmedByID"] = ErrDeletionBadAdmin
 		}
 	}
 }
