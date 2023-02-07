@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/APTrust/registry/common"
+	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/db"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/stretchr/testify/assert"
@@ -107,9 +108,6 @@ func TestDeletionRequestValidate(t *testing.T) {
 	assert.Equal(t, pgmodels.ErrDeletionUserNotFound, valErr.Errors["CancelledByID"])
 
 	// User role cannot approve or cancel deletions
-	req.RequestedBy = nil
-	req.ConfirmedBy = nil
-	req.CancelledBy = nil
 	req.InstitutionID = inst1ID
 	req.RequestedByID = inst1UserID
 	req.ConfirmedByID = inst1UserID
@@ -121,9 +119,6 @@ func TestDeletionRequestValidate(t *testing.T) {
 
 	// Admin can approve & cancel deletions, but only at their
 	// own institution.
-	req.RequestedBy = nil
-	req.ConfirmedBy = nil
-	req.CancelledBy = nil
 	req.InstitutionID = inst1ID
 	req.RequestedByID = inst2AdminID
 	req.ConfirmedByID = inst2AdminID
@@ -167,6 +162,46 @@ func TestDeletionRequestValidate(t *testing.T) {
 	valErr = req.Validate()
 	assert.NotNil(t, valErr)
 	assert.Equal(t, pgmodels.ErrDeletionIllegalObject, valErr.Errors["IntellectualObjects"])
+}
+
+func TestDeletionConfirmationOneAdmin(t *testing.T) {
+	err := db.LoadFixtures()
+	require.Nil(t, err)
+
+	// These IDS are fixed in the fixture data under db/fixtures/users.sql
+	inst1AdminID := int64(2)
+	inst1ID := int64(2)
+
+	req, err := pgmodels.NewDeletionRequest()
+	require.Nil(t, err)
+	require.NotNil(t, req)
+
+	// Admin can approve their own deletion, if they are the
+	// only admin at the institution.
+	req.InstitutionID = inst1ID
+	req.RequestedByID = inst1AdminID
+	req.ConfirmedByID = inst1AdminID
+	valErr := req.Validate()
+	require.Nil(t, valErr)
+
+	// Now, if there is more than one admin at the institution,
+	// the the admin cannot approve their own deletion request.
+	// The other admin has to approve it.
+	encPassword, _ := common.EncryptPassword("password")
+	newAdmin := pgmodels.User{
+		Name:              "Temp Inst 1 Admin",
+		Email:             "admin_temp@inst1.edu",
+		InstitutionID:     inst1ID,
+		Role:              constants.RoleInstAdmin,
+		EncryptedPassword: encPassword,
+	}
+	assert.Nil(t, newAdmin.Save())
+	defer common.Context().DB.Exec("delete from users where email=?", newAdmin.Email)
+
+	valErr = req.Validate()
+	require.NotNil(t, valErr)
+	assert.Equal(t, 1, len(valErr.Errors))
+	assert.Equal(t, pgmodels.ErrDeletionBadAdmin, valErr.Errors["ConfirmedByID"])
 }
 
 func TestDeletionRequestAddFile(t *testing.T) {

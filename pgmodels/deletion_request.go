@@ -167,7 +167,7 @@ func (request *DeletionRequest) Validate() *common.ValidationError {
 
 func (request *DeletionRequest) validateRequestedBy(errors map[string]string) {
 	var err error
-	if request.RequestedByID > 0 && request.RequestedBy == nil {
+	if request.RequestedByID > 0 && (request.RequestedBy == nil || request.RequestedBy.ID != request.RequestedByID) {
 		request.RequestedBy, err = UserByID(request.RequestedByID)
 	}
 	if request.RequestedByID < 1 {
@@ -185,7 +185,7 @@ func (request *DeletionRequest) validateConfirmedBy(errors map[string]string) {
 	// Make sure approver has admin role at the right institution
 	if request.ConfirmedByID > 0 {
 		var err error
-		if request.ConfirmedBy == nil || request.ConfirmedBy.ID == 0 {
+		if request.ConfirmedBy == nil || request.ConfirmedBy.ID != request.ConfirmedByID {
 			request.ConfirmedBy, err = UserByID(request.ConfirmedByID)
 			if err != nil || request.ConfirmedBy == nil || request.ConfirmedBy.ID == 0 {
 				errors["ConfirmedByID"] = ErrDeletionUserNotFound
@@ -212,7 +212,7 @@ func (request *DeletionRequest) validateConfirmedBy(errors map[string]string) {
 func (request *DeletionRequest) validateCancelledBy(errors map[string]string) {
 	// Make sure canceller has admin role at the right institution
 	if request.CancelledByID > 0 {
-		if request.CancelledBy == nil {
+		if request.CancelledBy == nil || request.CancelledByID != request.CancelledBy.ID {
 			user, err := UserByID(request.CancelledByID)
 			if err != nil || user.ID == 0 {
 				errors["CancelledByID"] = ErrDeletionUserNotFound
