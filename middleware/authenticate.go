@@ -63,14 +63,19 @@ func GetUserFromSession(c *gin.Context) (user *pgmodels.User, err error) {
 	if err == nil {
 		value := ""
 		if err = ctx.Config.Cookies.Secure.Decode(ctx.Config.Cookies.SessionCookie, cookie, &value); err != nil {
+			ctx.Log.Error().Msgf("GetUserFromSession: Error decoding session cookie: %v", err)
 			return nil, common.ErrDecodeCookie
 		}
 		var userID int64
 		userID, err = strconv.ParseInt(value, 10, 64)
 		if err != nil {
+			ctx.Log.Error().Msgf("GetUserFromSession: Session cookie contains non-numeric user id: %s", value)
 			return nil, common.ErrWrongDataType
 		}
 		user, err = pgmodels.UserByID(userID)
+		if err != nil {
+			ctx.Log.Error().Msgf("GetUserFromSession: Got user id from session cookie but user lookup returned error: %v", err)
+		}
 	}
 	return user, err
 }
@@ -78,10 +83,12 @@ func GetUserFromSession(c *gin.Context) (user *pgmodels.User, err error) {
 // GetUserFromAPIHeaders returns the current user based on the API
 // auth headers.
 func GetUserFromAPIHeaders(c *gin.Context) (user *pgmodels.User, err error) {
+	ctx := common.Context()
 	apiUserEmail := c.Request.Header.Get(constants.APIUserHeader)
 	apiUserKey := c.Request.Header.Get(constants.APIKeyHeader)
 	user, err = pgmodels.UserByEmail(apiUserEmail)
 	if err != nil {
+		ctx.Log.Error().Msgf("GetUserFromAPIHeaders: Attempt to look up user %s failed with error %v", apiUserEmail, err)
 		return nil, err
 	}
 	if common.ComparePasswords(user.EncryptedAPISecretKey, apiUserKey) {
@@ -94,7 +101,7 @@ func GetUserFromAPIHeaders(c *gin.Context) (user *pgmodels.User, err error) {
 		c.Set("UserIsApiAuthenticated", true)
 		return user, nil
 	}
-	common.Context().Log.Warn().Msgf("Invalid API token from user %s at %s.", apiUserEmail, c.Request.RemoteAddr)
+	ctx.Log.Warn().Msgf("Invalid API token from user %s at %s.", apiUserEmail, c.Request.RemoteAddr)
 	helpers.DeleteSessionCookie(c) // just to be extra safe
 	return nil, common.ErrInvalidAPICredentials
 }
