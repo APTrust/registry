@@ -1,6 +1,7 @@
 package common_test
 
 import (
+	"fmt"
 	"os"
 	"strings"
 	"testing"
@@ -18,7 +19,7 @@ func TestNewConfig(t *testing.T) {
 	assert.Equal(t, "postgres", config.DB.Driver)
 	assert.Equal(t, "localhost", config.DB.Host)
 	assert.Equal(t, 5432, config.DB.Port)
-	assert.True(t, strings.HasSuffix(config.Logging.File, "registry_test.log"))
+	assert.True(t, strings.HasSuffix(config.Logging.File, fmt.Sprintf("registry_%s.log", os.Getenv("APT_ENV"))))
 	assert.Equal(t, zerolog.DebugLevel, config.Logging.Level)
 
 	// Local tests vs. Travis-CI tests.
@@ -29,6 +30,11 @@ func TestNewConfig(t *testing.T) {
 		assert.Equal(t, "dev_user", config.DB.User)
 		assert.Equal(t, "password", config.DB.Password)
 		assert.Equal(t, "test", config.EnvName)
+	} else if os.Getenv("APT_ENV") == "dev" {
+		assert.Equal(t, "apt_registry_development", config.DB.Name)
+		assert.Equal(t, "dev_user", config.DB.User)
+		assert.Equal(t, "password", config.DB.Password)
+		assert.Equal(t, "dev", config.EnvName)
 	} else if os.Getenv("APT_ENV") == "travis" {
 		assert.Equal(t, "apt_registry_travis", config.DB.Name)
 		assert.Equal(t, "postgres", config.DB.User)

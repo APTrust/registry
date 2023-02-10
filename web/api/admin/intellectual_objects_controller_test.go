@@ -2,10 +2,12 @@ package admin_api_test
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"testing"
 	"time"
 
+	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/APTrust/registry/web/api"
@@ -81,6 +83,19 @@ func TestObjectIndex(t *testing.T) {
 }
 
 func TestObjectCreateUpdateDelete(t *testing.T) {
+
+	if common.Context().Config.EnvName != "test" {
+		// For security reasons, the deletion setup endpoint works
+		// only in the test env. In all others, it returns an error.
+		// Devs may sometimes run unit tests in dev mode, just for
+		// the side effect of populating the DB. Skipping this test
+		// when APT_ENV=dev prevents an error.
+		//
+		// See web/admin/api/dummy_controller.go
+		fmt.Println("Skipping TestObjectCreateUpdateDelete because env is not test")
+		return
+	}
+
 	tu.InitHTTPTests(t)
 	obj := testObjectCreate(t)
 	updatedObj := testObjectUpdate(t, obj)
@@ -93,10 +108,10 @@ func TestObjectCreateUpdateDelete(t *testing.T) {
 // below. In reality, the supporting object are created during
 // actual workflows.
 //
-// - Ingest event at ingest.
-// - Deletion request when a user clicks the delete object button
-//   in the web UI.
-// - WorkItem when an inst admin has approved the deletion request.
+//   - Ingest event at ingest.
+//   - Deletion request when a user clicks the delete object button
+//     in the web UI.
+//   - WorkItem when an inst admin has approved the deletion request.
 //
 // Here, we create them just so we can complete our test.
 func createObjectDeletionPreConditions(t *testing.T, obj *pgmodels.IntellectualObject) {

@@ -2,10 +2,12 @@ package admin_api_test
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"testing"
 	"time"
 
+	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/db"
 	"github.com/APTrust/registry/pgmodels"
@@ -134,6 +136,19 @@ func TestGenericFileIndex(t *testing.T) {
 }
 
 func TestFileCreateUpdateDelete(t *testing.T) {
+
+	if common.Context().Config.EnvName != "test" {
+		// For security reasons, the deletion setup endpoint works
+		// only in the test env. In all others, it returns an error.
+		// Devs may sometimes run unit tests in dev mode, just for
+		// the side effect of populating the DB. Skipping this test
+		// when APT_ENV=dev prevents an error.
+		//
+		// See web/admin/api/dummy_controller.go
+		fmt.Println("Skipping TestFileCreateUpdateDelete because env is not test")
+		return
+	}
+
 	// Reset DB after this test so we don't screw up others.
 	defer db.ForceFixtureReload()
 	tu.InitHTTPTests(t)
@@ -198,10 +213,10 @@ func testFileUpdate(t *testing.T, gf *pgmodels.GenericFile) *pgmodels.GenericFil
 
 // Registry business rules won't allow deletions without the following:
 //
-// - Ingest event at ingest.
-// - Deletion request when a user clicks the delete file button
-//   in the web UI.
-// - WorkItem when an inst admin has approved the deletion request.
+//   - Ingest event at ingest.
+//   - Deletion request when a user clicks the delete file button
+//     in the web UI.
+//   - WorkItem when an inst admin has approved the deletion request.
 //
 // Here, we create them just so we can complete our test.
 func createFileDeletionPreConditions(t *testing.T, gf *pgmodels.GenericFile) {
