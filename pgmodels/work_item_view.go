@@ -29,6 +29,7 @@ var WorkItemFilters = []string{
 	"generic_file_identifier",
 	"institution_id",
 	"intellectual_object_id",
+	"intellectual_object_id__is_null",
 	"name",
 	"needs_admin_review",
 	"node__is_null",
@@ -138,4 +139,26 @@ func (item *WorkItemView) GetObjIdentifier() string {
 	}
 	itemName := tarExtension.ReplaceAllString(item.Name, "")
 	return fmt.Sprintf("%s/%s", item.InstitutionIdentifier, itemName)
+}
+
+// FindIngestedObject sounds like something the vet would do with your cat.
+// It's actually used to fix a specific case where Registry thinks an ingest
+// has failed, even though it actually succeeded. If we have to manually
+// push the WorkItem to Ingest/Cleanup/Success, we need to link it to the
+// ingested object. That object should match the identifier and etag of
+// the WorkItem.
+//
+// We rarely need to do this. This case occurs only when preserv tries
+// to re-record an already completed ingest and accidentally overwrites
+// the WorkItem's object id. We're still trying to track down the conditions
+// that lead to that event, but again, it's rare.
+func (item *WorkItemView) FindIngestedObject() (*IntellectualObject, error) {
+	query := NewQuery().Where("intellectual_object.identifier", "=", item.GetObjIdentifier()).Where("intellectual_object.etag", "=", item.ETag).Limit(1).Offset(0)
+	return IntellectualObjectGet(query)
+}
+
+// IngestObjectLinkIsMissing returns true if this WorkItemView should
+// have an associated IntellectualObjectID but does not have it.
+func (item *WorkItemView) IngestObjectLinkIsMissing() bool {
+	return item.Action == constants.ActionIngest && item.Status == constants.StatusSuccess && item.IntellectualObjectID == 0
 }

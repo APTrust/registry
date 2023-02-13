@@ -131,6 +131,7 @@ func (f *WorkItemFilterForm) init() {
 			{"in_process", "In Process - Last 30 Days", false},
 			{"cancelled_failed", "Canceled/Failed - Last 30 Days", false},
 			{"active_restorations", "Active Restorations", false},
+			{"missing_obj_ids", "Missing Object IDs", false},
 		},
 	}
 	f.Fields["size__gteq"] = &Field{

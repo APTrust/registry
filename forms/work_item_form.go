@@ -1,6 +1,9 @@
 package forms
 
 import (
+	"strconv"
+
+	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/pgmodels"
 )
@@ -82,6 +85,11 @@ func (f *WorkItemForm) init() {
 			"required": "",
 		},
 	}
+	f.Fields["IntellectualObjectID"] = &Field{
+		Name:        "IntellectualObjectID",
+		Label:       "Intellectual Object",
+		Placeholder: "Intellectual Object",
+	}
 }
 
 func (f *WorkItemForm) SetValues() {
@@ -93,4 +101,17 @@ func (f *WorkItemForm) SetValues() {
 	f.Fields["Note"].Value = item.Note
 	f.Fields["Node"].Value = item.Node
 	f.Fields["PID"].Value = item.PID
+	if item.IntellectualObjectID > 0 {
+		obj, err := pgmodels.IntellectualObjectByID(item.IntellectualObjectID)
+		if err == nil {
+			f.Fields["IntellectualObjectID"].Options = []*ListOption{
+				{strconv.FormatInt(item.IntellectualObjectID, 10), obj.Identifier, true},
+			}
+			f.Fields["IntellectualObjectID"].Attrs = map[string]string{
+				"disabled": "",
+			}
+		} else {
+			common.Context().Log.Error().Msgf("WorkItem form could not retrieve associated object for work item %d. Obj id is %d. Error: %v", item.ID, item.IntellectualObjectID, err)
+		}
+	}
 }

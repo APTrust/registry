@@ -38,6 +38,11 @@
         <div class="column">{{ template "forms/number.html" .form.Fields.PID }}</div>
       </div>
 
+      <div class="columns">
+        <div class="column">{{ template "forms/select.html" .form.Fields.IntellectualObjectID }}</div>
+        <div class="column"></div>
+      </div>
+
       {{ template "forms/csrf_token.html" . }}
 
       <div class="is-flex is-justify-content-space-between">

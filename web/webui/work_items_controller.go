@@ -3,6 +3,7 @@ package webui
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
@@ -48,6 +49,12 @@ func WorkItemShow(c *gin.Context) {
 		}
 		req.TemplateData["form"] = form
 	}
+
+	// Let user fix missing object id, if necessary
+	if item.IngestObjectLinkIsMissing() && req.CurrentUser.HasPermission(constants.WorkItemUpdate, item.InstitutionID) {
+		req.TemplateData["showMissingObjWarning"] = true
+	}
+
 	getRedisInfo(req, item)
 	c.HTML(http.StatusOK, "work_items/show.html", req.TemplateData)
 }
@@ -74,6 +81,29 @@ func WorkItemEdit(c *gin.Context) {
 	form, req, err := getFormAndRequest(c)
 	if AbortIfError(c, err) {
 		return
+	}
+	workItemView, err := pgmodels.WorkItemViewByID(req.Auth.ResourceID)
+	if err != nil {
+		common.Context().Log.Error().Msgf("Could not get work item view for %d: %v", req.Auth.ResourceID, err)
+	}
+	if workItemView != nil && workItemView.IngestObjectLinkIsMissing() {
+		obj, err := workItemView.FindIngestedObject()
+		if err != nil {
+			common.Context().Log.Error().Msgf("FindIngestedObject return error work item %d: %v", req.Auth.ResourceID, err)
+		}
+		if obj != nil && obj.ID > 0 {
+			form.Fields["IntellectualObjectID"].Options = []*forms.ListOption{
+				{
+					Value:    strconv.FormatInt(obj.ID, 10),
+					Text:     obj.Identifier,
+					Selected: false,
+				},
+			}
+			form.Fields["IntellectualObjectID"].Attrs = map[string]string{
+				"title": "This item is not associated with an intellectual object, but it should be. The system says this successful ingest matches the identifier and etag of the sole object in this list. If this looks sane to you, select the object to associate it.",
+			}
+
+		}
 	}
 	c.HTML(http.StatusOK, form.Template, req.TemplateData)
 }

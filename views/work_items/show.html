@@ -9,7 +9,10 @@
   <div class="box-header is-flex is-align-items-center is-justify-content-space-between">
     <h2>{{ .item.Name }}</h2>
     {{ if userCan .CurrentUser "WorkItemUpdate" .item.InstitutionID }}
-    <div><a class="button" href="/work_items/edit/{{ .item.ID }}">Edit</a></div>
+      {{ if .showMissingObjWarning }} 
+        <div><span class="badge is-failed">Missing Object ID</span></div>
+      {{ end }}
+      <div><a class="button" href="/work_items/edit/{{ .item.ID }}">Edit</a></div>
     {{ end }}
   </div>
 
