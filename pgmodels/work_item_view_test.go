@@ -96,3 +96,30 @@ func TestWorkItemViewGetObjIdentifier(t *testing.T) {
 	item.ObjectIdentifier = "example.edu/override"
 	assert.Equal(t, "example.edu/override", item.GetObjIdentifier())
 }
+
+func TestWorkItemIngestedObject(t *testing.T) {
+	db.LoadFixtures()
+	query := pgmodels.NewQuery().Where("name", "=", "chocolate.tar")
+	item, err := pgmodels.WorkItemViewGet(query)
+	require.Nil(t, err)
+	require.NotNil(t, item)
+
+	require.NotEmpty(t, item.IntellectualObjectID)
+	assert.False(t, item.IngestObjectLinkIsMissing())
+
+	associatedObj, err := item.FindIngestedObject()
+	assert.Nil(t, err)
+	assert.Contains(t, associatedObj.Identifier, "chocolate")
+
+	// If we set this to zero, the object link is missing.
+	// Note that we're not saving anything there.
+	item.IntellectualObjectID = 0
+	assert.True(t, item.IngestObjectLinkIsMissing())
+
+	// FindIngestedObject should return the same object
+	// no matter what. It matches on identifier and etag.
+	associatedObj, err = item.FindIngestedObject()
+	assert.Nil(t, err)
+	assert.Contains(t, associatedObj.Identifier, "chocolate")
+
+}

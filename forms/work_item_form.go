@@ -104,6 +104,7 @@ func (f *WorkItemForm) SetValues() {
 	if item.IntellectualObjectID > 0 {
 		obj, err := pgmodels.IntellectualObjectByID(item.IntellectualObjectID)
 		if err == nil {
+			f.Fields["IntellectualObjectID"].Value = strconv.FormatInt(item.IntellectualObjectID, 10)
 			f.Fields["IntellectualObjectID"].Options = []*ListOption{
 				{strconv.FormatInt(item.IntellectualObjectID, 10), obj.Identifier, true},
 			}
