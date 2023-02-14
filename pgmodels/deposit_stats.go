@@ -7,11 +7,13 @@ import (
 	"github.com/APTrust/registry/common"
 )
 
-// Note: chart_metric is ignored by backend. Used only in front-end.
+// Note: chart_metric and report_type are ignored by backend.
+// Used only in front-end.
 var DepositStatsFilters = []string{
 	"chart_metric",
 	"end_date",
 	"institution_id",
+	"report_type",
 	"storage_option",
 }
 
@@ -58,8 +60,8 @@ type DepositStats struct {
 func DepositStatsSelect(institutionID int64, storageOption string, endDate time.Time) ([]*DepositStats, error) {
 	var stats []*DepositStats
 	statsQuery := getDepositStatsQuery(institutionID, storageOption, endDate)
-	// fmt.Println(statsQuery, "INST", institutionID, "STOR", storageOption, "END", endDate)
-	// fmt.Println(statsQuery)
+	fmt.Println(statsQuery, "INST", institutionID, "STOR", storageOption, "END", endDate)
+	//fmt.Println(statsQuery)
 	_, err := common.Context().DB.Query(&stats, statsQuery,
 		institutionID, institutionID, institutionID,
 		storageOption, storageOption,

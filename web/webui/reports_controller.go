@@ -15,6 +15,7 @@ type DepositReportParams struct {
 	ChartMetric   string
 	InstitutionID int64
 	StorageOption string
+	ReportType    string
 	UpdatedBefore time.Time
 }
 
@@ -87,9 +88,11 @@ func getDepositReportParams(c *gin.Context) DepositReportParams {
 	institutionID, _ := strconv.ParseInt(c.Query("institution_id"), 10, 64)
 	storageOption := c.Query("storage_option")
 	chartMetric := c.Query("chart_metric")
+	reportType := c.Query("report_type")
 	return DepositReportParams{
 		ChartMetric:   chartMetric,
 		InstitutionID: institutionID,
+		ReportType:    reportType,
 		StorageOption: storageOption,
 		UpdatedBefore: updatedBefore,
 	}

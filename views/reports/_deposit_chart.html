@@ -17,14 +17,20 @@
      if (metric == "") {
          metric = metricSelect.value = "total_gb"
      }
+     let reportType = document.forms["depositReportFilterForm"].elements["report_type"].value
+     console.log(reportType)
      let ctx = document.getElementById("depositChart");
      let data = buildChartData(label, metric)
-     if (depositChart == null) {
-         depositChart = new Chart(ctx, { type: 'bar', data: data })
-     } else {
-         depositChart.data = data
-         depositChart.update()
-     }
+     //if (depositChart == null) {
+        if (reportType == 'by_inst') {
+            depositChart = new Chart(ctx, { type: 'bar', data: data })
+        } else {
+            depositChart = new Chart(ctx, { type: 'line', data: data })
+        }
+     //} else {
+     //    depositChart.data = data
+     //    depositChart.update()
+     //}
  }
 
  function buildChartData(label, metric) {
