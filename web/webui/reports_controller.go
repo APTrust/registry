@@ -36,11 +36,21 @@ func DepositReportShow(c *gin.Context) {
 	if !req.CurrentUser.IsAdmin() {
 		params.InstitutionID = req.CurrentUser.InstitutionID
 	}
-	deposits, err := pgmodels.DepositStatsSelect(params.InstitutionID, params.StorageOption, params.UpdatedBefore)
+	var deposits []*pgmodels.DepositStats
+	var err error
+	if params.ReportType == "over_time" {
+		deposits, err = pgmodels.DepositStatsOverTime(params.InstitutionID, params.StorageOption)
+	} else {
+		deposits, err = pgmodels.DepositStatsSelect(params.InstitutionID, params.StorageOption, params.UpdatedBefore)
+	}
 	if AbortIfError(c, err) {
 		return
 	}
-	filterForm, err := forms.NewDepositReportFilterForm(req.GetFilterCollection(), req.CurrentUser)
+	filterCollection := req.GetFilterCollection()
+	if filterCollection.ValueOf("report_type") == "" {
+		filterCollection.Add("report_type", []string{params.ReportType})
+	}
+	filterForm, err := forms.NewDepositReportFilterForm(filterCollection, req.CurrentUser)
 	if AbortIfError(c, err) {
 		return
 	}
@@ -89,6 +99,9 @@ func getDepositReportParams(c *gin.Context) DepositReportParams {
 	storageOption := c.Query("storage_option")
 	chartMetric := c.Query("chart_metric")
 	reportType := c.Query("report_type")
+	if reportType == "" {
+		reportType = "by_inst"
+	}
 	return DepositReportParams{
 		ChartMetric:   chartMetric,
 		InstitutionID: institutionID,

@@ -7,7 +7,7 @@
 
 <script>
  var depositChart = null
- const depositData = {{ toJSON .deposits }};
+ const depositData = {{ toJSON .deposits }}; 
  const reportParams = {{ toJSON .reportParams }};
 
  function renderChart() {
@@ -18,14 +18,30 @@
          metric = metricSelect.value = "total_gb"
      }
      let reportType = document.forms["depositReportFilterForm"].elements["report_type"].value
-     console.log(reportType)
      let ctx = document.getElementById("depositChart");
-     let data = buildChartData(label, metric)
+     // let data = buildBarChartData(label, metric)
+     if (depositChart != null) {
+        depositChart.destroy()
+     }
      //if (depositChart == null) {
         if (reportType == 'by_inst') {
-            depositChart = new Chart(ctx, { type: 'bar', data: data })
+            depositChart = new Chart(ctx, { 
+                type: 'bar', 
+                data: buildBarChartData(label, metric),
+                options: {
+                    maintainAspectRatio: false,
+                }
+            })
         } else {
-            depositChart = new Chart(ctx, { type: 'line', data: data })
+            let lineChartData = buildLineChartData(label, metric)
+            console.log(lineChartData)
+            depositChart = new Chart(ctx, { 
+                type: 'line', 
+                data: lineChartData,
+                options: {
+                    maintainAspectRatio: false,
+                }            
+            })
         }
      //} else {
      //    depositChart.data = data
@@ -33,13 +49,13 @@
      //}
  }
 
- function buildChartData(label, metric) {
-     let labels = getLabels()
+ function buildBarChartData(label, metric) {
+     let labels = getBarChartLabels()
      return {
          labels: labels,
          datasets: [{
              label: label + ' {{ dateUS .reportParams.UpdatedBefore }}',
-             data: getDepositData(metric),
+             data: getBarDepositData(metric),
              backgroundColor: window.APT.chartColors('fill', labels.length),
              borderColor: window.APT.chartColors('border', labels.length),
              borderWidth: 1
@@ -47,11 +63,46 @@
      }
  }
 
- function getDepositData(metric) {
+ function getBarDepositData(metric) {
      return depositData.map(item => item[metric])
  }
 
- function getLabels() {
+ // FIX ME!
+ // THIS IS NOT AGGREGATING DATA CORRECTLY 
+
+ function buildLineChartData(label, metric) {
+    let sets = []
+    let labels = []
+    let lastId = ""
+    let currentSet = null
+    for (var i = 0; i < depositData.length; i++) {
+        let entry = depositData[i]
+        let currentId = entry.institution_name + entry.storage_option
+        if (currentId != lastId) {
+            let label = `${entry.institution_name} - ${entry.storage_option}`
+            labels.push(label)
+            currentSet = {
+                label: label,
+                data: [],
+                backgroundColor: window.APT.chartColors('fill', i),
+                borderColor: window.APT.chartColors('border', i),
+                borderWidth: 1
+            }
+            sets.push(currentSet)
+            lastId = currentId
+            console.log("Added set for " + currentSet.label)
+        }
+        currentSet.data.push(entry[metric])
+        console.log(entry[metric] + " to data " + i + " " + metric)
+        //console.log(entry)
+    }
+    return { 
+        //labels: labels,
+        datasets: sets 
+    }
+ }
+
+ function getBarChartLabels() {
      let includeName = true
      let includeOptionTotals = true
      let includeInstTotals = true
@@ -71,6 +122,17 @@
              continue
          }
          labels.push(`${d.institution_name} ${d.storage_option}`)
+     }
+     return labels
+ }
+
+ var months = ['Jan', 'Feb', 'March', 'April', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+
+ function getLineChartLabels() {
+     let labels = []
+     for (let d of depositData) {
+        date = new Date(d.end_date)
+        labels.push(`${months[date.getMonth()]} ${date.getYear() + 1900}`)
      }
      return labels
  }

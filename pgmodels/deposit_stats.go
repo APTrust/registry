@@ -34,6 +34,8 @@ type DepositStats struct {
 	CostGBPerMonth      float64   `json:"cost_gb_per_month" pg:"cost_gb_per_month"`
 	MonthlyCost         float64   `json:"monthly_cost"`
 	EndDate             time.Time `json:"end_date"`
+	PrimarySort         string    `json:"-"`
+	SecondarySort       string    `json:"-"`
 }
 
 // ----------------------------------------------------------------------------
@@ -95,6 +97,73 @@ func DepositStatsSelect(institutionID int64, storageOption string, endDate time.
 	return stats, err
 }
 
+func DepositStatsOverTime(institutionID int64, storageOption string) ([]*DepositStats, error) {
+	var stats []*DepositStats
+	statsQuery := getDepositTimelineQuery()
+	fmt.Println(statsQuery, "INST", institutionID, "STOR", storageOption)
+	//fmt.Println(statsQuery)
+	_, err := common.Context().DB.Query(&stats, statsQuery,
+		institutionID, institutionID, institutionID,
+		storageOption, storageOption)
+	fmt.Println("STATS RECORDS -> ", len(stats))
+	return stats, err
+}
+
+func getDepositTimelineQuery() string {
+	// Basic depost stats query. Use the "is null / or" trick to deal with
+	// filters that may or may not be present. Also note that historical
+	// deposit stats uses EXACT FIRST-OF-MONTH dates, so we look for
+	// "end_date = " not "<" or "<=".
+	q := `select 
+			institution_id, 
+			institution_name, 
+			storage_option, 
+			file_count, 
+			object_count, 
+			total_bytes, 
+			total_gb, 
+			total_tb, 
+			monthly_cost, 
+			end_date
+		from (
+		select 
+			institution_id, 
+			member_institution_id,
+			institution_name, 
+			storage_option, 
+			file_count, 
+			object_count, 
+			total_bytes, 
+			total_gb, 
+			total_tb, 
+			monthly_cost, 
+			end_date,
+			primary_sort,
+			secondary_sort 
+			from historical_deposit_stats  
+		union all
+		select 
+			institution_id, 
+			member_institution_id,
+			institution_name, 
+			storage_option, 
+			file_count, 
+			object_count, 
+			total_bytes, 
+			total_gb, 
+			total_tb, 
+			monthly_cost, 
+			end_date, 
+			primary_sort,
+			secondary_sort 
+			from current_deposit_stats 
+		) all_deposit_stats
+		where (? = 0 or institution_id = ? or member_institution_id = ?)
+		and (? = '' or storage_option = ?) 
+		order by primary_sort, secondary_sort, end_date`
+	return q
+}
+
 func getDepositStatsQuery(institutionID int64, storageOption string, endDate time.Time) string {
 	// Basic depost stats query. Use the "is null / or" trick to deal with
 	// filters that may or may not be present. Also note that historical
@@ -110,13 +179,14 @@ func getDepositStatsQuery(institutionID int64, storageOption string, endDate tim
 				total_tb, 
 				cost_gb_per_month,
 				monthly_cost, 
-				end_date from %s 
+				end_date 
+				from %s 
 				where (? = 0 or institution_id = ? or member_institution_id = ?)
 				and (? = '' or storage_option = ?) `
 
 	tableName, dateClause := getTableNameAndDateClause(endDate)
 	q += dateClause
-	q += " order by primary_sort, secondary_sort"
+	q += " order by end_date, primary_sort, secondary_sort"
 	return fmt.Sprintf(q, tableName)
 }
 
