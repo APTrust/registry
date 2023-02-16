@@ -62,7 +62,7 @@ type DepositStats struct {
 func DepositStatsSelect(institutionID int64, storageOption string, endDate time.Time) ([]*DepositStats, error) {
 	var stats []*DepositStats
 	statsQuery := getDepositStatsQuery(institutionID, storageOption, endDate)
-	fmt.Println(statsQuery, "INST", institutionID, "STOR", storageOption, "END", endDate)
+	//fmt.Println(statsQuery, "INST", institutionID, "STOR", storageOption, "END", endDate)
 	//fmt.Println(statsQuery)
 	_, err := common.Context().DB.Query(&stats, statsQuery,
 		institutionID, institutionID, institutionID,
@@ -100,10 +100,9 @@ func DepositStatsSelect(institutionID int64, storageOption string, endDate time.
 func DepositStatsOverTime(institutionID int64, storageOption string) ([]*DepositStats, error) {
 	var stats []*DepositStats
 	statsQuery := getDepositTimelineQuery(institutionID)
-	fmt.Println(statsQuery, "INST", institutionID, "STOR", storageOption)
+	//fmt.Println(statsQuery, "INST", institutionID, "STOR", storageOption)
 	//fmt.Println(statsQuery)
 	_, err := common.Context().DB.Query(&stats, statsQuery, institutionID)
-	fmt.Println("STATS RECORDS -> ", len(stats))
 	return stats, err
 }
 

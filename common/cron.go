@@ -13,6 +13,7 @@ func initCronJobs(ctx *APTContext) {
 		updateSlowCounts(ctx)
 		updateCurrentDepositStats(ctx)
 		updateHistoricalDepositStats(ctx)
+		populateEmptyDepositStats(ctx)
 		cronJobsInitialized = true
 	}
 }
@@ -122,5 +123,24 @@ func updateHistoricalDepositStats(ctx *APTContext) {
 				time.Sleep(24 * time.Hour)
 			}
 		}()
+	}
+}
+
+// This fills in stats for timeline reports where depositors had no
+// data in the system in a given month. We only need to run this once.
+// Afterwards, it will be called on the first of each month when we
+// populate historical deposit stats.
+func populateEmptyDepositStats(ctx *APTContext) {
+	if !cronJobsInitialized {
+		ctx.Log.Info().Msg("cron: starting populate_empty_deposit_stats()")
+		start := time.Now().UTC()
+		_, err := ctx.DB.Exec("select populate_empty_deposit_stats()")
+		end := time.Now().UTC()
+		duration := end.Sub(start).Seconds()
+		if err != nil {
+			ctx.Log.Error().Msgf("cron: populate_empty_deposit_stats failed after %f seconds: %s", duration, err.Error())
+		} else {
+			ctx.Log.Info().Msgf("cron: populate_empty_deposit_stats completed after %f seconds. (Less than one second indicates stats did not need to be updated.)", duration)
+		}
 	}
 }

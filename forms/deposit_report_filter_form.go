@@ -39,24 +39,28 @@ func (f *DepositReportFilterForm) init() {
 		Label:       "Deposits Through",
 		Placeholder: "Deposits Through",
 		Options:     ListDepositReportDates(),
+		Attrs:       make(map[string]string),
 	}
 	f.Fields["institution_id"] = &Field{
 		Name:        "institution_id",
 		Label:       "Institution",
 		Placeholder: "Institution",
 		Options:     f.instOptions,
+		Attrs:       make(map[string]string),
 	}
 	f.Fields["storage_option"] = &Field{
 		Name:        "storage_option",
 		Label:       "Storage Option",
 		Placeholder: "Storage Option",
 		Options:     Options(constants.StorageOptions),
+		Attrs:       make(map[string]string),
 	}
 	f.Fields["chart_metric"] = &Field{
 		Name:        "chart_metric",
 		Label:       "Chart Metric",
 		Placeholder: "Chart Metric",
 		Options:     DepositChartMetrics,
+		Attrs:       make(map[string]string),
 	}
 	f.Fields["report_type"] = &Field{
 		Name:        "report_type",
@@ -66,6 +70,7 @@ func (f *DepositReportFilterForm) init() {
 			{"by_inst", "Deposits by Institution", false},
 			{"over_time", "Deposits Over Time", false},
 		},
+		Attrs: make(map[string]string),
 	}
 }
 

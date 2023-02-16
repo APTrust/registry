@@ -15,6 +15,12 @@
 
   </div>
 
+  <!-- 
+    The deposits over time report generated too many data points to render, 
+    and they're not very useful in text/table format anyway. So don't show
+    them.
+  -->
+  {{ if not (eq "over_time" .reportType) }}
   <table class="table is-fullwidth has-padding is-striped">
     <thead>
       <tr>
@@ -48,6 +54,8 @@
     </tbody>
   </table>
 </div>
+{{ end }}
+
 {{ template "shared/_footer.html" .}}
 
 {{ end }}

@@ -55,9 +55,15 @@ func DepositReportShow(c *gin.Context) {
 		return
 	}
 
+	if params.ReportType == "over_time" {
+		filterForm.GetFields()["storage_option"].Attrs["disabled"] = "true"
+		filterForm.GetFields()["end_date"].Attrs["disabled"] = "true"
+	}
+
 	instList := depositInstList(deposits)
 	storageOptionsList := depositStorageOptions(deposits)
 
+	req.TemplateData["reportType"] = params.ReportType
 	req.TemplateData["deposits"] = deposits
 	req.TemplateData["isSingleInstitutionReport"] = params.InstitutionID > 0
 	req.TemplateData["filterForm"] = filterForm
