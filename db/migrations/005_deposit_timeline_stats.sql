@@ -136,7 +136,7 @@ $BODY$
 $BODY$
 LANGUAGE plpgsql VOLATILE;
 
-select populate_current_deposit_stats();
+select update_current_deposit_stats();
 select populate_empty_deposit_stats();
 
 -- Now note that the migration is complete.
