@@ -136,7 +136,22 @@ $BODY$
 $BODY$
 LANGUAGE plpgsql VOLATILE;
 
+
+-- An early run of the function that populated historical deposit stats
+-- left some incorrect object counts. Let's wipe out this table and
+-- rebuild it.
+delete from historical_deposit_stats ;
+
+-- Rebuild the deposit stats table. This will take a long time on prod.
+select populate_all_historical_deposit_stats();
+
+-- Update the current stats, if necessary.
 select update_current_deposit_stats();
+
+-- Now, the point of this whole migration: Add explicit zero counts to
+-- the historical_deposit_stats table for months when depositors had no
+-- materials in APTrust. Our front-end charts need the data points to 
+-- correctly plot the time series data.
 select populate_empty_deposit_stats();
 
 -- Now note that the migration is complete.
