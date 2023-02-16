@@ -34,12 +34,18 @@
             })
         } else {
             let lineChartData = buildLineChartData(label, metric)
+            console.log(depositData)
             console.log(lineChartData)
             depositChart = new Chart(ctx, { 
                 type: 'line', 
                 data: lineChartData,
                 options: {
                     maintainAspectRatio: false,
+                    elements: {
+                        point:{
+                            radius: 0
+                        }
+                    }
                 }            
             })
         }
@@ -67,20 +73,21 @@
      return depositData.map(item => item[metric])
  }
 
- // FIX ME!
- // THIS IS NOT AGGREGATING DATA CORRECTLY 
 
  function buildLineChartData(label, metric) {
+    //console.log(depositData.length)
+    //fillOutLineChartData()
+    //console.log(depositData.length)
     let sets = []
-    let labels = []
+    let xAxisLabels = new Set()
     let lastId = ""
     let currentSet = null
     for (var i = 0; i < depositData.length; i++) {
         let entry = depositData[i]
+        let endDate = entry.end_date.substr(0,10)
         let currentId = entry.institution_name + entry.storage_option
         if (currentId != lastId) {
             let label = `${entry.institution_name} - ${entry.storage_option}`
-            labels.push(label)
             currentSet = {
                 label: label,
                 data: [],
@@ -92,15 +99,68 @@
             lastId = currentId
             console.log("Added set for " + currentSet.label)
         }
+        xAxisLabels.add(endDate)
         currentSet.data.push(entry[metric])
-        console.log(entry[metric] + " to data " + i + " " + metric)
+        console.log(`${entry[metric]} to  ${i} - ${entry.institution_id} ${endDate} ${entry.storage_option}`)
         //console.log(entry)
     }
     return { 
-        //labels: labels,
+        labels: Array.from(xAxisLabels).sort(),
         datasets: sets 
     }
  }
+
+
+//  function fillOutLineChartData() {
+//     let dates = new Set()
+//     let opts = new Set()
+//     let institutions = new Set()
+//     let exists = {}
+//     let nameFor = {}
+//     for (var i = 0; i < depositData.length; i++) {
+//         let entry = depositData[i]
+//         dates.add(entry.end_date)
+//         opts.add(entry.storage_option)
+//         institutions.add(entry.institution_id)
+//         nameFor[entry.institution_id] = entry.institution_name
+//         let key = entry.institution_id + entry.storage_option + entry.end_date
+//         exists[key] = true
+//         //console.log("Exists: " + key)
+//     }
+//     let dateArray = Array.from(dates)
+//     let optsArray = Array.from(opts)
+//     let instArray = Array.from(institutions)
+//     for (var i = 0; i < dateArray.length; i++) {
+//         for (var j = 0; j < optsArray.length; j++) {
+//             for (var x = 0; x < instArray.length; x++) {
+//                 let inst = instArray[x]
+//                 let date = dateArray[i]
+//                 let opt = optsArray[j]
+//                 let key = inst + opt + date
+//                 if (!exists[key]) {
+//                     //console.log("Adding " + date + " for " + inst + " for " + opt)
+//                     depositData.push({
+//                         "institution_id": inst,
+// 	                    "member_institution_id": 0,
+// 	                    "institution_name": nameFor[inst],
+// 	                    "storage_option": opt,
+// 	                    "object_count": 0,
+// 	                    "file_count": 0,
+// 	                    "total_bytes": 0,
+// 	                    "total_gb": 0,
+// 	                    "total_tb": 0,
+// 	                    "cost_gb_per_month": 0,
+// 	                    "monthly_cost": 0,
+// 	                    "end_date": date                        
+//                     })
+//                 }
+//             }
+//         }
+//     }
+//     depositData.sort((a, b) => (a.institution_id < b.institution_id && a.storage_option < b.storage_option && a.end_date < b.end_date))
+//  }
+
+
 
  function getBarChartLabels() {
      let includeName = true
@@ -126,16 +186,16 @@
      return labels
  }
 
- var months = ['Jan', 'Feb', 'March', 'April', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+//  var months = ['Jan', 'Feb', 'March', 'April', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
- function getLineChartLabels() {
-     let labels = []
-     for (let d of depositData) {
-        date = new Date(d.end_date)
-        labels.push(`${months[date.getMonth()]} ${date.getYear() + 1900}`)
-     }
-     return labels
- }
+//  function getLineChartLabels() {
+//      let labels = []
+//      for (let d of depositData) {
+//         date = new Date(d.end_date)
+//         labels.push(`${months[date.getMonth()]} ${date.getYear() + 1900}`)
+//      }
+//      return labels
+//  }
 
  // Render the chart after APTLoaded (aptLoadEvent) because it depends
  // on APT.chartColors.

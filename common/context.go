@@ -34,7 +34,6 @@ type APTContext struct {
 // If that happens, ensure the database is running and accepting
 // connections at the specified location, and ensure that the db
 // credentials are correct.
-//
 func Context() *APTContext {
 	if ctx == nil {
 		config := NewConfig()
@@ -45,6 +44,7 @@ func Context() *APTContext {
 			Database:     config.DB.Name,
 			MinIdleConns: 2,
 			PoolSize:     10,
+			MaxRetries:   2,
 		})
 		zlogger := getLogger(config)
 		if config.Logging.LogSql {

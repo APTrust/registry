@@ -99,17 +99,15 @@ func DepositStatsSelect(institutionID int64, storageOption string, endDate time.
 
 func DepositStatsOverTime(institutionID int64, storageOption string) ([]*DepositStats, error) {
 	var stats []*DepositStats
-	statsQuery := getDepositTimelineQuery()
+	statsQuery := getDepositTimelineQuery(institutionID)
 	fmt.Println(statsQuery, "INST", institutionID, "STOR", storageOption)
 	//fmt.Println(statsQuery)
-	_, err := common.Context().DB.Query(&stats, statsQuery,
-		institutionID, institutionID, institutionID,
-		storageOption, storageOption)
+	_, err := common.Context().DB.Query(&stats, statsQuery, institutionID)
 	fmt.Println("STATS RECORDS -> ", len(stats))
 	return stats, err
 }
 
-func getDepositTimelineQuery() string {
+func getDepositTimelineQuery(institutionID int64) string {
 	// Basic depost stats query. Use the "is null / or" trick to deal with
 	// filters that may or may not be present. Also note that historical
 	// deposit stats uses EXACT FIRST-OF-MONTH dates, so we look for
@@ -158,10 +156,13 @@ func getDepositTimelineQuery() string {
 			secondary_sort 
 			from current_deposit_stats 
 		) all_deposit_stats
-		where (? = 0 or institution_id = ? or member_institution_id = ?)
-		and (? = '' or storage_option = ?) 
+		where institution_id %s
 		order by primary_sort, secondary_sort, end_date`
-	return q
+	op := " = ? "
+	if institutionID == 0 {
+		op = " is null "
+	}
+	return fmt.Sprintf(q, op)
 }
 
 func getDepositStatsQuery(institutionID int64, storageOption string, endDate time.Time) string {
