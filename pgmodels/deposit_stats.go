@@ -113,18 +113,6 @@ func getDepositTimelineQuery(institutionID int64) string {
 	// "end_date = " not "<" or "<=".
 	q := `select 
 			institution_id, 
-			institution_name, 
-			storage_option, 
-			file_count, 
-			object_count, 
-			total_bytes, 
-			total_gb, 
-			total_tb, 
-			monthly_cost, 
-			end_date
-		from (
-		select 
-			institution_id, 
 			member_institution_id,
 			institution_name, 
 			storage_option, 
@@ -138,23 +126,6 @@ func getDepositTimelineQuery(institutionID int64) string {
 			primary_sort,
 			secondary_sort 
 			from historical_deposit_stats  
-		union all
-		select 
-			institution_id, 
-			member_institution_id,
-			institution_name, 
-			storage_option, 
-			file_count, 
-			object_count, 
-			total_bytes, 
-			total_gb, 
-			total_tb, 
-			monthly_cost, 
-			end_date, 
-			primary_sort,
-			secondary_sort 
-			from current_deposit_stats 
-		) all_deposit_stats
 		where institution_id %s
 		order by primary_sort, secondary_sort, end_date`
 	op := " = ? "
