@@ -146,10 +146,6 @@ func ListDepositReportDates() []*ListOption {
 			}
 			displayYear := year
 			displayMonth := Months[month]
-			if month == int(time.January) {
-				displayMonth = Months[12]
-				displayYear = year - 1
-			}
 			displayDate := fmt.Sprintf("%s %d", displayMonth, displayYear)
 			dateValue := time.Date(year, time.Month(month), 1, 0, 0, 0, 0, time.UTC)
 			options = append(options, &ListOption{dateValue.Format("2006-01-02"), displayDate, false})

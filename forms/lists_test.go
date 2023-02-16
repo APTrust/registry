@@ -65,5 +65,5 @@ func TestListDepositReportDates(t *testing.T) {
 	assert.True(t, len(options) > 80)
 	earliestOption := options[len(options)-1]
 	assert.Equal(t, "2015-01-01", earliestOption.Value)
-	assert.Equal(t, "December 2014", earliestOption.Text)
+	assert.Equal(t, "January 2015", earliestOption.Text)
 }

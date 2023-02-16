@@ -56,8 +56,14 @@ func DepositReportShow(c *gin.Context) {
 	}
 
 	if params.ReportType == "over_time" {
-		filterForm.GetFields()["storage_option"].Attrs["disabled"] = "true"
-		filterForm.GetFields()["end_date"].Attrs["disabled"] = "true"
+		fields := filterForm.GetFields()
+		fields["storage_option"].Attrs["disabled"] = "true"
+		fields["end_date"].Attrs["disabled"] = "true"
+
+		// Time report covers through end of prior month.
+		if len(fields["end_date"].Options) > 1 {
+			fields["end_date"].Value = fields["end_date"].Options[1].Value
+		}
 	}
 
 	instList := depositInstList(deposits)
