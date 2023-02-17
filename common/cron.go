@@ -69,6 +69,8 @@ func updateSlowCounts(ctx *APTContext) {
 func updateCurrentDepositStats(ctx *APTContext) {
 	if !cronJobsInitialized {
 		go func() {
+			// Stagger this, so it doesn't overlap with update slow counts
+			time.Sleep(12 * time.Minute)
 			for {
 				ctx.Log.Info().Msg("cron: starting update_current_deposit_stats()")
 				start := time.Now().UTC()
