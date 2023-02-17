@@ -3,7 +3,6 @@ package admin_api_test
 import (
 	"encoding/json"
 	"net/http"
-	"os"
 	"testing"
 
 	"github.com/APTrust/registry/constants"
@@ -93,7 +92,6 @@ func TestWorkItemIndex(t *testing.T) {
 }
 
 func TestItemCreateAndUpdate(t *testing.T) {
-	os.Setenv("APT_ENV", "test")
 	item := testItemCreate(t)
 	testItemUpdate(t, item)
 }
