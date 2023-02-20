@@ -6993,7 +6993,7 @@ body.freeze {
   border-radius: 8px;
   max-height: 90vh;
   overflow: auto;
-  padding: 22px 54px 32px 20px;
+  padding: 32px;
   width: 775px;
 }
 .modal-detail .modal-title-row,
