@@ -13,6 +13,11 @@
   display: flex;
 }
 
+.sidebar a {
+  color: $grey-dark;
+  text-decoration: none;
+}
+
 .global-search {
   flex: 1;
   margin-bottom: 24px;
@@ -54,7 +59,12 @@
   margin-left: 36px;
   padding-top: 10px;
 
+  a {
+    text-decoration: none;
+  }
+
   .alert-icon {
+    color: $grey-dark;
     position: relative;
     &.has-notifications {
       &::after {

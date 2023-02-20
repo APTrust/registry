@@ -13,30 +13,30 @@
     <thead>
       <tr>
         <th class="pl-5">
-          <a href="{{ sortUrl .currentUrl `requested_by_name` }}">Requested By
+          <a href="{{ sortUrl .currentUrl `requested_by_name` }}" class="is-grey-dark">Requested By
             <span class="material-icons sort-icon" aria-hidden="true">{{ sortIcon .currentUrl `requested_by_name`
               }}</span></a>
         </th>
         <th>
-          <a href="{{ sortUrl .currentUrl `requested_at` }}">Request Date<span class="material-icons sort-icon"
+          <a href="{{ sortUrl .currentUrl `requested_at` }}" class="is-grey-dark">Request Date<span class="material-icons sort-icon"
               aria-hidden="true">{{ sortIcon .currentUrl `requested_at` }}</span></a>
         </th>
         <th>
-          <a href="{{ sortUrl .currentUrl `confirmed_at` }}">Confirmed At
+          <a href="{{ sortUrl .currentUrl `confirmed_at` }}" class="is-grey-dark">Confirmed At
             <span class="material-icons sort-icon" aria-hidden="true">{{ sortIcon .currentUrl `confirmed_at`
               }}</span></a>
         </th>
         <th>
-          <a href="{{ sortUrl .currentUrl `file_count` }}">Files
+          <a href="{{ sortUrl .currentUrl `file_count` }}" class="is-grey-dark">Files
             <span class="material-icons sort-icon" aria-hidden="true">{{ sortIcon .currentUrl `file_count` }}</span></a>
         </th>
         <th>
-          <a href="{{ sortUrl .currentUrl `object_count` }}">Objects
+          <a href="{{ sortUrl .currentUrl `object_count` }}" class="is-grey-dark">Objects
             <span class="material-icons sort-icon" aria-hidden="true">{{ sortIcon .currentUrl `object_count`
               }}</span></a>
         </th>
         <th>
-          <a href="{{ sortUrl .currentUrl `status` }}">Status
+          <a href="{{ sortUrl .currentUrl `status` }}" class="is-grey-dark">Status
             <span class="material-icons sort-icon" aria-hidden="true">{{ sortIcon .currentUrl `status` }}</span></a>
         </th>
       </tr>

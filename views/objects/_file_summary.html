@@ -32,12 +32,12 @@
       </div>
     
       <div class="column">
-        <h5 class="text-label text-xs has-text-centered">Files by Size (GB)</h5>
+        <h5 class="text-label text-xs has-text-centered mb-4">Files by Size (GB)</h5>
         <div><canvas id="sizeChart"></canvas></div>
       </div>
     
       <div class="column">
-        <h5 class="text-label text-xs has-text-centered">Files by Count</h5>
+        <h5 class="text-label text-xs has-text-centered mb-4">Files by Count</h5>
         <div>
           <canvas id="countChart"></canvas>
         </div>
@@ -55,7 +55,7 @@
  function renderChart(elementID, metric, label) {
      let ctx = document.getElementById(elementID);
      let data = buildChartData(metric, label)
-     return new Chart(ctx, { type: 'doughnut', data: data })
+     return new Chart(ctx, { type: 'doughnut', data: data, options: chartOptions })
  }
 
  function buildChartData(metric, label) {
@@ -80,6 +80,14 @@
  function getLabels() {
      return depositData.filter(item => item.file_format != 'Total').map(item => item.file_format);
  }
+
+ const chartOptions = {
+    plugins: {
+      legend: {
+        display: false,
+      },
+    },
+  }
 
  // Render the chart after APTLoaded (aptLoadEvent) because it depends
  // on APT.chartColors.

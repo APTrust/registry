@@ -77,6 +77,10 @@ $input-border-color: $grey;
 $table-row-hover-background-color: $grey-lightest;
 $table-head-cell-border-width: 0 0 1px;
 
+.is-not-underlined {
+  text-decoration: none;
+}
+
 // Import bulma packages as needed
 @import "../../node_modules/bulma/sass/utilities/all";
 @import "../../node_modules/bulma/sass/base/all";
