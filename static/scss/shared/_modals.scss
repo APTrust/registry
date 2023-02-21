@@ -56,18 +56,22 @@ body {
   }
 
   dt {
+    @extend .text-label;
+    @extend .text-xs;
+    color: $grey-1;
     margin-bottom: 6px;
   }
 
   dd {
-    margin-bottom: 16px;
+    color: $grey-dark-brand;
+    margin-bottom: 24px;
 
     &:last-child {
-      margin-bottom: 0;
+      margin: 0;
     }
 
     & + dd {
-      margin-top: -16px;
+      margin-top: -24px;
     }
   }
 

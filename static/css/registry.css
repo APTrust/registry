@@ -6322,7 +6322,8 @@ h3,
   line-height: 20px;
 }
 
-.text-label, .single-item-info dt, .single-item-header-type, .table .total td:first-child, .table thead th, .button, .badge, .side-nav ul a, .global-search .button {
+.text-label, .modal-detail dt,
+.modal-edit dt, .data-list dt, .single-item-info dt, .single-item-header-type, .table .total td:first-child, .table thead th, .button, .badge, .side-nav ul a, .global-search .button {
   font-size: 16px;
   font-weight: 500;
   line-height: 20px;
@@ -6345,7 +6346,8 @@ p,
   line-height: 16px;
 }
 
-.text-xs, .single-item-info dt, .single-item-header-type, .table .total td:first-child, .table thead th, .button, .badge {
+.text-xs, .modal-detail dt,
+.modal-edit dt, .data-list dt, .single-item-info dt, .single-item-header-type, .table .total td:first-child, .table thead th, .button, .badge {
   font-size: 12px;
   line-height: 14px;
 }
@@ -6923,7 +6925,8 @@ pre.with-wrap {
   margin-bottom: 6px;
 }
 .single-item-info dd {
-  margin-bottom: 16px;
+  color: #333030;
+  margin-bottom: 24px;
 }
 .single-item-info dd:last-child {
   margin: 0;
@@ -6948,17 +6951,24 @@ pre.with-wrap {
   max-width: 700px;
 }
 
+.data-list-wrapper,
+.data-list-row {
+  margin-bottom: 24px;
+}
+
 .data-list dt {
+  color: #6b6b6b;
   margin-bottom: 6px;
 }
 .data-list dd {
-  margin-bottom: 16px;
+  color: #333030;
+  margin-bottom: 24px;
 }
 .data-list dd:last-child {
-  margin-bottom: 0;
+  margin: 0;
 }
 .data-list dd + dd {
-  margin-top: -16px;
+  margin-top: -24px;
 }
 
 body.freeze {
@@ -7026,19 +7036,21 @@ body.freeze {
 }
 .modal-detail dt,
 .modal-edit dt {
+  color: #6b6b6b;
   margin-bottom: 6px;
 }
 .modal-detail dd,
 .modal-edit dd {
-  margin-bottom: 16px;
+  color: #333030;
+  margin-bottom: 24px;
 }
 .modal-detail dd:last-child,
 .modal-edit dd:last-child {
-  margin-bottom: 0;
+  margin: 0;
 }
 .modal-detail dd + dd,
 .modal-edit dd + dd {
-  margin-top: -16px;
+  margin-top: -24px;
 }
 .modal-detail .modal-header-row,
 .modal-edit .modal-header-row {
