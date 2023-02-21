@@ -147,7 +147,7 @@
       location = `${location.pathname}?status__in=Pending&status__in=Started&date_processed__gteq=${date}`
       break
     case "cancelled_failed":
-      location = `${location.pathname}?status__in=Cancelled&status__in=Failed&date_processed__gteq=${date}`
+      location = `${location.pathname}?status__in=Cancelled&status__in=Failed&status__in=Suspended&date_processed__gteq=${date}`
       break
     case "active_restorations": 
       location = `${location.pathname}?action__in=Glacier+Restore&action__in=Restore+File&action__in=Restore+Object&date_processed__gteq=${date}`
