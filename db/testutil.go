@@ -181,7 +181,7 @@ func dropEverything(db *pg.DB) error {
 // Views will be loaded separately below.
 func loadSchema(db *pg.DB) error {
 	panicOnWrongEnv()
-	file := filepath.Join("db", "initial_launch_schema.sql")
+	file := filepath.Join("db", "schema.sql")
 	ddl, err := common.LoadRelativeFile(file)
 	if err != nil {
 		return fmt.Errorf("File %s: %v", file, err)
@@ -269,7 +269,6 @@ func loadCSVFile(db *pg.DB, table string) error {
 //
 // To avoid this, the resetSequence code below tells Postgres to start the
 // ID sequence at the highest existing ID in the table, instead of at 1.
-//
 func resetSequences(db *pg.DB) error {
 	for _, table := range LoadOrder {
 		if slice.ContainsString(HasNoIDColumn, table) {
