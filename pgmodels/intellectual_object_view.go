@@ -2,6 +2,9 @@ package pgmodels
 
 import (
 	"time"
+
+	"github.com/APTrust/registry/common"
+	"github.com/go-pg/pg/v10"
 )
 
 // IntellectualObjectFilters describes the allowed filters for searching
@@ -96,4 +99,38 @@ func IntellectualObjectViewSelect(query *Query) ([]*IntellectualObjectView, erro
 
 func (obj *IntellectualObjectView) GetID() int64 {
 	return obj.ID
+}
+
+// SmallestObjectNotRestoredInXDays returns the smallest intellectual object
+// belonging to an institutition that has not been restored in at least X days.
+// We use this for restoration spot tests because 1) we don't want to restore
+// an item the depositor has recently restored, and 2) we don't want to restore
+// massive objects (hundreds of GB) if we can help it.
+//
+// Param institutionID is the ID of the depositing institution. minSize is the
+// minimum size of the object to restore. This should generally be around 1-20 KB.
+// days is the number of days since last restoration. This should be 365 or more
+// for spot tests, perferably 730 or more.
+func SmallestObjectNotRestoredInXDays(institutionID, minSize int64, days int) (*IntellectualObjectView, error) {
+	query := `select obj.id 
+	from intellectual_objects_view obj
+	where obj.institution_id = ?
+	and obj."size" >= ?
+	and not exists (
+		select 1 
+		from work_items 
+		where intellectual_object_id = obj.id
+		and action = 'Restore Object' 
+		and status='Success' 
+		and updated_at > current_date - ?
+	)
+	order by obj."size" 
+	limit 1
+	`
+	var objID int64
+	_, err := common.Context().DB.Model((*IntellectualObjectView)(nil)).QueryOne(pg.Scan(&objID), query, institutionID, minSize, days)
+	if err != nil {
+		return nil, err
+	}
+	return IntellectualObjectViewByID(objID)
 }
