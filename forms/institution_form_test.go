@@ -33,7 +33,7 @@ func TestInstitutionForm(t *testing.T) {
 	assert.Equal(t, inst.Type, form.Fields["Type"].Value)
 	assert.Equal(t, inst.MemberInstitutionID, form.Fields["MemberInstitutionID"].Value)
 	assert.Equal(t, inst.OTPEnabled, form.Fields["OTPEnabled"].Value)
-	assert.Equal(t, inst.EnableSpotRestore, form.Fields["EnableSpotRestore"].Value)
+	assert.Equal(t, inst.SpotRestoreFrequency, form.Fields["SpotRestoreFrequency"].Value)
 	assert.Equal(t, inst.ReceivingBucket, form.Fields["ReceivingBucket"].Value)
 	assert.Equal(t, inst.RestoreBucket, form.Fields["RestoreBucket"].Value)
 }

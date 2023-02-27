@@ -36,8 +36,8 @@
         <dd class="text-table">{{ if .institution.ParentName }}{{ .institution.ParentName }}{{ else }}None{{end}}</dd>
         <dt class="text-label text-xs is-grey-dark">Two-Factor Enabled</dt>
         <dd class="text-table">{{ yesNo .institution.OTPEnabled }}</dd>
-        <dt class="text-label text-xs is-grey-dark">Restoration Spot Tests Enabled</dt>
-        <dd class="text-table">{{ yesNo .institution.EnableSpotRestore }}</dd>
+        <dt class="text-label text-xs is-grey-dark">Restoration Spot Test Frequency</dt>
+        <dd class="text-table">{{ if eq 0 .institution.SpotRestoreFrequency }}Never {{ else }} {{ .institution.SpotRestoreFrequency }} days {{ end }}</dd>
         <dt class="text-label text-xs is-grey-dark">Active?</dt>
         <dd class="text-table">{{ if eq .institution.State "A" }} Yes {{ else }} No - deactivated {{ dateUS
           .institution.DeactivatedAt }} {{ end }}</dd>

@@ -27,16 +27,17 @@ var InstitutionFilters = []string{
 
 type Institution struct {
 	TimestampModel
-	Name                string    `json:"name"`
-	Identifier          string    `json:"identifier"`
-	State               string    `json:"state"`
-	Type                string    `json:"type"`
-	MemberInstitutionID int64     `json:"member_institution_id"`
-	DeactivatedAt       time.Time `json:"deactivated_at"`
-	OTPEnabled          bool      `json:"otp_enabled" pg:",use_zero"`
-	EnableSpotRestore   bool      `json:"enable_spot_restore" pg:",use_zero"`
-	ReceivingBucket     string    `json:"receiving_bucket"`
-	RestoreBucket       string    `json:"restore_bucket"`
+	Name                      string    `json:"name"`
+	Identifier                string    `json:"identifier"`
+	State                     string    `json:"state"`
+	Type                      string    `json:"type"`
+	MemberInstitutionID       int64     `json:"member_institution_id"`
+	DeactivatedAt             time.Time `json:"deactivated_at"`
+	OTPEnabled                bool      `json:"otp_enabled" pg:",use_zero"`
+	SpotRestoreFrequency      int64     `json:"spot_restore_frequency" pg:",use_zero"`
+	LastSpotRestoreWorkItemID int64     `json:"last_spot_restore_work_item_id"`
+	ReceivingBucket           string    `json:"receiving_bucket"`
+	RestoreBucket             string    `json:"restore_bucket"`
 }
 
 // InstitutionByID returns the institution with the specified id.
