@@ -167,3 +167,38 @@ func (inst *Institution) Validate() *common.ValidationError {
 	}
 	return nil
 }
+
+// DueForSpotRestore returns true if this institution is due for
+// a restoration spot test.
+func (inst *Institution) DueForSpotRestore() (bool, error) {
+
+	// If frequency is zero, institution has disabled spot
+	// tests, so they can't be due for one.
+	if inst.SpotRestoreFrequency == 0 {
+		return false, nil
+	}
+
+	// If inst has non-zero frequency and they've never had
+	// a restoration spot test, they're due for one now.
+	if inst.LastSpotRestoreWorkItemID == 0 {
+		return true, nil
+	}
+
+	// Look up the date of their last restoration spot test.
+	// If we get an error here, it's likely a DB connection error.
+	// Foreign key constraint in DB should ensure this record is
+	// not missing.
+	workItem, err := WorkItemByID(inst.LastSpotRestoreWorkItemID)
+	if err != nil {
+		return false, err
+	}
+
+	// According to their scheduled frequency, how long ago
+	// should they have had a restoration?
+	expectedLastRestoreDate := time.Now().UTC().AddDate(0, 0, int(-1*inst.SpotRestoreFrequency))
+
+	// Was their last restoration before that date?
+	// If so, they're due for a spot test now.
+	isOverdue := workItem.DateProcessed.Before(expectedLastRestoreDate)
+	return isOverdue, nil
+}

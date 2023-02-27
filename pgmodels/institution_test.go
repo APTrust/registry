@@ -220,3 +220,46 @@ func TestInstitutionHasSubAccounts(t *testing.T) {
 	require.Nil(t, err)
 	assert.True(t, hasKids)
 }
+
+func TestDueForSpotRestore(t *testing.T) {
+	db.LoadFixtures()
+
+	// We'll fiddle with this object but the changes
+	// won't stick because we're not saving them to
+	// the DB.
+	inst1, err := pgmodels.InstitutionByIdentifier("institution1.edu")
+	require.Nil(t, err)
+	require.NotNil(t, inst1)
+
+	// Should be true because this inst is configured for
+	// spot tests every 30 days and inst has no last
+	// spot test work item id.
+	dueForRestore, err := inst1.DueForSpotRestore()
+	require.Nil(t, err)
+	assert.Equal(t, int64(30), inst1.SpotRestoreFrequency)
+	assert.Empty(t, inst1.LastSpotRestoreWorkItemID)
+	assert.True(t, dueForRestore)
+
+	// Should be false if we change SpotRestoreFrequency to zero.
+	inst1.SpotRestoreFrequency = 0
+	dueForRestore, err = inst1.DueForSpotRestore()
+	require.Nil(t, err)
+	assert.False(t, dueForRestore)
+
+	// Should be true, because frequency is 30 days and
+	// WorkItem 31 was a restoration from August, 2016
+	// (it's loaded from the fixtures csv file).
+	inst1.SpotRestoreFrequency = 30
+	inst1.LastSpotRestoreWorkItemID = 31
+	dueForRestore, err = inst1.DueForSpotRestore()
+	require.Nil(t, err)
+	assert.True(t, dueForRestore)
+
+	// Should be false, because frequency is once every
+	// 100 years, and the 2016 restoration was less than
+	// 100 years ago
+	inst1.SpotRestoreFrequency = 36500
+	dueForRestore, err = inst1.DueForSpotRestore()
+	require.Nil(t, err)
+	assert.False(t, dueForRestore)
+}
