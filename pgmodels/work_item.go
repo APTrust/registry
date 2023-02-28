@@ -298,7 +298,7 @@ func NewItemFromLastSuccessfulIngest(objID int64) (*WorkItem, error) {
 	return newItem, err
 }
 
-// CreateObjectRestorationItem creates and saves a new WorkItem
+// NewRestorationItem creates and saves a new WorkItem
 // for an object or file restoration.
 //
 // Param obj (required) is the object to be restored.

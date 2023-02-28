@@ -1,7 +1,6 @@
 package pgmodels
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/APTrust/registry/common"
@@ -200,8 +199,8 @@ func (request *DeletionRequest) validateConfirmedBy(errors map[string]string) {
 		if request.ConfirmedBy.InstitutionID != request.InstitutionID {
 			errors["ConfirmedByID"] = ErrDeletionWrongInst
 		} else if request.ConfirmedBy.Role != constants.RoleInstAdmin {
-			fmt.Println("Req Inst:", request.InstitutionID, "Conf Inst:", request.ConfirmedBy.InstitutionID)
-			fmt.Println(request.ConfirmedBy)
+			// fmt.Println("Req Inst:", request.InstitutionID, "Conf Inst:", request.ConfirmedBy.InstitutionID)
+			// fmt.Println(request.ConfirmedBy)
 			errors["ConfirmedByID"] = ErrDeletionWrongRole
 		} else if request.ConfirmedBy.ID == request.RequestedByID && len(instAdmins) > 1 {
 			errors["ConfirmedByID"] = ErrDeletionBadAdmin

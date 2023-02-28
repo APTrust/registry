@@ -67,6 +67,23 @@ end
 $$;
 
 
+-- Now bring the old ActiveRecord table ar_internal_metadata into line with
+-- our other tables by giving it a numeric serial id column. We have to 
+-- get rid of the old primary key to do that, but we still want entries in
+-- the "key" column to be unique, so we add a unique index at the end.
+alter table ar_internal_metadata drop constraint if exists ar_internal_metadata_pkey;
+alter table ar_internal_metadata add column if not exists id serial primary key;
+create unique index if not exists ix_ar_internal_metadata_uniq_key on ar_internal_metadata("key");
+
+-- Create records we'll need to track spot restorations
+insert into ar_internal_metadata ("key", "value", created_at, updated_at) 
+values ('spot restore is running', 'false', now(), now())
+on conflict do nothing;
+
+insert into ar_internal_metadata ("key", "value", created_at, updated_at) 
+values ('spot restore last run', '2000-01-01', now(), now())
+on conflict do nothing;
+
 
 -- Now note that the migration is complete.
 update schema_migrations set finished_at = now() where "version" = '007_spot_restore';
