@@ -125,7 +125,8 @@ func (del *Deletion) loadDeletionRequest(deletionRequestID int64) error {
 func (del *Deletion) loadInstAdmins() error {
 	adminsQuery := pgmodels.NewQuery().
 		Where("institution_id", "=", del.DeletionRequest.InstitutionID).
-		Where("role", "=", constants.RoleInstAdmin)
+		Where("role", "=", constants.RoleInstAdmin).
+		IsNull("deactivated_at")
 	instAdmins, err := pgmodels.UserSelect(adminsQuery)
 	if err != nil {
 		return err
