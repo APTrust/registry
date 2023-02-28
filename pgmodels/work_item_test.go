@@ -478,6 +478,8 @@ func TestIsRestorationSpotTest(t *testing.T) {
 	require.Nil(t, inst.Save())
 
 	item, err = pgmodels.WorkItemByID(item.ID)
+	require.Nil(t, err)
+	require.NotEmpty(t, item.ID)
 	isSpotTest, inst, obj, err = item.IsRestorationSpotTest()
 	assert.True(t, isSpotTest)
 	assert.NotNil(t, inst)
