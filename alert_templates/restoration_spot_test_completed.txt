@@ -1,0 +1,25 @@
+Hello from APTrust,
+
+We just restored an intellectual object as part of your institution's periodic "restoration spot test."
+
+The point of this exercise is to ensure that when we restore objects you've deposited:
+
+- they come back whole, with all expected files intact, and 
+- you can make sense of their contents, and 
+- if you need to import restored item into a local DAMS or repository, you can do it 
+
+The restored object, {{ .ItemName }}, is now in your restoration bucket at:
+
+{{ .RestorationURL }}
+
+To download this object, you'll need your S3 credentials an S3 client such as Minio (https://docs.min.io/docs/minio-client-quickstart-guide.html) or APTrust's Partner Tools (https://aptrust.github.io/userguide/partner_tools/).
+
+Your institution runs spot tests every {{ .SpotTestDays }} days. institutional admins can change this by logging into the Registry at {{ .RegistryURL }} and changing the spot test frequency on your institution page. You can turn off spot tests entirely by setting the frequency to zero.
+
+If you have questions, please contact us at help@aptrust.org.
+
+The APTrust Team
+https://aptrust.org
+help@aptrust.org
+
+More about restoration: https://aptrust.github.io/userguide/preservation/restoration/
