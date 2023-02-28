@@ -438,3 +438,54 @@ func TestNewDeletionItem(t *testing.T) {
 	require.NotNil(t, err)
 	require.Nil(t, item6)
 }
+
+func TestIsRestorationSpotTest(t *testing.T) {
+
+	// This is not a spot test because it's not even a restoration.
+	query := pgmodels.NewQuery().Where("action", "=", constants.ActionIngest).Limit(1)
+	item, err := pgmodels.WorkItemGet(query)
+	require.Nil(t, err)
+	require.NotNil(t, item)
+	require.NotEmpty(t, item.ID)
+
+	isSpotTest, inst, obj, err := item.IsRestorationSpotTest()
+	assert.False(t, isSpotTest)
+	assert.Nil(t, inst)
+	assert.Nil(t, obj)
+	assert.Nil(t, err)
+
+	// Although this one in an object restoration, it's not a spot
+	// test because it's not tied to any institution.last_spot_restore_work_item_id.
+	query = pgmodels.NewQuery().Where("action", "=", constants.ActionRestoreObject).IsNotNull("intellectual_object_id").Limit(1)
+	item, err = pgmodels.WorkItemGet(query)
+	require.Nil(t, err)
+	require.NotNil(t, item)
+	require.NotEmpty(t, item.ID)
+
+	isSpotTest, inst, obj, err = item.IsRestorationSpotTest()
+	assert.False(t, isSpotTest)
+	assert.Nil(t, inst)
+	assert.Nil(t, obj)
+	assert.Nil(t, err)
+
+	// Now link this to an institution, and we should get a yes.
+	inst, err = pgmodels.InstitutionByID(item.InstitutionID)
+	require.Nil(t, err)
+	require.NotNil(t, inst)
+	require.NotEmpty(t, inst.ID)
+
+	inst.LastSpotRestoreWorkItemID = item.ID
+	require.Nil(t, inst.Save())
+
+	item, err = pgmodels.WorkItemByID(item.ID)
+	isSpotTest, inst, obj, err = item.IsRestorationSpotTest()
+	assert.True(t, isSpotTest)
+	assert.NotNil(t, inst)
+	assert.NotEmpty(t, inst.ID)
+	assert.NotNil(t, obj)
+	assert.NotEmpty(t, obj.ID)
+	assert.Nil(t, err)
+
+	assert.Equal(t, item.InstitutionID, inst.ID)
+	assert.Equal(t, item.IntellectualObjectID, obj.ID)
+}

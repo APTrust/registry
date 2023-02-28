@@ -239,6 +239,29 @@ func (item *WorkItem) ValidateChanges(updatedItem *WorkItem) error {
 	return nil
 }
 
+// IsRestorationSpotTest returns true if this WorkItem is a restoration
+// spot test. It also returns the Institution on whose behalf the test
+// was conducted, and the object that was or is being restored.
+func (item *WorkItem) IsRestorationSpotTest() (bool, *Institution, *IntellectualObject, error) {
+	if item.Action != constants.ActionRestoreObject {
+		return false, nil, nil, nil
+	}
+	query := NewQuery().Where("last_spot_restore_work_item_id", "=", item.ID)
+	institution, err := InstitutionGet(query)
+	if err != nil {
+		if IsNoRowError(err) {
+			err = nil
+		}
+		return false, nil, nil, err
+	}
+	var obj *IntellectualObject
+	if institution != nil && institution.ID > 0 {
+		obj, err = IntellectualObjectByID(item.IntellectualObjectID)
+	}
+	isRestorationItem := institution != nil && institution.ID > 0 && obj != nil && obj.ID > 0
+	return isRestorationItem, institution, obj, err
+}
+
 // LastSuccessfulIngest returns the last successful
 // ingest WorkItem for the specified intellectual object id.
 func LastSuccessfulIngest(objID int64) (*WorkItem, error) {
