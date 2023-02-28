@@ -73,35 +73,7 @@ func IntellectualObjectInitRestore(c *gin.Context) {
 		return
 	}
 
-	// Make sure there are no pending work items...
-	pendingWorkItems, err := pgmodels.WorkItemsPendingForObject(obj.InstitutionID, obj.BagName)
-	if AbortIfError(c, err) {
-		return
-	}
-	if len(pendingWorkItems) > 0 {
-		AbortIfError(c, common.ErrPendingWorkItems)
-		return
-	}
-
-	// Create the new restoration work item
-	workItem, err := pgmodels.NewRestorationItem(obj, nil, req.CurrentUser)
-	if AbortIfError(c, err) {
-		return
-	}
-
-	// Queue the new work item in NSQ
-	topic, err := constants.TopicFor(workItem.Action, workItem.Stage)
-	if AbortIfError(c, err) {
-		return
-	}
-	ctx := common.Context()
-	err = ctx.NSQClient.Enqueue(topic, workItem.ID)
-	if AbortIfError(c, err) {
-		return
-	}
-
-	workItem.QueuedAt = time.Now().UTC()
-	err = workItem.Save()
+	_, err = InitObjectRestoration(obj, req.CurrentUser)
 	if AbortIfError(c, err) {
 		return
 	}
@@ -247,4 +219,37 @@ func loadEvents(req *Request, objID int64) error {
 	req.TemplateData["events"] = events
 	req.TemplateData["eventPager"] = pager
 	return err
+}
+
+func InitObjectRestoration(obj *pgmodels.IntellectualObject, user *pgmodels.User) (*pgmodels.WorkItem, error) {
+	// Make sure there are no pending work items...
+	pendingWorkItems, err := pgmodels.WorkItemsPendingForObject(obj.InstitutionID, obj.BagName)
+	if err != nil {
+		return nil, err
+	}
+	if len(pendingWorkItems) > 0 {
+		return nil, common.ErrPendingWorkItems
+	}
+
+	// Create the new restoration work item
+	workItem, err := pgmodels.NewRestorationItem(obj, nil, user)
+	if err != nil {
+		return nil, err
+	}
+
+	// Queue the new work item in NSQ
+	topic, err := constants.TopicFor(workItem.Action, workItem.Stage)
+	if err != nil {
+		return nil, err
+	}
+
+	ctx := common.Context()
+	err = ctx.NSQClient.Enqueue(topic, workItem.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	workItem.QueuedAt = time.Now().UTC()
+	err = workItem.Save()
+	return workItem, err
 }
