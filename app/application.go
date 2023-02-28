@@ -21,6 +21,7 @@ import (
 // the app.
 func Run() {
 	r := InitAppEngine(false)
+	initCronJobs(common.Context())
 	r.Run()
 }
 

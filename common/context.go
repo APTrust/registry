@@ -66,7 +66,6 @@ func Context() *APTContext {
 			SNSClient:   network.NewSNSClient(config.TwoFactor.SMSEnabled, config.TwoFactor.AWSRegion, config.Email.SesUser, config.Email.SesPassword, zlogger),
 			RedisClient: redisClient,
 		}
-		initCronJobs(ctx)
 	}
 	return ctx
 }

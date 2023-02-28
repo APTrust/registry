@@ -81,7 +81,7 @@ values ('spot restore is running', 'false', now(), now())
 on conflict do nothing;
 
 insert into ar_internal_metadata ("key", "value", created_at, updated_at) 
-values ('spot restore last run', '2000-01-01', now(), now())
+values ('spot restore last run', '2000-01-01T00:00:00Z', now(), now())
 on conflict do nothing;
 
 
