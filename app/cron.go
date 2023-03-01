@@ -228,6 +228,20 @@ func scheduleSpotRestoration(ctx *common.APTContext, inst *pgmodels.Institution,
 		ctx.Log.Error().Msgf("runRestorationSpotTest: error creating restoration work item for %s: %v", obj.Identifier, err)
 		return err
 	}
+
+	// Queue the work item in NSQ
+	topic := constants.TopicObjectRestore
+	if obj.IsGlacierOnly() {
+		topic = constants.TopicGlacierRestore
+	}
+	err = ctx.NSQClient.Enqueue(topic, workItem.ID)
+	if err != nil {
+		// Log this error and keep going.
+		// Admin can manually queue the item, if necessary.
+		// We want to record the LastSpotRestoreWorkItemID.
+		ctx.Log.Error().Msgf("runRestorationSpotTest: error queuing work item %d in topic %s: %v", workItem.ID, topic, err)
+	}
+
 	inst.LastSpotRestoreWorkItemID = workItem.ID
 	err = inst.Save()
 	if err != nil {
