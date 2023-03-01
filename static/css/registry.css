@@ -6488,6 +6488,10 @@ pre.with-wrap {
   padding: 0;
 }
 
+.has-nowrap {
+  white-space: nowrap;
+}
+
 /* TODO: This is not too pretty, but serviceable for now. */
 .flash {
   padding: 8px;
@@ -6826,22 +6830,22 @@ pre.with-wrap {
   top: 10px;
   width: 16px;
 }
-.table.has-chart-data tbody tr:not(.total):nth-child(6n+2) td:first-child::before {
+.table.has-chart-data tbody tr:not(.total):nth-child(6n+1) td:first-child::before {
   background-color: #bb9566;
 }
-.table.has-chart-data tbody tr:not(.total):nth-child(6n+3) td:first-child::before {
+.table.has-chart-data tbody tr:not(.total):nth-child(6n+2) td:first-child::before {
   background-color: #13135c;
 }
-.table.has-chart-data tbody tr:not(.total):nth-child(6n+4) td:first-child::before {
+.table.has-chart-data tbody tr:not(.total):nth-child(6n+3) td:first-child::before {
   background-color: #333030;
 }
-.table.has-chart-data tbody tr:not(.total):nth-child(6n+5) td:first-child::before {
+.table.has-chart-data tbody tr:not(.total):nth-child(6n+4) td:first-child::before {
   background-color: #608292;
 }
-.table.has-chart-data tbody tr:not(.total):nth-child(6n+6) td:first-child::before {
+.table.has-chart-data tbody tr:not(.total):nth-child(6n+5) td:first-child::before {
   background-color: #935a15;
 }
-.table.has-chart-data tbody tr:not(.total):nth-child(6n+7) td:first-child::before {
+.table.has-chart-data tbody tr:not(.total):nth-child(6n+6) td:first-child::before {
   background-color: #6097cd;
 }
 .table thead th {

@@ -34,7 +34,7 @@
                 {{ end }}
               </td>
               <td class="is-grey-dark num text-sm has-text-right">{{ formatInt64 $stat.FileCount }}</td>
-              <td class="is-grey-dark num text-sm has-text-right">{{ humanSize $stat.TotalBytes }}</td>
+              <td class="is-grey-dark num text-sm has-text-right has-nowrap">{{ humanSize $stat.TotalBytes }}</td>
             </tr>
             {{ end }}
           </tbody>

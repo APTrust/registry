@@ -103,6 +103,10 @@ pre.with-wrap {
   padding: 0;
 }
 
+.has-nowrap {
+  white-space: nowrap;
+}
+
 /* TODO: This is not too pretty, but serviceable for now. */
 .flash {
   padding: 8px;
