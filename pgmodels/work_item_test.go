@@ -453,6 +453,9 @@ func TestIsRestorationSpotTest(t *testing.T) {
 	assert.Nil(t, obj)
 	assert.Nil(t, err)
 
+	// Should not alert, because this is not a successful spot test
+	assert.Nil(t, item.AlertOnSuccessfulSpotTest())
+
 	// Although this one in an object restoration, it's not a spot
 	// test because it's not tied to any institution.last_spot_restore_work_item_id.
 	query = pgmodels.NewQuery().Where("action", "=", constants.ActionRestoreObject).IsNotNull("intellectual_object_id").Limit(1)
@@ -465,6 +468,9 @@ func TestIsRestorationSpotTest(t *testing.T) {
 	assert.Nil(t, inst)
 	assert.Nil(t, obj)
 	assert.Nil(t, err)
+
+	// Should not alert, because this is not a successful spot test
+	assert.Nil(t, item.AlertOnSuccessfulSpotTest())
 
 	// Now link this to an institution, and we should get a yes.
 	inst, err = pgmodels.InstitutionByID(item.InstitutionID)
@@ -488,4 +494,25 @@ func TestIsRestorationSpotTest(t *testing.T) {
 
 	assert.Equal(t, item.InstitutionID, inst.ID)
 	assert.Equal(t, item.IntellectualObjectID, obj.ID)
+
+	testAlertOnSuccessfulSpotTest(t, item)
+}
+
+func testAlertOnSuccessfulSpotTest(t *testing.T, item *pgmodels.WorkItem) {
+	alert := item.AlertOnSuccessfulSpotTest()
+	require.NotNil(t, alert)
+
+	assert.Equal(t, "Restoration Spot Test Completed", alert.Subject)
+	assert.Contains(t, alert.Content, "institution1.edu/photos")
+	assert.Contains(t, alert.Content, "https://s3.example.com/photos.tar")
+	assert.Contains(t, alert.Content, "Your institution runs spot tests every 30 days.")
+	assert.Contains(t, alert.Content, "logging into the Registry at http://localhost")
+
+	assert.Equal(t, 3, len(alert.Users))
+	for _, user := range alert.Users {
+		assert.EqualValues(t, 2, user.InstitutionID)
+	}
+
+	require.Equal(t, 1, len(alert.WorkItems))
+	assert.Equal(t, item.ID, alert.WorkItems[0].ID)
 }

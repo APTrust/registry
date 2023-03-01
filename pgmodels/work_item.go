@@ -135,14 +135,20 @@ func (item *WorkItem) HasCompleted() bool {
 // if WorkItem.ID is zero. Otherwise, it updates.
 func (item *WorkItem) Save() error {
 	item.SetTimestamps()
-	err := item.Validate()
-	if err != nil {
-		return err
+	validationErr := item.Validate()
+	if validationErr != nil {
+		return validationErr
 	}
+	var err error
 	if item.ID == int64(0) {
-		return insert(item)
+		err = insert(item)
+	} else {
+		err = update(item)
 	}
-	return update(item)
+	if err == nil && item.Action == constants.ActionRestoreObject && item.Status == constants.StatusSuccess {
+		item.AlertOnSuccessfulSpotTest()
+	}
+	return err
 }
 
 // SetForRequeue sets properies so this item can be requeued.
@@ -263,28 +269,43 @@ func (item *WorkItem) GetSpotTestDetails() (*Institution, *IntellectualObject, e
 	return institution, obj, err
 }
 
-func (item *WorkItem) AlertOnSuccessfulSpotTest() {
+// AlertOnSuccessfulSpotTest sends an email to institutional users and admins
+// when a restoration spot test has completed. It's the institution's job to
+// figure out what to do with the restored object.
+//
+// This returns an alert if the alert was created successfully, nil otherwise.
+// Zero does not necessarily indicate failure. It just means we didn't create
+// an alert, and there may be valid reasons for not doing so.
+func (item *WorkItem) AlertOnSuccessfulSpotTest() *Alert {
+
+	// If this is not a successful restoration, quit now.
+	if item.Action != constants.ActionRestoreObject || item.Status != constants.StatusSuccess {
+		return nil
+	}
+
 	ctx := common.Context()
 	inst, obj, err := item.GetSpotTestDetails()
 	if err != nil {
 		ctx.Log.Error().Msgf("AlertOnSuccessfulSpotTest: Error getting WorkItem spot test details: %v", err)
-		return
+		return nil
 	}
+
 	if inst == nil || inst.ID == 0 || obj == nil || obj.ID == 0 {
-		// Not a restoration spot test.
-		return
+		// OK, this is a successful restoration, but it's
+		// not a restoration spot test.
+		return nil
 	}
 	query := NewQuery().Where("institution_id", "=", item.InstitutionID).IsNull("deactivated_at")
 	users, err := UserSelect(query)
 	if err != nil {
 		ctx.Log.Error().Msgf("AlertOnSuccessfulSpotTest: Error getting users for institution %s: %v", inst.Identifier, err)
-		return
+		return nil
 	}
 
 	parts := strings.Split(item.Note, " restored to ")
 	if len(parts) < 2 {
 		ctx.Log.Error().Msgf("AlertOnSuccessfulSpotTest: Error extracting URL from WorkItem note. Note is: %s", item.Note)
-		return
+		return nil
 	}
 	urlWithTrailingPeriod := parts[1]
 	restorationURL := urlWithTrailingPeriod[0 : len(urlWithTrailingPeriod)-1]
@@ -293,10 +314,10 @@ func (item *WorkItem) AlertOnSuccessfulSpotTest() {
 
 	templateName := "alerts/restoration_spot_test_completed.txt"
 	alertData := map[string]interface{}{
-		"itemName":       obj.Identifier,
-		"restorationURL": restorationURL,
-		"spotTestDays":   strconv.FormatInt(inst.SpotRestoreFrequency, 10),
-		"registryURL":    registryURL,
+		"ItemName":       obj.Identifier,
+		"RestorationURL": restorationURL,
+		"SpotTestDays":   strconv.FormatInt(inst.SpotRestoreFrequency, 10),
+		"RegistryURL":    registryURL,
 	}
 
 	alert := &Alert{
@@ -315,6 +336,7 @@ func (item *WorkItem) AlertOnSuccessfulSpotTest() {
 	} else {
 		ctx.Log.Info().Msgf("Created spot test restoration alert %d for WorkItem %d going to %d users", restorationAlert.ID, item.ID, len(users))
 	}
+	return restorationAlert
 }
 
 // LastSuccessfulIngest returns the last successful
