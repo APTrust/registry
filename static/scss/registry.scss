@@ -84,7 +84,7 @@ $table-head-cell-border-width: 0 0 1px;
 // Import bulma packages as needed
 @import "../../node_modules/bulma/sass/utilities/all";
 @import "../../node_modules/bulma/sass/base/all";
-// @import "../../node_modules/bulma/sass/components/all";
+@import "../../node_modules/bulma/sass/components/message";
 @import "../../node_modules/bulma/sass/elements/box";
 @import "../../node_modules/bulma/sass/elements/button";
 @import "../../node_modules/bulma/sass/elements/notification";

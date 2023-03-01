@@ -26,12 +26,16 @@
     <p class="mb-3">How would you like to complete your login?</p>
 
     <div class="two-factor-option mb-3">
-      <button class="button is-primary" onclick="submitSecondFactor('authy')">Authy</button> <br />
-      <span id="two-factor-method-authy" class="two-factor-message" style="display:none"> Sent push notification.</span>
+      <button class="button is-primary" onclick="submitSecondFactor('authy')">Authy</button>
+      <article id="two-factor-method-authy" class="message is-info mt-4 two-factor-message" style="display:none">
+        <div class="message-body">Sent push notification.</div>
+      </article>
     </div>
     <div class="two-factor-option mb-3">
-      <button class="button is-primary" onclick="submitSecondFactor('sms')">Text Message</button> <br />
-      <span id="two-factor-method-sms" class="two-factor-message" style="display:none;"> Sent code via SMS.</span>
+      <button class="button is-primary" onclick="submitSecondFactor('sms')">Text Message</button>
+      <article id="two-factor-method-sms" class="message is-info mt-4 two-factor-message" style="display:none">
+        <div class="message-body">Sent code via SMS.</div>
+      </article>
     </div>
     <div class="two-factor-option mb-3">
       <button class="button is-primary" onclick="submitSecondFactor('backup')">Backup Code</button> <br />

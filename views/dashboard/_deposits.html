@@ -16,8 +16,8 @@
         <table class="table is-borderless is-fullwidth has-chart-data">
           <thead>
             <th>Storage Option</th>
-            <th>Files</th>
-            <th>Size</th>
+            <th class="has-text-right">Files</th>
+            <th class="has-text-right">Size</th>
           </thead>
           <tbody>
             {{ range $index, $stat := .depositStats }}

@@ -428,7 +428,7 @@ fieldset[disabled] .file-name, fieldset[disabled] .select select, .select fields
   width: 0.625em;
 }
 
-.table-container:not(:last-child), .table:not(:last-child), .notification:not(:last-child), .box:not(:last-child) {
+.table-container:not(:last-child), .table:not(:last-child), .notification:not(:last-child), .box:not(:last-child), .message:not(:last-child) {
   margin-bottom: 1.5rem;
 }
 
@@ -665,6 +665,173 @@ table th {
     transform: rotate(359deg);
   }
 }
+.message {
+  background-color: hsl(0deg, 0%, 96%);
+  border-radius: 4px;
+  font-size: 1rem;
+}
+.message strong {
+  color: currentColor;
+}
+.message a:not(.button):not(.tag):not(.dropdown-item) {
+  color: currentColor;
+  text-decoration: underline;
+}
+.message.is-small {
+  font-size: 0.75rem;
+}
+.message.is-medium {
+  font-size: 1.25rem;
+}
+.message.is-large {
+  font-size: 1.5rem;
+}
+.message.is-white {
+  background-color: white;
+}
+.message.is-white .message-header {
+  background-color: hsl(0deg, 0%, 100%);
+  color: hsl(0deg, 0%, 4%);
+}
+.message.is-white .message-body {
+  border-color: hsl(0deg, 0%, 100%);
+}
+.message.is-black {
+  background-color: #fafafa;
+}
+.message.is-black .message-header {
+  background-color: hsl(0deg, 0%, 4%);
+  color: hsl(0deg, 0%, 100%);
+}
+.message.is-black .message-body {
+  border-color: hsl(0deg, 0%, 4%);
+}
+.message.is-light {
+  background-color: #fafafa;
+}
+.message.is-light .message-header {
+  background-color: hsl(0deg, 0%, 96%);
+  color: rgba(0, 0, 0, 0.7);
+}
+.message.is-light .message-body {
+  border-color: hsl(0deg, 0%, 96%);
+}
+.message.is-dark {
+  background-color: #fafafa;
+}
+.message.is-dark .message-header {
+  background-color: #333030;
+  color: #fff;
+}
+.message.is-dark .message-body {
+  border-color: #333030;
+}
+.message.is-primary {
+  background-color: #eeeefc;
+}
+.message.is-primary .message-header {
+  background-color: #13135c;
+  color: #fff;
+}
+.message.is-primary .message-body {
+  border-color: #13135c;
+  color: #4545d9;
+}
+.message.is-link {
+  background-color: #f5f4f4;
+}
+.message.is-link .message-header {
+  background-color: #333030;
+  color: #fff;
+}
+.message.is-link .message-body {
+  border-color: #333030;
+  color: #8d8686;
+}
+.message.is-info {
+  background-color: #eff5fb;
+}
+.message.is-info .message-header {
+  background-color: hsl(207deg, 61%, 53%);
+  color: #fff;
+}
+.message.is-info .message-body {
+  border-color: hsl(207deg, 61%, 53%);
+  color: #296fa8;
+}
+.message.is-success {
+  background-color: #f1f9f7;
+}
+.message.is-success .message-header {
+  background-color: #35826b;
+  color: #fff;
+}
+.message.is-success .message-body {
+  border-color: #35826b;
+  color: #42a386;
+}
+.message.is-warning {
+  background-color: #fffaeb;
+}
+.message.is-warning .message-header {
+  background-color: hsl(44deg, 100%, 77%);
+  color: rgba(0, 0, 0, 0.7);
+}
+.message.is-warning .message-body {
+  border-color: hsl(44deg, 100%, 77%);
+  color: #946c00;
+}
+.message.is-danger {
+  background-color: #fcedf1;
+}
+.message.is-danger .message-header {
+  background-color: #be1f45;
+  color: #fff;
+}
+.message.is-danger .message-body {
+  border-color: #be1f45;
+  color: #d7234e;
+}
+
+.message-header {
+  align-items: center;
+  background-color: #6b6b6b;
+  border-radius: 4px 4px 0 0;
+  color: #fff;
+  display: flex;
+  font-weight: 700;
+  justify-content: space-between;
+  line-height: 1.25;
+  padding: 0.75em 1em;
+  position: relative;
+}
+.message-header .delete {
+  flex-grow: 0;
+  flex-shrink: 0;
+  margin-left: 0.75em;
+}
+.message-header + .message-body {
+  border-width: 0;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.message-body {
+  border-color: #d6d6d6;
+  border-radius: 4px;
+  border-style: solid;
+  border-width: 0 0 0 4px;
+  color: #6b6b6b;
+  padding: 1.25em 1.5em;
+}
+.message-body code,
+.message-body pre {
+  background-color: hsl(0deg, 0%, 100%);
+}
+.message-body pre code {
+  background-color: transparent;
+}
+
 .box {
   background-color: hsl(0deg, 0%, 100%);
   border-radius: 8px;
