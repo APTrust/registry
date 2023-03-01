@@ -448,8 +448,7 @@ func TestIsRestorationSpotTest(t *testing.T) {
 	require.NotNil(t, item)
 	require.NotEmpty(t, item.ID)
 
-	isSpotTest, inst, obj, err := item.IsRestorationSpotTest()
-	assert.False(t, isSpotTest)
+	inst, obj, err := item.GetSpotTestDetails()
 	assert.Nil(t, inst)
 	assert.Nil(t, obj)
 	assert.Nil(t, err)
@@ -462,8 +461,7 @@ func TestIsRestorationSpotTest(t *testing.T) {
 	require.NotNil(t, item)
 	require.NotEmpty(t, item.ID)
 
-	isSpotTest, inst, obj, err = item.IsRestorationSpotTest()
-	assert.False(t, isSpotTest)
+	inst, obj, err = item.GetSpotTestDetails()
 	assert.Nil(t, inst)
 	assert.Nil(t, obj)
 	assert.Nil(t, err)
@@ -480,8 +478,8 @@ func TestIsRestorationSpotTest(t *testing.T) {
 	item, err = pgmodels.WorkItemByID(item.ID)
 	require.Nil(t, err)
 	require.NotEmpty(t, item.ID)
-	isSpotTest, inst, obj, err = item.IsRestorationSpotTest()
-	assert.True(t, isSpotTest)
+
+	inst, obj, err = item.GetSpotTestDetails()
 	assert.NotNil(t, inst)
 	assert.NotEmpty(t, inst.ID)
 	assert.NotNil(t, obj)

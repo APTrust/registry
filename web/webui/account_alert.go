@@ -1,11 +1,9 @@
 package webui
 
 import (
-	"bytes"
 	"fmt"
 	"time"
 
-	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/pgmodels"
 )
@@ -30,7 +28,7 @@ func CreatePasswordChangedAlert(req *Request, userToEdit *pgmodels.User) (*pgmod
 		CreatedAt:     time.Now().UTC(),
 		Users:         recipients,
 	}
-	return createAlert(alert, templateName, alertData)
+	return pgmodels.CreateAlert(alert, templateName, alertData)
 }
 
 // CreatePasswordResetAlert creates an alert telling a user to
@@ -56,7 +54,7 @@ func CreatePasswordResetAlert(req *Request, userToEdit *pgmodels.User, token str
 		CreatedAt:     time.Now().UTC(),
 		Users:         recipients,
 	}
-	alert, err := createAlert(alert, templateName, alertData)
+	alert, err := pgmodels.CreateAlert(alert, templateName, alertData)
 
 	if err == nil {
 		userToEdit.ResetPasswordSentAt = time.Now().UTC()
@@ -84,61 +82,12 @@ func CreateNewAccountAlert(req *Request, newUser *pgmodels.User, token string) (
 		CreatedAt:     time.Now().UTC(),
 		Users:         recipients,
 	}
-	alert, err := createAlert(alert, templateName, alertData)
+	alert, err := pgmodels.CreateAlert(alert, templateName, alertData)
 
 	if err == nil {
 		newUser.ResetPasswordSentAt = time.Now().UTC()
 		err = newUser.Save()
 	}
-
-	return alert, err
-}
-
-// createAlert adds customized text to the alert and saves it in the
-// database. Param templateName is the name of the text template used
-// to construct the alert message. Param alertData is the custom data
-// to put into the template.
-//
-// This returns the alert with a non-zero ID (since it saves it) and
-// an error if there's a problem with the template or the save.
-func createAlert(alert *pgmodels.Alert, templateName string, alertData map[string]interface{}) (*pgmodels.Alert, error) {
-
-	// Create the alert text from the template...
-	tmpl := common.TextTemplates[templateName]
-	var buf bytes.Buffer
-	err := tmpl.Execute(&buf, alertData)
-	if err != nil {
-		return nil, err
-	}
-
-	// Set the alert text & save it.
-	alert.Content = buf.String()
-	err = alert.Save()
-	if err != nil {
-		return nil, err
-	}
-
-	// Send the alert & mark as sent
-	for _, recipient := range alert.Users {
-		err := common.Context().SESClient.Send(recipient.Email, alert.Subject, alert.Content)
-		if err == nil {
-			err = alert.MarkAsSent(recipient.ID)
-			if err != nil {
-				common.Context().Log.Error().Msgf("Could not mark alert %d to user %s as sent, even though it was: %v", alert.ID, recipient.Email, err)
-			}
-		} else {
-			common.Context().Log.Error().Msgf("Saved but could not send alert %d to user %s: %v", alert.ID, recipient.Email, err)
-		}
-	}
-
-	// Show the alert text in dev and test consoles,
-	// so we don't have to look it up in the DB.
-	// For dev/test, we need to see the review and
-	// confirmation URLS in this alert so we can
-	// review and test them.
-	common.ConsoleDebug("***********************")
-	common.ConsoleDebug(alert.Content)
-	common.ConsoleDebug("***********************")
 
 	return alert, err
 }

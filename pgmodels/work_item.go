@@ -2,6 +2,8 @@ package pgmodels
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/APTrust/registry/common"
@@ -239,12 +241,12 @@ func (item *WorkItem) ValidateChanges(updatedItem *WorkItem) error {
 	return nil
 }
 
-// IsRestorationSpotTest returns true if this WorkItem is a restoration
+// GetSpotTestDetails returns true if this WorkItem is a restoration
 // spot test. It also returns the Institution on whose behalf the test
 // was conducted, and the object that was or is being restored.
-func (item *WorkItem) IsRestorationSpotTest() (bool, *Institution, *IntellectualObject, error) {
+func (item *WorkItem) GetSpotTestDetails() (*Institution, *IntellectualObject, error) {
 	if item.Action != constants.ActionRestoreObject {
-		return false, nil, nil, nil
+		return nil, nil, nil
 	}
 	query := NewQuery().Where("last_spot_restore_work_item_id", "=", item.ID)
 	institution, err := InstitutionGet(query)
@@ -252,14 +254,67 @@ func (item *WorkItem) IsRestorationSpotTest() (bool, *Institution, *Intellectual
 		if IsNoRowError(err) {
 			err = nil
 		}
-		return false, nil, nil, err
+		return nil, nil, err
 	}
-	var obj *IntellectualObject
-	if institution != nil && institution.ID > 0 {
-		obj, err = IntellectualObjectByID(item.IntellectualObjectID)
+	if institution.ID == 0 {
+		return nil, nil, nil
 	}
-	isRestorationItem := institution != nil && institution.ID > 0 && obj != nil && obj.ID > 0
-	return isRestorationItem, institution, obj, err
+	obj, err := IntellectualObjectByID(item.IntellectualObjectID)
+	return institution, obj, err
+}
+
+func (item *WorkItem) AlertOnSuccessfulSpotTest() {
+	ctx := common.Context()
+	inst, obj, err := item.GetSpotTestDetails()
+	if err != nil {
+		ctx.Log.Error().Msgf("AlertOnSuccessfulSpotTest: Error getting WorkItem spot test details: %v", err)
+		return
+	}
+	if inst == nil || inst.ID == 0 || obj == nil || obj.ID == 0 {
+		// Not a restoration spot test.
+		return
+	}
+	query := NewQuery().Where("institution_id", "=", item.InstitutionID).IsNull("deactivated_at")
+	users, err := UserSelect(query)
+	if err != nil {
+		ctx.Log.Error().Msgf("AlertOnSuccessfulSpotTest: Error getting users for institution %s: %v", inst.Identifier, err)
+		return
+	}
+
+	parts := strings.Split(item.Note, " restored to ")
+	if len(parts) < 2 {
+		ctx.Log.Error().Msgf("AlertOnSuccessfulSpotTest: Error extracting URL from WorkItem note. Note is: %s", item.Note)
+		return
+	}
+	urlWithTrailingPeriod := parts[1]
+	restorationURL := urlWithTrailingPeriod[0 : len(urlWithTrailingPeriod)-1]
+
+	registryURL := fmt.Sprintf("%s://%s", ctx.Config.HTTPScheme(), ctx.Config.Cookies.Domain)
+
+	templateName := "alerts/restoration_spot_test_completed.txt"
+	alertData := map[string]interface{}{
+		"itemName":       obj.Identifier,
+		"restorationURL": restorationURL,
+		"spotTestDays":   strconv.FormatInt(inst.SpotRestoreFrequency, 10),
+		"registryURL":    registryURL,
+	}
+
+	alert := &Alert{
+		InstitutionID: inst.ID,
+		Type:          constants.AlertRestorationCompleted,
+		Subject:       "Restoration Spot Test Completed",
+		Content:       "Your fries are ready.",
+		PremisEvents:  nil,
+		Users:         users,
+		WorkItems:     []*WorkItem{item},
+	}
+
+	restorationAlert, err := CreateAlert(alert, templateName, alertData)
+	if err != nil {
+		ctx.Log.Error().Msgf("AlertOnSuccessfulSpotTest: CreateAlert returned error %v", err)
+	} else {
+		ctx.Log.Info().Msgf("Created spot test restoration alert %d for WorkItem %d going to %d users", restorationAlert.ID, item.ID, len(users))
+	}
 }
 
 // LastSuccessfulIngest returns the last successful

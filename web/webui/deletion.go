@@ -309,8 +309,7 @@ func (del *Deletion) createDeletionAlert(templateName, alertType string, alertDa
 		Users:             del.InstAdmins,
 	}
 
-	// createAlert is in account_alert.go
-	return createAlert(alert, templateName, alertData)
+	return pgmodels.CreateAlert(alert, templateName, alertData)
 }
 
 // ReviewURL returns the URL for an institutional admin to review
