@@ -15,7 +15,7 @@
     <div class="is-flex mb-5">
       {{ if .user.DeactivatedAt.IsZero }}
       {{ if userCan .CurrentUser "UserCreate" .user.InstitutionID }}
-      <a class="button mr-3" href="/users/edit/{{ .user.ID }}">Edit</a>
+      <a class="button mr-3 is-not-underlined" href="/users/edit/{{ .user.ID }}">Edit</a>
       {{ end }}
       {{ if userCan .CurrentUser "UserDelete" .user.InstitutionID }}
       <button class="button mr-3" onclick="document.forms['userDeleteForm'].submit()">Deactivate</button>
@@ -24,8 +24,8 @@
         {{ template "forms/csrf_token.html" . }}
       </form>
       {{ if userCan .CurrentUser "UserUpdate" .user.InstitutionID }}
-      <a class="button mr-3" href="/users/change_password/{{ .user.ID }}">Change Password</a>
-      <a class="button mr-3" href="javascript:forcePasswordReset()">Force Password Reset</a>
+      <a class="button mr-3 is-not-underlined" href="/users/change_password/{{ .user.ID }}">Change Password</a>
+      <a class="button mr-3 is-not-underlined" href="javascript:forcePasswordReset()">Force Password Reset</a>
       {{ end }}
       {{ end }}
       {{ else }}

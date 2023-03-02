@@ -4,11 +4,11 @@
   <div class="box-header is-flex is-align-items-center is-justify-content-space-between">
     <h1 class="h2">Users</h1>
     {{ if .CurrentUser.IsAdmin }}
-    <a class="button is-success mr-6" href="/users/new">
+    <a class="button is-success mr-6 is-not-underlined" href="/users/new">
       Add new user
     </a>
     {{ else if userCan .CurrentUser "UserCreate" .CurrentUser.InstitutionID }}
-    <a class="button is-success mr-6" href="/users/new?institution_id={{ .CurrentUser.InstitutionID }}">
+    <a class="button is-success mr-6 is-not-underlined" href="/users/new?institution_id={{ .CurrentUser.InstitutionID }}">
       Add new user
     </a>
     {{ end }}
@@ -24,33 +24,33 @@
     <thead>
       <tr>
         <th class="pl-5">
-          <a href="{{ sortUrl .currentUrl `name` }}">Name<span class="material-icons sort-icon" aria-hidden="true">
+          <a href="{{ sortUrl .currentUrl `name` }}" class="is-grey-dark">Name<span class="material-icons sort-icon" aria-hidden="true">
               {{ sortIcon .currentUrl `name` }}</span></a>
         </th>
         <th>
-          <a href="{{ sortUrl .currentUrl `email` }}">Email<span class="material-icons sort-icon" aria-hidden="true">
+          <a href="{{ sortUrl .currentUrl `email` }}" class="is-grey-dark">Email<span class="material-icons sort-icon" aria-hidden="true">
               {{ sortIcon .currentUrl `email` }}</span></a>
         </th>
         <th>
-          <a href="{{ sortUrl .currentUrl `institution_name` }}">Institution<span class="material-icons sort-icon"
+          <a href="{{ sortUrl .currentUrl `institution_name` }}" class="is-grey-dark">Institution<span class="material-icons sort-icon"
               aria-hidden="true">{{ sortIcon .currentUrl `institution_name` }}</span></a>
         </th>
         <th>
-          <a href="{{ sortUrl .currentUrl `role` }}">Role<span class="material-icons sort-icon" aria-hidden="true">
+          <a href="{{ sortUrl .currentUrl `role` }}" class="is-grey-dark">Role<span class="material-icons sort-icon" aria-hidden="true">
               {{ sortIcon .currentUrl `role` }}</span></a>
         </th>
         <th>
-          <a href="{{ sortUrl .currentUrl `last_sign_in_at` }}">Last Sign In
+          <a href="{{ sortUrl .currentUrl `last_sign_in_at` }}" class="is-grey-dark">Last Sign In
             <span class="material-icons sort-icon" aria-hidden="true">{{ sortIcon .currentUrl `last_sign_in_at`
               }}</span></a>
         </th>
         <th>
-          <a href="{{ sortUrl .currentUrl `enabled_two_factor` }}">2FA
+          <a href="{{ sortUrl .currentUrl `enabled_two_factor` }}" class="is-grey-dark">2FA
             <span class="material-icons sort-icon" aria-hidden="true">{{ sortIcon .currentUrl `enabled_two_factor`
               }}</span></a>
         </th>
         <th>
-          <a href="{{ sortUrl .currentUrl `deactivated_at` }}">Disabled
+          <a href="{{ sortUrl .currentUrl `deactivated_at` }}" class="is-grey-dark">Disabled
             <span class="material-icons sort-icon" aria-hidden="true">{{ sortIcon .currentUrl `deactivated_at`
               }}</span></a>
         </th>

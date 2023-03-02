@@ -9,24 +9,24 @@
   Started {{ unixToISO .stats.Info.StartTime }}. Health: {{ .stats.Health }}.</p>
 
 <div id="nsqActionList" class="nsq-action-list">
-  <a class="button is-primary is-outlined is-compact" href="javascript:nsqInit()">Create Default Topics</a> <br /><br />
+  <a class="button is-primary is-outlined is-compact is-not-underlined" href="javascript:nsqInit()">Create Default Topics</a> <br /><br />
 
-  <a class="button is-primary is-outlined is-compact" href="javascript:nsqPost('pause', '', '', 'topic', true)"
+  <a class="button is-primary is-outlined is-compact is-not-underlined" href="javascript:nsqPost('pause', '', '', 'topic', true)"
     title="Pause all topics">Pause All Topics</a>
-  <a class="button is-primary is-outlined is-compact"
+  <a class="button is-primary is-outlined is-compact is-not-underlined"
     href="javascript:nsqPost('unpause', '', '', 'topic', true)">Unpause All Topics</a>
-  <a class="button is-danger is-outlined is-compact" href="javascript:nsqPost('empty', '', '', 'topic', true)">Empty
+  <a class="button is-danger is-outlined is-compact is-not-underlined" href="javascript:nsqPost('empty', '', '', 'topic', true)">Empty
     All Topics</a>
-  <a class="button is-danger is-outlined is-compact" href="javascript:nsqPost('delete', '', '', 'topic', true)">Delete
+  <a class="button is-danger is-outlined is-compact is-not-underlined" href="javascript:nsqPost('delete', '', '', 'topic', true)">Delete
     All Topics</a> <br /><br />
 
-  <a class="button is-primary is-outlined is-compact" href="javascript:nsqPost('pause', '', '', 'channel', true)"
+  <a class="button is-primary is-outlined is-compact is-not-underlined" href="javascript:nsqPost('pause', '', '', 'channel', true)"
     title="Pause all channels">Pause All Channels</a>
-  <a class="button is-primary is-outlined is-compact"
+  <a class="button is-primary is-outlined is-compact is-not-underlined"
     href="javascript:nsqPost('unpause', '', '', 'channel', true)">Unpause All Channels</a>
-  <a class="button is-danger is-outlined is-compact" href="javascript:nsqPost('empty', '', '', 'channel', true)">Empty
+  <a class="button is-danger is-outlined is-compact is-not-underlined" href="javascript:nsqPost('empty', '', '', 'channel', true)">Empty
     All Channels</a>
-  <a class="button is-danger is-outlined is-compact" href="javascript:nsqPost('delete', '', '', 'channel', true)">Delete
+  <a class="button is-danger is-outlined is-compact is-not-underlined" href="javascript:nsqPost('delete', '', '', 'channel', true)">Delete
     All Channels</a>
 </div>
 

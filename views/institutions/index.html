@@ -8,7 +8,7 @@
   <div class="box-header is-flex is-align-items-center is-justify-content-space-between">
     <h1 class="h2">Institutions</h1>
     {{ if .CurrentUser.IsAdmin }}
-    <a class="button is-success ml-6" href="/institutions/new">Create New</a>
+    <a class="button is-success ml-6 is-not-underlined" href="/institutions/new">Create New</a>
     {{ end }}
   </div>
 
@@ -21,24 +21,24 @@
   <table class="table is-hoverable is-fullwidth has-padding">
     <thead>
       <tr>
-        <th class="pl-5"><a href="{{ sortUrl .currentUrl `name` }}" class="is-flex is-align-items-center">
+        <th class="pl-5"><a href="{{ sortUrl .currentUrl `name` }}" class="is-flex is-align-items-center is-grey-dark">
             Name
             <span class="material-icons sort-icon" aria-hidden="true">{{ sortIcon .currentUrl `name` }}</span>
           </a></th>
-        <th><a href="{{ sortUrl .currentUrl `identifier` }}" class="is-flex is-align-items-center">
+        <th><a href="{{ sortUrl .currentUrl `identifier` }}" class="is-flex is-align-items-center is-grey-dark">
             Identifier
             <span class="material-icons sort-icon" aria-hidden="true">{{ sortIcon .currentUrl `identifier` }}</span>
           </a></th>
-        <th><a href="{{ sortUrl .currentUrl `type` }}" class="is-flex is-align-items-center">
+        <th><a href="{{ sortUrl .currentUrl `type` }}" class="is-flex is-align-items-center is-grey-dark">
             Type
             <span class="material-icons sort-icon" aria-hidden="true">{{ sortIcon .currentUrl `type` }}</span>
           </a></th>
-        <th><a href="{{ sortUrl .currentUrl `parent_identifier` }}" class="is-flex is-align-items-center">
+        <th><a href="{{ sortUrl .currentUrl `parent_identifier` }}" class="is-flex is-align-items-center is-grey-dark">
             Parent
             <span class="material-icons sort-icon" aria-hidden="true">{{ sortIcon .currentUrl `parent_identifier`
               }}</span>
           </a></th>
-        <th><a href="{{ sortUrl .currentUrl `deactivated_at` }}" class="is-flex is-align-items-center">
+        <th><a href="{{ sortUrl .currentUrl `deactivated_at` }}" class="is-flex is-align-items-center is-grey-dark">
             Deactivated
             <span class="material-icons sort-icon" aria-hidden="true">{{ sortIcon .currentUrl `deactivated_at` }}</span>
           </a></th>

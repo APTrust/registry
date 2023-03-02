@@ -13,32 +13,32 @@
 
       <div class="column">
         <!-- TODO Update styles here when file summary total is also at the end -->
-          <table class="table is-borderless is-fullwidth has-chart-data">
-            <thead>
-              <th>Storage Option</th>
-              <th>Files</th>
-              <th>Size</th>
-            </thead>
-            <tbody>
-              {{ range $index, $stat := .depositStats }}
-              {{ if eq $stat.StorageOption "Total" }}
-                <tr class="total">
+        <table class="table is-borderless is-fullwidth has-chart-data">
+          <thead>
+            <th>Storage Option</th>
+            <th class="has-text-right">Files</th>
+            <th class="has-text-right">Size</th>
+          </thead>
+          <tbody>
+            {{ range $index, $stat := .depositStats }}
+            {{ if eq $stat.StorageOption "Total" }}
+            <tr class="total">
               {{ else }}
-                <tr>
+            <tr>
               {{ end }}
-                  <td class="text-sm">
-                    {{ if eq $stat.StorageOption "" }}
-                    Total
-                    {{ else }}
-                    {{ $stat.StorageOption }}
-                    {{ end }}
-                  </td>
-                  <td class="is-grey-dark num text-sm has-text-right">{{ formatInt64 $stat.FileCount }}</td>
-                  <td class="is-grey-dark num text-sm has-text-right">{{ humanSize $stat.TotalBytes }}</td>
-                </tr>
+              <td class="text-sm">
+                {{ if eq $stat.StorageOption "" }}
+                Total
+                {{ else }}
+                {{ $stat.StorageOption }}
                 {{ end }}
-            </tbody>
-          </table>
+              </td>
+              <td class="is-grey-dark num text-sm has-text-right">{{ formatInt64 $stat.FileCount }}</td>
+              <td class="is-grey-dark num text-sm has-text-right has-nowrap">{{ humanSize $stat.TotalBytes }}</td>
+            </tr>
+            {{ end }}
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
@@ -66,48 +66,56 @@
 
 <script>
 
- var depositChart = null
- const depositData = {{ toJSON .depositStats }};
+  var depositChart = null
+  const depositData = {{ toJSON .depositStats }};
 
- function renderChart() {
-     let ctx = document.getElementById("depositChart");
-     let data = buildChartData("Deposits by Storage Type")
-     if (depositChart == null) {
-         depositChart = new Chart(ctx, { type: 'doughnut', data: data })
-     } else {
-         depositChart.data = data
-         depositChart.update()
-     }
- }
+  function renderChart() {
+    let ctx = document.getElementById("depositChart");
+    let data = buildChartData("Deposits by Storage Type")
+    if (depositChart == null) {
+      depositChart = new Chart(ctx, { type: 'doughnut', data: data, options: chartOptions })
+    } else {
+      depositChart.data = data
+      depositChart.update()
+    }
+  }
 
- function buildChartData(label) {
-     let labels = getLabels()
-     return {
-         labels: labels,
-         datasets: [{
-             label: label,
-             data: getDepositData(),
-             backgroundColor: window.APT.chartColors('fill', labels.length),
-             borderColor: window.APT.chartColors('border', labels.length),
-             borderWidth: 1
-         }],
-         hoverOffset: 4
-     }
- }
+  function buildChartData(label) {
+    let labels = getLabels()
+    return {
+      labels: labels,
+      datasets: [{
+        label: label,
+        data: getDepositData(),
+        backgroundColor: window.APT.chartColors('fill', labels.length),
+        borderColor: window.APT.chartColors('border', labels.length),
+        borderWidth: 1
+      }],
+      hoverOffset: 4,
+    }
+  }
 
- function getDepositData() {
-     return depositData.filter(item => item.storage_option != 'Total').map(item => item.total_gb);
- }
+  function getDepositData() {
+    return depositData.filter(item => item.storage_option != 'Total').map(item => item.total_gb);
+  }
 
- function getLabels() {
-     return depositData.filter(item => item.storage_option != 'Total').map(item => item.storage_option);
- }
+  function getLabels() {
+    return depositData.filter(item => item.storage_option != 'Total').map(item => item.storage_option);
+  }
 
- // Render the chart after APTLoaded (aptLoadEvent) because it depends
- // on APT.chartColors.
- window.addEventListener('APTLoaded', (event) => {
-     renderChart()
- });
+  const chartOptions = {
+    plugins: {
+      legend: {
+        display: false,
+      },
+    },
+  }
+
+  // Render the chart after APTLoaded (aptLoadEvent) because it depends
+  // on APT.chartColors.
+  window.addEventListener('APTLoaded', (event) => {
+    renderChart()
+  });
 
 </script>
 
