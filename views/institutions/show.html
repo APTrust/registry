@@ -14,14 +14,14 @@
     <div class="is-flex mb-5">
       {{ if .institution.DeactivatedAt.IsZero }}
       {{ if userCan .CurrentUser "InstitutionUpdate" .institution.ID }}
-      <a class="button is-primary" href="/institutions/edit/{{ .institution.ID }}">Edit</a>
+      <a class="button is-primary is-not-underlined" href="/institutions/edit/{{ .institution.ID }}">Edit</a>
       {{ end }}
       {{ if userCan .CurrentUser "InstitutionDelete" .institution.ID }}
-      <a class="button is-danger ml-4" href="/institutions/delete/{{ .institution.ID }}">Deactivate</a>
+      <a class="button is-danger ml-4 is-not-underlined" href="/institutions/delete/{{ .institution.ID }}">Deactivate</a>
       {{ end }}
       {{ else }}
       {{ if userCan .CurrentUser "InstitutionUpdate" .institution.ID }}
-      <a class="button" href="/institutions/undelete/{{ .institution.ID }}">Reactivate</a>
+      <a class="button is-not-underlined" href="/institutions/undelete/{{ .institution.ID }}">Reactivate</a>
       {{ end }}
       {{ end }}
     </div>

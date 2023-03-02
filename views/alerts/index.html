@@ -12,7 +12,7 @@ $isAdmin := .CurrentUser.IsAdmin }}
     {{ template "alerts/_filters.html" . }}
 
     <div class="mt-5">
-      <a href="javascript:document.forms['alertsMarkAllAsRead'].submit()" class="is-underlined">Mark all as read</a>
+      <a href="javascript:document.forms['alertsMarkAllAsRead'].submit()" class="is-underlined is-grey-dark">Mark all as read</a>
     </div>
     <form name="alertsMarkAllAsRead" action="/alerts/mark_all_as_read" method="post">
       {{ template "forms/csrf_token.html" . }}
@@ -23,21 +23,21 @@ $isAdmin := .CurrentUser.IsAdmin }}
     <thead>
       <tr>
         <th class="pl-5">
-          <a href="{{ sortUrl .currentUrl `type` }}">Type
+          <a href="{{ sortUrl .currentUrl `type` }}" class="is-grey-dark">Type
             <span class="material-icons sort-icon" aria-hidden="true">{{ sortIcon .currentUrl `type` }}</span></a>
         </th>
         {{ if $isAdmin }}
         <th>
-          <a href="{{ sortUrl .currentUrl `user_name` }}">Recipient
+          <a href="{{ sortUrl .currentUrl `user_name` }}" class="is-grey-dark">Recipient
             <span class="material-icons sort-icon" aria-hidden="true">{{ sortIcon .currentUrl `user_name` }}</span></a>
         </th>
         {{ end }}
         <th>
-          <a href="{{ sortUrl .currentUrl `created_at` }}">Created
+          <a href="{{ sortUrl .currentUrl `created_at` }}" class="is-grey-dark">Created
             <span class="material-icons sort-icon" aria-hidden="true">{{ sortIcon .currentUrl `created_at` }}</span></a>
         </th>
         <th>
-          <a href="{{ sortUrl .currentUrl `read_at` }}">Read
+          <a href="{{ sortUrl .currentUrl `read_at` }}" class="is-grey-dark">Read
             <span class="material-icons sort-icon" aria-hidden="true">{{ sortIcon .currentUrl `read_at` }}</span></a>
         </th>
         <th>Read Status</th>

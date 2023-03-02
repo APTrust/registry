@@ -41,37 +41,37 @@
           }
         }
 
-        &:nth-child(6n + 2) {
+        &:nth-child(6n + 1) {
           td:first-child::before {
             background-color: $gold;
           }
         }
 
-        &:nth-child(6n + 3) {
+        &:nth-child(6n + 2) {
           td:first-child::before {
             background-color: $purple;
           }
         }
 
-        &:nth-child(6n + 4) {
+        &:nth-child(6n + 3) {
           td:first-child::before {
             background-color: $grey-dark-brand;
           }
         }
 
-        &:nth-child(6n + 5) {
+        &:nth-child(6n + 4) {
           td:first-child::before {
             background-color: $blue-dark;
           }
         }
 
-        &:nth-child(6n + 6) {
+        &:nth-child(6n + 5) {
           td:first-child::before {
             background-color: $brown;
           }
         }
         
-        &:nth-child(6n + 7) {
+        &:nth-child(6n + 6) {
           td:first-child::before {
             background-color: $blue-light;
           }
