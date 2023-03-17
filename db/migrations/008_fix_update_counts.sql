@@ -10,6 +10,14 @@
 insert into schema_migrations ("version", started_at) values ('008_fix_update_counts', now())
 on conflict ("version") do update set started_at = now();
 
+drop function if exists lock_update_counts();
+drop function if exists unlock_update_counts();
+
+create unique index if not exists ix_generic_file_counts on generic_file_counts (institution_id, "state");
+create unique index if not exists ix_intellectual_object_counts on intellectual_object_counts (institution_id, "state");
+create unique index if not exists ix_premis_event_counts on premis_event_counts (institution_id, event_type, outcome);
+create unique index if not exists ix_work_item_counts on work_item_counts (institution_id, "action");
+
 
 CREATE OR REPLACE FUNCTION public.update_counts()
  RETURNS integer
@@ -41,10 +49,10 @@ AS $function$
    		insert into ar_internal_metadata ("key", "value", created_at, updated_at) values ('update counts is running', 'true', now(), now())
    		on conflict("key") do update set "value" = 'true';
    	
-    	refresh materialized view premis_event_counts;
-   		refresh materialized view intellectual_object_counts;
-   		refresh materialized view generic_file_counts;
-   		refresh materialized view work_item_counts;    
+    	refresh materialized view concurrently premis_event_counts;
+   		refresh materialized view concurrently intellectual_object_counts;
+   		refresh materialized view concurrently generic_file_counts;
+   		refresh materialized view concurrently work_item_counts;    
 
    		update ar_internal_metadata set "value" = 'false', updated_at = now() where "key" = 'update counts is running';
    		return 1;

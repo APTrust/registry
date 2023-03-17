@@ -1,4 +1,4 @@
--- Schema generated 2023-03-15
+-- Registry Schema - 2023-03-17
 
 -- public.ar_internal_metadata definition
 
@@ -834,6 +834,9 @@ AS SELECT generic_files.institution_id,
   ORDER BY generic_files.institution_id, generic_files.state
 WITH DATA;
 
+-- View indexes:
+CREATE UNIQUE INDEX ix_generic_file_counts ON public.generic_file_counts USING btree (institution_id, state);
+
 
 -- public.generic_files_view source
 
@@ -917,6 +920,9 @@ AS SELECT intellectual_objects.institution_id,
   ORDER BY intellectual_objects.institution_id, intellectual_objects.state
 WITH DATA;
 
+-- View indexes:
+CREATE UNIQUE INDEX ix_intellectual_object_counts ON public.intellectual_object_counts USING btree (institution_id, state);
+
 
 -- public.intellectual_objects_view source
 
@@ -972,6 +978,9 @@ AS SELECT premis_events.institution_id,
   GROUP BY CUBE(premis_events.institution_id, premis_events.event_type, premis_events.outcome)
   ORDER BY premis_events.institution_id, premis_events.event_type, premis_events.outcome
 WITH DATA;
+
+-- View indexes:
+CREATE UNIQUE INDEX ix_premis_event_counts ON public.premis_event_counts USING btree (institution_id, event_type, outcome);
 
 
 -- public.premis_events_view source
@@ -1085,6 +1094,9 @@ AS SELECT work_items.institution_id,
   ORDER BY work_items.institution_id, work_items.action
 WITH DATA;
 
+-- View indexes:
+CREATE UNIQUE INDEX ix_work_item_counts ON public.work_item_counts USING btree (institution_id, action);
+
 
 -- public.work_items_view source
 
@@ -1144,20 +1156,6 @@ AS $function$
         execute 'ALTER TABLE ' || t_name || ' ADD CONSTRAINT ' || c_name || ' ' || constraint_sql;
     end if;
 end;
-$function$
-;
-
-CREATE OR REPLACE FUNCTION public.lock_update_counts()
- RETURNS integer
- LANGUAGE plpgsql
-AS $function$
-  begin
-    if exists (select 1 from ar_internal_metadata where "key"='update counts is running' and "value" = 'false') then 
-	    update ar_internal_metadata set value='true', updated_at = now() where "key" = 'update counts is running';
-        return 1;
-    end if;
-   return 0;
-  end;
 $function$
 ;
 
@@ -1437,20 +1435,6 @@ AS $function$
 $function$
 ;
 
-CREATE OR REPLACE FUNCTION public.unlock_update_counts()
- RETURNS integer
- LANGUAGE plpgsql
-AS $function$
-  begin
-    if exists (select 1 from ar_internal_metadata where "key"='update counts is running' and "value" = 'true') then 
-	    update ar_internal_metadata set value='false', updated_at = now() where "key" = 'update counts is running';
-        return 1;
-    end if;
-   return 0;
-  end;
-$function$
-;
-
 CREATE OR REPLACE FUNCTION public.update_counts()
  RETURNS integer
  LANGUAGE plpgsql
@@ -1481,10 +1465,10 @@ AS $function$
    		insert into ar_internal_metadata ("key", "value", created_at, updated_at) values ('update counts is running', 'true', now(), now())
    		on conflict("key") do update set "value" = 'true';
    	
-    	refresh materialized view premis_event_counts;
-   		refresh materialized view intellectual_object_counts;
-   		refresh materialized view generic_file_counts;
-   		refresh materialized view work_item_counts;    
+    	refresh materialized view concurrently premis_event_counts;
+   		refresh materialized view concurrently intellectual_object_counts;
+   		refresh materialized view concurrently generic_file_counts;
+   		refresh materialized view concurrently work_item_counts;    
 
    		update ar_internal_metadata set "value" = 'false', updated_at = now() where "key" = 'update counts is running';
    		return 1;
