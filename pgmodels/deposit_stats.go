@@ -162,23 +162,28 @@ func getDepositStatsQuery(institutionID int64, storageOption string, endDate tim
 }
 
 func calculateSubAccountRollup(institutionID int64, storageOption string, endDate time.Time) ([]*DepositStats, error) {
+	common.Context().Log.Info().Msgf("calculateSubAccountRollup for inst %d", institutionID)
 	if institutionID < 1 {
+		common.Context().Log.Info().Msgf("calculateSubAccountRollup: ignoring request for inst %d", institutionID)
 		return nil, nil
 	}
 	inst, err := InstitutionByID(institutionID)
 	if err != nil {
+		common.Context().Log.Info().Msgf("calculateSubAccountRollup: error looking up inst %d: %v", institutionID, err)
 		return nil, err
 	}
 	hasSubAccounts, err := inst.HasSubAccounts()
 	if err != nil {
+		common.Context().Log.Error().Msgf("calculateSubAccountRollup: inst %d: error checking for subaccounts: %v", institutionID, err)
 		return nil, err
 	}
 	if !hasSubAccounts {
+		common.Context().Log.Info().Msgf("calculateSubAccountRollup: ignoring inst %d: error has no subaccounts", institutionID)
 		return nil, nil
 	}
 	var stats []*DepositStats
 	rollupQuery := getSubAccountRollupQuery(institutionID, storageOption, endDate)
-	common.Context().Log.Info().Msg(rollupQuery)
+	common.Context().Log.Info().Msgf("calculateSubAccountRollup: gathering rollup data with the following query: %s", rollupQuery)
 	_, err = common.Context().DB.Query(&stats, rollupQuery,
 		institutionID, institutionID,
 		storageOption, storageOption,
@@ -188,11 +193,13 @@ func calculateSubAccountRollup(institutionID int64, storageOption string, endDat
 	// exist for weeks or months before making a deposit.
 	// So don't consider empty result set an error.
 	if IsNoRowError(err) {
+		common.Context().Log.Info().Msg("calculateSubAccountRollup: query returned no rows")
 		return stats, nil
 	}
 	if err != nil {
-		common.Context().Log.Error().Msgf("calculateSubAccountRollup error: %v", err)
+		common.Context().Log.Error().Msgf("calculateSubAccountRollup: query returned error: %v", err)
 	}
+	common.Context().Log.Info().Msgf("calculateSubAccountRollup: got stats: %v", stats)
 	return stats, err
 }
 
