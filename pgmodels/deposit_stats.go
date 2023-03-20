@@ -178,6 +178,7 @@ func calculateSubAccountRollup(institutionID int64, storageOption string, endDat
 	}
 	var stats []*DepositStats
 	rollupQuery := getSubAccountRollupQuery(institutionID, storageOption, endDate)
+	common.Context().Log.Info().Msg(rollupQuery)
 	_, err = common.Context().DB.Query(&stats, rollupQuery,
 		institutionID, institutionID,
 		storageOption, storageOption,
@@ -188,6 +189,9 @@ func calculateSubAccountRollup(institutionID int64, storageOption string, endDat
 	// So don't consider empty result set an error.
 	if IsNoRowError(err) {
 		return stats, nil
+	}
+	if err != nil {
+		common.Context().Log.Error().Msgf("calculateSubAccountRollup error: %v", err)
 	}
 	return stats, err
 }
