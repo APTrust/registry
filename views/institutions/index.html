@@ -47,15 +47,17 @@
     <tbody>
       {{ range $index, $inst := .items }}
       {{ $cssClass := "clickable" }}
+      {{ $cellClass := "is-grey-dark" }}
       {{ if not $inst.DeactivatedAt.IsZero }}
-      {{ $cssClass = "clickable row-disabled" }}
+      {{ $cssClass = "clickable is-grey-lighter" }}
+      {{ $cellClass = "is-grey-lighter" }}
       {{ end }}
       <tr class="{{ $cssClass }}" onclick="window.location.href='/institutions/show/{{ $inst.ID }}'">
         <td class="pl-5">{{ $inst.Name }}</td>
-        <td class="is-grey-dark">{{ $inst.Identifier }}</td>
-        <td class="is-grey-dark">{{ replace $inst.Type "Institution" "" 1 }}</td>
-        <td class="is-grey-dark">{{ $inst.ParentIdentifier }}</td>
-        <td class="is-grey-dark">{{ dateUS $inst.DeactivatedAt }}</td>
+        <td class="{{ $cellClass }}">{{ $inst.Identifier }}</td>
+        <td class="{{ $cellClass }}">{{ replace $inst.Type "Institution" "" 1 }}</td>
+        <td class="{{ $cellClass }}">{{ $inst.ParentIdentifier }}</td>
+        <td class="{{ $cellClass }}">{{ dateUS $inst.DeactivatedAt }}</td>
       </tr>
       {{ end }}
     </tbody>
