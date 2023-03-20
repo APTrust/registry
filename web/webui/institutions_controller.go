@@ -123,6 +123,29 @@ func InstitutionEdit(c *gin.Context) {
 	c.HTML(http.StatusOK, form.Template, req.TemplateData)
 }
 
+// InstitutionEditPrefs shows a form to edit institutional preferences.
+// GET /institutions/edit_preferences/:id
+func InstitutionEditPrefs(c *gin.Context) {
+	req := NewRequest(c)
+	institution, err := pgmodels.InstitutionByID(req.Auth.ResourceID)
+	if AbortIfError(c, err) {
+		return
+	}
+	form, err := forms.NewInstitutionPreferencesForm(institution)
+	if AbortIfError(c, err) {
+		return
+	}
+	req.TemplateData["form"] = form
+	c.HTML(http.StatusOK, form.Template, req.TemplateData)
+
+}
+
+// InstitutionUpdatePrefs saves institutional preferences.
+// PUT /institutions/edit_preferences/:id
+func InstitutionUpdatePrefs(c *gin.Context) {
+	saveInstitutionForm(c)
+}
+
 func saveInstitutionForm(c *gin.Context) {
 	req := NewRequest(c)
 	var err error

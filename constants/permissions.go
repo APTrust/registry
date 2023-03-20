@@ -4,15 +4,15 @@ package constants
 // different roles. We use string instead of bitmask or array index
 // for a few reasons:
 //
-// 1. We may wind up with more than 64 of these, which would be too
-//    many for a bitmask.
-// 2. Our models need to construct permission names from strings made
-//    up of model names and actions. E.g. "User" + "Create" or
-//    "Object" + "Read".
-// 3. We will likely insert permissions as the application grows, and
-//    adding bitmasks and array indices is order-dependent, while
-//    adding string keys is value-dependent, which means we can insert
-//    them anywhere in the list.
+//  1. We may wind up with more than 64 of these, which would be too
+//     many for a bitmask.
+//  2. Our models need to construct permission names from strings made
+//     up of model names and actions. E.g. "User" + "Create" or
+//     "Object" + "Read".
+//  3. We will likely insert permissions as the application grows, and
+//     adding bitmasks and array indices is order-dependent, while
+//     adding string keys is value-dependent, which means we can insert
+//     them anywhere in the list.
 type Permission string
 
 const (
@@ -45,6 +45,7 @@ const (
 	InstitutionList                    = "InstitutionList"
 	InstitutionRead                    = "InstitutionRead"
 	InstitutionUpdate                  = "InstitutionUpdate"
+	InstitutionUpdatePrefs             = "InstitutionUpdatePrefs"
 	IntellectualObjectCreate           = "IntellectualObjectCreate"
 	IntellectualObjectDelete           = "IntellectualObjectDelete"
 	IntellectualObjectFinishBulkDelete = "IntellectualObjectFinishBulkDelete"
@@ -119,6 +120,7 @@ var Permissions = []Permission{
 	InstitutionList,
 	InstitutionRead,
 	InstitutionUpdate,
+	InstitutionUpdatePrefs,
 	IntellectualObjectCreate,
 	IntellectualObjectDelete,
 	IntellectualObjectFinishBulkDelete,
@@ -246,6 +248,7 @@ func initPermissions() {
 	instAdmin[FileRequestDelete] = true
 	instAdmin[FileRestore] = true
 	instAdmin[InstitutionRead] = true
+	instAdmin[InstitutionUpdatePrefs] = true
 	instAdmin[IntellectualObjectDelete] = true
 	instAdmin[IntellectualObjectRead] = true
 	instAdmin[IntellectualObjectRequestDelete] = true
@@ -302,6 +305,7 @@ func initPermissions() {
 	sysAdmin[InstitutionList] = true
 	sysAdmin[InstitutionRead] = true
 	sysAdmin[InstitutionUpdate] = true
+	sysAdmin[InstitutionUpdatePrefs] = true
 	sysAdmin[IntellectualObjectCreate] = true
 	sysAdmin[IntellectualObjectDelete] = true           // preserv workers do this with sys admin account
 	sysAdmin[IntellectualObjectFinishBulkDelete] = true // not implemented yet

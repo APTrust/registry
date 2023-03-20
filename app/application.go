@@ -185,8 +185,11 @@ func initRoutes(router *gin.Engine) {
 		webRoutes.GET("/institutions/new", webui.InstitutionNew)
 		webRoutes.GET("/institutions/show/:id", webui.InstitutionShow)
 		webRoutes.GET("/institutions/edit/:id", webui.InstitutionEdit)
+		webRoutes.GET("/institutions/edit_preferences/:id", webui.InstitutionEdit)
 		webRoutes.PUT("/institutions/edit/:id", webui.InstitutionUpdate)
 		webRoutes.POST("/institutions/edit/:id", webui.InstitutionUpdate)
+		webRoutes.PUT("/institutions/edit_preferences/:id", webui.InstitutionUpdatePrefs)
+		webRoutes.POST("/institutions/edit_preferences/:id", webui.InstitutionUpdatePrefs)
 
 		// IntellectualObjects
 		webRoutes.GET("/objects", webui.IntellectualObjectIndex)
