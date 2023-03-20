@@ -1,0 +1,43 @@
+{{ define "institutions/preferences_form.html" }}
+
+<!-- Show the header unless query string says modal=true -->
+{{ if not .showAsModal }}
+{{ template "shared/_header.html" .}}
+{{ end }}
+
+<div class="box">
+  <div class="box-header">
+    <h2>Edit Institution</h2>
+  </div>
+  <div class="box-content">
+    <form action="{{ .form.Action }}" id="instForm" method="post">
+
+      {{ if .FormError }}
+      <div class="notification is-danger is-light">
+        {{ .FormError }}
+      </div>
+      {{ end }}
+
+      <div class="columns">
+        <div class="column">{{ template "forms/select.html" .form.Fields.OTPEnabled }}</div>
+        <div class="column">{{ template "forms/number.html" .form.Fields.SpotRestoreFrequency }}</div>
+      </div>
+
+
+      {{ template "forms/csrf_token.html" . }}
+
+      <div class="is-flex">
+        <input class="button is-primary mr-4" type="submit" value="Submit">
+        <a class="button modal-exit is-not-underlined" href="#">Cancel</a>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<!-- Show the footer unless query string says modal=true -->
+{{ if not .showAsModal }}
+{{ template "shared/_footer.html" .}}
+{{ end }}
+
+{{ end }}

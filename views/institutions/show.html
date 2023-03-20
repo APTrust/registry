@@ -13,16 +13,18 @@
   <div class="box-content">
     <div class="is-flex mb-5">
       {{ if .institution.DeactivatedAt.IsZero }}
-      {{ if userCan .CurrentUser "InstitutionUpdate" .institution.ID }}
-      <a class="button is-primary is-not-underlined" href="/institutions/edit/{{ .institution.ID }}">Edit</a>
-      {{ end }}
-      {{ if userCan .CurrentUser "InstitutionDelete" .institution.ID }}
-      <a class="button is-danger ml-4 is-not-underlined" href="/institutions/delete/{{ .institution.ID }}">Deactivate</a>
-      {{ end }}
+        {{ if userCan .CurrentUser "InstitutionUpdate" .institution.ID }}
+          <a class="button is-primary is-not-underlined" href="/institutions/edit/{{ .institution.ID }}">Edit</a>
+        {{ else if (and (userCan .CurrentUser "InstitutionUpdatePrefs" .institution.ID) (eq .CurrentUser.InstitutionID .institution.ID)) }}
+          <a class="button is-primary is-not-underlined" href="/institutions/edit_preferences/{{ .institution.ID }}">Settings</a>
+        {{ end }}
+        {{ if userCan .CurrentUser "InstitutionDelete" .institution.ID }}
+          <a class="button is-danger ml-4 is-not-underlined" href="/institutions/delete/{{ .institution.ID }}">Deactivate</a>
+        {{ end }}
       {{ else }}
-      {{ if userCan .CurrentUser "InstitutionUpdate" .institution.ID }}
-      <a class="button is-not-underlined" href="/institutions/undelete/{{ .institution.ID }}">Reactivate</a>
-      {{ end }}
+        {{ if userCan .CurrentUser "InstitutionUpdate" .institution.ID }}
+          <a class="button is-not-underlined" href="/institutions/undelete/{{ .institution.ID }}">Reactivate</a>
+        {{ end }}
       {{ end }}
     </div>
 

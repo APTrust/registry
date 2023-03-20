@@ -1,6 +1,8 @@
 package forms
 
 import (
+	"fmt"
+
 	"github.com/APTrust/registry/pgmodels"
 )
 
@@ -18,6 +20,11 @@ func NewInstitutionPreferencesForm(institution *pgmodels.Institution) (*Institut
 	instPrefsForm.init()
 	instPrefsForm.SetValues()
 	return instPrefsForm, nil
+}
+
+// Action returns the html form.action attribute for this form.
+func (f *InstitutionPreferencesForm) Action() string {
+	return fmt.Sprintf("%s/edit_preferences/%d", f.BaseURL, f.Model.GetID())
 }
 
 func (f *InstitutionPreferencesForm) init() {
