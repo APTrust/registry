@@ -178,3 +178,53 @@ func TestInstitutionEdit(t *testing.T) {
 	testutil.Inst2AdminClient.GET("/institutions/edit/2").Expect().Status(http.StatusForbidden)
 	testutil.Inst2UserClient.GET("/institutions/edit/2").Expect().Status(http.StatusForbidden)
 }
+
+func TestInstitutionUpdatePreferences(t *testing.T) {
+	testutil.InitHTTPTests(t)
+
+	// Inst1Admin can edit own institution prefs
+	testutil.Inst1AdminClient.GET("/institutions/edit_preferences/2").Expect().
+		Status(http.StatusOK)
+
+	// Inst 1 user and all Inst 2 accounts cannot see this page
+	testutil.Inst1UserClient.GET("/institutions/edit_preferences/2").Expect().Status(http.StatusForbidden)
+	testutil.Inst2AdminClient.GET("/institutions/edit_preferences/2").Expect().Status(http.StatusForbidden)
+	testutil.Inst2UserClient.GET("/institutions/edit_preferences/2").Expect().Status(http.StatusForbidden)
+
+	inst1, err := pgmodels.InstitutionByID(testutil.Inst1Admin.InstitutionID)
+	require.Nil(t, err)
+	require.NotNil(t, inst1)
+
+	// Inst1 Admin can submit changes to their own preferences page
+	testutil.Inst1AdminClient.POST("/institutions/edit_preferences/2").
+		WithHeader("Referer", testutil.BaseURL).
+		WithFormField(constants.CSRFTokenName, testutil.Inst1AdminToken).
+		WithFormField("OTPEnabled", inst1.OTPEnabled).
+		WithFormField("SpotRestoreFrequency", inst1.SpotRestoreFrequency).
+		Expect().Status(http.StatusOK)
+
+	// Inst 1 user and all Inst 2 accounts cannot update inst 1 prefs
+	testutil.Inst1UserClient.POST("/institutions/edit_preferences/2").
+		WithHeader("Referer", testutil.BaseURL).
+		WithFormField(constants.CSRFTokenName, testutil.Inst1AdminToken).
+		WithFormField("OTPEnabled", inst1.OTPEnabled).
+		WithFormField("SpotRestoreFrequency", inst1.SpotRestoreFrequency).
+		Expect().Status(http.StatusForbidden)
+	testutil.Inst2AdminClient.POST("/institutions/edit_preferences/2").
+		WithHeader("Referer", testutil.BaseURL).
+		WithFormField(constants.CSRFTokenName, testutil.Inst1AdminToken).
+		WithFormField("OTPEnabled", inst1.OTPEnabled).
+		WithFormField("SpotRestoreFrequency", inst1.SpotRestoreFrequency).
+		Expect().Status(http.StatusForbidden)
+	testutil.Inst2UserClient.POST("/institutions/edit_preferences/2").
+		WithHeader("Referer", testutil.BaseURL).
+		WithFormField(constants.CSRFTokenName, testutil.Inst1AdminToken).
+		WithFormField("OTPEnabled", inst1.OTPEnabled).
+		WithFormField("SpotRestoreFrequency", inst1.SpotRestoreFrequency).
+		Expect().Status(http.StatusForbidden)
+
+	// Note that, technically, SysAdmin can edit these settings,
+	// but SysAdmin does so through the broader "Edit Institution"
+	// page, which provides access to all editable institutions
+	// settings, instead of just the "preferences" subset.
+}
