@@ -178,7 +178,7 @@ func calculateSubAccountRollup(institutionID int64, storageOption string, endDat
 		return nil, err
 	}
 	if !hasSubAccounts {
-		common.Context().Log.Info().Msgf("calculateSubAccountRollup: ignoring inst %d: error has no subaccounts", institutionID)
+		common.Context().Log.Info().Msgf("calculateSubAccountRollup: ignoring inst %d: institution has no subaccounts", institutionID)
 		return nil, nil
 	}
 	var stats []*DepositStats

@@ -93,6 +93,9 @@ func TestInstitutionCreateEditDeleteUndelete(t *testing.T) {
 	require.Nil(t, err)
 	assert.True(t, institution.ID > 0)
 
+	// Make sure state is set to "A" for new inst. https://trello.com/c/S5Oss7e0
+	assert.Equal(t, constants.StateActive, institution.State)
+
 	// Fix the spelling of the institution name,
 	// save it, and make sure the save works.
 	institution.Name = "Springfield University"

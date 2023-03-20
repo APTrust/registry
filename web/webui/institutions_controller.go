@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/forms"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/gin-gonic/gin"
@@ -67,7 +68,7 @@ func InstitutionIndex(c *gin.Context) {
 // GET /institutions/new
 func InstitutionNew(c *gin.Context) {
 	req := NewRequest(c)
-	form, err := forms.NewInstitutionForm(&pgmodels.Institution{})
+	form, err := forms.NewInstitutionForm(&pgmodels.Institution{State: constants.StateActive})
 	if AbortIfError(c, err) {
 		return
 	}
@@ -159,6 +160,13 @@ func saveInstitutionForm(c *gin.Context) {
 	// Bind submitted form values in case we have to
 	// re-display the form with an error message.
 	c.ShouldBind(institution)
+
+	// Make sure state has valid value: https://trello.com/c/S5Oss7e0
+	// This is only an issue when creating new institutions.
+	if institution.ID == 0 && institution.State == "" {
+		institution.State = constants.StateActive
+	}
+
 	form, err := forms.NewInstitutionForm(institution)
 	if AbortIfError(c, err) {
 		return
