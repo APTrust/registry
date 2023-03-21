@@ -52,7 +52,7 @@
      return {
          labels: labels,
          datasets: [{
-             label: label + ' {{ dateUS .reportParams.UpdatedBefore }}',
+             label: label + ' {{ dateUS .reportParams.EndDate }}',
              data: getBarDepositData(metric),
              backgroundColor: window.APT.chartColors('fill', labels.length),
              borderColor: window.APT.chartColors('border', labels.length),

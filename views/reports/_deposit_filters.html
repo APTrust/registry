@@ -7,7 +7,11 @@
 
       <div class="columns">
         <div class="column is-one-quarter">
+          {{ if (eq "over_time" .reportType) }}
+          {{ template "forms/select.html" .filterForm.Fields.start_date }}
+          {{ else }}
           {{ template "forms/select.html" .filterForm.Fields.storage_option }}
+          {{ end }}
         </div>
         <div class="column is-one-quarter">
           {{ template "forms/select.html" .filterForm.Fields.end_date }}
@@ -31,10 +35,9 @@
         </div>
       </div>
     </form>
-
-    {{ template "shared/_filter_chips.html" . }}
-
   </div>
 </div>
+
+{{ template "shared/_filter_chips.html" . }}
 
 {{ end }}

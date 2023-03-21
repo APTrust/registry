@@ -16,7 +16,8 @@ type DepositReportParams struct {
 	InstitutionID int64
 	StorageOption string
 	ReportType    string
-	UpdatedBefore time.Time
+	StartDate     time.Time
+	EndDate       time.Time
 }
 
 // DepositReportShow shows the deposits report.
@@ -39,9 +40,9 @@ func DepositReportShow(c *gin.Context) {
 	var deposits []*pgmodels.DepositStats
 	var err error
 	if params.ReportType == "over_time" {
-		deposits, err = pgmodels.DepositStatsOverTime(params.InstitutionID, params.StorageOption)
+		deposits, err = pgmodels.DepositStatsOverTime(params.InstitutionID, params.StorageOption, params.StartDate, params.EndDate)
 	} else {
-		deposits, err = pgmodels.DepositStatsSelect(params.InstitutionID, params.StorageOption, params.UpdatedBefore)
+		deposits, err = pgmodels.DepositStatsSelect(params.InstitutionID, params.StorageOption, params.EndDate)
 	}
 	if AbortIfError(c, err) {
 		return
@@ -58,7 +59,7 @@ func DepositReportShow(c *gin.Context) {
 	if params.ReportType == "over_time" {
 		fields := filterForm.GetFields()
 		fields["storage_option"].Attrs["disabled"] = "true"
-		fields["end_date"].Attrs["disabled"] = "true"
+		//fields["end_date"].Attrs["disabled"] = "true"
 
 		// Time report covers through end of prior month.
 		if len(fields["end_date"].Options) > 1 {
@@ -103,9 +104,13 @@ func depositStorageOptions(deposits []*pgmodels.DepositStats) []string {
 // deposit report. It ignores parse errors for updatedBefore and
 // institutionID because these fields can legitimately be empty.
 func getDepositReportParams(c *gin.Context) DepositReportParams {
-	updatedBefore, _ := time.Parse("2006-01-02", c.Query("end_date"))
-	if updatedBefore.IsZero() {
-		updatedBefore = time.Now().UTC()
+	startDate, _ := time.Parse("2006-01-02", c.Query("start_date"))
+	if startDate.IsZero() {
+		startDate, _ = time.Parse("2006-01-02", "2014-01-01")
+	}
+	endDate, _ := time.Parse("2006-01-02", c.Query("end_date"))
+	if endDate.IsZero() {
+		endDate = time.Now().UTC()
 	}
 	institutionID, _ := strconv.ParseInt(c.Query("institution_id"), 10, 64)
 	storageOption := c.Query("storage_option")
@@ -119,6 +124,7 @@ func getDepositReportParams(c *gin.Context) DepositReportParams {
 		InstitutionID: institutionID,
 		ReportType:    reportType,
 		StorageOption: storageOption,
-		UpdatedBefore: updatedBefore,
+		StartDate:     startDate,
+		EndDate:       endDate,
 	}
 }

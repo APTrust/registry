@@ -14,6 +14,7 @@ var DepositStatsFilters = []string{
 	"end_date",
 	"institution_id",
 	"report_type",
+	"start_date",
 	"storage_option",
 }
 
@@ -97,12 +98,16 @@ func DepositStatsSelect(institutionID int64, storageOption string, endDate time.
 	return stats, err
 }
 
-func DepositStatsOverTime(institutionID int64, storageOption string) ([]*DepositStats, error) {
+func DepositStatsOverTime(institutionID int64, storageOption string, startDate, endDate time.Time) ([]*DepositStats, error) {
 	var stats []*DepositStats
 	statsQuery := getDepositTimelineQuery(institutionID)
-	//fmt.Println(statsQuery, "INST", institutionID, "STOR", storageOption)
-	//fmt.Println(statsQuery)
-	_, err := common.Context().DB.Query(&stats, statsQuery, institutionID)
+	var err error
+	if institutionID == 0 {
+		// Omit inst id if zero because it will go into the startDate param slot and cause an error.
+		_, err = common.Context().DB.Query(&stats, statsQuery, startDate, endDate)
+	} else {
+		_, err = common.Context().DB.Query(&stats, statsQuery, institutionID, startDate, endDate)
+	}
 	return stats, err
 }
 
@@ -127,6 +132,8 @@ func getDepositTimelineQuery(institutionID int64) string {
 			secondary_sort 
 			from historical_deposit_stats  
 		where institution_id %s
+		and end_date >= ?
+		and end_date <= ?
 		order by primary_sort, secondary_sort, end_date`
 	op := " = ? "
 	if institutionID == 0 {
