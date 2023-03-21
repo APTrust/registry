@@ -17,7 +17,8 @@ update storage_options set cost_gb_per_month = 0.05859, updated_at = now() where
 update storage_options set cost_gb_per_month = 0.01953, updated_at = now() where "service" = 'Glacier-Deep';
 
 -- Now rebuild the historical deposit stats table
-delete from historical_deposit_stats ;
+delete from historical_deposit_stats;
+select populate_empty_deposit_stats();
 select populate_all_historical_deposit_stats();
 
 
