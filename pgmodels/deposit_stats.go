@@ -22,6 +22,11 @@ var DepositStatsFilters = []string{
 // of those deposits. This struct does not implement the usual pgmodel
 // interface, nor does it map to a single underlying table or view.
 // This struct merely represents to the output of a reporting query.
+//
+// Note that we store CostGBPerMonth and MonthlyCost in the table
+// rather than calculating them because cost per GB per month may
+// change over time, and we want to capture the actual historical
+// cost for each month.
 type DepositStats struct {
 	InstitutionID       int64     `json:"institution_id"`
 	MemberInstitutionID int64     `json:"member_institution_id"`
