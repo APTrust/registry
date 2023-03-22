@@ -193,12 +193,15 @@ func log2FAIncomplete(c *gin.Context, currentUser *pgmodels.User) {
 
 func respondToAuthError(c *gin.Context, err error) {
 	if err == common.ErrInvalidAPICredentials {
+		msg := "API credentials are missing or invalid."
+		common.Context().Log.Warn().Msgf("AuthError: %s", msg)
 		obj := map[string]interface{}{
 			"StatusCode": http.StatusUnauthorized,
-			"Error":      "API credentials are missing or invalid.",
+			"Error":      msg,
 		}
 		c.JSON(http.StatusUnauthorized, obj)
 	} else {
+		common.Context().Log.Warn().Msgf("AuthError: %s", err.Error())
 		c.HTML(http.StatusUnauthorized, "errors/show.html", gin.H{
 			"suppressSideNav": true,
 			"suppressTopNav":  true,
