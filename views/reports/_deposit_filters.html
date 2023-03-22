@@ -40,4 +40,11 @@
 
 {{ template "shared/_filter_chips.html" . }}
 
+<script>
+     document.forms["depositReportFilterForm"].elements["report_type"].addEventListener('change', (event) => {
+         let reportType = document.forms["depositReportFilterForm"].elements["report_type"].value 
+         document.location = document.location.pathname + '?report_type=' + reportType
+     });
+</script>
+
 {{ end }}
