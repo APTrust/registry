@@ -65,6 +65,11 @@
       {{ if userCan .CurrentUser "NsqAdmin" .CurrentUser.InstitutionID }}
       <li><a href="/nsq"><span class="material-icons" aria-hidden="true">not_started</span> NSQ</a></li>
       {{ end }}
+
+      {{ if userCan .CurrentUser "InternalMetadataRead" .CurrentUser.InstitutionID }}
+      <li><a href="/internal_metadata"><span class="material-icons" aria-hidden="true">dns</span> DB Meta</a></li>
+      {{ end }}
+
     </ul>
 
     <hr />
