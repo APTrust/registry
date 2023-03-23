@@ -25,7 +25,7 @@ func TestDepositReportShow(t *testing.T) {
 		"10</td>",
 		"72.810</td>",
 		"0.071</td>",
-		"$1.97</td>",
+		// "$1.97</td>", -- Costs are temporarily disabled. See https://trello.com/c/pTHtYtK4
 	}
 	testutil.AssertMatchesAll(t, html, expected)
 

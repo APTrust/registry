@@ -21,6 +21,7 @@
     them.
   -->
   {{ if not (eq "over_time" .reportType) }}
+  {{ $currentUser := .CurrentUser }}
   <table class="table is-fullwidth has-padding is-striped">
     <thead>
       <tr>
@@ -31,11 +32,11 @@
         <th>File Count</th>
         <th>Total GB</th>
         <th>Total TB</th>
-        <th>Monthly Cost</th>
+        {{ if $currentUser.IsAdmin }}<th>Monthly Cost</th>{{ end }}
       </tr>
     </thead>
     <tbody>
-      {{ $isSingleInstitutionReport := .isSingleInstitutionReport }}
+      {{ $isSingleInstitutionReport := .isSingleInstitutionReport }}      
       {{ range $index, $item := .deposits }}
       {{ if and $isSingleInstitutionReport (eq $item.InstitutionName "Total") }}
       <!-- Don't bother printing Totals if we're reporting on a single institution. -->
@@ -47,7 +48,7 @@
         <td class="is-grey-dark num text-sm">{{ formatInt64 $item.FileCount }}</td>
         <td class="is-grey-dark num text-sm">{{ formatFloat $item.TotalGB 3 }}</td>
         <td class="is-grey-dark num text-sm">{{ formatFloat $item.TotalTB 3 }}</td>
-        <td class="is-grey-dark num text-sm">${{ formatFloat $item.MonthlyCost 2 }}</td>
+        {{ if $currentUser.IsAdmin }}<td class="is-grey-dark num text-sm">${{ formatFloat $item.MonthlyCost 2 }}</td>{{ end }}
       </tr>
       {{ end }}
       {{ end }}

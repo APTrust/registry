@@ -46,7 +46,7 @@ var DepositChartMetrics = []*ListOption{
 	{"total_bytes", "Total Bytes", false},
 	{"total_gb", "Total Gigabytes", false},
 	{"total_tb", "Total Terabytes", false},
-	{"monthly_cost", "Monthly Cost", false},
+	// {"monthly_cost", "Monthly Cost", false}, -- Temporarily removed until we verify costs are correct. https://trello.com/c/pTHtYtK4
 }
 
 // InstRolesList is a list of user roles for institutions.
