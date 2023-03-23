@@ -18,7 +18,9 @@ func InternalMetadataIndex(c *gin.Context) {
 	}
 	req.TemplateData["internalMetadata"] = internalMetaData
 
-	migrations, err := pgmodels.SchemaMigrationSelect(pgmodels.NewQuery().OrderBy("version", "desc"))
+	// Filter out migrations with null started_at timestamps.
+	// Those are legacy Rails migrations, and there are a lot of them.
+	migrations, err := pgmodels.SchemaMigrationSelect(pgmodels.NewQuery().IsNotNull("started_at").OrderBy("version", "desc"))
 	if AbortIfError(c, err) {
 		return
 	}
