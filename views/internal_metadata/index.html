@@ -1,0 +1,70 @@
+{{ define "internal_metadata/index.html" }} 
+
+{{ template "shared/_header.html" .}}
+
+<div class="box">
+  <div class="box-header">
+    <h1 class="h2">Internal Metadata</h1>
+  </div>
+
+  <table class="table is-hoverable is-fullwidth has-padding">
+    <thead>
+      <tr>
+        <th class="pl-5">Key</th>
+        <th>Value</th>
+        <th>Updated</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{ range $index, $item := .internalMetadata }}
+      <tr>
+        <td class="pl-5">
+          {{ $item.Key}}
+        </td>
+        <td>
+          {{ $item.Value }}
+        </td>
+        <td>
+          {{ dateTimeUS $item.UpdatedAt }}
+        </td>
+      </tr>
+      {{ end }}
+    </tbody>
+  </table>
+</div>
+
+
+<div class="box">
+  <div class="box-header">
+    <h1 class="h2">Migrations</h1>
+  </div>
+
+  <table class="table is-hoverable is-fullwidth has-padding">
+    <thead>
+      <tr>
+        <th class="pl-5">Version</th>
+        <th>Started</th>
+        <th>Completed</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{ range $index, $item := .migrations }}
+      <tr>
+        <td class="pl-5">
+          {{ $item.Version}}
+        </td>
+        <td>
+          {{ dateTimeUS $item.StartedAt }}
+        </td>
+        <td>
+          {{ dateTimeUS $item.FinishedAt }}
+        </td>
+      </tr>
+      {{ end }}
+    </tbody>
+  </table>
+</div>
+
+{{ template "shared/_footer.html" .}} 
+
+{{ end }}

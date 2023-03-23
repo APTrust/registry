@@ -91,6 +91,7 @@ var AuthMap = map[string]AuthMetadata{
 	"IntellectualObjectRequestRestore":   {"IntellectualObject", constants.IntellectualObjectRestore},
 	"IntellectualObjectShow":             {"IntellectualObject", constants.IntellectualObjectRead},
 	"IntellectualObjectUpdate":           {"IntellectualObject", constants.IntellectualObjectUpdate},
+	"InternalMetadataIndex":              {"InternalMetadata", constants.InternalMetadataRead},
 	"NsqShow":                            {"NSQ", constants.NsqAdmin},
 	"NsqAdmin":                           {"NSQ", constants.NsqAdmin},
 	"NsqInit":                            {"NSQ", constants.NsqAdmin},

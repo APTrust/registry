@@ -53,6 +53,7 @@ const (
 	IntellectualObjectRequestDelete    = "IntellectualObjectRequestDelete"
 	IntellectualObjectRestore          = "IntellectualObjectRestore"
 	IntellectualObjectUpdate           = "IntellectualObjectUpdate"
+	InternalMetadataRead               = "InternalMetadataRead"
 	NsqAdmin                           = "NsqAdmin"
 	PrepareFileDelete                  = "PrepareFileDelete"
 	PrepareObjectDelete                = "PrepareObjectDelete"
@@ -128,6 +129,7 @@ var Permissions = []Permission{
 	IntellectualObjectRequestDelete,
 	IntellectualObjectRestore,
 	IntellectualObjectUpdate,
+	InternalMetadataRead,
 	NsqAdmin,
 	PrepareFileDelete,
 	PrepareObjectDelete,
@@ -313,6 +315,7 @@ func initPermissions() {
 	sysAdmin[IntellectualObjectRequestDelete] = false // inst admin only
 	sysAdmin[IntellectualObjectRestore] = true
 	sysAdmin[IntellectualObjectUpdate] = true
+	sysAdmin[InternalMetadataRead] = true
 	sysAdmin[NsqAdmin] = true
 	sysAdmin[PrepareFileDelete] = true
 	sysAdmin[PrepareObjectDelete] = true
