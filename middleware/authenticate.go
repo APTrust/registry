@@ -201,7 +201,7 @@ func respondToAuthError(c *gin.Context, err error) {
 		}
 		c.JSON(http.StatusUnauthorized, obj)
 	} else {
-		common.Context().Log.Warn().Msgf("AuthError: %s", err.Error())
+		common.Context().Log.Warn().Msgf("AuthError: %s. IP: %s, URL: %s, Agent: %s, Referer: %s", err.Error(), c.Request.RemoteAddr, c.Request.RequestURI, c.Request.UserAgent(), c.Request.Referer())
 		c.HTML(http.StatusUnauthorized, "errors/show.html", gin.H{
 			"suppressSideNav": true,
 			"suppressTopNav":  true,
