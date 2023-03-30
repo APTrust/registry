@@ -126,7 +126,8 @@ func UserSignInShow(c *gin.Context) {
 	user, _ := middleware.GetUser(c)
 	if user != nil && user.InstitutionID > 0 {
 		common.Context().Log.Info().Msgf("User %s is already logged in. Redirecting to dashboard.", user.Email)
-		c.Redirect(http.StatusFound, "/dashboard")
+		location := c.DefaultQuery("requrl", "/dashboard")
+		c.Redirect(http.StatusFound, location)
 	}
 
 	// For these environments, prefill logins defined in fixtures

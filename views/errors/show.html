@@ -10,13 +10,13 @@
         {{ if .redirectURL }}
         <p>You will be redirected automatically in <span id="time"></span> seconds...</p>
         <script type="text/javascript">
-        let redirTime = 4;
+        let redirTime = 2;
         function showSeconds(s) {
             document.getElementById("time").innerHTML = s.toString()
         }
         setInterval(function () {
             showSeconds(--redirTime);
-            if (redirTime == 0) {
+            if (redirTime <= 0) {
                 window.location = "{{ .redirectURL }}"
             }
         }, 1000);

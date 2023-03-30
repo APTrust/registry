@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -76,6 +77,10 @@ func GetUserFromSession(c *gin.Context) (user *pgmodels.User, err error) {
 		if err != nil {
 			ctx.Log.Error().Msgf("GetUserFromSession: Got user id from session cookie but user lookup returned error: %v", err)
 		}
+	} else {
+		// This is for a specific and recurrent auth error.
+		// https://trello.com/c/rHKhPkau
+		err = fmt.Errorf("%v - missing cookie is %s", err, ctx.Config.Cookies.SessionCookie)
 	}
 	return user, err
 }
@@ -206,7 +211,7 @@ func respondToAuthError(c *gin.Context, err error) {
 			"suppressSideNav": true,
 			"suppressTopNav":  true,
 			"error":           "Please log in",
-			"redirectURL":     "/",
+			"redirectURL":     fmt.Sprintf("/?requrl=%s", c.Request.URL),
 		})
 	}
 }
