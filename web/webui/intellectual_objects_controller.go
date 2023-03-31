@@ -93,6 +93,13 @@ func IntellectualObjectIndex(c *gin.Context) {
 	if AbortIfError(c, err) {
 		return
 	}
+	// If user searched by identifier and we have exactly one
+	// result, show them the object detail page. This brings us
+	// in line with old Pharos behavior of accessing an object
+	// detail page by identifier.
+	if len(objects) == 1 && c.Query("identifier") != "" {
+		c.Redirect(http.StatusFound, fmt.Sprintf("/objects/show/%d", objects[0].ID))
+	}
 	c.HTML(http.StatusOK, template, req.TemplateData)
 }
 

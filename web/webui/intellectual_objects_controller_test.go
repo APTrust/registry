@@ -121,6 +121,40 @@ func TestObjectList(t *testing.T) {
 
 }
 
+// If we search by identifier and get a single match,
+// we should be redirected to the object/show page.
+// Ideally, we'd test the location of the redirect using
+// resp.Raw().Location(), but that always returns an error,
+// so we test the page contents instead.
+func TestObjectByIdentifier(t *testing.T) {
+	testutil.InitHTTPTests(t)
+	items := []string{
+		"Object Event History",
+		"File Summary",
+		"etagforinst1photos",
+		"institution1.edu/photos/picture1",
+		"institution1.edu/photos/picture2",
+		"institution1.edu/photos/picture3",
+	}
+
+	// This matches one object, so we should be redirected
+	// to the object detail page, which will include the
+	// strings above.
+	resp := testutil.Inst1UserClient.GET("/objects").WithQuery("identifier", "institution1.edu/photos").Expect()
+	assert.Equal(t, http.StatusOK, resp.Raw().StatusCode)
+	html := resp.Body().Raw()
+	testutil.AssertMatchesAll(t, html, items)
+
+	// This should show an empty results page that includes
+	// the identifier filter we just applied.
+	resp = testutil.Inst1UserClient.GET("/objects").WithQuery("identifier", "institution1.edu/does-not-exist").Expect()
+	assert.Equal(t, http.StatusOK, resp.Raw().StatusCode)
+
+	expected := `<input class="input" type="text" id="identifier" name="identifier" value="institution1.edu/does-not-exist" placeholder="Object Identifier"`
+	html = resp.Body().Raw()
+	assert.Contains(t, html, expected)
+}
+
 func TestObjectRequestDelete(t *testing.T) {
 	testutil.InitHTTPTests(t)
 
