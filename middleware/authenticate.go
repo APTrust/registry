@@ -197,7 +197,7 @@ func log2FAIncomplete(c *gin.Context, currentUser *pgmodels.User) {
 }
 
 func respondToAuthError(c *gin.Context, err error) {
-	if err == common.ErrInvalidAPICredentials {
+	if IsAPIRequest(c) || IsAPIRoute(c) {
 		msg := "API credentials are missing or invalid."
 		common.Context().Log.Warn().Msgf("AuthError: %s", msg)
 		obj := map[string]interface{}{
