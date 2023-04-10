@@ -1,4 +1,4 @@
--- Registry Schema - 2023-03-17
+-- Registry Schema - 2023-04-10
 
 -- public.ar_internal_metadata definition
 
@@ -720,6 +720,7 @@ AS SELECT a.id,
     a.created_at,
     au.user_id,
     u.name AS user_name,
+    u.email as user_email,
     au.sent_at,
     au.read_at
    FROM alerts a
