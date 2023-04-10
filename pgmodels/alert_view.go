@@ -27,6 +27,7 @@ type AlertView struct {
 	CreatedAt             time.Time `json:"created_at"`
 	UserID                int64     `json:"user_id"`
 	UserName              string    `json:"user_name"`
+	UserEmail             string    `json:"user_email"`
 	SentAt                time.Time `json:"sent_at"`
 	ReadAt                time.Time `json:"read_at"`
 }

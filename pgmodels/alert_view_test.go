@@ -27,6 +27,14 @@ func TestAlertView(t *testing.T) {
 	alerts, err := pgmodels.AlertViewSelect(query)
 	require.Nil(t, err)
 	assert.Equal(t, 6, len(alerts))
+	for _, alertView := range alerts {
+		assert.NotEmpty(t, alertView.Content)
+		assert.NotEmpty(t, alertView.Subject)
+		assert.NotEmpty(t, alertView.Type)
+		assert.NotEmpty(t, alertView.UserID)
+		assert.NotEmpty(t, alertView.UserEmail)
+		assert.NotEmpty(t, alertView.UserName)
+	}
 }
 
 func TestAlertViewHasBeenRead(t *testing.T) {
