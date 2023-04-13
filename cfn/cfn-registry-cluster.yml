@@ -293,20 +293,20 @@ Resources:
           Value: registry
   
 
-  ListenerReg80: 
-      Type: 'AWS::ElasticLoadBalancingV2::Listener'
-      Properties:
-        DefaultActions:
-          - RedirectConfig:
-              Host: "#{host}"
-              Port: 443
-              StatusCode: "HTTP_301"
-              Protocol: "HTTPS"
-            Type: redirect
-        LoadBalancerArn: 
-          Fn::ImportValue: !Sub 'AppLoad-${DNS}'
-        Port: 80
-        Protocol: HTTP
+  #ListenerReg80: 
+  #    Type: 'AWS::ElasticLoadBalancingV2::Listener'
+  #    Properties:
+  #      DefaultActions:
+  #        - RedirectConfig:
+  #            Host: "#{host}"
+  #            Port: 443
+  #            StatusCode: "HTTP_301"
+  #            Protocol: "HTTPS"
+  #          Type: redirect
+  #      LoadBalancerArn: 
+  #        Fn::ImportValue: !Sub 'AppLoad-${DNS}'
+  #      Port: 80
+  #      Protocol: HTTP
   
   ListenerReg443:
     Type: 'AWS::ElasticLoadBalancingV2::Listener'
