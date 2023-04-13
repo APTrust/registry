@@ -23,7 +23,7 @@
     <hr />
   
     {{ if userCan .CurrentUser "DepositReportShow" .CurrentUser.InstitutionID }}
-    <li><a href="/reports/deposits"><span class="material-icons" aria-hidden="true">insert_chart</span> Reports</a></li>
+    <li><a href="/reports/deposits?storage_option=Total"><span class="material-icons" aria-hidden="true">insert_chart</span> Reports</a></li>
     {{ end }}
 
     {{ if userCan .CurrentUser "UserCreate" .CurrentUser.InstitutionID }}

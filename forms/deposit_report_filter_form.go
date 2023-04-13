@@ -55,11 +55,14 @@ func (f *DepositReportFilterForm) init() {
 		Options:     f.instOptions,
 		Attrs:       make(map[string]string),
 	}
+
+	storageOpts := Options(constants.StorageOptions)
+	storageOpts = append(storageOpts, &ListOption{Value: "Total", Text: "Total"})
 	f.Fields["storage_option"] = &Field{
 		Name:        "storage_option",
 		Label:       "Storage Option",
 		Placeholder: "Storage Option",
-		Options:     Options(constants.StorageOptions),
+		Options:     storageOpts,
 		Attrs:       make(map[string]string),
 	}
 	f.Fields["chart_metric"] = &Field{

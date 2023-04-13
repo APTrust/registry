@@ -36,12 +36,13 @@
       </tr>
     </thead>
     <tbody>
-      {{ $isSingleInstitutionReport := .isSingleInstitutionReport }}      
+      {{ $isSingleInstitutionReport := .isSingleInstitutionReport }}
+      {{ $isSummaryTotalReport := .isSummaryTotalReport }}      
       {{ range $index, $item := .deposits }}
       {{ if and $isSingleInstitutionReport (eq $item.InstitutionName "Total") }}
       <!-- Don't bother printing Totals if we're reporting on a single institution. -->
       {{ else }}
-      <tr {{ if eq $item.StorageOption "Total" }}style="border-bottom: 2px solid #be1f45"{{ end }}>
+      <tr {{ if and (eq $item.StorageOption "Total") (not  $isSummaryTotalReport) }}style="border-bottom: 2px solid #be1f45"{{ end }}>
         <td class="pl-5">{{ $item.InstitutionName }}</td>
         <td class="is-grey-dark">{{ $item.StorageOption }}</td>
         <td class="is-grey-dark num text-sm">{{ formatInt64 $item.ObjectCount }}</td>

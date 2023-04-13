@@ -61,7 +61,10 @@ $isAdmin := .CurrentUser.IsAdmin }}
           </div>
         </td>
         {{ if $isAdmin }}
-        <td>{{ defaultString $alert.UserName "N/A" }}</td>
+        <td>
+            {{ defaultString $alert.UserName "N/A" }} <br/>
+            <span class="text-xs is-grey-dark">{{ defaultString $alert.UserEmail "N/A" }}</span>
+        </td>
         {{ end }}
         <td>{{ dateUS $alert.CreatedAt }}</td>
         <td data-name="alertReadAt">{{ dateUS $alert.ReadAt }}</td>

@@ -73,6 +73,7 @@ func DepositReportShow(c *gin.Context) {
 	req.TemplateData["reportType"] = params.ReportType
 	req.TemplateData["deposits"] = deposits
 	req.TemplateData["isSingleInstitutionReport"] = params.InstitutionID > 0
+	req.TemplateData["isSummaryTotalReport"] = params.StorageOption == "Total"
 	req.TemplateData["filterForm"] = filterForm
 	req.TemplateData["reportParams"] = params
 	req.TemplateData["depositInstitutions"] = instList
