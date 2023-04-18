@@ -37,7 +37,7 @@ func TestWorkItemViewByID(t *testing.T) {
 	assert.Equal(t, "institution1.edu", item.InstitutionIdentifier)
 	assert.Equal(t, "institution1.edu/pdfs", item.ObjectIdentifier)
 	assert.Equal(t, "pdf_docs_with_lots_of_words", item.AltIdentifier)
-	assert.Equal(t, "", item.BagGroupIdentifier)
+	assert.Equal(t, "carolina-1", item.BagGroupIdentifier)
 	assert.Equal(t, constants.StorageOptionStandard, item.StorageOption)
 	assert.Equal(t, "https://example.com/profile.json", item.BagItProfileIdentifier)
 	assert.Equal(t, "Institution One", item.SourceOrganization)

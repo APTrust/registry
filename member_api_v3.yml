@@ -1540,9 +1540,21 @@ paths:
           required: false
           schema:
             type: string
+        - name: alt_identifier__starts_with
+          in: query
+          description: Return objects whose alternate identifier starts with the speficied string.
+          required: false
+          schema:
+            type: string
         - name: bag_group_identifier
           in: query
           description: Return objects with this bag group identifier.
+          required: false
+          schema:
+            type: string
+        - name: bag_group_identifier__starts_with
+          in: query
+          description: Return objects whose bag group identifier starts with the specified string.
           required: false
           schema:
             type: string

@@ -39,14 +39,14 @@ func (f *ObjectFilterForm) init() {
 		Placeholder: "Access",
 		Options:     Options(constants.AccessSettings),
 	}
-	f.Fields["alt_identifier"] = &Field{
-		Name:        "alt_identifier",
-		Label:       "Alternate Identifier",
+	f.Fields["alt_identifier__starts_with"] = &Field{
+		Name:        "alt_identifier__starts_with",
+		Label:       "Alternate Identifier (Prefix or Exact)",
 		Placeholder: "Alternate Identifier",
 	}
-	f.Fields["bag_group_identifier"] = &Field{
-		Name:        "bag_group_identifier",
-		Label:       "Bag Group Identifier",
+	f.Fields["bag_group_identifier__starts_with"] = &Field{
+		Name:        "bag_group_identifier__starts_with",
+		Label:       "Bag Group Identifier (Prefix or Exact)",
 		Placeholder: "Bag Group Identifier",
 	}
 	f.Fields["bag_name"] = &Field{
@@ -149,8 +149,8 @@ func (f *ObjectFilterForm) init() {
 // setValues sets the form values to match the Institution values.
 func (f *ObjectFilterForm) SetValues() {
 	f.Fields["access"].Value = f.FilterCollection.ValueOf("access")
-	f.Fields["alt_identifier"].Value = f.FilterCollection.ValueOf("alt_identifier")
-	f.Fields["bag_group_identifier"].Value = f.FilterCollection.ValueOf("bag_group_identifier")
+	f.Fields["alt_identifier__starts_with"].Value = f.FilterCollection.ValueOf("alt_identifier__starts_with")
+	f.Fields["bag_group_identifier__starts_with"].Value = f.FilterCollection.ValueOf("bag_group_identifier__starts_with")
 	f.Fields["bag_name"].Value = f.FilterCollection.ValueOf("bag_name")
 	f.Fields["bagit_profile_identifier"].Value = f.FilterCollection.ValueOf("bagit_profile_identifier")
 	f.Fields["etag"].Value = f.FilterCollection.ValueOf("etag")

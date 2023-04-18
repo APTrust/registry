@@ -14,8 +14,8 @@ import (
 func getObjectFilters() *pgmodels.FilterCollection {
 	fc := pgmodels.NewFilterCollection()
 	fc.Add("access", []string{constants.AccessConsortia})
-	fc.Add("alt_identifier", []string{"sap"})
-	fc.Add("bag_group_identifier", []string{"54321"})
+	fc.Add("alt_identifier__starts_with", []string{"sap"})
+	fc.Add("bag_group_identifier__starts_with", []string{"54321"})
 	fc.Add("bag_name", []string{"some_bag"})
 	fc.Add("bagit_profile_ideitifier", []string{constants.BTRProfileIdentifier})
 	fc.Add("created_at__gteq", []string{"2020-01-01"})
@@ -72,8 +72,8 @@ func TestObjectFilterFormNonAdmin(t *testing.T) {
 func testObjectFields(t *testing.T, fc *pgmodels.FilterCollection, fields map[string]*forms.Field) {
 	filters := []string{
 		"access",
-		"alt_identifier",
-		"bag_group_identifier",
+		"alt_identifier__starts_with",
+		"bag_group_identifier__starts_with",
 		"bag_name",
 		"bagit_profile_identifier",
 		"created_at__lteq",

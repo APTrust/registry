@@ -83,8 +83,8 @@ func TestObjectList(t *testing.T) {
 	commonFilters := []string{
 		`type="text" id="identifier" name="identifier"`,
 		`type="text" id="bag_name" name="bag_name"`,
-		`type="text" id="alt_identifier" name="alt_identifier"`,
-		`type="text" id="bag_group_identifier" name="bag_group_identifier"`,
+		`type="text" id="alt_identifier__starts_with" name="alt_identifier__starts_with"`,
+		`type="text" id="bag_group_identifier__starts_with" name="bag_group_identifier__starts_with"`,
 		`type="text" id="internal_sender_identifier" name="internal_sender_identifier"`,
 		`select name="bagit_profile_identifier"`,
 		`select name="access"`,
@@ -153,6 +153,30 @@ func TestObjectByIdentifier(t *testing.T) {
 	expected := `<input class="input" type="text" id="identifier" name="identifier" value="institution1.edu/does-not-exist" placeholder="Object Identifier"`
 	html = resp.Body().Raw()
 	assert.Contains(t, html, expected)
+}
+
+// Test new alt identifier starts with and bag group
+// identifier starts with filters.
+func TestObjectStartsWith(t *testing.T) {
+	testutil.InitHTTPTests(t)
+	items := []string{
+		"institution2.edu/wasabi-or",
+		"institution2.edu/gl-dp-va",
+	}
+
+	// Should return the two results listed above
+	resp := testutil.Inst2UserClient.GET("/objects").
+		WithQuery("alt_identifier__starts_with", "description of").Expect()
+	assert.Equal(t, http.StatusOK, resp.Raw().StatusCode)
+	html := resp.Body().Raw()
+	testutil.AssertMatchesAll(t, html, items)
+
+	// Also should return the two results listed above
+	resp = testutil.Inst2UserClient.GET("/objects").
+		WithQuery("bag_group_identifier__starts_with", "dakota").Expect()
+	assert.Equal(t, http.StatusOK, resp.Raw().StatusCode)
+	html = resp.Body().Raw()
+	testutil.AssertMatchesAll(t, html, items)
 }
 
 func TestObjectRequestDelete(t *testing.T) {

@@ -15,7 +15,9 @@ import (
 var IntellectualObjectFilters = []string{
 	"access",
 	"alt_identifier",
+	"alt_identifier__starts_with",
 	"bag_group_identifier",
+	"bag_group_identifier__starts_with",
 	"bag_name",
 	"bagit_profile_identifier",
 	"created_at__lteq",
