@@ -29,7 +29,11 @@ fi
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     DIR="./bin/linux"
 elif [[ "$OSTYPE" == "darwin"* ]]; then
-    DIR="./bin/osx"
+    if [[ `uname -p` == "arm" ]]; then
+        DIR="./bin/osx/arm64"
+    else
+        DIR="./bin/osx/amd64"
+    fi
 fi
 
 
