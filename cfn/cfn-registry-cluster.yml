@@ -100,7 +100,7 @@ Resources:
     DeletionPolicy: Retain
 
   RegistryService: 
-    DependsOn: ListenerReg443
+    DependsOn: ListenerReg443 
     Type: AWS::ECS::Service
     Properties:
       Cluster:
@@ -187,7 +187,7 @@ Resources:
         - Condition: SUCCESS
           ContainerName: Nsqadmin_ResolvConf_InitContainer
         Essential: true 
-        Image: docker.io/aptrust/registry:bc4a414-master 
+        Image: docker.io/aptrust/registry:f8552e1-master 
         Secrets:
         - Name: APT_ENV
           ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/APT_ENV'
