@@ -31,6 +31,10 @@ You will also need the following for some Admin operations:
 
 If you're running on Linux or OSX, you'll find the required Redis and NSQ binaries in this repo's .bin/linux and ./bin/osx directories. The registry script automatically starts them when it runs the server and tests.
 
+The script is smart enough to choose between Mac Intel and ARM binaries, but you may need to first run the NSQ binaries manually, as they are not signed. To do this, open bin/osx/amd64 or bin/osx/arm64 (whichever platform you're running) in Finder.
+
+Right-click each of the NSQ binaries, then hold the Shift key and select Open from the context menu. Choose to run the binary, then close the terminal window. You'll need to do this for each of the three NSQ binaries.
+
 ## Requirements for Two Factor Authentication
 
 As a developer, you generally won't need to send Authy or SMS messages for two-factor authentication. If you're running this in a demo or production environment, you will.
