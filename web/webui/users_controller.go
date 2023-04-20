@@ -504,7 +504,12 @@ func SignInUser(c *gin.Context) (int, string, error) {
 	}
 
 	// Set this flag for two factor users.
+	// Be sure to save this, or user can bypass 2fa on next request.
 	user.AwaitingSecondFactor = user.IsTwoFactorUser()
+	err = user.Save()
+	if err != nil {
+		return http.StatusInternalServerError, redirectTo, err
+	}
 
 	err = helpers.SetSessionCookie(c, user)
 	if err != nil {

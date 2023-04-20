@@ -123,6 +123,7 @@ func UserTwoFactorVerify(c *gin.Context) {
 		req.TemplateData["flash"] = msg
 		c.HTML(http.StatusBadRequest, "users/enter_auth_token.html", req.TemplateData)
 	} else {
+		// Note that call to ClearOTPSecret saves user record to db.
 		user.AwaitingSecondFactor = false
 		err := user.ClearOTPSecret()
 		if AbortIfError(c, err) {
