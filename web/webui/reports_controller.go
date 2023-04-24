@@ -20,6 +20,12 @@ type DepositReportParams struct {
 	EndDate       time.Time
 }
 
+// GET /reports/billing
+func BillingReportShow(c *gin.Context) {
+	// ... use pgmodels.BillingStatsSelect ...
+	// views/reports/billing.html
+}
+
 // DepositReportShow shows the deposits report.
 //
 // Note that this does not follow the usual pattern for list/show

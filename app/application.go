@@ -165,8 +165,9 @@ func initRoutes(router *gin.Engine) {
 		// Dashboard
 		webRoutes.GET("/dashboard", webui.DashboardShow)
 
-		// Deposit Report
+		// Reports
 		webRoutes.GET("/reports/deposits", webui.DepositReportShow)
+		webRoutes.GET("/reports/billing", webui.BillingReportShow)
 
 		// GenericFiles
 		webRoutes.GET("/files", webui.GenericFileIndex)

@@ -20,6 +20,7 @@ const (
 	AlertDelete                        = "AlertDelete"
 	AlertRead                          = "AlertRead"
 	AlertUpdate                        = "AlertUpdate"
+	BillingReportShow                  = "BillingReportShow"
 	ChecksumCreate                     = "ChecksumCreate"
 	ChecksumDelete                     = "ChecksumDelete"
 	ChecksumRead                       = "ChecksumRead"
@@ -96,6 +97,7 @@ var Permissions = []Permission{
 	AlertDelete,
 	AlertRead,
 	AlertUpdate,
+	BillingReportShow,
 	ChecksumCreate,
 	ChecksumDelete,
 	ChecksumRead,
@@ -282,6 +284,7 @@ func initPermissions() {
 	sysAdmin[AlertDelete] = true
 	sysAdmin[AlertRead] = true
 	sysAdmin[AlertUpdate] = true
+	sysAdmin[BillingReportShow] = true
 	sysAdmin[ChecksumCreate] = true
 	sysAdmin[ChecksumDelete] = false // no one can do this
 	sysAdmin[ChecksumRead] = true
