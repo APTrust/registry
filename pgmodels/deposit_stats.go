@@ -77,7 +77,7 @@ func DepositStatsSelect(institutionID int64, storageOption string, endDate time.
 
 	// If we happen to get a query for a date before 2014,
 	// we'll get no results. We don't want to return nil, because
-	// the caller is likely expected something that can be serialized
+	// the caller is likely expecting something that can be serialized
 	// to JSON. Give the caller an actual answer, saying there was
 	// nothing in the system on the date they inquired about.
 	if stats == nil {
