@@ -22,8 +22,27 @@ type DepositReportParams struct {
 
 // GET /reports/billing
 func BillingReportShow(c *gin.Context) {
-	// ... use pgmodels.BillingStatsSelect ...
-	// views/reports/billing.html
+	req := NewRequest(c)
+	template := "reports/billing.html"
+	params := getDepositReportParams(c)
+	if !req.CurrentUser.IsAdmin() {
+		params.InstitutionID = req.CurrentUser.InstitutionID
+	}
+	stats, err := pgmodels.BillingStatsSelect(params.InstitutionID, params.StartDate, params.EndDate)
+	if AbortIfError(c, err) {
+		return
+	}
+	filterCollection := req.GetFilterCollection()
+	filterForm, err := forms.NewBillingReportFilterForm(filterCollection, req.CurrentUser)
+	if AbortIfError(c, err) {
+		return
+	}
+
+	req.TemplateData["stats"] = stats
+	req.TemplateData["filterForm"] = filterForm
+	req.TemplateData["reportParams"] = params
+	c.HTML(http.StatusOK, template, req.TemplateData)
+
 }
 
 // DepositReportShow shows the deposits report.

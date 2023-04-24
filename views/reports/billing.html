@@ -9,7 +9,7 @@
 
   <div class="box-content">
 
-    {{ template "reports/_deposit_filters.html" . }}
+    {{ template "reports/_billing_filters.html" . }}
 
   </div>
 
@@ -25,13 +25,13 @@
       </tr>
     </thead>
     <tbody>
-    {{ range $index, $item := .deposits }}
+    {{ range $index, $item := .stats }}
       <tr>
-        <td class="is-grey-dark">{{ $item.Month }}</td>
+        <td class="is-grey-dark">{{ $item.MonthAndYear }}</td>
         <td class="is-grey-dark">{{ $item.StorageOption }}</td>
-        <td class="is-grey-dark num text-sm">{{ formatFloat $item.TotalGB 3 }}</td>
-        <td class="is-grey-dark num text-sm">{{ formatFloat $item.TotalTB 3 }}</td>
-        <td class="is-grey-dark num text-sm">{{ formatFloat $item.Overage 3 }}</td>
+        <td class="is-grey-dark num text-sm">{{ formatFloat $item.TotalGB 2 }}</td>
+        <td class="is-grey-dark num text-sm">{{ formatFloat $item.TotalTB 2 }}</td>
+        <td class="is-grey-dark num text-sm">{{ formatFloat $item.Overage 2 }}</td>
       </tr>
     {{ end }}
     </tbody>

@@ -1,0 +1,30 @@
+{{ define "reports/_billing_filters.html" }}
+
+<div class="filters-grid">
+  <h3 class="filters-grid-label text-label text-xs">Filter</h3>
+  <div class="filters-grid-content">
+    <form id="depositReportFilterForm" method="get">
+
+      <div class="columns">
+        <div class="column is-one-quarter">
+          {{ template "forms/select.html" .filterForm.Fields.start_date }}
+        </div>
+        <div class="column is-one-quarter">
+          {{ template "forms/select.html" .filterForm.Fields.end_date }}
+        </div>
+        <div class="column is-one-quarter">
+            {{ if .CurrentUser.IsAdmin }}
+            {{ template "forms/select.html" .filterForm.Fields.institution_id }}
+            {{ end }}
+          </div>
+        <div class="column is-one-quarter is-align-self-flex-end">
+          <input class="filter-button button is-primary" type="submit" value="Filter">
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+{{ template "shared/_filter_chips.html" . }}
+
+{{ end }}
