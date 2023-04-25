@@ -31,6 +31,7 @@ var billingStatsQuery = `select
 	and end_date > ?
 	and end_date <= ?
 	and total_tb > 0
+	and storage_option != 'Total'
 	order by end_date, storage_option`
 
 func BillingStatsSelect(institutionID int64, startDate, endDate time.Time) ([]*BillingStats, error) {

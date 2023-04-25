@@ -4,7 +4,7 @@
 
 <div class="box">
   <div class="box-header">
-    <h1 class="h2">Deposits</h1>
+    <h1 class="h2">Deposits {{ if .institutionName }} for {{ .institutionName }} {{ end }}</h1>
   </div>
 
   <div class="box-content">
@@ -21,18 +21,20 @@
         <th>Storage Option</th>
         <th>Total GB</th>
         <th>Total TB</th>
-        <th>Overage</th>
+        <!-- th>Overage</th -->
       </tr>
     </thead>
     <tbody>
+    {{ $lastMonth := "" }}
     {{ range $index, $item := .stats }}
-      <tr>
+      <tr {{ if (and (ne $lastMonth "") (ne $lastMonth $item.MonthAndYear)) }} style="border-top: 2px solid #be1f45" {{ end }}>
         <td class="is-grey-dark">{{ $item.MonthAndYear }}</td>
         <td class="is-grey-dark">{{ $item.StorageOption }}</td>
         <td class="is-grey-dark num text-sm">{{ formatFloat $item.TotalGB 2 }}</td>
         <td class="is-grey-dark num text-sm">{{ formatFloat $item.TotalTB 2 }}</td>
-        <td class="is-grey-dark num text-sm">{{ formatFloat $item.Overage 2 }}</td>
+        <!-- td class="is-grey-dark num text-sm">{{ formatFloat $item.Overage 2 }}</td -->
       </tr>
+      {{ $lastMonth = $item.MonthAndYear }}
     {{ end }}
     </tbody>
   </table>

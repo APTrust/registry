@@ -57,13 +57,19 @@ func TestListUsers(t *testing.T) {
 }
 
 func TestListDepositReportDates(t *testing.T) {
-	options := forms.ListDepositReportDates()
+	options := forms.ListDepositReportDates(true)
 
 	today := time.Now().UTC().Format("2006-01-02")
 	assert.Equal(t, "Today", options[0].Text)
 	assert.Equal(t, today, options[0].Value)
 	assert.True(t, len(options) > 80)
 	earliestOption := options[len(options)-1]
+	assert.Equal(t, "2015-01-01", earliestOption.Value)
+	assert.Equal(t, "January 1, 2015", earliestOption.Text)
+
+	options = forms.ListDepositReportDates(false)
+	assert.NotEqual(t, "Today", options[0].Text)
+	earliestOption = options[len(options)-1]
 	assert.Equal(t, "2015-01-01", earliestOption.Value)
 	assert.Equal(t, "January 1, 2015", earliestOption.Text)
 }

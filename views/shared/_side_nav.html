@@ -62,6 +62,10 @@
         {{ end }}
       {{ end }}
 
+      {{ if userCan .CurrentUser "BillingReportShow" .CurrentUser.InstitutionID }}
+      <li><a href="/reports/billing/"><span class="material-icons" aria-hidden="true">monetization_on</span> Billing Report</a></li>
+      {{ end }}
+
       {{ if userCan .CurrentUser "NsqAdmin" .CurrentUser.InstitutionID }}
       <li><a href="/nsq"><span class="material-icons" aria-hidden="true">not_started</span> NSQ</a></li>
       {{ end }}

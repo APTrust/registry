@@ -38,14 +38,14 @@ func (f *DepositReportFilterForm) init() {
 		Name:        "start_date",
 		Label:       "Deposits from",
 		Placeholder: "Deposits from",
-		Options:     ListDepositReportDates(),
+		Options:     ListDepositReportDates(false),
 		Attrs:       make(map[string]string),
 	}
 	f.Fields["end_date"] = &Field{
 		Name:        "end_date",
 		Label:       "Deposits up to",
 		Placeholder: "Deposits up to",
-		Options:     ListDepositReportDates(),
+		Options:     ListDepositReportDates(true),
 		Attrs:       make(map[string]string),
 	}
 	f.Fields["institution_id"] = &Field{

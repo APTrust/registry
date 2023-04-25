@@ -134,10 +134,12 @@ func ListUsers(institutionID int64) ([]*ListOption, error) {
 //
 // If user chooses the "Today" option, the data will come from the
 // current_deposit_stats view, which is updated hourly.
-func ListDepositReportDates() []*ListOption {
+func ListDepositReportDates(includeToday bool) []*ListOption {
 	now := time.Now().UTC()
-	options := make([]*ListOption, 1)
-	options[0] = &ListOption{now.Format("2006-01-02"), "Today", false}
+	options := make([]*ListOption, 0)
+	if includeToday {
+		options = append(options, &ListOption{now.Format("2006-01-02"), "Today", false})
+	}
 	thisYear, thisMonth, _ := now.Date()
 	for year := thisYear; year > 2014; year-- {
 		for month := int(time.December); month > 0; month-- {

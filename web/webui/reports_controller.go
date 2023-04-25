@@ -38,6 +38,9 @@ func BillingReportShow(c *gin.Context) {
 		return
 	}
 
+	if len(stats) > 0 {
+		req.TemplateData["institutionName"] = stats[0].InstitutionName
+	}
 	req.TemplateData["stats"] = stats
 	req.TemplateData["filterForm"] = filterForm
 	req.TemplateData["reportParams"] = params
