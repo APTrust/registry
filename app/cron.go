@@ -114,18 +114,18 @@ func updateHistoricalDepositStats(ctx *common.APTContext) {
 				// We usually use UTC dates in Registry, but here, we'll check whether
 				// it's the first of the month in the local timezone.
 				if time.Now().Day() == 1 {
-					ctx.Log.Info().Msg("cron: starting update_all_historical_deposit_stats() because it's the first of the month")
+					ctx.Log.Info().Msg("cron: starting populate_all_historical_deposit_stats() because it's the first of the month")
 					start := time.Now().UTC()
-					_, err := ctx.DB.Exec("select update_all_historical_deposit_stats()")
+					_, err := ctx.DB.Exec("select populate_all_historical_deposit_stats()")
 					end := time.Now().UTC()
 					duration := end.Sub(start).Seconds()
 					if err != nil {
-						ctx.Log.Error().Msgf("cron: update_all_historical_deposit_stats failed after %f seconds: %s", duration, err.Error())
+						ctx.Log.Error().Msgf("cron: populate_all_historical_deposit_stats failed after %f seconds: %s", duration, err.Error())
 					} else {
-						ctx.Log.Info().Msgf("cron: update_all_historical_deposit_stats completed after %f seconds. (Less than one second indicates stats did not need to be updated.)", duration)
+						ctx.Log.Info().Msgf("cron: populate_all_historical_deposit_stats completed after %f seconds. (Less than one second indicates stats did not need to be updated.)", duration)
 					}
 				} else {
-					ctx.Log.Info().Msg("cron: no need to run update_all_historical_deposit_stats() because it's not the first of the month")
+					ctx.Log.Info().Msg("cron: no need to run populate_all_historical_deposit_stats() because it's not the first of the month")
 				}
 				time.Sleep(24 * time.Hour)
 			}

@@ -1314,6 +1314,10 @@ end;
 $function$
 ;
 
+-- Note: This version of the function is no longer used. See the version 
+-- below that takes a timestamp param. We have to keep this version in the
+-- schema for data loading and testing on dev machines. Delete this and
+-- the tests won't run. :(
 CREATE OR REPLACE FUNCTION public.populate_historical_deposit_stats(stop_date date)
  RETURNS integer
  LANGUAGE plpgsql
