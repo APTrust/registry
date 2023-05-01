@@ -30,12 +30,13 @@ var billingStatsQuery = `select
 	where institution_id = ?
 	and end_date > ?
 	and end_date <= ?
+	and (? = '' or storage_option = ?)
 	and total_tb > 0
 	and storage_option != 'Total'
 	order by end_date, storage_option`
 
-func BillingStatsSelect(institutionID int64, startDate, endDate time.Time) ([]*BillingStats, error) {
+func BillingStatsSelect(institutionID int64, startDate, endDate time.Time, storageOption string) ([]*BillingStats, error) {
 	var stats []*BillingStats
-	_, err := common.Context().DB.Query(&stats, billingStatsQuery, institutionID, startDate, endDate)
+	_, err := common.Context().DB.Query(&stats, billingStatsQuery, institutionID, startDate, endDate, storageOption, storageOption)
 	return stats, err
 }

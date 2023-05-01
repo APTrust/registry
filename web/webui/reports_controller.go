@@ -28,7 +28,7 @@ func BillingReportShow(c *gin.Context) {
 	if !req.CurrentUser.IsAdmin() {
 		params.InstitutionID = req.CurrentUser.InstitutionID
 	}
-	stats, err := pgmodels.BillingStatsSelect(params.InstitutionID, params.StartDate, params.EndDate)
+	stats, err := pgmodels.BillingStatsSelect(params.InstitutionID, params.StartDate, params.EndDate, params.StorageOption)
 	if AbortIfError(c, err) {
 		return
 	}

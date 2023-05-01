@@ -2,6 +2,7 @@ package forms
 
 import (
 	"github.com/APTrust/registry/common"
+	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/pgmodels"
 )
 
@@ -52,6 +53,13 @@ func (f *BillingReportFilterForm) init() {
 		Label:       "Institution",
 		Placeholder: "Institution",
 		Options:     f.instOptions,
+		Attrs:       make(map[string]string),
+	}
+	f.Fields["storage_option"] = &Field{
+		Name:        "storage_option",
+		Label:       "Storage Option",
+		Placeholder: "Storage Option",
+		Options:     Options(constants.StorageOptions),
 		Attrs:       make(map[string]string),
 	}
 }

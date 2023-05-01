@@ -17,7 +17,7 @@ func TestBillingStats(t *testing.T) {
 
 	startDate := time.Date(2022, 01, 01, 0, 0, 0, 0, time.UTC)
 	endDate := time.Date(2023, 01, 01, 0, 0, 0, 0, time.UTC)
-	stats, err := pgmodels.BillingStatsSelect(999, startDate, endDate)
+	stats, err := pgmodels.BillingStatsSelect(999, startDate, endDate, "")
 
 	require.Nil(t, err)
 	require.NotEmpty(t, stats)
@@ -42,6 +42,17 @@ func TestBillingStats(t *testing.T) {
 	// 	fmt.Println(s)
 	// }
 	// assert.True(t, false)
+
+	// Try again with a storage option filter
+	stats, err = pgmodels.BillingStatsSelect(999, startDate, endDate, constants.StorageOptionGlacierDeepOR)
+	require.Nil(t, err)
+	require.NotEmpty(t, stats)
+	assert.Equal(t, 12, len(stats))
+
+	for _, s := range stats {
+		assert.Equal(t, constants.StorageOptionGlacierDeepOR, s.StorageOption)
+	}
+
 }
 
 func addDummyBillingData(t *testing.T) {
