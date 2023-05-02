@@ -9,6 +9,7 @@ import (
 
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
+	"github.com/APTrust/registry/db"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/APTrust/registry/web/api"
 	admin_api "github.com/APTrust/registry/web/api/admin"
@@ -267,4 +268,26 @@ func TestCoerceObjectStorageOption(t *testing.T) {
 	assert.NotEqual(t, existingObj.StorageOption, submittedObj.StorageOption)
 	admin_api.CoerceObjectStorageOption(existingObj, submittedObj)
 	assert.NotEqual(t, existingObj.StorageOption, submittedObj.StorageOption)
+}
+
+func TestObjectInitRestore(t *testing.T) {
+	// Force fixture reload to prevent "pending work item"
+	// error when requesting restoration.
+	err := db.ForceFixtureReload()
+	require.Nil(t, err)
+	tu.InitHTTPTests(t)
+
+	tu.SysAdminClient.POST("/admin-api/v3/objects/init_restore/{id}", 6).
+		WithHeader(constants.APIUserHeader, tu.SysAdmin.Email).
+		WithHeader(constants.APIKeyHeader, "password").
+		Expect().Status(http.StatusCreated)
+
+	tu.Inst1AdminClient.POST("/admin-api/v3/objects/init_restore/{id}", 6).
+		WithHeader(constants.APIUserHeader, tu.Inst1Admin.Email).
+		WithHeader(constants.APIKeyHeader, "password").
+		Expect().Status(http.StatusForbidden)
+	tu.Inst1UserClient.POST("/admin-api/v3/objects/init_restore/{id}", 6).
+		WithHeader(constants.APIUserHeader, tu.Inst1User.Email).
+		WithHeader(constants.APIKeyHeader, "password").
+		Expect().Status(http.StatusForbidden)
 }

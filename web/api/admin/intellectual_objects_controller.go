@@ -7,6 +7,7 @@ import (
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/APTrust/registry/web/api"
+	"github.com/APTrust/registry/web/webui"
 	"github.com/gin-gonic/gin"
 )
 
@@ -31,6 +32,25 @@ func IntellectualObjectUpdate(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, obj)
+}
+
+// IntellectualObjectInitRestore creates an object restoration request,
+// which is really just a WorkItem that gets queued. Restoration can take
+// seconds or hours, depending on where the object is stored and how big it is.
+// POST /admin-api/v3/objects/init_restore/:id
+func IntellectualObjectInitRestore(c *gin.Context) {
+	req := api.NewRequest(c)
+	obj, err := pgmodels.IntellectualObjectByID(req.Auth.ResourceID)
+	if api.AbortIfError(c, err) {
+		return
+	}
+
+	workItem, err := webui.InitObjectRestoration(obj, req.CurrentUser)
+	if api.AbortIfError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusCreated, workItem)
 }
 
 // IntellectualObjectDelete marks an object record as deleted.
