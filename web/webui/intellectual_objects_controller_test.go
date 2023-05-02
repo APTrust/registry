@@ -337,7 +337,6 @@ func TestObjectInitRestore(t *testing.T) {
 		WithHeader("Referer", testutil.BaseURL).
 		WithFormField(constants.CSRFTokenName, testutil.Inst1UserToken).
 		Expect().Status(http.StatusForbidden)
-
 }
 
 func TestIntellectualObjectEvents(t *testing.T) {
