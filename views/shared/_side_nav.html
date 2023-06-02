@@ -27,7 +27,7 @@
     {{ end }}
 
     {{ if userCan .CurrentUser "UserCreate" .CurrentUser.InstitutionID }}
-    <li><a href="/users"><span class="material-icons" aria-hidden="true">people</span> Users</a></li>
+    <li><a href="/users?deactivated_at__is_null=true"><span class="material-icons" aria-hidden="true">people</span> Users</a></li>
     {{ end }}
 
     <li><a href="#sidebarSubnav" id="sidebarToggle">

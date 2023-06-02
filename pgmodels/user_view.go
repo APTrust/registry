@@ -5,6 +5,8 @@ import (
 )
 
 var UserFilters = []string{
+	"deactivated_at__is_null",
+	"deactivated_at__is_not_null",
 	"email__contains",
 	"institution_id",
 	"name__contains",

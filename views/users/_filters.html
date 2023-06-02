@@ -16,7 +16,7 @@
           {{ template "forms/text_input.html" .filterForm.Fields.email__contains }}
         </div>
         <div class="column is-one-quarter is-align-self-flex-end">
-          <input class="filter-button button is-primary" type="submit" value="Filter">
+          {{ template "forms/select.html" .filterForm.Fields.deactivated_at__is_null }}
         </div>
       </div>
 
@@ -26,6 +26,9 @@
         </div>
         <div class="column is-one-quarter">
           {{ template "forms/select.html" .filterForm.Fields.role }}
+        </div>
+        <div class="column is-one-quarter is-align-self-flex-end">
+          <input class="filter-button button is-primary" type="submit" value="Filter">
         </div>
       </div>
 
