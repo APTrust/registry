@@ -28,3 +28,13 @@ func TestInstitutionView(t *testing.T) {
 	require.Nil(t, err)
 	assert.Equal(t, 5, len(instViews))
 }
+
+func TestInstViewDisplayType(t *testing.T) {
+	inst := &pgmodels.InstitutionView{
+		Type: constants.InstTypeMember,
+	}
+	assert.Equal(t, "Member", inst.DisplayType())
+
+	inst.Type = constants.InstTypeSubscriber
+	assert.Equal(t, "Associate", inst.DisplayType())
+}
