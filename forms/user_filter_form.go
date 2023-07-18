@@ -55,6 +55,15 @@ func (f *UserFilterForm) init() {
 		Placeholder: "Role",
 		Options:     AllRolesList,
 	}
+	f.Fields["deactivated_at__is_null"] = &Field{
+		Name:        "deactivated_at__is_null",
+		Label:       "Status",
+		Placeholder: "Status",
+		Options: []*ListOption{
+			{"true", "Active", false},
+			{"false", "Inactive", false},
+		},
+	}
 }
 
 // setValues sets the form values to match the User values.

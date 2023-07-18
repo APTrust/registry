@@ -128,6 +128,23 @@ func (inst *Institution) HasSubAccounts() (bool, error) {
 		Exists()
 }
 
+// DisplayType returns either "Member" or "Associate" depending on the
+// institution type. This is the type as we display it to users, not
+// as we store it in the database. This method exists because we changed
+// terminology in 2023.
+//
+// "Subscription Institution", "Sub-Account", "Associate Member" and
+// "Associate" all mean the same thing, but we're using "Associate"
+// in the UI.
+func (i *Institution) DisplayType() string {
+	if i.Type == constants.InstTypeMember {
+		return "Member"
+	} else if i.Type == constants.InstTypeSubscriber {
+		return "Associate"
+	}
+	return "" // APTrust inst has no type
+}
+
 // bucket returns a valid bucket name for this institution.
 // Param name should be "receiving" or "restore"
 func (inst *Institution) bucket(name string) string {

@@ -55,7 +55,7 @@
       <tr class="{{ $cssClass }}" onclick="window.location.href='/institutions/show/{{ $inst.ID }}'">
         <td class="pl-5">{{ $inst.Name }}</td>
         <td class="{{ $cellClass }}">{{ $inst.Identifier }}</td>
-        <td class="{{ $cellClass }}">{{ replace $inst.Type "Institution" "" 1 }}</td>
+        <td class="{{ $cellClass }}">{{ $inst.DisplayType }}</td>
         <td class="{{ $cellClass }}">{{ $inst.ParentIdentifier }}</td>
         <td class="{{ $cellClass }}">{{ dateUS $inst.DeactivatedAt }}</td>
       </tr>

@@ -263,3 +263,13 @@ func TestDueForSpotRestore(t *testing.T) {
 	require.Nil(t, err)
 	assert.False(t, dueForRestore)
 }
+
+func TestInstDisplayType(t *testing.T) {
+	inst := &pgmodels.Institution{
+		Type: constants.InstTypeMember,
+	}
+	assert.Equal(t, "Member", inst.DisplayType())
+
+	inst.Type = constants.InstTypeSubscriber
+	assert.Equal(t, "Associate", inst.DisplayType())
+}

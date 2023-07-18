@@ -57,7 +57,7 @@ var InstRolesList = []*ListOption{
 
 var InstTypeList = []*ListOption{
 	{constants.InstTypeMember, "Member", false},
-	{constants.InstTypeSubscriber, "Subscriber (Sub-Account)", false},
+	{constants.InstTypeSubscriber, "Associate", false},
 }
 
 var ObjectStateList = []*ListOption{

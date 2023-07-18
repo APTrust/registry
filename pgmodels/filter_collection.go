@@ -209,9 +209,17 @@ func (pf *ParamFilter) AddToQuery(q *Query) error {
 	case "contains":
 		q.Where(pf.Column, pf.SQLOp, fmt.Sprintf("%%%s%%", pf.Values[0]))
 	case "is_null":
-		q.IsNull(pf.Column)
+		if pf.Values[0] == "true" {
+			q.IsNull(pf.Column)
+		} else if pf.Values[0] == "false" {
+			q.IsNotNull(pf.Column)
+		}
 	case "not_null":
-		q.IsNotNull(pf.Column)
+		if pf.Values[0] == "true" {
+			q.IsNotNull(pf.Column)
+		} else if pf.Values[0] == "false" {
+			q.IsNull(pf.Column)
+		}
 	case "in":
 		q.WhereIn(pf.Column, pf.InterfaceValues()...)
 	default:

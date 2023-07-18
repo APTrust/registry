@@ -2,6 +2,8 @@ package pgmodels
 
 import (
 	"time"
+
+	"github.com/APTrust/registry/constants"
 )
 
 // InstitutionView contains information about an institution and its
@@ -56,4 +58,21 @@ func InstitutionViewGet(query *Query) (*InstitutionView, error) {
 	var institution InstitutionView
 	err := query.Select(&institution)
 	return &institution, err
+}
+
+// DisplayType returns either "Member" or "Associate" depending on the
+// institution type. This is the type as we display it to users, not
+// as we store it in the database. This method exists because we changed
+// terminology in 2023.
+//
+// "Subscription Institution", "Sub-Account", "Associate Member" and
+// "Associate" all mean the same thing, but we're using "Associate"
+// in the UI.
+func (i *InstitutionView) DisplayType() string {
+	if i.Type == constants.InstTypeMember {
+		return "Member"
+	} else if i.Type == constants.InstTypeSubscriber {
+		return "Associate"
+	}
+	return "" // APTrust inst has no type
 }

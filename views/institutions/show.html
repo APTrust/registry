@@ -33,7 +33,7 @@
         <dt class="text-label text-xs is-grey-dark">Identifier</dt>
         <dd class="text-table">{{ .institution.Identifier }}</dd>
         <dt class="text-label text-xs is-grey-dark">Type</dt>
-        <dd class="text-table">{{ replace .institution.Type "Institution" "" 1 }}</dd>
+        <dd class="text-table">{{ .institution.DisplayType }}</dd>
         <dt class="text-label text-xs is-grey-dark">Parent</dt>
         <dd class="text-table">{{ if .institution.ParentName }}{{ .institution.ParentName }}{{ else }}None{{end}}</dd>
         <dt class="text-label text-xs is-grey-dark">Two-Factor Enabled</dt>
