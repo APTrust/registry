@@ -36,6 +36,8 @@ func (f *InstitutionForm) init() {
 			"min":      "2",
 		},
 	}
+	// The regex here matches the DNSName regex in
+	// github.com/asaskevich/govalidator/patterns.go
 	f.Fields["Identifier"] = &Field{
 		Name:        "Identifier",
 		Label:       "Identifier",
@@ -43,7 +45,7 @@ func (f *InstitutionForm) init() {
 		ErrMsg:      pgmodels.ErrInstIdentifier,
 		Attrs: map[string]string{
 			"required": "",
-			"pattern":  "[A-Za-z0-9]{2,}\\.[A-Za-z0-9]{2,}",
+			"pattern":  `^([a-zA-Z0-9_]{1}[a-zA-Z0-9_-]{0,62}){1}(\.[a-zA-Z0-9_]{1}[a-zA-Z0-9_-]{0,62})*[\._]?$`,
 		},
 	}
 	f.Fields["Type"] = &Field{
