@@ -54,9 +54,6 @@ Parameters:
     AllowedValues: [1, 7, 14, 30, 90] 
     Default: 30
 
-Conditions:
-  IsStaging: !Equals [!Ref DNS, 'staging']
-  IsPrimary: !Or [!Equals [!Ref DNS, 'prod'] , !Equals [!Ref DNS, 'demo']]
 
 Resources:
   
@@ -68,18 +65,11 @@ Resources:
         - FARGATE  
         - FARGATE_SPOT
       DefaultCapacityProviderStrategy:
-        Fn::If:
-          - IsPrimary
-          - 
-            - CapacityProvider: FARGATE
-              Weight: 1
-              Base: 1
-            - CapacityProvider: FARGATE_SPOT
-              Weight: 2 
-          - 
-            - CapacityProvider: FARGATE_SPOT
-              Base: 1
-              Weight: 1
+        - CapacityProvider: FARGATE 
+          Weight: 1
+          Base: 1
+        - CapacityProvider: FARGATE_SPOT
+          Weight: 2
       ClusterSettings: 
         - Name: containerInsights
           Value: enabled 
@@ -197,7 +187,7 @@ Resources:
         - Condition: SUCCESS
           ContainerName: Nsqadmin_ResolvConf_InitContainer
         Essential: true 
-        Image: docker.io/aptrust/registry:ea47e76-master 
+        Image: docker.io/aptrust/registry:5f8c1fa-master 
         Secrets:
         - Name: APT_ENV
           ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/APT_ENV'
