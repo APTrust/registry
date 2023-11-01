@@ -460,3 +460,21 @@ func TestUserCountryCodeAndPhone(t *testing.T) {
 	assert.EqualValues(t, 1, countryCode)
 	assert.Equal(t, "3135551234", phone)
 }
+
+func TestUserHasUnreadAlerts(t *testing.T) {
+	db.LoadFixtures()
+
+	// See db/fixtures/alerts_users.csv
+	// In that file, users 1,2 and 3 have
+	// unread alerts but other users do not.
+
+	user1, err := pgmodels.UserByID(1)
+	require.Nil(t, err)
+	require.NotNil(t, user1)
+	assert.True(t, user1.HasUnreadAlerts())
+
+	user6, err := pgmodels.UserByID(6)
+	require.Nil(t, err)
+	require.NotNil(t, user6)
+	assert.False(t, user6.HasUnreadAlerts())
+}

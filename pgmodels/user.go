@@ -437,3 +437,13 @@ func (user *User) ClearOTPSecret() error {
 func (user *User) CountryCodeAndPhone() (int32, string, error) {
 	return common.CountryCodeAndPhone(user.PhoneNumber)
 }
+
+// HasUnreadAlerts returns true if user has unread alerts.
+func (user *User) HasUnreadAlerts() bool {
+	alertView := &AlertView{}
+	count, err := NewQuery().Where("user_id", "=", user.ID).IsNull("read_at").Count(alertView)
+	if err != nil {
+		common.Context().Log.Warn().Msgf("Error checking unread alerts for user %s: %v", user.Email, err)
+	}
+	return count > 0
+}
