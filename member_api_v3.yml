@@ -1607,7 +1607,7 @@ paths:
             type: string
         - name: identifier__starts_with
           in: query
-          description: Return the objects whose identifier matches this prefix.
+          description: Return intellectual objects whose identifiers match this prefix.
           required: false
           schema:
             type: string
