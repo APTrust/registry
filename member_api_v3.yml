@@ -1605,6 +1605,12 @@ paths:
           required: false
           schema:
             type: string
+        - name: identifier__starts_with
+          in: query
+          description: Return the objects whose identifier matches this prefix.
+          required: false
+          schema:
+            type: string
         - name: internal_sender_identifier
           in: query
           description: Return objects with this internal sender identifier.
