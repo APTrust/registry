@@ -27,7 +27,11 @@
 <div class="user-icons">
   {{ if userCan .CurrentUser "AlertRead" .CurrentUser.InstitutionID }}
   <!-- TODO If there are unread alerts, show red dot on notifications icon, using `has-notifications` classname -->
-  <a href="/alerts" class="alert-icon has-notifications">
+  {{ $cssClass := "" }}
+  {{ if .CurrentUser.HasUnreadAlerts }}
+    {{ $cssClass = "has-notifications" }}
+  {{ end }}
+  <a href="/alerts" class="alert-icon {{ $cssClass }}">
     <span class="material-icons md-30" aria-hidden="true">notifications</span>
     <span class="is-sr-only">Alerts</span>
   </a>
