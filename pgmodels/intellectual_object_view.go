@@ -26,6 +26,7 @@ var IntellectualObjectFilters = []string{
 	"file_count__gteq",
 	"file_count__lteq",
 	"identifier",
+	"identifier__starts_with",
 	"institution_id",
 	"institution_parent_id",
 	"internal_sender_description",

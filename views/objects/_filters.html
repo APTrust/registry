@@ -11,7 +11,7 @@
 
       <div class="columns filters-grid-header">
         <div class="column">
-          {{ template "forms/text_input.html" .filterForm.Fields.identifier }}
+          {{ template "forms/text_input.html" .filterForm.Fields.identifier__starts_with }}
         </div>
         <div class="column">
           {{ template "forms/select.html" .filterForm.Fields.state }}

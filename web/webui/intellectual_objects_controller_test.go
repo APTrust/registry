@@ -81,7 +81,7 @@ func TestObjectList(t *testing.T) {
 	}
 
 	commonFilters := []string{
-		`type="text" id="identifier" name="identifier"`,
+		`type="text" id="identifier__starts_with" name="identifier__starts_with"`,
 		`type="text" id="bag_name" name="bag_name"`,
 		`type="text" id="alt_identifier__starts_with" name="alt_identifier__starts_with"`,
 		`type="text" id="bag_group_identifier__starts_with" name="bag_group_identifier__starts_with"`,
@@ -147,10 +147,10 @@ func TestObjectByIdentifier(t *testing.T) {
 
 	// This should show an empty results page that includes
 	// the identifier filter we just applied.
-	resp = testutil.Inst1UserClient.GET("/objects").WithQuery("identifier", "institution1.edu/does-not-exist").Expect()
+	resp = testutil.Inst1UserClient.GET("/objects").WithQuery("identifier__starts_with", "institution1.edu/does-not-exist").Expect()
 	assert.Equal(t, http.StatusOK, resp.Raw().StatusCode)
 
-	expected := `<input class="input" type="text" id="identifier" name="identifier" value="institution1.edu/does-not-exist" placeholder="Object Identifier"`
+	expected := `<input class="input" type="text" id="identifier__starts_with" name="identifier__starts_with" value="institution1.edu/does-not-exist" placeholder="Object Identifier (Prefix or Exact)"`
 	html = resp.Body().Raw()
 	assert.Contains(t, html, expected)
 }

@@ -90,6 +90,11 @@ func (f *ObjectFilterForm) init() {
 		Label:       "Object Identifier",
 		Placeholder: "Object Identifier",
 	}
+	f.Fields["identifier__starts_with"] = &Field{
+		Name:        "identifier__starts_with",
+		Label:       "Object Identifier (Prefix or Exact)",
+		Placeholder: "Object Identifier (Prefix or Exact)",
+	}
 	f.Fields["institution_id"] = &Field{
 		Name:        "institution_id",
 		Label:       "Institution",
@@ -157,6 +162,7 @@ func (f *ObjectFilterForm) SetValues() {
 	f.Fields["file_count__gteq"].Value = f.FilterCollection.ValueOf("file_count__gteq")
 	f.Fields["file_count__lteq"].Value = f.FilterCollection.ValueOf("file_count__lteq")
 	f.Fields["identifier"].Value = f.FilterCollection.ValueOf("identifier")
+	f.Fields["identifier__starts_with"].Value = f.FilterCollection.ValueOf("identifier__starts_with")
 	f.Fields["institution_id"].Value = f.FilterCollection.ValueOf("institution_id")
 	f.Fields["institution_parent_id"].Value = f.FilterCollection.ValueOf("institution_parent_id")
 	f.Fields["internal_sender_identifier"].Value = f.FilterCollection.ValueOf("internal_sender_identifier")
