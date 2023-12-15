@@ -24,6 +24,6 @@ require (
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/stew v0.0.0-20130812190256-80ef0842b48b
 	github.com/stretchr/testify v1.8.2
-	golang.org/x/crypto v0.0.0-20220214200702-86341886e292
+	golang.org/x/crypto v0.1.0
 	golang.org/x/text v0.7.0
 )
