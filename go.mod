@@ -25,6 +25,6 @@ require (
 	github.com/stretchr/stew v0.0.0-20130812190256-80ef0842b48b
 	github.com/stretchr/testify v1.8.3
 	github.com/ugorji/go v1.1.7 // indirect
-	golang.org/x/crypto v0.9.0
-	golang.org/x/text v0.9.0
+	golang.org/x/crypto v0.17.0
+	golang.org/x/text v0.14.0
 )
