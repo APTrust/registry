@@ -9,7 +9,7 @@ require (
 	github.com/dcu/go-authy v1.0.1
 	github.com/gavv/httpexpect/v2 v2.14.0
 	github.com/gin-contrib/logger v0.0.2
-	github.com/gin-gonic/gin v1.7.7
+	github.com/gin-gonic/gin v1.9.1
 	github.com/go-pg/pg/v10 v10.9.1
 	github.com/go-redis/redis/v7 v7.4.1
 	github.com/gojektech/heimdall v5.0.2+incompatible // indirect
@@ -23,7 +23,8 @@ require (
 	github.com/rs/zerolog v1.20.0
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/stew v0.0.0-20130812190256-80ef0842b48b
-	github.com/stretchr/testify v1.8.2
-	golang.org/x/crypto v0.0.0-20220214200702-86341886e292
-	golang.org/x/text v0.7.0
+	github.com/stretchr/testify v1.8.3
+	github.com/ugorji/go v1.1.7 // indirect
+	golang.org/x/crypto v0.17.0
+	golang.org/x/text v0.14.0
 )
