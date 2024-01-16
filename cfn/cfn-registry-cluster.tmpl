@@ -121,7 +121,7 @@ Resources:
           TargetGroupArn: !Ref RegistryTargetGroup
       NetworkConfiguration:
         AwsvpcConfiguration:
-          AssignPublicIp: ENABLED
+          AssignPublicIp: DISABLED
           SecurityGroups:
           - Fn::ImportValue: !Sub "UnifiedSecurityGroup-${DNS}"
           - Fn::ImportValue: !Sub "RegistrySecurityGroup-${DNS}"
@@ -173,7 +173,7 @@ Resources:
         - us-east-1.compute.internal
         - !Ref DNS
         Essential: false
-        Image: docker/ecs-searchdomain-sidecar:latest
+        Image: 997427182289.dkr.ecr.us-east-1.amazonaws.com/docker-hub/docker/ecs-searchdomain-sidecar:latest
         LogConfiguration:
           LogDriver: awslogs
           Options:
@@ -187,7 +187,7 @@ Resources:
         - Condition: SUCCESS
           ContainerName: Nsqadmin_ResolvConf_InitContainer
         Essential: true 
-        Image: docker.io/aptrust/registry:multi 
+        Image: 997427182289.dkr.ecr.us-east-1.amazonaws.com/docker-hub/aptrust/registry:multi 
         Secrets:
         - Name: APT_ENV
           ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/APT_ENV'
