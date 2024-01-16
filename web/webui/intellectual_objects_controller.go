@@ -163,7 +163,10 @@ func IntellectualObjectFiles(c *gin.Context) {
 // Select max 20 files to start. Some objects have > 100k files, and
 // we definitely don't want that many results. Let the user page through.
 func loadFiles(req *Request, objID int64) error {
-	baseURL := req.GinContext.Request.URL.Path + "?" + req.GinContext.Request.URL.RawQuery
+	// Load files list inside objFileList div, withouth header
+	// and side nav. See https://trello.com/c/cz1QIJ5k
+	correctedPath := strings.Replace(req.GinContext.Request.URL.Path, "/objects/show", "/objects/files", 1)
+	baseURL := correctedPath + "?" + req.GinContext.Request.URL.RawQuery
 	pager, err := common.NewPager(req.GinContext, baseURL, 20)
 	if err != nil {
 		return err

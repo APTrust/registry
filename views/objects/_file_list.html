@@ -102,9 +102,11 @@
     </tr>
     {{ end }}
   </table>
+
+  {{ template "shared/_pager.html" dict "pager" .filePager "xhrTarget" "objFileList" }}
+
 </div>
 
-{{ template "shared/_pager.html" dict "pager" .filePager "xhrTarget" "objFileList" }}
 
 
 {{ end }}
