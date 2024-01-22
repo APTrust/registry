@@ -88,7 +88,16 @@ func NewDeletionForObject(objID int64, currentUser *pgmodels.User, baseURL strin
 // IntellectualObjects and returns the Deletion object. This constructor
 // is only for initializing new DeletionRequests, not for reviewing, approving
 // or cancelling existing requests.
-func NewDeletionForObjectBatch(institutionID int64, objIDs []int64, currentUser *pgmodels.User, baseURL string) (*Deletion, error) {
+func NewDeletionForObjectBatch(requestorID, institutionID int64, objIDs []int64, baseURL string) (*Deletion, error) {
+
+	requestingUser, err := pgmodels.UserByID(requestorID)
+	if err != nil {
+		return nil, err
+	}
+	if requestingUser.InstitutionID != institutionID || requestingUser.Role != constants.RoleInstAdmin {
+		common.Context().Log.Error().Msgf("Requesting user %d is not admin at institution %d. Rejecting bulk deletion request.", requestorID, institutionID)
+		return nil, fmt.Errorf("invalid requestor id")
+	}
 
 	// Make sure that all objects belong to the specified institution.
 	validObjectCount, err := pgmodels.CountObjectsThatCanBeDeleted(institutionID, objIDs)
@@ -97,7 +106,7 @@ func NewDeletionForObjectBatch(institutionID int64, objIDs []int64, currentUser 
 	}
 	if validObjectCount != len(objIDs) {
 		common.Context().Log.Error().Msgf("Batch deletion requested for %d objects, of which only %d are valid. InstitutionID = %d. Current user = %s. IDs: %v",
-			len(objIDs), validObjectCount, institutionID, currentUser.Email, objIDs)
+			len(objIDs), validObjectCount, institutionID, requestingUser.Email, objIDs)
 		return nil, fmt.Errorf("one or more object ids is invalid")
 	}
 
@@ -113,7 +122,7 @@ func NewDeletionForObjectBatch(institutionID int64, objIDs []int64, currentUser 
 
 	del := &Deletion{
 		baseURL:     baseURL,
-		currentUser: currentUser,
+		currentUser: requestingUser,
 	}
 	err = del.initObjectDeletionRequest(institutionID, objIDs)
 	if err != nil {

@@ -291,3 +291,35 @@ func TestObjectInitRestore(t *testing.T) {
 		WithHeader(constants.APIKeyHeader, "password").
 		Expect().Status(http.StatusForbidden)
 }
+
+func TestObjectBatchDelete(t *testing.T) {
+	// START HERE
+
+	// Test permissions. Only APTrust admin should be allowed to do this.
+
+	// Ensure that we get failure if we include an object
+	// with a pending WorkItem.
+
+	// Ensure that we get failure if we include an object
+	// that belongs to another institution.
+
+	// Ensure that we get failure if requestorID belongs
+	// to an inst user rather than inst admin.
+
+	// Ensure we get success with valid params:
+	// inst id, user id, object ids.
+
+	// Check post conditions. There should be a deletion
+	// request with all expected properties and with the
+	// right list of object IDs.
+
+	// Check the text of the alert. It should include
+	// all of the object identifiers.
+
+	// Confirm the alert, and then test that the correct
+	// WorkItems were created and that no spurious work
+	// items were created.
+
+	// TODO: Create & test bulk delete ENV token from
+	//       parameter store?
+}

@@ -69,7 +69,15 @@ func IntellectualObjectInitBatchDelete(c *gin.Context) {
 	if api.AbortIfError(c, err) {
 		return
 	}
-	del, err := webui.NewDeletionForObjectBatch(institutionID, objectIDs, req.CurrentUser, req.BaseURL())
+	requestorID, err := strconv.ParseInt(c.Request.PostFormValue("requestorID"), 10, 64)
+	if api.AbortIfError(c, err) {
+		return
+	}
+
+	common.Context().Log.Warn().Msgf("Creating batch deletion request on behalf of user %d for %d objects belonging to institution %d. Current user is %s.",
+		requestorID, len(objectIDs), institutionID, req.CurrentUser.Email)
+
+	del, err := webui.NewDeletionForObjectBatch(requestorID, institutionID, objectIDs, req.BaseURL())
 	if api.AbortIfError(c, err) {
 		return
 	}
