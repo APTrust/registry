@@ -74,6 +74,18 @@ func IntellectualObjectSelect(query *Query) ([]*IntellectualObject, error) {
 	return objects, err
 }
 
+// CountObjectsThatCanBeDeleted returns the number of active objects in the
+// list of object IDs that belong to the specified institution. We use this
+// when running batch deletions to ensure that no objects belong to an
+// institution other than the one requesting the deletion.
+//
+// If we get a list of 100 ids, the return value should be 100. If it's not
+// some object in the ID list was already deleted, or it belongs to someone
+// else.
+func CountObjectsThatCanBeDeleted(institutionID int64, objIDs []int64) (int, error) {
+	return common.Context().DB.Model((*IntellectualObject)(nil)).Where(`institution_id = ? and state = 'A' and id in (?)`, institutionID, pg.In(objIDs)).Count()
+}
+
 // Save saves this object to the database. This will peform an insert
 // if IntellectualObject.ID is zero. Otherwise, it updates.
 func (obj *IntellectualObject) Save() error {

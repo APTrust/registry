@@ -94,6 +94,34 @@ func TestObjHasActiveFiles(t *testing.T) {
 
 }
 
+func TestCountObjectsThatCanBeDeleted(t *testing.T) {
+	// These are the ids of non-deleted objects belonging to institution 3.
+	// These are loaded from fixture data.
+	idsBelongingToInst3 := []int64{4, 5, 6, 12, 13}
+
+	// All five items should be OK to delete, because all five
+	// belong to inst 3 and are in active state.
+	numberOkToDelete, err := pgmodels.CountObjectsThatCanBeDeleted(3, idsBelongingToInst3)
+	require.NoError(t, err)
+	assert.Equal(t, len(idsBelongingToInst3), numberOkToDelete)
+
+	// We should get zero here, because none of these objects
+	// belong to inst2.
+	numberOkToDelete, err = pgmodels.CountObjectsThatCanBeDeleted(2, idsBelongingToInst3)
+	require.NoError(t, err)
+	assert.Equal(t, 0, numberOkToDelete)
+
+	// In this set, the first three items belong to inst 3 and
+	// are active. ID 14 is already deleted, and items 1 and 2
+	// belong to a different institution. So we should get three
+	// because only the first three items belong to inst 3 AND
+	// are currently active.
+	miscIds := []int64{4, 5, 6, 14, 1, 2}
+	numberOkToDelete, err = pgmodels.CountObjectsThatCanBeDeleted(3, miscIds)
+	require.NoError(t, err)
+	assert.Equal(t, 3, numberOkToDelete)
+}
+
 func TestObjLastIngestEvent(t *testing.T) {
 	obj, err := pgmodels.IntellectualObjectByID(6)
 	require.Nil(t, err)

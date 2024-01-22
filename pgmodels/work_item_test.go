@@ -439,6 +439,27 @@ func TestNewDeletionItem(t *testing.T) {
 	require.Nil(t, item6)
 }
 
+func TestWorkItemsPendingForObjectBatch(t *testing.T) {
+	db.LoadFixtures()
+
+	// These objects belong to institution 3
+	// and have no pending WorkItems in the fixture data.
+	objIDs := []int64{5, 6, 12, 13}
+	itemCount, err := pgmodels.WorkItemsPendingForObjectBatch(objIDs)
+	require.NoError(t, err)
+	assert.Equal(t, 0, itemCount)
+
+	// Now add in Intel Obj 4, which has three
+	// pending WorkItems. The function should return
+	// the number of unfinished work items for this
+	// batch of objects.
+	objIDs = []int64{4, 5, 6, 12, 13}
+	itemCount, err = pgmodels.WorkItemsPendingForObjectBatch(objIDs)
+	require.NoError(t, err)
+	assert.Equal(t, 3, itemCount)
+
+}
+
 func TestIsRestorationSpotTest(t *testing.T) {
 
 	// This is not a spot test because it's not even a restoration.

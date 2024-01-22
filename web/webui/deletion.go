@@ -76,7 +76,46 @@ func NewDeletionForObject(objID int64, currentUser *pgmodels.User, baseURL strin
 		baseURL:     baseURL,
 		currentUser: currentUser,
 	}
-	err = del.initObjectDeletionRequest(objID)
+	err = del.initObjectDeletionRequest(obj.InstitutionID, []int64{objID})
+	if err != nil {
+		return nil, err
+	}
+	err = del.loadInstAdmins()
+	return del, err
+}
+
+// NewDeletionForObjectBatch creates a new DeletionRequest for a batch of
+// IntellectualObjects and returns the Deletion object. This constructor
+// is only for initializing new DeletionRequests, not for reviewing, approving
+// or cancelling existing requests.
+func NewDeletionForObjectBatch(institutionID int64, objIDs []int64, currentUser *pgmodels.User, baseURL string) (*Deletion, error) {
+
+	// Make sure that all objects belong to the specified institution.
+	validObjectCount, err := pgmodels.CountObjectsThatCanBeDeleted(institutionID, objIDs)
+	if err != nil {
+		return nil, err
+	}
+	if validObjectCount != len(objIDs) {
+		common.Context().Log.Error().Msgf("Batch deletion requested for %d objects, of which only %d are valid. InstitutionID = %d. Current user = %s. IDs: %v",
+			len(objIDs), validObjectCount, institutionID, currentUser.Email, objIDs)
+		return nil, fmt.Errorf("one or more object ids is invalid")
+	}
+
+	// Make sure there are no pending work items for these objects.
+	pendingWorkItems, err := pgmodels.WorkItemsPendingForObjectBatch(objIDs)
+	if err != nil {
+		return nil, err
+	}
+	if pendingWorkItems > 0 {
+		common.Context().Log.Warn().Msgf("Some objects in batch deletion request have pending work items. Object IDs: %v", objIDs)
+		return nil, common.ErrPendingWorkItems
+	}
+
+	del := &Deletion{
+		baseURL:     baseURL,
+		currentUser: currentUser,
+	}
+	err = del.initObjectDeletionRequest(institutionID, objIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -168,20 +207,22 @@ func (del *Deletion) initFileDeletionRequest(genericFileID int64) error {
 // We do not save the plaintext version of the token,
 // only the encrypted version. When this new DeletionRequest goes out of
 // scope, there's no further access to the token, so get it while you can.
-func (del *Deletion) initObjectDeletionRequest(objID int64) error {
-	obj, err := pgmodels.IntellectualObjectByID(objID)
-	if err != nil {
-		return err
-	}
-
+func (del *Deletion) initObjectDeletionRequest(institutionID int64, objIDs []int64) error {
 	deletionRequest, err := pgmodels.NewDeletionRequest()
 	if err != nil {
 		return err
 	}
-	deletionRequest.InstitutionID = obj.InstitutionID
+	deletionRequest.InstitutionID = institutionID
 	deletionRequest.RequestedByID = del.currentUser.ID
 	deletionRequest.RequestedAt = time.Now().UTC()
-	deletionRequest.AddObject(obj)
+
+	for _, objID := range objIDs {
+		obj, err := pgmodels.IntellectualObjectByID(objID)
+		if err != nil {
+			return err
+		}
+		deletionRequest.AddObject(obj)
+	}
 	err = deletionRequest.Save()
 	if err != nil {
 		return err

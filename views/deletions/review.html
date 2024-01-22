@@ -5,8 +5,9 @@
 <div class="box">
   <div class="box-header"><h1>Review Deletion Request</h1></div>
   <div class="box-content">
-    <p>User {{ .deletionRequest.RequestedBy.Name }} ({{ .deletionRequest.RequestedBy.Email }}) wants to delete the following item:</p>
+    <p>User {{ .deletionRequest.RequestedBy.Name }} ({{ .deletionRequest.RequestedBy.Email }}) wants to delete the following items:</p>
 
+    <!-- Single file deletion -->
     {{ if (eq .itemType "file") }}
 
     <h3>Generic File</h3>
@@ -18,7 +19,9 @@
       Updated: {{ dateUS .file.UpdatedAt }} <br/>
     </p>
 
-    {{ else }}
+
+    <!-- Single object deletion -->
+    {{ else if (eq .itemType "single object") }}
 
     <h3>Intellectual Object</h3>
 
@@ -32,9 +35,19 @@
       Updated: {{ dateUS .object.UpdatedAt }} <br/>
     </p>
 
+
+    <!-- Bulk object deletion -->
+    {{ else if (eq .itemType "object list") }}
+
+    <h3>Intellectual Objects</h3>
+
+    {{ range $index, $obj := .objectList }}
+      <p><b>{{ $obj.Identifier }}</b></p>
     {{ end }}
 
-    <p>Do you want to approve or cancel this request? If you approve, the file(s) will be deleted as soon as possible. Deletion cannot be undone. If you cancel, the file(s) will stay and no one else will be able to approve this request.</p>
+    {{ end }}
+
+    <p>Do you want to approve or cancel this request? If you approve, the items(s) will be deleted as soon as possible. Deletion cannot be undone. If you cancel, the file(s) will stay and no one else will be able to approve this request.</p>
 
     <div class="is-flex">
         <button class="button mr-3" onclick="document.forms['deletionCancelForm'].submit()">Cancel</button>

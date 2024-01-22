@@ -2,6 +2,7 @@ package admin_api
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
@@ -51,6 +52,32 @@ func IntellectualObjectInitRestore(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, workItem)
+}
+
+// IntellectualObjectInitBatchDelete creates an deletion request for
+// multiple objects. This request must be approved by an administrator
+// at the depositing institution before the deletion will actually be queued.
+//
+// POST /objects/init_batch_delete/:id
+func IntellectualObjectInitBatchDelete(c *gin.Context) {
+	req := api.NewRequest(c)
+	objectIDs, err := StringSliceToInt64Slice(c.Request.PostForm["objectID"])
+	if api.AbortIfError(c, err) {
+		return
+	}
+	institutionID, err := strconv.ParseInt(c.Request.PostFormValue("institutionID"), 10, 64)
+	if api.AbortIfError(c, err) {
+		return
+	}
+	del, err := webui.NewDeletionForObjectBatch(institutionID, objectIDs, req.CurrentUser, req.BaseURL())
+	if api.AbortIfError(c, err) {
+		return
+	}
+	_, err = del.CreateRequestAlert()
+	if api.AbortIfError(c, err) {
+		return
+	}
+	c.JSON(http.StatusCreated, del.DeletionRequest)
 }
 
 // IntellectualObjectDelete marks an object record as deleted.
@@ -126,4 +153,16 @@ func CoerceObjectStorageOption(existingObject, submittedObject *pgmodels.Intelle
 		common.Context().Log.Warn().Msgf("Forcing storage option back to '%s' on IntellectualObject %d (%s)", existingObject.StorageOption, submittedObject.ID, submittedObject.Identifier)
 		submittedObject.StorageOption = existingObject.StorageOption
 	}
+}
+
+func StringSliceToInt64Slice(strSlice []string) ([]int64, error) {
+	var err error
+	ints := make([]int64, len(strSlice))
+	for i, strValue := range strSlice {
+		ints[i], err = strconv.ParseInt(strValue, 10, 64)
+		if err != nil {
+			break
+		}
+	}
+	return ints, err
 }

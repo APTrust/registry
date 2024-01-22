@@ -9,6 +9,7 @@ import (
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
 	v "github.com/asaskevich/govalidator"
+	"github.com/go-pg/pg/v10"
 	"github.com/jinzhu/copier"
 	"github.com/stretchr/stew/slice"
 )
@@ -114,6 +115,12 @@ func WorkItemsPendingForObject(instID int64, bagName string) ([]*WorkItem, error
 		WhereNotIn("status", completed...).
 		OrderBy("date_processed", "desc")
 	return WorkItemSelect(query)
+}
+
+// WorkItemsPendingForObjectBatch returns the number of WorkItems pending
+func WorkItemsPendingForObjectBatch(objIDs []int64) (int, error) {
+	completed := common.InterfaceList(constants.CompletedStatusValues)
+	return common.Context().DB.Model((*WorkItem)(nil)).Where(`intellectual_object_id in (?) and status not in (?)`, pg.In(objIDs), pg.In(completed)).Count()
 }
 
 // WorkItemsPendingForFile returns a list of in-progress WorkItems
