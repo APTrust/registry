@@ -79,15 +79,15 @@ type RedisConfig struct {
 }
 
 type Config struct {
-	Cookies            *CookieConfig
-	DB                 *DBConfig
-	EnvName            string
-	Logging            *LoggingConfig
-	NsqUrl             string
-	TwoFactor          *TwoFactorConfig
-	Email              *EmailConfig
-	Redis              *RedisConfig
-	BatchDeleteEnabled bool
+	Cookies          *CookieConfig
+	DB               *DBConfig
+	EnvName          string
+	Logging          *LoggingConfig
+	NsqUrl           string
+	TwoFactor        *TwoFactorConfig
+	Email            *EmailConfig
+	Redis            *RedisConfig
+	BatchDeletionKey string
 }
 
 // Returns a new config based on APT_ENV
@@ -182,8 +182,8 @@ func loadConfig() *Config {
 			FlashCookie:   v.GetString("FLASH_COOKIE_NAME"),
 			PrefsCookie:   v.GetString("PREFS_COOKIE_NAME"),
 		},
-		NsqUrl:             nsqUrl,
-		BatchDeleteEnabled: v.GetBool("BATCH_DELETE_ENABLED"),
+		NsqUrl:           nsqUrl,
+		BatchDeletionKey: v.GetString("BATCH_DELETION_KEY"),
 		TwoFactor: &TwoFactorConfig{
 			AuthyAPIKey:   v.GetString("AUTHY_API_KEY"),
 			AuthyEnabled:  v.GetBool("ENABLE_TWO_FACTOR_AUTHY"),
