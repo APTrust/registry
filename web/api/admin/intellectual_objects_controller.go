@@ -1,6 +1,7 @@
 package admin_api
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -60,6 +61,11 @@ func IntellectualObjectInitRestore(c *gin.Context) {
 //
 // POST /objects/init_batch_delete/:id
 func IntellectualObjectInitBatchDelete(c *gin.Context) {
+	if !common.Context().Config.BatchDeleteEnabled {
+		common.Context().Log.Error().Msgf("Rejecting attempt to run batch deletion when config says BatchDeleteEnabled=false")
+		api.AbortIfError(c, fmt.Errorf("No!"))
+		return
+	}
 	req := api.NewRequest(c)
 	objectIDs, err := StringSliceToInt64Slice(c.Request.PostForm["objectID"])
 	if api.AbortIfError(c, err) {
