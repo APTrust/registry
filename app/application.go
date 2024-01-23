@@ -379,6 +379,7 @@ func initRoutes(router *gin.Engine) {
 		adminAPI.PUT("/objects/update/:id", admin_api.IntellectualObjectUpdate)
 		adminAPI.DELETE("/objects/delete/:id", admin_api.IntellectualObjectDelete)
 		adminAPI.POST("/objects/init_restore/:id", admin_api.IntellectualObjectInitRestore)
+		adminAPI.POST("/objects/init_batch_delete", admin_api.IntellectualObjectInitBatchDelete)
 
 		// Premis Events
 		adminAPI.POST("/events/create", admin_api.PremisEventCreate)
