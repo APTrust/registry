@@ -95,7 +95,7 @@ func prepareFileDeletionPreconditions(gfID int64) (*pgmodels.WorkItem, error) {
 	request.RequestedAt = now
 	request.ConfirmedByID = instAdmin.ID
 	request.ConfirmedAt = now
-	request.WorkItemID = item.ID
+	//request.WorkItemID = item.ID
 	err = request.Save()
 	return item, err
 }
@@ -151,7 +151,7 @@ func prepareObjectDeletionPreconditions(objID int64) (*pgmodels.WorkItem, error)
 	request.RequestedAt = now
 	request.ConfirmedByID = instAdmin.ID
 	request.ConfirmedAt = now
-	request.WorkItemID = item.ID
+	//request.WorkItemID = item.ID
 	err = request.Save()
 	return item, err
 }

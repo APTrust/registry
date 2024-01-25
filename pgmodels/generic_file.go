@@ -474,8 +474,11 @@ func (gf *GenericFile) ActiveDeletionWorkItem() (*WorkItem, error) {
 }
 
 func (gf *GenericFile) DeletionRequest(workItemID int64) (*DeletionRequestView, error) {
-	query := NewQuery().Where("work_item_id", "=", workItemID)
-	return DeletionRequestViewGet(query)
+	workItem, err := WorkItemByID(workItemID)
+	if err != nil {
+		return nil, err
+	}
+	return DeletionRequestViewByID(workItem.DeletionRequestID)
 }
 
 func (gf *GenericFile) AssertDeletionPreconditions() error {

@@ -78,7 +78,7 @@ func NewDeletionRequest() (*DeletionRequest, error) {
 // DeletionRequestByID returns the institution with the specified id.
 // Returns pg.ErrNoRows if there is no match.
 func DeletionRequestByID(id int64) (*DeletionRequest, error) {
-	query := NewQuery().Relations("RequestedBy", "ConfirmedBy", "CancelledBy", "GenericFiles", "IntellectualObjects", "WorkItem").Where(`"deletion_request"."id"`, "=", id)
+	query := NewQuery().Relations("RequestedBy", "ConfirmedBy", "CancelledBy", "GenericFiles", "IntellectualObjects", "WorkItems").Where(`"deletion_request"."id"`, "=", id)
 	return DeletionRequestGet(query)
 }
 

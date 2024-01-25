@@ -295,7 +295,6 @@ func TestAssertObjDeletionPreconditions(t *testing.T) {
 	req, err := pgmodels.CreateDeletionRequest(objects, nil)
 	require.Nil(t, err)
 	require.NotNil(t, req)
-	req.WorkItemID = workItem.ID
 	require.Nil(t, req.Save())
 
 	err = obj.AssertDeletionPreconditions()
@@ -364,7 +363,6 @@ func testObjectDeletionRequest(t *testing.T, obj *pgmodels.IntellectualObject) {
 	req, err := pgmodels.CreateDeletionRequest(objects, nil)
 	require.Nil(t, err)
 	require.NotNil(t, req)
-	req.WorkItemID = item.ID
 	require.Nil(t, req.Save())
 
 	deletionReqView, err := obj.DeletionRequest(item.ID)
@@ -412,7 +410,6 @@ func TestNewObjDeletionEvent(t *testing.T) {
 	req, err := pgmodels.CreateDeletionRequest(objects, nil)
 	require.Nil(t, err)
 	require.NotNil(t, req)
-	req.WorkItemID = workItem.ID
 	require.Nil(t, req.Save())
 
 	event, err = obj.NewDeletionEvent()
