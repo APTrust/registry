@@ -27,7 +27,7 @@ func TestObjectBatchDelete(t *testing.T) {
 	tu.InitHTTPTests(t)
 
 	idsThatCanBeDeleted := []int64{5, 6, 12, 13}
-	// idAlreadyDeleted := int64(14)
+	idAlreadyDeleted := int64(14)
 	idWithPendingWorkItems := int64(4)
 	idBelongingToOtherInst := int64(1)
 
@@ -58,14 +58,14 @@ func TestObjectBatchDelete(t *testing.T) {
 		SecretKey:     common.Context().Config.BatchDeletionKey,
 	}
 
-	// // This batch contains one id referring to an object that
-	// // has already been deleted.
-	// paramsBadIdAlreadyDeleted := admin_api.ObjectBatchDeleteParams{
-	// 	InstitutionID: tu.Inst2Admin.InstitutionID,
-	// 	RequestorID:   tu.Inst2Admin.ID,
-	// 	ObjectIDs:     append(idsThatCanBeDeleted, idAlreadyDeleted),
-	// 	SecretKey:     common.Context().Config.BatchDeletionKey,
-	// }
+	// This batch contains one id referring to an object that
+	// has already been deleted.
+	paramsBadIdAlreadyDeleted := admin_api.ObjectBatchDeleteParams{
+		InstitutionID: tu.Inst2Admin.InstitutionID,
+		RequestorID:   tu.Inst2Admin.ID,
+		ObjectIDs:     append(idsThatCanBeDeleted, idAlreadyDeleted),
+		SecretKey:     common.Context().Config.BatchDeletionKey,
+	}
 
 	// This batch contains one id that has pending work items.
 	paramsBadPendingWorkItem := admin_api.ObjectBatchDeleteParams{
@@ -108,15 +108,9 @@ func TestObjectBatchDelete(t *testing.T) {
 	// the objects.
 	testObjectBatchDeleteWrongRequestorInst(t, paramsBadRequestorInst)
 
-	// Check the text of the alert. It should include
-	// all of the object identifiers.
-
-	// Confirm the alert, and then test that the correct
-	// WorkItems were created and that no spurious work
-	// items were created.
-
-	// TODO: Create & test bulk delete ENV token from
-	//       parameter store?
+	// This should fail because one of the objects in the list
+	// has already been deleted.
+	testObjectBatchDeleteAlreadyDeleted(t, paramsBadIdAlreadyDeleted)
 }
 
 func testObjectBatchDeletePermissions(t *testing.T, params admin_api.ObjectBatchDeleteParams) {
@@ -267,4 +261,14 @@ func testObjectBatchDeleteWrongRequestorInst(t *testing.T, params admin_api.Obje
 		Expect()
 	resp.Status(http.StatusBadRequest)
 	assert.Equal(t, `{"StatusCode":400,"Error":"invalid requestor id"}`, resp.Body().Raw())
+}
+
+func testObjectBatchDeleteAlreadyDeleted(t *testing.T, params admin_api.ObjectBatchDeleteParams) {
+	resp := tu.SysAdminClient.POST("/admin-api/v3/objects/init_batch_delete").
+		WithHeader(constants.APIUserHeader, tu.SysAdmin.Email).
+		WithHeader(constants.APIKeyHeader, "password").
+		WithJSON(params).
+		Expect()
+	resp.Status(http.StatusBadRequest)
+	assert.Equal(t, `{"StatusCode":400,"Error":"one or more object ids is invalid"}`, resp.Body().Raw())
 }
