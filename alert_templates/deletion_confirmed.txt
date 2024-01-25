@@ -6,7 +6,11 @@ For your reference, the link below has information about the request.
 
 {{ .deletionReadOnlyURL }}
 
-The Work Item showing the status of this deletion is at {{ .workItemURL }}
+The Work Items showing the status of this deletion are at 
+
+{{ range $index, $itemUrl := .workItemURLs }}
+{{ $itemURL }}
+{{ end }}
 
 If you have questions, please contact us at help@aptrust.org.
 

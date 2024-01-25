@@ -338,13 +338,13 @@ func (del *Deletion) CreateRequestAlert() (*pgmodels.Alert, error) {
 func (del *Deletion) CreateApprovalAlert() (*pgmodels.Alert, error) {
 	templateName := "alerts/deletion_confirmed.txt"
 	alertType := constants.AlertDeletionConfirmed
-	workItemURL, err := del.WorkItemURL()
+	workItemURLs, err := del.WorkItemURLs()
 	if err != nil {
 		return nil, err
 	}
 	alertData := map[string]interface{}{
 		"deletionRequest":     del.DeletionRequest,
-		"workItemURL":         workItemURL,
+		"workItemURLs":        workItemURLs,
 		"deletionReadOnlyURL": del.ReadOnlyURL(),
 	}
 	return del.createDeletionAlert(templateName, alertType, alertData)
@@ -397,16 +397,21 @@ func (del *Deletion) ReviewURL() (string, error) {
 		del.DeletionRequest.ConfirmationToken), nil
 }
 
-// WorkItemURL returns the URL for the WorkItem for this DeletionRequest.
+// WorkItemURLs returns the URL for the WorkItem for this DeletionRequest.
 // If you call this on a cancelled or not-yet-approved request, there is
 // no WorkItem and you'll get common.ErrNotSupported.
-func (del *Deletion) WorkItemURL() (string, error) {
-	if del.DeletionRequest.WorkItemID == 0 {
-		return "", common.ErrNotSupported
+func (del *Deletion) WorkItemURLs() ([]string, error) {
+	urls := make([]string, 0)
+	if len(del.DeletionRequest.WorkItems) == 0 {
+		return urls, common.ErrNotSupported
 	}
-	return fmt.Sprintf("%s/work_items/show/%d",
-		del.baseURL,
-		del.DeletionRequest.WorkItemID), nil
+	for _, item := range del.DeletionRequest.WorkItems {
+		itemUrl := fmt.Sprintf("%s/work_items/show/%d",
+			del.baseURL,
+			item.ID)
+		urls = append(urls, itemUrl)
+	}
+	return urls, nil
 }
 
 // ReadOnlyURL returns a URL that displays info about the deletion request

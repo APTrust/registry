@@ -213,7 +213,7 @@ func testObjectBatchDeleteCreatesExpectedRecords(t *testing.T, params admin_api.
 	// there should be no associated WorkItem. We create the WorkItem
 	// only after the deletion request has been approved by the
 	// local institutional admin.
-	assert.Empty(t, deletionRequest.WorkItemID)
+	assert.Empty(t, deletionRequest.WorkItems)
 
 	// Make sure the deletion request alert was created in the DB.
 	query := pgmodels.NewQuery().Where("deletion_request_id", "=", deletionRequest.ID)

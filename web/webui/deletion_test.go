@@ -121,10 +121,10 @@ func TestNewDeletionForReview(t *testing.T) {
 	readOnlyURL := fmt.Sprintf("https://example.com/deletions/show/%d", del.DeletionRequest.ID)
 	assert.Equal(t, readOnlyURL, del.ReadOnlyURL())
 
-	expectedWorkItemURL := fmt.Sprintf("https://example.com/work_items/show/%d", del.DeletionRequest.WorkItemID)
-	actualWorkItemURL, err := del.WorkItemURL()
+	expectedWorkItemURL := fmt.Sprintf("https://example.com/work_items/show/%d", del.DeletionRequest.WorkItems[0].ID)
+	actualWorkItemURLs, err := del.WorkItemURLs()
 	require.Nil(t, err)
-	assert.Equal(t, expectedWorkItemURL, actualWorkItemURL)
+	assert.Equal(t, expectedWorkItemURL, actualWorkItemURLs[0])
 }
 
 func testCreateAndQueueWorkItem(t *testing.T, del *webui.Deletion) {
@@ -170,9 +170,9 @@ func testCreateApprovalAlert(t *testing.T, del *webui.Deletion) {
 		assert.Equal(t, del.DeletionRequest.InstitutionID, recipient.InstitutionID)
 	}
 
-	workItemURL, err := del.WorkItemURL()
+	workItemURLs, err := del.WorkItemURLs()
 	require.Nil(t, err)
-	assert.Contains(t, alert.Content, workItemURL)
+	assert.Contains(t, alert.Content, workItemURLs[0])
 }
 
 func testCreateCancellationAlert(t *testing.T, del *webui.Deletion) {

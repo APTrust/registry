@@ -51,10 +51,12 @@ func deletionRequestLoad(req *Request) error {
 	}
 	req.TemplateData["deletionRequest"] = deletionRequest
 
-	if deletionRequest.WorkItemID > 0 {
-		req.TemplateData["workItemURL"] = fmt.Sprintf("%s/work_items/show/%d",
-			req.BaseURL(),
-			deletionRequest.WorkItemID)
+	if len(deletionRequest.WorkItems) > 0 {
+		urls := make([]string, 0)
+		for _, item := range deletionRequest.WorkItems {
+			urls = append(urls, fmt.Sprintf("%s/work_items/show/%d", req.BaseURL(), item.ID))
+		}
+		req.TemplateData["workItemURLs"] = urls
 	}
 	return nil
 }
