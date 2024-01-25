@@ -29,7 +29,7 @@ func TestObjectBatchDelete(t *testing.T) {
 	idsThatCanBeDeleted := []int64{5, 6, 12, 13}
 	// idAlreadyDeleted := int64(14)
 	idWithPendingWorkItems := int64(4)
-	// idBelongingToOtherInst := int64(1)
+	idBelongingToOtherInst := int64(1)
 
 	// These params are valid and will create a bulk deletion request
 	// if submitted by APTrust admin user.
@@ -74,12 +74,12 @@ func TestObjectBatchDelete(t *testing.T) {
 	}
 
 	// // This batch contains one object that belongs to another institution.
-	// paramsBadOtherInstItem := admin_api.ObjectBatchDeleteParams{
-	// 	InstitutionID: tu.Inst2Admin.InstitutionID,
-	// 	RequestorID:   tu.Inst2Admin.ID,
-	// 	ObjectIDs:     append(idsThatCanBeDeleted, idBelongingToOtherInst),
-	// 	SecretKey:     common.Context().Config.BatchDeletionKey,
-	// }
+	paramsBadOtherInstItem := admin_api.ObjectBatchDeleteParams{
+		InstitutionID: tu.Inst2Admin.InstitutionID,
+		RequestorID:   tu.Inst2Admin.ID,
+		ObjectIDs:     append(idsThatCanBeDeleted, idBelongingToOtherInst),
+		SecretKey:     common.Context().Config.BatchDeletionKey,
+	}
 
 	// Test permissions. Only APTrust admin should be allowed to do this.
 	testObjectBatchDeletePermissions(t, validParams)
@@ -93,6 +93,7 @@ func TestObjectBatchDelete(t *testing.T) {
 
 	// Ensure that we get failure if we include an object
 	// that belongs to another institution.
+	testObjectBatchDeleteWithOtherInstItem(t, paramsBadOtherInstItem)
 
 	// Ensure that we get failure if requestorID belongs
 	// to an inst user rather than inst admin.
@@ -233,4 +234,14 @@ func testObjectBatchDeleteWithPendingWorkItem(t *testing.T, params admin_api.Obj
 		Expect()
 	resp.Status(http.StatusConflict)
 	assert.Equal(t, `{"StatusCode":409,"Error":"task cannot be completed because this object has pending work items"}`, resp.Body().Raw())
+}
+
+func testObjectBatchDeleteWithOtherInstItem(t *testing.T, params admin_api.ObjectBatchDeleteParams) {
+	resp := tu.SysAdminClient.POST("/admin-api/v3/objects/init_batch_delete").
+		WithHeader(constants.APIUserHeader, tu.SysAdmin.Email).
+		WithHeader(constants.APIKeyHeader, "password").
+		WithJSON(params).
+		Expect()
+	resp.Status(http.StatusBadRequest)
+	assert.Equal(t, `{"StatusCode":400,"Error":"one or more object ids is invalid"}`, resp.Body().Raw())
 }

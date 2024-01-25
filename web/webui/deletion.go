@@ -96,7 +96,7 @@ func NewDeletionForObjectBatch(requestorID, institutionID int64, objIDs []int64,
 	}
 	if requestingUser.InstitutionID != institutionID || requestingUser.Role != constants.RoleInstAdmin {
 		common.Context().Log.Error().Msgf("Requesting user %d is not admin at institution %d. Rejecting bulk deletion request.", requestorID, institutionID)
-		return nil, fmt.Errorf("invalid requestor id")
+		return nil, common.ErrInvalidRequestorID
 	}
 
 	// Make sure that all objects belong to the specified institution.
@@ -107,7 +107,7 @@ func NewDeletionForObjectBatch(requestorID, institutionID int64, objIDs []int64,
 	if validObjectCount != len(objIDs) {
 		common.Context().Log.Error().Msgf("Batch deletion requested for %d objects, of which only %d are valid. InstitutionID = %d. Current user = %s. IDs: %v",
 			len(objIDs), validObjectCount, institutionID, requestingUser.Email, objIDs)
-		return nil, fmt.Errorf("one or more object ids is invalid")
+		return nil, common.ErrInvalidObjectID
 	}
 
 	// Make sure there are no pending work items for these objects.

@@ -61,7 +61,8 @@ func StatusCodeForError(err error) (status int) {
 		status = http.StatusInternalServerError
 	case common.ErrPendingWorkItems:
 		status = http.StatusConflict
-	case common.ErrWrongDataType, common.ErrIDMismatch, common.ErrInstIDChange, common.ErrIdentifierChange, common.ErrStorageOptionChange, common.ErrDecodeCookie:
+	case common.ErrWrongDataType, common.ErrIDMismatch, common.ErrInstIDChange, common.ErrIdentifierChange,
+		common.ErrStorageOptionChange, common.ErrDecodeCookie, common.ErrInvalidObjectID, common.ErrInvalidRequestorID:
 		status = http.StatusBadRequest
 	default:
 		status = http.StatusInternalServerError
