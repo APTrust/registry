@@ -242,55 +242,72 @@ func (del *Deletion) initObjectDeletionRequest(institutionID int64, objIDs []int
 
 // CreateWorkItem creates a WorkItem describing this deletion. We call
 // this only if the admin approves the deletion.
-func (del *Deletion) CreateWorkItem() (*pgmodels.WorkItem, error) {
-	// Create the deletion WorkItem
-	obj := del.DeletionRequest.FirstObject()
-	gf := del.DeletionRequest.FirstFile()
+func (del *Deletion) CreateObjDeletionWorkItem(obj *pgmodels.IntellectualObject) error {
+	workItem, err := pgmodels.NewDeletionItem(obj, nil, del.DeletionRequest.RequestedBy, del.DeletionRequest.ConfirmedBy)
+	if err != nil {
+		return err
+	}
+	del.DeletionRequest.WorkItems = append(del.DeletionRequest.WorkItems, workItem)
+	return nil
+}
 
-	// Deletion may be file only, no object.
-	var err error
-	if obj == nil && gf != nil {
-		obj, err = pgmodels.IntellectualObjectByID(gf.IntellectualObjectID)
-		if err != nil {
-			return nil, err
-		}
+func (del *Deletion) CreateFileDeletionWorkItem(gf *pgmodels.GenericFile) error {
+	obj, err := pgmodels.IntellectualObjectByID(gf.IntellectualObjectID)
+	if err != nil {
+		return err
 	}
 
 	workItem, err := pgmodels.NewDeletionItem(obj, gf, del.DeletionRequest.RequestedBy, del.DeletionRequest.ConfirmedBy)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	del.DeletionRequest.WorkItem = workItem
-	err = del.DeletionRequest.Save()
-
-	return workItem, err
+	del.DeletionRequest.WorkItems = append(del.DeletionRequest.WorkItems, workItem)
+	return nil
 }
 
 // QueueWorkItem sends the WorkItem.ID into the appropriate NSQ topic.
 // We call this after calling CreateWorkItem, and only if the admin
 // approves the deletion.
-func (del *Deletion) QueueWorkItem() error {
-	workItem := del.DeletionRequest.WorkItem
-	if workItem == nil {
-		return common.ErrInternal
+func (del *Deletion) QueueWorkItems() error {
+	for _, item := range del.DeletionRequest.WorkItems {
+		if item == nil {
+			return common.ErrInternal
+		}
+		topic, err := constants.TopicFor(item.Action, item.Stage)
+		if err != nil {
+			return err
+		}
+		ctx := common.Context()
+		ctx.Log.Info().Msgf("Queueing WorkItem %d to topic %s", item.ID, topic)
+		err = ctx.NSQClient.Enqueue(topic, item.ID)
+		if err != nil {
+			return err
+		}
 	}
-	topic, err := constants.TopicFor(workItem.Action, workItem.Stage)
-	if err != nil {
-		return err
-	}
-	ctx := common.Context()
-	ctx.Log.Info().Msgf("Queueing WorkItem %d to topic %s", workItem.ID, topic)
-	return ctx.NSQClient.Enqueue(topic, workItem.ID)
+	return nil
 }
 
 // CreateAndQueueWorkItem creates and queues a deletion WorkItem.
 // We call this only if the admin approves the DeletionRequest.
-func (del *Deletion) CreateAndQueueWorkItem() (*pgmodels.WorkItem, error) {
-	workItem, err := del.CreateWorkItem()
-	if err == nil {
-		err = del.QueueWorkItem()
+func (del *Deletion) CreateAndQueueWorkItems() error {
+	var err error
+	for _, gf := range del.DeletionRequest.GenericFiles {
+		err = del.CreateFileDeletionWorkItem(gf)
+		if err != nil {
+			return err
+		}
 	}
-	return workItem, err
+	for _, obj := range del.DeletionRequest.IntellectualObjects {
+		err = del.CreateObjDeletionWorkItem(obj)
+		if err != nil {
+			return err
+		}
+	}
+	err = del.DeletionRequest.Save()
+	if err != nil {
+		return err
+	}
+	return del.QueueWorkItems()
 }
 
 // CreateRequestAlert creates an alert saying that a user has requested

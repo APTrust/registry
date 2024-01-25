@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"os"
 	"testing"
 
 	"github.com/APTrust/registry/common"
@@ -19,9 +18,6 @@ import (
 )
 
 func TestObjectBatchDelete(t *testing.T) {
-
-	os.Setenv("APT_ENV", "test")
-
 	err := db.ForceFixtureReload()
 	require.Nil(t, err)
 	tu.InitHTTPTests(t)

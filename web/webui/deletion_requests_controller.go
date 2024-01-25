@@ -121,7 +121,7 @@ func DeletionRequestApprove(c *gin.Context) {
 	if AbortIfError(c, err) {
 		return
 	}
-	_, err = del.CreateAndQueueWorkItem()
+	err = del.CreateAndQueueWorkItems()
 	if AbortIfError(c, err) {
 		return
 	}

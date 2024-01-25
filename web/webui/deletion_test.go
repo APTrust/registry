@@ -128,9 +128,10 @@ func TestNewDeletionForReview(t *testing.T) {
 }
 
 func testCreateAndQueueWorkItem(t *testing.T, del *webui.Deletion) {
-	item, err := del.CreateAndQueueWorkItem()
+	err := del.CreateAndQueueWorkItems()
 	require.Nil(t, err)
-	require.NotNil(t, item)
+	require.Equal(t, 1, len(del.DeletionRequest.WorkItems))
+	item := del.DeletionRequest.WorkItems[0]
 	assert.True(t, item.ID > 0)
 	assert.Equal(t, del.DeletionRequest.GenericFiles[0].ID, item.GenericFileID)
 	assert.Equal(t, constants.ActionDelete, item.Action)

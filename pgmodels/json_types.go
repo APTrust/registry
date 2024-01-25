@@ -56,7 +56,6 @@ type DeletionRequestMin struct {
 	CancelledBy         *UserMin              `json:"cancelled_by"`
 	GenericFiles        []*GenericFile        `json:"generic_files"`
 	IntellectualObjects []*IntellectualObject `json:"intellectual_objects"`
-	WorkItem            *WorkItem             `json:"work_item"`
 }
 
 // ToMin returns DeletionRequestMin object suitable for serialization
@@ -81,6 +80,5 @@ func (r *DeletionRequest) ToMin() *DeletionRequestMin {
 		CancelledBy:         cancelledBy,
 		GenericFiles:        r.GenericFiles,
 		IntellectualObjects: r.IntellectualObjects,
-		WorkItem:            r.WorkItem,
 	}
 }

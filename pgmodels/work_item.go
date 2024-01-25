@@ -67,6 +67,7 @@ type WorkItem struct {
 	StageStartedAt       time.Time `json:"stage_started_at"`
 	APTrustApprover      string    `json:"aptrust_approver" pg:"aptrust_approver"`
 	InstApprover         string    `json:"inst_approver"`
+	DeletionRequestID    int64     `json:"deletion_request_id"`
 }
 
 // WorkItemByID returns the work item with the specified id.

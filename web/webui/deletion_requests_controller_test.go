@@ -143,7 +143,7 @@ func TestDeletionRequestApprove(t *testing.T) {
 	assert.Equal(t, req.ConfirmedByID, testutil.Inst1Admin.ID)
 	assert.Equal(t, req.ConfirmedBy.ID, testutil.Inst1Admin.ID)
 	assert.False(t, req.ConfirmedAt.IsZero())
-	assert.NotNil(t, req.WorkItem)
+	assert.NotEmpty(t, req.WorkItems)
 
 	// We also should have an alert for this deletion confirmation
 	query := pgmodels.NewQuery().
@@ -178,7 +178,7 @@ func TestDeletionRequestCancel(t *testing.T) {
 	assert.False(t, req.CancelledAt.IsZero())
 
 	// There should be no work item because the deletion was cancelled.
-	assert.Nil(t, req.WorkItem)
+	assert.Empty(t, req.WorkItems)
 
 	// We also should have an alert for this deletion confirmation
 	query := pgmodels.NewQuery().

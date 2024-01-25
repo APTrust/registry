@@ -34,12 +34,11 @@ type DeletionRequestView struct {
 	CancelledAt           time.Time `json:"cancelled_at"`
 	FileCount             int64     `json:"file_count"`
 	ObjectCount           int64     `json:"object_count"`
-	WorkItemID            int64     `json:"work_item_id"`
-	Stage                 string    `json:"stage"`
-	Status                string    `json:"status"`
-	DateProcessed         time.Time `json:"date_processed"`
-	Size                  int64     `json:"size"`
-	Note                  string    `json:"note"`
+	// Stage                 string    `json:"stage"`
+	// Status                string    `json:"status"`
+	// DateProcessed         time.Time `json:"date_processed"`
+	// Size                  int64     `json:"size"`
+	// Note                  string    `json:"note"`
 }
 
 // DeletionRequestViewByID returns the DeletionRequestView record
@@ -72,9 +71,8 @@ func DeletionRequestViewGet(query *Query) (*DeletionRequestView, error) {
 func (request *DeletionRequestView) DisplayStatus() string {
 	if request.CancelledByID > 0 {
 		return "Rejected"
-	}
-	if request.Status != "" {
-		return request.Status
+	} else if request.ConfirmedByID > 0 {
+		return "Approved"
 	}
 	return "Awaiting Approval"
 }

@@ -50,7 +50,10 @@ func TestDeletionRequestMin(t *testing.T) {
 			pgmodels.RandomObject(),
 			pgmodels.RandomObject(),
 		},
-		WorkItem: pgmodels.RandomWorkItem("object/id", constants.ActionDelete, 999, 222),
+		WorkItems: []*pgmodels.WorkItem{
+			pgmodels.RandomWorkItem("object/id1", constants.ActionDelete, 888, 111),
+			pgmodels.RandomWorkItem("object/id2", constants.ActionDelete, 999, 222),
+		},
 	}
 
 	reqMin := req.ToMin()

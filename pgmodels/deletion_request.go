@@ -44,10 +44,9 @@ type DeletionRequest struct {
 	RequestedBy                *User                 `json:"requested_by" pg:"rel:has-one"`
 	ConfirmedBy                *User                 `json:"confirmed_by" pg:"rel:has-one"`
 	CancelledBy                *User                 `json:"cancelled_by" pg:"rel:has-one"`
-	WorkItemID                 int64                 `json:"work_item_id"`
 	GenericFiles               []*GenericFile        `json:"generic_files" pg:"many2many:deletion_requests_generic_files"`
 	IntellectualObjects        []*IntellectualObject `json:"intellectual_objects" pg:"many2many:deletion_requests_intellectual_objects"`
-	WorkItem                   *WorkItem             `json:"work_item" pg:"rel:has-one"`
+	WorkItems                  []*WorkItem           `json:"work_item" pg:"rel:has-many"`
 }
 
 type DeletionRequestsGenericFiles struct {
@@ -247,7 +246,7 @@ func (request *DeletionRequest) saveRelations(tx *pg.Tx) error {
 	if err != nil {
 		return err
 	}
-	return request.saveWorkItem(tx)
+	return request.saveWorkItems(tx)
 }
 
 func (request *DeletionRequest) saveFiles(tx *pg.Tx) error {
@@ -274,18 +273,13 @@ func (request *DeletionRequest) saveObjects(tx *pg.Tx) error {
 	return nil
 }
 
-func (request *DeletionRequest) saveWorkItem(tx *pg.Tx) error {
-	if request.WorkItem != nil {
-		err := request.WorkItem.Save()
+func (request *DeletionRequest) saveWorkItems(tx *pg.Tx) error {
+	for _, item := range request.WorkItems {
+		item.DeletionRequestID = request.ID
+		err := item.Save()
 		if err != nil {
 			return err
 		}
-		if request.WorkItemID == 0 {
-			request.WorkItemID = request.WorkItem.ID
-			sql := "update deletion_requests set work_item_id = ? where id = ?"
-			_, err = tx.Exec(sql, request.WorkItem.ID, request.ID)
-		}
-		return err
 	}
 	return nil
 }
