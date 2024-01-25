@@ -40,6 +40,15 @@ func TestObjectBatchDelete(t *testing.T) {
 		SecretKey:     common.Context().Config.BatchDeletionKey,
 	}
 
+	// These params are valid, except for the batch deletion
+	// secret key.
+	paramsBadKey := admin_api.ObjectBatchDeleteParams{
+		InstitutionID: tu.Inst2Admin.InstitutionID,
+		RequestorID:   tu.Inst2Admin.ID,
+		ObjectIDs:     idsThatCanBeDeleted,
+		SecretKey:     "this-key-is-incorrect",
+	}
+
 	// Inst admin can request batch deletion, but inst user cannot.
 	paramsBadRequestorRole := admin_api.ObjectBatchDeleteParams{
 		InstitutionID: tu.Inst2User.InstitutionID,
@@ -75,7 +84,7 @@ func TestObjectBatchDelete(t *testing.T) {
 		SecretKey:     common.Context().Config.BatchDeletionKey,
 	}
 
-	// // This batch contains one object that belongs to another institution.
+	// This batch contains one object that belongs to another institution.
 	paramsBadOtherInstItem := admin_api.ObjectBatchDeleteParams{
 		InstitutionID: tu.Inst2Admin.InstitutionID,
 		RequestorID:   tu.Inst2Admin.ID,
@@ -111,6 +120,13 @@ func TestObjectBatchDelete(t *testing.T) {
 	// This should fail because one of the objects in the list
 	// has already been deleted.
 	testObjectBatchDeleteAlreadyDeleted(t, paramsBadIdAlreadyDeleted)
+
+	// Sending a bad deletion key should cause failure
+	testObjectBatchDeleteWithBadKey(t, paramsBadKey)
+
+	// If deletion key is not set in config, request should fail even if
+	// params are valid.
+	testObjectBatchDeleteSystemKeyMissing(t, validParams)
 }
 
 func testObjectBatchDeletePermissions(t *testing.T, params admin_api.ObjectBatchDeleteParams) {
@@ -271,4 +287,27 @@ func testObjectBatchDeleteAlreadyDeleted(t *testing.T, params admin_api.ObjectBa
 		Expect()
 	resp.Status(http.StatusBadRequest)
 	assert.Equal(t, `{"StatusCode":400,"Error":"one or more object ids is invalid"}`, resp.Body().Raw())
+}
+
+func testObjectBatchDeleteWithBadKey(t *testing.T, params admin_api.ObjectBatchDeleteParams) {
+	resp := tu.SysAdminClient.POST("/admin-api/v3/objects/init_batch_delete").
+		WithHeader(constants.APIUserHeader, tu.SysAdmin.Email).
+		WithHeader(constants.APIKeyHeader, "password").
+		WithJSON(params).
+		Expect()
+	resp.Status(http.StatusBadRequest)
+	assert.Equal(t, `{"StatusCode":400,"Error":"invalid token"}`, resp.Body().Raw())
+}
+
+func testObjectBatchDeleteSystemKeyMissing(t *testing.T, params admin_api.ObjectBatchDeleteParams) {
+	deletionKey := common.Context().Config.BatchDeletionKey
+	defer func() { common.Context().Config.BatchDeletionKey = deletionKey }()
+	common.Context().Config.BatchDeletionKey = ""
+	resp := tu.SysAdminClient.POST("/admin-api/v3/objects/init_batch_delete").
+		WithHeader(constants.APIUserHeader, tu.SysAdmin.Email).
+		WithHeader(constants.APIKeyHeader, "password").
+		WithJSON(params).
+		Expect()
+	resp.Status(http.StatusInternalServerError)
+	assert.Equal(t, `{"StatusCode":500,"Error":"Configuration setting for BatchDeletionKey is missing or invalid"}`, resp.Body().Raw())
 }

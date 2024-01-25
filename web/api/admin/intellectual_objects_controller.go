@@ -127,7 +127,7 @@ func IntellectualObjectInitBatchDelete(c *gin.Context) {
 	if params.SecretKey != common.Context().Config.BatchDeletionKey {
 		message := "Request secret key does not match configuration's BatchDeletionKey"
 		common.Context().Log.Error().Msgf("IntellectualObjectInitBatchDelete: Rejecting object batch deletion request: %s", message)
-		api.AbortIfError(c, errors.New(message))
+		api.AbortIfError(c, common.ErrInvalidToken)
 		return
 	}
 
