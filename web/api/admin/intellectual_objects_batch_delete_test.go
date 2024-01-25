@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"testing"
 
 	"github.com/APTrust/registry/common"
@@ -19,7 +20,7 @@ import (
 
 func TestObjectBatchDelete(t *testing.T) {
 
-	//os.Setenv("APT_ENV", "test")
+	os.Setenv("APT_ENV", "test")
 
 	err := db.ForceFixtureReload()
 	require.Nil(t, err)
@@ -27,7 +28,7 @@ func TestObjectBatchDelete(t *testing.T) {
 
 	idsThatCanBeDeleted := []int64{5, 6, 12, 13}
 	// idAlreadyDeleted := int64(14)
-	// idWithPendingWorkItems := int64(4)
+	idWithPendingWorkItems := int64(4)
 	// idBelongingToOtherInst := int64(1)
 
 	// These params are valid and will create a bulk deletion request
@@ -64,13 +65,13 @@ func TestObjectBatchDelete(t *testing.T) {
 	// 	SecretKey:     common.Context().Config.BatchDeletionKey,
 	// }
 
-	// // This batch contains one id that has pending work items.
-	// paramsBadPendingWorkItem := admin_api.ObjectBatchDeleteParams{
-	// 	InstitutionID: tu.Inst2Admin.InstitutionID,
-	// 	RequestorID:   tu.Inst2Admin.ID,
-	// 	ObjectIDs:     append(idsThatCanBeDeleted, idWithPendingWorkItems),
-	// 	SecretKey:     common.Context().Config.BatchDeletionKey,
-	// }
+	// This batch contains one id that has pending work items.
+	paramsBadPendingWorkItem := admin_api.ObjectBatchDeleteParams{
+		InstitutionID: tu.Inst2Admin.InstitutionID,
+		RequestorID:   tu.Inst2Admin.ID,
+		ObjectIDs:     append(idsThatCanBeDeleted, idWithPendingWorkItems),
+		SecretKey:     common.Context().Config.BatchDeletionKey,
+	}
 
 	// // This batch contains one object that belongs to another institution.
 	// paramsBadOtherInstItem := admin_api.ObjectBatchDeleteParams{
@@ -80,15 +81,15 @@ func TestObjectBatchDelete(t *testing.T) {
 	// 	SecretKey:     common.Context().Config.BatchDeletionKey,
 	// }
 
-	testObjectBatchDeletePermissions(t, validParams)
-	testObjectBatchDeleteCreatesExpectedRecords(t, validParams)
-
-	// START HERE
-
 	// Test permissions. Only APTrust admin should be allowed to do this.
+	testObjectBatchDeletePermissions(t, validParams)
+
+	// Make sure a successful request creates the expected records in the DB.
+	testObjectBatchDeleteCreatesExpectedRecords(t, validParams)
 
 	// Ensure that we get failure if we include an object
 	// with a pending WorkItem.
+	testObjectBatchDeleteWithPendingWorkItem(t, paramsBadPendingWorkItem)
 
 	// Ensure that we get failure if we include an object
 	// that belongs to another institution.
@@ -179,6 +180,8 @@ func testObjectBatchDeleteCreatesExpectedRecords(t *testing.T, params admin_api.
 	}
 
 	// Make sure this deletion request was saved to the DB as well.
+	// Also ensure that the request is linked to all four requested
+	// objects, and no other objects.
 	savedDelRequest, err := pgmodels.DeletionRequestByID(deletionRequest.ID)
 	require.NoError(t, err)
 	require.NotNil(t, savedDelRequest)
@@ -220,4 +223,14 @@ func testObjectBatchDeleteCreatesExpectedRecords(t *testing.T, params admin_api.
 
 	// Should be no work items because request has not yet been approved.
 	assert.Empty(t, alert.WorkItems)
+}
+
+func testObjectBatchDeleteWithPendingWorkItem(t *testing.T, params admin_api.ObjectBatchDeleteParams) {
+	resp := tu.SysAdminClient.POST("/admin-api/v3/objects/init_batch_delete").
+		WithHeader(constants.APIUserHeader, tu.SysAdmin.Email).
+		WithHeader(constants.APIKeyHeader, "password").
+		WithJSON(params).
+		Expect()
+	resp.Status(http.StatusConflict)
+	assert.Equal(t, `{"StatusCode":409,"Error":"task cannot be completed because this object has pending work items"}`, resp.Body().Raw())
 }
