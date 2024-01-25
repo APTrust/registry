@@ -40,21 +40,23 @@ func TestObjectBatchDelete(t *testing.T) {
 		SecretKey:     common.Context().Config.BatchDeletionKey,
 	}
 
-	// // Inst admin can request batch deletion, but inst user cannot.
-	// paramsBadRequestorRole := admin_api.ObjectBatchDeleteParams{
-	// 	InstitutionID: tu.Inst2User.InstitutionID,
-	// 	RequestorID:   tu.Inst2User.ID,
-	// 	ObjectIDs:     idsThatCanBeDeleted,
-	// 	SecretKey:     common.Context().Config.BatchDeletionKey,
-	// }
+	// Inst admin can request batch deletion, but inst user cannot.
+	paramsBadRequestorRole := admin_api.ObjectBatchDeleteParams{
+		InstitutionID: tu.Inst2User.InstitutionID,
+		RequestorID:   tu.Inst2User.ID,
+		ObjectIDs:     idsThatCanBeDeleted,
+		SecretKey:     common.Context().Config.BatchDeletionKey,
+	}
 
-	// // This inst admin is at the wrong institution
-	// paramsBadRequestorInst := admin_api.ObjectBatchDeleteParams{
-	// 	InstitutionID: tu.Inst1Admin.InstitutionID,
-	// 	RequestorID:   tu.Inst1Admin.ID,
-	// 	ObjectIDs:     idsThatCanBeDeleted,
-	// 	SecretKey:     common.Context().Config.BatchDeletionKey,
-	// }
+	// This inst admin is at the wrong institution.
+	// He's requesting deletion of items belonging to Inst2,
+	// but he belongs to Inst1
+	paramsBadRequestorInst := admin_api.ObjectBatchDeleteParams{
+		InstitutionID: tu.Inst2Admin.InstitutionID,
+		RequestorID:   tu.Inst1Admin.ID,
+		ObjectIDs:     idsThatCanBeDeleted,
+		SecretKey:     common.Context().Config.BatchDeletionKey,
+	}
 
 	// // This batch contains one id referring to an object that
 	// // has already been deleted.
@@ -84,7 +86,9 @@ func TestObjectBatchDelete(t *testing.T) {
 	// Test permissions. Only APTrust admin should be allowed to do this.
 	testObjectBatchDeletePermissions(t, validParams)
 
-	// Make sure a successful request creates the expected records in the DB.
+	// Ensure we get success with valid params and
+	// make sure a successful request creates the expected
+	// records in the DB.
 	testObjectBatchDeleteCreatesExpectedRecords(t, validParams)
 
 	// Ensure that we get failure if we include an object
@@ -97,13 +101,12 @@ func TestObjectBatchDelete(t *testing.T) {
 
 	// Ensure that we get failure if requestorID belongs
 	// to an inst user rather than inst admin.
+	testObjectBatchDeleteWithWrongRole(t, paramsBadRequestorRole)
 
-	// Ensure we get success with valid params:
-	// inst id, user id, object ids.
-
-	// Check post conditions. There should be a deletion
-	// request with all expected properties and with the
-	// right list of object IDs.
+	// Ensure failure if requestor id belongs to someone at
+	// a different institution. An institution that does not own
+	// the objects.
+	testObjectBatchDeleteWrongRequestorInst(t, paramsBadRequestorInst)
 
 	// Check the text of the alert. It should include
 	// all of the object identifiers.
@@ -244,4 +247,24 @@ func testObjectBatchDeleteWithOtherInstItem(t *testing.T, params admin_api.Objec
 		Expect()
 	resp.Status(http.StatusBadRequest)
 	assert.Equal(t, `{"StatusCode":400,"Error":"one or more object ids is invalid"}`, resp.Body().Raw())
+}
+
+func testObjectBatchDeleteWithWrongRole(t *testing.T, params admin_api.ObjectBatchDeleteParams) {
+	resp := tu.SysAdminClient.POST("/admin-api/v3/objects/init_batch_delete").
+		WithHeader(constants.APIUserHeader, tu.SysAdmin.Email).
+		WithHeader(constants.APIKeyHeader, "password").
+		WithJSON(params).
+		Expect()
+	resp.Status(http.StatusBadRequest)
+	assert.Equal(t, `{"StatusCode":400,"Error":"invalid requestor id"}`, resp.Body().Raw())
+}
+
+func testObjectBatchDeleteWrongRequestorInst(t *testing.T, params admin_api.ObjectBatchDeleteParams) {
+	resp := tu.SysAdminClient.POST("/admin-api/v3/objects/init_batch_delete").
+		WithHeader(constants.APIUserHeader, tu.SysAdmin.Email).
+		WithHeader(constants.APIKeyHeader, "password").
+		WithJSON(params).
+		Expect()
+	resp.Status(http.StatusBadRequest)
+	assert.Equal(t, `{"StatusCode":400,"Error":"invalid requestor id"}`, resp.Body().Raw())
 }
