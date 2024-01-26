@@ -7,16 +7,15 @@
 <div class="box">
   <div class="box-header"><h1>Deletion Cancelled</h1></div>
   <div class="box-content">
-    <p>You have cancelled deletion of the following object:</p>
+    <p>You have cancelled deletion of the following objects:</p>
+
+    <ol class="mb-3 mt-3 ml-5" style="list-style: decimal">
+    {{ range $index, $obj := .deletionRequest.IntellectualObjects }}
+        <li class="mb-1"><a target="_blank" href="/objects/show/{{ $obj.ID }}">{{ $obj.Identifier }}</a></li>
+    {{ end }}
+    </ol>
 
     <p>
-      <b>{{ $obj.Identifier }}</b><br/>
-      Alt Identifier: {{ $obj.AltIdentifier }} <br/>
-      Internal Sender Identifier: {{ $obj.InternalSenderIdentifier }} <br/>
-      Bag Group: {{ $obj.BagGroupIdentifier }} <br/>
-      Storage Option: {{ $obj.StorageOption }} <br/>
-      Created: {{ dateUS $obj.CreatedAt }} <br/>
-      Updated: {{ dateUS $obj.UpdatedAt }} <br/>
       Requested: {{ .deletionRequest.RequestedBy.Name }} on {{ dateUS .deletionRequest.RequestedAt }} <br/>
       Cancelled: {{ .deletionRequest.CancelledBy.Name }}  on {{ dateUS .deletionRequest.CancelledAt }} <br/>
     </p>
