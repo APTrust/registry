@@ -264,18 +264,6 @@ func (obj *IntellectualObject) ActiveDeletionWorkItem() (*WorkItem, error) {
 	return item, err
 }
 
-func (obj *IntellectualObject) DeletionRequest(workItemID int64) (*DeletionRequestView, error) {
-	// web/webui/deletion_request_controller.go method DeletionRequestApprove
-	// creates a WorkItem when deletion request is approved. This is a
-	// one-to-one relationship. If we can't find the deletion request view
-	// for a valid deletion WorkItem, something is wrong!
-	query := NewQuery().
-		Where("work_item_id", "=", workItemID).
-		Where("object_count", ">", 0).
-		Where("file_count", "=", 0)
-	return DeletionRequestViewGet(query)
-}
-
 func (obj *IntellectualObject) AssertDeletionPreconditions() error {
 	err := obj.assertNoActiveFiles()
 	if err == nil {
@@ -342,7 +330,7 @@ func (obj *IntellectualObject) assertDeletionApproved() (*WorkItem, *DeletionReq
 	if common.IsEmptyString(workItem.InstApprover) {
 		return workItem, nil, fmt.Errorf("Deletion work item is missing institutional approver")
 	}
-	deletionRequest, err := obj.DeletionRequest(workItem.ID)
+	deletionRequest, err := DeletionRequestViewByID(workItem.DeletionRequestID)
 	if deletionRequest == nil || IsNoRowError(err) {
 		return workItem, nil, fmt.Errorf("No deletion request for work item %d", workItem.ID)
 	}
