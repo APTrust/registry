@@ -276,7 +276,7 @@ func TestFileDeletionPreConditions(t *testing.T) {
 	assert.True(t, strings.HasPrefix(err.Error(), "No deletion request for work item"))
 	testGenericFileDeleteError(t, gf)
 
-	testFileDeletionRequest(t, gf, workItem.ID)
+	testFileDeletionRequest(t, gf, workItem)
 
 	// Request not yet approved
 	err = gf.AssertDeletionPreconditions()
@@ -285,9 +285,7 @@ func TestFileDeletionPreConditions(t *testing.T) {
 	testGenericFileDeleteError(t, gf)
 
 	// Add approver & test
-	query := pgmodels.NewQuery().
-		Where("work_item_id", "=", workItem.ID)
-	req, err := pgmodels.DeletionRequestGet(query)
+	req, err := pgmodels.DeletionRequestByID(workItem.DeletionRequestID)
 	require.Nil(t, err)
 	require.NotNil(t, req)
 	require.NotEqual(t, int64(0), req.ID)
@@ -304,9 +302,9 @@ func TestFileDeletionPreConditions(t *testing.T) {
 	testGenericFileDeleteSuccess(t, gf)
 }
 
-func testFileDeletionRequest(t *testing.T, gf *pgmodels.GenericFile, workItemID int64) {
+func testFileDeletionRequest(t *testing.T, gf *pgmodels.GenericFile, workItem *pgmodels.WorkItem) {
 	// Request doesn't exist yet.
-	reqView, err := gf.DeletionRequest(workItemID)
+	reqView, err := pgmodels.DeletionRequestViewByID(workItem.DeletionRequestID)
 	require.NotNil(t, err)
 	assert.True(t, pgmodels.IsNoRowError(err))
 	require.Nil(t, reqView)
@@ -319,7 +317,11 @@ func testFileDeletionRequest(t *testing.T, gf *pgmodels.GenericFile, workItemID 
 	req.ConfirmedByID = 0
 	require.Nil(t, req.Save())
 
-	reqView, err = gf.DeletionRequest(workItemID)
+	// Add it to the work item for next test
+	workItem.DeletionRequestID = req.ID
+	require.NoError(t, workItem.Save())
+
+	reqView, err = pgmodels.DeletionRequestViewByID(req.ID)
 	require.Nil(t, err)
 	require.NotNil(t, reqView)
 	assert.Equal(t, req.ID, reqView.ID)

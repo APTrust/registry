@@ -2,7 +2,6 @@ package pgmodels_test
 
 import (
 	"fmt"
-	"os"
 	"strings"
 	"testing"
 	"time"
@@ -236,7 +235,6 @@ func TestObjInsertAndUpdate(t *testing.T) {
 }
 
 func TestAssertObjDeletionPreconditions(t *testing.T) {
-	os.Setenv("APT_ENV", "test")
 	defer db.ForceFixtureReload()
 	obj, err := pgmodels.CreateObjectWithRelations()
 	require.Nil(t, err)

@@ -332,6 +332,7 @@ func (obj *IntellectualObject) assertDeletionApproved() (*WorkItem, *DeletionReq
 	}
 	deletionRequest, err := DeletionRequestViewByID(workItem.DeletionRequestID)
 	if deletionRequest == nil || IsNoRowError(err) {
+		fmt.Println(workItem.ID, workItem.DeletionRequestID)
 		return workItem, nil, fmt.Errorf("No deletion request for work item %d", workItem.ID)
 	}
 	if err != nil {

@@ -473,14 +473,6 @@ func (gf *GenericFile) ActiveDeletionWorkItem() (*WorkItem, error) {
 	return item, err
 }
 
-func (gf *GenericFile) DeletionRequest(workItemID int64) (*DeletionRequestView, error) {
-	workItem, err := WorkItemByID(workItemID)
-	if err != nil {
-		return nil, err
-	}
-	return DeletionRequestViewByID(workItem.DeletionRequestID)
-}
-
 func (gf *GenericFile) AssertDeletionPreconditions() error {
 	if gf.State == constants.StateDeleted {
 		return fmt.Errorf("File is already in deleted state")
@@ -500,7 +492,7 @@ func (gf *GenericFile) assertDeletionApproved() (*WorkItem, *DeletionRequestView
 	if common.IsEmptyString(workItem.InstApprover) {
 		return workItem, nil, fmt.Errorf("Deletion work item is missing institutional approver")
 	}
-	deletionRequest, err := gf.DeletionRequest(workItem.ID)
+	deletionRequest, err := DeletionRequestViewByID(workItem.DeletionRequestID)
 	if deletionRequest == nil || IsNoRowError(err) {
 		return workItem, nil, fmt.Errorf("No deletion request for work item %d", workItem.ID)
 	}
