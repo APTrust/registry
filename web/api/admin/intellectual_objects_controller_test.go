@@ -84,7 +84,6 @@ func TestObjectIndex(t *testing.T) {
 }
 
 func TestObjectCreateUpdateDelete(t *testing.T) {
-
 	if common.Context().Config.EnvName != "test" {
 		// For security reasons, the deletion setup endpoint works
 		// only in the test env. In all others, it returns an error.
@@ -101,7 +100,7 @@ func TestObjectCreateUpdateDelete(t *testing.T) {
 	obj := testObjectCreate(t)
 	updatedObj := testObjectUpdate(t, obj)
 
-	createObjectDeletionPreConditions(t, obj)
+	createObjectDeletionPreConditions(t, updatedObj)
 	testObjectDelete(t, updatedObj)
 }
 
@@ -121,6 +120,12 @@ func createObjectDeletionPreConditions(t *testing.T, obj *pgmodels.IntellectualO
 		WithHeader(constants.APIKeyHeader, "password").
 		Expect()
 	resp.Status(http.StatusOK)
+
+	workItem := &pgmodels.WorkItem{}
+	err := json.Unmarshal([]byte(resp.Body().Raw()), workItem)
+	require.NoError(t, err)
+	assert.NotEmpty(t, workItem.DeletionRequestID)
+	require.NoError(t, obj.AssertDeletionPreconditions())
 }
 
 func testObjectCreate(t *testing.T) *pgmodels.IntellectualObject {
