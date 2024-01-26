@@ -17,6 +17,22 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// To test manually:
+/*
+	curl -H "Content-Type: application/json" \
+	     -H "X-Pharos-API-User: system@aptrust.org" \
+		 -H "X-Pharos-API-Key: password" \
+         -X POST \
+         -d '{"institutionId": 3, "requestorId": 5, "secretKey": "00000000-0000-0000-0000-000000000000", "objectIds": [5,6,12,13]}' \
+         http://localhost:8080/admin-api/v3/objects/init_batch_delete
+
+	* Then log in as admin@inst2.edu
+    * Click the alerts icon
+	* Click the "deletion request alert"
+	* Click the review link in that alert
+	* Approve the deletion on the review page (approval currently fails because objects have no ingest events)
+*/
+
 func TestObjectBatchDelete(t *testing.T) {
 	err := db.ForceFixtureReload()
 	require.Nil(t, err)
