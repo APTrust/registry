@@ -68,7 +68,54 @@ begin
        
         -- Now remove the work_item_id column from deletion requests
 		alter table deletion_requests drop column work_item_id;
-		
+
+
+		drop view if exists work_items_view; 
+
+		CREATE OR REPLACE VIEW public.work_items_view
+		AS SELECT wi.id,
+			wi.institution_id,
+			i.name AS institution_name,
+			i.identifier AS institution_identifier,
+			wi.intellectual_object_id,
+			io.identifier AS object_identifier,
+			io.alt_identifier,
+			io.bag_group_identifier,
+			io.storage_option,
+			io.bagit_profile_identifier,
+			io.source_organization,
+			io.internal_sender_identifier,
+			wi.generic_file_id,
+			gf.identifier AS generic_file_identifier,
+			wi.name,
+			wi.etag,
+			wi.bucket,
+			wi."user",
+			wi.note,
+			wi.action,
+			wi.stage,
+			wi.status,
+			wi.outcome,
+			wi.bag_date,
+			wi.date_processed,
+			wi.retry,
+			wi.node,
+			wi.pid,
+			wi.needs_admin_review,
+			wi.size,
+			wi.queued_at,
+			wi.stage_started_at,
+			wi.aptrust_approver,
+			wi.inst_approver,
+			wi.deletion_request_id,
+			wi.created_at,
+			wi.updated_at
+		FROM work_items wi
+			LEFT JOIN institutions i ON wi.institution_id = i.id
+			LEFT JOIN intellectual_objects io ON wi.intellectual_object_id = io.id
+			LEFT JOIN generic_files gf ON wi.generic_file_id = gf.id;
+
+
 	end if;
 end
 $$;
