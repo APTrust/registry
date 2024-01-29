@@ -458,7 +458,7 @@ func NewRestorationItem(obj *IntellectualObject, gf *GenericFile, user *User) (*
 // Param requestedBy is the User who initially requested the deletion.
 // Param approvedBy is the User who approved the deletion request.
 // These two are required.
-func NewDeletionItem(obj *IntellectualObject, gf *GenericFile, requestedBy, approvedBy *User) (*WorkItem, error) {
+func NewDeletionItem(obj *IntellectualObject, gf *GenericFile, requestedBy, approvedBy *User, deletionRequestID int64) (*WorkItem, error) {
 	if obj == nil || requestedBy == nil || approvedBy == nil {
 		return nil, common.ErrInvalidParam
 	}
@@ -490,6 +490,7 @@ func NewDeletionItem(obj *IntellectualObject, gf *GenericFile, requestedBy, appr
 	deletionItem.Action = constants.ActionDelete
 	deletionItem.User = requestedBy.Email
 	deletionItem.InstApprover = approvedBy.Email
+	deletionItem.DeletionRequestID = deletionRequestID
 	err = deletionItem.Save()
 	return deletionItem, err
 }

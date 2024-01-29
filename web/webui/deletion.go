@@ -243,7 +243,7 @@ func (del *Deletion) initObjectDeletionRequest(institutionID int64, objIDs []int
 // CreateWorkItem creates a WorkItem describing this deletion. We call
 // this only if the admin approves the deletion.
 func (del *Deletion) CreateObjDeletionWorkItem(obj *pgmodels.IntellectualObject) error {
-	workItem, err := pgmodels.NewDeletionItem(obj, nil, del.DeletionRequest.RequestedBy, del.DeletionRequest.ConfirmedBy)
+	workItem, err := pgmodels.NewDeletionItem(obj, nil, del.DeletionRequest.RequestedBy, del.DeletionRequest.ConfirmedBy, del.DeletionRequest.ID)
 	if err != nil {
 		return err
 	}
@@ -257,7 +257,7 @@ func (del *Deletion) CreateFileDeletionWorkItem(gf *pgmodels.GenericFile) error 
 		return err
 	}
 
-	workItem, err := pgmodels.NewDeletionItem(obj, gf, del.DeletionRequest.RequestedBy, del.DeletionRequest.ConfirmedBy)
+	workItem, err := pgmodels.NewDeletionItem(obj, gf, del.DeletionRequest.RequestedBy, del.DeletionRequest.ConfirmedBy, del.DeletionRequest.ID)
 	if err != nil {
 		return err
 	}

@@ -8,6 +8,7 @@ import (
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/db"
 	"github.com/APTrust/registry/pgmodels"
+	"github.com/APTrust/registry/web/testutil"
 	"github.com/jinzhu/copier"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -373,6 +374,22 @@ func TestNewDeletionItem(t *testing.T) {
 	require.Nil(t, err)
 	require.NotNil(t, obj)
 
+	inst1Admin := testutil.InitUser(t, "admin@inst1.edu")
+	inst1ID := inst1Admin.InstitutionID
+
+	deletionRequest, err := pgmodels.NewDeletionRequest()
+	require.NoError(t, err)
+	objects, err := pgmodels.IntellectualObjectSelect(pgmodels.NewQuery().Where("institution_id", "=", inst1ID))
+	require.NoError(t, err)
+	require.NotEmpty(t, objects)
+
+	deletionRequest.InstitutionID = inst1ID
+	deletionRequest.IntellectualObjects = objects
+	deletionRequest.RequestedByID = inst1Admin.ID
+	deletionRequest.RequestedBy = inst1Admin
+	deletionRequest.RequestedAt = time.Now().UTC()
+	require.NoError(t, deletionRequest.Save())
+
 	query := pgmodels.NewQuery().
 		Where("institution_id", "=", obj.InstitutionID).
 		Where("state", "=", constants.StateActive).
@@ -391,7 +408,7 @@ func TestNewDeletionItem(t *testing.T) {
 	require.Nil(t, err)
 	require.NotNil(t, approver)
 
-	item1, err := pgmodels.NewDeletionItem(obj, nil, requestor, approver)
+	item1, err := pgmodels.NewDeletionItem(obj, nil, requestor, approver, deletionRequest.ID)
 	require.Nil(t, err)
 	require.NotNil(t, item1)
 	assert.Equal(t, obj.ID, item1.IntellectualObjectID)
@@ -399,6 +416,7 @@ func TestNewDeletionItem(t *testing.T) {
 	assert.Equal(t, requestor.Email, item1.User)
 	assert.Equal(t, approver.Email, item1.InstApprover)
 	assert.Empty(t, item1.GenericFileID)
+	assert.Equal(t, deletionRequest.ID, item1.DeletionRequestID)
 
 	query2 := pgmodels.NewQuery().
 		Where("intellectual_object_id", "=", obj.ID).
@@ -408,7 +426,7 @@ func TestNewDeletionItem(t *testing.T) {
 	require.Nil(t, err)
 	require.NotNil(t, gf)
 
-	item2, err := pgmodels.NewDeletionItem(obj, gf, requestor, approver)
+	item2, err := pgmodels.NewDeletionItem(obj, gf, requestor, approver, deletionRequest.ID)
 	require.Nil(t, err)
 	require.NotNil(t, item2)
 	assert.Equal(t, obj.ID, item2.IntellectualObjectID)
@@ -417,24 +435,25 @@ func TestNewDeletionItem(t *testing.T) {
 	assert.Equal(t, approver.Email, item2.InstApprover)
 	assert.Equal(t, gf.ID, item2.GenericFileID)
 	assert.Equal(t, gf.Size, item2.Size)
+	assert.Equal(t, deletionRequest.ID, item2.DeletionRequestID)
 
 	// Missing object should cause an error
-	item3, err := pgmodels.NewDeletionItem(nil, gf, requestor, approver)
+	item3, err := pgmodels.NewDeletionItem(nil, gf, requestor, approver, 888)
 	require.NotNil(t, err)
 	require.Nil(t, item3)
 
 	// Missing requestor and missing approver should cause errors
-	item4, err := pgmodels.NewDeletionItem(obj, gf, nil, approver)
+	item4, err := pgmodels.NewDeletionItem(obj, gf, nil, approver, 888)
 	require.NotNil(t, err)
 	require.Nil(t, item4)
 
-	item5, err := pgmodels.NewDeletionItem(obj, gf, requestor, nil)
+	item5, err := pgmodels.NewDeletionItem(obj, gf, requestor, nil, 888)
 	require.NotNil(t, err)
 	require.Nil(t, item5)
 
 	// Object that has never been ingested should cause error
 	randomObj := pgmodels.RandomObject()
-	item6, err := pgmodels.NewDeletionItem(randomObj, nil, requestor, approver)
+	item6, err := pgmodels.NewDeletionItem(randomObj, nil, requestor, approver, 888)
 	require.NotNil(t, err)
 	require.Nil(t, item6)
 }
