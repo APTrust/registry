@@ -1,12 +1,7 @@
--- Registry Schema - 2023-04-10
+-- Registry Schema - 2024-01-29
 
--- public.ar_internal_metadata definition
 
--- Drop table
-
--- DROP TABLE ar_internal_metadata;
-
-CREATE TABLE ar_internal_metadata (
+CREATE TABLE public.ar_internal_metadata (
 	"key" varchar NOT NULL,
 	value varchar NULL,
 	created_at timestamp NOT NULL,
@@ -19,11 +14,7 @@ CREATE UNIQUE INDEX ix_ar_internal_metadata_uniq_key ON public.ar_internal_metad
 
 -- public.bulk_delete_jobs definition
 
--- Drop table
-
--- DROP TABLE bulk_delete_jobs;
-
-CREATE TABLE bulk_delete_jobs (
+CREATE TABLE public.bulk_delete_jobs (
 	id bigserial NOT NULL,
 	requested_by varchar NULL,
 	institutional_approver varchar NULL,
@@ -40,11 +31,7 @@ CREATE TABLE bulk_delete_jobs (
 
 -- public.bulk_delete_jobs_emails definition
 
--- Drop table
-
--- DROP TABLE bulk_delete_jobs_emails;
-
-CREATE TABLE bulk_delete_jobs_emails (
+CREATE TABLE public.bulk_delete_jobs_emails (
 	bulk_delete_job_id int8 NULL,
 	email_id int8 NULL
 );
@@ -54,11 +41,7 @@ CREATE INDEX index_bulk_delete_jobs_emails_on_email_id ON public.bulk_delete_job
 
 -- public.bulk_delete_jobs_generic_files definition
 
--- Drop table
-
--- DROP TABLE bulk_delete_jobs_generic_files;
-
-CREATE TABLE bulk_delete_jobs_generic_files (
+CREATE TABLE public.bulk_delete_jobs_generic_files (
 	bulk_delete_job_id int8 NULL,
 	generic_file_id int8 NULL
 );
@@ -68,11 +51,7 @@ CREATE INDEX index_bulk_delete_jobs_generic_files_on_generic_file_id ON public.b
 
 -- public.bulk_delete_jobs_institutions definition
 
--- Drop table
-
--- DROP TABLE bulk_delete_jobs_institutions;
-
-CREATE TABLE bulk_delete_jobs_institutions (
+CREATE TABLE public.bulk_delete_jobs_institutions (
 	bulk_delete_job_id int8 NULL,
 	institution_id int8 NULL
 );
@@ -82,11 +61,7 @@ CREATE INDEX index_bulk_delete_jobs_institutions_on_institution_id ON public.bul
 
 -- public.bulk_delete_jobs_intellectual_objects definition
 
--- Drop table
-
--- DROP TABLE bulk_delete_jobs_intellectual_objects;
-
-CREATE TABLE bulk_delete_jobs_intellectual_objects (
+CREATE TABLE public.bulk_delete_jobs_intellectual_objects (
 	bulk_delete_job_id int8 NULL,
 	intellectual_object_id int8 NULL
 );
@@ -96,11 +71,7 @@ CREATE INDEX index_bulk_delete_jobs_intellectual_objects_on_object_id ON public.
 
 -- public.confirmation_tokens definition
 
--- Drop table
-
--- DROP TABLE confirmation_tokens;
-
-CREATE TABLE confirmation_tokens (
+CREATE TABLE public.confirmation_tokens (
 	id bigserial NOT NULL,
 	"token" varchar NULL,
 	intellectual_object_id int4 NULL,
@@ -113,11 +84,7 @@ CREATE TABLE confirmation_tokens (
 
 -- public.emails definition
 
--- Drop table
-
--- DROP TABLE emails;
-
-CREATE TABLE emails (
+CREATE TABLE public.emails (
 	id bigserial NOT NULL,
 	email_type varchar NULL,
 	event_identifier varchar NULL,
@@ -135,11 +102,7 @@ CREATE TABLE emails (
 
 -- public.emails_generic_files definition
 
--- Drop table
-
--- DROP TABLE emails_generic_files;
-
-CREATE TABLE emails_generic_files (
+CREATE TABLE public.emails_generic_files (
 	generic_file_id int8 NULL,
 	email_id int8 NULL
 );
@@ -149,11 +112,7 @@ CREATE INDEX index_emails_generic_files_on_generic_file_id ON public.emails_gene
 
 -- public.emails_intellectual_objects definition
 
--- Drop table
-
--- DROP TABLE emails_intellectual_objects;
-
-CREATE TABLE emails_intellectual_objects (
+CREATE TABLE public.emails_intellectual_objects (
 	intellectual_object_id int8 NULL,
 	email_id int8 NULL
 );
@@ -163,11 +122,7 @@ CREATE INDEX index_emails_intellectual_objects_on_intellectual_object_id ON publ
 
 -- public.emails_premis_events definition
 
--- Drop table
-
--- DROP TABLE emails_premis_events;
-
-CREATE TABLE emails_premis_events (
+CREATE TABLE public.emails_premis_events (
 	premis_event_id int8 NULL,
 	email_id int8 NULL
 );
@@ -177,11 +132,7 @@ CREATE INDEX index_emails_premis_events_on_premis_event_id ON public.emails_prem
 
 -- public.emails_work_items definition
 
--- Drop table
-
--- DROP TABLE emails_work_items;
-
-CREATE TABLE emails_work_items (
+CREATE TABLE public.emails_work_items (
 	work_item_id int8 NULL,
 	email_id int8 NULL
 );
@@ -191,11 +142,7 @@ CREATE INDEX index_emails_work_items_on_work_item_id ON public.emails_work_items
 
 -- public.generic_files definition
 
--- Drop table
-
--- DROP TABLE generic_files;
-
-CREATE TABLE generic_files (
+CREATE TABLE public.generic_files (
 	id serial4 NOT NULL,
 	file_format varchar NULL,
 	"size" int8 NULL,
@@ -207,7 +154,7 @@ CREATE TABLE generic_files (
 	last_fixity_check timestamp NOT NULL DEFAULT '2000-01-01 00:00:00'::timestamp without time zone,
 	institution_id int4 NOT NULL,
 	storage_option varchar NOT NULL DEFAULT 'Standard'::character varying,
-	uuid varchar NOT NULL,
+	"uuid" varchar NOT NULL,
 	CONSTRAINT generic_files_pkey PRIMARY KEY (id)
 );
 CREATE INDEX index_generic_files_on_created_at ON public.generic_files USING btree (created_at);
@@ -224,11 +171,7 @@ CREATE INDEX ix_gf_last_fixity_check ON public.generic_files USING btree (last_f
 
 -- public.historical_deposit_stats definition
 
--- Drop table
-
--- DROP TABLE historical_deposit_stats;
-
-CREATE TABLE historical_deposit_stats (
+CREATE TABLE public.historical_deposit_stats (
 	institution_id int8 NULL,
 	institution_name varchar(80) NULL,
 	storage_option varchar(40) NULL,
@@ -252,11 +195,7 @@ CREATE UNIQUE INDEX ix_historical_inst_opt_date ON public.historical_deposit_sta
 
 -- public.intellectual_objects definition
 
--- Drop table
-
--- DROP TABLE intellectual_objects;
-
-CREATE TABLE intellectual_objects (
+CREATE TABLE public.intellectual_objects (
 	id serial4 NOT NULL,
 	title varchar NULL,
 	description text NULL,
@@ -286,11 +225,7 @@ CREATE INDEX index_intellectual_objects_on_updated_at ON public.intellectual_obj
 
 -- public.old_passwords definition
 
--- Drop table
-
--- DROP TABLE old_passwords;
-
-CREATE TABLE old_passwords (
+CREATE TABLE public.old_passwords (
 	id bigserial NOT NULL,
 	encrypted_password varchar NOT NULL,
 	password_salt varchar NULL,
@@ -304,11 +239,7 @@ CREATE INDEX index_password_archivable ON public.old_passwords USING btree (pass
 
 -- public.premis_events definition
 
--- Drop table
-
--- DROP TABLE premis_events;
-
-CREATE TABLE premis_events (
+CREATE TABLE public.premis_events (
 	id serial4 NOT NULL,
 	identifier varchar NULL,
 	event_type varchar NULL,
@@ -339,11 +270,7 @@ CREATE INDEX index_premis_events_on_outcome ON public.premis_events USING btree 
 
 -- public.schema_migrations definition
 
--- Drop table
-
--- DROP TABLE schema_migrations;
-
-CREATE TABLE schema_migrations (
+CREATE TABLE public.schema_migrations (
 	"version" varchar NOT NULL,
 	started_at timestamp NULL,
 	finished_at timestamp NULL,
@@ -353,11 +280,7 @@ CREATE TABLE schema_migrations (
 
 -- public.snapshots definition
 
--- Drop table
-
--- DROP TABLE snapshots;
-
-CREATE TABLE snapshots (
+CREATE TABLE public.snapshots (
 	id bigserial NOT NULL,
 	audit_date timestamp NULL,
 	institution_id int4 NULL,
@@ -374,11 +297,7 @@ CREATE TABLE snapshots (
 
 -- public.storage_options definition
 
--- Drop table
-
--- DROP TABLE storage_options;
-
-CREATE TABLE storage_options (
+CREATE TABLE public.storage_options (
 	id bigserial NOT NULL,
 	provider varchar NOT NULL,
 	service varchar NOT NULL,
@@ -394,11 +313,7 @@ CREATE UNIQUE INDEX index_storage_options_name ON public.storage_options USING b
 
 -- public.usage_samples definition
 
--- Drop table
-
--- DROP TABLE usage_samples;
-
-CREATE TABLE usage_samples (
+CREATE TABLE public.usage_samples (
 	id serial4 NOT NULL,
 	created_at timestamp NOT NULL,
 	updated_at timestamp NOT NULL,
@@ -408,60 +323,9 @@ CREATE TABLE usage_samples (
 );
 
 
--- public.work_items definition
-
--- Drop table
-
--- DROP TABLE work_items;
-
-CREATE TABLE work_items (
-	id serial4 NOT NULL,
-	created_at timestamp NOT NULL,
-	updated_at timestamp NOT NULL,
-	intellectual_object_id int4 NULL,
-	generic_file_id int4 NULL,
-	"name" varchar NULL,
-	etag varchar NULL,
-	bucket varchar NULL,
-	"user" varchar NULL,
-	note text NULL,
-	"action" varchar NULL,
-	stage varchar NULL,
-	status varchar NULL,
-	outcome text NULL,
-	bag_date timestamp NULL,
-	date_processed timestamp NULL,
-	retry bool NOT NULL DEFAULT false,
-	node varchar(255) NULL,
-	pid int4 NULL DEFAULT 0,
-	needs_admin_review bool NOT NULL DEFAULT false,
-	institution_id int4 NULL,
-	queued_at timestamp NULL,
-	"size" int8 NULL,
-	stage_started_at timestamp NULL,
-	aptrust_approver varchar NULL,
-	inst_approver varchar NULL,
-	CONSTRAINT work_items_pkey PRIMARY KEY (id)
-);
-CREATE INDEX index_work_items_etag_instid_and_name ON public.work_items USING btree (etag, institution_id, name);
-CREATE INDEX index_work_items_on_action ON public.work_items USING btree (action);
-CREATE INDEX index_work_items_on_date_processed ON public.work_items USING btree (date_processed);
-CREATE INDEX index_work_items_on_etag_and_name ON public.work_items USING btree (etag, name);
-CREATE INDEX index_work_items_on_generic_file_id ON public.work_items USING btree (generic_file_id);
-CREATE INDEX index_work_items_on_inst_id_and_date_processed ON public.work_items USING btree (institution_id, date_processed);
-CREATE INDEX index_work_items_on_institution_id ON public.work_items USING btree (institution_id);
-CREATE INDEX index_work_items_on_intellectual_object_id ON public.work_items USING btree (intellectual_object_id);
-CREATE INDEX index_work_items_on_stage ON public.work_items USING btree (stage);
-CREATE INDEX index_work_items_on_status ON public.work_items USING btree (status);
-
-
 -- public.checksums definition
 
--- Drop table
-
--- DROP TABLE checksums;
-
-CREATE TABLE checksums (
+CREATE TABLE public.checksums (
 	id serial4 NOT NULL,
 	algorithm varchar NULL,
 	datetime timestamp NULL,
@@ -470,18 +334,110 @@ CREATE TABLE checksums (
 	created_at timestamp NOT NULL,
 	updated_at timestamp NOT NULL,
 	CONSTRAINT checksums_pkey PRIMARY KEY (id),
-	CONSTRAINT fk_rails_89bb0866e7 FOREIGN KEY (generic_file_id) REFERENCES generic_files(id)
+	CONSTRAINT fk_rails_89bb0866e7 FOREIGN KEY (generic_file_id) REFERENCES public.generic_files(id)
 );
 CREATE INDEX index_checksums_on_generic_file_id ON public.checksums USING btree (generic_file_id);
 
 
+-- public.storage_records definition
+
+CREATE TABLE public.storage_records (
+	id bigserial NOT NULL,
+	generic_file_id int4 NULL,
+	url varchar NULL,
+	CONSTRAINT storage_records_pkey PRIMARY KEY (id),
+	CONSTRAINT fk_rails_a126ea6adc FOREIGN KEY (generic_file_id) REFERENCES public.generic_files(id)
+);
+CREATE INDEX index_storage_records_on_generic_file_id ON public.storage_records USING btree (generic_file_id);
+
+
+-- public.alerts definition
+
+CREATE TABLE public.alerts (
+	id bigserial NOT NULL,
+	institution_id int4 NULL,
+	"type" varchar NOT NULL,
+	subject varchar NOT NULL,
+	"content" text NOT NULL,
+	deletion_request_id int4 NULL,
+	created_at timestamp NOT NULL,
+	CONSTRAINT alerts_pkey PRIMARY KEY (id)
+);
+CREATE INDEX index_alerts_institution_id ON public.alerts USING btree (institution_id);
+CREATE INDEX index_alerts_type ON public.alerts USING btree (type);
+
+
+-- public.alerts_premis_events definition
+
+CREATE TABLE public.alerts_premis_events (
+	alert_id int4 NOT NULL,
+	premis_event_id int4 NOT NULL
+);
+CREATE INDEX index_alerts_premis_events_alert_id ON public.alerts_premis_events USING btree (alert_id);
+CREATE UNIQUE INDEX index_alerts_premis_events_unique ON public.alerts_premis_events USING btree (alert_id, premis_event_id);
+
+
+-- public.alerts_users definition
+
+CREATE TABLE public.alerts_users (
+	alert_id int4 NOT NULL,
+	user_id int4 NOT NULL,
+	sent_at timestamp NULL,
+	read_at timestamp NULL
+);
+CREATE INDEX index_alerts_users_alert_id ON public.alerts_users USING btree (alert_id);
+CREATE UNIQUE INDEX index_alerts_users_unique ON public.alerts_users USING btree (alert_id, user_id);
+CREATE INDEX index_alerts_users_user_id ON public.alerts_users USING btree (user_id);
+
+
+-- public.alerts_work_items definition
+
+CREATE TABLE public.alerts_work_items (
+	alert_id int4 NOT NULL,
+	work_item_id int4 NOT NULL
+);
+CREATE INDEX index_alerts_work_items_alert_id ON public.alerts_work_items USING btree (alert_id);
+CREATE UNIQUE INDEX index_alerts_work_items_unique ON public.alerts_work_items USING btree (alert_id, work_item_id);
+
+
+-- public.deletion_requests definition
+
+CREATE TABLE public.deletion_requests (
+	id bigserial NOT NULL,
+	institution_id int4 NOT NULL,
+	requested_by_id int4 NOT NULL,
+	requested_at timestamp NOT NULL,
+	encrypted_confirmation_token varchar NOT NULL,
+	confirmed_by_id int4 NULL,
+	confirmed_at timestamp NULL,
+	cancelled_by_id int4 NULL,
+	cancelled_at timestamp NULL,
+	CONSTRAINT deletion_requests_pkey PRIMARY KEY (id)
+);
+CREATE INDEX index_deletion_requests_institution_id ON public.deletion_requests USING btree (institution_id);
+
+
+-- public.deletion_requests_generic_files definition
+
+CREATE TABLE public.deletion_requests_generic_files (
+	deletion_request_id int4 NOT NULL,
+	generic_file_id int4 NOT NULL
+);
+CREATE UNIQUE INDEX index_drgf_unique ON public.deletion_requests_generic_files USING btree (deletion_request_id, generic_file_id);
+
+
+-- public.deletion_requests_intellectual_objects definition
+
+CREATE TABLE public.deletion_requests_intellectual_objects (
+	deletion_request_id int4 NOT NULL,
+	intellectual_object_id int4 NOT NULL
+);
+CREATE UNIQUE INDEX index_drio_unique ON public.deletion_requests_intellectual_objects USING btree (deletion_request_id, intellectual_object_id);
+
+
 -- public.institutions definition
 
--- Drop table
-
--- DROP TABLE institutions;
-
-CREATE TABLE institutions (
+CREATE TABLE public.institutions (
 	id serial4 NOT NULL,
 	"name" varchar NULL,
 	identifier varchar NULL,
@@ -496,8 +452,7 @@ CREATE TABLE institutions (
 	restore_bucket varchar NOT NULL,
 	spot_restore_frequency int4 NOT NULL DEFAULT 0,
 	last_spot_restore_work_item_id int8 NULL,
-	CONSTRAINT institutions_pkey PRIMARY KEY (id),
-	CONSTRAINT fk_institutions_last_spot_restore FOREIGN KEY (last_spot_restore_work_item_id) REFERENCES work_items(id)
+	CONSTRAINT institutions_pkey PRIMARY KEY (id)
 );
 CREATE UNIQUE INDEX index_institutions_identifier ON public.institutions USING btree (identifier);
 CREATE INDEX index_institutions_on_name ON public.institutions USING btree (name);
@@ -505,29 +460,9 @@ CREATE UNIQUE INDEX index_institutions_receiving_bucket ON public.institutions U
 CREATE UNIQUE INDEX index_institutions_restore_bucket ON public.institutions USING btree (restore_bucket);
 
 
--- public.storage_records definition
-
--- Drop table
-
--- DROP TABLE storage_records;
-
-CREATE TABLE storage_records (
-	id bigserial NOT NULL,
-	generic_file_id int4 NULL,
-	url varchar NULL,
-	CONSTRAINT storage_records_pkey PRIMARY KEY (id),
-	CONSTRAINT fk_rails_a126ea6adc FOREIGN KEY (generic_file_id) REFERENCES generic_files(id)
-);
-CREATE INDEX index_storage_records_on_generic_file_id ON public.storage_records USING btree (generic_file_id);
-
-
 -- public.users definition
 
--- Drop table
-
--- DROP TABLE users;
-
-CREATE TABLE users (
+CREATE TABLE public.users (
 	id serial4 NOT NULL,
 	"name" varchar NULL,
 	email varchar NULL,
@@ -566,8 +501,7 @@ CREATE TABLE users (
 	grace_period timestamp NULL,
 	awaiting_second_factor bool NOT NULL DEFAULT false,
 	"role" varchar(50) NOT NULL DEFAULT 'none'::character varying,
-	CONSTRAINT users_pkey PRIMARY KEY (id),
-	CONSTRAINT fk_rails_7fcf39ca13 FOREIGN KEY (institution_id) REFERENCES institutions(id)
+	CONSTRAINT users_pkey PRIMARY KEY (id)
 );
 CREATE INDEX index_users_on_authy_id ON public.users USING btree (authy_id);
 CREATE UNIQUE INDEX index_users_on_email ON public.users USING btree (email);
@@ -576,134 +510,107 @@ CREATE INDEX index_users_on_password_changed_at ON public.users USING btree (pas
 CREATE UNIQUE INDEX index_users_on_reset_password_token ON public.users USING btree (reset_password_token);
 
 
--- public.deletion_requests definition
+-- public.work_items definition
 
--- Drop table
-
--- DROP TABLE deletion_requests;
-
-CREATE TABLE deletion_requests (
-	id bigserial NOT NULL,
-	institution_id int4 NOT NULL,
-	requested_by_id int4 NOT NULL,
-	requested_at timestamp NOT NULL,
-	encrypted_confirmation_token varchar NOT NULL,
-	confirmed_by_id int4 NULL,
-	confirmed_at timestamp NULL,
-	cancelled_by_id int4 NULL,
-	cancelled_at timestamp NULL,
-	work_item_id int4 NULL,
-	CONSTRAINT deletion_requests_pkey PRIMARY KEY (id),
-	CONSTRAINT deletion_requests_cancelled_by_id_fkey FOREIGN KEY (cancelled_by_id) REFERENCES users(id),
-	CONSTRAINT deletion_requests_confirmed_by_id_fkey FOREIGN KEY (confirmed_by_id) REFERENCES users(id),
-	CONSTRAINT deletion_requests_institution_id_fkey FOREIGN KEY (institution_id) REFERENCES institutions(id),
-	CONSTRAINT deletion_requests_requested_by_id_fkey FOREIGN KEY (requested_by_id) REFERENCES users(id),
-	CONSTRAINT deletion_requests_work_item_id_fkey FOREIGN KEY (work_item_id) REFERENCES work_items(id)
-);
-CREATE INDEX index_deletion_requests_institution_id ON public.deletion_requests USING btree (institution_id);
-
-
--- public.deletion_requests_generic_files definition
-
--- Drop table
-
--- DROP TABLE deletion_requests_generic_files;
-
-CREATE TABLE deletion_requests_generic_files (
-	deletion_request_id int4 NOT NULL,
-	generic_file_id int4 NOT NULL,
-	CONSTRAINT deletion_requests_generic_files_deletion_request_id_fkey FOREIGN KEY (deletion_request_id) REFERENCES deletion_requests(id),
-	CONSTRAINT deletion_requests_generic_files_generic_file_id_fkey FOREIGN KEY (generic_file_id) REFERENCES generic_files(id)
-);
-CREATE UNIQUE INDEX index_drgf_unique ON public.deletion_requests_generic_files USING btree (deletion_request_id, generic_file_id);
-
-
--- public.deletion_requests_intellectual_objects definition
-
--- Drop table
-
--- DROP TABLE deletion_requests_intellectual_objects;
-
-CREATE TABLE deletion_requests_intellectual_objects (
-	deletion_request_id int4 NOT NULL,
-	intellectual_object_id int4 NOT NULL,
-	CONSTRAINT deletion_requests_intellectual_obje_intellectual_object_id_fkey FOREIGN KEY (intellectual_object_id) REFERENCES intellectual_objects(id),
-	CONSTRAINT deletion_requests_intellectual_objects_deletion_request_id_fkey FOREIGN KEY (deletion_request_id) REFERENCES deletion_requests(id)
-);
-CREATE UNIQUE INDEX index_drio_unique ON public.deletion_requests_intellectual_objects USING btree (deletion_request_id, intellectual_object_id);
-
-
--- public.alerts definition
-
--- Drop table
-
--- DROP TABLE alerts;
-
-CREATE TABLE alerts (
-	id bigserial NOT NULL,
-	institution_id int4 NULL,
-	"type" varchar NOT NULL,
-	subject varchar NOT NULL,
-	"content" text NOT NULL,
-	deletion_request_id int4 NULL,
+CREATE TABLE public.work_items (
+	id serial4 NOT NULL,
 	created_at timestamp NOT NULL,
-	CONSTRAINT alerts_pkey PRIMARY KEY (id),
-	CONSTRAINT alerts_deletion_request_id_fkey FOREIGN KEY (deletion_request_id) REFERENCES deletion_requests(id),
-	CONSTRAINT alerts_institution_id_fkey FOREIGN KEY (institution_id) REFERENCES institutions(id)
+	updated_at timestamp NOT NULL,
+	intellectual_object_id int4 NULL,
+	generic_file_id int4 NULL,
+	"name" varchar NULL,
+	etag varchar NULL,
+	bucket varchar NULL,
+	"user" varchar NULL,
+	note text NULL,
+	"action" varchar NULL,
+	stage varchar NULL,
+	status varchar NULL,
+	outcome text NULL,
+	bag_date timestamp NULL,
+	date_processed timestamp NULL,
+	retry bool NOT NULL DEFAULT false,
+	node varchar(255) NULL,
+	pid int4 NULL DEFAULT 0,
+	needs_admin_review bool NOT NULL DEFAULT false,
+	institution_id int4 NULL,
+	queued_at timestamp NULL,
+	"size" int8 NULL,
+	stage_started_at timestamp NULL,
+	aptrust_approver varchar NULL,
+	inst_approver varchar NULL,
+	deletion_request_id int8 NULL,
+	CONSTRAINT work_items_pkey PRIMARY KEY (id)
 );
-CREATE INDEX index_alerts_institution_id ON public.alerts USING btree (institution_id);
-CREATE INDEX index_alerts_type ON public.alerts USING btree (type);
+CREATE INDEX index_work_items_etag_instid_and_name ON public.work_items USING btree (etag, institution_id, name);
+CREATE INDEX index_work_items_on_action ON public.work_items USING btree (action);
+CREATE INDEX index_work_items_on_date_processed ON public.work_items USING btree (date_processed);
+CREATE INDEX index_work_items_on_etag_and_name ON public.work_items USING btree (etag, name);
+CREATE INDEX index_work_items_on_generic_file_id ON public.work_items USING btree (generic_file_id);
+CREATE INDEX index_work_items_on_inst_id_and_date_processed ON public.work_items USING btree (institution_id, date_processed);
+CREATE INDEX index_work_items_on_institution_id ON public.work_items USING btree (institution_id);
+CREATE INDEX index_work_items_on_intellectual_object_id ON public.work_items USING btree (intellectual_object_id);
+CREATE INDEX index_work_items_on_stage ON public.work_items USING btree (stage);
+CREATE INDEX index_work_items_on_status ON public.work_items USING btree (status);
 
 
--- public.alerts_premis_events definition
+-- public.alerts foreign keys
 
--- Drop table
-
--- DROP TABLE alerts_premis_events;
-
-CREATE TABLE alerts_premis_events (
-	alert_id int4 NOT NULL,
-	premis_event_id int4 NOT NULL,
-	CONSTRAINT alerts_premis_events_alert_id_fkey FOREIGN KEY (alert_id) REFERENCES alerts(id),
-	CONSTRAINT alerts_premis_events_premis_event_id_fkey FOREIGN KEY (premis_event_id) REFERENCES premis_events(id)
-);
-CREATE INDEX index_alerts_premis_events_alert_id ON public.alerts_premis_events USING btree (alert_id);
-CREATE UNIQUE INDEX index_alerts_premis_events_unique ON public.alerts_premis_events USING btree (alert_id, premis_event_id);
+ALTER TABLE public.alerts ADD CONSTRAINT alerts_deletion_request_id_fkey FOREIGN KEY (deletion_request_id) REFERENCES public.deletion_requests(id);
+ALTER TABLE public.alerts ADD CONSTRAINT alerts_institution_id_fkey FOREIGN KEY (institution_id) REFERENCES public.institutions(id);
 
 
--- public.alerts_users definition
+-- public.alerts_premis_events foreign keys
 
--- Drop table
-
--- DROP TABLE alerts_users;
-
-CREATE TABLE alerts_users (
-	alert_id int4 NOT NULL,
-	user_id int4 NOT NULL,
-	sent_at timestamp NULL,
-	read_at timestamp NULL,
-	CONSTRAINT alerts_users_alert_id_fkey FOREIGN KEY (alert_id) REFERENCES alerts(id),
-	CONSTRAINT alerts_users_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(id)
-);
-CREATE INDEX index_alerts_users_alert_id ON public.alerts_users USING btree (alert_id);
-CREATE UNIQUE INDEX index_alerts_users_unique ON public.alerts_users USING btree (alert_id, user_id);
-CREATE INDEX index_alerts_users_user_id ON public.alerts_users USING btree (user_id);
+ALTER TABLE public.alerts_premis_events ADD CONSTRAINT alerts_premis_events_alert_id_fkey FOREIGN KEY (alert_id) REFERENCES public.alerts(id);
+ALTER TABLE public.alerts_premis_events ADD CONSTRAINT alerts_premis_events_premis_event_id_fkey FOREIGN KEY (premis_event_id) REFERENCES public.premis_events(id);
 
 
--- public.alerts_work_items definition
+-- public.alerts_users foreign keys
 
--- Drop table
+ALTER TABLE public.alerts_users ADD CONSTRAINT alerts_users_alert_id_fkey FOREIGN KEY (alert_id) REFERENCES public.alerts(id);
+ALTER TABLE public.alerts_users ADD CONSTRAINT alerts_users_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id);
 
--- DROP TABLE alerts_work_items;
 
-CREATE TABLE alerts_work_items (
-	alert_id int4 NOT NULL,
-	work_item_id int4 NOT NULL,
-	CONSTRAINT alerts_work_items_alert_id_fkey FOREIGN KEY (alert_id) REFERENCES alerts(id),
-	CONSTRAINT alerts_work_items_work_item_id_fkey FOREIGN KEY (work_item_id) REFERENCES work_items(id)
-);
-CREATE INDEX index_alerts_work_items_alert_id ON public.alerts_work_items USING btree (alert_id);
-CREATE UNIQUE INDEX index_alerts_work_items_unique ON public.alerts_work_items USING btree (alert_id, work_item_id);
+-- public.alerts_work_items foreign keys
+
+ALTER TABLE public.alerts_work_items ADD CONSTRAINT alerts_work_items_alert_id_fkey FOREIGN KEY (alert_id) REFERENCES public.alerts(id);
+ALTER TABLE public.alerts_work_items ADD CONSTRAINT alerts_work_items_work_item_id_fkey FOREIGN KEY (work_item_id) REFERENCES public.work_items(id);
+
+
+-- public.deletion_requests foreign keys
+
+ALTER TABLE public.deletion_requests ADD CONSTRAINT deletion_requests_cancelled_by_id_fkey FOREIGN KEY (cancelled_by_id) REFERENCES public.users(id);
+ALTER TABLE public.deletion_requests ADD CONSTRAINT deletion_requests_confirmed_by_id_fkey FOREIGN KEY (confirmed_by_id) REFERENCES public.users(id);
+ALTER TABLE public.deletion_requests ADD CONSTRAINT deletion_requests_institution_id_fkey FOREIGN KEY (institution_id) REFERENCES public.institutions(id);
+ALTER TABLE public.deletion_requests ADD CONSTRAINT deletion_requests_requested_by_id_fkey FOREIGN KEY (requested_by_id) REFERENCES public.users(id);
+
+
+-- public.deletion_requests_generic_files foreign keys
+
+ALTER TABLE public.deletion_requests_generic_files ADD CONSTRAINT deletion_requests_generic_files_deletion_request_id_fkey FOREIGN KEY (deletion_request_id) REFERENCES public.deletion_requests(id);
+ALTER TABLE public.deletion_requests_generic_files ADD CONSTRAINT deletion_requests_generic_files_generic_file_id_fkey FOREIGN KEY (generic_file_id) REFERENCES public.generic_files(id);
+
+
+-- public.deletion_requests_intellectual_objects foreign keys
+
+ALTER TABLE public.deletion_requests_intellectual_objects ADD CONSTRAINT deletion_requests_intellectual_obje_intellectual_object_id_fkey FOREIGN KEY (intellectual_object_id) REFERENCES public.intellectual_objects(id);
+ALTER TABLE public.deletion_requests_intellectual_objects ADD CONSTRAINT deletion_requests_intellectual_objects_deletion_request_id_fkey FOREIGN KEY (deletion_request_id) REFERENCES public.deletion_requests(id);
+
+
+-- public.institutions foreign keys
+
+ALTER TABLE public.institutions ADD CONSTRAINT fk_institutions_last_spot_restore FOREIGN KEY (last_spot_restore_work_item_id) REFERENCES public.work_items(id);
+
+
+-- public.users foreign keys
+
+ALTER TABLE public.users ADD CONSTRAINT fk_rails_7fcf39ca13 FOREIGN KEY (institution_id) REFERENCES public.institutions(id);
+
+
+-- public.work_items foreign keys
+
+ALTER TABLE public.work_items ADD CONSTRAINT fk_work_items_deletion_request_id FOREIGN KEY (deletion_request_id) REFERENCES public.deletion_requests(id);
 
 
 -- public.alerts_view source
@@ -720,7 +627,7 @@ AS SELECT a.id,
     a.created_at,
     au.user_id,
     u.name AS user_name,
-    u.email as user_email,
+    u.email AS user_email,
     au.sent_at,
     au.read_at
    FROM alerts a
@@ -807,19 +714,12 @@ AS SELECT dr.id,
           WHERE drgf.deletion_request_id = dr.id) AS file_count,
     ( SELECT count(*) AS count
            FROM deletion_requests_intellectual_objects drio
-          WHERE drio.deletion_request_id = dr.id) AS object_count,
-    dr.work_item_id,
-    wi.stage,
-    wi.status,
-    wi.date_processed,
-    wi.size,
-    wi.note
+          WHERE drio.deletion_request_id = dr.id) AS object_count
    FROM deletion_requests dr
      LEFT JOIN institutions i ON dr.institution_id = i.id
      LEFT JOIN users req ON dr.requested_by_id = req.id
      LEFT JOIN users conf ON dr.confirmed_by_id = conf.id
-     LEFT JOIN users can ON dr.confirmed_by_id = can.id
-     LEFT JOIN work_items wi ON dr.work_item_id = wi.id;
+     LEFT JOIN users can ON dr.confirmed_by_id = can.id;
 
 
 -- public.generic_file_counts source
@@ -1136,6 +1036,7 @@ AS SELECT wi.id,
     wi.stage_started_at,
     wi.aptrust_approver,
     wi.inst_approver,
+    wi.deletion_request_id,
     wi.created_at,
     wi.updated_at
    FROM work_items wi
@@ -1144,6 +1045,8 @@ AS SELECT wi.id,
      LEFT JOIN generic_files gf ON wi.generic_file_id = gf.id;
 
 
+
+-- DROP FUNCTION public.create_constraint_if_not_exists(text, text, text);
 
 CREATE OR REPLACE FUNCTION public.create_constraint_if_not_exists(t_name text, c_name text, constraint_sql text)
  RETURNS void
@@ -1159,6 +1062,8 @@ AS $function$
 end;
 $function$
 ;
+
+-- DROP FUNCTION public.populate_all_historical_deposit_stats();
 
 CREATE OR REPLACE FUNCTION public.populate_all_historical_deposit_stats()
  RETURNS void
@@ -1199,6 +1104,8 @@ end;
 $function$
 ;
 
+-- DROP FUNCTION public.populate_current_deposit_stats();
+
 CREATE OR REPLACE FUNCTION public.populate_current_deposit_stats()
  RETURNS integer
  LANGUAGE plpgsql
@@ -1238,6 +1145,8 @@ AS $function$
 $function$
 ;
 
+-- DROP FUNCTION public.populate_deposit_stats(date);
+
 CREATE OR REPLACE FUNCTION public.populate_deposit_stats(stop_date date)
  RETURNS void
  LANGUAGE plpgsql
@@ -1275,6 +1184,8 @@ AS $function$
 	end;
 $function$
 ;
+
+-- DROP FUNCTION public.populate_empty_deposit_stats();
 
 CREATE OR REPLACE FUNCTION public.populate_empty_deposit_stats()
  RETURNS integer
@@ -1314,10 +1225,8 @@ end;
 $function$
 ;
 
--- Note: This version of the function is no longer used. See the version 
--- below that takes a timestamp param. We have to keep this version in the
--- schema for data loading and testing on dev machines. Delete this and
--- the tests won't run. :(
+-- DROP FUNCTION public.populate_historical_deposit_stats(date);
+
 CREATE OR REPLACE FUNCTION public.populate_historical_deposit_stats(stop_date date)
  RETURNS integer
  LANGUAGE plpgsql
@@ -1380,6 +1289,8 @@ AS $function$
 $function$
 ;
 
+-- DROP FUNCTION public.populate_historical_deposit_stats(timestamp);
+
 CREATE OR REPLACE FUNCTION public.populate_historical_deposit_stats(stop_date timestamp without time zone)
  RETURNS integer
  LANGUAGE plpgsql
@@ -1440,6 +1351,8 @@ AS $function$
 $function$
 ;
 
+-- DROP FUNCTION public.update_counts();
+
 CREATE OR REPLACE FUNCTION public.update_counts()
  RETURNS integer
  LANGUAGE plpgsql
@@ -1483,6 +1396,8 @@ AS $function$
   end;
 $function$
 ;
+
+-- DROP FUNCTION public.update_current_deposit_stats();
 
 CREATE OR REPLACE FUNCTION public.update_current_deposit_stats()
  RETURNS integer
