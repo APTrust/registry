@@ -1,8 +1,10 @@
 package webui
 
 import (
+	"fmt"
 	"net/http"
 
+	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/gin-gonic/gin"
 )
@@ -25,6 +27,9 @@ func InternalMetadataIndex(c *gin.Context) {
 		return
 	}
 	req.TemplateData["migrations"] = migrations
+	req.TemplateData["envName"] = common.Context().Config.EnvName
+	req.TemplateData["redisUrl"] = common.Context().Config.Redis.URL
+	req.TemplateData["dbName"] = fmt.Sprintf("%s@%s", common.Context().Config.DB.Name, common.Context().Config.DB.Host)
 
 	c.HTML(http.StatusOK, "internal_metadata/index.html", req.TemplateData)
 }

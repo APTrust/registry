@@ -2,6 +2,50 @@
 
 {{ template "shared/_header.html" .}}
 
+
+
+<div class="box">
+  <div class="box-header">
+    <h1 class="h2">Environment</h1>
+  </div>
+  <table class="table is-hoverable is-fullwidth has-padding">
+    <thead>
+      <tr>
+        <th class="pl-5">Key</th>
+        <th>Value</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="pl-5">
+          APT_ENV
+        </td>
+        <td>
+          {{ .envName }}
+        </td>
+      </tr>
+      <tr>
+        <td class="pl-5">
+          Redis URL
+        </td>
+        <td>
+          {{ .redisUrl }}
+        </td>
+      </tr>
+      <tr>
+        <td class="pl-5">
+          Database
+        </td>
+        <td>
+          {{ .dbName }}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+
 <div class="box">
   <div class="box-header">
     <h1 class="h2">Internal Metadata</h1>
