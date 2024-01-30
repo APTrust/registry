@@ -96,6 +96,26 @@ func DeletionRequestSelect(query *Query) ([]*DeletionRequest, error) {
 	return requests, err
 }
 
+// DeletionRequestIncludesFile returns true if the deletion request with the
+// specified ID includes the generic file with the specified ID.
+func DeletionRequestIncludesFile(requestID, gfID int64) (bool, error) {
+	db := common.Context().DB
+	var count int
+	query := `SELECT count(*) FROM deletion_requests_generic_files where deletion_request_id = ? and generic_file_id = ?`
+	_, err := db.Model((*DeletionRequestsGenericFiles)(nil)).QueryOne(pg.Scan(&count), query, requestID, gfID)
+	return count > 0, err
+}
+
+// DeletionRequestIncludesObject returns true if the deletion request with the
+// specified ID includes the intellectual object with the specified ID.
+func DeletionRequestIncludesObject(requestID, objID int64) (bool, error) {
+	db := common.Context().DB
+	var count int
+	query := `SELECT count(*) FROM deletion_requests_intellectual_objects where deletion_request_id = ? and intellectual_object_id = ?`
+	_, err := db.Model((*DeletionRequestsGenericFiles)(nil)).QueryOne(pg.Scan(&count), query, requestID, objID)
+	return count > 0, err
+}
+
 // Save saves this requestitution to the database. This will peform an insert
 // if DeletionRequest.ID is zero. Otherwise, it updates.
 func (request *DeletionRequest) Save() error {

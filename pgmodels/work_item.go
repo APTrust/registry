@@ -223,6 +223,37 @@ func (item *WorkItem) Validate() *common.ValidationError {
 	if len(errors) > 0 {
 		return &common.ValidationError{Errors: errors}
 	}
+
+	// Inst users and admins can't create or update work items,
+	// but let's say some smarty pants figures out a way to do this.
+	// Prevent malicious users from inserting a deletion request ID
+	// into this work item. For such an insertion to succeed, there
+	// would have to be an existing deletion request that already
+	// includes this file or object.
+	if item.Action == constants.ActionDelete && item.DeletionRequestID != 0 {
+		if item.GenericFileID != 0 {
+			isLegitFileDeletion, err := DeletionRequestIncludesFile(item.DeletionRequestID, item.GenericFileID)
+			if err != nil {
+				common.Context().Log.Error().Msgf("Error checking whether deletion request includes file: %v", err)
+				if !isLegitFileDeletion {
+					errors["DeletionRequestID"] = "Invalid deletion request ID / file"
+				}
+			}
+		} else if item.IntellectualObjectID != 0 {
+			isLegitObjectDeletion, err := DeletionRequestIncludesObject(item.DeletionRequestID, item.IntellectualObjectID)
+			if err != nil {
+				common.Context().Log.Error().Msgf("Error checking whether deletion request includes object: %v", err)
+				if !isLegitObjectDeletion {
+					errors["DeletionRequestID"] = "Invalid deletion request ID / object"
+				}
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return &common.ValidationError{Errors: errors}
+	}
+
 	return nil
 }
 
