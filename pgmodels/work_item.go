@@ -9,6 +9,7 @@ import (
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
 	v "github.com/asaskevich/govalidator"
+	"github.com/go-pg/pg/v10"
 	"github.com/jinzhu/copier"
 	"github.com/stretchr/stew/slice"
 )
@@ -66,6 +67,7 @@ type WorkItem struct {
 	StageStartedAt       time.Time `json:"stage_started_at"`
 	APTrustApprover      string    `json:"aptrust_approver" pg:"aptrust_approver"`
 	InstApprover         string    `json:"inst_approver"`
+	DeletionRequestID    int64     `json:"deletion_request_id"`
 }
 
 // WorkItemByID returns the work item with the specified id.
@@ -114,6 +116,12 @@ func WorkItemsPendingForObject(instID int64, bagName string) ([]*WorkItem, error
 		WhereNotIn("status", completed...).
 		OrderBy("date_processed", "desc")
 	return WorkItemSelect(query)
+}
+
+// WorkItemsPendingForObjectBatch returns the number of WorkItems pending
+func WorkItemsPendingForObjectBatch(objIDs []int64) (int, error) {
+	completed := common.InterfaceList(constants.CompletedStatusValues)
+	return common.Context().DB.Model((*WorkItem)(nil)).Where(`intellectual_object_id in (?) and status not in (?)`, pg.In(objIDs), pg.In(completed)).Count()
 }
 
 // WorkItemsPendingForFile returns a list of in-progress WorkItems
@@ -215,6 +223,37 @@ func (item *WorkItem) Validate() *common.ValidationError {
 	if len(errors) > 0 {
 		return &common.ValidationError{Errors: errors}
 	}
+
+	// Inst users and admins can't create or update work items,
+	// but let's say some smarty pants figures out a way to do this.
+	// Prevent malicious users from inserting a deletion request ID
+	// into this work item. For such an insertion to succeed, there
+	// would have to be an existing deletion request that already
+	// includes this file or object.
+	if item.Action == constants.ActionDelete && item.DeletionRequestID != 0 {
+		if item.GenericFileID != 0 {
+			isLegitFileDeletion, err := DeletionRequestIncludesFile(item.DeletionRequestID, item.GenericFileID)
+			if err != nil {
+				common.Context().Log.Error().Msgf("Error checking whether deletion request includes file: %v", err)
+				if !isLegitFileDeletion {
+					errors["DeletionRequestID"] = "Invalid deletion request ID / file"
+				}
+			}
+		} else if item.IntellectualObjectID != 0 {
+			isLegitObjectDeletion, err := DeletionRequestIncludesObject(item.DeletionRequestID, item.IntellectualObjectID)
+			if err != nil {
+				common.Context().Log.Error().Msgf("Error checking whether deletion request includes object: %v", err)
+				if !isLegitObjectDeletion {
+					errors["DeletionRequestID"] = "Invalid deletion request ID / object"
+				}
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return &common.ValidationError{Errors: errors}
+	}
+
 	return nil
 }
 
@@ -450,7 +489,7 @@ func NewRestorationItem(obj *IntellectualObject, gf *GenericFile, user *User) (*
 // Param requestedBy is the User who initially requested the deletion.
 // Param approvedBy is the User who approved the deletion request.
 // These two are required.
-func NewDeletionItem(obj *IntellectualObject, gf *GenericFile, requestedBy, approvedBy *User) (*WorkItem, error) {
+func NewDeletionItem(obj *IntellectualObject, gf *GenericFile, requestedBy, approvedBy *User, deletionRequestID int64) (*WorkItem, error) {
 	if obj == nil || requestedBy == nil || approvedBy == nil {
 		return nil, common.ErrInvalidParam
 	}
@@ -482,6 +521,7 @@ func NewDeletionItem(obj *IntellectualObject, gf *GenericFile, requestedBy, appr
 	deletionItem.Action = constants.ActionDelete
 	deletionItem.User = requestedBy.Email
 	deletionItem.InstApprover = approvedBy.Email
+	deletionItem.DeletionRequestID = deletionRequestID
 	err = deletionItem.Save()
 	return deletionItem, err
 }

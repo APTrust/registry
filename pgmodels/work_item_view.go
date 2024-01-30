@@ -86,6 +86,7 @@ type WorkItemView struct {
 	StageStartedAt           time.Time `json:"stage_started_at" pg:"stage_started_at"`
 	APTrustApprover          string    `json:"aptrust_approver" pg:"aptrust_approver"`
 	InstApprover             string    `json:"inst_approver" pg:"inst_approver"`
+	DeletionRequestID        int64     `json:"deletion_request_id" pg:"deletion_request_id"`
 	CreatedAt                time.Time `json:"created_at" pg:"created_at"`
 	UpdatedAt                time.Time `json:"updated_at" pg:"updated_at"`
 }

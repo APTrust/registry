@@ -121,16 +121,18 @@ func TestNewDeletionForReview(t *testing.T) {
 	readOnlyURL := fmt.Sprintf("https://example.com/deletions/show/%d", del.DeletionRequest.ID)
 	assert.Equal(t, readOnlyURL, del.ReadOnlyURL())
 
-	expectedWorkItemURL := fmt.Sprintf("https://example.com/work_items/show/%d", del.DeletionRequest.WorkItemID)
-	actualWorkItemURL, err := del.WorkItemURL()
+	expectedWorkItemURL := fmt.Sprintf("https://example.com/work_items/show/%d", del.DeletionRequest.WorkItems[0].ID)
+	actualWorkItemURLs, err := del.WorkItemURLs()
 	require.Nil(t, err)
-	assert.Equal(t, expectedWorkItemURL, actualWorkItemURL)
+	assert.Equal(t, expectedWorkItemURL, actualWorkItemURLs[0])
 }
 
 func testCreateAndQueueWorkItem(t *testing.T, del *webui.Deletion) {
-	item, err := del.CreateAndQueueWorkItem()
+	err := del.CreateAndQueueWorkItems()
 	require.Nil(t, err)
-	require.NotNil(t, item)
+	// This request includes three files, so there should be three work items
+	require.Equal(t, 3, len(del.DeletionRequest.WorkItems))
+	item := del.DeletionRequest.WorkItems[0]
 	assert.True(t, item.ID > 0)
 	assert.Equal(t, del.DeletionRequest.GenericFiles[0].ID, item.GenericFileID)
 	assert.Equal(t, constants.ActionDelete, item.Action)
@@ -169,9 +171,9 @@ func testCreateApprovalAlert(t *testing.T, del *webui.Deletion) {
 		assert.Equal(t, del.DeletionRequest.InstitutionID, recipient.InstitutionID)
 	}
 
-	workItemURL, err := del.WorkItemURL()
+	workItemURLs, err := del.WorkItemURLs()
 	require.Nil(t, err)
-	assert.Contains(t, alert.Content, workItemURL)
+	assert.Contains(t, alert.Content, workItemURLs[0])
 }
 
 func testCreateCancellationAlert(t *testing.T, del *webui.Deletion) {

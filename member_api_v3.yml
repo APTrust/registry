@@ -3,7 +3,7 @@ openapi: 3.0.0
 info:
   title: APTrust Registry Member API
   description: Open API documentation for version 3 of the APTrust Member API.
-  version: '3.0'
+  version: '3.0.1'
   contact:
     email: "help@aptrust.org"
   license:
@@ -275,34 +275,10 @@ components:
           format: int64
           description: The total number of objects to be deleted in this request. If zero, this is a file deletion request.
           minimum: 0
-        work_item_id:
-          type: integer
-          format: int64
-          description: The ID of the WorkItem for this deletion request. The WorkItem will not exist until the deletion request is approved and will never be created if the deletion request is rejected.
-          nullable: true
-        stage:
-          type: string
-          description: The stage of the deletion WorkItem, if it exists. This describes how far along the deletion worker is in the deletion process.
-          enum: ["Requested", "Resolve"]
-          nullable: true
         status:
           type: string
-          description: The status of the deletion WorkItem, if it exists. This describes whether the deletion operation has started, completed, etc.
-          enum: ["Cancelled", "Failed", "Pending", "Started", "Success"]
-          nullable: true
-        date_processed:
-          type: string
-          format: date-time
-          description: Timestamp of the last activity on this deletion's WorkItem (assuming the deletion was approved).
-          nullable: true
-        size:
-          type: integer
-          format: int64
-          description: Total size, in bytes, of items to be deleted. This will be empty if the deletion request was not approved.
-          nullable: true
-        note:
-          type: string
-          description: A brief, human-readable summary of the current state of the deletion WorkItem. This will be null if the deletion request was not approved.
+          description: The status of the deletion request.
+          enum: ["Approved", "Awaiting Approval", "Rejected"]
           nullable: true
     DeletionRequestViewList:
       properties:
@@ -824,6 +800,11 @@ components:
           type: string
           format: date-time
           description: The date and time of last known activity on this work item. This timestamp may change several times during multipart processes such as ingest.
+        deletion_request_id:
+          type: integer
+          format: int64
+          description: The ID of the file or object deletion request related to this item. This will be null for all actions other than Delete.
+          nullable: false
         etag:
           type: string
           description: The etag of tar file uploaded for ingest.

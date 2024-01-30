@@ -68,20 +68,6 @@ func prepareFileDeletionPreconditions(gfID int64) (*pgmodels.WorkItem, error) {
 		return nil, err
 	}
 
-	// Also requires an approved Deletion work item
-	item := pgmodels.RandomWorkItem(
-		gf.IntellectualObject.BagName,
-		constants.ActionDelete,
-		gf.IntellectualObjectID,
-		gf.ID)
-	item.User = instAdmin.Email
-	item.InstApprover = instAdmin.Email
-	item.Status = constants.StatusStarted
-	err = item.Save()
-	if err != nil {
-		return nil, err
-	}
-
 	// Requires approved deletion request
 	now := time.Now().UTC()
 	request, err := pgmodels.NewDeletionRequest()
@@ -95,8 +81,23 @@ func prepareFileDeletionPreconditions(gfID int64) (*pgmodels.WorkItem, error) {
 	request.RequestedAt = now
 	request.ConfirmedByID = instAdmin.ID
 	request.ConfirmedAt = now
-	request.WorkItemID = item.ID
 	err = request.Save()
+	if err != nil {
+		return nil, err
+	}
+
+	// Also requires an approved Deletion work item
+	item := pgmodels.RandomWorkItem(
+		gf.IntellectualObject.BagName,
+		constants.ActionDelete,
+		gf.IntellectualObjectID,
+		gf.ID)
+	item.User = instAdmin.Email
+	item.InstApprover = instAdmin.Email
+	item.Status = constants.StatusStarted
+	item.DeletionRequestID = request.ID
+	err = item.Save()
+
 	return item, err
 }
 
@@ -124,20 +125,6 @@ func prepareObjectDeletionPreconditions(objID int64) (*pgmodels.WorkItem, error)
 		return nil, err
 	}
 
-	// Also requires an approved Deletion work item
-	item := pgmodels.RandomWorkItem(
-		obj.BagName,
-		constants.ActionDelete,
-		obj.ID,
-		0)
-	item.User = instAdmin.Email
-	item.InstApprover = instAdmin.Email
-	item.Status = constants.StatusStarted
-	err = item.Save()
-	if err != nil {
-		return nil, err
-	}
-
 	// Requires approved deletion request
 	now := time.Now().UTC()
 	request, err := pgmodels.NewDeletionRequest()
@@ -151,8 +138,23 @@ func prepareObjectDeletionPreconditions(objID int64) (*pgmodels.WorkItem, error)
 	request.RequestedAt = now
 	request.ConfirmedByID = instAdmin.ID
 	request.ConfirmedAt = now
-	request.WorkItemID = item.ID
 	err = request.Save()
+	if err != nil {
+		return nil, err
+	}
+
+	// Also requires an approved Deletion work item
+	item := pgmodels.RandomWorkItem(
+		obj.BagName,
+		constants.ActionDelete,
+		obj.ID,
+		0)
+	item.User = instAdmin.Email
+	item.InstApprover = instAdmin.Email
+	item.Status = constants.StatusStarted
+	item.DeletionRequestID = request.ID
+	err = item.Save()
+
 	return item, err
 }
 

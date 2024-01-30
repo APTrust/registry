@@ -3,7 +3,6 @@ package pgmodels_test
 import (
 	"testing"
 
-	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/db"
 	"github.com/APTrust/registry/pgmodels"
 
@@ -27,12 +26,15 @@ func TestDeletionRequestView(t *testing.T) {
 func TestDeletionRequestViewDisplayStatus(t *testing.T) {
 	req := &pgmodels.DeletionRequestView{}
 
-	for _, status := range constants.Statuses {
-		req.CancelledByID = 0
-		req.Status = status
-		assert.Equal(t, status, req.DisplayStatus())
+	req.CancelledByID = 0
+	req.ConfirmedByID = 0
+	assert.Equal(t, "Awaiting Approval", req.DisplayStatus())
 
-		req.CancelledByID = 1000
-		assert.Equal(t, "Rejected", req.DisplayStatus())
-	}
+	req.CancelledByID = 0
+	req.ConfirmedByID = 100
+	assert.Equal(t, "Approved", req.DisplayStatus())
+
+	req.ConfirmedByID = 0
+	req.CancelledByID = 1000
+	assert.Equal(t, "Rejected", req.DisplayStatus())
 }

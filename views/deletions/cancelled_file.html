@@ -7,13 +7,16 @@
 <div class="box">
   <div class="box-header"><h1>Deletion Cancelled</h1></div>
   <div class="box-content">
-    <p>You have cancelled deletion of the following file:</p>
+    <p>You have cancelled deletion of the following files:</p>
+
+
+    <ol class="mb-3 mt-3 ml-5" style="list-style: decimal">
+    {{ range $index, $gf := .deletionRequest.GenericFiles }}
+        <li class="mb-1"><a target="_blank" href="/files/show/{{ $gf.ID }}">{{ $gf.Identifier }}</a></li>
+    {{ end }}
+    </ol>
 
     <p>
-      <b>{{ $gf.Identifier }}</b><br/>
-      Size: {{ humanSize $gf.Size }} <br/>
-      Created: {{ dateUS $gf.CreatedAt }} <br/>
-      Updated: {{ dateUS $gf.UpdatedAt }} <br/>
       Requested: {{ .deletionRequest.RequestedBy.Name }} on {{ dateUS .deletionRequest.RequestedAt }} <br/>
       Cancelled: {{ .deletionRequest.CancelledBy.Name }}  on {{ dateUS .deletionRequest.CancelledAt }} <br/>
     </p>

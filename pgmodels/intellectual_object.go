@@ -74,6 +74,18 @@ func IntellectualObjectSelect(query *Query) ([]*IntellectualObject, error) {
 	return objects, err
 }
 
+// CountObjectsThatCanBeDeleted returns the number of active objects in the
+// list of object IDs that belong to the specified institution. We use this
+// when running batch deletions to ensure that no objects belong to an
+// institution other than the one requesting the deletion.
+//
+// If we get a list of 100 ids, the return value should be 100. If it's not
+// some object in the ID list was already deleted, or it belongs to someone
+// else.
+func CountObjectsThatCanBeDeleted(institutionID int64, objIDs []int64) (int, error) {
+	return common.Context().DB.Model((*IntellectualObject)(nil)).Where(`institution_id = ? and state = 'A' and id in (?)`, institutionID, pg.In(objIDs)).Count()
+}
+
 // Save saves this object to the database. This will peform an insert
 // if IntellectualObject.ID is zero. Otherwise, it updates.
 func (obj *IntellectualObject) Save() error {
@@ -252,18 +264,6 @@ func (obj *IntellectualObject) ActiveDeletionWorkItem() (*WorkItem, error) {
 	return item, err
 }
 
-func (obj *IntellectualObject) DeletionRequest(workItemID int64) (*DeletionRequestView, error) {
-	// web/webui/deletion_request_controller.go method DeletionRequestApprove
-	// creates a WorkItem when deletion request is approved. This is a
-	// one-to-one relationship. If we can't find the deletion request view
-	// for a valid deletion WorkItem, something is wrong!
-	query := NewQuery().
-		Where("work_item_id", "=", workItemID).
-		Where("object_count", ">", 0).
-		Where("file_count", "=", 0)
-	return DeletionRequestViewGet(query)
-}
-
 func (obj *IntellectualObject) AssertDeletionPreconditions() error {
 	err := obj.assertNoActiveFiles()
 	if err == nil {
@@ -330,8 +330,9 @@ func (obj *IntellectualObject) assertDeletionApproved() (*WorkItem, *DeletionReq
 	if common.IsEmptyString(workItem.InstApprover) {
 		return workItem, nil, fmt.Errorf("Deletion work item is missing institutional approver")
 	}
-	deletionRequest, err := obj.DeletionRequest(workItem.ID)
+	deletionRequest, err := DeletionRequestViewByID(workItem.DeletionRequestID)
 	if deletionRequest == nil || IsNoRowError(err) {
+		fmt.Println(workItem.ID, workItem.DeletionRequestID)
 		return workItem, nil, fmt.Errorf("No deletion request for work item %d", workItem.ID)
 	}
 	if err != nil {

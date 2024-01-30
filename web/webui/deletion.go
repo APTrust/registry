@@ -76,7 +76,55 @@ func NewDeletionForObject(objID int64, currentUser *pgmodels.User, baseURL strin
 		baseURL:     baseURL,
 		currentUser: currentUser,
 	}
-	err = del.initObjectDeletionRequest(objID)
+	err = del.initObjectDeletionRequest(obj.InstitutionID, []int64{objID})
+	if err != nil {
+		return nil, err
+	}
+	err = del.loadInstAdmins()
+	return del, err
+}
+
+// NewDeletionForObjectBatch creates a new DeletionRequest for a batch of
+// IntellectualObjects and returns the Deletion object. This constructor
+// is only for initializing new DeletionRequests, not for reviewing, approving
+// or cancelling existing requests.
+func NewDeletionForObjectBatch(requestorID, institutionID int64, objIDs []int64, baseURL string) (*Deletion, error) {
+
+	requestingUser, err := pgmodels.UserByID(requestorID)
+	if err != nil {
+		return nil, err
+	}
+	if requestingUser.InstitutionID != institutionID || requestingUser.Role != constants.RoleInstAdmin {
+		common.Context().Log.Error().Msgf("Requesting user %d is not admin at institution %d. Rejecting bulk deletion request.", requestorID, institutionID)
+		return nil, common.ErrInvalidRequestorID
+	}
+
+	// Make sure that all objects belong to the specified institution.
+	validObjectCount, err := pgmodels.CountObjectsThatCanBeDeleted(institutionID, objIDs)
+	if err != nil {
+		return nil, err
+	}
+	if validObjectCount != len(objIDs) {
+		common.Context().Log.Error().Msgf("Batch deletion requested for %d objects, of which only %d are valid. InstitutionID = %d. Current user = %s. IDs: %v",
+			len(objIDs), validObjectCount, institutionID, requestingUser.Email, objIDs)
+		return nil, common.ErrInvalidObjectID
+	}
+
+	// Make sure there are no pending work items for these objects.
+	pendingWorkItems, err := pgmodels.WorkItemsPendingForObjectBatch(objIDs)
+	if err != nil {
+		return nil, err
+	}
+	if pendingWorkItems > 0 {
+		common.Context().Log.Warn().Msgf("Some objects in batch deletion request have pending work items. Object IDs: %v", objIDs)
+		return nil, common.ErrPendingWorkItems
+	}
+
+	del := &Deletion{
+		baseURL:     baseURL,
+		currentUser: requestingUser,
+	}
+	err = del.initObjectDeletionRequest(institutionID, objIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -168,20 +216,22 @@ func (del *Deletion) initFileDeletionRequest(genericFileID int64) error {
 // We do not save the plaintext version of the token,
 // only the encrypted version. When this new DeletionRequest goes out of
 // scope, there's no further access to the token, so get it while you can.
-func (del *Deletion) initObjectDeletionRequest(objID int64) error {
-	obj, err := pgmodels.IntellectualObjectByID(objID)
-	if err != nil {
-		return err
-	}
-
+func (del *Deletion) initObjectDeletionRequest(institutionID int64, objIDs []int64) error {
 	deletionRequest, err := pgmodels.NewDeletionRequest()
 	if err != nil {
 		return err
 	}
-	deletionRequest.InstitutionID = obj.InstitutionID
+	deletionRequest.InstitutionID = institutionID
 	deletionRequest.RequestedByID = del.currentUser.ID
 	deletionRequest.RequestedAt = time.Now().UTC()
-	deletionRequest.AddObject(obj)
+
+	for _, objID := range objIDs {
+		obj, err := pgmodels.IntellectualObjectByID(objID)
+		if err != nil {
+			return err
+		}
+		deletionRequest.AddObject(obj)
+	}
 	err = deletionRequest.Save()
 	if err != nil {
 		return err
@@ -192,55 +242,80 @@ func (del *Deletion) initObjectDeletionRequest(objID int64) error {
 
 // CreateWorkItem creates a WorkItem describing this deletion. We call
 // this only if the admin approves the deletion.
-func (del *Deletion) CreateWorkItem() (*pgmodels.WorkItem, error) {
-	// Create the deletion WorkItem
-	obj := del.DeletionRequest.FirstObject()
-	gf := del.DeletionRequest.FirstFile()
-
-	// Deletion may be file only, no object.
-	var err error
-	if obj == nil && gf != nil {
-		obj, err = pgmodels.IntellectualObjectByID(gf.IntellectualObjectID)
-		if err != nil {
-			return nil, err
-		}
+func (del *Deletion) CreateObjDeletionWorkItem(obj *pgmodels.IntellectualObject) error {
+	if del.DeletionRequest == nil || del.DeletionRequest.ID == 0 {
+		errMsg := "Cannot create deletion work item because deletion request id is zero."
+		common.Context().Log.Error().Msgf(errMsg)
+		return fmt.Errorf(errMsg)
 	}
-
-	workItem, err := pgmodels.NewDeletionItem(obj, gf, del.DeletionRequest.RequestedBy, del.DeletionRequest.ConfirmedBy)
+	common.Context().Log.Warn().Msgf("Creating deletion work item for object %d - %s", obj.ID, obj.Identifier)
+	workItem, err := pgmodels.NewDeletionItem(obj, nil, del.DeletionRequest.RequestedBy, del.DeletionRequest.ConfirmedBy, del.DeletionRequest.ID)
 	if err != nil {
-		return nil, err
+		common.Context().Log.Error().Msgf(err.Error())
+		return err
 	}
-	del.DeletionRequest.WorkItem = workItem
-	err = del.DeletionRequest.Save()
+	common.Context().Log.Warn().Msgf("Created deletion work item %d with deletion request id %d", workItem.ID, workItem.DeletionRequestID)
+	del.DeletionRequest.WorkItems = append(del.DeletionRequest.WorkItems, workItem)
+	return nil
+}
 
-	return workItem, err
+func (del *Deletion) CreateFileDeletionWorkItem(gf *pgmodels.GenericFile) error {
+	obj, err := pgmodels.IntellectualObjectByID(gf.IntellectualObjectID)
+	if err != nil {
+		return err
+	}
+
+	workItem, err := pgmodels.NewDeletionItem(obj, gf, del.DeletionRequest.RequestedBy, del.DeletionRequest.ConfirmedBy, del.DeletionRequest.ID)
+	if err != nil {
+		return err
+	}
+	del.DeletionRequest.WorkItems = append(del.DeletionRequest.WorkItems, workItem)
+	return nil
 }
 
 // QueueWorkItem sends the WorkItem.ID into the appropriate NSQ topic.
 // We call this after calling CreateWorkItem, and only if the admin
 // approves the deletion.
-func (del *Deletion) QueueWorkItem() error {
-	workItem := del.DeletionRequest.WorkItem
-	if workItem == nil {
-		return common.ErrInternal
+func (del *Deletion) QueueWorkItems() error {
+	for _, item := range del.DeletionRequest.WorkItems {
+		if item == nil {
+			return common.ErrInternal
+		}
+		topic, err := constants.TopicFor(item.Action, item.Stage)
+		if err != nil {
+			return err
+		}
+		ctx := common.Context()
+		ctx.Log.Info().Msgf("Queueing WorkItem %d to topic %s", item.ID, topic)
+		err = ctx.NSQClient.Enqueue(topic, item.ID)
+		if err != nil {
+			return err
+		}
 	}
-	topic, err := constants.TopicFor(workItem.Action, workItem.Stage)
-	if err != nil {
-		return err
-	}
-	ctx := common.Context()
-	ctx.Log.Info().Msgf("Queueing WorkItem %d to topic %s", workItem.ID, topic)
-	return ctx.NSQClient.Enqueue(topic, workItem.ID)
+	return nil
 }
 
 // CreateAndQueueWorkItem creates and queues a deletion WorkItem.
 // We call this only if the admin approves the DeletionRequest.
-func (del *Deletion) CreateAndQueueWorkItem() (*pgmodels.WorkItem, error) {
-	workItem, err := del.CreateWorkItem()
-	if err == nil {
-		err = del.QueueWorkItem()
+func (del *Deletion) CreateAndQueueWorkItems() error {
+	var err error
+	for _, gf := range del.DeletionRequest.GenericFiles {
+		err = del.CreateFileDeletionWorkItem(gf)
+		if err != nil {
+			return err
+		}
 	}
-	return workItem, err
+	for _, obj := range del.DeletionRequest.IntellectualObjects {
+		err = del.CreateObjDeletionWorkItem(obj)
+		if err != nil {
+			return err
+		}
+	}
+	err = del.DeletionRequest.Save()
+	if err != nil {
+		return err
+	}
+	return del.QueueWorkItems()
 }
 
 // CreateRequestAlert creates an alert saying that a user has requested
@@ -271,13 +346,13 @@ func (del *Deletion) CreateRequestAlert() (*pgmodels.Alert, error) {
 func (del *Deletion) CreateApprovalAlert() (*pgmodels.Alert, error) {
 	templateName := "alerts/deletion_confirmed.txt"
 	alertType := constants.AlertDeletionConfirmed
-	workItemURL, err := del.WorkItemURL()
+	workItemURLs, err := del.WorkItemURLs()
 	if err != nil {
 		return nil, err
 	}
 	alertData := map[string]interface{}{
 		"deletionRequest":     del.DeletionRequest,
-		"workItemURL":         workItemURL,
+		"workItemURLs":        workItemURLs,
 		"deletionReadOnlyURL": del.ReadOnlyURL(),
 	}
 	return del.createDeletionAlert(templateName, alertType, alertData)
@@ -330,16 +405,21 @@ func (del *Deletion) ReviewURL() (string, error) {
 		del.DeletionRequest.ConfirmationToken), nil
 }
 
-// WorkItemURL returns the URL for the WorkItem for this DeletionRequest.
+// WorkItemURLs returns the URL for the WorkItem for this DeletionRequest.
 // If you call this on a cancelled or not-yet-approved request, there is
 // no WorkItem and you'll get common.ErrNotSupported.
-func (del *Deletion) WorkItemURL() (string, error) {
-	if del.DeletionRequest.WorkItemID == 0 {
-		return "", common.ErrNotSupported
+func (del *Deletion) WorkItemURLs() ([]string, error) {
+	urls := make([]string, 0)
+	if len(del.DeletionRequest.WorkItems) == 0 {
+		return urls, common.ErrNotSupported
 	}
-	return fmt.Sprintf("%s/work_items/show/%d",
-		del.baseURL,
-		del.DeletionRequest.WorkItemID), nil
+	for _, item := range del.DeletionRequest.WorkItems {
+		itemUrl := fmt.Sprintf("%s/work_items/show/%d",
+			del.baseURL,
+			item.ID)
+		urls = append(urls, itemUrl)
+	}
+	return urls, nil
 }
 
 // ReadOnlyURL returns a URL that displays info about the deletion request

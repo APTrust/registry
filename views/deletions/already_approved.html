@@ -5,9 +5,9 @@
 <div class="box">
   <div class="box-header"><h1>Deletion Previously Confirmed</h1></div>
   <div class="box-content">
-    <p>The deletion of file <b>{{ .itemIdentifier }}</b> was approved by {{ .deletionRequest.ConfirmedBy.Name }} ({{ .deletionRequest.ConfirmedBy.Email }}) on {{ dateUS .deletionRequest.ConfirmedAt }}.</p>
+    <p>The deletion of <b>{{ .itemIdentifier }}</b> was approved by {{ .deletionRequest.ConfirmedBy.Name }} ({{ .deletionRequest.ConfirmedBy.Email }}) on {{ dateUS .deletionRequest.ConfirmedAt }}.</p>
 
-    <p>If the file has not yet been deleted, it will be soon.</p>
+    <p>If the items have not yet been deleted, they will be soon.</p>
 
     <a class="button mr-3" href="/deletions">Back to Deletions List</a>
   </div>

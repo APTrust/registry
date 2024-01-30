@@ -51,10 +51,12 @@ func deletionRequestLoad(req *Request) error {
 	}
 	req.TemplateData["deletionRequest"] = deletionRequest
 
-	if deletionRequest.WorkItemID > 0 {
-		req.TemplateData["workItemURL"] = fmt.Sprintf("%s/work_items/show/%d",
-			req.BaseURL(),
-			deletionRequest.WorkItemID)
+	if len(deletionRequest.WorkItems) > 0 {
+		urls := make([]string, 0)
+		for _, item := range deletionRequest.WorkItems {
+			urls = append(urls, fmt.Sprintf("%s/work_items/show/%d", req.BaseURL(), item.ID))
+		}
+		req.TemplateData["workItemURLs"] = urls
 	}
 	return nil
 }
@@ -77,13 +79,18 @@ func DeletionRequestReview(c *gin.Context) {
 	req.TemplateData["deletionRequest"] = del.DeletionRequest
 	req.TemplateData["token"] = c.Query("token")
 
-	if len(del.DeletionRequest.IntellectualObjects) > 0 {
-		req.TemplateData["itemType"] = "object"
-		req.TemplateData["itemIdentifier"] = del.DeletionRequest.IntellectualObjects[0].Identifier
+	if len(del.DeletionRequest.IntellectualObjects) == 1 {
+		req.TemplateData["itemType"] = "single object"
+		req.TemplateData["itemIdentifier"] = fmt.Sprintf("object %s", del.DeletionRequest.IntellectualObjects[0].Identifier)
 		req.TemplateData["object"] = del.DeletionRequest.IntellectualObjects[0]
+	} else if len(del.DeletionRequest.IntellectualObjects) > 1 {
+		// Bulk object deletion
+		req.TemplateData["itemType"] = "object list"
+		req.TemplateData["itemIdentifier"] = fmt.Sprintf("%d objects", len(del.DeletionRequest.IntellectualObjects))
+		req.TemplateData["objectList"] = del.DeletionRequest.IntellectualObjects
 	} else if len(del.DeletionRequest.GenericFiles) > 0 {
 		req.TemplateData["itemType"] = "file"
-		req.TemplateData["itemIdentifier"] = del.DeletionRequest.GenericFiles[0].Identifier
+		req.TemplateData["itemIdentifier"] = fmt.Sprintf("file %s", del.DeletionRequest.GenericFiles[0].Identifier)
 		req.TemplateData["file"] = del.DeletionRequest.GenericFiles[0]
 	} else {
 		common.Context().Log.Info().Msgf("DeletionRequest with ID %d has no associated files or objects.", req.Auth.ResourceID)
@@ -116,7 +123,7 @@ func DeletionRequestApprove(c *gin.Context) {
 	if AbortIfError(c, err) {
 		return
 	}
-	_, err = del.CreateAndQueueWorkItem()
+	err = del.CreateAndQueueWorkItems()
 	if AbortIfError(c, err) {
 		return
 	}

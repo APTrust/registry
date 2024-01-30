@@ -47,6 +47,7 @@ const (
 	InstitutionRead                    = "InstitutionRead"
 	InstitutionUpdate                  = "InstitutionUpdate"
 	InstitutionUpdatePrefs             = "InstitutionUpdatePrefs"
+	IntellectualObjectBatchDelete      = "IntellectualObjectBatchDelete"
 	IntellectualObjectCreate           = "IntellectualObjectCreate"
 	IntellectualObjectDelete           = "IntellectualObjectDelete"
 	IntellectualObjectFinishBulkDelete = "IntellectualObjectFinishBulkDelete"
@@ -124,6 +125,7 @@ var Permissions = []Permission{
 	InstitutionRead,
 	InstitutionUpdate,
 	InstitutionUpdatePrefs,
+	IntellectualObjectBatchDelete,
 	IntellectualObjectCreate,
 	IntellectualObjectDelete,
 	IntellectualObjectFinishBulkDelete,
@@ -311,6 +313,7 @@ func initPermissions() {
 	sysAdmin[InstitutionRead] = true
 	sysAdmin[InstitutionUpdate] = true
 	sysAdmin[InstitutionUpdatePrefs] = true
+	sysAdmin[IntellectualObjectBatchDelete] = true
 	sysAdmin[IntellectualObjectCreate] = true
 	sysAdmin[IntellectualObjectDelete] = true           // preserv workers do this with sys admin account
 	sysAdmin[IntellectualObjectFinishBulkDelete] = true // not implemented yet

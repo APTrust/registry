@@ -44,10 +44,9 @@ type DeletionRequest struct {
 	RequestedBy                *User                 `json:"requested_by" pg:"rel:has-one"`
 	ConfirmedBy                *User                 `json:"confirmed_by" pg:"rel:has-one"`
 	CancelledBy                *User                 `json:"cancelled_by" pg:"rel:has-one"`
-	WorkItemID                 int64                 `json:"work_item_id"`
 	GenericFiles               []*GenericFile        `json:"generic_files" pg:"many2many:deletion_requests_generic_files"`
 	IntellectualObjects        []*IntellectualObject `json:"intellectual_objects" pg:"many2many:deletion_requests_intellectual_objects"`
-	WorkItem                   *WorkItem             `json:"work_item" pg:"rel:has-one"`
+	WorkItems                  []*WorkItem           `json:"work_item" pg:"rel:has-many"`
 }
 
 type DeletionRequestsGenericFiles struct {
@@ -79,7 +78,7 @@ func NewDeletionRequest() (*DeletionRequest, error) {
 // DeletionRequestByID returns the institution with the specified id.
 // Returns pg.ErrNoRows if there is no match.
 func DeletionRequestByID(id int64) (*DeletionRequest, error) {
-	query := NewQuery().Relations("RequestedBy", "ConfirmedBy", "CancelledBy", "GenericFiles", "IntellectualObjects", "WorkItem").Where(`"deletion_request"."id"`, "=", id)
+	query := NewQuery().Relations("RequestedBy", "ConfirmedBy", "CancelledBy", "GenericFiles", "IntellectualObjects", "WorkItems").Where(`"deletion_request"."id"`, "=", id)
 	return DeletionRequestGet(query)
 }
 
@@ -95,6 +94,26 @@ func DeletionRequestSelect(query *Query) ([]*DeletionRequest, error) {
 	var requests []*DeletionRequest
 	err := query.Select(&requests)
 	return requests, err
+}
+
+// DeletionRequestIncludesFile returns true if the deletion request with the
+// specified ID includes the generic file with the specified ID.
+func DeletionRequestIncludesFile(requestID, gfID int64) (bool, error) {
+	db := common.Context().DB
+	var count int
+	query := `SELECT count(*) FROM deletion_requests_generic_files where deletion_request_id = ? and generic_file_id = ?`
+	_, err := db.Model((*DeletionRequestsGenericFiles)(nil)).QueryOne(pg.Scan(&count), query, requestID, gfID)
+	return count > 0, err
+}
+
+// DeletionRequestIncludesObject returns true if the deletion request with the
+// specified ID includes the intellectual object with the specified ID.
+func DeletionRequestIncludesObject(requestID, objID int64) (bool, error) {
+	db := common.Context().DB
+	var count int
+	query := `SELECT count(*) FROM deletion_requests_intellectual_objects where deletion_request_id = ? and intellectual_object_id = ?`
+	_, err := db.Model((*DeletionRequestsGenericFiles)(nil)).QueryOne(pg.Scan(&count), query, requestID, objID)
+	return count > 0, err
 }
 
 // Save saves this requestitution to the database. This will peform an insert
@@ -247,7 +266,7 @@ func (request *DeletionRequest) saveRelations(tx *pg.Tx) error {
 	if err != nil {
 		return err
 	}
-	return request.saveWorkItem(tx)
+	return request.saveWorkItems(tx)
 }
 
 func (request *DeletionRequest) saveFiles(tx *pg.Tx) error {
@@ -274,18 +293,13 @@ func (request *DeletionRequest) saveObjects(tx *pg.Tx) error {
 	return nil
 }
 
-func (request *DeletionRequest) saveWorkItem(tx *pg.Tx) error {
-	if request.WorkItem != nil {
-		err := request.WorkItem.Save()
+func (request *DeletionRequest) saveWorkItems(tx *pg.Tx) error {
+	for _, item := range request.WorkItems {
+		item.DeletionRequestID = request.ID
+		err := item.Save()
 		if err != nil {
 			return err
 		}
-		if request.WorkItemID == 0 {
-			request.WorkItemID = request.WorkItem.ID
-			sql := "update deletion_requests set work_item_id = ? where id = ?"
-			_, err = tx.Exec(sql, request.WorkItem.ID, request.ID)
-		}
-		return err
 	}
 	return nil
 }

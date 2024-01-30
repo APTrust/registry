@@ -2,11 +2,13 @@ package pgmodels_test
 
 import (
 	"testing"
+	"time"
 
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/db"
 	"github.com/APTrust/registry/pgmodels"
+	"github.com/APTrust/registry/web/testutil"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -230,6 +232,60 @@ func TestDeletionRequestAddObject(t *testing.T) {
 	}
 	assert.Equal(t, 5, len(req.IntellectualObjects))
 	assert.Equal(t, req.IntellectualObjects[0], req.FirstObject())
+}
+
+func TestDeletionRequestIncludesFilesAndObjects(t *testing.T) {
+	defer db.ForceFixtureReload()
+
+	// Create a deletion request
+	req, err := pgmodels.NewDeletionRequest()
+	require.Nil(t, err)
+	require.NotNil(t, req)
+
+	// Add the requestor, institution id, etc.
+	inst2Admin := testutil.InitUser(t, "admin@inst2.edu")
+	req.RequestedBy = inst2Admin
+	req.RequestedByID = inst2Admin.ID
+	req.InstitutionID = inst2Admin.InstitutionID
+	req.RequestedAt = time.Now().UTC()
+
+	// Now add three objects and three files to the request
+	for i := 0; i < 3; i++ {
+		obj := pgmodels.RandomObject()
+		obj.InstitutionID = inst2Admin.InstitutionID
+		require.NoError(t, obj.Save())
+		req.AddObject(obj)
+
+		gf := pgmodels.RandomGenericFile(obj.ID, obj.Identifier)
+		gf.InstitutionID = inst2Admin.InstitutionID
+		require.NoError(t, gf.Save())
+		req.AddFile(gf)
+	}
+
+	// Save the request, with associated files and objects
+	require.NoError(t, req.Save())
+
+	// Now test the IncludesFile and IncludesObject functions
+	for _, obj := range req.IntellectualObjects {
+		isIncluded, err := pgmodels.DeletionRequestIncludesObject(req.ID, obj.ID)
+		require.NoError(t, err)
+		assert.True(t, isIncluded)
+	}
+	// Random, bogus object should not be included
+	isIncluded, err := pgmodels.DeletionRequestIncludesObject(req.ID, 99999999)
+	require.NoError(t, err)
+	assert.False(t, isIncluded)
+
+	// Check the files
+	for _, gf := range req.GenericFiles {
+		isIncluded, err := pgmodels.DeletionRequestIncludesFile(req.ID, gf.ID)
+		require.NoError(t, err)
+		assert.True(t, isIncluded)
+	}
+	// Random, bogus file should not be included
+	isIncluded, err = pgmodels.DeletionRequestIncludesFile(req.ID, 99999999)
+	require.NoError(t, err)
+	assert.False(t, isIncluded)
 }
 
 func TestDeletionRequestConfirm(t *testing.T) {

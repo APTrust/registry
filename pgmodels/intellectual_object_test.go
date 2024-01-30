@@ -94,6 +94,34 @@ func TestObjHasActiveFiles(t *testing.T) {
 
 }
 
+func TestCountObjectsThatCanBeDeleted(t *testing.T) {
+	// These are the ids of non-deleted objects belonging to institution 3.
+	// These are loaded from fixture data.
+	idsBelongingToInst3 := []int64{4, 5, 6, 12, 13}
+
+	// All five items should be OK to delete, because all five
+	// belong to inst 3 and are in active state.
+	numberOkToDelete, err := pgmodels.CountObjectsThatCanBeDeleted(3, idsBelongingToInst3)
+	require.NoError(t, err)
+	assert.Equal(t, len(idsBelongingToInst3), numberOkToDelete)
+
+	// We should get zero here, because none of these objects
+	// belong to inst2.
+	numberOkToDelete, err = pgmodels.CountObjectsThatCanBeDeleted(2, idsBelongingToInst3)
+	require.NoError(t, err)
+	assert.Equal(t, 0, numberOkToDelete)
+
+	// In this set, the first three items belong to inst 3 and
+	// are active. ID 14 is already deleted, and items 1 and 2
+	// belong to a different institution. So we should get three
+	// because only the first three items belong to inst 3 AND
+	// are currently active.
+	miscIds := []int64{4, 5, 6, 14, 1, 2}
+	numberOkToDelete, err = pgmodels.CountObjectsThatCanBeDeleted(3, miscIds)
+	require.NoError(t, err)
+	assert.Equal(t, 3, numberOkToDelete)
+}
+
 func TestObjLastIngestEvent(t *testing.T) {
 	obj, err := pgmodels.IntellectualObjectByID(6)
 	require.Nil(t, err)
@@ -213,9 +241,8 @@ func TestAssertObjDeletionPreconditions(t *testing.T) {
 	require.NotNil(t, obj)
 
 	testLastObjDeletionWorkItem(t, obj)
-	testObjectDeletionRequest(t, obj)
 
-	// Hit the following underlying methods:
+	// This hits the following underlying methods:
 	// assertNoActiveFiles
 	// assertNotAlreadyDeleted
 	// assertDeletionApproved
@@ -267,8 +294,11 @@ func TestAssertObjDeletionPreconditions(t *testing.T) {
 	req, err := pgmodels.CreateDeletionRequest(objects, nil)
 	require.Nil(t, err)
 	require.NotNil(t, req)
-	req.WorkItemID = workItem.ID
 	require.Nil(t, req.Save())
+
+	// Associate deletion request with work item
+	workItem.DeletionRequestID = req.ID
+	require.NoError(t, workItem.Save())
 
 	err = obj.AssertDeletionPreconditions()
 	require.NotNil(t, err)
@@ -320,32 +350,6 @@ func testLastObjDeletionWorkItem(t *testing.T, obj *pgmodels.IntellectualObject)
 
 }
 
-func testObjectDeletionRequest(t *testing.T, obj *pgmodels.IntellectualObject) {
-	// Initially, there's no deletion request for this object
-	reqView, err := obj.DeletionRequest(99999999999)
-	require.NotNil(t, err)
-	assert.Nil(t, reqView)
-
-	// Figure out the work item id. That will lead us back to
-	// the original deletion request.
-	item, err := obj.ActiveDeletionWorkItem()
-	require.Nil(t, err)
-	require.NotNil(t, item)
-
-	objects := []*pgmodels.IntellectualObject{obj}
-	req, err := pgmodels.CreateDeletionRequest(objects, nil)
-	require.Nil(t, err)
-	require.NotNil(t, req)
-	req.WorkItemID = item.ID
-	require.Nil(t, req.Save())
-
-	deletionReqView, err := obj.DeletionRequest(item.ID)
-	require.Nil(t, err)
-	require.NotNil(t, deletionReqView)
-
-	assert.Equal(t, req.ID, deletionReqView.ID)
-}
-
 func TestNewObjDeletionEvent(t *testing.T) {
 	defer db.ForceFixtureReload()
 	obj, err := pgmodels.CreateObjectWithRelations()
@@ -384,8 +388,12 @@ func TestNewObjDeletionEvent(t *testing.T) {
 	req, err := pgmodels.CreateDeletionRequest(objects, nil)
 	require.Nil(t, err)
 	require.NotNil(t, req)
-	req.WorkItemID = workItem.ID
 	require.Nil(t, req.Save())
+
+	// Attach the deletion request to the work item,
+	// but remember, it's still not approved.
+	workItem.DeletionRequestID = req.ID
+	require.NoError(t, workItem.Save())
 
 	event, err = obj.NewDeletionEvent()
 	assert.Nil(t, event)

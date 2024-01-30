@@ -144,6 +144,14 @@ var ErrCountTypeNotSupported = errors.New("type is not supported for view count"
 // but they shouldn't be doing it in this context.
 var ErrMustCompleteReset = errors.New("you must complete your own password reset")
 
+// ErrInvalidObjectID occurs when requesting a batch deletion that
+// contains one or more invalid object ids.
+var ErrInvalidObjectID = errors.New("one or more object ids is invalid")
+
+// ErrInvalidRequestorID occurs when APTrust admin submits batch delete
+// request on behalf of a user who is not allowed to initiate a batch deletion.
+var ErrInvalidRequestorID = errors.New("invalid requestor id")
+
 type ValidationError struct {
 	Errors map[string]string
 }
