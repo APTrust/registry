@@ -18,7 +18,7 @@ type SESClient struct {
 	Service        *ses.SES
 }
 
-func NewSESClient(serviceEnabled bool, awsRegion, sesUser, sesPassword, fromAddress string, logger zerolog.Logger) *SESClient {
+func NewSESClient(serviceEnabled bool, awsRegion, endpointUrl, sesUser, sesPassword, fromAddress string, logger zerolog.Logger) *SESClient {
 	client := &SESClient{
 		logger:         logger,
 		ServiceEnabled: serviceEnabled,
@@ -28,6 +28,7 @@ func NewSESClient(serviceEnabled bool, awsRegion, sesUser, sesPassword, fromAddr
 		client.Session = session.Must(session.NewSession(&aws.Config{
 			Region:      aws.String(awsRegion),
 			Credentials: credentials.NewStaticCredentials(sesUser, sesPassword, ""),
+			Endpoint:    aws.String(endpointUrl),
 		}))
 		client.Service = ses.New(client.Session)
 		logger.Info().Msgf("Email service is enabled. Alerts will be sent through AWS SES service with from address %s.", fromAddress)
