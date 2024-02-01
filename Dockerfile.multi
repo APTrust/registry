@@ -2,7 +2,7 @@
 
 FROM golang:alpine3.19 AS builder
 
-RUN apk update && apk add --no-cache upx make build-base bash git openssl
+RUN apk update && apk add --no-cache upx make build-base bash git openssl bind-tools curl
 
 ENV CGO_ENABLED=0 \
     GOOS=linux \
@@ -20,7 +20,7 @@ RUN go build -o ./main
 
 FROM golang:alpine3.19
 
-RUN apk update && apk add --no-cache upx make build-base bash git openssl
+RUN apk update && apk add --no-cache upx make build-base bash git openssl bind-tools curl
 
 WORKDIR /app
 
