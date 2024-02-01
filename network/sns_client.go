@@ -17,7 +17,7 @@ type SNSClient struct {
 	Service        *sns.SNS
 }
 
-func NewSNSClient(serviceEnabled bool, awsRegion, sesUser, sesPassword string, logger zerolog.Logger) *SNSClient {
+func NewSNSClient(serviceEnabled bool, awsRegion, endpoint, sesUser, sesPassword string, logger zerolog.Logger) *SNSClient {
 	client := &SNSClient{
 		logger:         logger,
 		ServiceEnabled: serviceEnabled,
@@ -26,6 +26,7 @@ func NewSNSClient(serviceEnabled bool, awsRegion, sesUser, sesPassword string, l
 		client.Session = session.Must(session.NewSession(&aws.Config{
 			Region:      aws.String(awsRegion),
 			Credentials: credentials.NewStaticCredentials(sesUser, sesPassword, ""),
+			Endpoint:    aws.String(endpoint),
 		}))
 		client.Service = sns.New(client.Session)
 		logger.Info().Msg("Two-factor SMS is enabled. OTP codes will be sent through AWS SNS service.")

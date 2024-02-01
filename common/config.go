@@ -28,6 +28,7 @@ var allowedConfigs = []string{
 	"uidemo",
 }
 
+// DBConfig contains info for connecting to the Postgres database.
 type DBConfig struct {
 	Host     string
 	Name     string
@@ -56,20 +57,33 @@ type LoggingConfig struct {
 	LogSql       bool
 }
 
+// TwoFactorConfig contains info for sending push messages
+// through Authy and SMS text messages through AWS SNS.
+// If SNSEndpoint is empty, we'll use the default public
+// SNS endpoint for the specified region. If non-empty,
+// we'll use the explicit SNSEndpoint. Should be non-empty
+// if we're on a private subnet without a NAT gateway.
 type TwoFactorConfig struct {
 	AuthyEnabled  bool
 	AuthyAPIKey   string `json:"-"`
 	AWSRegion     string
 	SMSEnabled    bool
 	OTPExpiration time.Duration
+	SNSEndpoint   string
 }
 
+// EmailConfig describes how to connect to Amazon SES or
+// another SMTP service. If SesEndpoint is empty, we'll use
+// the default public SES endpoint for the specified region.
+// If non-empty, we'll use the explicit SesEndpoint. Should
+// be non-empty if we're on a private subnet without a NAT gateway.
 type EmailConfig struct {
 	AWSRegion   string
 	Enabled     bool
 	FromAddress string
 	SesUser     string
 	SesPassword string
+	SesEndpoint string
 }
 
 type RedisConfig struct {
@@ -190,6 +204,7 @@ func loadConfig() *Config {
 			AWSRegion:     v.GetString("AWS_REGION"),
 			SMSEnabled:    v.GetBool("ENABLE_TWO_FACTOR_SMS"),
 			OTPExpiration: v.GetDuration("OTP_EXPIRATION"),
+			SNSEndpoint:   v.GetString("SNS_ENDPOINT"),
 		},
 		Email: &EmailConfig{
 			AWSRegion:   v.GetString("AWS_REGION"),
@@ -197,6 +212,7 @@ func loadConfig() *Config {
 			FromAddress: v.GetString("EMAIL_FROM_ADDRESS"),
 			SesUser:     sesUser,
 			SesPassword: sesPassword,
+			SesEndpoint: v.GetString("SES_ENDPOINT"),
 		},
 		Redis: &RedisConfig{
 			DefaultDB: v.GetInt("REDIS_DEFAULT_DB"),
