@@ -2,7 +2,7 @@
 
 FROM golang:alpine3.19 AS builder
 
-#RUN apk update && apk add --no-cache upx make build-base bash git openssl
+RUN apk update && apk add --no-cache upx make build-base bash git openssl
 
 ENV CGO_ENABLED=0 \
     GOOS=linux \
@@ -79,6 +79,8 @@ ENV LOG_TO_CONSOLE=true
 ENV LOG_SQL=false
 ENV AWS_SES_PWD=password
 ENV AWS_SES_USER=system@user.org
+ENV SES_ENDPOINT=smtp.mail.com
+ENV SNS_ENDPOINT=sns.local.com
 ENV BATCH_DELETION_KEY=key
 
 # Making a note for a new dockerfile test. 
