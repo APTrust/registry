@@ -265,6 +265,8 @@ Resources:
           ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/AWS_SES_PWD'
         - Name: AWS_SES_USER
           ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/AWS_SES_USER'
+        - Name:  BATCH_DELETION_KEY
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/BATCH_DELETION_KEY'
         LinuxParameters: {}
         LogConfiguration:
           LogDriver: awslogs
