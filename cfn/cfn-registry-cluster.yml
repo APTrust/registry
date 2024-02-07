@@ -187,7 +187,7 @@ Resources:
         - Condition: SUCCESS
           ContainerName: Nsqadmin_ResolvConf_InitContainer
         Essential: true 
-        Image: docker.io/aptrust/registry:491f9f1-master 
+        Image: docker.io/aptrust/registry:29f93a6-bulk-delete 
         Secrets:
         - Name: APT_ENV
           ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/APT_ENV'
@@ -265,6 +265,10 @@ Resources:
           ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/AWS_SES_PWD'
         - Name: AWS_SES_USER
           ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/AWS_SES_USER'
+        - Name:  SES_ENDPOINT
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/SES_ENDPOINT'
+        - Name:  SNS_ENDPOINT
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/SNS_ENDPOINT'
         - Name:  BATCH_DELETION_KEY
           ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/BATCH_DELETION_KEY'
         LinuxParameters: {}
