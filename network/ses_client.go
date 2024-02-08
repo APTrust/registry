@@ -28,7 +28,7 @@ func NewSESClient(serviceEnabled bool, awsRegion, endpointUrl, sesUser, sesPassw
 		client.Session = session.Must(session.NewSession(&aws.Config{
 			Region:      aws.String(awsRegion),
 			Credentials: credentials.NewStaticCredentials(sesUser, sesPassword, ""),
-			//Endpoint:    aws.String(endpointUrl),
+			Endpoint:    aws.String(endpointUrl),
 		}))
 		client.Service = ses.New(client.Session)
 		logger.Info().Msgf("Email service is enabled. Alerts will be sent through AWS SES service with from address %s.", fromAddress)
