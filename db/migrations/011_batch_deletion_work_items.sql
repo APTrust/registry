@@ -61,9 +61,10 @@ begin
             foreign key (deletion_request_id) references deletion_requests (id);	
 
         -- Copy deletion request ids from legacy requests into the work_items table.
-        update work_items  
+        update work_items wi
         set deletion_request_id = dr.id 
-        from work_items wi inner join deletion_requests dr on dr.work_item_id = wi.id
+        from work_items wi2 
+        inner join deletion_requests dr on dr.work_item_id = wi2.id
         where dr.work_item_id = wi.id;
        
         -- Now remove the work_item_id column from deletion requests
