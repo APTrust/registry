@@ -65,7 +65,7 @@ type LoggingConfig struct {
 // if we're on a private subnet without a NAT gateway.
 type TwoFactorConfig struct {
 	AuthyEnabled  bool
-	AuthyAPIKey   string `json:"-"`
+	AuthyAPIKey   string
 	AWSRegion     string
 	SMSEnabled    bool
 	OTPExpiration time.Duration
@@ -282,9 +282,28 @@ func (config *Config) BucketQualifier() string {
 // ToJSON serializes the config to JSON for logging purposes.
 // It omits some sensitive data, such as the Pharos API key and
 // AWS credentials.
-func (config *Config) ToJSON() string {
-	data, _ := json.Marshal(config)
-	return string(data)
+func (config *Config) ToJSON() (string, error) {
+	// Quick and dirty copy
+	data, err := json.Marshal(config)
+	if err != nil {
+		return "", err
+	}
+	copyOfConfig := &Config{}
+	err = json.Unmarshal(data, copyOfConfig)
+	if err != nil {
+		return "", err
+	}
+	// Mask sensitive data
+	copyOfConfig.BatchDeletionKey = maskString(config.BatchDeletionKey)
+	copyOfConfig.DB.Password = maskString(config.DB.Password)
+	copyOfConfig.DB.User = maskString(config.DB.User)
+	copyOfConfig.Email.SesUser = maskString(config.Email.SesUser)
+	copyOfConfig.Email.SesPassword = maskString(config.Email.SesPassword)
+	copyOfConfig.Redis.Password = maskString(config.Redis.Password)
+	copyOfConfig.TwoFactor.AuthyAPIKey = maskString(config.TwoFactor.AuthyAPIKey)
+
+	safeJson, err := json.MarshalIndent(copyOfConfig, "", "  ")
+	return string(safeJson), err
 }
 
 // Returns true if we're in a test or dev environment.
@@ -303,4 +322,11 @@ func (config *Config) HTTPScheme() string {
 		return "http"
 	}
 	return "https"
+}
+
+func maskString(s string) string {
+	if len(s) < 10 {
+		return "****"
+	}
+	return fmt.Sprintf("****%s", s[len(s)-3:])
 }

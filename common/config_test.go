@@ -52,7 +52,19 @@ func TestNewConfig(t *testing.T) {
 	assert.Equal(t, 43200, config.Cookies.MaxAge)
 	assert.Equal(t, "aptrust_session", config.Cookies.SessionCookie)
 	assert.False(t, config.Cookies.HTTPSOnly)
-	assert.NotEmpty(t, config.ToJSON())
+
+	// Set sensitive data and make sure it's masked in JSON.
+	config.BatchDeletionKey = "mask-me-batchdeletionkey"
+	config.DB.Password = "mask-me-dbpassword"
+	config.DB.User = "mask-me-dbuser"
+	config.Email.SesUser = "mask-me-sesuser"
+	config.Email.SesPassword = "mask-me-pwd-ses"
+	config.Redis.Password = "mask-me-pwd-redis"
+	config.TwoFactor.AuthyAPIKey = "mask-me-authy"
+
+	jsonString, err := config.ToJSON()
+	require.NoError(t, err)
+	assert.Equal(t, expectedConfigJson, jsonString)
 }
 
 func TestConfigBucketQualifier(t *testing.T) {
@@ -127,3 +139,55 @@ func TestHTTPScheme(t *testing.T) {
 	config.EnvName = "production"
 	assert.Equal(t, "https", config.HTTPScheme())
 }
+
+var expectedConfigJson = `{
+  "Cookies": {
+    "Secure": {},
+    "Domain": "localhost",
+    "HTTPSOnly": false,
+    "MaxAge": 43200,
+    "SessionCookie": "aptrust_session",
+    "FlashCookie": "aptrust_flash",
+    "PrefsCookie": "aptrust_prefs"
+  },
+  "DB": {
+    "Host": "localhost",
+    "Name": "apt_registry_test",
+    "User": "****ser",
+    "Password": "****ord",
+    "Port": 5432,
+    "Driver": "postgres",
+    "UseSSL": false
+  },
+  "EnvName": "test",
+  "Logging": {
+    "File": "/home/diamond/tmp/logs/registry_test.log",
+    "Level": 0,
+    "LogCaller": false,
+    "LogToConsole": false,
+    "LogSql": false
+  },
+  "NsqUrl": "http://localhost:4151",
+  "TwoFactor": {
+    "AuthyEnabled": false,
+    "AuthyAPIKey": "****thy",
+    "AWSRegion": "",
+    "SMSEnabled": false,
+    "OTPExpiration": 900000000000,
+    "SNSEndpoint": ""
+  },
+  "Email": {
+    "AWSRegion": "",
+    "Enabled": false,
+    "FromAddress": "help@aptrust.org",
+    "SesUser": "****ser",
+    "SesPassword": "****ses",
+    "SesEndpoint": ""
+  },
+  "Redis": {
+    "URL": "localhost:6379",
+    "Password": "****dis",
+    "DefaultDB": 0
+  },
+  "BatchDeletionKey": "****key"
+}`
