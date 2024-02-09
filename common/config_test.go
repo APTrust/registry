@@ -189,5 +189,6 @@ var expectedConfigJson = `{
     "Password": "****dis",
     "DefaultDB": 0
   },
-  "BatchDeletionKey": "****key"
+  "BatchDeletionKey": "****key",
+  "MaintenanceMode": false
 }`

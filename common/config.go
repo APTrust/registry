@@ -93,15 +93,26 @@ type RedisConfig struct {
 }
 
 type Config struct {
-	Cookies          *CookieConfig
-	DB               *DBConfig
-	EnvName          string
-	Logging          *LoggingConfig
-	NsqUrl           string
-	TwoFactor        *TwoFactorConfig
-	Email            *EmailConfig
-	Redis            *RedisConfig
+	Cookies   *CookieConfig
+	DB        *DBConfig
+	EnvName   string
+	Logging   *LoggingConfig
+	NsqUrl    string
+	TwoFactor *TwoFactorConfig
+	Email     *EmailConfig
+	Redis     *RedisConfig
+
+	// BatchDeletionKey is a secret loaded from parameter store.
+	// Batch deletion requests must include this as an extra security token.
 	BatchDeletionKey string
+
+	// MaintenanceMode indicates whether we're currently doing maintenance
+	// on the system. If this is true, all requests will be redirected to
+	// the /maintenance page, which will render HTML or JSON as necessary.
+	// Also, when this is true, the cron jobs in application/cron.go will
+	// not be initialized, so that the DB will receive no writes from Registry
+	// and will be free to run migrations.
+	MaintenanceMode bool
 }
 
 // Returns a new config based on APT_ENV
@@ -198,6 +209,7 @@ func loadConfig() *Config {
 		},
 		NsqUrl:           nsqUrl,
 		BatchDeletionKey: v.GetString("BATCH_DELETION_KEY"),
+		MaintenanceMode:  v.GetBool("MAINTENANCE_MODE"),
 		TwoFactor: &TwoFactorConfig{
 			AuthyAPIKey:   v.GetString("AUTHY_API_KEY"),
 			AuthyEnabled:  v.GetBool("ENABLE_TWO_FACTOR_AUTHY"),

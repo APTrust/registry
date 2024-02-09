@@ -1,0 +1,42 @@
+{{ define "maintenance/index.html" }} 
+
+{{ template "shared/_header.html" .}}
+
+
+<div class="row mb-5" style="width: 500px;margin:auto;">
+
+    {{ if .maintenanceMode }}
+
+    <h1 class="mb-5">System Maintenance</h1>
+
+    <p class="mb-3">{{ .timestamp }} </p>
+
+    <p class="mb-3">
+        The APTrust Registry is undergoing system maintenance.
+        Ingests, restorations and deletions are temporarily paused and
+        will resume when maintenance is complete.
+    </p>
+
+    <p>
+        If you have questions, please contact us at help@aptrust.org.
+    </p>
+
+    {{ else }}
+
+    <h1 class="mb-5">Normal Operation Mode</h1>
+
+    <p class="mb-3">{{ .timestamp }} </p>
+
+    <p class="mb-3">
+        The APTrust Registry is operating as expected. Thanks for checking!
+    </p>
+
+    <p><a class="button" title="Registry Dashboard" href="/">Go to Dashboard</a></p>
+
+    {{ end }}
+
+</div>
+
+{{ template "shared/_footer.html" .}} 
+
+{{ end }}

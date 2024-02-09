@@ -205,6 +205,9 @@ func initRoutes(router *gin.Engine) {
 		// InternalMetadata
 		webRoutes.GET("/internal_metadata", webui.InternalMetadataIndex)
 
+		// Maintenance
+		webRoutes.GET("/maintenance", webui.MaintenanceIndex)
+
 		// PremisEvents
 		webRoutes.GET("/events", webui.PremisEventIndex)
 		webRoutes.GET("/events/show/:id", webui.PremisEventShow)
