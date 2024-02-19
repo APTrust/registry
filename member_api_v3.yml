@@ -11,9 +11,9 @@ info:
     url: https://raw.githubusercontent.com/APTrust/registry/master/LICENSE
 
 servers:
-  - url: http://demo.aptrust.org/member-api/v3
+  - url: https://demo.aptrust.org
     description: "APTrust demo server. Use this for testing."
-  - url: http://repo.aptrust.org/member-api/v3
+  - url: https://repo.aptrust.org
     description: "APTrust production server."
 
 tags:
