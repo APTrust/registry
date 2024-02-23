@@ -271,6 +271,8 @@ Resources:
           ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/SNS_ENDPOINT'
         - Name:  BATCH_DELETION_KEY
           ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/BATCH_DELETION_KEY'
+        - Name:  MAINTENANCE_MODE
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/MAINTENANCE_MODE'
         LinuxParameters: {}
         LogConfiguration:
           LogDriver: awslogs
