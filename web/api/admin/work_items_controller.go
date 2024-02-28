@@ -1,8 +1,12 @@
 package admin_api
 
 import (
+	"fmt"
 	"net/http"
+	"strconv"
 
+	"github.com/APTrust/registry/common"
+	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/APTrust/registry/web/api"
 	"github.com/gin-gonic/gin"
@@ -28,6 +32,44 @@ func WorkItemUpdate(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gf)
+}
+
+// WorkItemRequeue requeues a WorkItem to the specified stage.
+//
+// PUT /admin-api/v3/items/requeue/:id
+func WorkItemRequeue(c *gin.Context) {
+	stage := c.PostForm("stage")
+	itemID, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if api.AbortIfError(c, err) {
+		return
+	}
+
+	item, err := pgmodels.WorkItemByID(itemID)
+	if api.AbortIfError(c, err) {
+		return
+	}
+
+	common.Context().Log.Info().Msgf("Requeueing WorkItem %d to %s", itemID, stage)
+
+	err = item.SetForRequeue(stage)
+	if api.AbortIfError(c, err) {
+		return
+	}
+
+	topic, err := constants.TopicFor(item.Action, stage)
+	if api.AbortIfError(c, err) {
+		return
+	}
+
+	err = common.Context().NSQClient.Enqueue(topic, itemID)
+	if api.AbortIfError(c, err) {
+		return
+	}
+	data := map[string]interface{}{
+		"StatusCode": http.StatusOK,
+		"Message":    fmt.Sprintf("Requeued WorkItem %d to %s", itemID, stage),
+	}
+	c.JSON(http.StatusOK, data)
 }
 
 func CreateOrUpdateItem(c *gin.Context) (*pgmodels.WorkItem, error) {

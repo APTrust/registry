@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"testing"
-	"time"
 
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
@@ -162,7 +161,7 @@ func TestWorkItemIndex(t *testing.T) {
 func TestWorkItemEditUpdate(t *testing.T) {
 	testutil.InitHTTPTests(t)
 
-	workItem := createWorkItem(t, "unit_test_bag1.tar")
+	workItem := testutil.CreateWorkItem(t, "unit_test_bag1.tar")
 
 	// Sys Admin should should be able to see the edit page for this item
 	testutil.SysAdminClient.GET("/work_items/edit/{id}", workItem.ID).
@@ -248,7 +247,7 @@ func TestWorkItemEditMissingObjectLink(t *testing.T) {
 func TestWorkItemRequeue(t *testing.T) {
 	testutil.InitHTTPTests(t)
 
-	workItem := createWorkItem(t, "unit_test_bag2.tar")
+	workItem := testutil.CreateWorkItem(t, "unit_test_bag2.tar")
 
 	// SysAdmin can requeue
 	testutil.SysAdminClient.PUT("/work_items/requeue/{id}", workItem.ID).
@@ -407,31 +406,4 @@ func createRedisRecord(t *testing.T, ctx *common.APTContext) (int64, string) {
 	require.NotEmpty(t, str)
 
 	return 22, obj.Identifier
-}
-
-func createWorkItem(t *testing.T, name string) *pgmodels.WorkItem {
-	now := time.Now().UTC()
-	workItem := &pgmodels.WorkItem{
-		Name:             name,
-		ETag:             "54321543215432154321000000000000",
-		InstitutionID:    testutil.Inst1User.InstitutionID,
-		Bucket:           "aptrust.receiving.yadda.yadda",
-		User:             "system@aptrust.org",
-		Note:             "Wheel her in, Homer! I'm not a picky man.",
-		Action:           constants.ActionIngest,
-		Stage:            constants.StageRecord,
-		Status:           constants.StatusStarted,
-		Outcome:          "Ourcome? I ain't done yet.",
-		BagDate:          now,
-		DateProcessed:    now,
-		Retry:            false,
-		Node:             "oh god, not Node!",
-		PID:              3344,
-		NeedsAdminReview: true,
-		QueuedAt:         now,
-		Size:             8900,
-		StageStartedAt:   now,
-	}
-	require.Nil(t, workItem.Save())
-	return workItem
 }

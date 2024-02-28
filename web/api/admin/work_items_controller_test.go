@@ -8,6 +8,7 @@ import (
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/APTrust/registry/web/api"
+	"github.com/APTrust/registry/web/testutil"
 	tu "github.com/APTrust/registry/web/testutil"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -89,6 +90,43 @@ func TestWorkItemIndex(t *testing.T) {
 			Expect().
 			Status(http.StatusForbidden)
 	}
+}
+
+func TestWorkItemRequeue(t *testing.T) {
+	tu.InitHTTPTests(t)
+
+	workItem := testutil.CreateWorkItem(t, "unit_test_bag2.tar")
+
+	// SysAdmin can requeue
+	tu.SysAdminClient.PUT("/admin-api/v3/items/requeue/{id}", workItem.ID).
+		WithHeader(constants.APIUserHeader, tu.SysAdmin.Email).
+		WithHeader(constants.APIKeyHeader, "password").
+		WithFormField("stage", constants.StageReingestCheck).
+		Expect().Status(http.StatusOK)
+
+	// Make sure that worked. It should set not only the stage,
+	// but the other values noted below.
+	item, err := pgmodels.WorkItemByID(workItem.ID)
+	require.Nil(t, err)
+	require.NotNil(t, item)
+	assert.Equal(t, constants.StageReingestCheck, item.Stage)
+	assert.True(t, item.Retry)
+	assert.False(t, item.NeedsAdminReview)
+	assert.Empty(t, item.PID)
+	assert.Empty(t, item.Node)
+	assert.Equal(t, constants.StatusPending, item.Status)
+
+	// Make sure other roles cannot requeue
+	tu.Inst1AdminClient.PUT("/admin-api/v3/items/requeue/requeue/{id}", workItem.ID).
+		WithHeader(constants.APIUserHeader, tu.Inst1Admin.Email).
+		WithHeader(constants.APIKeyHeader, "password").
+		WithFormField("stage", constants.StageReingestCheck).
+		Expect().Status(http.StatusForbidden)
+	tu.Inst1UserClient.PUT("/admin-api/v3/items/requeue/requeue/{id}", workItem.ID).
+		WithHeader(constants.APIUserHeader, tu.Inst1User.Email).
+		WithHeader(constants.APIKeyHeader, "password").
+		WithFormField("stage", constants.StageReingestCheck).
+		Expect().Status(http.StatusForbidden)
 }
 
 func TestItemCreateAndUpdate(t *testing.T) {

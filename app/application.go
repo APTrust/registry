@@ -395,6 +395,7 @@ func initRoutes(router *gin.Engine) {
 		adminAPI.GET("/storage_records", admin_api.StorageRecordIndex)
 
 		// Work Items
+		adminAPI.PUT("/items/requeue/:id", admin_api.WorkItemRequeue)
 		adminAPI.POST("/items/create/:institution_id", admin_api.WorkItemCreate)
 		adminAPI.PUT("/items/update/:id", admin_api.WorkItemUpdate)
 		adminAPI.GET("/items/show/:id", common_api.WorkItemShow)
