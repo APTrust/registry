@@ -152,6 +152,14 @@ var ErrInvalidObjectID = errors.New("one or more object ids is invalid")
 // request on behalf of a user who is not allowed to initiate a batch deletion.
 var ErrInvalidRequestorID = errors.New("invalid requestor id")
 
+// ErrRequestAlreadyApproved occurs when someone tries to approve
+// or cancel a request that was previously approved.
+var ErrRequestAlreadyApproved = errors.New("this request has already been approved")
+
+// ErrRequestAlreadyCancelled occurs when someone tries to approve
+// or cancel a request that was previously cancelled.
+var ErrRequestAlreadyCancelled = errors.New("this request has already been cancelled")
+
 type ValidationError struct {
 	Errors map[string]string
 }

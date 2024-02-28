@@ -154,6 +154,8 @@ func TestDeletionRequestApprove(t *testing.T) {
 	require.Nil(t, err)
 	require.NotNil(t, alert)
 	assert.Equal(t, constants.AlertDeletionConfirmed, alert.Type)
+
+	testDeletionRequestCannotBeAltered(t, request)
 }
 
 func TestDeletionRequestCancel(t *testing.T) {
@@ -189,4 +191,26 @@ func TestDeletionRequestCancel(t *testing.T) {
 	require.Nil(t, err)
 	require.NotNil(t, alert)
 	assert.Equal(t, constants.AlertDeletionCancelled, alert.Type)
+
+	testDeletionRequestCannotBeAltered(t, request)
+}
+
+// Make sure we can't cancel or approve it after it's been cancelled.
+// request should be an already approved or already cancelled
+// deletion request.
+func testDeletionRequestCannotBeAltered(t *testing.T, request *pgmodels.DeletionRequest) {
+
+	expect := testutil.Inst1AdminClient.POST("/deletions/cancel/{id}", request.ID).
+		WithHeader("Referer", testutil.BaseURL).
+		WithFormField("token", request.ConfirmationToken).
+		WithFormField("csrf_token", testutil.Inst1AdminToken).
+		Expect()
+	expect.Status(http.StatusConflict)
+
+	expect = testutil.Inst1AdminClient.POST("/deletions/approve/{id}", request.ID).
+		WithHeader("Referer", testutil.BaseURL).
+		WithFormField("token", request.ConfirmationToken).
+		WithFormField("csrf_token", testutil.Inst1AdminToken).
+		Expect()
+	expect.Status(http.StatusConflict)
 }
