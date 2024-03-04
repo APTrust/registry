@@ -5,7 +5,7 @@
     {{ if .xhrTarget }}
     {{ .pager.PerPage }}
     {{ else }}
-    <select id="selRowsPerPage" name="selRowsPerPage">
+    <select name="selRowsPerPage">
       <option value="20" {{ if strEq .pager.PerPage 20 }}selected{{ end }}>20</option>
       <option value="50" {{ if strEq .pager.PerPage 50 }}selected{{ end }}>50</option>
       <option value="100" {{ if strEq .pager.PerPage 100 }}selected{{ end }}>100</option>
@@ -70,15 +70,15 @@
 </div>
 
 <script>
-  if (document.getElementById("selRowsPerPage") != null) {
-    document.getElementById("selRowsPerPage").addEventListener("change", function (event) {
-      let rows = document.getElementById("selRowsPerPage").value
+  document.querySelectorAll('[name="selRowsPerPage"]').forEach((selectList) => {
+    selectList.addEventListener("change", function (event) {
+      let rows = selectList.value
       let urlParams = new URLSearchParams(location.search);
       urlParams.set("per_page", rows)
       urlParams.set("page", "1")
-      location = location.pathname + "?" + urlParams.toString()
+      location = location.pathname + "?" + urlParams.toString()  
     })
-  }
+  })
 </script>
 
 {{ end }}
