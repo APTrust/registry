@@ -24,6 +24,12 @@ func DepositFormatStatsSelect(institutionID, intellectualObjectID int64) ([]*Dep
 	_, err := common.Context().DB.Query(&stats, depositFormatQuery,
 		institutionID, institutionID,
 		intellectualObjectID, intellectualObjectID)
+	// Make sure Total displays last: https://trello.com/c/oM8onSiJ
+	for i := range stats {
+		if stats[i].FileFormat == "" {
+			stats[i].FileFormat = "Total"
+		}
+	}
 	return stats, err
 }
 
@@ -36,7 +42,7 @@ const depositFormatQuery = `
         (sum("size") / 1073741824) as "total_gb",
         (sum("size") / 1099511627776) as "total_tb",
         count(*) as file_count,
-        coalesce(file_format, 'Total') as "file_format"
+        file_format
         from generic_files
         where (? = 0 or institution_id = ?)
         and   (? = 0 or intellectual_object_id = ?)
