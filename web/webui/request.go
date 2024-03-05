@@ -29,25 +29,27 @@ func NewRequest(c *gin.Context) *Request {
 	ctx := common.Context()
 	flash, _ := c.Get(ctx.Config.Cookies.FlashCookie)
 	currentUser := helpers.CurrentUser(c)
-	auth, _ := c.Get("ResourceAuthorization")
+	resourceAuth, _ := c.Get("ResourceAuthorization")
 	pathAndQuery := c.Request.URL.Path
 	if c.Request.URL.RawQuery != "" {
 		pathAndQuery = c.Request.URL.Path + "?" + c.Request.URL.RawQuery
 	}
 	csrfToken, _ := c.Get(constants.CSRFTokenName)
+	auth := resourceAuth.(*middleware.ResourceAuthorization)
 	req := &Request{
 		PathAndQuery: pathAndQuery,
 		CurrentUser:  currentUser,
 		GinContext:   c,
-		Auth:         auth.(*middleware.ResourceAuthorization),
+		Auth:         auth,
 		TemplateData: gin.H{
 			"CurrentUser":           currentUser,
 			"filterChips":           make([]*pgmodels.ParamFilter, 0),
 			"filterChipJson":        "",
 			"flash":                 flash,
 			"showAsModal":           common.IsTrueString(c.Query("modal")),
-			"openSubMenu":           ShowOpenSubMenu(auth.(*middleware.ResourceAuthorization)),
+			"openSubMenu":           ShowOpenSubMenu(auth),
 			"currentUrl":            c.Request.URL,
+			"pageTitle":             auth.PageTitle,
 			constants.CSRFTokenName: csrfToken,
 		},
 	}
@@ -56,7 +58,7 @@ func NewRequest(c *gin.Context) *Request {
 }
 
 func ShowOpenSubMenu(auth *middleware.ResourceAuthorization) bool {
-	submenuItems := []string {
+	submenuItems := []string{
 		"AlertIndex",
 		"DeletionRequestIndex",
 		"GenericFileIndex",
