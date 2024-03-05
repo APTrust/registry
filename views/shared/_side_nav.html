@@ -20,7 +20,7 @@
     <li><a href="/work_items"><span class="material-icons" aria-hidden="true">build</span> Work Items</a></li>
     {{ end }}
 
-    <hr />
+    <li><hr /></li>
   
     {{ if userCan .CurrentUser "DepositReportShow" .CurrentUser.InstitutionID }}
     <li><a href="/reports/deposits?storage_option=Total"><span class="material-icons" aria-hidden="true">insert_chart</span> Reports</a></li>
@@ -37,46 +37,48 @@
       &nbsp;Options
     </a></li>
   
-    <ul id="sidebarSubnav" class="{{ if not .openSubMenu }} is-sr-only {{ end }}">
-      {{ if userCan .CurrentUser "FileRead" .CurrentUser.InstitutionID }}
-      <li><a href="/files?state=A"><span class="material-icons" aria-hidden="true">insert_drive_file</span> Files</a></li>
-      {{ end }}
-    
-      {{ if userCan .CurrentUser "EventRead" .CurrentUser.InstitutionID }}
-      <li><a href="/events"><span class="material-icons" aria-hidden="true">fact_check</span> Events</a></li>
-      {{ end }}
-    
-      {{ if userCan .CurrentUser "DeletionRequestList" .CurrentUser.InstitutionID }}
-      <li><a href="/deletions"><span class="material-icons" aria-hidden="true">backspace</span> Deletions</a></li>
-      {{ end }}
-
-      {{ if userCan .CurrentUser "AlertRead" .CurrentUser.InstitutionID }}
-      <li><a href="/alerts"><span class="material-icons" aria-hidden="true">notifications</span> Notifications</a></li>
-      {{ end }}
-    
-      {{ if .CurrentUser.IsAdmin }}
-        <li><a href="/institutions"><span class="material-icons" aria-hidden="true">location_city</span> Institutions</a></li>
-      {{ else }}
-        {{ if userCan .CurrentUser "InstitutionRead" .CurrentUser.InstitutionID }}
-        <li><a href="/institutions/show/{{ .CurrentUser.InstitutionID }}"><span class="material-icons" aria-hidden="true">location_city</span> Institution</a></li>
+    <li>
+      <ul id="sidebarSubnav" class="{{ if not .openSubMenu }} is-sr-only {{ end }}">
+        {{ if userCan .CurrentUser "FileRead" .CurrentUser.InstitutionID }}
+        <li><a href="/files?state=A"><span class="material-icons" aria-hidden="true">insert_drive_file</span> Files</a></li>
         {{ end }}
-      {{ end }}
+      
+        {{ if userCan .CurrentUser "EventRead" .CurrentUser.InstitutionID }}
+        <li><a href="/events"><span class="material-icons" aria-hidden="true">fact_check</span> Events</a></li>
+        {{ end }}
+      
+        {{ if userCan .CurrentUser "DeletionRequestList" .CurrentUser.InstitutionID }}
+        <li><a href="/deletions"><span class="material-icons" aria-hidden="true">backspace</span> Deletions</a></li>
+        {{ end }}
 
-      {{ if userCan .CurrentUser "BillingReportShow" .CurrentUser.InstitutionID }}
-      <li><a href="/reports/billing/"><span class="material-icons" aria-hidden="true">monetization_on</span> Billing Report</a></li>
-      {{ end }}
+        {{ if userCan .CurrentUser "AlertRead" .CurrentUser.InstitutionID }}
+        <li><a href="/alerts"><span class="material-icons" aria-hidden="true">notifications</span> Notifications</a></li>
+        {{ end }}
+      
+        {{ if .CurrentUser.IsAdmin }}
+          <li><a href="/institutions"><span class="material-icons" aria-hidden="true">location_city</span> Institutions</a></li>
+        {{ else }}
+          {{ if userCan .CurrentUser "InstitutionRead" .CurrentUser.InstitutionID }}
+          <li><a href="/institutions/show/{{ .CurrentUser.InstitutionID }}"><span class="material-icons" aria-hidden="true">location_city</span> Institution</a></li>
+          {{ end }}
+        {{ end }}
 
-      {{ if userCan .CurrentUser "NsqAdmin" .CurrentUser.InstitutionID }}
-      <li><a href="/nsq"><span class="material-icons" aria-hidden="true">not_started</span> NSQ</a></li>
-      {{ end }}
+        {{ if userCan .CurrentUser "BillingReportShow" .CurrentUser.InstitutionID }}
+        <li><a href="/reports/billing/"><span class="material-icons" aria-hidden="true">monetization_on</span> Billing Report</a></li>
+        {{ end }}
 
-      {{ if userCan .CurrentUser "InternalMetadataRead" .CurrentUser.InstitutionID }}
-      <li><a href="/internal_metadata"><span class="material-icons" aria-hidden="true">dns</span> DB Meta</a></li>
-      {{ end }}
+        {{ if userCan .CurrentUser "NsqAdmin" .CurrentUser.InstitutionID }}
+        <li><a href="/nsq"><span class="material-icons" aria-hidden="true">not_started</span> NSQ</a></li>
+        {{ end }}
 
-    </ul>
+        {{ if userCan .CurrentUser "InternalMetadataRead" .CurrentUser.InstitutionID }}
+        <li><a href="/internal_metadata"><span class="material-icons" aria-hidden="true">dns</span> DB Meta</a></li>
+        {{ end }}
 
-    <hr />
+      </ul>
+    </li>
+
+    <li><hr /></li>
   
     <li><a href="/users/sign_out"><span class="material-icons" aria-hidden="true">logout</span> Sign Out</a></li>
   </ul>
