@@ -60,10 +60,12 @@ func NewRequest(c *gin.Context) *Request {
 func ShowOpenSubMenu(auth *middleware.ResourceAuthorization) bool {
 	submenuItems := []string{
 		"AlertIndex",
+		"BillingReportShow",
 		"DeletionRequestIndex",
 		"GenericFileIndex",
 		"InstitutionIndex",
 		"InstitutionShow",
+		"InternalMetadataIndex",
 		"PremisEventIndex",
 		"NsqShow",
 		"NsqInit",
