@@ -19,6 +19,8 @@ $isAdmin := .CurrentUser.IsAdmin }}
     </form>
   </div>
 
+  {{ template "shared/_pager.html" dict "pager" .pager }}
+
   <table class="table is-hoverable is-fullwidth has-padding">
     <thead>
       <tr>

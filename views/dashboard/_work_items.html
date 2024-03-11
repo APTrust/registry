@@ -14,7 +14,7 @@
       {{ range $index, $item := .items }}
       <tr class="clickable" onclick="document.location.href='/work_items/show/{{ $item.ID }}'">
         <td class="pl-5">
-          <div class="is-flex is-align-items-center">
+          <div class="is-flex is-align-items-center wrap-long-words">
             <span class="action-icon mr-3">
               <span class="material-icons md-16" aria-hidden="true"><span>{{ iconFor $item.Action }}</span></span>
             </span>

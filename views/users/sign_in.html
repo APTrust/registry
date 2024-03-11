@@ -8,7 +8,7 @@
      suppress main template elements for non-logged-in users.
 -->
 
-<html>
+<html lang="en">
 
 <head>
   <title>APTrust Registry</title>
@@ -66,7 +66,7 @@
 
 <body>
   <div class="sign-in">
-    <img src="/static/img/APTrustLogo.gif">
+    <img src="/static/img/APTrustLogo.gif" alt="Academic Preservation Trust logo">
     <form action="/users/sign_in/" method="post">
       {{ if .preFillTestLogins }}
       <select name="email" id="emailInput">

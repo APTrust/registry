@@ -25,16 +25,21 @@ function modalOpen(event) {
     // that isn't present yet. This does not work without the timeout.
     // Ideally, we use a mutation observer for this. We'll get back
     // to this when we actually have some time.
-    window.setTimeout(function() { attachModalClose(modal) }, 350)
+    window.setTimeout(function() { 
+        console.log("Attaching modal close listener.")
+        attachModalClose(modal) 
+    }, 350)
 }
 
 export function attachModalClose(modal) {
     var exits = modal.querySelectorAll(".modal-exit");
+    console.log(`Found ${exits.length} close buttons`)
     exits.forEach(function (exit) {
         exit.addEventListener("click", function (event) {
             event.preventDefault();
             document.body.classList.remove("freeze");
             modal.classList.remove("open");
         });
+        console.log("Added close listener to one button")
     });
 }

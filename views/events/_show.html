@@ -38,11 +38,11 @@
     </tr>
     <tr>
       <th>Intellectual Object</th>
-      <td><a href="/objects/show/{{ .event.IntellectualObjectID }}">{{ .event.IntellectualObjectIdentifier }}</a></td>
+      <td class="wrap-long-words"><a href="/objects/show/{{ .event.IntellectualObjectID }}">{{ .event.IntellectualObjectIdentifier }}</a></td>
     </tr>
     <tr>
       <th>Generic File</th>
-      <td>
+      <td class="wrap-long-words">
         {{ if .event.GenericFileIdentifier }}
         <a href="/files/show/{{ .event.GenericFileID }}">{{ .event.GenericFileIdentifier }}</a>
         {{ else }}

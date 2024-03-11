@@ -205,6 +205,9 @@ func initRoutes(router *gin.Engine) {
 		// InternalMetadata
 		webRoutes.GET("/internal_metadata", webui.InternalMetadataIndex)
 
+		// Maintenance
+		webRoutes.GET("/maintenance", webui.MaintenanceIndex)
+
 		// PremisEvents
 		webRoutes.GET("/events", webui.PremisEventIndex)
 		webRoutes.GET("/events/show/:id", webui.PremisEventShow)
@@ -392,6 +395,7 @@ func initRoutes(router *gin.Engine) {
 		adminAPI.GET("/storage_records", admin_api.StorageRecordIndex)
 
 		// Work Items
+		adminAPI.PUT("/items/requeue/:id", admin_api.WorkItemRequeue)
 		adminAPI.POST("/items/create/:institution_id", admin_api.WorkItemCreate)
 		adminAPI.PUT("/items/update/:id", admin_api.WorkItemUpdate)
 		adminAPI.GET("/items/show/:id", common_api.WorkItemShow)

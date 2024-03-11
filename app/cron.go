@@ -12,6 +12,15 @@ var cronJobsInitialized = false
 
 // initCronJobs initializes
 func initCronJobs(ctx *common.APTContext) {
+	// We set the maintenance mode flag in Parameter Store, and it comes in through
+	// the environment. Changing this setting requires an application restart.
+	// So if it's true now, it's going to remain true until the app restarts.
+	// If it's true, we don't want to run these cron jobs against the DB, because
+	// part of maintenance my be a DB migration.
+	if ctx.Config.MaintenanceMode {
+		ctx.Log.Warn().Msg("Registry is NOT initializing cron jobs because system is in maintenance mode.")
+		return
+	}
 	if !cronJobsInitialized {
 		ctx.Log.Info().Msg("Initializing cron jobs")
 		updateSlowCounts(ctx)

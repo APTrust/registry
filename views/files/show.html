@@ -19,7 +19,7 @@
   <dl class="modal-header-row is-flex is-justify-content-space-between">
     <div>
       <dt class="text-label text-xs is-grey-dark">Identifier</dt>
-      <dd class="text-table">
+      <dd class="text-table wrap-long-words">
         {{ .file.Identifier }}
       </dd>
     </div>
@@ -47,16 +47,16 @@
         <dt class="text-label text-xs is-grey-dark">UUID</dt>
         <dd class="text-table">{{ .file.UUID }}</dd>
         <dt class="text-label text-xs is-grey-dark">Parent Object</dt>
-        <dd class="text-table"><a href="/objects/show/{{ .file.IntellectualObject.ID }}">{{
+        <dd class="text-table wrap-long-words"><a href="/objects/show/{{ .file.IntellectualObject.ID }}">{{
             .file.IntellectualObject.Identifier }}</a></dd>
         <dt class="text-label text-xs is-grey-dark">Storage URLs</dt>
-        <dd class="text-table">
+        <dd class="text-table wrap-long-words">
           {{ range $index, $storageRecord := .file.StorageRecords }}
           <a href="{{ $storageRecord.URL }}">{{ $storageRecord.URL }}</a><br />
           {{ end }}
         </dd>
         <dt class="text-label text-xs is-grey-dark">Checksums</dt>
-        <dd class="text-table">
+        <dd class="text-table wrap-long-words">
           {{ range $index, $cs := .file.Checksums }}
           {{ dateUS $cs.DateTime }} - {{ $cs.Algorithm }}:{{ $cs.Digest }}<br />
           {{ end }}

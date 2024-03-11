@@ -13,6 +13,8 @@
 
   <!-- .items type is []*WorkItemView -->
 
+  {{ template "shared/_pager.html" dict "pager" .pager }}
+
   <table class="table is-hoverable is-fullwidth has-padding">
     <thead>
       <tr>
@@ -61,7 +63,7 @@
             <span class="is-grey-dark">{{ $item.Action }}</span>
           </div>
         </td>
-        <td>{{ $item.Name }}</td>
+        <td class="wrap-long-words">{{ $item.Name }}</td>
 
         {{ if $cu.IsAdmin }}
         <td class="is-grey-dark">{{ $item.InstitutionName }}</td>

@@ -12,7 +12,7 @@
 
     <h3>Generic File</h3>
 
-    <p>
+    <p class="wrap-long-words">
       <b>{{ .file.Identifier }}</b><br/>
       Size: {{ humanSize .file.Size }} <br/>
       Created: {{ dateUS .file.CreatedAt }} <br/>
@@ -25,7 +25,7 @@
 
     <h3>Intellectual Object</h3>
 
-    <p class="mt-3">
+    <p class="mt-3 wrap-long-words">
       <a target="_blank" href="/objects/show/{{ .object.ID }}">{{ .object.Identifier }}</a><br/>
       Alt Identifier: {{ .object.AltIdentifier }} <br/>
       Internal Sender Identifier: {{ .object.InternalSenderIdentifier }} <br/>

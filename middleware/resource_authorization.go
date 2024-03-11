@@ -21,6 +21,7 @@ type ResourceAuthorization struct {
 	ResourceIdentifier string
 	ResourceInstID     int64
 	ResourceType       string
+	PageTitle          string
 	Permission         constants.Permission
 	Checked            bool
 	Approved           bool
@@ -81,6 +82,7 @@ func (r *ResourceAuthorization) getPermissionType() {
 		if authMeta, ok := AuthMap[r.Handler]; ok {
 			r.Permission = authMeta.Permission
 			r.ResourceType = authMeta.ResourceType
+			r.PageTitle = authMeta.PageTitle
 		} else {
 			r.Error = common.ErrResourcePermission
 		}

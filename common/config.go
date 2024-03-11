@@ -65,7 +65,7 @@ type LoggingConfig struct {
 // if we're on a private subnet without a NAT gateway.
 type TwoFactorConfig struct {
 	AuthyEnabled  bool
-	AuthyAPIKey   string `json:"-"`
+	AuthyAPIKey   string
 	AWSRegion     string
 	SMSEnabled    bool
 	OTPExpiration time.Duration
@@ -93,15 +93,26 @@ type RedisConfig struct {
 }
 
 type Config struct {
-	Cookies          *CookieConfig
-	DB               *DBConfig
-	EnvName          string
-	Logging          *LoggingConfig
-	NsqUrl           string
-	TwoFactor        *TwoFactorConfig
-	Email            *EmailConfig
-	Redis            *RedisConfig
+	Cookies   *CookieConfig
+	DB        *DBConfig
+	EnvName   string
+	Logging   *LoggingConfig
+	NsqUrl    string
+	TwoFactor *TwoFactorConfig
+	Email     *EmailConfig
+	Redis     *RedisConfig
+
+	// BatchDeletionKey is a secret loaded from parameter store.
+	// Batch deletion requests must include this as an extra security token.
 	BatchDeletionKey string
+
+	// MaintenanceMode indicates whether we're currently doing maintenance
+	// on the system. If this is true, all requests will be redirected to
+	// the /maintenance page, which will render HTML or JSON as necessary.
+	// Also, when this is true, the cron jobs in application/cron.go will
+	// not be initialized, so that the DB will receive no writes from Registry
+	// and will be free to run migrations.
+	MaintenanceMode bool
 }
 
 // Returns a new config based on APT_ENV
@@ -198,6 +209,7 @@ func loadConfig() *Config {
 		},
 		NsqUrl:           nsqUrl,
 		BatchDeletionKey: v.GetString("BATCH_DELETION_KEY"),
+		MaintenanceMode:  v.GetBool("MAINTENANCE_MODE"),
 		TwoFactor: &TwoFactorConfig{
 			AuthyAPIKey:   v.GetString("AUTHY_API_KEY"),
 			AuthyEnabled:  v.GetBool("ENABLE_TWO_FACTOR_AUTHY"),
@@ -282,9 +294,28 @@ func (config *Config) BucketQualifier() string {
 // ToJSON serializes the config to JSON for logging purposes.
 // It omits some sensitive data, such as the Pharos API key and
 // AWS credentials.
-func (config *Config) ToJSON() string {
-	data, _ := json.Marshal(config)
-	return string(data)
+func (config *Config) ToJSON() (string, error) {
+	// Quick and dirty copy
+	data, err := json.Marshal(config)
+	if err != nil {
+		return "", err
+	}
+	copyOfConfig := &Config{}
+	err = json.Unmarshal(data, copyOfConfig)
+	if err != nil {
+		return "", err
+	}
+	// Mask sensitive data
+	copyOfConfig.BatchDeletionKey = maskString(config.BatchDeletionKey)
+	copyOfConfig.DB.Password = maskString(config.DB.Password)
+	copyOfConfig.DB.User = maskString(config.DB.User)
+	copyOfConfig.Email.SesUser = maskString(config.Email.SesUser)
+	copyOfConfig.Email.SesPassword = maskString(config.Email.SesPassword)
+	copyOfConfig.Redis.Password = maskString(config.Redis.Password)
+	copyOfConfig.TwoFactor.AuthyAPIKey = maskString(config.TwoFactor.AuthyAPIKey)
+
+	safeJson, err := json.MarshalIndent(copyOfConfig, "", "  ")
+	return string(safeJson), err
 }
 
 // Returns true if we're in a test or dev environment.
@@ -303,4 +334,11 @@ func (config *Config) HTTPScheme() string {
 		return "http"
 	}
 	return "https"
+}
+
+func maskString(s string) string {
+	if len(s) < 10 {
+		return "****"
+	}
+	return fmt.Sprintf("****%s", s[len(s)-3:])
 }

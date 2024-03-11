@@ -118,6 +118,18 @@ func DeletionRequestApprove(c *gin.Context) {
 	if AbortIfError(c, err) {
 		return
 	}
+
+	if !del.DeletionRequest.CancelledAt.IsZero() {
+		err = common.ErrRequestAlreadyCancelled
+	} else if !del.DeletionRequest.ConfirmedAt.IsZero() {
+		err = common.ErrRequestAlreadyApproved
+	}
+
+	if AbortIfError(c, err) {
+		common.Context().Log.Error().Msgf("Cannot approve deletion request %d: %v", del.DeletionRequest.ID, err)
+		return
+	}
+
 	del.DeletionRequest.Confirm(req.CurrentUser)
 	err = del.DeletionRequest.Save()
 	if AbortIfError(c, err) {
@@ -150,6 +162,18 @@ func DeletionRequestCancel(c *gin.Context) {
 	if AbortIfError(c, err) {
 		return
 	}
+
+	if !del.DeletionRequest.CancelledAt.IsZero() {
+		err = common.ErrRequestAlreadyCancelled
+	} else if !del.DeletionRequest.ConfirmedAt.IsZero() {
+		err = common.ErrRequestAlreadyApproved
+	}
+
+	if AbortIfError(c, err) {
+		common.Context().Log.Error().Msgf("Cannot cancel deletion request %d: %v", del.DeletionRequest.ID, err)
+		return
+	}
+
 	del.DeletionRequest.Cancel(req.CurrentUser)
 	err = del.DeletionRequest.Save()
 	if AbortIfError(c, err) {

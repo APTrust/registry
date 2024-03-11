@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/APTrust/registry/app"
+	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/db"
 	"github.com/APTrust/registry/forms"
 	"github.com/APTrust/registry/pgmodels"
@@ -228,4 +229,31 @@ func AssertMatchesResultCount(t *testing.T, body string, count int) {
 	if matches != nil {
 		assert.Equal(t, countStr, matches[0][1], "Expected result count %d; got %s. Full string: %s", count, matches[0][1], matches[0][0])
 	}
+}
+
+func CreateWorkItem(t *testing.T, name string) *pgmodels.WorkItem {
+	now := time.Now().UTC()
+	workItem := &pgmodels.WorkItem{
+		Name:             name,
+		ETag:             "54321543215432154321000000000000",
+		InstitutionID:    Inst1User.InstitutionID,
+		Bucket:           "aptrust.receiving.yadda.yadda",
+		User:             "system@aptrust.org",
+		Note:             "Wheel her in, Homer! I'm not a picky man.",
+		Action:           constants.ActionIngest,
+		Stage:            constants.StageRecord,
+		Status:           constants.StatusStarted,
+		Outcome:          "Ourcome? I ain't done yet.",
+		BagDate:          now,
+		DateProcessed:    now,
+		Retry:            false,
+		Node:             "oh god, not Node!",
+		PID:              3344,
+		NeedsAdminReview: true,
+		QueuedAt:         now,
+		Size:             8900,
+		StageStartedAt:   now,
+	}
+	require.Nil(t, workItem.Save())
+	return workItem
 }

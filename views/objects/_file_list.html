@@ -59,13 +59,13 @@
       <td colspan="6" style="border:none">
         <div>
 
-          <div class="single-item-file-list-detail">
+          <div class="single-item-file-list-detail wrap-long-words">
             <h5 class="text-label text-xs">Identifier</h5>
-            <p>{{ $file.Identifier }}</p>
+            <p class="wrap-long-words">{{ $file.Identifier }}</p>
           </div>
 
           {{ range $index, $sr := $file.StorageRecords }}
-          <div class="single-item-file-list-detail">
+          <div class="single-item-file-list-detail wrap-long-words">
             <h5 class="text-label text-xs">URL</h5>
             <p><a href="{{ $sr.URL }}">{{ $sr.URL }}</a></p>
           </div>
@@ -80,7 +80,7 @@
             <dt class="text-label text-xs is-grey-dark">Algorithm</dt>
             <dd class="text-table">{{ $c.Algorithm }}</dd>
             <dt class="text-label text-xs is-grey-dark">Digest</dt>
-            <dd class="text-table">{{ $c.Digest }}</dd>
+            <dd class="text-table wrap-long-words">{{ $c.Digest }}</dd>
             <hr>
             {{ end }}
           </dl>

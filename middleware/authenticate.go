@@ -19,6 +19,17 @@ func Authenticate() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		LoadCookies(c)
 		SetDefaultHeaders(c)
+		// If in maintenance mode, redirect to maintenance mode page.
+		// Don't redirect requests to /maintenance, or you'll get into an infinite loop.
+		// Don't redirect requests to / or ECS health checks will fail.
+		if common.Context().Config.MaintenanceMode && c.Request.URL.Path != "/maintenance" && c.Request.URL.Path != "/" {
+			redirectTo := "/maintenance"
+			if IsAPIRequest(c) || IsAPIRoute(c) {
+				redirectTo += "?format=json"
+			}
+			c.Redirect(http.StatusFound, redirectTo)
+			c.Abort()
+		}
 		var user *pgmodels.User
 		var err error
 		if !ExemptFromAuth(c) {
@@ -224,6 +235,7 @@ func ExemptFromAuth(c *gin.Context) bool {
 		p == "/users/sign_out" ||
 		p == "/users/forgot_password" ||
 		p == "/ui_components" ||
+		p == "/maintenance" ||
 		strings.HasPrefix(p, "/static") ||
 		strings.HasPrefix(p, "/favicon") ||
 		strings.HasPrefix(p, "/error") ||

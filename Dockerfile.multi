@@ -82,7 +82,7 @@ ENV AWS_SES_USER=system@user.org
 ENV SES_ENDPOINT=smtp.mail.com
 ENV SNS_ENDPOINT=sns.local.com
 ENV BATCH_DELETION_KEY=key
-
+ENV MAINTENANCE_MODE=false
 # Making a note for a new dockerfile test. 
 EXPOSE 8080
 
