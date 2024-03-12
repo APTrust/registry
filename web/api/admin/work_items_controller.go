@@ -72,6 +72,26 @@ func WorkItemRequeue(c *gin.Context) {
 	c.JSON(http.StatusOK, data)
 }
 
+// WorkItemRedisDelete deletes a WorkItem's Redis record.
+// This is an admin-only feature.
+//
+// DELETE /admin-api/v3/items/redis_delete/:id
+func WorkItemRedisDelete(c *gin.Context) {
+	aptContext := common.Context()
+	req := api.NewRequest(c)
+	_, err := aptContext.RedisClient.WorkItemDelete(req.Auth.ResourceID)
+	if err != nil {
+		aptContext.Log.Error().Msgf("Error deleting WorkItem %d from Redis: %v", req.Auth.ResourceID, err)
+		api.AbortIfError(c, err)
+		return
+	}
+	data := map[string]interface{}{
+		"StatusCode": http.StatusOK,
+		"Message":    fmt.Sprintf("Deleted WorkItem %d from Redis.", req.Auth.ResourceID),
+	}
+	c.JSON(http.StatusOK, data)
+}
+
 func CreateOrUpdateItem(c *gin.Context) (*pgmodels.WorkItem, error) {
 	req := api.NewRequest(c)
 	gf, err := WorkItemFromJson(req)
