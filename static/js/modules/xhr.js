@@ -63,7 +63,8 @@ function setContent(elementOrId) {
     observer.observe(element, {childList: true, characterData: true})
 	return function(htmlData) {
         element.innerHTML = htmlData
-    }
+		attachModalClose(element)
+	}
 }
 
 function deleteContent(elementId) {
