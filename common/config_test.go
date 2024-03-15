@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/APTrust/registry/common"
+	"github.com/APTrust/registry/constants"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -61,6 +62,7 @@ func TestNewConfig(t *testing.T) {
 	config.Email.SesPassword = "mask-me-pwd-ses"
 	config.Redis.Password = "mask-me-pwd-redis"
 	config.TwoFactor.AuthyAPIKey = "mask-me-authy"
+	config.EmailServiceType = constants.EmailServiceSMTP
 
 	jsonString, err := config.ToJSON()
 	require.NoError(t, err)
@@ -190,5 +192,6 @@ var expectedConfigJson = `{
     "DefaultDB": 0
   },
   "BatchDeletionKey": "****key",
-  "MaintenanceMode": false
+  "MaintenanceMode": false,
+  "EmailServiceType": "SMTP"
 }`

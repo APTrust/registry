@@ -43,6 +43,8 @@ const (
 	CSRFHeaderName             = "X-CSRF-Token"
 	CSRFTokenName              = "csrf_token"
 	DefaultProfileIdentifier   = "https://raw.githubusercontent.com/APTrust/preservation-services/master/profiles/aptrust-v2.2.json"
+	EmailServiceSES            = "SES"
+	EmailServiceSMTP           = "SMTP"
 	EventAccessAssignment      = "access assignment"
 	EventCapture               = "capture"
 	EventCompression           = "compression"

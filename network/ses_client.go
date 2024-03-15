@@ -39,6 +39,9 @@ func NewSESClient(serviceEnabled bool, awsRegion, endpointUrl, sesUser, sesPassw
 }
 
 // Send sends an email to the specified address.
+//
+// Don't call this directly. Use common.Context().SendEmail() instead, so the
+// system can choose the right email service type based on the current config.
 func (client *SESClient) Send(emailAddress, subject, message string) error {
 	if client.ServiceEnabled {
 		return client.sendRealEmail(emailAddress, subject, message)

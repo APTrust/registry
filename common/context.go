@@ -5,6 +5,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/network"
 	"github.com/go-pg/pg/v10"
 	"github.com/rs/zerolog"
@@ -13,14 +14,38 @@ import (
 var ctx *APTContext
 
 type APTContext struct {
-	Config      *Config
-	DB          *pg.DB
-	Log         zerolog.Logger
+
+	// Config contains config information for the entire app.
+	Config *Config
+
+	// DB is our connection to the Postgres/RDS database.
+	DB *pg.DB
+
+	// Log is our logger.
+	Log zerolog.Logger
+
+	// AuthyClient sends push notifications to users who have enabled
+	// two-factor auth via push.
 	AuthyClient network.AuthyClientInterface
-	NSQClient   *network.NSQClient
+
+	// NSQClient lets registry queue work items for preservation services
+	// and lets us view NSQ admin stats.
+	NSQClient *network.NSQClient
+
+	// RedisClient talks to Redis/Elasticache to retrieve info about
+	// WorkItems in progress.
 	RedisClient *network.RedisClient
-	SESClient   *network.SESClient
-	SNSClient   *network.SNSClient
+
+	// SESClient is for sending emails from behind a NAT gateway
+	SESClient *network.SESClient
+
+	// SNSClient sends two-factor auth codes via Text/SMS message
+	// to user phones.
+	SNSClient *network.SNSClient
+
+	// SMTPClient is for sending emails from a private subnet that
+	// is not using a NAT gateway.
+	SMTPClient *network.SMTPClient
 }
 
 // Context returns an APTContext object, which includes
@@ -64,6 +89,7 @@ func Context() *APTContext {
 			NSQClient:   network.NewNSQClient(config.NsqUrl, zlogger),
 			SESClient:   network.NewSESClient(config.Email.Enabled, config.TwoFactor.AWSRegion, config.Email.SesEndpoint, config.Email.SesUser, config.Email.SesPassword, config.Email.FromAddress, zlogger),
 			SNSClient:   network.NewSNSClient(config.TwoFactor.SMSEnabled, config.TwoFactor.AWSRegion, config.TwoFactor.SNSEndpoint, config.Email.SesUser, config.Email.SesPassword, zlogger),
+			SMTPClient:  network.NewSMTPClient(config.Email.Enabled, config.TwoFactor.AWSRegion, config.Email.SesEndpoint, config.Email.SesUser, config.Email.SesPassword, config.Email.FromAddress, zlogger),
 			RedisClient: redisClient,
 		}
 	}
@@ -105,4 +131,13 @@ func getLogger(config *Config) zerolog.Logger {
 	}
 
 	return logger
+}
+
+func (c *APTContext) SendEmail(recipientEmail, subject, message string) error {
+	c.Log.Info().Msgf("Sending email to %s re %s via %s", recipientEmail, subject, c.Config.EmailServiceType)
+	if c.Config.EmailServiceType == constants.EmailServiceSES {
+		return c.SESClient.Send(recipientEmail, subject, message)
+	} else {
+		return c.SMTPClient.Send(recipientEmail, subject, message)
+	}
 }

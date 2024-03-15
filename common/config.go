@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/APTrust/registry/constants"
 	"github.com/asaskevich/govalidator"
 	"github.com/gorilla/securecookie"
 	"github.com/rs/zerolog"
@@ -113,6 +114,12 @@ type Config struct {
 	// not be initialized, so that the DB will receive no writes from Registry
 	// and will be free to run migrations.
 	MaintenanceMode bool
+
+	// EmailServiceType describes which email service to use in the current
+	// environment. This should be "SMTP" if we're running on a private
+	// subnet with no NAT gateway. Otherwise, it should be "SES". If this is
+	// not set, or if it's set to an invalid value, it defaults to SMTP.
+	EmailServiceType string
 }
 
 // Returns a new config based on APT_ENV
@@ -180,6 +187,12 @@ func loadConfig() *Config {
 		sesPassword = v.GetString("AWS_SECRET_ACCESS_KEY")
 	}
 
+	emailServiceType := strings.ToUpper(v.GetString("EMAIL_SERVICE_TYPE"))
+	if emailServiceType != constants.EmailServiceSES && emailServiceType != constants.EmailServiceSMTP {
+		fmt.Fprintf(os.Stderr, "EMAIL_SERVICE_TYPE %s is not valid. Defaulting to %s.", emailServiceType, constants.EmailServiceSMTP)
+		emailServiceType = constants.EmailServiceSMTP
+	}
+
 	return &Config{
 		Logging: &LoggingConfig{
 			File:         v.GetString("LOG_FILE"),
@@ -209,6 +222,7 @@ func loadConfig() *Config {
 		},
 		NsqUrl:           nsqUrl,
 		BatchDeletionKey: v.GetString("BATCH_DELETION_KEY"),
+		EmailServiceType: emailServiceType,
 		MaintenanceMode:  v.GetBool("MAINTENANCE_MODE"),
 		TwoFactor: &TwoFactorConfig{
 			AuthyAPIKey:   v.GetString("AUTHY_API_KEY"),

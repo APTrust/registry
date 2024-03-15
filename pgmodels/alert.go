@@ -223,7 +223,7 @@ func CreateAlert(alert *Alert, templateName string, alertData map[string]interfa
 
 	// Send the alert & mark as sent
 	for _, recipient := range alert.Users {
-		err := common.Context().SESClient.Send(recipient.Email, alert.Subject, alert.Content)
+		err := common.Context().SendEmail(recipient.Email, alert.Subject, alert.Content)
 		if err == nil {
 			err = alert.MarkAsSent(recipient.ID)
 			if err != nil {
