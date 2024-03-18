@@ -30,15 +30,14 @@
     <li><a href="/users"><span class="material-icons" aria-hidden="true">people</span> Users</a></li>
     {{ end }}
 
-    <li><a href="#sidebarSubnav" id="sidebarToggle">
+    <li><a href="#sidebarSubnav" id="sidebarToggle" aria-expanded="{{ if not .openSubMenu }}false{{ else }}true{{end}}" aria-controls="sidebarSubnav">
       <span class="material-icons" aria-hidden="true">list</span> 
       <span class="more-options {{ if .openSubMenu }} is-hidden {{ end }}">More </span>  
       <span class="less-options {{ if not .openSubMenu }} is-hidden {{ end }}">Fewer </span> 
       &nbsp;Options
-    </a></li>
-  
-    <li>
-      <ul id="sidebarSubnav" class="{{ if not .openSubMenu }} is-sr-only {{ end }}">
+    </a>
+    
+      <ul id="sidebarSubnav" class="{{ if not .openSubMenu }} is-sr-only {{ end }}" style="{{ if not .openSubMenu }}display:none{{ else }}display:block{{end}}">
         {{ if userCan .CurrentUser "FileRead" .CurrentUser.InstitutionID }}
         <li><a href="/files?state=A"><span class="material-icons" aria-hidden="true">insert_drive_file</span> Files</a></li>
         {{ end }}
