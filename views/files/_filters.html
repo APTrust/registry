@@ -21,7 +21,7 @@
         <div class="column is-align-self-flex-end">
           <div class="filters-grid-controls">
             <input class="filter-button button is-primary" type="submit" value="Filter">
-            <a class="filter-toggle button is-compact is-white is-not-underlined" href="#gridFiltersAll">
+            <a class="filter-toggle button is-compact is-white is-not-underlined" aria-expanded="false" aria-controls="gridFiltersAll" href="#gridFiltersAll">
               <span class="material-icons md-16" aria-hidden="true">expand_more</span>
               <span class="more-filters">More Filters</span>
               <span class="less-filters is-hidden">Fewer Filters</span>
@@ -30,7 +30,7 @@
         </div>
       </div>
 
-      <div class="filters-grid-all is-sr-only" id="gridFiltersAll">
+      <div class="filters-grid-all is-sr-only" id="gridFiltersAll" style="display:none">
         <hr>
 
         <div class="columns">
