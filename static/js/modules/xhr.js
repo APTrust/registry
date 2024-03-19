@@ -64,6 +64,8 @@ function setContent(elementOrId) {
 	return function(htmlData) {
         element.innerHTML = htmlData
 		attachModalClose(element)
+		focusOnChild(element)
+		console.log(document.activeElement)
 	}
 }
 
@@ -87,7 +89,14 @@ function getJSON(url, callback) {
 }
 
 function isElement(element) {
-    return element instanceof Element || element instanceof HTMLDocument;
+    return element instanceof Element || element instanceof Document;
+}
+
+function focusOnChild(element) {
+	let child = element.querySelector('a:not(.modal-exit)', 'input', 'select', 'button')
+	if (child != null) {
+		child.focus()
+	}
 }
 
 export function initXHR() {
