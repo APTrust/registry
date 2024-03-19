@@ -1,6 +1,7 @@
 package webui
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -68,8 +69,12 @@ func DepositReportShow(c *gin.Context) {
 	var deposits []*pgmodels.DepositStats
 	var err error
 	if params.ReportType == "over_time" {
+		req.TemplateData["chartTitle"] = "Deposits Over Time"
+		req.TemplateData["chartAltText"] = fmt.Sprintf("APTrust Deposits Over Time from %s to %s", params.StartDate.Format("January 2, 2006"), params.EndDate.Format("January 2, 2006"))
 		deposits, err = pgmodels.DepositStatsOverTime(params.InstitutionID, params.StorageOption, params.StartDate, params.EndDate)
 	} else {
+		req.TemplateData["chartTitle"] = "Deposits By Institution"
+		req.TemplateData["chartAltText"] = fmt.Sprintf("APTrust Deposits By Institution from %s to %s", params.StartDate.Format("January 2, 2006"), params.EndDate.Format("January 2, 2006"))
 		deposits, err = pgmodels.DepositStatsSelect(params.InstitutionID, params.StorageOption, params.EndDate)
 	}
 	if AbortIfError(c, err) {
