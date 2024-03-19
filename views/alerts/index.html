@@ -118,6 +118,11 @@ $isAdmin := .CurrentUser.IsAdmin }}
       row.addEventListener("click", function () {
         markAlertRead(id);
       });
+      row.addEventListener("keyup", function (event) {
+        if (event.keyCode == 13) {
+          markAlertRead(id);
+        }
+      });
     });
   }
   addAlertEventListeners();
