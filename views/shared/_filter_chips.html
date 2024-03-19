@@ -2,7 +2,7 @@
 
 <div class="filters-grid-clear">
     {{ range $index, $chip := .filterChips }}
-    <button class="badge filter-chip mb-3">
+    <button class="badge filter-chip mb-3" data-filter-index="{{ $index }}">
       <strong class="mr-1">{{ $chip.ChipLabel }}:</strong> {{ $chip.ChipValue }}
       <span class="icon material-icons md-16" aria-hidden="true" onclick="removeFilter({{ $index }})">cancel</span>
     </button>
@@ -69,5 +69,15 @@ function removeAllFilters() {
     let newUrl = url + '?' + newParams.toString()
     window.location = newUrl
 }
+
+// Accessibility: Let user remove filters with keyboard navigation.
+document.querySelectorAll('[data-filter-index]').forEach((el) => {
+    el.addEventListener("keydown", function(event){
+        if(event.keyCode == 13) {
+            let filterIndex = el.getAttribute("data-filter-index")
+            removeFilter(filterIndex)            
+        }
+    })
+})
 </script>
 {{ end }}
