@@ -7,6 +7,10 @@
 // the attribute data-modal-initialized.
 //
 
+// Keep track of which element opened the modal, so we can
+// return focus to that element when the modal closes.
+var modalOpener = null
+
 export function initModals() {
     var modalControllers = document.querySelectorAll("[data-modal]");
     modalControllers.forEach(function (c) {
@@ -20,6 +24,7 @@ function modalOpen(event) {
     event.preventDefault();
     document.body.classList.add("freeze");
     modal.classList.add("open");
+    modalOpener = event.target || event.srcElement;
 }
 
 // This is called in xhr.js after content is loaded into modal via ajax request.
@@ -32,6 +37,10 @@ export function attachModalClose(modal) {
             event.preventDefault();
             document.body.classList.remove("freeze");
             parent.classList.remove("open");
+
+            // For keyboard navigation, return focus to modal opener.
+            modalOpener.focus()
+            //console.log(document.activeElement)
         });
         console.log("Added close listener to one button")
     });

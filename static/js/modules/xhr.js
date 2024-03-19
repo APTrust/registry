@@ -65,7 +65,7 @@ function setContent(elementOrId) {
         element.innerHTML = htmlData
 		attachModalClose(element)
 		focusOnChild(element)
-		console.log(document.activeElement)
+		//console.log(document.activeElement)
 	}
 }
 
