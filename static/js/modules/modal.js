@@ -39,7 +39,9 @@ export function attachModalClose(modal) {
             parent.classList.remove("open");
 
             // For keyboard navigation, return focus to modal opener.
-            modalOpener.focus()
+            if (modalOpener != null) {
+                modalOpener.focus()
+            }
             //console.log(document.activeElement)
         });
         console.log("Added close listener to one button")
