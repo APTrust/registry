@@ -43,26 +43,28 @@ var QueryOp = map[string]string{
 // already know virtually all of the ways users want to join tables.
 // Views allow us to issue simple queries, which this package supports.
 type Query struct {
-	conditions   []string
-	params       []interface{}
-	columns      []string
-	whereColumns []string
-	relations    []string
-	orderBy      []string
-	offset       int
-	limit        int
+	conditions          []string
+	params              []interface{}
+	columns             []string
+	whereColumns        []string
+	relations           []string
+	orderBy             []string
+	offset              int
+	limit               int
+	includesInCondition bool
 }
 
 func NewQuery() *Query {
 	return &Query{
-		conditions:   make([]string, 0),
-		params:       make([]interface{}, 0),
-		columns:      make([]string, 0),
-		whereColumns: make([]string, 0),
-		relations:    make([]string, 0),
-		orderBy:      make([]string, 0),
-		offset:       -1,
-		limit:        -1,
+		conditions:          make([]string, 0),
+		params:              make([]interface{}, 0),
+		columns:             make([]string, 0),
+		whereColumns:        make([]string, 0),
+		relations:           make([]string, 0),
+		orderBy:             make([]string, 0),
+		offset:              -1,
+		limit:               -1,
+		includesInCondition: false,
 	}
 }
 
@@ -142,8 +144,25 @@ func (q *Query) inOrNotIn(col, op string, vals ...interface{}) *Query {
 		q.conditions = append(q.conditions, cond)
 		q.params = append(q.params, vals...)
 		q.whereColumns = append(q.whereColumns, common.SanitizeIdentifier(col))
+		q.includesInCondition = true
 	}
 	return q
+}
+
+// IncludesInCondition returns true if this query's where clause includes
+// either an "IN" or "NOT IN" condition in its where clause.
+//
+// This is to help with a special case regarding row counts. Because Postgres
+// counts are slow on large tables, we cache counts hourly in the *_counts
+// tables. We generally want to pull counts from those cache tables, except
+// in cases where the filter criteria are too specific, or when the filter
+// criteria include an "IN" or "NOT IN" condition because those can match
+// multiple rows in the *_counts table, leading to the error
+// "pg: multiple rows in result set"
+//
+// See https://trello.com/c/bePHaJpe
+func (q *Query) IncludesInCondition() bool {
+	return q.includesInCondition
 }
 
 func (q *Query) MakePlaceholders(start, count int) string {
@@ -246,7 +265,6 @@ func (q *Query) OrderBy(column, direction string) *Query {
 //
 // var users []*User
 // err := query.Select(&users)
-//
 func (q *Query) Select(structOrSlice interface{}) error {
 	orm := common.Context().DB.Model(structOrSlice)
 	for _, rel := range q.GetRelations() {
