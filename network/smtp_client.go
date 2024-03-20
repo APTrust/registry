@@ -49,10 +49,15 @@ func (client *SMTPClient) Send(recipientAddress, subject, body string) error {
 
 // send sends a real email
 func (client *SMTPClient) send(recipientAddress, subject, body string) error {
-	auth := smtp.PlainAuth("", client.sesUser, client.sesPassword, client.endpointUrl)
+	// Strip port to get hostname
+	hostname := strings.SplitN(client.endpointUrl, ":", 2)[0]
+	client.logger.Info().Msgf("Sending mail through host %s. Full endpoint with port is %s.", hostname, client.endpointUrl)
+
+	auth := smtp.PlainAuth("", client.sesUser, client.sesPassword, hostname)
 	msg := SMTPFormatMessage(recipientAddress, subject, body)
 
 	// AWS requires we use STARTTLS. The SendMail function should do this automatically.
+	// Note that endpoint here MUST include the port, according to go smtp.SendMail docs.
 	return smtp.SendMail(client.endpointUrl, auth, client.FromAddress, []string{recipientAddress}, msg)
 }
 
