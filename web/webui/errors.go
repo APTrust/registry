@@ -23,6 +23,7 @@ func AbortIfError(c *gin.Context, err error) bool {
 		} else {
 			ErrorShow(c)
 		}
+		common.Context().Log.Error().Msgf("Request aborted. %s - %v", c.Request.RequestURI, err)
 		c.Abort()
 		return true
 	}

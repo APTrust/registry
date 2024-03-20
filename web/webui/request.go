@@ -143,15 +143,22 @@ func (req *Request) LoadResourceList(items interface{}, orderByColumn, direction
 	query.Offset(pager.QueryOffset).Limit(pager.PerPage)
 	err = query.Select(items)
 	if err != nil {
+		common.Context().Log.Error().Msgf("Error running main query in WebUI LoadResourceItemList. Where = %s. Error = %v", query.WhereClause(), err)
 		return err
 	}
 	var count int
 	if pgmodels.CanCountFromView(query, items) {
 		common.Context().Log.Info().Msgf("WebUI: Using view to count query '%s'", query.WhereClause())
 		count, err = pgmodels.GetCountFromView(query, items)
+		if err != nil {
+			common.Context().Log.Error().Msgf("Error running count query on view with where clause %s: %v", query.WhereClause(), err)
+		}
 	} else {
 		common.Context().Log.Info().Msgf("WebUI: Using standard count query for '%s'", query.WhereClause())
 		count, err = query.Count(items)
+		if err != nil {
+			common.Context().Log.Error().Msgf("Error running standard count with where clause %s: %v", query.WhereClause(), err)
+		}
 	}
 
 	if err != nil {
