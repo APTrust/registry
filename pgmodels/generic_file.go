@@ -477,6 +477,9 @@ func (gf *GenericFile) AssertDeletionPreconditions() error {
 	if gf.State == constants.StateDeleted {
 		return fmt.Errorf("File is already in deleted state")
 	}
+	if !gf.HasPassedMinimumRetentionPeriod() {
+		return fmt.Errorf("File has not passed minimum retention period")
+	}
 	_, _, err := gf.assertDeletionApproved()
 	return err
 }
@@ -529,4 +532,26 @@ func (gf *GenericFile) NewDeletionEvent() (*PremisEvent, error) {
 		OutcomeDetail:        deletionRequestView.RequestedByEmail,
 		OutcomeInformation:   fmt.Sprintf("File deleted at the request of %s. Institutional approver: %s. This event confirms all preservation copies have been deleted.", deletionRequestView.RequestedByEmail, deletionRequestView.ConfirmedByEmail),
 	}, nil
+}
+
+// EarliestDeletionDate returns the earliest date on which this
+// file can be deleted, per retention rules that apply to the
+// object's storage option.
+//
+// The following (rare) case will return a false positive:
+// file was ingested five years ago, deleted four years ago,
+// and then ingested again yesterday.
+//
+// We can sort through Premis Events to solve these false positives,
+// but that's very expensive and false positives probably are
+// less than 0.2% of all cases.
+func (gf *GenericFile) EarliestDeletionDate() time.Time {
+	minRetentionDays := constants.MinRetentionDaysFor(gf.StorageOption)
+	return gf.CreatedAt.AddDate(0, 0, minRetentionDays)
+}
+
+// HasPassedMinimumRetentionPeriod returns true if this object has
+// passed the minimum retention period for its storage option.
+func (gf *GenericFile) HasPassedMinimumRetentionPeriod() bool {
+	return gf.EarliestDeletionDate().Before(time.Now())
 }
