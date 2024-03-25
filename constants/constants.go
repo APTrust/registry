@@ -320,6 +320,8 @@ func MinRetentionDaysFor(storageOption string) int {
 		days = MinRetentionDaysWasabi
 	case StorageOptionStandard:
 		days = MinRetentionDaysStandard
+	default:
+		days = 0
 	}
 	return days
 }

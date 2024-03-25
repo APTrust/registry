@@ -2,6 +2,7 @@ package pgmodels_test
 
 import (
 	"testing"
+	"time"
 
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/db"
@@ -64,4 +65,19 @@ func TestSmallestObjectNotRestoredInXDays(t *testing.T) {
 	require.NotNil(t, obj)
 	assert.Equal(t, int64(10), obj.ID)
 	assert.Equal(t, int64(28234280000), obj.Size)
+}
+
+func TestIntellectualObjectViewMinRetention(t *testing.T) {
+	obj := pgmodels.IntellectualObjectView{}
+	obj.CreatedAt = time.Now()
+	obj.StorageOption = constants.StorageOptionGlacierDeepOH
+
+	expectedDate := time.Now().AddDate(0, 0, constants.MinRetentionDaysGlacierDeep-1)
+	assert.True(t, obj.EarliestDeletionDate().After(expectedDate))
+	assert.False(t, obj.HasPassedMinimumRetentionPeriod())
+
+	obj.CreatedAt = obj.CreatedAt.AddDate(0, 0, (constants.MinRetentionDaysGlacierDeep * -2))
+	expectedDate = obj.CreatedAt.AddDate(0, 0, constants.MinRetentionDaysGlacierDeep)
+	assert.Equal(t, expectedDate, obj.EarliestDeletionDate())
+	assert.True(t, obj.HasPassedMinimumRetentionPeriod())
 }

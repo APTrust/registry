@@ -465,7 +465,7 @@ func testObjDeletionEventProperties(t *testing.T, obj *pgmodels.IntellectualObje
 	assert.Equal(t, constants.OutcomeSuccess, event.Outcome)
 }
 
-func TestIntellectualObjecteMinRetention(t *testing.T) {
+func TestIntellectualObjectMinRetention(t *testing.T) {
 	obj := pgmodels.IntellectualObject{}
 	obj.CreatedAt = time.Now()
 	obj.StorageOption = constants.StorageOptionGlacierDeepOH
