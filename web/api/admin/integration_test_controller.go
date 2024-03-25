@@ -53,6 +53,13 @@ func prepareFileDeletionPreconditions(gfID int64) (*pgmodels.WorkItem, error) {
 		return nil, err
 	}
 
+	// Ensure file has met minimum retention period.
+	gf.CreatedAt = time.Now().Add(time.Hour * 24 * -365)
+	err = gf.Save()
+	if err != nil {
+		return nil, err
+	}
+
 	instAdmin, err := getInstAdmin(gf.InstitutionID)
 	if err != nil {
 		return nil, err
@@ -109,6 +116,29 @@ func prepareObjectDeletionPreconditions(objID int64) (*pgmodels.WorkItem, error)
 	obj, err := pgmodels.IntellectualObjectByID(objID)
 	if err != nil {
 		return nil, err
+	}
+
+	// Ensure object has met minimum retention period.
+	oneYearAgo := time.Now().Add(time.Hour * 24 * -365)
+	obj.CreatedAt = oneYearAgo
+	err = obj.Save()
+	if err != nil {
+		return nil, err
+	}
+
+	// And files too.
+	query := pgmodels.NewQuery().
+		Where("intellectual_object_id", "=", obj.ID)
+	files, err := pgmodels.GenericFileSelect(query)
+	if err != nil {
+		return nil, err
+	}
+	for _, gf := range files {
+		gf.CreatedAt = oneYearAgo
+		err = gf.Save()
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	instAdmin, err := getInstAdmin(obj.InstitutionID)
