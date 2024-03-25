@@ -63,6 +63,7 @@ func ShowOpenSubMenu(auth *middleware.ResourceAuthorization) bool {
 		"BillingReportShow",
 		"DeletionRequestIndex",
 		"GenericFileIndex",
+		"GenericFileShow",
 		"InstitutionIndex",
 		"InstitutionShow",
 		"InternalMetadataIndex",
