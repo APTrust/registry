@@ -4,6 +4,8 @@
     {{ if userCan .CurrentUser "IntellectualObjectRequestDelete" .object.InstitutionID }}
       {{ if .hasPendingWorkItems }}
         <button class="button" disabled title="Object cannot be deleted until pending work items are complete." data-modal="modal-one" data-xhr-url="/objects/request_delete/{{ .object.ID }}">Delete</button>
+      {{ else if not .object.HasPassedMinimumRetentionPeriod}} 
+        <button class="button" disabled title="Object cannot be deleted until minimum retention period ends on {{ dateUS .object.EarliestDeletionDate}}" data-modal="modal-one" data-xhr-url="/objects/request_delete/{{ .object.ID }}">Delete</button>
       {{ else }}
         <button class="button is-primary is-outlined" data-modal="modal-one" data-xhr-url="/objects/request_delete/{{ .object.ID }}">Delete</button>
       {{ end }}
