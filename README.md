@@ -131,6 +131,14 @@ Note that Go does not rerun tests that passed on the prior run. If you want to f
 
 This may be necessary if the tests passed on the prior run, but you want to force a reload of the schema or the fixtures.
 
+__Note__ Anytime you make substial updates to Registry (anything more than cosmetic UI changes), and anytime you update Registry's dependencies (e.g. when Dependabot tells you to upgrade an underlying library), you should all of the following tests to be sure there are no regressions:
+
+`registry test` from Registry and
+
+`./scripts/test.rb integration && ./scripts/test.rb e2e` from the [preservation-services repo](https://github.com/APTrust/preservation-services).
+
+The preservation services tests will ensure that Registry still behaves as expected from Preserve's point of view. Keep in mind that Preserve is responsible for most of the data written into Registry, so it's essential that Registry and Preserve work well together.
+
 ## Building the Docker Container
 
 ```
