@@ -26,7 +26,6 @@ var allowedConfigs = []string{
 	"staging",
 	"test",
 	"travis",
-	"uidemo",
 }
 
 // DBConfig contains info for connecting to the Postgres database.
