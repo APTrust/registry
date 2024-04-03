@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/APTrust/registry/constants"
 	"github.com/asaskevich/govalidator"
 	"github.com/gorilla/securecookie"
 	"github.com/rs/zerolog"
@@ -92,15 +93,51 @@ type RedisConfig struct {
 	DefaultDB int
 }
 
+// RetentionMinimum describes the minimum number of days items
+// must remain in preservation storage before they can be deleted.
+// For S3 and APTrust Standard storage, this is zero. We can
+// delete those items at any time. All other storage types have
+// restrictions. We prevent depositors from deleting items that
+// have not met the minimum retention period because we have to
+// pay for the minimum retention period no matter what, and we
+// need to pass those costs through to depositors.
+type RetentionMinimum struct {
+	Glacier     int
+	GlacierDeep int
+	Wasabi      int
+	Standard    int
+}
+
+// For returns the minimum number of days an object
+// or file must be stored in the specified storage option.
+// (RetentionMinimum.For(option) makes for readable code.)
+func (rm *RetentionMinimum) For(storageOption string) int {
+	days := 0
+	switch storageOption {
+	case constants.StorageOptionGlacierDeepOH, constants.StorageOptionGlacierDeepOR, constants.StorageOptionGlacierDeepVA:
+		days = rm.GlacierDeep
+	case constants.StorageOptionGlacierOH, constants.StorageOptionGlacierOR, constants.StorageOptionGlacierVA:
+		days = rm.Glacier
+	case constants.StorageOptionWasabiOR, constants.StorageOptionWasabiVA:
+		days = rm.Wasabi
+	case constants.StorageOptionStandard:
+		days = rm.Standard
+	default:
+		days = 0
+	}
+	return days
+}
+
 type Config struct {
-	Cookies   *CookieConfig
-	DB        *DBConfig
-	EnvName   string
-	Logging   *LoggingConfig
-	NsqUrl    string
-	TwoFactor *TwoFactorConfig
-	Email     *EmailConfig
-	Redis     *RedisConfig
+	Cookies          *CookieConfig
+	DB               *DBConfig
+	EnvName          string
+	Logging          *LoggingConfig
+	NsqUrl           string
+	TwoFactor        *TwoFactorConfig
+	Email            *EmailConfig
+	Redis            *RedisConfig
+	RetentionMinimum *RetentionMinimum
 
 	// BatchDeletionKey is a secret loaded from parameter store.
 	// Batch deletion requests must include this as an extra security token.
@@ -230,6 +267,12 @@ func loadConfig() *Config {
 			DefaultDB: v.GetInt("REDIS_DEFAULT_DB"),
 			Password:  v.GetString("REDIS_PASSWORD"),
 			URL:       v.GetString("REDIS_URL"),
+		},
+		RetentionMinimum: &RetentionMinimum{
+			Glacier:     v.GetInt("RETENTION_MINIMUM_GLACIER"),
+			GlacierDeep: v.GetInt("RETENTION_MINIMUM_GLACIER_DEEP"),
+			Wasabi:      v.GetInt("RETENTION_MINIMUM_WASABI"),
+			Standard:    v.GetInt("RETENTION_MINIMUM_STANDARD"),
 		},
 	}
 }

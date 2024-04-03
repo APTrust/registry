@@ -455,12 +455,12 @@ func TestGenericFileMinRetention(t *testing.T) {
 	gf.CreatedAt = time.Now()
 	gf.StorageOption = constants.StorageOptionGlacierDeepOH
 
-	expectedDate := time.Now().AddDate(0, 0, constants.MinRetentionDaysGlacierDeep-1)
+	expectedDate := time.Now().AddDate(0, 0, common.Context().Config.RetentionMinimum.GlacierDeep-1)
 	assert.True(t, gf.EarliestDeletionDate().After(expectedDate))
 	assert.False(t, gf.HasPassedMinimumRetentionPeriod())
 
-	gf.CreatedAt = gf.CreatedAt.AddDate(0, 0, (constants.MinRetentionDaysGlacierDeep * -2))
-	expectedDate = gf.CreatedAt.AddDate(0, 0, constants.MinRetentionDaysGlacierDeep)
+	gf.CreatedAt = gf.CreatedAt.AddDate(0, 0, (common.Context().Config.RetentionMinimum.GlacierDeep * -2))
+	expectedDate = gf.CreatedAt.AddDate(0, 0, common.Context().Config.RetentionMinimum.GlacierDeep)
 	assert.Equal(t, expectedDate, gf.EarliestDeletionDate())
 	assert.True(t, gf.HasPassedMinimumRetentionPeriod())
 }

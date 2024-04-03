@@ -189,6 +189,12 @@ var expectedConfigJson = `{
     "Password": "****dis",
     "DefaultDB": 0
   },
+  "RetentionMinimum": {
+    "Glacier": 90,
+    "GlacierDeep": 180,
+    "Wasabi": 90,
+    "Standard": 0
+  },
   "BatchDeletionKey": "****key",
   "MaintenanceMode": false
 }`

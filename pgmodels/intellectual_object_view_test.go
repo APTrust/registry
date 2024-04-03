@@ -4,6 +4,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/db"
 	"github.com/APTrust/registry/pgmodels"
@@ -72,12 +73,12 @@ func TestIntellectualObjectViewMinRetention(t *testing.T) {
 	obj.CreatedAt = time.Now()
 	obj.StorageOption = constants.StorageOptionGlacierDeepOH
 
-	expectedDate := time.Now().AddDate(0, 0, constants.MinRetentionDaysGlacierDeep-1)
+	expectedDate := time.Now().AddDate(0, 0, common.Context().Config.RetentionMinimum.GlacierDeep-1)
 	assert.True(t, obj.EarliestDeletionDate().After(expectedDate))
 	assert.False(t, obj.HasPassedMinimumRetentionPeriod())
 
-	obj.CreatedAt = obj.CreatedAt.AddDate(0, 0, (constants.MinRetentionDaysGlacierDeep * -2))
-	expectedDate = obj.CreatedAt.AddDate(0, 0, constants.MinRetentionDaysGlacierDeep)
+	obj.CreatedAt = obj.CreatedAt.AddDate(0, 0, (common.Context().Config.RetentionMinimum.GlacierDeep * -2))
+	expectedDate = obj.CreatedAt.AddDate(0, 0, common.Context().Config.RetentionMinimum.GlacierDeep)
 	assert.Equal(t, expectedDate, obj.EarliestDeletionDate())
 	assert.True(t, obj.HasPassedMinimumRetentionPeriod())
 }

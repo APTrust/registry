@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/APTrust/registry/common"
-	"github.com/APTrust/registry/constants"
 	"github.com/go-pg/pg/v10"
 )
 
@@ -155,7 +154,7 @@ func SmallestObjectNotRestoredInXDays(institutionID, minSize int64, days int) (*
 // but that's very expensive and false positives probably are
 // less than 0.2% of all cases.
 func (obj *IntellectualObjectView) EarliestDeletionDate() time.Time {
-	minRetentionDays := constants.MinRetentionDaysFor(obj.StorageOption)
+	minRetentionDays := common.Context().Config.RetentionMinimum.For(obj.StorageOption)
 	return obj.CreatedAt.AddDate(0, 0, minRetentionDays)
 }
 

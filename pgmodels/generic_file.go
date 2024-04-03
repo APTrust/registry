@@ -546,7 +546,7 @@ func (gf *GenericFile) NewDeletionEvent() (*PremisEvent, error) {
 // but that's very expensive and false positives probably are
 // less than 0.2% of all cases.
 func (gf *GenericFile) EarliestDeletionDate() time.Time {
-	minRetentionDays := constants.MinRetentionDaysFor(gf.StorageOption)
+	minRetentionDays := common.Context().Config.RetentionMinimum.For(gf.StorageOption)
 	return gf.CreatedAt.AddDate(0, 0, minRetentionDays)
 }
 
