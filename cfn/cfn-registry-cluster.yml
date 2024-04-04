@@ -265,16 +265,24 @@ Resources:
           ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/AWS_SES_PWD'
         - Name: AWS_SES_USER
           ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/AWS_SES_USER'
-        - Name:  SES_ENDPOINT
+        - Name: SES_ENDPOINT
           ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/SES_ENDPOINT'
-        - Name:  SNS_ENDPOINT
+        - Name: SNS_ENDPOINT
           ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/SNS_ENDPOINT'
-        - Name:  BATCH_DELETION_KEY
+        - Name: BATCH_DELETION_KEY
           ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/BATCH_DELETION_KEY'
-        - Name:  MAINTENANCE_MODE
+        - Name: MAINTENANCE_MODE
           ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/MAINTENANCE_MODE'
-        - Name:  EMAIL_SERVICE_TYPE
-          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/EMAIL_SERVICE_TYPE'
+        - Name: EMAIL_SERVICE_TYPE
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/EMAIL_SERVICE_TYPE' 
+        - Name: RETENTION_MINIMUM_GLACIER
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/RETENTION_MINIMUM_GLACIER'
+        - Name: RETENTION_MINIMUM_GLACIER_DEEP
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/RETENTION_MINIMUM_GLACIER_DEEP'
+        - Name: RETENTION_MINIMUM_WASABI
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/RETENTION_MINIMUM_WASABI'
+        - Name: RETENTION_MINIMUM_STANDARD
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/RETENTION_MINIMUM_STANDARD' 
         LinuxParameters: {}
         LogConfiguration:
           LogDriver: awslogs
