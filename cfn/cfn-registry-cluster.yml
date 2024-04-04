@@ -187,7 +187,7 @@ Resources:
         - Condition: SUCCESS
           ContainerName: Nsqadmin_ResolvConf_InitContainer
         Essential: true 
-        Image: 997427182289.dkr.ecr.us-east-1.amazonaws.com/docker-hub/aptrust/registry:5175df3-nat-removal
+        Image: 997427182289.dkr.ecr.us-east-1.amazonaws.com/docker-hub/aptrust/registry:3a12b0f-nat-removal 
         Secrets:
         - Name: APT_ENV
           ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/APT_ENV'
@@ -274,15 +274,7 @@ Resources:
         - Name:  MAINTENANCE_MODE
           ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/MAINTENANCE_MODE'
         - Name:  EMAIL_SERVICE_TYPE
-          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/EMAIL_SERVICE_TYPE' 
-        - Name:  EMAIL_SERVICE_TYPE
-          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/RETENTION_MINIMUM_GLACIER'
-        - Name:  EMAIL_SERVICE_TYPE
-          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/RETENTION_MINIMUM_GLACIER_DEEP' 
-        - Name:  EMAIL_SERVICE_TYPE
-          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/RETENTION_MINIMUM_WASABI' 
-        - Name:  EMAIL_SERVICE_TYPE
-          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/RETENTION_MINIMUM_STANDARD'
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/EMAIL_SERVICE_TYPE'
         LinuxParameters: {}
         LogConfiguration:
           LogDriver: awslogs
