@@ -128,6 +128,11 @@ func CanCountFromView(query *Query, model interface{}) bool {
 		return false
 	}
 
+	if query.IncludesInCondition() {
+		common.Context().Log.Debug().Msgf("Cannot query count view for type %s because this specific query contains an IN clause", typeName)
+		return false
+	}
+
 	// Our views only contain certain counts. If the filters in
 	// the where clause are too specific, the view won't have
 	// counts for them, and we'll have to do a regular SQL count().

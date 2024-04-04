@@ -137,3 +137,29 @@ func SmallestObjectNotRestoredInXDays(institutionID, minSize int64, days int) (*
 	}
 	return IntellectualObjectViewByID(objID)
 }
+
+// EarliestDeletionDate returns the earliest date on which this
+// object can be deleted, per retention rules that apply to the
+// object's storage option.
+//
+// This is generally accurate, but can't be 100% accurate, as some
+// of the object's files may have been ingested after the object
+// creation date.
+//
+// Also, the following (rare) case will return a false positive:
+// object was ingested five years ago, deleted four years ago,
+// and then ingested again yesterday.
+//
+// We can sort through Premis Events to solve these false positives,
+// but that's very expensive and false positives probably are
+// less than 0.2% of all cases.
+func (obj *IntellectualObjectView) EarliestDeletionDate() time.Time {
+	minRetentionDays := common.Context().Config.RetentionMinimum.For(obj.StorageOption)
+	return obj.CreatedAt.AddDate(0, 0, minRetentionDays)
+}
+
+// HasPassedMinimumRetentionPeriod returns true if this object has
+// passed the minimum retention period for its storage option.
+func (obj *IntellectualObjectView) HasPassedMinimumRetentionPeriod() bool {
+	return obj.EarliestDeletionDate().Before(time.Now())
+}

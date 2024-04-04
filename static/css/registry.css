@@ -933,11 +933,11 @@ a.box:active {
 }
 .button.is-white:hover, .button.is-white.is-hovered {
   background-color: #f9f9f9;
-  border-color: transparent;
+  border-color: #d6d6d6;
   color: hsl(0deg, 0%, 4%);
 }
 .button.is-white:focus, .button.is-white.is-focused {
-  border-color: transparent;
+  border-color: #d6d6d6;
   color: hsl(0deg, 0%, 4%);
 }
 .button.is-white:focus:not(:active), .button.is-white.is-focused:not(:active) {

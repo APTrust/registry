@@ -6,7 +6,7 @@
 {{ end }}
 
 <div class="modal-detail">
-  <div class="modal-title-row is-flex is-justify-content-space-between is-align-items-center">
+  <div id="modalTitle" class="modal-title-row is-flex is-justify-content-space-between is-align-items-center">
     <h2>Generic File</h2>
     {{ if .showAsModal }}
     <a class="modal-exit is-grey-dark" href="#">
@@ -82,8 +82,9 @@
     {{ if eq .file.State "A" }}
     <div class="modal-footer-row">
       {{ if userCan .CurrentUser "FileRequestDelete" .file.InstitutionID }}
-      <button class="button" data-modal="modal-one" data-xhr-url="/files/request_delete/{{ .file.ID }}" {{ if
-        .hasPendingWorkItems }} disabled title="This file cannot be deleted until pending work items complete." {{ end }}>Delete</button>
+      <button class="button" data-modal="modal-one" data-xhr-url="/files/request_delete/{{ .file.ID }}" 
+        {{ if .hasPendingWorkItems }} disabled title="This file cannot be deleted until pending work items complete." 
+        {{ else if not .file.HasPassedMinimumRetentionPeriod}} disabled title="File cannot be deleted until minimum retention period ends on {{ dateUS .file.EarliestDeletionDate}}" {{ end }}>Delete</button>
       {{ end }}
       {{ if userCan .CurrentUser "FileRestore" .file.InstitutionID }}
       <button class="button" data-modal="modal-one" data-xhr-url="/files/request_restore/{{ .file.ID }}" {{ if

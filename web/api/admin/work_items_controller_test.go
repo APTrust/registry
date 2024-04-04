@@ -117,16 +117,37 @@ func TestWorkItemRequeue(t *testing.T) {
 	assert.Equal(t, constants.StatusPending, item.Status)
 
 	// Make sure other roles cannot requeue
-	tu.Inst1AdminClient.PUT("/admin-api/v3/items/requeue/requeue/{id}", workItem.ID).
+	tu.Inst1AdminClient.PUT("/admin-api/v3/items/requeue/{id}", workItem.ID).
 		WithHeader(constants.APIUserHeader, tu.Inst1Admin.Email).
 		WithHeader(constants.APIKeyHeader, "password").
 		WithFormField("stage", constants.StageReingestCheck).
 		Expect().Status(http.StatusForbidden)
-	tu.Inst1UserClient.PUT("/admin-api/v3/items/requeue/requeue/{id}", workItem.ID).
+	tu.Inst1UserClient.PUT("/admin-api/v3/items/requeue/{id}", workItem.ID).
 		WithHeader(constants.APIUserHeader, tu.Inst1User.Email).
 		WithHeader(constants.APIKeyHeader, "password").
 		WithFormField("stage", constants.StageReingestCheck).
 		Expect().Status(http.StatusForbidden)
+}
+
+func TestWorkItemRedisDelete(t *testing.T) {
+	tu.InitHTTPTests(t)
+	workItem := testutil.CreateWorkItem(t, "unit_test_bag2.tar")
+
+	// Make sure non-admins cannot delete the Redis record
+	tu.Inst1AdminClient.DELETE("/admin-api/v3/items/redis_delete/{id}", workItem.ID).
+		WithHeader(constants.APIUserHeader, tu.Inst1Admin.Email).
+		WithHeader(constants.APIKeyHeader, "password").
+		Expect().Status(http.StatusForbidden)
+	tu.Inst1UserClient.DELETE("/admin-api/v3/items/redis_delete/{id}", workItem.ID).
+		WithHeader(constants.APIUserHeader, tu.Inst1User.Email).
+		WithHeader(constants.APIKeyHeader, "password").
+		Expect().Status(http.StatusForbidden)
+
+	// SysAdmin can delete the Redis data
+	tu.SysAdminClient.DELETE("/admin-api/v3/items/redis_delete/{id}", workItem.ID).
+		WithHeader(constants.APIUserHeader, tu.SysAdmin.Email).
+		WithHeader(constants.APIKeyHeader, "password").
+		Expect().Status(http.StatusOK)
 }
 
 func TestItemCreateAndUpdate(t *testing.T) {

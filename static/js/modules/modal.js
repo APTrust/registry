@@ -7,6 +7,10 @@
 // the attribute data-modal-initialized.
 //
 
+// Keep track of which element opened the modal, so we can
+// return focus to that element when the modal closes.
+var modalOpener = null
+
 export function initModals() {
     var modalControllers = document.querySelectorAll("[data-modal]");
     modalControllers.forEach(function (c) {
@@ -20,25 +24,25 @@ function modalOpen(event) {
     event.preventDefault();
     document.body.classList.add("freeze");
     modal.classList.add("open");
-    // This is a hack, but we have to wait for children to load,
-    // and there's no way to attach an onload event to an item
-    // that isn't present yet. This does not work without the timeout.
-    // Ideally, we use a mutation observer for this. We'll get back
-    // to this when we actually have some time.
-    window.setTimeout(function() { 
-        console.log("Attaching modal close listener.")
-        attachModalClose(modal) 
-    }, 350)
+    modalOpener = event.target || event.srcElement;
 }
 
+// This is called in xhr.js after content is loaded into modal via ajax request.
 export function attachModalClose(modal) {
+    var parent = modal.parentElement
     var exits = modal.querySelectorAll(".modal-exit");
     console.log(`Found ${exits.length} close buttons`)
     exits.forEach(function (exit) {
         exit.addEventListener("click", function (event) {
             event.preventDefault();
             document.body.classList.remove("freeze");
-            modal.classList.remove("open");
+            parent.classList.remove("open");
+
+            // For keyboard navigation, return focus to modal opener.
+            if (modalOpener != null) {
+                modalOpener.focus()
+            }
+            //console.log(document.activeElement)
         });
         console.log("Added close listener to one button")
     });

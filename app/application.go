@@ -400,6 +400,7 @@ func initRoutes(router *gin.Engine) {
 		adminAPI.PUT("/items/update/:id", admin_api.WorkItemUpdate)
 		adminAPI.GET("/items/show/:id", common_api.WorkItemShow)
 		adminAPI.GET("/items", common_api.WorkItemIndex)
+		adminAPI.DELETE("/items/redis_delete/:id", admin_api.WorkItemRedisDelete)
 
 		// Special test endpoints
 		adminAPI.POST("/prepare_file_delete/:id", admin_api.PrepareFileDelete)

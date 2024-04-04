@@ -18,6 +18,16 @@ export function initFiltersGrid() {
             gridFiltersAll.classList.toggle('is-sr-only');
             gridFiltersMore.classList.toggle('is-hidden');
             gridFiltersLess.classList.toggle('is-hidden');
+
+            // For aria keyboard navigation. https://trello.com/c/CEQ5jAe1
+            var allFiltersAreShowing = gridFiltersMore.classList.contains("is-hidden")
+            if (allFiltersAreShowing) {
+                gridFiltersToggle.setAttribute("aria-expanded", "true")
+                gridFiltersAll.style.display = "block"
+            } else {
+                gridFiltersToggle.setAttribute("aria-expanded", "false")
+                gridFiltersAll.style.display = "none"
+            }
         });
     }
 }

@@ -1,6 +1,7 @@
 {{ define "objects/_file_list.html" }}
 
 {{ $CurrentUser := .CurrentUser }}
+{{ $HasPendingWorkItems := .hasPendingWorkItems }}
 
 <div class="box" id="objFileList">
   <div class="box-header is-flex is-justify-content-space-between is-align-items-center">
@@ -87,13 +88,13 @@
 
           {{ if eq $file.State "A"}}
           {{ if userCan $CurrentUser "FileRequestDelete" $file.InstitutionID }}
-          <button class="button" data-modal="modal-one" data-xhr-url="/files/request_delete/{{ $file.ID }}">Delete
-            File</button>
+          <button class="button" data-modal="modal-one" data-xhr-url="/files/request_delete/{{ $file.ID }}"
+            {{ if $HasPendingWorkItems }} disabled title="This file cannot be deleted until pending work items complete." 
+            {{ else if not $file.HasPassedMinimumRetentionPeriod}} disabled title="File cannot be deleted until minimum retention period ends on {{ dateUS $file.EarliestDeletionDate}}" {{ end }}>Delete File</button>
           {{ end }}
 
           {{ if userCan $CurrentUser "FileRestore" $file.InstitutionID }}
-          <button class="button" data-modal="modal-one" data-xhr-url="/files/request_restore/{{ $file.ID }}">Restore
-            File</button>
+          <button class="button" data-modal="modal-one" data-xhr-url="/files/request_restore/{{ $file.ID }}" {{ if $HasPendingWorkItems }} disabled title="This file cannot be restored until pending work items complete."{{ end }}>Restore File</button>
           {{ end }}
           {{ end }}
 

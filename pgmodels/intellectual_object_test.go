@@ -272,6 +272,19 @@ func TestAssertObjDeletionPreconditions(t *testing.T) {
 	err = obj.Save()
 	require.Nil(t, err)
 
+	// Can't delete if object hasn't met minimum storage retention period.
+	origCreatedAt := obj.CreatedAt
+	origStorageOption := obj.StorageOption
+	obj.CreatedAt = time.Now()
+	obj.StorageOption = constants.StorageOptionGlacierDeepOH
+
+	err = obj.AssertDeletionPreconditions()
+	require.NotNil(t, err)
+	assert.Equal(t, "Object has not passed minimum retention period", err.Error())
+
+	obj.CreatedAt = origCreatedAt
+	obj.StorageOption = origStorageOption
+
 	// Create a deletion work item for this object
 	workItem := pgmodels.RandomWorkItem(obj.BagName, constants.ActionDelete, obj.ID, 0)
 	workItem.Status = constants.StatusStarted
@@ -450,4 +463,19 @@ func testObjDeletionEventProperties(t *testing.T, obj *pgmodels.IntellectualObje
 	assert.Equal(t, obj.ID, event.IntellectualObjectID)
 	assert.Equal(t, "Minio S3 library", event.Object)
 	assert.Equal(t, constants.OutcomeSuccess, event.Outcome)
+}
+
+func TestIntellectualObjectMinRetention(t *testing.T) {
+	obj := pgmodels.IntellectualObject{}
+	obj.CreatedAt = time.Now()
+	obj.StorageOption = constants.StorageOptionGlacierDeepOH
+
+	expectedDate := time.Now().AddDate(0, 0, common.Context().Config.RetentionMinimum.GlacierDeep-1)
+	assert.True(t, obj.EarliestDeletionDate().After(expectedDate))
+	assert.False(t, obj.HasPassedMinimumRetentionPeriod())
+
+	obj.CreatedAt = obj.CreatedAt.AddDate(0, 0, (common.Context().Config.RetentionMinimum.GlacierDeep * -2))
+	expectedDate = obj.CreatedAt.AddDate(0, 0, common.Context().Config.RetentionMinimum.GlacierDeep)
+	assert.Equal(t, expectedDate, obj.EarliestDeletionDate())
+	assert.True(t, obj.HasPassedMinimumRetentionPeriod())
 }

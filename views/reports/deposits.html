@@ -4,7 +4,7 @@
 
 <div class="box">
   <div class="box-header">
-    <h1 class="h2">Deposits</h1>
+    <h1 class="h2">{{ .chartTitle }}</h1>
   </div>
 
   <div class="box-content">
@@ -22,7 +22,7 @@
   -->
   {{ if not (eq "over_time" .reportType) }}
   {{ $currentUser := .CurrentUser }}
-  <table class="table is-fullwidth has-padding is-striped">
+  <table class="table is-fullwidth has-padding is-striped" role="table" aria-label="Raw data displayed in the chart {{ .chartAltText }}">
     <thead>
       <tr>
         <!-- Note: Due to the structure of report data, these columns cannot be sorted. -->

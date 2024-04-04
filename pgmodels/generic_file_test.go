@@ -238,6 +238,22 @@ func TestFileDeletionPreConditions(t *testing.T) {
 	testGenericFileDeleteError(t, gf)
 	gf.State = constants.StateActive
 
+	origCreatedAt := gf.CreatedAt
+	origStorageOption := gf.StorageOption
+
+	// Has not met minimum retention period
+	gf.State = constants.StateActive
+	gf.CreatedAt = time.Now()
+	gf.StorageOption = constants.StorageOptionGlacierDeepOH
+	err = gf.AssertDeletionPreconditions()
+	require.NotNil(t, err)
+	assert.Equal(t, "File has not passed minimum retention period", err.Error())
+
+	// Restore these values so we don't get the
+	// minimum retention error again.
+	gf.CreatedAt = origCreatedAt
+	gf.StorageOption = origStorageOption
+
 	// Has no deletion work item...
 	err = gf.AssertDeletionPreconditions()
 	require.NotNil(t, err)
@@ -432,4 +448,19 @@ func TestGenericFileCreateBatch(t *testing.T) {
 			assert.True(t, v.IsURL(sr.URL))
 		}
 	}
+}
+
+func TestGenericFileMinRetention(t *testing.T) {
+	gf := pgmodels.GenericFile{}
+	gf.CreatedAt = time.Now()
+	gf.StorageOption = constants.StorageOptionGlacierDeepOH
+
+	expectedDate := time.Now().AddDate(0, 0, common.Context().Config.RetentionMinimum.GlacierDeep-1)
+	assert.True(t, gf.EarliestDeletionDate().After(expectedDate))
+	assert.False(t, gf.HasPassedMinimumRetentionPeriod())
+
+	gf.CreatedAt = gf.CreatedAt.AddDate(0, 0, (common.Context().Config.RetentionMinimum.GlacierDeep * -2))
+	expectedDate = gf.CreatedAt.AddDate(0, 0, common.Context().Config.RetentionMinimum.GlacierDeep)
+	assert.Equal(t, expectedDate, gf.EarliestDeletionDate())
+	assert.True(t, gf.HasPassedMinimumRetentionPeriod())
 }

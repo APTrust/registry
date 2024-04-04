@@ -35,6 +35,9 @@ func WorkItemShow(c *gin.Context) {
 	}
 	req.TemplateData["item"] = item
 
+	// This has to be initialized to a string value, or the HTML template won't render.
+	req.TemplateData["clientStatusIcon"] = ""
+
 	// Show requeue options to Admin, if item has not completed.
 	// Only sys admin should have this permission.
 	userCanRequeue := req.CurrentUser.HasPermission(constants.WorkItemRequeue, item.InstitutionID)
@@ -48,6 +51,22 @@ func WorkItemShow(c *gin.Context) {
 			return
 		}
 		req.TemplateData["form"] = form
+
+		// Create an icon to display next to the node name indicating
+		// whether that node is currently running. Options are "?" for
+		// unknown, check for running, "!" for not running.
+		if item.Node != "" {
+			icon := `<i class="material-icons" aria-hidden="true">question_mark</i>`
+			nsqStats, err := common.Context().NSQClient.GetStats()
+			if err == nil && nsqStats != nil {
+				if nsqStats.ClientIsRunning(item.Node) {
+					icon = `<i class="material-icons" aria-hidden="true" style="color:#35826b">check_circle_outline</i>`
+				} else {
+					icon = `<i class="material-icons" aria-hidden="true" style="color:#be1f45">error_outline</i>`
+				}
+			}
+			req.TemplateData["clientStatusIcon"] = icon
+		}
 	}
 
 	// Let user fix missing object id, if necessary

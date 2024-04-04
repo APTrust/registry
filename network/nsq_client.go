@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -59,6 +59,19 @@ func (data *NSQStatsData) GetChannel(topicName, channelName string) *nsqd.Channe
 	return nil
 }
 
+func (data *NSQStatsData) ClientIsRunning(hostname string) bool {
+	for _, topic := range data.Topics {
+		for _, channel := range topic.Channels {
+			for _, client := range channel.Clients {
+				if client.Hostname == hostname {
+					return true
+				}
+			}
+		}
+	}
+	return false
+}
+
 // NewNSQClient returns a new NSQ client that will connect to the NSQ
 // server and the specified url. The URL is typically available through
 // Config.NsqdHttpAddress, and usually ends with :4151. This is
@@ -98,7 +111,7 @@ func (client *NSQClient) EnqueueString(topic string, data string) error {
 
 	// nsqd sends a simple OK. We have to read the response body,
 	// or the connection will hang open forever.
-	body, _ := ioutil.ReadAll(resp.Body)
+	body, _ := io.ReadAll(resp.Body)
 	resp.Body.Close()
 
 	// NSQ response body is short. "OK" on success,
@@ -123,7 +136,7 @@ func (client *NSQClient) get(_url string) ([]byte, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error connecting to nsq at %s: %v", client.URL, err)
 	}
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	resp.Body.Close()
 	if err != nil {
 		return nil, fmt.Errorf("error reading nsq response body: %v", err)

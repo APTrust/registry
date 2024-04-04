@@ -186,3 +186,17 @@ func TestSelect(t *testing.T) {
 	require.Nil(t, err)
 	assert.True(t, len(institutions) > 3)
 }
+
+func TestIncludesInCondition(t *testing.T) {
+	q := pgmodels.NewQuery().Where("id", "=", 1)
+	assert.False(t, q.IncludesInCondition())
+
+	q.WhereIn("action", "File Restore", "Object Restore")
+	assert.True(t, q.IncludesInCondition())
+
+	q2 := pgmodels.NewQuery().Where("id", "=", 1)
+	assert.False(t, q2.IncludesInCondition())
+
+	q.WhereNotIn("action", "File Restore", "Object Restore")
+	assert.True(t, q.IncludesInCondition())
+}
