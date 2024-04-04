@@ -274,7 +274,15 @@ Resources:
         - Name:  MAINTENANCE_MODE
           ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/MAINTENANCE_MODE'
         - Name:  EMAIL_SERVICE_TYPE
-          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/EMAIL_SERVICE_TYPE'
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/EMAIL_SERVICE_TYPE' 
+        - Name:  EMAIL_SERVICE_TYPE
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/RETENTION_MINIMUM_GLACIER'
+        - Name:  EMAIL_SERVICE_TYPE
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/RETENTION_MINIMUM_GLACIER_DEEP' 
+        - Name:  EMAIL_SERVICE_TYPE
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/RETENTION_MINIMUM_WASABI' 
+        - Name:  EMAIL_SERVICE_TYPE
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/RETENTION_MINIMUM_STANDARD'
         LinuxParameters: {}
         LogConfiguration:
           LogDriver: awslogs
