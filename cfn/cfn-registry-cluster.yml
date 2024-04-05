@@ -282,7 +282,7 @@ Resources:
         - Name: RETENTION_MINIMUM_WASABI
           ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/RETENTION_MINIMUM_WASABI'
         - Name: RETENTION_MINIMUM_STANDARD
-          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/RETENTION_MINIMUM_STANDARD' 
+          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/RETENTION_MINIMUM_STANDARD'
         LinuxParameters: {}
         LogConfiguration:
           LogDriver: awslogs
