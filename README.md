@@ -224,3 +224,9 @@ Routes excepted from auth checks include:
 The "forgot password" and "password reset" pages both use a secure token in the query string to identify the user.
 
 The authentication middleware also hijacks all requests in cases where a user must complete registration activities. For example, if a user needs to reset their password, confirm an Authy account, or provide the second factor for multi-factor auth, the middleware will not let them past the reset/confirmation/token page until they've provided the required info.
+
+# Notes on JSON Serialization
+
+JSON serialization for all objects follows a Ruby on Rails convention for property names, using all lower-case letters and underscores. So, for example, while a Go object property may be called WorkItemID, it is serialized to JSON as work_item_id. We do this because earlier generations of Registry (called Pharos and Fluctus) were written in Rails and included a REST API.
+
+Many depositors have been using the REST API for years, so when we wrote Registry, we wanted the API to be as similar as possible to prior implementations so depositors would not have to substantially alter their code.
