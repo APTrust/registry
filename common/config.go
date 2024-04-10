@@ -69,6 +69,8 @@ type TwoFactorConfig struct {
 	AWSRegion     string
 	SMSEnabled    bool
 	OTPExpiration time.Duration
+	SNSUser       string
+	SNSPassword   string
 	SNSEndpoint   string
 }
 
@@ -214,12 +216,23 @@ func loadConfig() *Config {
 	sesUser := v.GetString("AWS_SES_USER")
 	sesPassword := v.GetString("AWS_SES_PWD")
 	if sesUser == "" {
-		fmt.Fprintln(os.Stderr, "AWS_SES_USER not set. Defaulting to AWS_ACCESS_KEY_ID for sending email and text messages.")
+		fmt.Fprintln(os.Stderr, "AWS_SES_USER not set. Defaulting to AWS_ACCESS_KEY_ID for sending email.")
 		sesUser = v.GetString("AWS_ACCESS_KEY_ID")
 	}
 	if sesPassword == "" {
-		fmt.Fprintln(os.Stderr, "AWS_SES_PWD not set. Defaulting to AWS_SECRET_ACCESS_KEY for sending email and text messages.")
+		fmt.Fprintln(os.Stderr, "AWS_SES_PWD not set. Defaulting to AWS_SECRET_ACCESS_KEY for sending email.")
 		sesPassword = v.GetString("AWS_SECRET_ACCESS_KEY")
+	}
+
+	snsUser := v.GetString("AWS_SNS_USER")
+	snsPassword := v.GetString("AWS_SNS_PWD")
+	if snsUser == "" {
+		fmt.Fprintln(os.Stderr, "AWS_SNS_USER not set. Defaulting to AWS_ACCESS_KEY_ID for sending text messages.")
+		snsUser = v.GetString("AWS_ACCESS_KEY_ID")
+	}
+	if snsPassword == "" {
+		fmt.Fprintln(os.Stderr, "AWS_SNS_PWD not set. Defaulting to AWS_SECRET_ACCESS_KEY for sending text messages.")
+		snsPassword = v.GetString("AWS_SECRET_ACCESS_KEY")
 	}
 
 	emailServiceType := strings.ToUpper(v.GetString("EMAIL_SERVICE_TYPE"))
@@ -265,6 +278,8 @@ func loadConfig() *Config {
 			AWSRegion:     v.GetString("AWS_REGION"),
 			SMSEnabled:    v.GetBool("ENABLE_TWO_FACTOR_SMS"),
 			OTPExpiration: v.GetDuration("OTP_EXPIRATION"),
+			SNSUser:       snsUser,
+			SNSPassword:   snsPassword,
 			SNSEndpoint:   v.GetString("SNS_ENDPOINT"),
 		},
 		Email: &EmailConfig{
@@ -368,6 +383,8 @@ func (config *Config) ToJSON() (string, error) {
 	copyOfConfig.Email.SesPassword = maskString(config.Email.SesPassword)
 	copyOfConfig.Redis.Password = maskString(config.Redis.Password)
 	copyOfConfig.TwoFactor.AuthyAPIKey = maskString(config.TwoFactor.AuthyAPIKey)
+	copyOfConfig.TwoFactor.SNSUser = maskString(config.TwoFactor.SNSUser)
+	copyOfConfig.TwoFactor.SNSPassword = maskString(config.TwoFactor.SNSPassword)
 
 	safeJson, err := json.MarshalIndent(copyOfConfig, "", "  ")
 	return string(safeJson), err

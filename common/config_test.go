@@ -62,6 +62,9 @@ func TestNewConfig(t *testing.T) {
 	config.Email.SesPassword = "mask-me-pwd-ses"
 	config.Redis.Password = "mask-me-pwd-redis"
 	config.TwoFactor.AuthyAPIKey = "mask-me-authy"
+	config.TwoFactor.SNSUser = "user-1234"
+	config.TwoFactor.SNSPassword = "password-5678"
+	config.TwoFactor.SNSEndpoint = "sns.example.com:886"
 	config.EmailServiceType = constants.EmailServiceSMTP
 
 	jsonString, err := config.ToJSON()
@@ -176,7 +179,9 @@ var expectedConfigJson = `{
     "AWSRegion": "",
     "SMSEnabled": false,
     "OTPExpiration": 900000000000,
-    "SNSEndpoint": ""
+    "SNSUser": "****",
+    "SNSPassword": "****678",
+    "SNSEndpoint": "sns.example.com:886"
   },
   "Email": {
     "AWSRegion": "",
