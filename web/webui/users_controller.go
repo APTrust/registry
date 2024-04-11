@@ -231,8 +231,10 @@ func UserChangePassword(c *gin.Context) {
 	}
 	userToEdit.EncryptedPassword = encPassword
 	userToEdit.PasswordChangedAt = time.Now().UTC()
+
 	userToEdit.ResetPasswordToken = ""
 	userToEdit.ResetPasswordSentAt = time.Time{}
+	userToEdit.ForcePasswordUpdate = false
 	err = userToEdit.Save()
 	if AbortIfError(c, err) {
 		return
@@ -399,10 +401,6 @@ func UserCompletePasswordReset(c *gin.Context) {
 	}
 	user.CurrentSignInIP = c.ClientIP()
 	user.CurrentSignInAt = time.Now().UTC()
-
-	// Clear these, or user will get stuck in password reset loop
-	user.ForcePasswordUpdate = false
-	user.ResetPasswordToken = ""
 	err = user.Save()
 	if AbortIfError(c, err) {
 		return
