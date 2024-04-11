@@ -174,12 +174,19 @@ func UserComplete2FASetup(c *gin.Context) {
 		user.ConfirmedTwoFactor = false
 	}
 
+	user.PhoneNumber = prefs.NewPhone
+	user.AuthyStatus = prefs.NewMethod
+
 	// When turning off two factor, be sure to also clear AuthyStatus,
 	// or system will continue to expect to receive a second factor and
 	// user will be locked out. https://trello.com/c/UbYlbdyT
 	if prefs.DoNotUseTwoFactor() {
 		user.EnabledTwoFactor = false
 		user.AuthyStatus = ""
+		err = user.Save()
+		if AbortIfError(c, err) {
+			return
+		}
 		helpers.SetFlashCookie(c, "Two-factor authentication has been turned off for your account.")
 		c.Redirect(http.StatusFound, "/users/my_account")
 		return
