@@ -41,18 +41,17 @@ func Authenticate() gin.HandlerFunc {
 				c.Set("CurrentUser", user)
 			}
 		}
-		if forceCompletionOfPasswordChange(c, user) {
+		if forceCompletionOfTwoFactorAuth(c, user) {
+			log2FAIncomplete(c, user)
+			c.Redirect(http.StatusFound, "/users/2fa_choose/")
+			c.Abort()
+		} else if forceCompletionOfPasswordChange(c, user) {
 			logPasswordChangeIncomplete(c, user)
 			c.HTML(http.StatusUnauthorized, "errors/show.html", gin.H{
 				"suppressSideNav": true,
 				"suppressTopNav":  true,
 				"error":           "Please finish changing your password",
 			})
-			c.Abort()
-		}
-		if forceCompletionOfTwoFactorAuth(c, user) {
-			log2FAIncomplete(c, user)
-			c.Redirect(http.StatusFound, "/users/2fa_choose/")
 			c.Abort()
 		}
 		c.Next()
