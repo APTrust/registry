@@ -231,8 +231,10 @@ func UserChangePassword(c *gin.Context) {
 	}
 	userToEdit.EncryptedPassword = encPassword
 	userToEdit.PasswordChangedAt = time.Now().UTC()
+
 	userToEdit.ResetPasswordToken = ""
 	userToEdit.ResetPasswordSentAt = time.Time{}
+	userToEdit.ForcePasswordUpdate = false
 	err = userToEdit.Save()
 	if AbortIfError(c, err) {
 		return
