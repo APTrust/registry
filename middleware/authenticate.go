@@ -196,7 +196,8 @@ func forceCompletionOfTwoFactorAuth(c *gin.Context, currentUser *pgmodels.User) 
 		return false // user isn't even signed in
 	}
 	p := c.FullPath()
-	return currentUser.AwaitingSecondFactor &&
+	return currentUser.ResetPasswordToken == "" &&
+		currentUser.AwaitingSecondFactor &&
 		!strings.HasPrefix(p, "/users/2fa_backup") &&
 		!strings.HasPrefix(p, "/users/2fa_choose") &&
 		!strings.HasPrefix(p, "/users/2fa_push") &&
