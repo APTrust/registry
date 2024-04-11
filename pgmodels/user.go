@@ -272,7 +272,7 @@ func (user *User) SignOut() error {
 
 func (user *User) Save() error {
 	user.SetTimestamps()
-	user.reformatPhone()
+	user.ReformatPhone()
 	err := user.Validate()
 	if err != nil {
 		return err
@@ -330,7 +330,7 @@ func (user *User) Validate() *common.ValidationError {
 	return nil
 }
 
-func (user *User) reformatPhone() {
+func (user *User) ReformatPhone() {
 	digitsOnly := reNumeric.ReplaceAllString(user.PhoneNumber, "")
 	if len(digitsOnly) > 0 {
 		if !strings.HasPrefix(digitsOnly, "1") {

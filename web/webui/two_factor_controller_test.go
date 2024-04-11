@@ -209,7 +209,10 @@ func TestUserTwoComplete2FASetup(t *testing.T) {
 	// Submit with no change
 	expect := testutil.Inst1UserClient.POST("/users/2fa_setup").
 		WithHeader("Referer", testutil.BaseURL).
-		WithFormField(constants.CSRFTokenName, testutil.Inst1UserToken).Expect()
+		WithFormField(constants.CSRFTokenName, testutil.Inst1UserToken).
+		WithFormField("PhoneNumber", testutil.Inst1User.PhoneNumber).
+		WithFormField("AuthyStatus", testutil.Inst1User.AuthyStatus).
+		Expect()
 	html := expect.Body().Raw()
 	assert.True(t, strings.Contains(html, "Your two-factor preferences remain unchanged."))
 
@@ -253,6 +256,13 @@ func TestUserTwoComplete2FASetup(t *testing.T) {
 		Expect()
 	html = expect.Body().Raw()
 	assert.True(t, strings.Contains(html, "Two-factor authentication has been turned off for your account."))
+
+	// Confirm a couple of settings after turning off two-factor auth.
+	user, err := pgmodels.UserByEmail(testutil.Inst1User.Email)
+	require.NoError(t, err)
+	require.NotNil(t, user)
+	assert.False(t, user.EnabledTwoFactor)
+	assert.Empty(t, user.AuthyStatus)
 }
 
 func TestUserConfirmPhone(t *testing.T) {

@@ -1,7 +1,6 @@
 package webui
 
 import (
-	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/pgmodels"
 )
@@ -15,18 +14,19 @@ type TwoFactorPreferences struct {
 }
 
 func NewTwoFactorPreferences(req *Request) (*TwoFactorPreferences, error) {
-	user := req.CurrentUser
-	oldPhone := user.PhoneNumber
-	oldMethod := user.AuthyStatus
+	oldPhone := req.CurrentUser.PhoneNumber
+	oldMethod := req.CurrentUser.AuthyStatus
+
+	// Get phone and authy data submitted in the form.
+	user := &pgmodels.User{}
 	err := req.GinContext.ShouldBind(user)
 	if err != nil {
 		return nil, err
 	}
-	valError := user.Validate()
-	if valError != nil && len(valError.Errors) > 0 {
-		common.Context().Log.Error().Msgf("User validation error while completing two-factor setup: %s", valError.Error())
-		return nil, valError
-	}
+
+	// Make sure phone is formatted the way Authy & SMS/SNS like it,
+	// with leading + and country code. https://trello.com/c/QLMjQiyj
+	user.ReformatPhone()
 
 	prefs := &TwoFactorPreferences{
 		OldPhone:  oldPhone,
