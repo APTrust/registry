@@ -88,7 +88,7 @@ func Context() *APTContext {
 			AuthyClient: network.NewAuthyClient(config.TwoFactor.AuthyEnabled, config.TwoFactor.AuthyAPIKey, zlogger),
 			NSQClient:   network.NewNSQClient(config.NsqUrl, zlogger),
 			SESClient:   network.NewSESClient(config.Email.Enabled, config.TwoFactor.AWSRegion, config.Email.SesEndpoint, config.Email.SesUser, config.Email.SesPassword, config.Email.FromAddress, zlogger),
-			SNSClient:   network.NewSNSClient(config.TwoFactor.SMSEnabled, config.TwoFactor.AWSRegion, config.TwoFactor.SNSEndpoint, config.Email.SesUser, config.Email.SesPassword, zlogger),
+			SNSClient:   network.NewSNSClient(config.TwoFactor.SMSEnabled, config.TwoFactor.AWSRegion, config.TwoFactor.SNSEndpoint, config.TwoFactor.SNSUser, config.TwoFactor.SNSPassword, zlogger),
 			SMTPClient:  network.NewSMTPClient(config.Email.Enabled, config.TwoFactor.AWSRegion, config.Email.SesEndpoint, config.Email.SesUser, config.Email.SesPassword, config.Email.FromAddress, zlogger),
 			RedisClient: redisClient,
 		}
