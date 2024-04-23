@@ -75,7 +75,9 @@ func (f *PremisEventFilterForm) init() {
 		Name:        "outcome",
 		Label:       "Outcome",
 		Placeholder: "Outcome",
-		Options:     Options(constants.EventOutcomes),
+		// Fix options: https://trello.com/c/VooirpKZ
+		//Options:     Options(constants.EventOutcomes),
+		Options: Options([]string{"Success", "Failed"}),
 	}
 }
 

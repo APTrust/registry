@@ -52,11 +52,24 @@ func TestPremisEventFilterFormNonAdmin(t *testing.T) {
 		fc, form := getPremisEventFilterForm(t, user)
 		fields := form.GetFields()
 		testPremisEventFields(t, fc, fields)
-		// Non sysadmin can see only their own alerts, so
+		// Non sysadmin can see only their own events, so
 		// there should be no filter options in these lists.
 		assert.Empty(t, fields["institution_id"].Options)
 		assert.True(t, len(fields["event_type"].Options) > 1)
 		assert.True(t, len(fields["outcome"].Options) > 1)
+
+		// Late fix for https://trello.com/c/VooirpKZ
+		foundSuccessOption := false
+		foundFailedOption := false
+		for _, option := range fields["outcome"].Options {
+			if option.Value == "Success" {
+				foundSuccessOption = true
+			} else if option.Value == "Failed" {
+				foundFailedOption = true
+			}
+		}
+		assert.True(t, foundSuccessOption)
+		assert.True(t, foundFailedOption)
 	}
 }
 
