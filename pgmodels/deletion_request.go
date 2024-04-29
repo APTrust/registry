@@ -210,7 +210,8 @@ func (request *DeletionRequest) validateConfirmedBy(errors map[string]string) {
 				return
 			}
 		}
-		instAdmins, err := UserSelect(NewQuery().Where("institution_id", "=", request.ConfirmedBy.InstitutionID).Where("role", "=", constants.RoleInstAdmin))
+		query := NewQuery().Where("institution_id", "=", request.ConfirmedBy.InstitutionID).Where("role", "=", constants.RoleInstAdmin).IsNull("deactivated_at")
+		instAdmins, err := UserSelect(query)
 		if err != nil {
 			errors["ConfirmedByID"] = ErrDeletionBadQuery
 			return
