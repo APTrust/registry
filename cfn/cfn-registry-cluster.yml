@@ -58,6 +58,7 @@ Conditions:
   IsStaging: !Or [!Equals [!Ref DNS, 'staging'], !Equals [!Ref DNS, 'demo']]
   IsPrimary: !Equals [!Ref DNS, 'prod']
 
+
 Resources:
   
   Cluster:
@@ -92,6 +93,9 @@ Resources:
       - Key: Name
         Value: !Sub 'ecs-registry-${DNS}'
       - Key: Environment
+        Value: !Ref 'DNS'
+      - Key: MicroServ
+        Value: registry
         Value: !Ref DNS
       - Key: Service 
         Value: registry
@@ -150,8 +154,6 @@ Resources:
       Tags:  
       - Key: Service
         Value: registry
-      - Key: MicroServ
-        Value: registry
       - Key: Environment
         Value: !Ref "DNS"
       TaskDefinition: !Ref RegistryTaskDefinition
@@ -199,7 +201,7 @@ Resources:
         - Condition: SUCCESS
           ContainerName: Nsqadmin_ResolvConf_InitContainer
         Essential: true 
-        Image: 997427182289.dkr.ecr.us-east-1.amazonaws.com/docker-hub/aptrust/registry:45e3cac-master 
+        Image: 997427182289.dkr.ecr.us-east-1.amazonaws.com/docker-hub/aptrust/registry:c42fc23-master 
         Secrets:
         - Name: APT_ENV
           ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/APT_ENV'

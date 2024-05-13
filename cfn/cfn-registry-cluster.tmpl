@@ -93,6 +93,7 @@ Resources:
       - Key: Name
         Value: !Sub 'ecs-registry-${DNS}'
       - Key: Environment
+        Value: !Ref 'DNS'
       - Key: MicroServ
         Value: registry
         Value: !Ref DNS
