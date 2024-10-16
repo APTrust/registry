@@ -69,7 +69,7 @@ func TestNewConfig(t *testing.T) {
 
 	jsonString, err := config.ToJSON()
 	require.NoError(t, err)
-	assert.Equal(t, expectedConfigJson, jsonString)
+	assert.Equal(t, GetExpectedConfigJson(), jsonString)
 }
 
 func TestConfigBucketQualifier(t *testing.T) {
@@ -145,6 +145,9 @@ func TestHTTPScheme(t *testing.T) {
 	assert.Equal(t, "https", config.HTTPScheme())
 }
 
+// expectedConfigJson contains expected config JSON.
+// Don't use this directly. Use GetExpectedConfigJSON instead
+// because it substitutes '%s' with correct path.
 var expectedConfigJson = `{
   "Cookies": {
     "Secure": {},
@@ -166,7 +169,7 @@ var expectedConfigJson = `{
   },
   "EnvName": "test",
   "Logging": {
-    "File": "/home/diamond/tmp/logs/registry_test.log",
+    "File": "%s",
     "Level": 0,
     "LogCaller": false,
     "LogToConsole": false,
@@ -206,3 +209,11 @@ var expectedConfigJson = `{
   "MaintenanceMode": false,
   "EmailServiceType": "SMTP"
 }`
+
+// GetExpectedConfigJson returns the expected config settings
+// in JSON format. Note that it constructs the expected log file
+// path based on the current user's home directory.
+func GetExpectedConfigJson() string {
+	logFile, _ := common.ExpandTilde("~/tmp/logs/registry_test.log")
+	return fmt.Sprintf(expectedConfigJson, logFile)
+}
