@@ -85,6 +85,8 @@ If you want more data in your dev DB, we have a copy of the staging database in 
 
 [DBeaver](https://dbeaver.io/download/) is an excellent free GUI tool for interacting with the database.
 
+Also note that if you're running Fedora Linux, postgres will not be able to execute the COPY command if selinux is enabled. You must grant read access to all the fixture files to postgres using `chmod -r 0755` AND you must disable selinux. We don't use Fedora in production, and we don't load fixtures in production. This issue affects only local dev and test environments.
+
 # Running
 
 `APT_ENV=dev registry serve`
