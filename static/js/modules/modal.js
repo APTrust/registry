@@ -29,20 +29,22 @@ function modalOpen(event) {
 
 // This is called in xhr.js after content is loaded into modal via ajax request.
 export function attachModalClose(modal) {
-    var parent = modal.parentElement
     var exits = modal.querySelectorAll(".modal-exit");
     console.log(`Found ${exits.length} close buttons`)
     exits.forEach(function (exit) {
         exit.addEventListener("click", function (event) {
             event.preventDefault();
             document.body.classList.remove("freeze");
-            parent.classList.remove("open");
+
+            // Note that while several templates include a modal,
+            // there is only even one modal per page and its ID
+            // is always "modal-one".
+            document.getElementById("modal-one").classList.remove("open");
 
             // For keyboard navigation, return focus to modal opener.
             if (modalOpener != null) {
                 modalOpener.focus()
             }
-            //console.log(document.activeElement)
         });
         console.log("Added close listener to one button")
     });
