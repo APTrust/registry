@@ -102,6 +102,8 @@ NSQ_PID=$!
 
 if [[ $TRAVIS != "true" && $1 != "tests" && "$APT_ENV" != "integration" ]]; then
     echo "Starting NSQ Lookup daemon"
+    echo "DIR is set to: $DIR"
+    eval "ls -l $DIR"
     eval "$DIR/nsqlookupd -http-address=127.0.0.1:4161 &"
     NSQ_LOOKUPD_PID=$!
 

@@ -1,13 +1,14 @@
 # syntax=docker/dockerfile:1
 
-FROM golang:1.17.8-alpine
+FROM golang:1.22.10-alpine3.20
 
-RUN apk update && \
-    apk add --no-cache upx make build-base bash git 
+RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories && \
+  apk update && \
+  apk add --no-cache upx make build-base bash git
 
 ENV CGO_ENABLED=0 \
-    GOOS=linux \
-    GOARCH=amd64
+  GOOS=linux \
+  GOARCH=amd64
 
 WORKDIR /app
 

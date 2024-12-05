@@ -1,0 +1,48 @@
+services:
+  postgres:
+    image: postgres:alpine
+    container_name: postgres
+    environment:
+      POSTGRES_USER: dev_user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: apt_registry_development
+    volumes:
+      - ./shared/postgres_data:/var/lib/postgresql/data
+      - ./shared:/app/shared
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - app_network
+    ports:
+      - "5432:5432"
+
+  registry:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: registry_app
+    depends_on:
+      - postgres
+    volumes:
+      - ./bin/linux:/app/bin
+      - ./shared:/app/shared
+      - ./entrypoint.sh:/entrypoint.sh
+      - ./.env.local:/app/.env
+    environment:
+      - APT_ENV=integration
+      - DB_DRIVER=postgres
+      - DB_HOST=postgres
+      - DB_NAME=apt_registry_development
+      - DB_USER=dev_user
+      - DB_PASSWORD=password
+      - DB_PORT=5432
+    # entrypoint: ["/bin/sh", "/entrypoint.sh"]
+    # command: sh -c "sleep 20 && APT_ENV=test ./registry test ; APT_ENV=dev ./registry start"
+    command: sh -c "APT_ENV=dev /app/registry serve"
+    networks:
+      - app_network
+    ports:
+      - "8080:8080"
+
+networks:
+  app_network:
+    driver: bridge
