@@ -18,6 +18,11 @@ RUN go mod download
 
 COPY . .
 
+COPY db/schema.sql /docker-entrypoint-initdb.d/
+COPY db/migrations/*.sql /docker-entrypoint-initdb.d/migrations/
+
+RUN apk add --no-cache postgresql-client
+
 RUN go build -o /main
 
 #Environment VARS for deployment

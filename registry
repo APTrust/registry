@@ -28,6 +28,10 @@ fi
 # ----------------------------------------------------------------------
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     DIR="./bin/linux"
+    echo "DIR is $DIR"
+elif [[ "$OSTYPE" == "linux-musl"* ]]; then
+    DIR="./bin/linux"
+    echo "DIR is $DIR"
 elif [[ "$OSTYPE" == "darwin"* ]]; then
     if [[ `uname -p` == "arm" ]]; then
         DIR="./bin/osx/arm64"
@@ -36,6 +40,7 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
     fi
 fi
 
+echo "DIR is $DIR; OSTYPE is $OSTYPE"
 
 # ----------------------------------------------------------------------
 #
@@ -102,8 +107,6 @@ NSQ_PID=$!
 
 if [[ $TRAVIS != "true" && $1 != "tests" && "$APT_ENV" != "integration" ]]; then
     echo "Starting NSQ Lookup daemon"
-    echo "DIR is set to: $DIR"
-    eval "ls -l $DIR"
     eval "$DIR/nsqlookupd -http-address=127.0.0.1:4161 &"
     NSQ_LOOKUPD_PID=$!
 
@@ -134,6 +137,9 @@ elif [[ $1 == "cover" ]]; then
 elif [[ $1 == "serve" ]]; then
     if [[ "$APT_ENV" == "integration" ]]; then
         echo "Loading integration fixtures..."
+        APT_ENV=$APT_ENV go run loader/load_fixtures.go
+    elif [[ "$APT_ENV" == "dev_docker" ]]; then
+        echo "Loading dev_docker fixtures..."
         APT_ENV=$APT_ENV go run loader/load_fixtures.go
     fi
     echo "Starting registry app..."
