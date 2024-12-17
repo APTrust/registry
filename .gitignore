@@ -26,3 +26,6 @@ node_modules/
 
 # Temp data used for seeing empty staging db
 db/seed
+
+# Ignore shared directory
+shared

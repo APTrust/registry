@@ -1,6 +1,7 @@
 [![Build Status](https://travis-ci.com/APTrust/registry.svg?branch=master)](https://travis-ci.com/APTrust/registry)
 [![Maintainability](https://api.codeclimate.com/v1/badges/e4c7cfd351d6bae759e3/maintainability)](https://codeclimate.com/github/APTrust/registry/maintainability)
 [![REST API Documentation](https://img.shields.io/badge/documentation-REST%20API-blue)](https://aptrust.github.io/registry/)
+
 <!---
 Test coverage report is incorrect because Travis blows up and reports incorrect numbers.
 Actual coverage is around 80%. We can uncomment this when we move away from Travis.
@@ -133,7 +134,7 @@ Note that Go does not rerun tests that passed on the prior run. If you want to f
 
 This may be necessary if the tests passed on the prior run, but you want to force a reload of the schema or the fixtures.
 
-__Note__ Anytime you make substial updates to Registry (anything more than cosmetic UI changes), and anytime you update Registry's dependencies (e.g. when Dependabot tells you to upgrade an underlying library), you should all of the following tests to be sure there are no regressions:
+**Note** Anytime you make substial updates to Registry (anything more than cosmetic UI changes), and anytime you update Registry's dependencies (e.g. when Dependabot tells you to upgrade an underlying library), you should all of the following tests to be sure there are no regressions:
 
 `registry test` from Registry and
 
