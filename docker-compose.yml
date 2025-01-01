@@ -1,0 +1,51 @@
+services:
+  postgres:
+    image: postgres:alpine
+    container_name: postgres
+    environment:
+      POSTGRES_USER: dev_user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: apt_registry_development
+    volumes:
+      - ./shared/postgres_data:/var/lib/postgresql/data
+      - ./shared:/app/shared
+      # - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      app_network:
+        aliases:
+          - postgres_docker_local
+    ports:
+      - "5432:5432"
+
+  registry:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: registry_app
+    depends_on:
+      - postgres
+    volumes:
+      - ./bin/linux:/app/bin/linux
+      - ./shared:/app/shared
+      - ./entrypoint.sh:/entrypoint.sh
+      - ./.env.dev_docker:/app/.env
+      - ./db/fixtures:/app/db/fixtures
+    environment:
+      - APT_ENV=dev_docker
+      - DB_DRIVER=postgres
+      - DB_HOST=postgres_docker_local
+      - DB_NAME=apt_registry_development
+      - DB_USER=dev_user
+      - DB_PASSWORD=password
+      - DB_PORT=5432
+    entrypoint: ["/bin/sh", "/entrypoint.sh"]
+    # command: sh -c "sleep 20 && APT_ENV=test ./registry test ; APT_ENV=dev ./registry start"
+    command: sh -c 'echo "Changing directory to /app" && cd /app && echo "Setting APT_ENV to dev_docker" && APT_ENV=dev_docker && echo "Running registry serve" && ./registry serve'
+    networks:
+      - app_network
+    ports:
+      - "8080:8080"
+
+networks:
+  app_network:
+    driver: bridge

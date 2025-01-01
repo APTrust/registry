@@ -2,7 +2,6 @@ package db
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -23,6 +22,7 @@ var SafeEnvironments = []string{
 	"integration",
 	"test",
 	"travis",
+	"dev_docker",
 }
 
 // LoadOrder lists the names of tables for which we have fixture data
@@ -184,7 +184,7 @@ func loadSchema(db *pg.DB) error {
 	file := filepath.Join("db", "schema.sql")
 	ddl, err := common.LoadRelativeFile(file)
 	if err != nil {
-		return fmt.Errorf("File %s: %v", file, err)
+		return fmt.Errorf("file %s: %v", file, err)
 	}
 	return runTransaction(db, string(ddl))
 }
@@ -200,9 +200,9 @@ func runMigrations(db *pg.DB) error {
 		file := info.Name()
 		if info.Mode().IsRegular() && strings.HasSuffix(file, ".sql") {
 			absPath := filepath.Join(dir, file)
-			ddl, err := ioutil.ReadFile(absPath)
+			ddl, err := os.ReadFile(absPath)
 			if err != nil {
-				return fmt.Errorf("File %s: %v", file, err)
+				return fmt.Errorf("file %s: %v", file, err)
 			}
 			err = runTransaction(db, string(ddl))
 			if err != nil {
@@ -234,7 +234,7 @@ func loadCSVFile(db *pg.DB, table string) error {
 
 	// On Travis, posgres user can't read from Travis' home dir,
 	// so we have to copy our csv file to a readable temp dir.
-	if ctx.Config.EnvName == "travis" {
+	if ctx.Config.EnvName == "travis" || ctx.Config.EnvName == "dev_docker" {
 		tmpFile := path.Join(os.TempDir(), table+".csv")
 		err := common.CopyFile(file, tmpFile, 0666)
 		if err != nil {
@@ -247,7 +247,7 @@ func loadCSVFile(db *pg.DB, table string) error {
 	sql := fmt.Sprintf(`copy "%s" from '%s' csv header`, table, file)
 	err := runTransaction(db, sql)
 	if err != nil {
-		err = fmt.Errorf(`Error executing "%s": %v`, sql, err)
+		err = fmt.Errorf(`error executing "%s": %v`, sql, err)
 	}
 	return err
 }
@@ -347,7 +347,7 @@ func panicOnWrongEnv() {
 	//
 	// Don't like the kludgy, ugly code below? See how much you
 	// like restoring 250GB of deleted data.
-	if ctx.Config.DB.Host != "localhost" {
+	if ctx.Config.DB.Host != "localhost" && ctx.Config.DB.Host != "postgres_docker_local" {
 		panic("Cannot run destructive DB operations against external servers.")
 	}
 	if !strings.HasSuffix(ctx.Config.DB.Name, "_development") &&
