@@ -7,184 +7,204 @@
 # features require them.
 #
 
-# ----------------------------------------------------------------------
-#
-# Make sure we got a valid command line arg
 #
 # ----------------------------------------------------------------------
-if [[ $1 != "test" && $1 != "cover" && $1 != "serve" && $1 != "serve-ssl" ]]; then
+# FUNCTIONS
+# ----------------------------------------------------------------------
+
+usage() {
     echo "Usage:"
     echo "registry test       - run unit tests"
     echo "registry cover      - run unit tests and generate coverage report"
     echo "registry serve      - run application on port 8080"
     echo "registry serve-ssl  - run https application on port 443"
     exit 0
-fi
+}
 
-# ----------------------------------------------------------------------
-#
-# Set the path to our local bin dir based on OS type
-#
-# ----------------------------------------------------------------------
-if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    DIR="./bin/linux"
-    echo "DIR is $DIR"
-elif [[ "$OSTYPE" == "linux-musl"* ]]; then
-    DIR="./bin/linux"
-    echo "DIR is $DIR"
-elif [[ "$OSTYPE" == "darwin"* ]]; then
-    if [[ `uname -p` == "arm" ]]; then
-        DIR="./bin/osx/arm64"
-    else
-        DIR="./bin/osx/amd64"
+set_bin_dir() {
+    # Set the path to our local bin dir based on OS type
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        DIR="./bin/linux"
+    elif [[ "$OSTYPE" == "linux-musl"* ]]; then
+        DIR="./bin/linux"
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        if [[ "$(uname -p)" == "arm" ]]; then
+            DIR="./bin/osx/arm64"
+        else
+            DIR="./bin/osx/amd64"
+        fi
     fi
-fi
+    echo "DIR is $DIR; OSTYPE is $OSTYPE"
+}
 
-echo "DIR is $DIR; OSTYPE is $OSTYPE"
-
-# ----------------------------------------------------------------------
-#
-# Figure out our environment
-#
-# ----------------------------------------------------------------------
-if [[ $TRAVIS == "true" ]]; then
-    APT_ENV=travis
-elif [[ -z "${APT_ENV}" ]]; then
-    APT_ENV=test
-fi
-echo "APT_ENV is $APT_ENV"
-
-
-# ----------------------------------------------------------------------
-#
-# Get rid of NSQ data lingering from prior test runs
-#
-# ----------------------------------------------------------------------
-rm "$TMPDIR/nsqd.dat" > /dev/null 2>&1
-NSQ_DATA_FILES="$TMPDIR*diskqueue*dat"
-rm $NSQ_DATA_FILES > /dev/null 2>&1
-
-# ----------------------------------------------------------------------
-#
-# Get rid of log data lingering from prior test runs.
-# We need a better way of synching the log file setting
-# between here and .env.test. For now, we're assuming
-# ~/tmp/logs/registry_test.log
-#
-# ----------------------------------------------------------------------
-if [[ "$APT_ENV" == "test" || "$APT_ENV" == "integration" ]]; then
-    echo "Deleting old test log"
-    rm ~/tmp/logs/registry_test.log
-fi
-
-
-# ----------------------------------------------------------------------
-#
-# Set test BUILD_TAGS for all test environments. This turns on
-# controller functions in web/api/admin/integration_test_controller.go
-# instead of the dummy functions in web/api/admin/dummy_controller.go
-#
-# ----------------------------------------------------------------------
-if [[ "$APT_ENV" == "test" || "$APT_ENV" == "integration" || "$APT_ENV" == "travis" ]]; then
-    echo "*** Turning on integration test endpoints ***"
-    BUILD_TAGS="-tags=test"
-fi
-
-
-# ----------------------------------------------------------------------
-#
-# Start the services: NSQ and Redis unless any of the following are true:
-#
-# - We're running in travis
-# - We're running unit tests
-# - We're running local integration tests (because preservation services
-#   will start its own instances of Redis and NSQ on the same ports)
-#
-# ----------------------------------------------------------------------
-echo "Starting NSQ"
-eval "$DIR/nsqd -http-address 127.0.0.1:4151 --data-path=$TMPDIR > /dev/null 2>&1 &"
-NSQ_PID=$!
-
-if [[ $TRAVIS != "true" && $1 != "tests" && "$APT_ENV" != "integration" ]]; then
-    echo "Starting NSQ Lookup daemon"
-    eval "$DIR/nsqlookupd -http-address=127.0.0.1:4161 &"
-    NSQ_LOOKUPD_PID=$!
-
-    echo "Starting NSQ Admin service"
-    eval "$DIR/nsqadmin --nsqd-http-address=127.0.0.1:4151 -http-address=127.0.0.1:4171 &"
-    NSQ_ADMIN_PID=$!
-fi
-
-if [[ "$APT_ENV" != "integration" ]]; then
-    echo "Starting Redis"
-    eval "$DIR/redis-server --save --bind 127.0.0.1 --appendonly no > /dev/null 2>&1 &"
-    REDIS_PID=$!
-fi
-
-# ----------------------------------------------------------------------
-#
-# Run tests or server, based on command line arg.
-#
-# ----------------------------------------------------------------------
-if [[ $1 == "test" ]]; then
-    echo "Running registry tests..."
-    APT_ENV=$APT_ENV go test $BUILD_TAGS -p 1 ./...
-elif [[ $1 == "cover" ]]; then
-    echo "Generating test coverage report..."
-    APT_ENV=$APT_ENV go test $BUILD_TAGS -p 1 ./... -coverprofile c.out
-    echo "To generate HTML report:"
-    echo "> go tool cover -html=c.out"
-elif [[ $1 == "serve" ]]; then
-    if [[ "$APT_ENV" == "integration" ]]; then
-        echo "Loading integration fixtures..."
-        APT_ENV=$APT_ENV go run loader/load_fixtures.go
-    elif [[ "$APT_ENV" == "dev_docker" ]]; then
-        echo "Loading dev_docker fixtures..."
-        APT_ENV=$APT_ENV go run loader/load_fixtures.go
+set_environment() {
+    # Figure out our environment
+    if [[ $TRAVIS == "true" ]]; then
+        APT_ENV=travis
+    elif [[ -z "${APT_ENV}" ]]; then
+        APT_ENV=test
     fi
-    echo "Starting registry app..."
-    APT_ENV=$APT_ENV go run $BUILD_TAGS registry.go
-elif [[ $1 == "serve-ssl" ]]; then
-    echo "Building registry-ssl"
-    go build $BUILD_TAGS -o registry-ssl
-    echo "Starting registry-ssl"
-    APT_ENV=$APT_ENV GIN_MODE=release ./registry-ssl
-fi
+    echo "APT_ENV is $APT_ENV"
+}
 
-EXIT_CODE=$?
+cleanup_nsq_data() {
+    # Get rid of NSQ data lingering from prior test runs
+    rm "$TMPDIR/nsqd.dat" > /dev/null 2>&1
+    NSQ_DATA_FILES="$TMPDIR*diskqueue*dat"
+    rm $NSQ_DATA_FILES > /dev/null 2>&1
+}
 
+cleanup_logs() {
+    # Get rid of log data lingering from prior test runs (only for test/integration)
+    if [[ "$APT_ENV" == "test" || "$APT_ENV" == "integration" ]]; then
+        echo "Deleting old test log"
+        rm ~/tmp/logs/registry_test.log 2>/dev/null
+    fi
+}
 
-# ----------------------------------------------------------------------
+set_build_tags() {
+    # Set test BUILD_TAGS for all test environments
+    if [[ "$APT_ENV" == "test" || "$APT_ENV" == "integration" || "$APT_ENV" == "travis" ]]; then
+        echo "*** Turning on integration test endpoints ***"
+        BUILD_TAGS="-tags=test"
+    fi
+}
+
+start_nsq() {
+    echo "Starting NSQ"
+    eval "$DIR/nsqd -http-address 127.0.0.1:4151 --data-path=$TMPDIR > /dev/null 2>&1 &"
+    NSQ_PID=$!
+}
+
+start_nsq_lookup_and_admin() {
+    if [[ $TRAVIS != "true" && $1 != "tests" && "$APT_ENV" != "integration" ]]; then
+        echo "Starting NSQ Lookup daemon"
+        eval "$DIR/nsqlookupd -http-address=127.0.0.1:4161 &"
+        NSQ_LOOKUPD_PID=$!
+
+        echo "Starting NSQ Admin service"
+        eval "$DIR/nsqadmin --nsqd-http-address=127.0.0.1:4151 -http-address=127.0.0.1:4171 &"
+        NSQ_ADMIN_PID=$!
+    fi
+}
+
 #
-# Shut everything down after tests complete, or after user
-# hits Control-C to stop server.
+# ----------------------------------------------------------------------
+# UPDATED start_redis() FOR Option B
+# ----------------------------------------------------------------------
+start_redis() {
+    # Skip if we're in integration environment
+    if [[ "$APT_ENV" != "integration" ]]; then
+        if [[ "$APT_ENV" == "dev_docker" ]]; then
+            # We assume Redis is installed inside the container (e.g., via apk add redis)
+            echo "Starting Redis (installed in container)"
+            redis-server --save --bind 127.0.0.1 --appendonly no > /dev/null 2>&1 &
+            REDIS_PID=$!
+        else
+            # Use the bundled binary for other environments
+            echo "Starting Redis (bundled binary)"
+            eval "$DIR/redis-server --save --bind 127.0.0.1 --appendonly no > /dev/null 2>&1 &"
+            REDIS_PID=$!
+        fi
+    fi
+}
+
+run_command() {
+    # Decide what to do: tests, coverage, or serve (with/without SSL)
+    case "$1" in
+        "test")
+            echo "Running registry tests..."
+            APT_ENV=$APT_ENV go test $BUILD_TAGS -p 1 ./...
+            ;;
+        "cover")
+            echo "Generating test coverage report..."
+            APT_ENV=$APT_ENV go test $BUILD_TAGS -p 1 ./... -coverprofile c.out
+            echo "To generate HTML report:"
+            echo "> go tool cover -html=c.out"
+            ;;
+        "serve")
+            if [[ "$APT_ENV" == "integration" ]]; then
+                echo "Loading integration fixtures..."
+                APT_ENV=$APT_ENV go run loader/load_fixtures.go
+            elif [[ "$APT_ENV" == "dev_docker" ]]; then
+                echo "Loading dev_docker fixtures..."
+                APT_ENV=$APT_ENV go run loader/load_fixtures.go
+            fi
+            echo "Starting registry app..."
+            APT_ENV=$APT_ENV go run $BUILD_TAGS registry.go
+            ;;
+        "serve-ssl")
+            echo "Building registry-ssl"
+            go build $BUILD_TAGS -o registry-ssl
+            echo "Starting registry-ssl"
+            APT_ENV=$APT_ENV GIN_MODE=release ./registry-ssl
+            ;;
+    esac
+    EXIT_CODE=$?
+}
+
+shutdown_services() {
+    echo "Killing NSQ pid $NSQ_PID"
+    kill $NSQ_PID 2>/dev/null
+
+    if [[ $TRAVIS != "true" && $1 != "tests" ]]; then
+        echo "Killing NSQ Admin pid $NSQ_ADMIN_PID"
+        kill $NSQ_ADMIN_PID 2>/dev/null
+
+        echo "Killing NSQ Lookup pid $NSQ_LOOKUPD_PID"
+        kill $NSQ_LOOKUPD_PID 2>/dev/null
+    fi
+
+    echo "Killing Redis pid $REDIS_PID"
+    kill $REDIS_PID 2>/dev/null
+    sleep 1
+}
+
+cleanup_after_shutdown() {
+    echo "Cleaning up NSQ data files"
+    rm nsqd.dat 2>/dev/null
+    rm *diskqueue*.dat 2>/dev/null
+}
+
+report_test_status() {
+    # If tests were run, report pass/fail
+    if [[ $1 == "test" ]]; then
+        if [[ $EXIT_CODE == 0 ]]; then
+            echo "**** 😁 PASS 😁 ****"
+        else
+            echo "**** 🤬 FAIL 🤬 ****"
+        fi
+    fi
+}
+
 #
 # ----------------------------------------------------------------------
+# MAIN
+# ----------------------------------------------------------------------
+main() {
+    # Make sure we got a valid command line arg
+    if [[ $1 != "test" && $1 != "cover" && $1 != "serve" && $1 != "serve-ssl" ]]; then
+        usage
+    fi
 
-echo "Killing NSQ pid $NSQ_PID"
-kill $NSQ_PID
+    set_bin_dir
+    set_environment
 
-if [[ $TRAVIS != "true" && $1 != "tests" ]]; then
-    echo "Killing NSQ Admin pid $NSQ_ADMIN_PID"
-    kill $NSQ_ADMIN_PID
+    cleanup_nsq_data
+    cleanup_logs
+    set_build_tags
 
-    echo "Killing NSQ Lookup pid $NSQ_LOOKUPD_PID"
-    kill $NSQ_LOOKUPD_PID
-fi
+    start_nsq
+    start_nsq_lookup_and_admin "$1"
+    start_redis
 
-echo "Killing Redis pid $REDIS_PID"
-kill $REDIS_PID
-sleep 1
+    run_command "$1"
+    shutdown_services "$1"
+    cleanup_after_shutdown
 
-echo "Cleaning up NSQ data files"
-rm nsqd.dat
-rm *diskqueue*.dat
+    report_test_status "$1"
+    echo "Finished with code $EXIT_CODE"
+    exit $EXIT_CODE
+}
 
-if [[ $1 == "test" && $EXIT_CODE == 0 ]]; then
-    echo "**** 😁 PASS 😁 ****"
-elif [[ $1 == "test" && $EXIT_CODE != 0 ]]; then
-    echo "**** 🤬 FAIL 🤬 ****"
-fi
-
-echo "Finished with code $EXIT_CODE"
-exit $EXIT_CODE
+main "$@"

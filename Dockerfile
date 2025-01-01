@@ -4,7 +4,7 @@ FROM golang:1.22.10-alpine3.20
 
 RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories && \
   apk update && \
-  apk add --no-cache upx make build-base bash git
+  apk add --no-cache upx make build-base bash git redis
 
 ENV CGO_ENABLED=0 \
   GOOS=linux \

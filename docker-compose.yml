@@ -28,7 +28,8 @@ services:
       - ./bin/linux:/app/bin/linux
       - ./shared:/app/shared
       - ./entrypoint.sh:/entrypoint.sh
-      - ./.env.local:/app/.env
+      - ./.env.dev_docker:/app/.env
+      - ./db/fixtures:/app/db/fixtures
     environment:
       - APT_ENV=dev_docker
       - DB_DRIVER=postgres

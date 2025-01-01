@@ -234,7 +234,7 @@ func loadCSVFile(db *pg.DB, table string) error {
 
 	// On Travis, posgres user can't read from Travis' home dir,
 	// so we have to copy our csv file to a readable temp dir.
-	if ctx.Config.EnvName == "travis" {
+	if ctx.Config.EnvName == "travis" || ctx.Config.EnvName == "dev_docker" {
 		tmpFile := path.Join(os.TempDir(), table+".csv")
 		err := common.CopyFile(file, tmpFile, 0666)
 		if err != nil {
