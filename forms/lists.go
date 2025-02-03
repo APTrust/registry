@@ -74,6 +74,7 @@ var StorageOptionList = []*ListOption{
 	{constants.StorageOptionGlacierVA, "Glacier - Virginia", false},
 	{constants.StorageOptionStandard, "Standard", false},
 	{constants.StorageOptionWasabiOR, "Wasabi - Oregon", false},
+	{constants.StorageOptionWasabiTX, "Wasabi - Texas", false},
 	{constants.StorageOptionWasabiVA, "Wasabi - Virginia", false},
 }
 

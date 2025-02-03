@@ -63,11 +63,11 @@ func TestStorageOptionGetAll(t *testing.T) {
 	options, err := pgmodels.StorageOptionGetAll()
 	require.Nil(t, err)
 	require.NotEmpty(t, options)
-	require.Equal(t, 12, len(options))
+	require.Equal(t, 13, len(options))
 
 	// Should be ordered by name
 	assert.Equal(t, "Glacier-Deep-OH", options[0].Name)
-	assert.Equal(t, "Wasabi-VA", options[11].Name)
+	assert.Equal(t, "Wasabi-VA", options[12].Name)
 }
 
 func TestStorageOptionSelect(t *testing.T) {

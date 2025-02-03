@@ -117,6 +117,7 @@ const (
 	StorageOptionGlacierVA     = "Glacier-VA"
 	StorageOptionStandard      = "Standard"
 	StorageOptionWasabiOR      = "Wasabi-OR"
+	StorageOptionWasabiTX      = "Wasabi-TX"
 	StorageOptionWasabiVA      = "Wasabi-VA"
 	SystemUser                 = "system@aptrust.org"
 	TopicDelete                = "delete_item"
@@ -274,6 +275,7 @@ var StorageOptions = []string{
 	StorageOptionGlacierVA,
 	StorageOptionStandard,
 	StorageOptionWasabiOR,
+	StorageOptionWasabiTX,
 	StorageOptionWasabiVA,
 }
 
