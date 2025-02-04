@@ -31,7 +31,7 @@ revision: ## Show me the git hash
 	@echo "Branch: $(BRANCH)"
 
 build: ## Build the Registry container from current repo. Make sure to commit all changes beforehand
-	docker build --build-arg REGISTRY_RELEASE=$(REVISION) -t registry:multi -t $(TAG) -t aptrust/$(TAG)-$(BRANCH) -t $(REGISTRY)/$(REPOSITORY)/$(TAG) -t $(REGISTRY)/$(REPOSITORY)/registry:$(REVISION)-$(BRANCH) -f Dockerfile.multi .
+	docker buildx build --platform=linux/amd64,linux/arm64 --build-arg REGISTRY_RELEASE=$(REVISION) -t registry:multi -t $(TAG) -t aptrust/$(TAG)-$(BRANCH) -t $(REGISTRY)/$(REPOSITORY)/$(TAG) -t $(REGISTRY)/$(REPOSITORY)/registry:$(REVISION)-$(BRANCH) -f Dockerfile.multi .
 
 build-nc: ## Build the Registry container, no cached layers.
 	docker build --no-cache --build-arg REGISTRY_RELEASE=$(REVISION) -t aptrust/$(TAG)-$(BRANCH) -t $(REGISTRY)/$(REPOSITORY)/$(TAG) .
