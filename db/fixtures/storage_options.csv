@@ -11,4 +11,4 @@ id,provider,service,region,name,cost_gb_per_month,comment,updated_at
 10,AWS,Glacier-Deep,OR,Glacier-Deep-OR,0.00099,"Up to 450 TB as of July 29, 2021",2021-07-29 13:59:25
 11,Wasabi,S3,VA,Wasabi-VA,0.0059,"Pay as you go rate as of July 29, 2021",2021-07-29 13:59:25
 12,Wasabi,S3,OR,Wasabi-OR,0.0059,"Pay as you go rate as of July 29, 2021",2021-07-29 13:59:25
-13,Wasabi,S3,TX,Wasabi-TX,0.0059,"Pay as you go rate as of July 29, 2021",2025-02-03 14:04:25
+13,Wasabi,S3,TX,Wasabi-TX,0.0059,"Pay as you go rate as of Feb 13, 2025",2025-02-13 12:04:25

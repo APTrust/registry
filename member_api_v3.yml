@@ -333,7 +333,7 @@ components:
         storage_option:
           type: string
           description: Indicates where the file is stored.
-          enum: ["Glacier-Deep-OH", "Glacier-Deep-OR", "Glacier-Deep-VA", "Glacier-OH", "Glacier-OR", "Glacier-VA", "Standard", "Wasabi-OR", "Wasabi-VA"]
+          enum: ["Glacier-Deep-OH", "Glacier-Deep-OR", "Glacier-Deep-VA", "Glacier-OH", "Glacier-OR", "Glacier-VA", "Standard", "Wasabi-OR", "Wasabi-TX", "Wasabi-VA"]
         uuid:
           type: string
           format: uuid
@@ -409,7 +409,7 @@ components:
         storage_option:
           type: string
           description: Indicates where the file is stored.
-          enum: ["Glacier-Deep-OH", "Glacier-Deep-OR", "Glacier-Deep-VA", "Glacier-OH", "Glacier-OR", "Glacier-VA", "Standard", "Wasabi-OR", "Wasabi-VA"]
+          enum: ["Glacier-Deep-OH", "Glacier-Deep-OR", "Glacier-Deep-VA", "Glacier-OH", "Glacier-OR", "Glacier-VA", "Standard", "Wasabi-OR", "Wasabi-TX", "Wasabi-VA"]
         uuid:
           type: string
           format: uuid
@@ -505,7 +505,7 @@ components:
         storage_option:
           type: string
           description: Indicates where the object's files are stored.
-          enum: ["Glacier-Deep-OH", "Glacier-Deep-OR", "Glacier-Deep-VA", "Glacier-OH", "Glacier-OR", "Glacier-VA", "Standard", "Wasabi-OR", "Wasabi-VA"]
+          enum: ["Glacier-Deep-OH", "Glacier-Deep-OR", "Glacier-Deep-VA", "Glacier-OH", "Glacier-OR", "Glacier-VA", "Standard", "Wasabi-OR", "Wasabi-TX", "Wasabi-VA"]
         bagit_profile_identifier:
           type: string
           description: The identifier of the BagIt profile used to create this bag. This can be either the APTrust profile URL or the BTR profile URL. Bags will be restored using the same profile under which they were submitted.
@@ -923,7 +923,7 @@ components:
         storage_option:
           type: string
           description: Indicates where the object's files are stored.
-          enum: ["Glacier-Deep-OH", "Glacier-Deep-OR", "Glacier-Deep-VA", "Glacier-OH", "Glacier-OR", "Glacier-VA", "Standard", "Wasabi-OR", "Wasabi-VA"]
+          enum: ["Glacier-Deep-OH", "Glacier-Deep-OR", "Glacier-Deep-VA", "Glacier-OH", "Glacier-OR", "Glacier-VA", "Standard", "Wasabi-OR", "Wasabi-TX", "Wasabi-VA"]
         updated_at:
           type: string
           format: date-time
@@ -1390,7 +1390,7 @@ paths:
           required: false
           schema:
             type: string
-            enum: ["Glacier-Deep-OH", "Glacier-Deep-OR", "Glacier-Deep-VA", "Glacier-OH", "Glacier-OR", "Glacier-VA", "Standard", "Wasabi-OR", "Wasabi-VA"]
+            enum: ["Glacier-Deep-OH", "Glacier-Deep-OR", "Glacier-Deep-VA", "Glacier-OH", "Glacier-OR", "Glacier-VA", "Standard", "Wasabi-OR", "Wasabi-TX", "Wasabi-VA"]
         - name: updated_at__gteq
           in: query
           description: Return files updated on or after the given timestamp.
@@ -1625,7 +1625,7 @@ paths:
           required: false
           schema:
             type: string
-            enum: ["Glacier-Deep-OH", "Glacier-Deep-OR", "Glacier-Deep-VA", "Glacier-OH", "Glacier-OR", "Glacier-VA", "Standard", "Wasabi-OR", "Wasabi-VA"]
+            enum: ["Glacier-Deep-OH", "Glacier-Deep-OR", "Glacier-Deep-VA", "Glacier-OH", "Glacier-OR", "Glacier-VA", "Standard", "Wasabi-OR", "Wasabi-TX", "Wasabi-VA"]
         - name: updated_at__gteq
           in: query
           description: Return objects updated on or after the given timestamp.
@@ -2098,7 +2098,7 @@ paths:
           required: false
           schema:
             type: string
-            enum: ["Glacier-Deep-OH", "Glacier-Deep-OR", "Glacier-Deep-VA", "Glacier-OH", "Glacier-OR", "Glacier-VA", "Standard", "Wasabi-OR", "Wasabi-VA"]
+            enum: ["Glacier-Deep-OH", "Glacier-Deep-OR", "Glacier-Deep-VA", "Glacier-OH", "Glacier-OR", "Glacier-VA", "Standard", "Wasabi-OR", "Wasabi-TX", "Wasabi-VA"]
         - name: user
           in: query
           description: Return work items initiated by the specified user.
