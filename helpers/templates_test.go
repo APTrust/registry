@@ -23,6 +23,10 @@ func TestTruncate(t *testing.T) {
 	assert.Equal(t, "hello", helpers.Truncate("hello", 80))
 }
 
+func TestCurrentYear(t *testing.T) {
+	assert.Equal(t, time.Now().Year(), helpers.CurrentYear())
+}
+
 func TestDateUS(t *testing.T) {
 	assert.Equal(t, "Apr 16, 2021", helpers.DateUS(testDate))
 	assert.Equal(t, "", helpers.DateUS(time.Time{}))

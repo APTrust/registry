@@ -53,6 +53,7 @@ func InitAppEngine(discardStdOut bool) *gin.Engine {
 func initTemplates(router *gin.Engine) {
 	router.SetFuncMap(template.FuncMap{
 		"badgeClass":     helpers.BadgeClass,
+		"currentYear":    helpers.CurrentYear,
 		"dateISO":        helpers.DateISO,
 		"dateTimeISO":    helpers.DateTimeISO,
 		"dateUS":         helpers.DateUS,

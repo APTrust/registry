@@ -46,6 +46,11 @@ func Truncate(value string, length int) string {
 	return fmt.Sprintf(fmtStr, value)
 }
 
+// CurrentYear returns the current year.
+func CurrentYear() int {
+	return time.Now().Year()
+}
+
 // DateUS returns a date in format "Jan 2, 2006"
 func DateUS(date time.Time) string {
 	if date.IsZero() {
