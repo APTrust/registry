@@ -15,7 +15,7 @@ import (
 // On first ingest, we call GenericFileCreateBatch, and the
 // initial checksum is saved there, as part of a batch transaction.
 //
-// POST /admin-api/v3/checsums/create/:institution_id
+// POST /admin-api/v3/checksums/create/:institution_id
 func ChecksumCreate(c *gin.Context) {
 	gf, err := CreateChecksum(c)
 	if api.AbortIfError(c, err) {
