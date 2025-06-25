@@ -65,6 +65,17 @@ func GenerateFailedFixityAlerts(c *gin.Context) {
 		}
 	}
 
+	// Generate only one report for APTrust admins. This will
+	// include all failures at all institutions, and the embedded
+	// link will show them all.
+	err = AlertAPTrustOfFailedFixities(summaries)
+	if err != nil {
+		ctx.Log.Error().Msgf("Error generating failed fixity alerts for APTrust admins: %v", err)
+		response.Error = err.Error()
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+
 	if len(response.Summaries) > 0 {
 		c.JSON(http.StatusCreated, response)
 	} else {
@@ -92,6 +103,25 @@ func FailedFixityLastRunDate() (time.Time, error) {
 func GenerateFailedFixityAlert(summary *pgmodels.FailedFixitySummary) error {
 	ctx := common.Context()
 	ctx.Log.Info().Msgf("Generating failed fixity alert for %s with %d failures.", summary.InstitutionName, summary.Failures)
+
+	// TODO: Generate alert here. Log error or success.
+
+	return nil
+}
+
+func AlertAPTrustOfFailedFixities(summaries []*pgmodels.FailedFixitySummary) error {
+	if len(summaries) == 0 {
+		return nil
+	}
+	instCount := 0
+	failureCount := 0
+	for _, summary := range summaries {
+		instCount += 1
+		failureCount += int(summary.Failures)
+	}
+	ctx := common.Context()
+	ctx.Log.Info().Msgf("Generating failed fixity alert for APTrust admins showing %d failures at %d institutions.",
+		instCount, failureCount)
 
 	// TODO: Generate alert here. Log error or success.
 
