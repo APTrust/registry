@@ -37,14 +37,14 @@ func GenerateFailedFixityAlerts(c *gin.Context) {
 	// If this has already run today, don't run it again.
 	now := time.Now().UTC()
 	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.UTC)
-	if lastRunDate == today {
+	if lastRunDate.Equal(today) {
 		ctx.Log.Info().Msgf("Not generating failed fixity alerts because they were last generated on %v", lastRunDate)
 		response.Error = "Alerts have already been generated today."
 		c.JSON(http.StatusConflict, response)
 		return
 	}
 
-	summaries, err := pgmodels.FailedFixitySummarySelect(lastRunDate, time.Now().UTC())
+	summaries, err := pgmodels.FailedFixitySummarySelect(lastRunDate, now)
 	if err != nil {
 		ctx.Log.Error().Msgf("Error querying for failed fixity alerts: %v", err)
 		response.Error = err.Error()
@@ -59,7 +59,7 @@ func GenerateFailedFixityAlerts(c *gin.Context) {
 	// we don't want one failed alert to prevent others from
 	// being sent.
 	for _, summary := range summaries {
-		err = GenerateFailedFixityAlert(summary)
+		err = GenerateFailedFixityAlert(summary, lastRunDate)
 		if err != nil {
 			response.Error = fmt.Sprintf("%s; %s", response.Error, err.Error())
 		}
@@ -68,7 +68,7 @@ func GenerateFailedFixityAlerts(c *gin.Context) {
 	// Generate only one report for APTrust admins. This will
 	// include all failures at all institutions, and the embedded
 	// link will show them all.
-	err = AlertAPTrustOfFailedFixities(summaries)
+	err = AlertAPTrustOfFailedFixities(summaries, lastRunDate)
 	if err != nil {
 		ctx.Log.Error().Msgf("Error generating failed fixity alerts for APTrust admins: %v", err)
 		response.Error = err.Error()
@@ -83,6 +83,11 @@ func GenerateFailedFixityAlerts(c *gin.Context) {
 	}
 }
 
+// GenerateFailedFixityAlert returns the date on which failed
+// fixity checks were last run. The time component of the date
+// will always be midnight. If there's no date in the the
+// database's ar_internal_metadata table, this returns yesterday's
+// date.
 func FailedFixityLastRunDate() (time.Time, error) {
 	yesterdayTs := time.Now().UTC().AddDate(0, 0, -1)
 	yesterday := time.Date(yesterdayTs.Year(), yesterdayTs.Month(), yesterdayTs.Day(), 0, 0, 0, 0, time.UTC)
@@ -100,7 +105,9 @@ func FailedFixityLastRunDate() (time.Time, error) {
 	return time.Parse(time.RFC3339, metadata.Value)
 }
 
-func GenerateFailedFixityAlert(summary *pgmodels.FailedFixitySummary) error {
+// GenerateFailedFixityAlert creates fixity failure alerts
+// for each admin at the institution in summary.InstitutionID.
+func GenerateFailedFixityAlert(summary *pgmodels.FailedFixitySummary, lastRunDate time.Time) error {
 	ctx := common.Context()
 	ctx.Log.Info().Msgf("Generating failed fixity alert for %s with %d failures.", summary.InstitutionName, summary.Failures)
 
@@ -109,7 +116,7 @@ func GenerateFailedFixityAlert(summary *pgmodels.FailedFixitySummary) error {
 	return nil
 }
 
-func AlertAPTrustOfFailedFixities(summaries []*pgmodels.FailedFixitySummary) error {
+func AlertAPTrustOfFailedFixities(summaries []*pgmodels.FailedFixitySummary, lastRunDate time.Time) error {
 	if len(summaries) == 0 {
 		return nil
 	}
@@ -126,4 +133,27 @@ func AlertAPTrustOfFailedFixities(summaries []*pgmodels.FailedFixitySummary) err
 	// TODO: Generate alert here. Log error or success.
 
 	return nil
+}
+
+// GetFailedFixityEvents returns the PremisEvent records for the
+// failed fixity events. We want to link these to the Alert records
+// in the database, so we know when each admin was alerted to a
+// specific failure.
+//
+// For alerts to APTrust admins, institutionID should be zero,
+// because they want to see alerts pertaining to all institutions.
+//
+// For institutional admins, institutionID should match that of
+// the admin's own institution.
+func GetFailedFixityEvents(institutionID int64, lastRunDate time.Time) ([]*pgmodels.PremisEvent, error) {
+	query := pgmodels.NewQuery().
+		Where("event_type", "=", "fixity check").
+		Where("outcome", "=", "Failed").
+		Where("date_time", ">", lastRunDate)
+
+	// Add inst ID filter for institutional admin...
+	if institutionID > 0 {
+		query = query.Where("institutiton_id", "=", institutionID)
+	}
+	return pgmodels.PremisEventSelect(query)
 }

@@ -273,3 +273,27 @@ func TestInstDisplayType(t *testing.T) {
 	inst.Type = constants.InstTypeSubscriber
 	assert.Equal(t, "Associate", inst.DisplayType())
 }
+
+func TestGetAdmins(t *testing.T) {
+	db.LoadFixtures()
+
+	query := pgmodels.NewQuery().Where("name", "=", "Institution One")
+	inst, err := pgmodels.InstitutionGet(query)
+	require.Nil(t, err)
+	require.NotNil(t, inst)
+
+	admins, err := inst.GetAdmins()
+	require.Nil(t, err)
+	require.Equal(t, 1, len(admins))
+	assert.Equal(t, "admin@inst1.edu", admins[0].Email)
+
+	query = pgmodels.NewQuery().Where("name", "=", "Institution Two")
+	inst, err = pgmodels.InstitutionGet(query)
+	require.Nil(t, err)
+	require.NotNil(t, inst)
+
+	admins, err = inst.GetAdmins()
+	require.Nil(t, err)
+	require.Equal(t, 1, len(admins))
+	assert.Equal(t, "admin@inst2.edu", admins[0].Email)
+}

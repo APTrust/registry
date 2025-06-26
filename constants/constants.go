@@ -38,6 +38,7 @@ const (
 	APIKeyHeader               = "X-Pharos-API-Key"
 	APIPrefixAdmin             = "/admin-api/"
 	APIPrefixMember            = "/member-api/"
+	APTrustOpsEmail            = "ops@aptrust.org"
 	BTRProfileIdentifier       = "https://github.com/dpscollaborative/btr_bagit_profile/releases/download/1.0/btr-bagit-profile.json"
 	CSRFCookieName             = "csrf_token"
 	CSRFHeaderName             = "X-CSRF-Token"

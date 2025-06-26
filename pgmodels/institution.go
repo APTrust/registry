@@ -219,3 +219,11 @@ func (inst *Institution) DueForSpotRestore() (bool, error) {
 	isOverdue := workItem.DateProcessed.Before(expectedLastRestoreDate)
 	return isOverdue, nil
 }
+
+func (inst *Institution) GetAdmins() ([]*User, error) {
+	adminsQuery := NewQuery().
+		Where("institution_id", "=", inst.ID).
+		Where("role", "=", constants.RoleInstAdmin).
+		IsNull("deactivated_at")
+	return UserSelect(adminsQuery)
+}

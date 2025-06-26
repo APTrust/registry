@@ -1,6 +1,8 @@
 Hello from APTrust,
 
-While checking the integrity of your files, one or more fixity checks failed. The link below has more information.
+While checking the integrity of your files, one or more fixity checks failed. These failures were indetified by checks run between {{ .StartDate }} and {{ .EndDate }}
+
+Click link below to see a full list of affected files.
 
 {{ .AlertURL }}
 
