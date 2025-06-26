@@ -134,3 +134,31 @@ func testMarkAsUnread(t *testing.T, alert *pgmodels.Alert) {
 	require.NotNil(t, alertView)
 	require.Empty(t, alertView.ReadAt)
 }
+
+func TestNewFailedFixityAlert(t *testing.T) {
+	instID := int64(4)
+	premisEvents := []*pgmodels.PremisEvent{
+		pgmodels.RandomPremisEvent(constants.EventFixityCheck),
+		pgmodels.RandomPremisEvent(constants.EventFixityCheck),
+		pgmodels.RandomPremisEvent(constants.EventFixityCheck),
+	}
+	recipients := []*pgmodels.User{
+		{Email: "homer@simpsons.com"},
+		{Email: "duff_man@simpsons.com"},
+	}
+
+	alert := pgmodels.NewFailedFixityAlert(instID, premisEvents, recipients)
+
+	assert.Equal(t, int64(0), alert.ID) // Has not been saved
+	assert.Equal(t, constants.AlertFailedFixity, alert.Type)
+	assert.Equal(t, "Failed Fixity Check", alert.Subject)
+
+	require.Equal(t, 3, len(alert.PremisEvents))
+	assert.Equal(t, premisEvents[0], alert.PremisEvents[0])
+	assert.Equal(t, premisEvents[1], alert.PremisEvents[1])
+	assert.Equal(t, premisEvents[2], alert.PremisEvents[2])
+
+	require.Equal(t, 2, len(alert.Users))
+	assert.Equal(t, "homer@simpsons.com", alert.Users[0].Email)
+	assert.Equal(t, "duff_man@simpsons.com", alert.Users[1].Email)
+}

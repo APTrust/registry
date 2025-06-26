@@ -245,3 +245,26 @@ func CreateAlert(alert *Alert, templateName string, alertData map[string]interfa
 
 	return alert, err
 }
+
+// NewFailedFixityAlert returns a new Alert object describing
+// one or more failed fixity check events. Note that this does
+// not save the Alert. The caller must do that after creation.
+//
+// institutionID is the ID of the institution to which this alert
+// pertains.
+//
+// premisEvents is a list of PremisEvents describing the fixity
+// checks that failed.
+//
+// recipients is the list of recipients to whom this alert
+// will be sent. That's usually a group of users or admins
+// at the institution with the specified ID.
+func NewFailedFixityAlert(institutionID int64, premisEvents []*PremisEvent, recipients []*User) *Alert {
+	return &Alert{
+		InstitutionID: institutionID,
+		Type:          constants.AlertFailedFixity,
+		Subject:       "Failed Fixity Check",
+		PremisEvents:  premisEvents,
+		Users:         recipients,
+	}
+}
