@@ -127,10 +127,35 @@ func AlertAPTrustOfFailedFixities(summaries []*pgmodels.FailedFixitySummary, las
 		failureCount += int(summary.Failures)
 	}
 	ctx := common.Context()
-	ctx.Log.Info().Msgf("Generating failed fixity alert for APTrust admins showing %d failures at %d institutions.",
+	ctx.Log.Info().Msgf("Generating failed fixity alert for APTrust ops/admins showing %d failures at %d institutions.",
 		instCount, failureCount)
 
-	// TODO: Generate alert here. Log error or success.
+	events, err := GetFailedFixityEvents(0, lastRunDate)
+	if err == nil {
+		ctx.Log.Error().Msgf("Error collecting list of failed fixity events for admin/ops email: %v", err)
+		return err
+	}
+
+	institution, err := pgmodels.InstitutionByIdentifier("aptrust.org")
+	if err == nil {
+		ctx.Log.Error().Msgf("Error retrieving APTrust institution record for admin/ops email: %v", err)
+		return err
+	}
+
+	aptrustAdmins, err := institution.GetAdmins()
+	if err == nil {
+		ctx.Log.Error().Msgf("Error getting list of APTrust admins for admin/ops email: %v", err)
+		return err
+	}
+
+	alert := pgmodels.NewFailedFixityAlert(institution.ID, events, aptrustAdmins)
+	alertData := map[string]interface{}{
+		"StartDate": lastRunDate,
+		"EndDate":   time.Now().UTC().Format(time.RFC3339),
+		"AlertURL":  GetAlertURL(0, lastRunDate),
+	}
+
+	alert, err = pgmodels.CreateAlert(alert, "alerts/failed_fixity.txt", alertData)
 
 	return nil
 }
@@ -156,4 +181,10 @@ func GetFailedFixityEvents(institutionID int64, lastRunDate time.Time) ([]*pgmod
 		query = query.Where("institutiton_id", "=", institutionID)
 	}
 	return pgmodels.PremisEventSelect(query)
+}
+
+func GetAlertURL(institutionID int64, lastRunDate time.Time) string {
+	// TODO: Customize this with date, institution id, and
+	// environment (staging, demo, prod or localhost)
+	return "https://demo.aptrust.org/events?per_page=20&event_type=fixity+check&outcome=Failed&institution_id=44&date_time__gteq=2025-06-01&date_time__lteq=2025-06-25"
 }
