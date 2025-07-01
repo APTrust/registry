@@ -75,6 +75,7 @@ const (
 	IngestCleanup              = "ingest09_cleanup"
 	InstTypeMember             = "MemberInstitution"
 	InstTypeSubscriber         = "SubscriptionInstitution"
+	MetaFixityAlertsLastRun    = "fixity alerts last run"
 	MetaSpotTestsRunning       = "spot restore is running"
 	MetaSpotTestsLastRun       = "spot restore last run"
 	OutcomeFailure             = "Failure"

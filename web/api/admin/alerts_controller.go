@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/APTrust/registry/common"
+	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/gin-gonic/gin"
 )
@@ -92,7 +93,7 @@ func FailedFixityLastRunDate() (time.Time, error) {
 	yesterdayTs := time.Now().UTC().AddDate(0, 0, -1)
 	yesterday := time.Date(yesterdayTs.Year(), yesterdayTs.Month(), yesterdayTs.Day(), 0, 0, 0, 0, time.UTC)
 
-	metadata, err := pgmodels.InternalMetadataByKey("fixity alerts last run")
+	metadata, err := pgmodels.InternalMetadataByKey(constants.MetaFixityAlertsLastRun)
 
 	// Now rows in result set means GenerateFailedFixityAlerts has
 	// never run before. This should happen only once.
@@ -131,31 +132,40 @@ func AlertAPTrustOfFailedFixities(summaries []*pgmodels.FailedFixitySummary, las
 		instCount, failureCount)
 
 	events, err := GetFailedFixityEvents(0, lastRunDate)
-	if err == nil {
+	if err != nil {
 		ctx.Log.Error().Msgf("Error collecting list of failed fixity events for admin/ops email: %v", err)
 		return err
 	}
 
 	institution, err := pgmodels.InstitutionByIdentifier("aptrust.org")
-	if err == nil {
+	if err != nil {
 		ctx.Log.Error().Msgf("Error retrieving APTrust institution record for admin/ops email: %v", err)
 		return err
 	}
 
 	aptrustAdmins, err := institution.GetAdmins()
-	if err == nil {
+	if err != nil {
 		ctx.Log.Error().Msgf("Error getting list of APTrust admins for admin/ops email: %v", err)
 		return err
 	}
 
+	today := time.Now().UTC()
 	alert := pgmodels.NewFailedFixityAlert(institution.ID, events, aptrustAdmins)
 	alertData := map[string]interface{}{
-		"StartDate": lastRunDate,
-		"EndDate":   time.Now().UTC().Format(time.RFC3339),
-		"AlertURL":  GetAlertURL(0, lastRunDate),
+		"StartDate": lastRunDate.Format("2006-01-02"),
+		"EndDate":   today.Format("2006-01-02"),
+		"AlertURL":  FailedFixityReportURL(0, lastRunDate, today),
 	}
 
 	alert, err = pgmodels.CreateAlert(alert, "alerts/failed_fixity.txt", alertData)
+	if err != nil {
+		ctx.Log.Error().Msgf("Error creating failed fixity alert for admin/ops email: %v", err)
+		return err
+	}
+	if alert != nil {
+		ctx.Log.Info().Msg("Created failed fixity alert for APTrust admins.")
+		return err
+	}
 
 	return nil
 }
@@ -178,13 +188,36 @@ func GetFailedFixityEvents(institutionID int64, lastRunDate time.Time) ([]*pgmod
 
 	// Add inst ID filter for institutional admin...
 	if institutionID > 0 {
-		query = query.Where("institutiton_id", "=", institutionID)
+		query = query.Where("institution_id", "=", institutionID)
 	}
 	return pgmodels.PremisEventSelect(query)
 }
 
-func GetAlertURL(institutionID int64, lastRunDate time.Time) string {
-	// TODO: Customize this with date, institution id, and
-	// environment (staging, demo, prod or localhost)
-	return "https://demo.aptrust.org/events?per_page=20&event_type=fixity+check&outcome=Failed&institution_id=44&date_time__gteq=2025-06-01&date_time__lteq=2025-06-25"
+// FailedFixityReportURL returns a link to the Premis Events page
+// with pre-applied filters to display failed fixity checks for
+// the specified institution between the report's last run date
+// and today.
+func FailedFixityReportURL(institutionID int64, lastRunDate, currentRunDate time.Time) string {
+	var domainAndPort string
+	environment := common.Context().Config.EnvName
+	switch environment {
+	case "prod":
+		domainAndPort = "repo.aptrust.org"
+	case "demo":
+		domainAndPort = "demo.aptrust.org"
+	case "staging":
+		domainAndPort = "staging.aptrust.org"
+	default:
+		domainAndPort = "localhost:8080"
+	}
+	startDateString := lastRunDate.Format("2006-01-02")
+	endDateString := currentRunDate.Format("2006-01-02")
+	if institutionID == 0 {
+		return fmt.Sprintf(
+			"%s://%s/events?event_type=fixity+check&outcome=Failed&date_time__gteq=%s&date_time__lteq=%s",
+			common.Context().Config.HTTPScheme(), domainAndPort, startDateString, endDateString)
+	}
+	return fmt.Sprintf(
+		"%s://%s/events?event_type=fixity+check&outcome=Failed&institution_id=%d&date_time__gteq=%s&date_time__lteq=%s",
+		common.Context().Config.HTTPScheme(), domainAndPort, institutionID, startDateString, endDateString)
 }
