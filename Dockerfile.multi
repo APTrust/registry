@@ -18,7 +18,7 @@ COPY . .
 
 RUN go build -o ./main 
 
-FROM golang:alpine3.19
+FROM golang:1.23-alpine
 
 RUN apk update && apk add --no-cache upx make build-base bash git openssl bind-tools curl
 
