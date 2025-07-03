@@ -112,7 +112,41 @@ func GenerateFailedFixityAlert(summary *pgmodels.FailedFixitySummary, lastRunDat
 	ctx := common.Context()
 	ctx.Log.Info().Msgf("Generating failed fixity alert for %s with %d failures.", summary.InstitutionName, summary.Failures)
 
-	// TODO: Generate alert here. Log error or success.
+	institution, err := pgmodels.InstitutionByID(summary.InstitutionID)
+	if err != nil {
+		ctx.Log.Error().Msgf("Error getting institutiton record for institution %d: %v", summary.InstitutionID, err)
+		return err
+	}
+
+	instAdmins, err := institution.GetAdmins()
+	if err != nil {
+		ctx.Log.Error().Msgf("Error getting list of admins for %s: %v", institution.Identifier, err)
+		return err
+	}
+
+	events, err := GetFailedFixityEvents(institution.ID, lastRunDate)
+	if err != nil {
+		ctx.Log.Error().Msgf("Error collecting list of failed fixity events for %s: %v", institution.Identifier, err)
+		return err
+	}
+
+	today := time.Now().UTC()
+	alert := pgmodels.NewFailedFixityAlert(institution.ID, events, instAdmins)
+	alertData := map[string]interface{}{
+		"StartDate": lastRunDate.Format("2006-01-02"),
+		"EndDate":   today.Format("2006-01-02"),
+		"AlertURL":  FailedFixityReportURL(institution.ID, lastRunDate, today),
+	}
+
+	alert, err = pgmodels.CreateAlert(alert, "alerts/failed_fixity.txt", alertData)
+	if err != nil {
+		ctx.Log.Error().Msgf("Error creating failed fixity alert for %s: %v", institution.Identifier, err)
+		return err
+	}
+	if alert != nil {
+		ctx.Log.Info().Msgf("Created failed fixity alert for admins at %s.", institution.Identifier)
+		return err
+	}
 
 	return nil
 }
