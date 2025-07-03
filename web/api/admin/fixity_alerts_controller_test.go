@@ -1,6 +1,9 @@
 package admin_api_test
 
 import (
+	"fmt"
+	"net/http"
+	"os"
 	"testing"
 	"time"
 
@@ -8,12 +11,83 @@ import (
 	"github.com/APTrust/registry/db"
 	"github.com/APTrust/registry/pgmodels"
 	admin_api "github.com/APTrust/registry/web/api/admin"
+	tu "github.com/APTrust/registry/web/testutil"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestGenerateFailedFixityAlerts(t *testing.T) {
+	os.Setenv("APT_ENV", "test")
+	db.ForceFixtureReload()
 
+	tu.InitHTTPTests(t)
+	//defer db.ForceFixtureReload()
+
+	// There should be only one failed fixity alert when we start.
+	// This is part of the fixtures in db/fixtures.
+	query := pgmodels.NewQuery().
+		Where("subject", "=", "Failed Fixity Check").
+		Where("institution_id", "=", 1)
+	alerts, err := pgmodels.AlertSelect(query)
+	require.Nil(t, err)
+	assert.Equal(t, 0, len(alerts))
+
+	// Create three failed fixity events at institution 2
+	events, err := createFailedFixityEvents(3, 2)
+	require.Nil(t, err)
+	require.Equal(t, 3, len(events))
+
+	// And three more at institution 3
+	events, err = createFailedFixityEvents(3, 3)
+	require.Nil(t, err)
+	require.Equal(t, 3, len(events))
+
+	resp := tu.SysAdminClient.POST("/admin-api/v3/alerts/generate_failed_fixity_alerts").
+		WithHeader(constants.APIUserHeader, tu.SysAdmin.Email).
+		WithHeader(constants.APIKeyHeader, "password").
+		Expect()
+	resp.Status(http.StatusCreated)
+
+	// We should now have three failed fixity alerts.
+	// One is for institution one.
+	// One for inst two.
+	// One is for APTrust admins.
+	// The created_at filter filters out the
+	// failed fixity alert that was loaded as
+	// part of the test filters.
+	query = pgmodels.NewQuery().
+		Where("subject", "=", "Failed Fixity Check").
+		Where("created_at", ">", "2025-06-01")
+	alerts, err = pgmodels.AlertSelect(query)
+	for _, a := range alerts {
+		fmt.Print(a.Users)
+	}
+	require.Nil(t, err)
+	assert.Equal(t, 3, len(alerts))
+}
+
+func TestFailedFixityGenForbiddenToNonAdmins(t *testing.T) {
+	// Non sys-admin cannot call this endpoint
+	tu.Inst1AdminClient.POST("/admin-api/v3/alerts/generate_failed_fixity_alerts").
+		WithHeader(constants.APIUserHeader, tu.Inst1Admin.Email).
+		WithHeader(constants.APIKeyHeader, "password").
+		Expect().
+		Status(http.StatusForbidden)
+	tu.Inst1UserClient.POST("/admin-api/v3/alerts/generate_failed_fixity_alerts").
+		WithHeader(constants.APIUserHeader, tu.Inst1User.Email).
+		WithHeader(constants.APIKeyHeader, "password").
+		Expect().
+		Status(http.StatusForbidden)
+	tu.Inst2AdminClient.POST("/admin-api/v3/alerts/generate_failed_fixity_alerts").
+		WithHeader(constants.APIUserHeader, tu.Inst2Admin.Email).
+		WithHeader(constants.APIKeyHeader, "password").
+		Expect().
+		Status(http.StatusForbidden)
+	tu.Inst2UserClient.POST("/admin-api/v3/alerts/generate_failed_fixity_alerts").
+		WithHeader(constants.APIUserHeader, tu.Inst2User.Email).
+		WithHeader(constants.APIKeyHeader, "password").
+		Expect().
+		Status(http.StatusForbidden)
 }
 
 func TestFailedFixityLastRunDate(t *testing.T) {

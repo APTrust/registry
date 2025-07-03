@@ -353,6 +353,7 @@ func initRoutes(router *gin.Engine) {
 		// TODO: Delete this? Admin API doesn't really need it.
 		adminAPI.GET("/alerts", common_api.AlertIndex)
 		adminAPI.GET("/alerts/show/:id/:user_id", common_api.AlertShow)
+		adminAPI.POST("/alerts/generate_failed_fixity_alerts", admin_api.GenerateFailedFixityAlerts)
 
 		// Checksums
 		adminAPI.GET("/checksums", common_api.ChecksumIndex)

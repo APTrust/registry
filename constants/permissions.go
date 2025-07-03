@@ -41,6 +41,7 @@ const (
 	FileRequestDelete                  = "FileRequestDelete"
 	FileRestore                        = "FileRestore"
 	FileUpdate                         = "FileUpdate"
+	GenerateFailedFixityAlert          = "GenerateFailedFixityAlert"
 	InstitutionCreate                  = "InstitutionCreate"
 	InstitutionDelete                  = "InstitutionDelete"
 	InstitutionList                    = "InstitutionList"
@@ -119,6 +120,7 @@ var Permissions = []Permission{
 	FileRequestDelete,
 	FileRestore,
 	FileUpdate,
+	GenerateFailedFixityAlert,
 	InstitutionCreate,
 	InstitutionDelete,
 	InstitutionList,
@@ -307,6 +309,7 @@ func initPermissions() {
 	sysAdmin[FileRequestDelete] = false
 	sysAdmin[FileRestore] = true
 	sysAdmin[FileUpdate] = true
+	sysAdmin[GenerateFailedFixityAlert] = true
 	sysAdmin[InstitutionCreate] = true
 	sysAdmin[InstitutionDelete] = true
 	sysAdmin[InstitutionList] = true
