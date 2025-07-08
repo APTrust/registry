@@ -243,3 +243,37 @@ func TestSortIcon(t *testing.T) {
 	assert.Empty(t, helpers.SortIcon(url, "col2"))
 	assert.Empty(t, helpers.SortIcon(url, "col3"))
 }
+
+func TestRevisionURL(t *testing.T) {
+	originalCommitID := common.CommitID
+	defer func() { common.CommitID = originalCommitID }()
+
+	common.CommitID = ""
+	assert.Equal(t, "Missing commit ID", helpers.RevisionURL())
+
+	common.CommitID = "12345678"
+	assert.Equal(t, "https://github.com/APTrust/registry/commit/12345678", helpers.RevisionURL())
+}
+
+func TestShortCommitHash(t *testing.T) {
+	originalCommitID := common.CommitID
+	defer func() { common.CommitID = originalCommitID }()
+
+	common.CommitID = ""
+	assert.Equal(t, "Missing commit ID", helpers.ShortCommitHash())
+
+	common.CommitID = "0123456789ABCDEF"
+	assert.Equal(t, "0123456", helpers.ShortCommitHash())
+}
+
+func TestBuildDate(t *testing.T) {
+	originalBuildDate := common.BuildDate
+	defer func() { common.BuildDate = originalBuildDate }()
+
+	common.BuildDate = ""
+	assert.Equal(t, "Missing build date", helpers.BuildDate())
+
+	common.BuildDate = "Tue Jul  8 14:34:31 EDT 2025"
+	assert.Equal(t, "Tue Jul  8 14:34:31 EDT 2025", helpers.BuildDate())
+
+}

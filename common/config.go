@@ -28,6 +28,9 @@ var allowedConfigs = []string{
 	"travis",
 }
 
+var CommitID string
+var BuildDate string
+
 // DBConfig contains info for connecting to the Postgres database.
 type DBConfig struct {
 	Host     string

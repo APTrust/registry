@@ -336,3 +336,31 @@ func reverse(s []string) {
 		s[i], s[j] = s[j], s[i]
 	}
 }
+
+// RevisionURL returns a link to the GitHub page for
+// the commit from which this build was made. Note that
+// this does not include info about uncommitted changes.
+func RevisionURL() string {
+	if common.CommitID == "" {
+		return "Missing commit ID"
+	}
+	return fmt.Sprintf("https://github.com/APTrust/registry/commit/%s", common.CommitID)
+}
+
+// CommitHash returns the first seven characters of the
+// most recent commit hash, a la GitHub.
+func ShortCommitHash() string {
+	if len(common.CommitID) < 7 {
+		return "Missing commit ID"
+	}
+	return common.CommitID[0:7]
+}
+
+// BuildDate returns a date string describing when
+// this version of Registry was built.
+func BuildDate() string {
+	if common.BuildDate == "" {
+		return "Missing build date"
+	}
+	return common.BuildDate
+}
