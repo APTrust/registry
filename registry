@@ -88,6 +88,16 @@ fi
 
 # ----------------------------------------------------------------------
 #
+# Use Golang's ld flags to inject Git revision and build date at runtime.
+#
+# ----------------------------------------------------------------------
+GIT_REVISION=$(git rev-parse HEAD)
+BUILD_DATE=$(date)
+LD_FLAGS="-X 'github.com/APTrust/registry/common.CommitID=$GIT_REVISION' -X 'github.com/APTrust/registry/common.BuildDate=$BUILD_DATE'"
+
+
+# ----------------------------------------------------------------------
+#
 # Start the services: NSQ and Redis unless any of the following are true:
 #
 # - We're running in travis
@@ -123,10 +133,10 @@ fi
 # ----------------------------------------------------------------------
 if [[ $1 == "test" ]]; then
     echo "Running registry tests..."
-    APT_ENV=$APT_ENV go test $BUILD_TAGS -p 1 ./...
+    APT_ENV=$APT_ENV go test $BUILD_TAGS -ldflags="$LD_FLAGS" -p 1 ./...
 elif [[ $1 == "cover" ]]; then
     echo "Generating test coverage report..."
-    APT_ENV=$APT_ENV go test $BUILD_TAGS -p 1 ./... -coverprofile c.out
+    APT_ENV=$APT_ENV go test $BUILD_TAGS -ldflags="$LD_FLAGS" -p 1 ./... -coverprofile c.out
     echo "To generate HTML report:"
     echo "> go tool cover -html=c.out"
 elif [[ $1 == "serve" ]]; then
@@ -135,10 +145,10 @@ elif [[ $1 == "serve" ]]; then
         APT_ENV=$APT_ENV go run loader/load_fixtures.go
     fi
     echo "Starting registry app..."
-    APT_ENV=$APT_ENV go run $BUILD_TAGS registry.go
+    APT_ENV=$APT_ENV go run $BUILD_TAGS -ldflags="$LD_FLAGS" registry.go
 elif [[ $1 == "serve-ssl" ]]; then
     echo "Building registry-ssl"
-    go build $BUILD_TAGS -o registry-ssl
+    go build $BUILD_TAGS -ldflags="$LD_FLAGS" -o registry-ssl
     echo "Starting registry-ssl"
     APT_ENV=$APT_ENV GIN_MODE=release ./registry-ssl
 fi
