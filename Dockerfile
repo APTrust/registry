@@ -3,7 +3,7 @@
 FROM golang:1.23-alpine
 
 RUN apk update && \
-    apk add --no-cache upx make build-base bash git 
+    apk add --no-cache upx make build-base bash git
 
 ENV CGO_ENABLED=0 \
     GOOS=linux \
@@ -11,16 +11,17 @@ ENV CGO_ENABLED=0 \
 
 WORKDIR /app
 
-COPY go.mod ./ 
+COPY go.mod ./
 COPY go.sum ./
 RUN go mod download
 
 COPY . .
 
-RUN go build -o /main
+# Build the Registry binary with Git revision and build date.
+RUN ./build_for_docker.sh ./main
 
 #Environment VARS for deployment
-ENV APT_ENV=dev 
+ENV APT_ENV=dev
 
 ENV DB_DRIVER="postgres"
 ENV DB_HOST="localhost"
@@ -39,25 +40,25 @@ ENV SESSION_COOKIE_NAME="aptrust_session"
 ENV FLASH_COOKIE_NAME="aptrust_flash"
 ENV PREFS_COOKIE_NAME="aptrust_prefs"
 
-ENV HTTPS_COOKIES=false 
+ENV HTTPS_COOKIES=false
 
 ENV NSQ_URL="http://localhost:4151"
 
 ENV AWS_ACCESS_KEY_ID=<yourkeyid>
 ENV AWS_SECRET_ACCESS_KEY=<yoursecretkey>
-ENV AWS_REGION=us-east-1 
+ENV AWS_REGION=us-east-1
 
 ENV ENABLE_TWO_FACTOR_SMS=true
 
-ENV ENABLE_TWO_FACTOR_AUTHY=true 
-ENV AUTHY_API_KEY=<yourkey> 
+ENV ENABLE_TWO_FACTOR_AUTHY=true
+ENV AUTHY_API_KEY=<yourkey>
 
-ENV OTP_EXPIRATION="15m" 
+ENV OTP_EXPIRATION="15m"
 
 ENV EMAIL_ENABLED=false
-ENV EMAIL_FROM_ADDRESS="help@aptrust.org" 
+ENV EMAIL_FROM_ADDRESS="help@aptrust.org"
 
-ENV REDIS_DEFAULT_DB=0 
+ENV REDIS_DEFAULT_DB=0
 ENV REDIS_PASSWORD=""
 ENV REDIS_URL="localhost:6379"
 
