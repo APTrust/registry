@@ -3,7 +3,6 @@ package admin_api_test
 import (
 	"fmt"
 	"net/http"
-	"os"
 	"testing"
 	"time"
 
@@ -17,7 +16,6 @@ import (
 )
 
 func TestGenerateFailedFixityAlerts(t *testing.T) {
-	os.Setenv("APT_ENV", "test")
 	db.ForceFixtureReload()
 
 	tu.InitHTTPTests(t)
