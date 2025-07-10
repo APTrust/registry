@@ -1,4 +1,4 @@
--- Registry Schema - 2024-01-29
+-- Registry Schema - 2025-07-10
 
 
 CREATE TABLE public.ar_internal_metadata (
@@ -151,10 +151,18 @@ CREATE TABLE public.generic_files (
 	created_at timestamp NOT NULL,
 	updated_at timestamp NOT NULL,
 	state varchar NULL,
-	last_fixity_check timestamp NOT NULL DEFAULT '2000-01-01 00:00:00'::timestamp without time zone,
+	last_fixity_check timestamp DEFAULT '2000-01-01 00:00:00'::timestamp without time zone NOT NULL,
 	institution_id int4 NOT NULL,
-	storage_option varchar NOT NULL DEFAULT 'Standard'::character varying,
+	storage_option varchar DEFAULT 'Standard'::character varying NOT NULL,
 	"uuid" varchar NOT NULL,
+	access_time timestamp NULL,
+	change_time timestamp NULL,
+	mod_time timestamp NULL,
+	gid int8 NULL,
+	gname varchar NULL,
+	uid int8 NULL,
+	uname varchar NULL,
+	"mode" int8 NULL,
 	CONSTRAINT generic_files_pkey PRIMARY KEY (id)
 );
 CREATE INDEX index_generic_files_on_created_at ON public.generic_files USING btree (created_at);
@@ -167,7 +175,6 @@ CREATE INDEX index_generic_files_on_updated_at ON public.generic_files USING btr
 CREATE UNIQUE INDEX index_generic_files_on_uuid ON public.generic_files USING btree (uuid);
 CREATE INDEX ix_generic_files_state_opt_fixity ON public.generic_files USING btree (state, storage_option, last_fixity_check);
 CREATE INDEX ix_gf_last_fixity_check ON public.generic_files USING btree (last_fixity_check);
-
 
 -- public.historical_deposit_stats definition
 
@@ -756,6 +763,14 @@ AS SELECT gf.id,
     i.identifier AS institution_identifier,
     gf.storage_option,
     gf.uuid,
+    gf.access_time,
+    gf.change_time,
+    gf.mod_time,
+    gf.gid,
+    gf.gname,
+    gf.uid,
+    gf.uname,
+    gf.mode,
     ( SELECT checksums.digest
            FROM checksums
           WHERE checksums.generic_file_id = gf.id AND checksums.algorithm::text = 'md5'::text
@@ -1075,20 +1090,20 @@ DECLARE
    start_year      INTEGER := 2014;
    start_month     INTEGER := 1;
    already_populating VARCHAR;
-BEGIN 
+BEGIN
 	select "value" into already_populating from ar_internal_metadata where "key" = 'historical deposit stats is running';
 	raise notice '%', already_populating;
-	if (already_populating is null or already_populating != 'true') then	
+	if (already_populating is null or already_populating != 'true') then
 		-- Set a flag in ar_internal_metadata so know this process is running.
-		-- We do this because multiple Registry containers may call this function 
+		-- We do this because multiple Registry containers may call this function
 		-- while it's already running (on the first of the month). This is a long-running
 		-- select/insert query, and we don't want to overtax the DB, nor do we want
 		-- to end up with duplicate rows in the historical_deposit_stats table.
-		insert into ar_internal_metadata ("key", "value", created_at, updated_at) 
+		insert into ar_internal_metadata ("key", "value", created_at, updated_at)
 		values ('historical deposit stats is running', 'true', now(), now())
-		on conflict ("key") do 
+		on conflict ("key") do
 		update set "value" = 'true', updated_at = now();
-		
+
 		for year in start_year..current_year loop
    			for month in 1..12 loop
 	   			if make_timestamp(year, month,1,0,0,0) < now() then
@@ -1096,11 +1111,11 @@ BEGIN
 	    		end if;
    			end loop;
    		end loop;
-   	
+
    		-- Now clear the metadata flag.
    		update ar_internal_metadata set "value" = 'false' where key = 'historical deposit stats is running';
    	end if;
-end; 
+end;
 $function$
 ;
 
@@ -1138,8 +1153,8 @@ AS $function$
 		  where gf.state = 'A'
 		  group by cube (i."name", gf.storage_option)) stats
 		left join storage_options so on so."name" = stats.storage_option
-		left join institutions i2 on i2."name" = stats.institution_name;		
-	
+		left join institutions i2 on i2."name" = stats.institution_name;
+
 		return 1;
 	end;
 $function$
@@ -1152,7 +1167,7 @@ CREATE OR REPLACE FUNCTION public.populate_deposit_stats(stop_date date)
  LANGUAGE plpgsql
 AS $function$
 	begin
-		if not exists (select 1 from deposit_stats where end_date = stop_date) then 
+		if not exists (select 1 from deposit_stats where end_date = stop_date) then
 			insert into deposit_stats
 			select
 			  i2.id as institution_id,
@@ -1195,24 +1210,24 @@ declare
 	inst_id int8;
 	end_dt date;
 	storage_opt varchar;
-begin 
-	for inst_id in select distinct(institution_id) from historical_deposit_stats 
+begin
+	for inst_id in select distinct(institution_id) from historical_deposit_stats
 	loop
 		for end_dt in select distinct(end_date) from historical_deposit_stats
-		loop 
+		loop
 			for storage_opt in select distinct(storage_option) from historical_deposit_stats
-			loop 
+			loop
 
-				if inst_id is null and not exists (select * from historical_deposit_stats where institution_id is null and storage_option = storage_opt and end_date = end_dt) then 
-					insert into historical_deposit_stats (institution_id, institution_name, storage_option, object_count, 
-						file_count, total_bytes, total_gb, total_tb, cost_gb_per_month, monthly_cost, end_date, 
+				if inst_id is null and not exists (select * from historical_deposit_stats where institution_id is null and storage_option = storage_opt and end_date = end_dt) then
+					insert into historical_deposit_stats (institution_id, institution_name, storage_option, object_count,
+						file_count, total_bytes, total_gb, total_tb, cost_gb_per_month, monthly_cost, end_date,
 						member_institution_id, primary_sort, secondary_sort)
 					values (null, 'All Institutions', storage_opt,0,0,0,0,0,0,0, end_dt, 0, 'zzz', storage_opt);
 				end if;
 
-				if not exists (select * from historical_deposit_stats where institution_id = inst_id and storage_option = storage_opt and end_date = end_dt) then 
-					insert into historical_deposit_stats (institution_id, institution_name, storage_option, object_count, 
-						file_count, total_bytes, total_gb, total_tb, cost_gb_per_month, monthly_cost, end_date, 
+				if not exists (select * from historical_deposit_stats where institution_id = inst_id and storage_option = storage_opt and end_date = end_dt) then
+					insert into historical_deposit_stats (institution_id, institution_name, storage_option, object_count,
+						file_count, total_bytes, total_gb, total_tb, cost_gb_per_month, monthly_cost, end_date,
 						member_institution_id, primary_sort, secondary_sort)
 					select i.id, i.name, storage_opt, 0,0,0,0,0,0,0,end_dt, i.member_institution_id, i.name, storage_opt from institutions i where i.id = inst_id;
 				end if;
@@ -1232,7 +1247,7 @@ CREATE OR REPLACE FUNCTION public.populate_historical_deposit_stats(stop_date da
  LANGUAGE plpgsql
 AS $function$
 	begin
-		if not exists (select 1 from historical_deposit_stats where end_date = stop_date) then 
+		if not exists (select 1 from historical_deposit_stats where end_date = stop_date) then
 			insert into historical_deposit_stats (
 			  institution_id,
               member_institution_id,
@@ -1245,7 +1260,7 @@ AS $function$
 			  total_tb,
 			  cost_gb_per_month,
 			  monthly_cost,
-			  end_date, 
+			  end_date,
               primary_sort,
               secondary_sort
             )
@@ -1280,7 +1295,7 @@ AS $function$
 			left join institutions i2 on i2."name" = stats.institution_name;
 
 			select populate_empty_deposit_stats();
-		
+
 			return 1;
 		else
 			return 0;
@@ -1296,7 +1311,7 @@ CREATE OR REPLACE FUNCTION public.populate_historical_deposit_stats(stop_date ti
  LANGUAGE plpgsql
 AS $function$
 	begin
-		if not exists (select 1 from historical_deposit_stats where end_date = stop_date) then 
+		if not exists (select 1 from historical_deposit_stats where end_date = stop_date) then
 			insert into historical_deposit_stats (
 			  institution_id,
               member_institution_id,
@@ -1309,7 +1324,7 @@ AS $function$
 			  total_tb,
 			  cost_gb_per_month,
 			  monthly_cost,
-			  end_date, 
+			  end_date,
               primary_sort,
               secondary_sort
             )
@@ -1342,7 +1357,7 @@ AS $function$
 			  group by cube (i."name", gf.storage_option)) stats
 			left join storage_options so on so."name" = stats.storage_option
 			left join institutions i2 on i2."name" = stats.institution_name;
-		
+
 			return 1;
 		else
 			return 0;
@@ -1359,21 +1374,21 @@ CREATE OR REPLACE FUNCTION public.update_counts()
 AS $function$
   begin
     -- Don't start running this if it's already running. You'll get a long deadlock.
-    if exists (select 1 from ar_internal_metadata where "key"='update counts is running' and "value" = 'true') then 
+    if exists (select 1 from ar_internal_metadata where "key"='update counts is running' and "value" = 'true') then
     	raise notice 'update_counts is running in another process (has value true)';
         return 0;
     end if;
 
     -- Another hint that this function is already running is
     -- a lock on "update counts" row in the metadata table.
-    -- That update isn't committed until the entire function 
-    -- completes, which had been causing deadlocks. 
+    -- That update isn't committed until the entire function
+    -- completes, which had been causing deadlocks.
     -- This is the key addition in migration 008_fix_update_counts.
-	if exists (SELECT id FROM ar_internal_metadata aim where "key" = 'update counts is running') and not exists (SELECT id FROM ar_internal_metadata aim where "key" = 'update counts is running' FOR UPDATE SKIP locked) then 
+	if exists (SELECT id FROM ar_internal_metadata aim where "key" = 'update counts is running') and not exists (SELECT id FROM ar_internal_metadata aim where "key" = 'update counts is running' FOR UPDATE SKIP locked) then
     	raise notice 'update_counts is running in another process (metadata row is locked)';
 		return 0;
 	end if;
-      
+
     if exists (select 1 from work_item_counts where updated_at < (current_timestamp - interval '60 minutes')) or not exists (select * from work_item_counts where institution_id is not null limit 1) then
 
 		-- Use ar_internal_metadata to track whether this function is running.
@@ -1382,11 +1397,11 @@ AS $function$
 		-- a previous iteration is still in progress.
    		insert into ar_internal_metadata ("key", "value", created_at, updated_at) values ('update counts is running', 'true', now(), now())
    		on conflict("key") do update set "value" = 'true';
-   	
+
     	refresh materialized view concurrently premis_event_counts;
    		refresh materialized view concurrently intellectual_object_counts;
    		refresh materialized view concurrently generic_file_counts;
-   		refresh materialized view concurrently work_item_counts;    
+   		refresh materialized view concurrently work_item_counts;
 
    		update ar_internal_metadata set "value" = 'false', updated_at = now() where "key" = 'update counts is running';
    		return 1;
@@ -1405,15 +1420,15 @@ CREATE OR REPLACE FUNCTION public.update_current_deposit_stats()
 AS $function$
   begin
     -- Don't start running this if it's already running. You'll get a long deadlock.
-    if exists (select 1 from ar_internal_metadata where "key"='current_deposit_stats is running' and "value" = 'true') then 
+    if exists (select 1 from ar_internal_metadata where "key"='current_deposit_stats is running' and "value" = 'true') then
         return 0;
     end if;
 
     if exists (select 1 from current_deposit_stats where end_date < (current_timestamp - interval '60 minutes')) or not exists (select * from current_deposit_stats where institution_id is not null limit 1) then
 
-        insert into ar_internal_metadata ("key", "value", created_at, updated_at) 
+        insert into ar_internal_metadata ("key", "value", created_at, updated_at)
         values ('current_deposit_stats is running', 'true', now(), now())
-   		    on conflict("key") do update set "value" = 'true';    
+   		    on conflict("key") do update set "value" = 'true';
 
     	refresh materialized view concurrently current_deposit_stats;
 
