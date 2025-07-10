@@ -48,9 +48,9 @@ type GenericFile struct {
 	AccessTime           time.Time           `json:"atime"`
 	ChangeTime           time.Time           `json:"ctime"`
 	ModTime              time.Time           `json:"mtime"`
-	Gid                  int                 `json:"gid"`
+	Gid                  int64               `json:"gid"`
 	Gname                string              `json:"gname"`
-	Uid                  int                 `json:"uid"`
+	Uid                  int64               `json:"uid"`
 	Uname                string              `json:"uname"`
 	Mode                 int64               `json:"mode"`
 }
