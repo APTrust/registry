@@ -1,6 +1,6 @@
 -- 012_posix_metadata.sql
 --
--- This migration adds eight columns to the generic_files
+-- This migration adds one column to the generic_files
 -- table to track POSIX metadata related to files we ingest.
 -- All of these fields are nullable, so as not to substantially
 -- increase the size of the 40+ million rows already in the DB.
@@ -9,16 +9,19 @@
 -- POSIX metadata, depending on whether that data is stored in
 -- the tarred bag upload at the time it was created.
 --
+-- After polling depositors, we are capturing only mod_time,
+-- and ignoring the other POSIX data, such as user_id, group_id,
+-- uname, gname and file mode.
 
 -- Note that we're starting the migration.
 insert into schema_migrations ("version", started_at) values ('012_posix_metadata', now())
 on conflict ("version") do update set started_at = now();
 
--- Add new POSIX metadata columns to generic_files table.
+-- Add new POSIX metadata column to generic_files table.
 alter table generic_files add column if not exists mod_time timestamp null;
 
 
--- Now add POSIX metadata columns to generic_files_view.
+-- Now add POSIX metadata column to generic_files_view.
 drop view if exists public.generic_files_view;
 
 CREATE OR REPLACE VIEW public.generic_files_view
