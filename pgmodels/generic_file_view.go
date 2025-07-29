@@ -18,6 +18,7 @@ type GenericFileView struct {
 	InstitutionIdentifier string    `json:"institution_identifier"`
 	StorageOption         string    `json:"storage_option"`
 	UUID                  string    `json:"uuid" pg:"uuid"`
+	ModTime               time.Time `json:"mtime"`
 	Md5                   string    `json:"md5"`
 	Sha1                  string    `json:"sha1"`
 	Sha256                string    `json:"sha256"`

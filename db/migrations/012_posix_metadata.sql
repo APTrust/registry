@@ -15,14 +15,7 @@ insert into schema_migrations ("version", started_at) values ('012_posix_metadat
 on conflict ("version") do update set started_at = now();
 
 -- Add new POSIX metadata columns to generic_files table.
-alter table generic_files add column if not exists access_time timestamp null;
-alter table generic_files add column if not exists change_time timestamp null;
 alter table generic_files add column if not exists mod_time timestamp null;
-alter table generic_files add column if not exists gid int8 null;
-alter table generic_files add column if not exists gname varchar null;
-alter table generic_files add column if not exists "uid" int8 null;
-alter table generic_files add column if not exists uname varchar null;
-alter table generic_files add column if not exists "mode" int8 null;
 
 
 -- Now add POSIX metadata columns to generic_files_view.
@@ -43,14 +36,7 @@ AS SELECT gf.id,
     i.identifier AS institution_identifier,
     gf.storage_option,
     gf.uuid,
-    gf.access_time,
-    gf.change_time,
     gf.mod_time,
-    gf.gid,
-    gf.gname,
-    gf.uid,
-    gf.uname,
-    gf.mode,
     ( SELECT checksums.digest
            FROM checksums
           WHERE checksums.generic_file_id = gf.id AND checksums.algorithm::text = 'md5'::text

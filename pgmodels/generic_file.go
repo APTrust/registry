@@ -45,14 +45,7 @@ type GenericFile struct {
 	PremisEvents         []*PremisEvent      `json:"premis_events" pg:"rel:has-many"`
 	Checksums            []*Checksum         `json:"checksums" pg:"rel:has-many"`
 	StorageRecords       []*StorageRecord    `json:"storage_records" pg:"rel:has-many"`
-	AccessTime           time.Time           `json:"atime"`
-	ChangeTime           time.Time           `json:"ctime"`
 	ModTime              time.Time           `json:"mtime"`
-	Gid                  int64               `json:"gid"`
-	Gname                string              `json:"gname"`
-	Uid                  int64               `json:"uid"`
-	Uname                string              `json:"uname"`
-	Mode                 int64               `json:"mode"`
 }
 
 // TODO: When selecting relations, order by UpdatedAt asc.

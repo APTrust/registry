@@ -61,7 +61,7 @@ func TestWorkItemIndex(t *testing.T) {
 	assert.Equal(t, 32, list.Count)
 	assert.Equal(t, "/admin-api/v3/items?page=3&per_page=5", list.Next)
 	assert.Equal(t, "/admin-api/v3/items?page=1&per_page=5", list.Previous)
-	assert.Equal(t, tu.Inst1User.InstitutionID, list.Results[0].InstitutionID)
+	assert.Equal(t, tu.Inst2User.InstitutionID, list.Results[0].InstitutionID)
 
 	// Test some filters.
 	resp = tu.SysAdminClient.GET("/admin-api/v3/items").

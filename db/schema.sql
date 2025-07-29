@@ -155,14 +155,7 @@ CREATE TABLE public.generic_files (
 	institution_id int4 NOT NULL,
 	storage_option varchar DEFAULT 'Standard'::character varying NOT NULL,
 	"uuid" varchar NOT NULL,
-	access_time timestamp NULL,
-	change_time timestamp NULL,
 	mod_time timestamp NULL,
-	gid int8 NULL,
-	gname varchar NULL,
-	uid int8 NULL,
-	uname varchar NULL,
-	"mode" int8 NULL,
 	CONSTRAINT generic_files_pkey PRIMARY KEY (id)
 );
 CREATE INDEX index_generic_files_on_created_at ON public.generic_files USING btree (created_at);
@@ -763,14 +756,7 @@ AS SELECT gf.id,
     i.identifier AS institution_identifier,
     gf.storage_option,
     gf.uuid,
-    gf.access_time,
-    gf.change_time,
     gf.mod_time,
-    gf.gid,
-    gf.gname,
-    gf.uid,
-    gf.uname,
-    gf.mode,
     ( SELECT checksums.digest
            FROM checksums
           WHERE checksums.generic_file_id = gf.id AND checksums.algorithm::text = 'md5'::text
