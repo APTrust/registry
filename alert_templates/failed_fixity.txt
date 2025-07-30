@@ -1,13 +1,14 @@
 Hello from APTrust,
 
-While checking the integrity of your files, one or more fixity checks failed. These failures were indentified by checks run between {{ .StartDate }} and {{ .EndDate }}
+During routine integrity checks on your deposited content, we detected one or more failures in the fixity checks. These checks were run between {{ .StartDate }} and {{ .EndDate }} and are part of our regular monitoring to ensure the long-term integrity of your data.
 
-Click link below to see a full list of affected files.
+You can review the full list of affected files at this link: {{ .AlertURL }}
 
-{{ .AlertURL }}
+Fixity check failures can occur for various reasons and do not always indicate data loss. We encourage you to review the files in question. To help guide you through that process, we’ve provided more details in our documentation at https://aptrust.github.io/userguide/preservation/recovery/.
 
-If you have questions, please contact us at help@aptrust.org.
+If you have any questions or would like assistance with further investigation, please feel free to reach out at help@aptrust.org.
 
+Thank you,
 The APTrust Team
 https://aptrust.org
 help@aptrust.org
