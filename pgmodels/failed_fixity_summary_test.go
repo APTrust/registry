@@ -22,28 +22,28 @@ func TestFailedFixitySummary(t *testing.T) {
 	// that results are correct.
 	startDate := June012025.AddDate(0, 0, -1)
 	endDate := June012025.AddDate(0, 0, 1)
-	stats, err := pgmodels.FailedFixitySummarySelect(startDate, endDate)
+	summaries, err := pgmodels.FailedFixitySummarySelect(startDate, endDate)
 
 	require.Nil(t, err)
-	require.NotEmpty(t, stats)
-	assert.Equal(t, 2, len(stats))
+	require.NotEmpty(t, summaries)
+	assert.Equal(t, 2, len(summaries))
 
-	assert.EqualValues(t, 3, stats[0].Failures)
-	assert.EqualValues(t, 2, stats[0].InstitutionID)
-	assert.Equal(t, "Institution One", stats[0].InstitutionName)
+	assert.EqualValues(t, 3, summaries[0].Failures)
+	assert.EqualValues(t, 2, summaries[0].InstitutionID)
+	assert.Equal(t, "Institution One", summaries[0].InstitutionName)
 
-	assert.EqualValues(t, 3, stats[1].Failures)
-	assert.EqualValues(t, 3, stats[1].InstitutionID)
-	assert.Equal(t, "Institution Two", stats[1].InstitutionName)
+	assert.EqualValues(t, 3, summaries[1].Failures)
+	assert.EqualValues(t, 3, summaries[1].InstitutionID)
+	assert.Equal(t, "Institution Two", summaries[1].InstitutionName)
 
 	// Run a query that should produce no results and ensure
 	// it really does produce no results.
 	startDate = June012025.AddDate(0, 0, 1)
 	endDate = June012025.AddDate(0, 0, 3)
-	stats, err = pgmodels.FailedFixitySummarySelect(startDate, endDate)
+	summaries, err = pgmodels.FailedFixitySummarySelect(startDate, endDate)
 
 	require.Nil(t, err)
-	require.Empty(t, stats)
+	require.Empty(t, summaries)
 }
 
 func addDummyFailures(t *testing.T) {

@@ -21,8 +21,8 @@ func GenerateFailedFixityAlerts(c *gin.Context) {
 	ctx := common.Context()
 	ctx.Log.Info().Msg("Received request to generate failed fixity alerts.")
 	type Response struct {
-		Error     string `json:"error"`
-		Summaries []*pgmodels.FailedFixitySummary
+		Error     string                          `json:"error"`
+		Summaries []*pgmodels.FailedFixitySummary `json:"summaries"`
 	}
 	response := Response{}
 
@@ -40,11 +40,12 @@ func GenerateFailedFixityAlerts(c *gin.Context) {
 	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.UTC)
 	if lastRunDate.Equal(today) {
 		ctx.Log.Info().Msgf("Not generating failed fixity alerts because they were last generated on %v", lastRunDate)
-		response.Error = "Alerts have already been generated today."
+		response.Error = "Note: failed fixity alerts have already been generated today. Controller is returning without running them again."
 		c.JSON(http.StatusConflict, response)
 		return
 	}
 
+	ctx.Log.Info().Msgf("Querying for failed fixity checks between %s and %s", lastRunDate.Format(time.RFC3339), now.Format(time.RFC3339))
 	summaries, err := pgmodels.FailedFixitySummarySelect(lastRunDate, now)
 	if err != nil {
 		ctx.Log.Error().Msgf("Error querying for failed fixity alerts: %v", err)
@@ -52,6 +53,7 @@ func GenerateFailedFixityAlerts(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
+	ctx.Log.Info().Msgf("Result: failed fixity check query returned %d summaries", len(summaries))
 	response.Summaries = summaries
 
 	// Generate a fixity failure alert for each institution.
@@ -60,6 +62,7 @@ func GenerateFailedFixityAlerts(c *gin.Context) {
 	// we don't want one failed alert to prevent others from
 	// being sent.
 	for _, summary := range summaries {
+		ctx.Log.Info().Msgf("%s has %d failed fixity checks between %s and %s", summary.InstitutionName, summary.Failures, lastRunDate.Format(time.RFC3339), now.Format(time.RFC3339))
 		err = GenerateFailedFixityAlert(summary, lastRunDate)
 		if err != nil {
 			response.Error = fmt.Sprintf("%s; %s", response.Error, err.Error())
@@ -75,6 +78,13 @@ func GenerateFailedFixityAlerts(c *gin.Context) {
 		response.Error = err.Error()
 		c.JSON(http.StatusInternalServerError, response)
 		return
+	}
+
+	err = SetFailedFixityLastRunDate(now)
+	if err != nil {
+		ctx.Log.Error().Msgf("Error updating last failed fixity run date in DB: %v", err)
+	} else {
+		ctx.Log.Info().Msgf("Set last failed fixity run date in DB to %s", now.Format(time.RFC3339))
 	}
 
 	if len(response.Summaries) > 0 {
@@ -104,6 +114,24 @@ func FailedFixityLastRunDate() (time.Time, error) {
 		return time.Time{}, err
 	}
 	return time.Parse(time.RFC3339, metadata.Value)
+}
+
+// SetFailedFixityLastRunDate sets the last run date for
+// failed fixity alerts in the database.
+func SetFailedFixityLastRunDate(ts time.Time) error {
+	metadata, err := pgmodels.InternalMetadataByKey(constants.MetaFixityAlertsLastRun)
+
+	// Now rows in result set means GenerateFailedFixityAlerts has
+	// never run before. This should happen only once.
+	if pgmodels.IsNoRowError(err) {
+		metadata = &pgmodels.InternalMetadata{
+			Key:   constants.MetaFixityAlertsLastRun,
+			Value: ts.Format(time.RFC3339),
+		}
+	} else if err != nil {
+		return err
+	}
+	return metadata.Save()
 }
 
 // GenerateFailedFixityAlert creates fixity failure alerts

@@ -62,6 +62,13 @@ func TestGenerateFailedFixityAlerts(t *testing.T) {
 	}
 	require.Nil(t, err)
 	assert.Equal(t, 3, len(alerts))
+
+	// Make sure we updated the last run date
+	tenMinutesAgo := time.Now().UTC().Add(-10 * time.Minute)
+	lastRun, err := admin_api.FailedFixityLastRunDate()
+	require.Nil(t, err)
+	assert.True(t, lastRun.After(tenMinutesAgo))
+	assert.True(t, lastRun.Before(time.Now().UTC()))
 }
 
 func TestFailedFixityGenForbiddenToNonAdmins(t *testing.T) {
@@ -89,7 +96,7 @@ func TestFailedFixityGenForbiddenToNonAdmins(t *testing.T) {
 }
 
 func TestFailedFixityLastRunDate(t *testing.T) {
-	db.LoadFixtures()
+	db.ForceFixtureReload()
 
 	// This should return an error because ar_internal_metadata
 	// doesn't have an entry yet for last fixity alert date.
