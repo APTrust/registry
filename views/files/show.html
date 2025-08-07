@@ -35,6 +35,15 @@
       <dt class="text-label text-xs is-grey-dark">State</dt>
       <dd class="text-table">{{ .file.State }}</dd>
     </div>
+    <div>
+      <dt class="text-label text-xs is-grey-dark">Mod Time</dt>
+      <dd class="text-table">
+        {{ if $.file.ModTime.IsZero }} N/A
+        {{ else }}
+        {{ dateTimeUS .file.ModTime }}
+        {{ end }}
+      </dd>
+    </div>
   </dl>
 
   <div class="modal-content">
@@ -82,8 +91,8 @@
     {{ if eq .file.State "A" }}
     <div class="modal-footer-row">
       {{ if userCan .CurrentUser "FileRequestDelete" .file.InstitutionID }}
-      <button class="button" data-modal="modal-one" data-xhr-url="/files/request_delete/{{ .file.ID }}" 
-        {{ if .hasPendingWorkItems }} disabled title="This file cannot be deleted until pending work items complete." 
+      <button class="button" data-modal="modal-one" data-xhr-url="/files/request_delete/{{ .file.ID }}"
+        {{ if .hasPendingWorkItems }} disabled title="This file cannot be deleted until pending work items complete."
         {{ else if not .file.HasPassedMinimumRetentionPeriod}} disabled title="File cannot be deleted until minimum retention period ends on {{ dateUS .file.EarliestDeletionDate}}" {{ end }}>Delete</button>
       {{ end }}
       {{ if userCan .CurrentUser "FileRestore" .file.InstitutionID }}

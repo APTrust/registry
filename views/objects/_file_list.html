@@ -65,6 +65,15 @@
             <p class="wrap-long-words">{{ $file.Identifier }}</p>
           </div>
 
+          <div class="single-item-file-list-detail wrap-long-words">
+            <h5 class="text-label text-xs">File Modification Time</h5>
+            {{ if $file.ModTime.IsZero }}
+            <p class="wrap-long-words">N/A</p>
+            {{ else }}
+            <p class="wrap-long-words">{{ dateTimeUS $file.ModTime }}</p>
+            {{ end }}
+          </div>
+
           {{ range $index, $sr := $file.StorageRecords }}
           <div class="single-item-file-list-detail wrap-long-words">
             <h5 class="text-label text-xs">URL</h5>
@@ -89,12 +98,12 @@
           {{ if eq $file.State "A"}}
           {{ if userCan $CurrentUser "FileRequestDelete" $file.InstitutionID }}
           <button class="button" data-modal="modal-one" data-xhr-url="/files/request_delete/{{ $file.ID }}"
-            {{ if $HasPendingWorkItems }} disabled title="This file cannot be deleted until pending work items complete." 
+            {{ if $HasPendingWorkItems }} disabled title="This file cannot be deleted until pending work items complete."
             {{ else if not $file.HasPassedMinimumRetentionPeriod}} disabled title="File cannot be deleted until minimum retention period ends on {{ dateUS $file.EarliestDeletionDate}}" {{ end }}>Delete File</button>
           {{ end }}
 
           {{ if userCan $CurrentUser "FileRestore" $file.InstitutionID }}
-          <button class="button" data-modal="modal-one" data-xhr-url="/files/request_restore/{{ $file.ID }}" {{ if $HasPendingWorkItems }} disabled title="This file cannot be restored until pending work items complete."{{ end }}>Restore File</button>
+          <button class="button" data-modal="modal-one" data-xhr-url="/files/request_restore/{{ $file.ID }}" {{ if $HasPendingWorkItems }} disabled title="This file cannot be restored until pending work items complete." {{ end }}>Restore File</button>
           {{ end }}
           {{ end }}
 
