@@ -1,6 +1,7 @@
 package pgmodels
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -392,7 +393,7 @@ func LastSuccessfulIngest(objID int64) (*WorkItem, error) {
 	if len(items) > 0 {
 		return items[0], err
 	}
-	return nil, err
+	return nil, errors.New("Error - Previous ingest work item not found for object")
 }
 
 // NewItemFromLastSuccessfulIngest creates a new WorkItem based on
@@ -411,6 +412,32 @@ func NewItemFromLastSuccessfulIngest(objID int64) (*WorkItem, error) {
 		return nil, err
 	}
 	newItem := &WorkItem{}
+
+	// This should never happen as long as the DB records are intact.
+	// But without this fix, it wouldn't be possible to delete objects that have a missing ingest record.
+	if item == nil {
+		common.Context().Log.Error().Msgf("Error - Previous ingest work item not found for object %v. We will continue by creating a new work item.", objID)
+		item = &WorkItem{}
+		intellectualObject, err := IntellectualObjectByID(objID)
+		if err != nil {
+			return nil, err
+		}
+		// item.TimestampModel
+		// item.Name
+		// item.ETag
+		item.InstitutionID = intellectualObject.InstitutionID
+		item.IntellectualObjectID = objID
+		// item.GenericFileID - caller sets
+		// item.Bucket
+		// item.User - caller sets
+		// item.Action - caller sets
+		// item.BagDate
+		// item.Size
+		// item.APTrustApprover
+		// item.InstApprover
+		// item.DeletionRequestID
+	}
+
 	err = copier.Copy(&newItem, item)
 	if err != nil {
 		return nil, err
