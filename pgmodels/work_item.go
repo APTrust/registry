@@ -403,8 +403,9 @@ func LastSuccessfulIngest(objID int64) (*WorkItem, error) {
 // The caller must set essential fields like Action, User, GenericFileID
 // (if appropriate) and the like.
 //
-// This will return an error if the system can't find the last
-// successful ingest record for the specified object.
+// If the system can't find the last successful ingest work item,
+// we will construct a new work item and import fields from the
+// intellectual object.
 func NewItemFromLastSuccessfulIngest(objID int64) (*WorkItem, error) {
 	item, err := LastSuccessfulIngest(objID)
 	if err != nil {
@@ -420,9 +421,9 @@ func NewItemFromLastSuccessfulIngest(objID int64) (*WorkItem, error) {
 	}
 
 	// This should never happen in a demo or production environment, because records will be intact.
-	// But we will need this fix in order to delete any object with a missing or corrupted ingest record.
+	// But we will need this fix in order to delete or restore any object with a missing or corrupted ingest record.
 	if item == nil {
-		common.Context().Log.Warn().Msgf("Error - Previous ingest work item not found for object %v. We will continue by creating a new work item.", objID)
+		common.Context().Log.Warn().Msgf("Warning - Previous ingest work item not found for object %v. We will continue by creating a new work item.", objID)
 		item = &WorkItem{}
 
 		// item.Bucket
