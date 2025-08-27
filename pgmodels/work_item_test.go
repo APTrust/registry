@@ -305,6 +305,14 @@ func TestLastSuccessfulIngest(t *testing.T) {
 	assert.Equal(t, copyOfItem.ETag, lastIngest.ETag)
 }
 
+func TestNewItemFromLastSuccessfulIngest(t *testing.T) {
+	// For this object, the last successful ingest is missing. But we can still recover.
+	// We should return a valid WorkItem regardless.
+	item, err := pgmodels.NewItemFromLastSuccessfulIngest(5)
+	require.Nil(t, err)
+	require.Nil(t, item.Validate())
+}
+
 func TestNewRestorationItem(t *testing.T) {
 	// Object id #4 from fixtures, institution2.edu/chocolate
 	// has at least one successful ingest WorkItem.

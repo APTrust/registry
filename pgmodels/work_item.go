@@ -1,7 +1,6 @@
 package pgmodels
 
 import (
-	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -393,7 +392,7 @@ func LastSuccessfulIngest(objID int64) (*WorkItem, error) {
 	if len(items) > 0 {
 		return items[0], err
 	}
-	return nil, errors.New("Error - Previous ingest work item not found for object")
+	return nil, err
 }
 
 // NewItemFromLastSuccessfulIngest creates a new WorkItem based on
@@ -413,29 +412,25 @@ func NewItemFromLastSuccessfulIngest(objID int64) (*WorkItem, error) {
 	}
 	newItem := &WorkItem{}
 
-	// This should never happen as long as the DB records are intact.
-	// But without this fix, it wouldn't be possible to delete objects that have a missing ingest record.
+	// We need to query the existing intellectual object view to obtain the current size.
+	// This will allow all work items to reflect the correct object size.
+	intellectualObjectView, err := IntellectualObjectViewByID(objID)
+	if err != nil {
+		return nil, err
+	}
+
+	// This should never happen in a demo or production environment, because records will be intact.
+	// But we will need this fix in order to delete any object with a missing or corrupted ingest record.
 	if item == nil {
-		common.Context().Log.Error().Msgf("Error - Previous ingest work item not found for object %v. We will continue by creating a new work item.", objID)
+		common.Context().Log.Warn().Msgf("Error - Previous ingest work item not found for object %v. We will continue by creating a new work item.", objID)
 		item = &WorkItem{}
-		intellectualObject, err := IntellectualObjectByID(objID)
-		if err != nil {
-			return nil, err
-		}
-		// item.TimestampModel
-		// item.Name
-		// item.ETag
-		item.InstitutionID = intellectualObject.InstitutionID
-		item.IntellectualObjectID = objID
-		// item.GenericFileID - caller sets
+
 		// item.Bucket
-		// item.User - caller sets
-		// item.Action - caller sets
-		// item.BagDate
-		// item.Size
-		// item.APTrustApprover
-		// item.InstApprover
-		// item.DeletionRequestID
+		item.Name = intellectualObjectView.BagName
+		item.IntellectualObjectID = objID
+		item.ETag = intellectualObjectView.ETag
+		item.InstitutionID = intellectualObjectView.InstitutionID
+		item.BagDate = intellectualObjectView.CreatedAt
 	}
 
 	err = copier.Copy(&newItem, item)
@@ -460,6 +455,9 @@ func NewItemFromLastSuccessfulIngest(objID int64) (*WorkItem, error) {
 	newItem.StageStartedAt = time.Time{}
 	newItem.Status = constants.StatusPending
 	newItem.UpdatedAt = now
+
+	// Reset size to the actual current object size (fixes https://trello.com/c/FLWXUptM)
+	newItem.Size = intellectualObjectView.Size
 
 	return newItem, err
 }
