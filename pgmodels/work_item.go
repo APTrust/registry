@@ -426,8 +426,12 @@ func NewItemFromLastSuccessfulIngest(objID int64) (*WorkItem, error) {
 		common.Context().Log.Warn().Msgf("Warning - Previous ingest work item not found for object %v. We will continue by creating a new work item.", objID)
 		item = &WorkItem{}
 
-		// item.Bucket
-		item.Name = intellectualObjectView.BagName
+		institution, err := InstitutionViewByID(intellectualObjectView.InstitutionID)
+		if err != nil {
+			return nil, err
+		}
+		item.Bucket = institution.ReceivingBucket
+		item.Name = intellectualObjectView.BagName + ".tar"
 		item.IntellectualObjectID = objID
 		item.ETag = intellectualObjectView.ETag
 		item.InstitutionID = intellectualObjectView.InstitutionID

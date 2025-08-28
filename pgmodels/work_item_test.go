@@ -306,10 +306,22 @@ func TestLastSuccessfulIngest(t *testing.T) {
 }
 
 func TestNewItemFromLastSuccessfulIngest(t *testing.T) {
-	// For this object, the last successful ingest is missing. But we can still recover.
+	// For this object, the last successful ingest WorkItem is missing. But we can still recover.
 	// We should return a valid WorkItem regardless.
-	item, err := pgmodels.NewItemFromLastSuccessfulIngest(5)
+
+	// First, create some scenario where the only ingest WorkItem for this object is Pending.
+	// i.e. there are no successful ingest WorkItems for this object.
+	item, err := pgmodels.WorkItemByID(24)
 	require.Nil(t, err)
+	item.Status = constants.StatusPending
+	item.Save()
+
+	// Then try to create a new WorkItem. Even though there are no successful ingest WorkItems,
+	// we should still be able to complete this with no validation errors on the resulting WorkItem.
+	item, err = pgmodels.NewItemFromLastSuccessfulIngest(5)
+	require.Nil(t, err)
+	item.Action = constants.ActionDelete
+	item.User = "admin@inst2.edu"
 	require.Nil(t, item.Validate())
 }
 
