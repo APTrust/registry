@@ -403,14 +403,41 @@ func LastSuccessfulIngest(objID int64) (*WorkItem, error) {
 // The caller must set essential fields like Action, User, GenericFileID
 // (if appropriate) and the like.
 //
-// This will return an error if the system can't find the last
-// successful ingest record for the specified object.
+// If the system can't find the last successful ingest work item,
+// we will construct a new work item and import fields from the
+// intellectual object.
 func NewItemFromLastSuccessfulIngest(objID int64) (*WorkItem, error) {
 	item, err := LastSuccessfulIngest(objID)
 	if err != nil {
 		return nil, err
 	}
 	newItem := &WorkItem{}
+
+	// We need to query the existing intellectual object view to obtain the current size.
+	// This will allow all work items to reflect the correct object size.
+	intellectualObjectView, err := IntellectualObjectViewByID(objID)
+	if err != nil {
+		return nil, err
+	}
+
+	// This should never happen in a demo or production environment, because records will be intact.
+	// But we will need this fix in order to delete or restore any object with a missing or corrupted ingest record.
+	if item == nil {
+		common.Context().Log.Warn().Msgf("Warning - Previous ingest work item not found for object %v. We will continue by creating a new work item.", objID)
+		item = &WorkItem{}
+
+		institution, err := InstitutionViewByID(intellectualObjectView.InstitutionID)
+		if err != nil {
+			return nil, err
+		}
+		item.Bucket = institution.ReceivingBucket
+		item.Name = intellectualObjectView.BagName + ".tar"
+		item.IntellectualObjectID = objID
+		item.ETag = intellectualObjectView.ETag
+		item.InstitutionID = intellectualObjectView.InstitutionID
+		item.BagDate = intellectualObjectView.CreatedAt
+	}
+
 	err = copier.Copy(&newItem, item)
 	if err != nil {
 		return nil, err
@@ -433,6 +460,9 @@ func NewItemFromLastSuccessfulIngest(objID int64) (*WorkItem, error) {
 	newItem.StageStartedAt = time.Time{}
 	newItem.Status = constants.StatusPending
 	newItem.UpdatedAt = now
+
+	// Reset size to the actual current object size (fixes https://trello.com/c/FLWXUptM)
+	newItem.Size = intellectualObjectView.Size
 
 	return newItem, err
 }
