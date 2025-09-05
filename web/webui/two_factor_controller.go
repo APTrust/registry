@@ -1,6 +1,7 @@
 package webui
 
 import (
+	"encoding/base64"
 	"fmt"
 	"net/http"
 	"time"
@@ -10,6 +11,8 @@ import (
 	"github.com/APTrust/registry/forms"
 	"github.com/APTrust/registry/helpers"
 	"github.com/gin-gonic/gin"
+	"github.com/pquerna/otp/totp"
+	"github.com/skip2/go-qrcode"
 	"github.com/stretchr/stew/slice"
 )
 
@@ -197,6 +200,8 @@ func UserComplete2FASetup(c *gin.Context) {
 		return
 	}
 
+	// TO DO - If chose TOTP with an Authenticator app, and not set up with it, display /users/generate_totp to setup.
+
 	if prefs.UseAuthy() {
 		ok, err := userCompleteAuthySetup(req, prefs)
 		if AbortIfError(c, err) {
@@ -226,6 +231,7 @@ func UserComplete2FASetup(c *gin.Context) {
 			helpers.SetFlashCookie(c, "Your phone number has been updated.")
 		}
 	}
+
 	c.Redirect(http.StatusFound, "/users/my_account")
 }
 
@@ -396,4 +402,63 @@ func UserCompleteSMSSetup(req *Request) error {
 func OTPTokenIsExpired(tokenSentAt time.Time) bool {
 	expiration := tokenSentAt.Add(common.Context().Config.TwoFactor.OTPExpiration)
 	return time.Now().After(expiration)
+}
+
+// Generates a QR code that a user can use to set up MFA with any Authenticator App
+// on their device.
+//
+// GET /users/generate_totp
+func UserGenerateTOTP(c *gin.Context) {
+	req := NewRequest(c)
+	user := req.CurrentUser
+	// if user.EncryptedTOTPAppSecret == "" {
+	if 1 == 1 {
+		secret, err := totp.Generate(totp.GenerateOpts{
+			Issuer:      constants.TOTPSecretIssuer,
+			AccountName: user.Email,
+		})
+		if err != nil {
+			if AbortIfError(c, err) {
+				return
+			}
+		}
+		// user.EncryptedTOTPAppSecret = secret.Secret()
+		// err = user.Save()
+		// if AbortIfError(c, err) {
+		// return
+		// }
+		req.TemplateData["sec"] = secret // temp - remove
+	}
+	// otpURL := fmt.Sprintf("otpauth://totp/%s:%s?secret=%s&issuer=%s", constants.TOTPSecretIssuer, user.Email, user.EncryptedTOTPAppSecret, constants.TOTPSecretIssuer)
+	otpURL := fmt.Sprintf("otpauth://totp/%s:%s?secret=%s&issuer=%s", constants.TOTPSecretIssuer, user.Email, "nonesuch", constants.TOTPSecretIssuer)
+	png, err := qrcode.Encode(otpURL, qrcode.Medium, 256)
+	if err != nil {
+		if AbortIfError(c, err) {
+			return
+		}
+	}
+	otpQRImage := base64.StdEncoding.EncodeToString(png)
+	req.TemplateData["otpQRImage"] = otpQRImage
+	c.HTML(http.StatusOK, "users/setup_authenticator_app.html", req.TemplateData)
+}
+
+// Displays page for user to validate their TOTP using an authenticator app.
+func UserValidateTOTPView(c *gin.Context) {
+	req := NewRequest(c)
+	c.HTML(http.StatusOK, "users/validate_totp.html", req.TemplateData)
+}
+
+// Validates a TOTP provided by the user from their authenticator app.
+func UserValidateTOTP(c *gin.Context) {
+	req := NewRequest(c)
+	// user := req.CurrentUser
+	totpCode := c.PostForm("totpCode")
+	// isValid := totp.Validate(totpCode, user.EncryptedTOTPAppSecret)
+	isValid := totp.Validate(totpCode, "nonesuch")
+	if !isValid {
+		req.TemplateData["errorMessage"] = "Oops! That wasn't the right code. Please try again."
+		c.HTML(http.StatusOK, "users/validate_totp.html", req.TemplateData)
+		return
+	}
+	c.Redirect(http.StatusFound, "/dashboard")
 }

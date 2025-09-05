@@ -1,0 +1,34 @@
+{{ define "users/setup_authenticator_app.html" }}
+
+<!-- Show the header unless query string says modal=true -->
+{{ if not .showAsModal }}
+  {{ template "shared/_header.html" .}}
+{{ end }}
+
+<div class="modal-detail">
+  <div id="modalTitle" id="modalTitle" class="modal-title-row is-flex is-justify-content-space-between is-align-items-center">
+    <h2>Set Up Authenticator App</h2>
+    <a class="modal-exit is-grey-dark" href="#">
+      <span class="material-icons" aria-hidden="true">close</span>
+      <span class="is-sr-only">Close</span>
+    </a>
+  </div>
+
+  <div class="modal-content">
+    <p class="mb-5">Using your authenticator app, please scan the QR code displayed below. Then, follow the instructions in your authenticator app. When you're done setting up your authenticator app, click Continue.</p>
+
+    <img src="data:image/png;base64,{{ .otpQRImage }}" alt="This is the QR code image used to set up your authenticator app." />
+
+    <form name="finishTOTPSetup" method="get" action="/users/validate_totp">
+      <input class="button" type="submit" value="Continue">
+    </form>
+  </div>
+</div>
+
+<!-- Show the footer unless query string says modal=true -->
+{{ if not .showAsModal }}
+  {{ template "shared/_footer.html" .}}
+{{ end }}
+
+
+{{ end }}

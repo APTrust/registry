@@ -132,6 +132,7 @@ const (
 	TopicFixity                = "fixity_check"
 	TopicGlacierRestore        = "restore_glacier"
 	TopicObjectRestore         = "restore_object"
+	TOTPSecretIssuer           = "APTrust"
 	TwoFactorAuthy             = "onetouch"
 	TwoFactorNone              = "none"
 	TwoFactorSMS               = "sms"

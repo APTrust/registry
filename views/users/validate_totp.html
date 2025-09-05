@@ -1,0 +1,38 @@
+{{ define "users/validate_totp.html" }}
+
+<!-- Show the header unless query string says modal=true -->
+{{ if not .showAsModal }}
+  {{ template "shared/_header.html" .}}
+{{ end }}
+
+<div class="modal-detail">
+  <div id="modalTitle" id="modalTitle" class="modal-title-row is-flex is-justify-content-space-between is-align-items-center">
+    <h2>Enter One-Time Code From Your Authenticator App</h2>
+    <a class="modal-exit is-grey-dark" href="#">
+      <span class="material-icons" aria-hidden="true">close</span>
+      <span class="is-sr-only">Close</span>
+    </a>
+  </div>
+
+  <div class="modal-content">
+    <p class="mb-5">Using your authenticator app, please enter the one-time code that you see for APTrust.</p>
+
+    {{ if .errorMessage }}
+      <p class="mb-5">{{ .errorMessage }}</p> 
+    {{ end }}
+
+    <form name="validateTOTP" method="post" action="/users/validate_totp">
+      <input name="totpCode" type="text" label="One-Time Code">
+      {{ template "forms/csrf_token.html" . }}
+      <input class="button" type="submit" value="Continue">
+    </form>
+  </div>
+</div>
+
+<!-- Show the footer unless query string says modal=true -->
+{{ if not .showAsModal }}
+  {{ template "shared/_footer.html" .}}
+{{ end }}
+
+
+{{ end }}

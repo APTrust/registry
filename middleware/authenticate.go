@@ -174,7 +174,7 @@ func SetDefaultHeaders(c *gin.Context) {
 	// Set these security headers on all responses.
 	c.Writer.Header().Set("X-XSS-Protection", "1")
 	c.Writer.Header().Set("X-Content-Type-Options", "nosniff")
-	c.Writer.Header().Set("Content-Security-Policy", "default-src 'self'; font-src 'self' fonts.gstatic.com; style-src 'self' 'unsafe-inline' fonts.googleapis.com; script-src 'self' 'unsafe-inline'")
+	c.Writer.Header().Set("Content-Security-Policy", "default-src 'self'; font-src 'self' fonts.gstatic.com; style-src 'self' 'unsafe-inline' fonts.googleapis.com; script-src 'self' 'unsafe-inline'; img-src 'self' data:;")
 }
 
 func forceCompletionOfPasswordChange(c *gin.Context, currentUser *pgmodels.User) bool {
