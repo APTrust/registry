@@ -397,3 +397,35 @@ func OTPTokenIsExpired(tokenSentAt time.Time) bool {
 	expiration := tokenSentAt.Add(common.Context().Config.TwoFactor.OTPExpiration)
 	return time.Now().After(expiration)
 }
+
+func UserBeginPasskeyRegistration(c *gin.Context) {
+	// user := NewRequest(c).CurrentUser
+	// options, session, err := common.Context().WebAuthn.BeginRegistration(webauthn.User{})
+	// if err != nil
+	// Save session to DB table
+	c.Redirect(http.StatusFound, "/dashboard")
+}
+
+func UserFinishPasskeyRegistration(c *gin.Context) {
+	// Get Session-Key from header
+	// Get Session from DB
+	// credential, err := webauthn.FinishRegistration(webauth.User{}, webauthn.SessionData{}, *http.Request)
+	// if err != nil
+	// user.AddCredential(credential)
+	// Save user
+	// Delete session
+	c.Redirect(http.StatusFound, "/dashboard")
+}
+
+func UserBeginLoginWithPasskey(c *gin.Context) {
+	// options, session, err := webauthn.BeginLogin(user)
+	c.Redirect(http.StatusFound, "/dashboard")
+}
+
+func UserFinishLoginWithPasskey(c *gin.Context) {
+	// credential, err := webauthn.FinishLogin(user, session, *http.Request)
+	// user.UpdateCredential(credential)
+	// save user
+	// delete session
+	c.Redirect(http.StatusFound, "/dashboard")
+}
