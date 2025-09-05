@@ -18,6 +18,11 @@ alter table premis_events event_type;
 
 alter table premis_events add COLUMN event_type_int smallint;
 
+-- IMPORTANT --
+-- TO DO: If there is a value in the current premis_events table --
+-- for eventType that is NOT a match for any values in this function, --
+-- probably we need to abort and roll back. If it converts to a 0, --
+-- we will lose whatever information was in there. Same for object and agent fields --
 create or replace function convert_event_types()
 returns void as $$
 begin
