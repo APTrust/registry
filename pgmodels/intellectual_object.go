@@ -186,7 +186,7 @@ func (obj *IntellectualObject) LastDeletionEvent() (*PremisEvent, error) {
 	return obj.lastEvent(constants.EventDeletion)
 }
 
-func (obj *IntellectualObject) lastEvent(eventType string) (*PremisEvent, error) {
+func (obj *IntellectualObject) lastEvent(eventType int) (*PremisEvent, error) {
 	query := NewQuery().
 		Where("intellectual_object_id", "=", obj.ID).
 		Where("event_type", "=", eventType).
