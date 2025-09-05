@@ -46,7 +46,7 @@ const (
 	DefaultProfileIdentifier   = "https://raw.githubusercontent.com/APTrust/preservation-services/master/profiles/aptrust-v2.2.json"
 	EmailServiceSES            = "SES"
 	EmailServiceSMTP           = "SMTP"
-	EventAccessAssignment      = "access assignment"
+	EventAccessAssignment      = "access assignment" // 2
 	EventCapture               = "capture"
 	EventCompression           = "compression"
 	EventCreation              = "creation"

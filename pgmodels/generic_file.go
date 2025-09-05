@@ -435,11 +435,11 @@ func (gf *GenericFile) LastDeletionEvent() (*PremisEvent, error) {
 	return gf.lastEvent(constants.EventDeletion)
 }
 
-func (gf *GenericFile) lastEvent(eventType string) (*PremisEvent, error) {
+func (gf *GenericFile) lastEvent(eventType int) (*PremisEvent, error) {
 	query := NewQuery().
 		Where("generic_file_id", "=", gf.ID).
 		Where("event_type", "=", eventType).
-		OrderBy("created_at", "desc").
+		OrderBy("date_time", "desc").
 		Offset(0).
 		Limit(1)
 	return PremisEventGet(query)

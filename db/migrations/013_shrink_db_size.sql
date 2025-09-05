@@ -23,15 +23,58 @@ returns void as $$
 begin
     update premis_events
     set event_type_int = case event_type
-        when 'access assignment' then 1
-        when 'creation' then 2
-        when 'deletion' then 3
-        when 'message digest calculation' then 4
-        when 'fixity check' then 5
-        when 'identifier assignment' then 6
-        when 'ingestion' then 7
-        when 'replication' then 8
-        when 'validation' then 9
+        when 'fixity check' then 1
+        when 'access assignment' then 2
+        -- accession
+        -- appraisal
+        -- capture
+        -- compiling
+        -- compression
+        when 'creation' then 8
+        -- deaccession
+        -- decompression
+        -- decryption
+        when 'deletion' then 12
+        -- digital signature generation
+        -- digital signature validation
+        -- displaying
+        -- dissemination
+        -- encryption
+        -- execution
+        -- exporting
+        -- extraction
+        -- filename change
+        -- forensic feature analysis
+        -- format identification
+        when 'identifier assignment' then 25
+        -- imaging
+        -- information package creation
+        -- information package merging
+        -- information package splitting
+        when 'ingestion' then 30
+        -- ingestion end
+     -- ingestion start
+     -- interpreting
+     when 'message digest calculation' then 34
+     -- metadata extraction
+     -- metadata modification
+     -- migration
+     -- modification
+     -- normalization
+     -- packing
+     -- policy assignment
+     -- printing
+     -- quarantine
+     -- recovery
+     -- redaction
+     -- refreshment
+     -- rendering
+     when 'replication' then 48
+     -- transfer
+     -- unpacking
+     -- unquarantine
+     when 'validation' then 52
+     -- virus check
         else 0  -- default
     end;
 end;
@@ -44,56 +87,6 @@ alter table premis_events drop column event_type;
 alter table premis_events rename column event_type_int TO event_type;
 -- create table event_type_lookup
 -- Most of these, we are not using at the moment
--- accession
--- appraisal
--- capture
--- compiling
--- compression
--- creation
--- deaccession
--- decompression
--- decryption
--- deletion
--- digital signature generation
--- digital signature validation
--- displaying
--- dissemination
--- encryption
--- execution
--- exporting
--- extraction
--- filename change
--- fixity check
--- forensic feature analysis
--- format identification
--- imaging
--- information package creation
--- information package merging
--- information package splitting
--- ingestion
--- ingestion end
--- ingestion start
--- interpreting
--- message digest calculation
--- metadata extraction
--- metadata modification
--- migration
--- modification
--- normalization
--- packing
--- policy assignment
--- printing
--- quarantine
--- recovery
--- redaction
--- refreshment
--- rendering
--- replication
--- transfer
--- unpacking
--- unquarantine
--- validation
--- virus check
 
 -- add foreign key restraint to event_type to map to event_type_lookup
 

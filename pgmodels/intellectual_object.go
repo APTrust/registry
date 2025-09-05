@@ -191,7 +191,7 @@ func (obj *IntellectualObject) lastEvent(eventType string) (*PremisEvent, error)
 		Where("intellectual_object_id", "=", obj.ID).
 		Where("event_type", "=", eventType).
 		IsNull("generic_file_id").
-		OrderBy("created_at", "desc").
+		OrderBy("date_time", "desc").
 		Offset(0).
 		Limit(1)
 	return PremisEventGet(query)
