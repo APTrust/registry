@@ -15,7 +15,7 @@ func getPremisEventFilters() *pgmodels.FilterCollection {
 	fc := pgmodels.NewFilterCollection()
 	fc.Add("date_time__gteq", []string{"2020-01-01"})
 	fc.Add("date_time__lteq", []string{"2024-12-31"})
-	fc.Add("event_type", []string{constants.EventAccessAssignment, constants.EventIngestion})
+	fc.Add("event_type", []string{constants.EventAccessAssignmentString, constants.EventIngestionString})
 	fc.Add("generic_file_identifier", []string{"test.edu/obj/data/file.json"})
 	fc.Add("identifier", []string{"0000-0000-0000"})
 	fc.Add("institution_id", []string{"2"})

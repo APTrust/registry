@@ -48,7 +48,7 @@ func (f *PremisEventFilterForm) init() {
 		Name:        "event_type",
 		Label:       "Event Type",
 		Placeholder: "Event Type",
-		Options:     Options(constants.EventTypes),
+		Options:     Options(constants.EventTypesString),
 	}
 	f.Fields["generic_file_identifier"] = &Field{
 		Name:        "generic_file_identifier",

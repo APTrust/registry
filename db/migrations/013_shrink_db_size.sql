@@ -14,10 +14,11 @@ alter table premis_events drop column created_at;
 alter table premis_events drop column updated_at;
 
 alter table premis_events drop column old_uuid;
-alter table premis_events event_type;
+
+-- alter table premis_events event_type; --
 
 alter table premis_events add COLUMN event_type_int smallint;
-
+ 
 -- IMPORTANT --
 -- TO DO: If there is a value in the current premis_events table --
 -- for eventType that is NOT a match for any values in this function, --
@@ -92,12 +93,86 @@ alter table premis_events drop column event_type;
 alter table premis_events rename column event_type_int TO event_type;
 -- create table event_type_lookup
 -- Most of these, we are not using at the moment
+create table if not exists event_type_lookup (
+     id int primary key,
+     event_type varchar not null
+);
 
 -- add foreign key restraint to event_type to map to event_type_lookup
+alter table premis_events add constraint event_type_fk FOREIGN KEY event_type REFERENCES event_type_lookup(id)
 
 -- lookup table for object in premis
 
+alter table premis_events add COLUMN object_int smallint;
+ 
+-- IMPORTANT --
+-- TO DO: If there is a value in the current premis_events table --
+-- for object that is NOT a match for any values in this function, --
+-- probably we need to abort and roll back. If it converts to a 0, --
+-- we will lose whatever information was in there. --
+create or replace function convert_event_objects()
+returns void as $$
+begin
+    update premis_events
+    set object_int = case "object"
+        when 'object' then 1
+
+        else 0  -- default
+    end;
+end;
+$$ language plpgsql;
+
+select convert_event_objects();
+
+-- if exists
+alter table premis_events drop column "object";
+alter table premis_events rename column object_int TO "object";
+
+
+create table if not exists object_lookup (
+     id int primary key,
+     "object" varchar not null
+);
+
+alter table premis_events add constraint object_fk FOREIGN KEY "object" REFERENCES object_lookup(id)
+
+
 -- lookup table for agent in premis
+
+alter table premis_events add COLUMN agent_int smallint;
+ 
+-- IMPORTANT --
+-- TO DO: If there is a value in the current premis_events table --
+-- for agent that is NOT a match for any values in this function, --
+-- probably we need to abort and roll back. If it converts to a 0, --
+-- we will lose whatever information was in there. --
+create or replace function convert_event_agents()
+returns void as $$
+begin
+    update premis_events
+    set agent_int = case agent
+        when 'agent' then 1
+        else 0  -- default
+    end;
+end;
+$$ language plpgsql;
+
+select convert_event_agents();
+
+-- if exists
+alter table premis_events drop column agent;
+alter table premis_events rename column agent_int TO agent;
+
+
+create table if not exists agent_lookup (
+     id int primary key,
+     agent varchar not null
+);
+
+alter table premis_events add constraint agent_fk FOREIGN KEY agent REFERENCES agent_lookup(id)
+
+
+-- checksums
 
 alter table checksums drop column created_at;
 alter table checksums drop column updated_at;
