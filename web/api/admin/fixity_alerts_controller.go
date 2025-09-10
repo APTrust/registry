@@ -68,15 +68,15 @@ func GenerateFailedFixityAlerts(c *gin.Context) {
 	// add that into the response, but keep processing because
 	// we don't want one failed alert to prevent others from
 	// being sent.
-	errorOccurred := false
 	for _, summary := range summaries {
 		ctx.Log.Info().Msgf("%s has %d failed fixity checks between %s and %s", summary.InstitutionName, summary.Failures, lastRunDate.Format(time.RFC3339), now.Format(time.RFC3339))
 		err = GenerateFailedFixityAlert(c.Request.Host, summary, lastRunDate)
 		if err != nil {
 			// Log this error, but keep going, so other institutions
 			// can get their alerts.
-			ctx.Log.Error().Msgf("Error generating failed fixity alert for institution %s: %v", summary.InstitutionName, err)
-			errorOccurred = true
+			errMsg := fmt.Sprintf("Error generating failed fixity alert for institution %s: %v", summary.InstitutionName, err)
+			ctx.Log.Error().Msg(errMsg)
+			summary.Error = errMsg
 		}
 		response.Count += int(summary.Failures)
 	}
@@ -103,13 +103,8 @@ func GenerateFailedFixityAlerts(c *gin.Context) {
 	}
 
 	if response.Count > 0 {
-		if errorOccurred {
-			ctx.Log.Info().Msgf("Responding to client with HTTP status 500 because we created alerts for %d institutions, but one or more alerts failed.", len(summaries))
-			c.JSON(http.StatusInternalServerError, response)
-		} else {
-			ctx.Log.Info().Msgf("Responding to client with HTTP status 201 because we created alerts for %d institutions", len(summaries))
-			c.JSON(http.StatusCreated, response)
-		}
+		ctx.Log.Info().Msgf("Responding to client with HTTP status 201 because we created alerts for %d institutions", len(summaries))
+		c.JSON(http.StatusCreated, response)
 	} else {
 		ctx.Log.Info().Msg("Responding to client with HTTP status 200 because we didn't create any alerts.")
 		c.JSON(http.StatusOK, response)
