@@ -8,6 +8,7 @@ import (
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/pgmodels"
+	"github.com/APTrust/registry/web/api"
 	"github.com/gin-gonic/gin"
 )
 
@@ -20,18 +21,18 @@ import (
 func GenerateFailedFixityAlerts(c *gin.Context) {
 	ctx := common.Context()
 	ctx.Log.Info().Msg("Received request to generate failed fixity alerts.")
-	type Response struct {
-		Error     string                          `json:"error"`
-		Summaries []*pgmodels.FailedFixitySummary `json:"summaries"`
-	}
-	response := Response{}
+
+	response := &api.JsonList{}
 
 	// Find out when this process was last run.
 	lastRunDate, err := FailedFixityLastRunDate()
 	if err != nil {
 		ctx.Log.Error().Msgf("Could not get last run date for failed fixity alerts: %v", err)
-		response.Error = err.Error()
-		c.JSON(http.StatusInternalServerError, response)
+		reqError := api.RequestError{
+			StatusCode: http.StatusInternalServerError,
+			Error:      err.Error(),
+		}
+		c.JSON(http.StatusInternalServerError, reqError)
 		return
 	}
 
@@ -40,8 +41,11 @@ func GenerateFailedFixityAlerts(c *gin.Context) {
 	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.UTC)
 	if lastRunDate.Equal(today) {
 		ctx.Log.Info().Msgf("Not generating failed fixity alerts because they were last generated on %v", lastRunDate)
-		response.Error = "Note: failed fixity alerts have already been generated today. Controller is returning without running them again."
-		c.JSON(http.StatusConflict, response)
+		reqError := api.RequestError{
+			StatusCode: http.StatusConflict,
+			Error:      "Note: failed fixity alerts have already been generated today. Controller is returning without running them again.",
+		}
+		c.JSON(http.StatusConflict, reqError)
 		return
 	}
 
@@ -49,24 +53,32 @@ func GenerateFailedFixityAlerts(c *gin.Context) {
 	summaries, err := pgmodels.FailedFixitySummarySelect(lastRunDate, now)
 	if err != nil {
 		ctx.Log.Error().Msgf("Error querying for failed fixity alerts: %v", err)
-		response.Error = err.Error()
-		c.JSON(http.StatusInternalServerError, response)
+		reqError := api.RequestError{
+			StatusCode: http.StatusInternalServerError,
+			Error:      err.Error(),
+		}
+		c.JSON(http.StatusInternalServerError, reqError)
 		return
 	}
 	ctx.Log.Info().Msgf("Result: failed fixity check query returned %d summaries", len(summaries))
-	response.Summaries = summaries
+	response.Results = summaries
 
 	// Generate a fixity failure alert for each institution.
 	// If there's an error in the alert generation process,
 	// add that into the response, but keep processing because
 	// we don't want one failed alert to prevent others from
 	// being sent.
+	errorOccurred := false
 	for _, summary := range summaries {
 		ctx.Log.Info().Msgf("%s has %d failed fixity checks between %s and %s", summary.InstitutionName, summary.Failures, lastRunDate.Format(time.RFC3339), now.Format(time.RFC3339))
 		err = GenerateFailedFixityAlert(c.Request.Host, summary, lastRunDate)
 		if err != nil {
-			response.Error = fmt.Sprintf("%s; %s", response.Error, err.Error())
+			// Log this error, but keep going, so other institutions
+			// can get their alerts.
+			ctx.Log.Error().Msgf("Error generating failed fixity alert for institution %s: %v", summary.InstitutionName, err)
+			errorOccurred = true
 		}
+		response.Count += int(summary.Failures)
 	}
 
 	// Generate only one report for APTrust admins. This will
@@ -75,8 +87,11 @@ func GenerateFailedFixityAlerts(c *gin.Context) {
 	err = AlertAPTrustOfFailedFixities(c.Request.Host, summaries, lastRunDate)
 	if err != nil {
 		ctx.Log.Error().Msgf("Error generating failed fixity alerts for APTrust admins: %v", err)
-		response.Error = err.Error()
-		c.JSON(http.StatusInternalServerError, response)
+		reqError := api.RequestError{
+			StatusCode: http.StatusInternalServerError,
+			Error:      err.Error(),
+		}
+		c.JSON(http.StatusInternalServerError, reqError)
 		return
 	}
 
@@ -87,9 +102,14 @@ func GenerateFailedFixityAlerts(c *gin.Context) {
 		ctx.Log.Info().Msgf("Set last failed fixity run date in DB to %s", now.Format(time.RFC3339))
 	}
 
-	if len(response.Summaries) > 0 {
-		ctx.Log.Info().Msgf("Responding to client with HTTP status 201 because we created alerts for %d institutions", len(response.Summaries))
-		c.JSON(http.StatusCreated, response)
+	if response.Count > 0 {
+		if errorOccurred {
+			ctx.Log.Info().Msgf("Responding to client with HTTP status 500 because we created alerts for %d institutions, but one or more alerts failed.", len(summaries))
+			c.JSON(http.StatusInternalServerError, response)
+		} else {
+			ctx.Log.Info().Msgf("Responding to client with HTTP status 201 because we created alerts for %d institutions", len(summaries))
+			c.JSON(http.StatusCreated, response)
+		}
 	} else {
 		ctx.Log.Info().Msg("Responding to client with HTTP status 200 because we didn't create any alerts.")
 		c.JSON(http.StatusOK, response)
