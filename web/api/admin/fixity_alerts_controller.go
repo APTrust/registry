@@ -63,7 +63,7 @@ func GenerateFailedFixityAlerts(c *gin.Context) {
 	// being sent.
 	for _, summary := range summaries {
 		ctx.Log.Info().Msgf("%s has %d failed fixity checks between %s and %s", summary.InstitutionName, summary.Failures, lastRunDate.Format(time.RFC3339), now.Format(time.RFC3339))
-		err = GenerateFailedFixityAlert(summary, lastRunDate)
+		err = GenerateFailedFixityAlert(c.Request.Host, summary, lastRunDate)
 		if err != nil {
 			response.Error = fmt.Sprintf("%s; %s", response.Error, err.Error())
 		}
@@ -72,7 +72,7 @@ func GenerateFailedFixityAlerts(c *gin.Context) {
 	// Generate only one report for APTrust admins. This will
 	// include all failures at all institutions, and the embedded
 	// link will show them all.
-	err = AlertAPTrustOfFailedFixities(summaries, lastRunDate)
+	err = AlertAPTrustOfFailedFixities(c.Request.Host, summaries, lastRunDate)
 	if err != nil {
 		ctx.Log.Error().Msgf("Error generating failed fixity alerts for APTrust admins: %v", err)
 		response.Error = err.Error()
@@ -88,8 +88,10 @@ func GenerateFailedFixityAlerts(c *gin.Context) {
 	}
 
 	if len(response.Summaries) > 0 {
+		ctx.Log.Info().Msgf("Responding to client with HTTP status 201 because we created alerts for %d institutions", len(response.Summaries))
 		c.JSON(http.StatusCreated, response)
 	} else {
+		ctx.Log.Info().Msg("Responding to client with HTTP status 200 because we didn't create any alerts.")
 		c.JSON(http.StatusOK, response)
 	}
 }
@@ -131,12 +133,13 @@ func SetFailedFixityLastRunDate(ts time.Time) error {
 	} else if err != nil {
 		return err
 	}
+	metadata.Value = ts.Format(time.RFC3339)
 	return metadata.Save()
 }
 
 // GenerateFailedFixityAlert creates fixity failure alerts
 // for each admin at the institution in summary.InstitutionID.
-func GenerateFailedFixityAlert(summary *pgmodels.FailedFixitySummary, lastRunDate time.Time) error {
+func GenerateFailedFixityAlert(hostname string, summary *pgmodels.FailedFixitySummary, lastRunDate time.Time) error {
 	ctx := common.Context()
 	ctx.Log.Info().Msgf("Generating failed fixity alert for %s with %d failures.", summary.InstitutionName, summary.Failures)
 
@@ -163,7 +166,7 @@ func GenerateFailedFixityAlert(summary *pgmodels.FailedFixitySummary, lastRunDat
 	alertData := map[string]interface{}{
 		"StartDate": lastRunDate.Format("2006-01-02"),
 		"EndDate":   today.Format("2006-01-02"),
-		"AlertURL":  FailedFixityReportURL(institution.ID, lastRunDate, today),
+		"AlertURL":  FailedFixityReportURL(hostname, institution.ID, lastRunDate, today),
 	}
 
 	alert, err = pgmodels.CreateAlert(alert, "alerts/failed_fixity.txt", alertData)
@@ -179,7 +182,7 @@ func GenerateFailedFixityAlert(summary *pgmodels.FailedFixitySummary, lastRunDat
 	return nil
 }
 
-func AlertAPTrustOfFailedFixities(summaries []*pgmodels.FailedFixitySummary, lastRunDate time.Time) error {
+func AlertAPTrustOfFailedFixities(hostname string, summaries []*pgmodels.FailedFixitySummary, lastRunDate time.Time) error {
 	if len(summaries) == 0 {
 		return nil
 	}
@@ -205,9 +208,18 @@ func AlertAPTrustOfFailedFixities(summaries []*pgmodels.FailedFixitySummary, las
 		return err
 	}
 
-	aptrustAdmins, err := institution.GetAdmins()
+	// Get a list of APTrust admins, except for the system@aptrust.org user,
+	// because that's a service account, not a real person.
+	query := pgmodels.NewQuery().Where("institution_id", "=", institution.ID).Where("email", "!=", constants.SystemUser)
+	ctx.Log.Info().Msgf("Looking for APTrust admins by selecting from users table WHERE %s", query.WhereClause())
+
+	aptrustAdmins, err := pgmodels.UserSelect(query)
 	if err != nil {
 		ctx.Log.Error().Msgf("Error getting list of APTrust admins for admin/ops email: %v", err)
+		return err
+	}
+	if len(aptrustAdmins) == 0 {
+		ctx.Log.Error().Msg("Error getting list of APTrust admins: query returned no users, which should be impossible.")
 		return err
 	}
 
@@ -216,7 +228,7 @@ func AlertAPTrustOfFailedFixities(summaries []*pgmodels.FailedFixitySummary, las
 	alertData := map[string]interface{}{
 		"StartDate": lastRunDate.Format("2006-01-02"),
 		"EndDate":   today.Format("2006-01-02"),
-		"AlertURL":  FailedFixityReportURL(0, lastRunDate, today),
+		"AlertURL":  FailedFixityReportURL(hostname, 0, lastRunDate, today),
 	}
 
 	alert, err = pgmodels.CreateAlert(alert, "alerts/failed_fixity.txt", alertData)
@@ -259,27 +271,15 @@ func GetFailedFixityEvents(institutionID int64, lastRunDate time.Time) ([]*pgmod
 // with pre-applied filters to display failed fixity checks for
 // the specified institution between the report's last run date
 // and today.
-func FailedFixityReportURL(institutionID int64, lastRunDate, currentRunDate time.Time) string {
-	var domainAndPort string
-	environment := common.Context().Config.EnvName
-	switch environment {
-	case "prod":
-		domainAndPort = "repo.aptrust.org"
-	case "demo":
-		domainAndPort = "demo.aptrust.org"
-	case "staging":
-		domainAndPort = "staging.aptrust.org"
-	default:
-		domainAndPort = "localhost:8080"
-	}
+func FailedFixityReportURL(hostname string, institutionID int64, lastRunDate, currentRunDate time.Time) string {
 	startDateString := lastRunDate.Format("2006-01-02")
 	endDateString := currentRunDate.Format("2006-01-02")
 	if institutionID == 0 {
 		return fmt.Sprintf(
 			"%s://%s/events?event_type=fixity+check&outcome=Failed&date_time__gteq=%s&date_time__lteq=%s",
-			common.Context().Config.HTTPScheme(), domainAndPort, startDateString, endDateString)
+			common.Context().Config.HTTPScheme(), hostname, startDateString, endDateString)
 	}
 	return fmt.Sprintf(
 		"%s://%s/events?event_type=fixity+check&outcome=Failed&institution_id=%d&date_time__gteq=%s&date_time__lteq=%s",
-		common.Context().Config.HTTPScheme(), domainAndPort, institutionID, startDateString, endDateString)
+		common.Context().Config.HTTPScheme(), hostname, institutionID, startDateString, endDateString)
 }

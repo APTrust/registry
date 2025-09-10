@@ -21,6 +21,10 @@ func TestGenerateFailedFixityAlerts(t *testing.T) {
 	tu.InitHTTPTests(t)
 	//defer db.ForceFixtureReload()
 
+	// For this test, we need a temporary APTrust admin
+	// whose email is not system@aptrust.org.
+	createTempAPTrustAdmin(t)
+
 	// There should be only one failed fixity alert when we start.
 	// This is part of the fixtures in db/fixtures.
 	query := pgmodels.NewQuery().
@@ -114,8 +118,7 @@ func TestFailedFixityLastRunDate(t *testing.T) {
 	// Now set the value explicitly in the database, and the
 	// function should return that date.
 	fiveDaysAgo := yesterday.AddDate(0, 0, -4)
-	metadata := pgmodels.NewInteralMetadata(constants.MetaFixityAlertsLastRun, fiveDaysAgo.Format(time.RFC3339))
-	err = metadata.Save()
+	err = admin_api.SetFailedFixityLastRunDate(fiveDaysAgo)
 	require.Nil(t, err)
 
 	lastRun, err = admin_api.FailedFixityLastRunDate()
@@ -147,7 +150,7 @@ func TestGenerateFailedFixityAlert(t *testing.T) {
 	assert.Equal(t, 1, len(summaries))
 
 	// Generate the alert to institutional admins
-	err = admin_api.GenerateFailedFixityAlert(summaries[0], lastRunDate)
+	err = admin_api.GenerateFailedFixityAlert("localhost:8080", summaries[0], lastRunDate)
 	require.Nil(t, err)
 
 	// Check the db to make sure that alert is present.
@@ -162,6 +165,10 @@ func TestGenerateFailedFixityAlert(t *testing.T) {
 
 func TestAlertAPTrustOfFailedFixities(t *testing.T) {
 	db.ForceFixtureReload()
+
+	// For this test, we need a temporary APTrust admin
+	// whose email is not system@aptrust.org.
+	createTempAPTrustAdmin(t)
 
 	// There should be no failed fixity alerts for APTrust
 	// admins when we start.
@@ -190,7 +197,7 @@ func TestAlertAPTrustOfFailedFixities(t *testing.T) {
 	assert.Equal(t, 2, len(summaries))
 
 	// Generate the alert to institutional admins
-	err = admin_api.AlertAPTrustOfFailedFixities(summaries, lastRunDate)
+	err = admin_api.AlertAPTrustOfFailedFixities("localhost:8080", summaries, lastRunDate)
 	require.Nil(t, err)
 
 	// Check the db to make sure that alerts are present.
@@ -224,14 +231,14 @@ func TestFailedFixityReportURL(t *testing.T) {
 
 	// Expected URL for institutions other than APTrust.
 	// These should contain an institution ID filter.
-	expectedURL := "http://localhost:8080/events?event_type=fixity+check&outcome=Failed&institution_id=4&date_time__gteq=2025-07-01&date_time__lteq=2025-06-30"
-	url := admin_api.FailedFixityReportURL(4, endDate, startDate)
+	expectedURL := "http://example.com:8080/events?event_type=fixity+check&outcome=Failed&institution_id=4&date_time__gteq=2025-07-01&date_time__lteq=2025-06-30"
+	url := admin_api.FailedFixityReportURL("example.com:8080", 4, endDate, startDate)
 	assert.Equal(t, expectedURL, url)
 
 	// Expected URL for APTrust.
 	// This should not have an institution ID filter.
-	expectedURL = "http://localhost:8080/events?event_type=fixity+check&outcome=Failed&date_time__gteq=2025-07-01&date_time__lteq=2025-06-30"
-	url = admin_api.FailedFixityReportURL(0, endDate, startDate)
+	expectedURL = "http://example.com:8080/events?event_type=fixity+check&outcome=Failed&date_time__gteq=2025-07-01&date_time__lteq=2025-06-30"
+	url = admin_api.FailedFixityReportURL("example.com:8080", 0, endDate, startDate)
 	assert.Equal(t, expectedURL, url)
 }
 
@@ -250,4 +257,19 @@ func createFailedFixityEvents(howMany int, institutionID int64) ([]*pgmodels.Pre
 		events[i] = event
 	}
 	return events, nil
+}
+
+// Because fixity alerts deliberately exclude the non-human
+// system@aptrust.org from receiving fixity alerts, we need
+// to create a temporary APTrust admin with a different email
+// address for fixity alert tests.
+func createTempAPTrustAdmin(t *testing.T) {
+	user, err := pgmodels.UserByEmail(constants.SystemUser)
+	require.Nil(t, err)
+	require.NotNil(t, user)
+
+	user.ID = 0
+	user.Email = "temp_admin@aptrust.org"
+	err = user.Save()
+	require.Nil(t, err)
 }
