@@ -182,7 +182,7 @@ func GenerateFailedFixityAlert(hostname string, summary *pgmodels.FailedFixitySu
 	alertData := map[string]interface{}{
 		"StartDate": lastRunDate.Format("2006-01-02"),
 		"EndDate":   today.Format("2006-01-02"),
-		"AlertURL":  FailedFixityReportURL(hostname, institution.ID, lastRunDate, today),
+		"AlertURL":  FailedFixityReportURL(hostname, institution.ID, lastRunDate, today.Add(24*time.Hour)),
 	}
 
 	alert, err = pgmodels.CreateAlert(alert, "alerts/failed_fixity.txt", alertData)
@@ -247,7 +247,7 @@ func AlertAPTrustOfFailedFixities(hostname string, summaries []*pgmodels.FailedF
 	alertData := map[string]interface{}{
 		"StartDate": lastRunDate.Format("2006-01-02"),
 		"EndDate":   today.Format("2006-01-02"),
-		"AlertURL":  FailedFixityReportURL(hostname, 0, lastRunDate, today),
+		"AlertURL":  FailedFixityReportURL(hostname, 0, lastRunDate, today.Add(24*time.Hour)),
 	}
 
 	alert, err = pgmodels.CreateAlert(alert, "alerts/failed_fixity.txt", alertData)
@@ -290,6 +290,10 @@ func GetFailedFixityEvents(institutionID int64, lastRunDate time.Time) ([]*pgmod
 // with pre-applied filters to display failed fixity checks for
 // the specified institution between the report's last run date
 // and today.
+//
+// Note that to correctly display fixity failures in this
+// date range, we need to add one day to end date because
+// some events occurred after midnight on the end date.
 func FailedFixityReportURL(hostname string, institutionID int64, lastRunDate, currentRunDate time.Time) string {
 	startDateString := lastRunDate.Format("2006-01-02")
 	endDateString := currentRunDate.Format("2006-01-02")

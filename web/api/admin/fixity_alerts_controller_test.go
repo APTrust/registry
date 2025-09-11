@@ -227,34 +227,38 @@ func TestGetFailedFixityEvents(t *testing.T) {
 
 func TestFailedFixityReportURL(t *testing.T) {
 	startDate := time.Date(2025, 6, 30, 0, 0, 0, 0, time.UTC)
-	endDate := startDate.AddDate(0, 0, 1)
+	endDate := startDate.AddDate(0, 0, 2)
+
+	// Note that to correctly display fixity failures in this
+	// date range, we need to add one day to end date because
+	// some events occurred after midnight on the end date.
 
 	// Expected URL for institutions other than APTrust.
 	// These should contain an institution ID filter.
-	expectedURL := "http://example.com:8080/events?event_type=fixity+check&outcome=Failed&institution_id=4&date_time__gteq=2025-07-01&date_time__lteq=2025-06-30"
-	url := admin_api.FailedFixityReportURL("example.com:8080", 4, endDate, startDate)
+	expectedURL := "http://example.com:8080/events?event_type=fixity+check&outcome=Failed&institution_id=4&date_time__gteq=2025-06-30&date_time__lteq=2025-07-02"
+	url := admin_api.FailedFixityReportURL("example.com:8080", 4, startDate, endDate)
 	assert.Equal(t, expectedURL, url)
 
 	// Expected URL for APTrust.
 	// This should not have an institution ID filter.
-	expectedURL = "http://example.com:8080/events?event_type=fixity+check&outcome=Failed&date_time__gteq=2025-07-01&date_time__lteq=2025-06-30"
-	url = admin_api.FailedFixityReportURL("example.com:8080", 0, endDate, startDate)
+	expectedURL = "http://example.com:8080/events?event_type=fixity+check&outcome=Failed&date_time__gteq=2025-06-30&date_time__lteq=2025-07-02"
+	url = admin_api.FailedFixityReportURL("example.com:8080", 0, startDate, endDate)
 	assert.Equal(t, expectedURL, url)
 
-	expectedURL = "http://staging.aptrust.org/events?event_type=fixity+check&outcome=Failed&date_time__gteq=2025-07-01&date_time__lteq=2025-06-30"
-	url = admin_api.FailedFixityReportURL("registry.staging:8080", 0, endDate, startDate)
+	expectedURL = "http://staging.aptrust.org/events?event_type=fixity+check&outcome=Failed&date_time__gteq=2025-06-30&date_time__lteq=2025-07-02"
+	url = admin_api.FailedFixityReportURL("registry.staging:8080", 0, startDate, endDate)
 	assert.Equal(t, expectedURL, url)
 
-	expectedURL = "http://demo.aptrust.org/events?event_type=fixity+check&outcome=Failed&date_time__gteq=2025-07-01&date_time__lteq=2025-06-30"
-	url = admin_api.FailedFixityReportURL("registry.demo:8080", 0, endDate, startDate)
+	expectedURL = "http://demo.aptrust.org/events?event_type=fixity+check&outcome=Failed&date_time__gteq=2025-06-30&date_time__lteq=2025-07-02"
+	url = admin_api.FailedFixityReportURL("registry.demo:8080", 0, startDate, endDate)
 	assert.Equal(t, expectedURL, url)
 
-	expectedURL = "http://repo.aptrust.org/events?event_type=fixity+check&outcome=Failed&date_time__gteq=2025-07-01&date_time__lteq=2025-06-30"
-	url = admin_api.FailedFixityReportURL("registry.repo:8080", 0, endDate, startDate)
+	expectedURL = "http://repo.aptrust.org/events?event_type=fixity+check&outcome=Failed&date_time__gteq=2025-06-30&date_time__lteq=2025-07-02"
+	url = admin_api.FailedFixityReportURL("registry.repo:8080", 0, startDate, endDate)
 	assert.Equal(t, expectedURL, url)
 
-	expectedURL = "http://repo.aptrust.org/events?event_type=fixity+check&outcome=Failed&date_time__gteq=2025-07-01&date_time__lteq=2025-06-30"
-	url = admin_api.FailedFixityReportURL("registry.prod:8080", 0, endDate, startDate)
+	expectedURL = "http://repo.aptrust.org/events?event_type=fixity+check&outcome=Failed&date_time__gteq=2025-06-30&date_time__lteq=2025-07-02"
+	url = admin_api.FailedFixityReportURL("registry.prod:8080", 0, startDate, endDate)
 	assert.Equal(t, expectedURL, url)
 }
 
