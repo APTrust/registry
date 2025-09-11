@@ -3,6 +3,7 @@ package admin_api
 import (
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/APTrust/registry/common"
@@ -225,7 +226,10 @@ func AlertAPTrustOfFailedFixities(hostname string, summaries []*pgmodels.FailedF
 
 	// Get a list of APTrust admins, except for the system@aptrust.org user,
 	// because that's a service account, not a real person.
-	query := pgmodels.NewQuery().Where("institution_id", "=", institution.ID).Where("email", "!=", constants.SystemUser)
+	query := pgmodels.NewQuery().
+		Where("institution_id", "=", institution.ID).
+		Where("email", "!=", constants.SystemUser).
+		IsNull("deactivated_at")
 	ctx.Log.Info().Msgf("Looking for APTrust admins by selecting from users table WHERE %s", query.WhereClause())
 
 	aptrustAdmins, err := pgmodels.UserSelect(query)
@@ -289,12 +293,20 @@ func GetFailedFixityEvents(institutionID int64, lastRunDate time.Time) ([]*pgmod
 func FailedFixityReportURL(hostname string, institutionID int64, lastRunDate, currentRunDate time.Time) string {
 	startDateString := lastRunDate.Format("2006-01-02")
 	endDateString := currentRunDate.Format("2006-01-02")
+	correctedHostName := hostname
+	if strings.Contains(hostname, ".demo") {
+		correctedHostName = "demo.aptrust.org"
+	} else if strings.Contains(hostname, ".staging") {
+		correctedHostName = "staging.aptrust.org"
+	} else if strings.Contains(hostname, ".prod") || strings.Contains(hostname, ".repo") {
+		correctedHostName = "repo.aptrust.org"
+	}
 	if institutionID == 0 {
 		return fmt.Sprintf(
 			"%s://%s/events?event_type=fixity+check&outcome=Failed&date_time__gteq=%s&date_time__lteq=%s",
-			common.Context().Config.HTTPScheme(), hostname, startDateString, endDateString)
+			common.Context().Config.HTTPScheme(), correctedHostName, startDateString, endDateString)
 	}
 	return fmt.Sprintf(
 		"%s://%s/events?event_type=fixity+check&outcome=Failed&institution_id=%d&date_time__gteq=%s&date_time__lteq=%s",
-		common.Context().Config.HTTPScheme(), hostname, institutionID, startDateString, endDateString)
+		common.Context().Config.HTTPScheme(), correctedHostName, institutionID, startDateString, endDateString)
 }

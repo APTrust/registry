@@ -240,6 +240,22 @@ func TestFailedFixityReportURL(t *testing.T) {
 	expectedURL = "http://example.com:8080/events?event_type=fixity+check&outcome=Failed&date_time__gteq=2025-07-01&date_time__lteq=2025-06-30"
 	url = admin_api.FailedFixityReportURL("example.com:8080", 0, endDate, startDate)
 	assert.Equal(t, expectedURL, url)
+
+	expectedURL = "http://staging.aptrust.org/events?event_type=fixity+check&outcome=Failed&date_time__gteq=2025-07-01&date_time__lteq=2025-06-30"
+	url = admin_api.FailedFixityReportURL("registry.staging:8080", 0, endDate, startDate)
+	assert.Equal(t, expectedURL, url)
+
+	expectedURL = "http://demo.aptrust.org/events?event_type=fixity+check&outcome=Failed&date_time__gteq=2025-07-01&date_time__lteq=2025-06-30"
+	url = admin_api.FailedFixityReportURL("registry.demo:8080", 0, endDate, startDate)
+	assert.Equal(t, expectedURL, url)
+
+	expectedURL = "http://repo.aptrust.org/events?event_type=fixity+check&outcome=Failed&date_time__gteq=2025-07-01&date_time__lteq=2025-06-30"
+	url = admin_api.FailedFixityReportURL("registry.repo:8080", 0, endDate, startDate)
+	assert.Equal(t, expectedURL, url)
+
+	expectedURL = "http://repo.aptrust.org/events?event_type=fixity+check&outcome=Failed&date_time__gteq=2025-07-01&date_time__lteq=2025-06-30"
+	url = admin_api.FailedFixityReportURL("registry.prod:8080", 0, endDate, startDate)
+	assert.Equal(t, expectedURL, url)
 }
 
 func createFailedFixityEvents(howMany int, institutionID int64) ([]*pgmodels.PremisEvent, error) {
