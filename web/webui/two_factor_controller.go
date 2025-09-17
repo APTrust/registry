@@ -113,13 +113,29 @@ func UserTwoFactorVerify(c *gin.Context) {
 		return
 	}
 	if !tokenIsValid {
-		// TODO: increment failed login attempt count
-		// User model needs FailedLogins and LockoutUntil.
-		// Then we need logic to enforce the lockout.
 		msg := "Backup code is incorrect. Try again."
 		if method == constants.TwoFactorSMS {
 			msg = "One-time password is incorrect. Try again."
 		}
+
+		// TODO: increment failed login attempt count
+		// User model needs FailedLogins and LockoutUntil.
+		// Then we need logic to enforce the lockout.
+
+		// user.FailedLogins++
+		// if user.FailedLogins == constants.MaxFailedLoginsBeforeCooldown - 1 {
+		// msg = "Last attempt before cooldown period is enforced."
+		// } else if user.FailedLogins == constants.MaxFailedLoginsBeforeCooldown {
+		// msg = "Too many failed logins. Cooldown is enforced."
+		// user.CooldownUntil = now + constants.AccountCooldownTimePeriod
+		// } else if user.FailedLogins == constants.MaxFailedLoginsBeforeLockout - 1 {
+		// msg = "Last attempt before account locked."
+		// } else if user.FailedLogins == constants.MaxFailedLoginsBeforeLockout {
+		// msg = "Too many failed logins. Account has been locked for your security. Contact help@aptrust for help."
+		// user.IsLockout = true
+		// }
+		// user.Save()
+
 		req.TemplateData["flash"] = msg
 		c.HTML(http.StatusBadRequest, "users/enter_auth_token.html", req.TemplateData)
 	} else {
