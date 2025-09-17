@@ -18,19 +18,9 @@ func NewTwoFactorSetupForm(user *pgmodels.User) *TwoFactorSetupForm {
 }
 
 func (f *TwoFactorSetupForm) init() {
-	f.Fields["TOTP"] = &Field{
-		Name:        "TOTP",
-		Label:       "Preferred Method for Two-Factor Auth",
-		Placeholder: "",
-		ErrMsg:      "Please choose your preferred method.",
-		Options:     TwoFactorMethodList,
-		Attrs: map[string]string{
-			"required": "",
-		},
-	}
 	f.Fields["AuthyStatus"] = &Field{
 		Name:        "AuthyStatus",
-		Label:       "Authy",
+		Label:       "Preferred Method for Two-Factor Auth",
 		Placeholder: "Authy",
 		ErrMsg:      "Please choose your preferred method.",
 		Options:     TwoFactorMethodList,

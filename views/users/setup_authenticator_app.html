@@ -18,6 +18,12 @@
     <p class="mb-5">Using your authenticator app, please scan the QR code displayed below. Then, follow the instructions in your authenticator app. When you're done setting up your authenticator app, click Continue.</p>
 
     <img src="data:image/png;base64,{{ .otpQRImage }}" alt="This is the QR code image used to set up your authenticator app." />
+    <p class="mb-5">If you would rather enter a setup key into your app instead of scanning the QR code, please click the Show Setup Key button below.</p>
+    <button class="button is-primary" onclick="showSecVal()">Show Setup Key</button>
+    <p class="mb-5" id="secValSection" style="display:none;">
+        Enter this Setup Key into your authenticator app. Please do not share the Setup Key with anyone:<br />
+        {{ .secVal }}
+    </p>
 
     <form name="finishTOTPSetup" method="get" action="/users/validate_totp">
       <input class="button" type="submit" value="Continue">
@@ -25,6 +31,11 @@
   </div>
 </div>
 
+<script>
+    function showSecVal(){
+        document.getElementById('secValSection').style.display = "block"    
+    }
+</script>
 <!-- Show the footer unless query string says modal=true -->
 {{ if not .showAsModal }}
   {{ template "shared/_footer.html" .}}

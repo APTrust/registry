@@ -80,7 +80,7 @@ var StorageOptionList = []*ListOption{
 
 var TwoFactorMethodList = []*ListOption{
 	{constants.TwoFactorNone, "None (Turn Off Two-Factor Authentication)", false},
-	{constants.TwoFactorTOTP, "Authenticator App (QR Code)", false},
+	{constants.TwoFactorTOTP, "Authenticator App", false},
 	{constants.TwoFactorAuthy, "Authy OneTouch", false},
 	{constants.TwoFactorSMS, "Text Message", false},
 }

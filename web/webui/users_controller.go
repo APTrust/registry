@@ -524,7 +524,9 @@ func SignInUser(c *gin.Context) (int, string, error) {
 	c.Set("CurrentUser", user)
 
 	redirectTo = "/dashboard"
-	if user.IsTwoFactorUser() {
+	if user.IsTwoFactorUser() && user.IsAuthenticatorAppUser() {
+		redirectTo = "/users/validate_totp"
+	} else if user.IsTwoFactorUser() {
 		redirectTo = "/users/2fa_choose"
 	}
 	return http.StatusFound, redirectTo, nil

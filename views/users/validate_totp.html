@@ -22,7 +22,8 @@
     {{ end }}
 
     <form name="validateTOTP" method="post" action="/users/validate_totp">
-      <input name="totpCode" type="text" label="One-Time Code">
+      <input name="totpCode" type="password" label="One-Time Code">
+      <input name="firstConfirm" type="text" style="visibility:hidden" value="true">
       {{ template "forms/csrf_token.html" . }}
       <input class="button" type="submit" value="Continue">
     </form>

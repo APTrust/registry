@@ -102,7 +102,11 @@ func UserTwoFactorVerify(c *gin.Context) {
 
 	user := req.CurrentUser
 
-	if method == constants.TwoFactorSMS {
+	if method == constants.TwoFactorTOTP {
+		if OTPTokenIsExpired(user.EncryptedOTPSentAt) {
+			c.Redirect(http.StatusFound, "/users/validate_totp")
+		}
+	} else if method == constants.TwoFactorSMS {
 		if OTPTokenIsExpired(user.EncryptedOTPSentAt) {
 			helpers.SetFlashCookie(c, "Your one-time password expired. Please sign in again.")
 			c.Redirect(http.StatusFound, "/users/sign_out")
@@ -120,7 +124,9 @@ func UserTwoFactorVerify(c *gin.Context) {
 		// User model needs FailedLogins and LockoutUntil.
 		// Then we need logic to enforce the lockout.
 		msg := "Backup code is incorrect. Try again."
-		if method == constants.TwoFactorSMS {
+		if method == constants.TwoFactorTOTP {
+			msg = "One-time code is incorrect. Try again."
+		} else if method == constants.TwoFactorSMS {
 			msg = "One-time password is incorrect. Try again."
 		}
 		req.TemplateData["flash"] = msg
@@ -200,7 +206,22 @@ func UserComplete2FASetup(c *gin.Context) {
 		return
 	}
 
-	// TO DO - If chose TOTP with an Authenticator app, and not set up with it, display /users/generate_totp to setup.
+	if prefs.UseAuthenticatorApp() {
+		userCompleteAuthenticatorAppSetup(c, req, prefs)
+		return
+		/* if AbortIfError(c, err) {
+			return
+		}
+		if ok {
+			helpers.SetFlashCookie(c, "Your two-factor setup is complete. Next time you log in, you will need to use your authenticator app and provide a six-digit one-time code to complete the sign-in process.")
+			c.Redirect(http.StatusFound, "/users/my_account")
+			return
+		} else {
+			// User did not approve
+			c.Redirect(http.StatusFound, "/users/sign_out")
+			return
+		} */
+	}
 
 	if prefs.UseAuthy() {
 		ok, err := userCompleteAuthySetup(req, prefs)
@@ -381,6 +402,17 @@ func userCompleteAuthySetup(req *Request, prefs *TwoFactorPreferences) (ok bool,
 	return ok, err
 }
 
+func userCompleteAuthenticatorAppSetup(c *gin.Context, req *Request, prefs *TwoFactorPreferences) {
+	if prefs.NeedsAuthenticatorAppRegistration() {
+		c.Redirect(http.StatusFound, "/users/generate_totp")
+		return
+	} else if prefs.NeedsAuthenticatorAppConfirmation() {
+		c.Redirect(http.StatusFound, "/users/validate_totp")
+		return
+	}
+	c.Redirect(http.StatusFound, "/users/my_account")
+}
+
 func UserCompleteSMSSetup(req *Request) error {
 	// Send SMS code and redirect to UserConfirmPhone
 	user := req.CurrentUser
@@ -411,7 +443,7 @@ func OTPTokenIsExpired(tokenSentAt time.Time) bool {
 func UserGenerateTOTP(c *gin.Context) {
 	req := NewRequest(c)
 	user := req.CurrentUser
-	// if user.EncryptedTOTPAppSecret == "" {
+	// if user.EncryptedAuthAppSecret == "" {
 	if 1 == 1 {
 		secret, err := totp.Generate(totp.GenerateOpts{
 			Issuer:      constants.TOTPSecretIssuer,
@@ -422,14 +454,14 @@ func UserGenerateTOTP(c *gin.Context) {
 				return
 			}
 		}
-		// user.EncryptedTOTPAppSecret = secret.Secret()
+		// user.EncryptedAuthAppSecret = secret.Secret()
 		// err = user.Save()
 		// if AbortIfError(c, err) {
 		// return
 		// }
 		req.TemplateData["sec"] = secret // temp - remove
 	}
-	// otpURL := fmt.Sprintf("otpauth://totp/%s:%s?secret=%s&issuer=%s", constants.TOTPSecretIssuer, user.Email, user.EncryptedTOTPAppSecret, constants.TOTPSecretIssuer)
+	// otpURL := fmt.Sprintf("otpauth://totp/%s:%s?secret=%s&issuer=%s", constants.TOTPSecretIssuer, user.Email, user.EncryptedAuthAppSecret, constants.TOTPSecretIssuer)
 	otpURL := fmt.Sprintf("otpauth://totp/%s:%s?secret=%s&issuer=%s", constants.TOTPSecretIssuer, user.Email, "nonesuch", constants.TOTPSecretIssuer)
 	png, err := qrcode.Encode(otpURL, qrcode.Medium, 256)
 	if err != nil {
@@ -439,6 +471,8 @@ func UserGenerateTOTP(c *gin.Context) {
 	}
 	otpQRImage := base64.StdEncoding.EncodeToString(png)
 	req.TemplateData["otpQRImage"] = otpQRImage
+	// req.TemplateData["secVal"] = user.EncryptedAuthAppSecret
+	req.TemplateData["secVal"] = "nonesuch"
 	c.HTML(http.StatusOK, "users/setup_authenticator_app.html", req.TemplateData)
 }
 
@@ -453,12 +487,26 @@ func UserValidateTOTP(c *gin.Context) {
 	req := NewRequest(c)
 	// user := req.CurrentUser
 	totpCode := c.PostForm("totpCode")
-	// isValid := totp.Validate(totpCode, user.EncryptedTOTPAppSecret)
+	confirming := c.PostForm("firstConfirm")
+	// isValid := totp.Validate(totpCode, user.EncryptedAuthAppSecret)
 	isValid := totp.Validate(totpCode, "nonesuch")
 	if !isValid {
 		req.TemplateData["errorMessage"] = "Oops! That wasn't the right code. Please try again."
 		c.HTML(http.StatusOK, "users/validate_totp.html", req.TemplateData)
 		return
+	} else {
+		if confirming == "" {
+			req.CurrentUser.AwaitingSecondFactor = false
+
+			err := req.CurrentUser.Save()
+			if err != nil {
+				if AbortIfError(c, err) {
+					return
+				}
+			}
+		}
+		helpers.SetFlashCookie(c, "Logged in successfully!")
+		c.Redirect(http.StatusFound, "/dashboard")
+		return
 	}
-	c.Redirect(http.StatusFound, "/dashboard")
 }
