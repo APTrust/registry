@@ -16,7 +16,7 @@ var IconMap = map[string]string{
 	// Note that we use only 7 or so event types,
 	// so we don't define an icon for every type.
 	constants.EventAccessAssignmentString:     "admin_panel_settings",
-	constants.EventCreateString:               "add_circle_outline",
+	constants.EventCreationString:             "add_circle_outline",
 	constants.EventDeletionString:             "delete_forever",
 	constants.EventDigestCalculationString:    "description",
 	constants.EventFixityCheckString:          "fingerprint",
