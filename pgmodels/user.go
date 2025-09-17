@@ -116,7 +116,7 @@ type User struct {
 	// This value is not used for SMS OTP - that would be the EncryptedOTPSecret.
 	// Rather, this value is used with authenticator apps if the user has
 	// Authenticator App MFA enabled.
-	// EncryptedAuthAppSecret string `json:"-" form:"-" pg:"encrypted_auth_app_secret"`
+	EncryptedAuthAppSecret string `json:"-" form:"-" pg:"encrypted_auth_app_secret"`
 
 	// ConsumedTimestep is a legacy field from Devise, which used it
 	// for time-based one-time passwords. Not used.

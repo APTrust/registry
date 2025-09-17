@@ -485,7 +485,6 @@ CREATE TABLE public.users (
 	encrypted_otp_secret_iv varchar NULL,
 	encrypted_otp_secret_salt varchar NULL,
 	encrypted_otp_sent_at timestamp NULL,
-	-- encrypted_auth_app_secret varchar NULL,
 	consumed_timestep int4 NULL,
 	otp_required_for_login bool NULL,
 	deactivated_at timestamp NULL,
@@ -502,6 +501,7 @@ CREATE TABLE public.users (
 	grace_period timestamp NULL,
 	awaiting_second_factor bool NOT NULL DEFAULT false,
 	"role" varchar(50) NOT NULL DEFAULT 'none'::character varying,
+	encrypted_auth_app_secret varchar NULL,
 	CONSTRAINT users_pkey PRIMARY KEY (id)
 );
 CREATE INDEX index_users_on_authy_id ON public.users USING btree (authy_id);

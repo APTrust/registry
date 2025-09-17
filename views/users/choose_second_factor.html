@@ -34,7 +34,7 @@
           <p class="mb-5">{{ .errorMessage }}</p> 
         {{ end }}
 
-        <form name="validateTOTP" method="post" action="/users/validate_totp">
+        <form name="validateTOTP" method="get" action="/users/validate_totp">
           <input name="totpCode" type="password" label="One-Time Code">
           {{ template "forms/csrf_token.html" . }}
           <input class="button" type="submit" value="Continue">
@@ -74,8 +74,8 @@
     form["two_factor_method"].value = twoFactorMethod
 
     if (twoFactorMethod == "totp") {
-      form = document.forms["validateTOTP"]
-      addCsrf(form, csrfToken)
+      // form = document.forms["validateTOTP"]
+      // addCsrf(form, csrfToken)
     } else if (twoFactorMethod == "backup") {
       form["csrf_token"] = null
       form.method = "get"
@@ -90,7 +90,9 @@
       form.action = "/users/2fa_sms/"
     }
     showTwoFactorMessage(twoFactorMethod)
-    form.submit()
+    if (twoFactorMethod != "totp") {
+      form.submit()
+    }
   }
   function addCsrf(form, token) {
     if (form["csrf_token"] == null) {

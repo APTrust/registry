@@ -443,8 +443,8 @@ func OTPTokenIsExpired(tokenSentAt time.Time) bool {
 func UserGenerateTOTP(c *gin.Context) {
 	req := NewRequest(c)
 	user := req.CurrentUser
-	// if user.EncryptedAuthAppSecret == "" {
-	if 1 == 1 {
+	if user.EncryptedAuthAppSecret == "" {
+		// if 1 == 1 {
 		secret, err := totp.Generate(totp.GenerateOpts{
 			Issuer:      constants.TOTPSecretIssuer,
 			AccountName: user.Email,
@@ -454,15 +454,15 @@ func UserGenerateTOTP(c *gin.Context) {
 				return
 			}
 		}
-		// user.EncryptedAuthAppSecret = secret.Secret()
-		// err = user.Save()
-		// if AbortIfError(c, err) {
-		// return
-		// }
-		req.TemplateData["sec"] = secret // temp - remove
+		user.EncryptedAuthAppSecret = secret.Secret()
+		err = user.Save()
+		if AbortIfError(c, err) {
+			return
+		}
+		// req.TemplateData["sec"] = secret // temp - remove
 	}
-	// otpURL := fmt.Sprintf("otpauth://totp/%s:%s?secret=%s&issuer=%s", constants.TOTPSecretIssuer, user.Email, user.EncryptedAuthAppSecret, constants.TOTPSecretIssuer)
-	otpURL := fmt.Sprintf("otpauth://totp/%s:%s?secret=%s&issuer=%s", constants.TOTPSecretIssuer, user.Email, "nonesuch", constants.TOTPSecretIssuer)
+	otpURL := fmt.Sprintf("otpauth://totp/%s:%s?secret=%s&issuer=%s", constants.TOTPSecretIssuer, user.Email, user.EncryptedAuthAppSecret, constants.TOTPSecretIssuer)
+	//otpURL := fmt.Sprintf("otpauth://totp/%s:%s?secret=%s&issuer=%s", constants.TOTPSecretIssuer, user.Email, "nonesuch", constants.TOTPSecretIssuer)
 	png, err := qrcode.Encode(otpURL, qrcode.Medium, 256)
 	if err != nil {
 		if AbortIfError(c, err) {
@@ -471,8 +471,8 @@ func UserGenerateTOTP(c *gin.Context) {
 	}
 	otpQRImage := base64.StdEncoding.EncodeToString(png)
 	req.TemplateData["otpQRImage"] = otpQRImage
-	// req.TemplateData["secVal"] = user.EncryptedAuthAppSecret
-	req.TemplateData["secVal"] = "nonesuch"
+	req.TemplateData["secVal"] = user.EncryptedAuthAppSecret
+	// req.TemplateData["secVal"] = "nonesuch"
 	c.HTML(http.StatusOK, "users/setup_authenticator_app.html", req.TemplateData)
 }
 
@@ -485,18 +485,19 @@ func UserValidateTOTPView(c *gin.Context) {
 // Validates a TOTP provided by the user from their authenticator app.
 func UserValidateTOTP(c *gin.Context) {
 	req := NewRequest(c)
-	// user := req.CurrentUser
+	user := req.CurrentUser
 	totpCode := c.PostForm("totpCode")
 	confirming := c.PostForm("firstConfirm")
-	// isValid := totp.Validate(totpCode, user.EncryptedAuthAppSecret)
-	isValid := totp.Validate(totpCode, "nonesuch")
+	isValid := totp.Validate(totpCode, user.EncryptedAuthAppSecret)
+	// isValid := totp.Validate(totpCode, "nonesuch")
 	if !isValid {
 		req.TemplateData["errorMessage"] = "Oops! That wasn't the right code. Please try again."
 		c.HTML(http.StatusOK, "users/validate_totp.html", req.TemplateData)
 		return
 	} else {
+		// If we've reached here, you've provided a valid code
 		if confirming == "" {
-			req.CurrentUser.AwaitingSecondFactor = false
+			// req.CurrentUser.AwaitingSecondFactor = false
 
 			err := req.CurrentUser.Save()
 			if err != nil {
@@ -505,6 +506,10 @@ func UserValidateTOTP(c *gin.Context) {
 				}
 			}
 		}
+		user.AwaitingSecondFactor = false
+		user.EnabledTwoFactor = true
+		user.ConfirmedTwoFactor = true
+		user.Save()
 		helpers.SetFlashCookie(c, "Logged in successfully!")
 		c.Redirect(http.StatusFound, "/dashboard")
 		return
