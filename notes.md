@@ -103,11 +103,8 @@ Remember, depdenency hell and mountains of garbage code are only one npm package
 
 * Email/password login
 * Two-factor text/sms
-* Two-factor Authy
 
 To ensure users won't have to change their passwords when moving from the Rails app, implement the same password encryption scheme as Devise. The scheme is described [here](https://www.freecodecamp.org/news/how-does-devise-keep-your-passwords-safe-d367f6e816eb/), and the [Go bcrypt library](https://pkg.go.dev/golang.org/x/crypto/bcrypt) should be able to support it.
-
-For two-factor auth, since we're already using Authy, try the [Go Client for Authy](https://github.com/dcu/go-authy).
 
 ### Edit
 
@@ -345,7 +342,7 @@ The term "items" below refers to Intellectual Objects, Generic Files, Checksums,
 
 # Two Factor Authentication
 
-Current Pharos users who have enabled two-factor authentication receive one-time passwords through SMS or push notifications through Authy OneTouch. These methods were chosen after long discussion with depositors and we cannot change them without another long discussion. So for now, we're sticking with these two.
+Current Pharos users who have enabled two-factor authentication receive one-time passwords through SMS. This method was chosen after long discussion with depositors and we cannot change this without another long discussion. So for now, we're sticking with these two.
 
 Notes on two-factor setup and workflow have grown large enoug to warrant their own document. See [Two Factor Notes](two_factor_notes.md).
 

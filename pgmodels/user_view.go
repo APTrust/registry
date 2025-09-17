@@ -37,7 +37,7 @@ type UserView struct {
 	ConfirmedTwoFactor     bool      `json:"confirmed_two_factor" pg:"confirmed_two_factor"`
 	AuthyID                string    `json:"-" pg:"authy_id"`
 	LastSignInWithAuthy    time.Time `json:"last_sign_in_with_authy" pg:"last_sign_in_with_authy"`
-	AuthyStatus            string    `json:"authy_status" pg:"authy_status"`
+	MFAStatus              string    `json:"authy_status" pg:"authy_status"`
 	EmailVerified          bool      `json:"email_verified" pg:"email_verified"`
 	InitialPasswordUpdated bool      `json:"initial_password_updated" pg:"initial_password_updated"`
 	ForcePasswordUpdate    bool      `json:"force_password_update" pg:"force_password_update"`
