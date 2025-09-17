@@ -197,6 +197,14 @@ type User struct {
 	// Institution is where they lock you up after you've spent too much
 	// time trying to figure out the old Rails code.
 	Institution *Institution `json:"institution" pg:"rel:has-one"`
+
+	// EncryptedPasskeySession saves session data for use with passkey
+	// authentication. The passkey is used as a possible second factor of
+	// authentication for Registry.
+	EncryptedPasskeySession string `json:"-" form:"-" pg:"encrypted_passkey_session"`
+
+	// EncryptedPasskeyCredential saves the user's device passkey
+	EncryptedPasskeyCredential string `json:"-" form:"-" pg:"encrypted_passkey_credential"`
 }
 
 // UserByID returns the institution with the specified id.
@@ -377,6 +385,12 @@ func (user *User) IsAuthyOneTouchUser() bool {
 	return user.IsTwoFactorUser() && (user.AuthyStatus == constants.TwoFactorAuthy)
 }
 
+// IsPasskeyUser returns true if the user has enabled Passkeys
+// for two-factor login.
+func (user *User) IsPasskeyUser() bool {
+	return user.IsTwoFactorUser() && (user.AuthyStatus == constants.TwoFactorPasskey)
+}
+
 // IsTwoFactorUser returns true if this user has enabled and confirmed
 // two factor authentication.
 //
@@ -401,7 +415,10 @@ func (user *User) TwoFactorMethod() string {
 	if user.IsSMSUser() {
 		return constants.TwoFactorSMS
 	}
-	return constants.TwoFactorAuthy
+	if user.IsAuthyOneTouchUser() {
+		return constants.TwoFactorAuthy
+	}
+	return constants.TwoFactorPasskey
 }
 
 // CreateOTPToken creates a new one-time password token, typically

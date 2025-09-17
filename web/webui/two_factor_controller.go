@@ -197,6 +197,11 @@ func UserComplete2FASetup(c *gin.Context) {
 		return
 	}
 
+	if prefs.UsePasskey() {
+		UserBeginPasskeyRegistration(c)
+		return
+	}
+
 	if prefs.UseAuthy() {
 		ok, err := userCompleteAuthySetup(req, prefs)
 		if AbortIfError(c, err) {
@@ -398,34 +403,73 @@ func OTPTokenIsExpired(tokenSentAt time.Time) bool {
 	return time.Now().After(expiration)
 }
 
+// To run when a user is enrolling their device in passkey auth for the first time.
 func UserBeginPasskeyRegistration(c *gin.Context) {
-	// user := NewRequest(c).CurrentUser
-	// options, session, err := common.Context().WebAuthn.BeginRegistration(webauthn.User{})
-	// if err != nil
+	req := NewRequest(c)
+	user := req.CurrentUser
+	options, session, err := common.Context().WebAuthn.BeginRegistration(user) // webauthn.User with Id, Name, DisplayName
+	if err != nil {
+		return err
+	}
 	// Save session to DB table
-	c.Redirect(http.StatusFound, "/dashboard")
+	user.EncryptedPasskeySession = session
+	user.Save()
+	req.TemplateData["pubKey"] = options.publicKey
+	req.TemplateData["sessionKey"] = options.sessionKey // header?
+	c.HTML(http.StatusOK, "users/passkey_register.html", req.TemplateData)
 }
 
+// To run in order to finish device registration with a passkey.
 func UserFinishPasskeyRegistration(c *gin.Context) {
 	// Get Session-Key from header
 	// Get Session from DB
-	// credential, err := webauthn.FinishRegistration(webauth.User{}, webauthn.SessionData{}, *http.Request)
-	// if err != nil
-	// user.AddCredential(credential)
-	// Save user
-	// Delete session
+	req := NewRequest(c)
+	user := req.CurrentUser
+	session := user.EncryptedPasskeySession
+	credential, err := common.Context().WebAuthn.FinishRegistration(user, session, req) // webauthn.User and webauthn.SessionData
+	if err != nil {
+		return err
+	}
+
+	user.EncryptedPasskeyCredential = credential
+	user.EncryptedPasskeySession = ""
+	user.Save()
+
 	c.Redirect(http.StatusFound, "/dashboard")
 }
 
+// To run in order to begin logging in with a passkey.
 func UserBeginLoginWithPasskey(c *gin.Context) {
-	// options, session, err := webauthn.BeginLogin(user)
-	c.Redirect(http.StatusFound, "/dashboard")
+	req := NewRequest(c)
+	user := req.CurrentUser
+	options, session, err := common.Context().WebAuthn.BeginLogin(user)
+	if err != nil {
+		return err
+	}
+	// Save session to DB table
+	user.EncryptedPasskeySession = session
+	user.Save()
+	req.TemplateData["pubKey"] = options
+	c.HTML(http.StatusOK, "users/passkey_login.html", req.TemplateData)
 }
 
+// To run when completing login with a passkey.
 func UserFinishLoginWithPasskey(c *gin.Context) {
-	// credential, err := webauthn.FinishLogin(user, session, *http.Request)
-	// user.UpdateCredential(credential)
-	// save user
-	// delete session
+	req := NewRequest(c)
+	user := req.CurrentUser
+	session := user.EncryptedPasskeySession
+	credential, err := common.Context().WebAuthn.FinishLogin(user, session, req)
+	if err != nil {
+		return err
+	}
+
+	if credential.Authenticator.CloneWarning {
+		req.TemplateData["cloneWarningMessage"] = "Error: CloneWarning"
+	}
+
+	user.EncryptedPasskeyCredential = credential
+	user.EncryptedPasskeySession = ""
+	user.Save()
+
 	c.Redirect(http.StatusFound, "/dashboard")
 }

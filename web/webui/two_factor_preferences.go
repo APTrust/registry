@@ -59,6 +59,10 @@ func (p *TwoFactorPreferences) DoNotUseTwoFactor() bool {
 	return p.NewMethod == constants.TwoFactorNone
 }
 
+func (p *TwoFactorPreferences) UsePasskey() bool {
+	return p.NewMethod == constants.TwoFactorPasskey
+}
+
 func (p *TwoFactorPreferences) UseAuthy() bool {
 	return p.NewMethod == constants.TwoFactorAuthy
 }

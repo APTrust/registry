@@ -102,10 +102,13 @@ Remember, depdenency hell and mountains of garbage code are only one npm package
 ### Login
 
 * Email/password login
+* Two-factor passkey
 * Two-factor text/sms
 * Two-factor Authy
 
 To ensure users won't have to change their passwords when moving from the Rails app, implement the same password encryption scheme as Devise. The scheme is described [here](https://www.freecodecamp.org/news/how-does-devise-keep-your-passwords-safe-d367f6e816eb/), and the [Go bcrypt library](https://pkg.go.dev/golang.org/x/crypto/bcrypt) should be able to support it.
+
+We now support logging in using a device passkey as a second factor of authentication. The user's browser and device must be compatible with passkeys to use this feature.
 
 For two-factor auth, since we're already using Authy, try the [Go Client for Authy](https://github.com/dcu/go-authy).
 
@@ -344,6 +347,8 @@ The term "items" below refers to Intellectual Objects, Generic Files, Checksums,
   * Wasabi
 
 # Two Factor Authentication
+
+Passkeys are supported as a second factor of authentication. Note that your browser and device must be compatible with passkeys in order to use them. Passkeys are tied to the device they are configured on.
 
 Current Pharos users who have enabled two-factor authentication receive one-time passwords through SMS or push notifications through Authy OneTouch. These methods were chosen after long discussion with depositors and we cannot change them without another long discussion. So for now, we're sticking with these two.
 

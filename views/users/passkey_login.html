@@ -24,8 +24,25 @@
 </div>
 
 <script>
-  async function registerPasskey() {
-    assertionResponse = await SimpleWebAuthnBrowser.startAuthentication(options.publicKey)
+  async function passkeyLogin() {
+    let pubKey = "{{ .pubKey }}"
+    assertionResponse = await SimpleWebAuthnBrowser.startAuthentication(pubKey)
+
+     const verificationResponse = await fetch('/users/finish_login_with_passkey', {  
+          method: 'POST',  
+          headers: {  
+              'Content-Type': 'application/json',  
+              'Session-Key': "{{ .sessionKey }}"
+          },  
+          body: JSON.stringify(assertionResponse)  
+      });  
+
+      const msg = await verificationResponse.json();  
+      if (verificationResponse.ok) {  
+        // good
+      } else {  
+        // bad     
+      }  
   }
 </script>
 
