@@ -73,6 +73,7 @@ const (
 	UserDelete                         = "UserDelete"
 	UserDeleteSelf                     = "UserDeleteSelf"
 	UserGenerateBackupCodes            = "UserGenerateBackupCodes"
+	UserGenerateTOTP                   = "UserGenerateTOTP"
 	UserInit2FASetup                   = "UserInit2FASetup"
 	UserRead                           = "UserRead"
 	UserReadSelf                       = "UserReadSelf"
@@ -86,6 +87,8 @@ const (
 	UserTwoFactorVerify                = "UserTwoFactorVerify"
 	UserUpdate                         = "UserUpdate"
 	UserUpdateSelf                     = "UserUpdateSelf"
+	UserValidateTOTP                   = "UserValidateTOTP"
+	UserValidateTOTPView               = "UserValidateTOTPView"
 	WorkItemCreate                     = "WorkItemCreate"
 	WorkItemDelete                     = "WorkItemDelete"
 	WorkItemRead                       = "WorkItemRead"
@@ -152,6 +155,7 @@ var Permissions = []Permission{
 	UserDelete,
 	UserDeleteSelf,
 	UserGenerateBackupCodes,
+	UserGenerateTOTP,
 	UserInit2FASetup,
 	UserRead,
 	UserReadSelf,
@@ -165,6 +169,8 @@ var Permissions = []Permission{
 	UserTwoFactorVerify,
 	UserUpdate,
 	UserUpdateSelf,
+	UserValidateTOTP,
+	UserValidateTOTPView,
 	WorkItemCreate,
 	WorkItemDelete,
 	WorkItemRead,
@@ -228,6 +234,7 @@ func initPermissions() {
 	instUser[UserComplete2FASetup] = true
 	instUser[UserConfirmPhone] = true
 	instUser[UserGenerateBackupCodes] = true
+	instUser[UserGenerateTOTP] = true
 	instUser[UserInit2FASetup] = true
 	instUser[UserReadSelf] = true
 	instUser[UserSignIn] = true
@@ -238,6 +245,8 @@ func initPermissions() {
 	instUser[UserTwoFactorPush] = true
 	instUser[UserTwoFactorResend] = true
 	instUser[UserTwoFactorVerify] = true
+	instUser[UserValidateTOTP] = true
+	instUser[UserValidateTOTPView] = true
 	instUser[UserUpdateSelf] = true
 	instUser[WorkItemRead] = true
 
@@ -268,6 +277,7 @@ func initPermissions() {
 	instAdmin[UserCreate] = true
 	instAdmin[UserDelete] = true
 	instAdmin[UserGenerateBackupCodes] = true
+	instAdmin[UserGenerateTOTP] = true
 	instAdmin[UserInit2FASetup] = true
 	instAdmin[UserReadSelf] = true
 	instAdmin[UserRead] = true
@@ -279,6 +289,8 @@ func initPermissions() {
 	instAdmin[UserTwoFactorPush] = true
 	instAdmin[UserTwoFactorResend] = true
 	instAdmin[UserTwoFactorVerify] = true
+	instAdmin[UserValidateTOTP] = true
+	instAdmin[UserValidateTOTPView] = true
 	instAdmin[UserUpdateSelf] = true
 	instAdmin[UserUpdate] = true
 	instAdmin[WorkItemRead] = true
@@ -341,6 +353,7 @@ func initPermissions() {
 	sysAdmin[UserDeleteSelf] = true
 	sysAdmin[UserDelete] = true
 	sysAdmin[UserGenerateBackupCodes] = true
+	sysAdmin[UserGenerateTOTP] = true
 	sysAdmin[UserInit2FASetup] = true
 	sysAdmin[UserReadSelf] = true
 	sysAdmin[UserRead] = true
@@ -352,6 +365,8 @@ func initPermissions() {
 	sysAdmin[UserTwoFactorPush] = true
 	sysAdmin[UserTwoFactorResend] = true
 	sysAdmin[UserTwoFactorVerify] = true
+	sysAdmin[UserValidateTOTP] = true
+	sysAdmin[UserValidateTOTPView] = true
 	sysAdmin[UserUpdateSelf] = true
 	sysAdmin[UserUpdate] = true
 	sysAdmin[WorkItemCreate] = true
