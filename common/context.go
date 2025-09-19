@@ -8,7 +8,7 @@ import (
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/network"
 	"github.com/go-pg/pg/v10"
-	"github.com/go-webuthn/webauthn"
+	"github.com/go-webauthn/webauthn/webauthn"
 	"github.com/rs/zerolog"
 )
 

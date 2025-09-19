@@ -19,6 +19,7 @@
 
     <form name="passkeyRegistration" method="post" action="/users/begin_passkey_registration">
       <input class="button" type="submit" value="Set up Passkey">
+      {{ template "forms/csrf_token.html" . }}
     </form>
   </div>
 </div>

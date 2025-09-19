@@ -19,6 +19,7 @@
 
     <form name="passkeyLogin" method="post" action="/users/begin_passkey_login">
       <input class="button" type="submit" value="Sign in With Passkey">
+      {{ template "forms/csrf_token.html" . }}
     </form>
   </div>
 </div>

@@ -1,18 +1,14 @@
 package network
 
 import (
-	"errors"
-	stdlog "log"
-	"net/url"
-	"os"
-	"time"
+	"github.com/go-webauthn/webauthn/webauthn"
 )
 
-func NewWebAuthn() WebAuthn {
-	wconfig := &webAuthn.Config{
-		RPDisplayName: "APTrust"
-		RPID: "localhost",
-		RPOrigins: []string{"http://localhost:8080"}
+func NewWebAuthn() *webauthn.WebAuthn {
+	wconfig := &webauthn.Config{
+		RPDisplayName: "APTrust",
+		RPID:          "localhost",
+		RPOrigins:     []string{"http://localhost:8080"},
 	}
 	webauthn, err := webauthn.New(wconfig)
 	if err != nil {
