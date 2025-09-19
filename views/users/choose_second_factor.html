@@ -26,6 +26,9 @@
     <p class="mb-3">How would you like to complete your login?</p>
 
     <div class="two-factor-option mb-3">
+      <button class="button is-primary" onclick="submitSecondFactor('passkey')">Passkey</button> <br />
+    </div>
+    <div class="two-factor-option mb-3">
       <button class="button is-primary" onclick="submitSecondFactor('authy')" disabled title="Authy is temporarily not available. APTrust is working to resolve this issue.">Authy</button>
       <article id="two-factor-method-authy" class="message is-info mt-4 two-factor-message" style="display:none">
         <div class="message-body">Sent push notification.</div>
@@ -57,7 +60,11 @@
     let csrfToken = "{{ .csrf_token }}"
     form["two_factor_method"].value = twoFactorMethod
 
-    if (twoFactorMethod == "backup") {
+    if (twoFactorMethod == "passkey") {
+      addCsrf(form, csrfToken)
+      form.method = "post"
+      form.action = "/users/begin_login_with_passkey/"
+    } else if (twoFactorMethod == "backup") {
       form["csrf_token"] = null
       form.method = "get"
       form.action = "/users/2fa_backup/"
