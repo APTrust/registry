@@ -18,7 +18,7 @@
     <p class="mb-5">Click below to add a passkey.</p>
 
     <form name="passkeyRegistration" method="post" action="/users/begin_passkey_registration">
-      <input class="button" type="submit" value="Set up Passkey">
+      <button class="button" onclick="registerPasskey()" value="Set up Passkey">
       {{ template "forms/csrf_token.html" . }}
     </form>
   </div>

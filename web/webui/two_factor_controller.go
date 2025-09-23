@@ -489,28 +489,42 @@ func UserBeginPasskeyRegistration(c *gin.Context) {
 	user := req.CurrentUser
 	webauthnuser := ReturnTruePasskeyUser(user.Name)
 	if common.Context().WebAuthn != nil {
-		_, session, err := common.Context().WebAuthn.BeginRegistration(webauthnuser) // webauthn.User with Id, Name, DisplayName
-		d1 := []byte(err.Error())
-		_ = os.WriteFile("/tmp/passkeyerrs", d1, 0644)
+		options, session, err := common.Context().WebAuthn.BeginRegistration(webauthnuser) // webauthn.User with Id, Name, DisplayName
 		if AbortIfError(c, err) {
 			c.HTML(http.StatusOK, "users/passkey_register.html", req.TemplateData)
-			return
 		}
+
+		challenge := ""
+		relyingPartyID := ""
+		userID := ""
+		allowedCredentialsIDs := ""
+		expires := ""
 		// Save session to DB table
-		challenge := string(session.Challenge)
-		relyingPartyID := string(session.RelyingPartyID)
-		userID := string(session.UserID)
-		allowedCredentialsIDs := string(session.AllowedCredentialIDs[0])
-		expires := session.Expires.String()
+		if session.Challenge != "" {
+			challenge = string(session.Challenge)
+		}
+		if session.RelyingPartyID != "" {
+			relyingPartyID = string(session.RelyingPartyID)
+		}
+		if session.UserID != nil {
+			userID = string(session.UserID)
+		}
+		if len(session.AllowedCredentialIDs) > 0 {
+			allowedCredentialsIDs = string(session.AllowedCredentialIDs[0])
+		}
+		expires = session.Expires.String()
 		webauthnsession := challenge + "~" + relyingPartyID + "~" + userID + "~" + allowedCredentialsIDs + "~" + expires
 		user.EncryptedPasskeySession = webauthnsession
 
 		user.Save()
-		// req.TemplateData["pubKey"] = options
+
+		d1 := []byte("Saved user")
+		_ = os.WriteFile("/tmp/passkeyerrs", d1, 0644)
+
+		req.TemplateData["pubKey"] = options
 		sessionID, err := GenSessionID()
 		if AbortIfError(c, err) {
 			c.HTML(http.StatusOK, "users/passkey_register.html", req.TemplateData)
-			return
 		}
 		req.TemplateData["sessionKey"] = sessionID // options.sessionKey // header?
 	}
