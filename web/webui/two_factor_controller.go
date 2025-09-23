@@ -479,6 +479,10 @@ func UserGenerateTOTP(c *gin.Context) {
 // Displays page for user to validate their TOTP using an authenticator app.
 func UserValidateTOTPView(c *gin.Context) {
 	req := NewRequest(c)
+	_, firstConfirm := c.GetQueryMap("firstConfirm")
+	if firstConfirm {
+		req.TemplateData["firstConfirm"] = firstConfirm
+	}
 	c.HTML(http.StatusOK, "users/validate_totp.html", req.TemplateData)
 }
 
@@ -510,8 +514,14 @@ func UserValidateTOTP(c *gin.Context) {
 		user.EnabledTwoFactor = true
 		user.ConfirmedTwoFactor = true
 		user.Save()
-		helpers.SetFlashCookie(c, "Logged in successfully!")
-		c.Redirect(http.StatusFound, "/dashboard")
-		return
+		if confirming != "" {
+			helpers.SetFlashCookie(c, "Your two-factor setup is complete. Next time you log in, you'll need to use your authenticator app to enter a one-time password.")
+			c.Redirect(http.StatusFound, "/users/my_account")
+			return
+		} else {
+			helpers.SetFlashCookie(c, "Logged in successfully!")
+			c.Redirect(http.StatusFound, "/dashboard")
+			return
+		}
 	}
 }
