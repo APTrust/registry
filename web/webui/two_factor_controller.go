@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -24,22 +25,48 @@ type PasskeyUser struct {
 	ID          []byte
 	DisplayName string
 	Name        string
-	Credentials []webauthn.Credential
+	creds       []webauthn.Credential
 }
 
-func (o PasskeyUser) WebAuthnCredentials() []webauthn.Credential {
-	return o.Credentials
+type PasskeyRealUser interface {
+	webauthn.User
+	AddCredential(*webauthn.Credential)
+	UpdateCredential(*webauthn.Credential)
 }
 
-func (o PasskeyUser) WebAuthnDisplayName() string {
+func ReturnTruePasskeyUser(u string) PasskeyRealUser {
+	return &PasskeyUser{ID: []byte(u), DisplayName: u, Name: u}
+}
+
+func (o *PasskeyUser) WebAuthnIcon() string {
+	return "https://pics.com/avatar.png"
+}
+
+func (o *PasskeyUser) AddCredential(credential *webauthn.Credential) {
+	o.creds = append(o.creds, *credential)
+}
+
+func (o *PasskeyUser) UpdateCredential(credential *webauthn.Credential) {
+	for i, c := range o.creds {
+		if string(c.ID) == string(credential.ID) {
+			o.creds[i] = *credential
+		}
+	}
+}
+
+func (o *PasskeyUser) WebAuthnCredentials() []webauthn.Credential {
+	return o.creds
+}
+
+func (o *PasskeyUser) WebAuthnDisplayName() string {
 	return o.DisplayName
 }
 
-func (o PasskeyUser) WebAuthnID() []byte {
+func (o *PasskeyUser) WebAuthnID() []byte {
 	return o.ID
 }
 
-func (o PasskeyUser) WebAuthnName() string {
+func (o *PasskeyUser) WebAuthnName() string {
 	return o.Name
 }
 
@@ -460,29 +487,33 @@ func OTPTokenIsExpired(tokenSentAt time.Time) bool {
 func UserBeginPasskeyRegistration(c *gin.Context) {
 	req := NewRequest(c)
 	user := req.CurrentUser
-	webauthnuser := PasskeyUser{ID: []byte(strconv.FormatInt(user.ID, 10)), DisplayName: user.Name, Name: user.Name}
-	_, session, err := common.Context().WebAuthn.BeginRegistration(webauthnuser) // webauthn.User with Id, Name, DisplayName
-	if AbortIfError(c, err) {
-		c.HTML(http.StatusOK, "users/passkey_register.html", req.TemplateData)
-		return
-	}
-	// Save session to DB table
-	challenge := string(session.Challenge)
-	relyingPartyID := string(session.RelyingPartyID)
-	userID := string(session.UserID)
-	allowedCredentialsIDs := string(session.AllowedCredentialIDs[0])
-	expires := session.Expires.String()
-	webauthnsession := challenge + "~" + relyingPartyID + "~" + userID + "~" + allowedCredentialsIDs + "~" + expires
-	user.EncryptedPasskeySession = webauthnsession
+	webauthnuser := ReturnTruePasskeyUser(user.Name)
+	if common.Context().WebAuthn != nil {
+		_, session, err := common.Context().WebAuthn.BeginRegistration(webauthnuser) // webauthn.User with Id, Name, DisplayName
+		d1 := []byte(err.Error())
+		_ = os.WriteFile("/tmp/passkeyerrs", d1, 0644)
+		if AbortIfError(c, err) {
+			c.HTML(http.StatusOK, "users/passkey_register.html", req.TemplateData)
+			return
+		}
+		// Save session to DB table
+		challenge := string(session.Challenge)
+		relyingPartyID := string(session.RelyingPartyID)
+		userID := string(session.UserID)
+		allowedCredentialsIDs := string(session.AllowedCredentialIDs[0])
+		expires := session.Expires.String()
+		webauthnsession := challenge + "~" + relyingPartyID + "~" + userID + "~" + allowedCredentialsIDs + "~" + expires
+		user.EncryptedPasskeySession = webauthnsession
 
-	user.Save()
-	// req.TemplateData["pubKey"] = options
-	sessionID, err := GenSessionID()
-	if AbortIfError(c, err) {
-		c.HTML(http.StatusOK, "users/passkey_register.html", req.TemplateData)
-		return
+		user.Save()
+		// req.TemplateData["pubKey"] = options
+		sessionID, err := GenSessionID()
+		if AbortIfError(c, err) {
+			c.HTML(http.StatusOK, "users/passkey_register.html", req.TemplateData)
+			return
+		}
+		req.TemplateData["sessionKey"] = sessionID // options.sessionKey // header?
 	}
-	req.TemplateData["sessionKey"] = sessionID // options.sessionKey // header?
 	c.HTML(http.StatusOK, "users/passkey_register.html", req.TemplateData)
 }
 
@@ -493,7 +524,7 @@ func UserFinishPasskeyRegistration(c *gin.Context) {
 	req := NewRequest(c)
 	user := req.CurrentUser
 	session := user.EncryptedPasskeySession
-	webauthnuser := PasskeyUser{ID: []byte(string(user.ID)), DisplayName: user.Name, Name: user.Name}
+	webauthnuser := &PasskeyUser{ID: []byte(user.Name), DisplayName: user.Name, Name: user.Name}
 	sessionparts := strings.Split(session, "~")
 	bytestr := []byte(sessionparts[3])
 	allowedCreds := [][]byte{[]byte(bytestr)}
@@ -518,7 +549,7 @@ func UserFinishPasskeyRegistration(c *gin.Context) {
 func UserBeginLoginWithPasskey(c *gin.Context) {
 	req := NewRequest(c)
 	user := req.CurrentUser
-	webauthnuser := PasskeyUser{ID: []byte(strconv.FormatInt(user.ID, 10)), DisplayName: user.Name, Name: user.Name}
+	webauthnuser := &PasskeyUser{ID: []byte(strconv.FormatInt(user.ID, 10)), DisplayName: user.Name, Name: user.Name}
 	_, session, err := common.Context().WebAuthn.BeginLogin(webauthnuser)
 	if AbortIfError(c, err) {
 		return
@@ -548,7 +579,7 @@ func UserFinishLoginWithPasskey(c *gin.Context) {
 	user := req.CurrentUser
 	session := user.EncryptedPasskeySession
 	// session := user.EncryptedPasskeySession
-	webauthnuser := PasskeyUser{ID: []byte(string(user.ID)), DisplayName: user.Name, Name: user.Name}
+	webauthnuser := &PasskeyUser{ID: []byte(string(user.ID)), DisplayName: user.Name, Name: user.Name}
 	sessionparts := strings.Split(session, "~")
 	bytestr := []byte(sessionparts[3])
 	allowedCreds := [][]byte{[]byte(bytestr)}
