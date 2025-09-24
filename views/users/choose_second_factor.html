@@ -26,6 +26,22 @@
     <p class="mb-3">How would you like to complete your login?</p>
 
     <div class="two-factor-option mb-3">
+      <button class="button is-primary" onclick="submitSecondFactor('totp')">Authenticator App</button>
+      <article id="two-factor-method-totp" class="message is-info mt-4 two-factor-message" style="display:none">
+        <p class="mb-5">Using your authenticator app, please enter the one-time code that you see for APTrust.</p>
+
+        {{ if .errorMessage }}
+          <p class="mb-5">{{ .errorMessage }}</p> 
+        {{ end }}
+
+        <form name="validateTOTP" method="get" action="/users/validate_totp">
+          <input name="totpCode" type="password" label="One-Time Code">
+          {{ template "forms/csrf_token.html" . }}
+          <input class="button" type="submit" value="Continue">
+        </form>
+      </article>
+    </div>
+    <div class="two-factor-option mb-3">
       <button class="button is-primary" onclick="submitSecondFactor('authy')" disabled title="Authy is temporarily not available. APTrust is working to resolve this issue.">Authy</button>
       <article id="two-factor-method-authy" class="message is-info mt-4 two-factor-message" style="display:none">
         <div class="message-body">Sent push notification.</div>
@@ -57,7 +73,10 @@
     let csrfToken = "{{ .csrf_token }}"
     form["two_factor_method"].value = twoFactorMethod
 
-    if (twoFactorMethod == "backup") {
+    if (twoFactorMethod == "totp") {
+      // form = document.forms["validateTOTP"]
+      // addCsrf(form, csrfToken)
+    } else if (twoFactorMethod == "backup") {
       form["csrf_token"] = null
       form.method = "get"
       form.action = "/users/2fa_backup/"
@@ -71,7 +90,9 @@
       form.action = "/users/2fa_sms/"
     }
     showTwoFactorMessage(twoFactorMethod)
-    form.submit()
+    if (twoFactorMethod != "totp") {
+      form.submit()
+    }
   }
   function addCsrf(form, token) {
     if (form["csrf_token"] == null) {

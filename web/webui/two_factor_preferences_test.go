@@ -30,22 +30,39 @@ func TestTwoFactorPreferences(t *testing.T) {
 	assert.True(t, prefs.DoNotUseTwoFactor())
 	assert.False(t, prefs.UseAuthy())
 	assert.False(t, prefs.UseSMS())
+	assert.False(t, prefs.UseAuthenticatorApp())
 
 	prefs.NewMethod = constants.TwoFactorSMS
 	assert.False(t, prefs.DoNotUseTwoFactor())
 	assert.False(t, prefs.UseAuthy())
 	assert.True(t, prefs.UseSMS())
+	assert.False(t, prefs.UseAuthenticatorApp())
 
 	prefs.NewMethod = constants.TwoFactorAuthy
 	assert.False(t, prefs.DoNotUseTwoFactor())
 	assert.True(t, prefs.UseAuthy())
 	assert.False(t, prefs.UseSMS())
+	assert.False(t, prefs.UseAuthenticatorApp())
+
+	prefs.NewMethod = constants.TwoFactorTOTP
+	assert.False(t, prefs.DoNotUseTwoFactor())
+	assert.False(t, prefs.UseAuthy())
+	assert.False(t, prefs.UseSMS())
+	assert.True(t, prefs.UseAuthenticatorApp())
 
 	prefs.NewMethod = constants.TwoFactorAuthy
 	prefs.User.AuthyID = ""
 	assert.True(t, prefs.NeedsAuthyRegistration())
 
 	prefs.NewMethod = constants.TwoFactorSMS
+	prefs.User.AuthyID = ""
+	assert.False(t, prefs.NeedsAuthyRegistration())
+
+	prefs.NewMethod = constants.TwoFactorAuthy
+	prefs.User.AuthyID = ""
+	assert.True(t, prefs.NeedsAuthyRegistration())
+
+	prefs.NewMethod = constants.TwoFactorTOTP
 	prefs.User.AuthyID = ""
 	assert.False(t, prefs.NeedsAuthyRegistration())
 
