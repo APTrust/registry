@@ -18,7 +18,7 @@ require (
 	github.com/gorilla/securecookie v1.1.1
 	github.com/jinzhu/copier v0.3.0
 	github.com/nsqio/nsq v1.2.0
-	github.com/nyaruka/phonenumbers v1.0.71
+	github.com/nyaruka/phonenumbers v1.2.2
 	github.com/rs/zerolog v1.20.0
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/stew v0.0.0-20130812190256-80ef0842b48b
@@ -47,7 +47,6 @@ require (
 	github.com/goccy/go-json v0.10.2 // indirect
 	github.com/gojektech/heimdall v5.0.2+incompatible // indirect
 	github.com/gojektech/valkyrie v0.0.0-20190210220504-8f62c1e7ba45 // indirect
-	github.com/golang/protobuf v1.5.0 // indirect
 	github.com/golang/snappy v0.0.3 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
