@@ -1,0 +1,183 @@
+-- 013_shrink_db_size.sql
+--
+-- This migration contains several optimizations that will reduce the size of the database.
+-- They include:
+-- Removing columns that are no longer used
+-- Converting certain enumerated string fields to integer and adding lookup tables
+
+-- Note that we're starting the migration.
+insert into schema_migrations ("version", started_at) values ('013_shrink_db_size', now())
+on conflict ("version") do update set started_at = now();
+
+--
+alter table premis_events drop column created_at;
+alter table premis_events drop column updated_at;
+
+alter table premis_events drop column old_uuid;
+
+-- alter table premis_events event_type; --
+
+alter table premis_events add COLUMN event_type_int smallint;
+ 
+-- IMPORTANT --
+-- TO DO: If there is a value in the current premis_events table --
+-- for eventType that is NOT a match for any values in this function, --
+-- probably we need to abort and roll back. If it converts to a 0, --
+-- we will lose whatever information was in there. Same for object and agent fields --
+create or replace function convert_event_types()
+returns void as $$
+begin
+    update premis_events
+    set event_type_int = case event_type
+        when 'fixity check' then 1
+        when 'access assignment' then 2
+        -- accession
+        -- appraisal
+        -- capture
+        -- compiling
+        -- compression
+        when 'creation' then 8
+        -- deaccession
+        -- decompression
+        -- decryption
+        when 'deletion' then 12
+        -- digital signature generation
+        -- digital signature validation
+        -- displaying
+        -- dissemination
+        -- encryption
+        -- execution
+        -- exporting
+        -- extraction
+        -- filename change
+        -- forensic feature analysis
+        -- format identification
+        when 'identifier assignment' then 25
+        -- imaging
+        -- information package creation
+        -- information package merging
+        -- information package splitting
+        when 'ingestion' then 30
+        -- ingestion end
+     -- ingestion start
+     -- interpreting
+     when 'message digest calculation' then 34
+     -- metadata extraction
+     -- metadata modification
+     -- migration
+     -- modification
+     -- normalization
+     -- packing
+     -- policy assignment
+     -- printing
+     -- quarantine
+     -- recovery
+     -- redaction
+     -- refreshment
+     -- rendering
+     when 'replication' then 48
+     -- transfer
+     -- unpacking
+     -- unquarantine
+     when 'validation' then 52
+     -- virus check
+        else 0  -- default
+    end;
+end;
+$$ language plpgsql;
+
+select convert_event_types();
+
+-- if exists
+alter table premis_events drop column event_type;
+alter table premis_events rename column event_type_int TO event_type;
+-- create table event_type_lookup
+-- Most of these, we are not using at the moment
+create table if not exists event_type_lookup (
+     id int primary key,
+     event_type varchar not null
+);
+
+-- add foreign key restraint to event_type to map to event_type_lookup
+alter table premis_events add constraint event_type_fk FOREIGN KEY event_type REFERENCES event_type_lookup(id)
+
+-- lookup table for object in premis
+
+alter table premis_events add COLUMN object_int smallint;
+ 
+-- IMPORTANT --
+-- TO DO: If there is a value in the current premis_events table --
+-- for object that is NOT a match for any values in this function, --
+-- probably we need to abort and roll back. If it converts to a 0, --
+-- we will lose whatever information was in there. --
+create or replace function convert_event_objects()
+returns void as $$
+begin
+    update premis_events
+    set object_int = case "object"
+        when 'object' then 1
+
+        else 0  -- default
+    end;
+end;
+$$ language plpgsql;
+
+select convert_event_objects();
+
+-- if exists
+alter table premis_events drop column "object";
+alter table premis_events rename column object_int TO "object";
+
+
+create table if not exists object_lookup (
+     id int primary key,
+     "object" varchar not null
+);
+
+alter table premis_events add constraint object_fk FOREIGN KEY "object" REFERENCES object_lookup(id)
+
+
+-- lookup table for agent in premis
+
+alter table premis_events add COLUMN agent_int smallint;
+ 
+-- IMPORTANT --
+-- TO DO: If there is a value in the current premis_events table --
+-- for agent that is NOT a match for any values in this function, --
+-- probably we need to abort and roll back. If it converts to a 0, --
+-- we will lose whatever information was in there. --
+create or replace function convert_event_agents()
+returns void as $$
+begin
+    update premis_events
+    set agent_int = case agent
+        when 'agent' then 1
+        else 0  -- default
+    end;
+end;
+$$ language plpgsql;
+
+select convert_event_agents();
+
+-- if exists
+alter table premis_events drop column agent;
+alter table premis_events rename column agent_int TO agent;
+
+
+create table if not exists agent_lookup (
+     id int primary key,
+     agent varchar not null
+);
+
+alter table premis_events add constraint agent_fk FOREIGN KEY agent REFERENCES agent_lookup(id)
+
+
+-- checksums
+
+alter table checksums drop column created_at;
+alter table checksums drop column updated_at;
+
+-- storage records url
+
+-- Now mark the migration as completed.
+update schema_migrations set finished_at = now() where "version" = '013_shrink_db_size';
