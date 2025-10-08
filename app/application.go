@@ -283,6 +283,11 @@ func initRoutes(router *gin.Engine) {
 		// UI Components
 		webRoutes.GET("/ui_components", webui.ComponentsIndex)
 
+		// User MFA - Passkeys
+		webRoutes.POST("/users/begin_passkey_registration", webui.UserBeginPasskeyRegistration)
+		webRoutes.POST("/users/finish_passkey_registration", webui.UserFinishPasskeyRegistration)
+		webRoutes.POST("/users/begin_login_with_passkey", webui.UserBeginLoginWithPasskey)
+		webRoutes.POST("/users/finish_login_with_passkey", webui.UserFinishLoginWithPasskey)
 	}
 
 	// Root goes to sign-in page, which is a web route,
