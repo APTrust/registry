@@ -1,9 +1,12 @@
 package webui
 
 import (
+	"bytes"
 	"crypto/rand"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"strconv"
@@ -278,8 +281,9 @@ func UserComplete2FASetup(c *gin.Context) {
 	}
 
 	if prefs.UsePasskey() {
-		UserBeginPasskeyRegistration(c)
-		return
+		c.HTML(http.StatusOK, "users/passkey_register.html", req.TemplateData)
+		// UserBeginPasskeyRegistration(c)
+		// return
 	}
 
 	if prefs.UseAuthy() {
@@ -488,10 +492,11 @@ func UserBeginPasskeyRegistration(c *gin.Context) {
 	req := NewRequest(c)
 	user := req.CurrentUser
 	webauthnuser := ReturnTruePasskeyUser(user.Name)
+	resstring := ""
 	if common.Context().WebAuthn != nil {
 		options, session, err := common.Context().WebAuthn.BeginRegistration(webauthnuser) // webauthn.User with Id, Name, DisplayName
 		if AbortIfError(c, err) {
-			c.HTML(http.StatusOK, "users/passkey_register.html", req.TemplateData)
+			c.HTML(http.StatusOK, "users/my_account.html", req.TemplateData)
 		}
 
 		challenge := ""
@@ -518,17 +523,28 @@ func UserBeginPasskeyRegistration(c *gin.Context) {
 
 		user.Save()
 
-		d1 := []byte("Saved user")
-		_ = os.WriteFile("/tmp/passkeyerrs", d1, 0644)
+		var buf bytes.Buffer
+		encoder := json.NewEncoder(&buf)
+		err = encoder.Encode(options)
+		if AbortIfError(c, err) {
+			c.HTML(http.StatusOK, "users/my_account.html", req.TemplateData)
+		}
+		reader := io.Reader(&buf)
+		res, err := io.ReadAll(reader)
+		if AbortIfError(c, err) {
+			c.HTML(http.StatusOK, "users/my_account.html", req.TemplateData)
+		}
+		resstring = string(res)
 
-		req.TemplateData["pubKey"] = options
 		sessionID, err := GenSessionID()
 		if AbortIfError(c, err) {
-			c.HTML(http.StatusOK, "users/passkey_register.html", req.TemplateData)
+			c.HTML(http.StatusOK, "users/my_account.html", req.TemplateData)
 		}
 		req.TemplateData["sessionKey"] = sessionID // options.sessionKey // header?
 	}
-	c.HTML(http.StatusOK, "users/passkey_register.html", req.TemplateData)
+	req.TemplateData["public_key"] = resstring
+	c.HTML(http.StatusOK, "users/passkey_finish_registration.html", req.TemplateData)
+	// c.JSON(http.StatusOK, json.RawMessage(resstring))
 }
 
 // To run in order to finish device registration with a passkey.
@@ -537,6 +553,15 @@ func UserFinishPasskeyRegistration(c *gin.Context) {
 	// Get Session from DB
 	req := NewRequest(c)
 	user := req.CurrentUser
+
+	d1 := []byte(c.PostForm("attestation"))
+	_ = os.WriteFile("/tmp/passkeyerrs", d1, 0644)
+
+	newAttestation := []byte(c.PostForm("attestation"))
+	c.Request.Body = io.NopCloser(bytes.NewBuffer(newAttestation))
+	c.Request.ContentLength = int64(len(newAttestation))
+	c.Request.Header.Add("Content-Type", "application/json")
+
 	session := user.EncryptedPasskeySession
 	webauthnuser := &PasskeyUser{ID: []byte(user.Name), DisplayName: user.Name, Name: user.Name}
 	sessionparts := strings.Split(session, "~")
@@ -546,17 +571,23 @@ func UserFinishPasskeyRegistration(c *gin.Context) {
 	expire, _ := time.Parse(layout, sessionparts[4])
 	// webauthnsession := PasskeySession{Challenge: sessionparts[0], RelyingPartyID: sessionparts[1], UserID: []byte(sessionparts[2]), AllowedCredentialIDs: allowedCreds, Expires: expire}
 	wasession := webauthn.SessionData{Challenge: sessionparts[0], RelyingPartyID: sessionparts[1], UserID: []byte(sessionparts[2]), AllowedCredentialIDs: allowedCreds, Expires: expire}
+
 	_, err := common.Context().WebAuthn.FinishRegistration(webauthnuser, wasession, c.Request) // webauthn.User and webauthn.SessionData
+
+	d1 = []byte(err.Error())
+	_ = os.WriteFile("/tmp/passkeyerrs", d1, 0644)
+
 	if AbortIfError(c, err) {
 		return
 	}
+
 	// GET credential from FinishRegistration above
-	//webauthncredential := webauthn.Credential{}
 	// user.EncryptedPasskeyCredential = webauthncredential // credential
+
 	user.EncryptedPasskeySession = ""
 	user.Save()
 
-	c.Redirect(http.StatusFound, "/dashboard")
+	c.Redirect(http.StatusFound, "/users/my_account")
 }
 
 // To run in order to begin logging in with a passkey.

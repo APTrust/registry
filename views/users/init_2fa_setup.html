@@ -37,14 +37,16 @@
 
 <script>
  let currentMethod = '{{ .CurrentUser.AuthyStatus }}'
- function confirmChange() {
-     let selectedMethod = document.forms['twoFactorSetupForm']['AuthyStatus'].value
+ async function confirmChange() {
+      let selectedMethod = document.forms['twoFactorSetupForm']['AuthyStatus'].value
      if (selectedMethod != currentMethod && selectedMethod.toLowerCase() == 'none') {
          return confirm('Are you sure you want to turn off two-factor authentication?')
      }
      return true
  }
 </script>
+
+<script src="/static/js/simplewebauthn.index.umd.min.js"></script>
 
 <!-- Show the footer unless query string says modal=true -->
 {{ if not .showAsModal }}
