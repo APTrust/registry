@@ -3,6 +3,7 @@ package middleware
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 
@@ -220,11 +221,12 @@ func respondToAuthError(c *gin.Context, err error) {
 		c.JSON(http.StatusUnauthorized, obj)
 	} else {
 		common.Context().Log.Warn().Msgf("AuthError: %s. IP: %s, URL: %s, Agent: %s, Referer: %s", err.Error(), c.Request.RemoteAddr, c.Request.RequestURI, c.Request.UserAgent(), c.Request.Referer())
+		redirectUrl := url.QueryEscape(c.Request.URL.RequestURI())
 		c.HTML(http.StatusUnauthorized, "errors/show.html", gin.H{
 			"suppressSideNav": true,
 			"suppressTopNav":  true,
 			"error":           "Please log in",
-			"redirectURL":     fmt.Sprintf("/?requrl=%s", c.Request.URL),
+			"redirectURL":     fmt.Sprintf("/?requrl=%s", redirectUrl),
 		})
 	}
 }

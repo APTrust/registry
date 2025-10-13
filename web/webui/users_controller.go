@@ -123,6 +123,8 @@ func UserSignInShow(c *gin.Context) {
 	// and go there when they still have a valid session.
 	// Instead of forcing them to sign in again, just push
 	// them to the dashboard.
+	//
+	// Note that requrl comes from the query string here.
 	user, _ := middleware.GetUser(c)
 	if user != nil && user.InstitutionID > 0 {
 		common.Context().Log.Info().Msgf("User %s is already logged in. Redirecting to dashboard.", user.Email)
@@ -133,11 +135,16 @@ func UserSignInShow(c *gin.Context) {
 	// For these environments, prefill logins defined in fixtures
 	// to make dev's life easier. These envs contain only fixture
 	// and test data.
+	//
+	// Again, requrl comes from the query string here, but we're going
+	// to put it into the form, so it will come back as a a post.
+	// See the SignIn() method below.
 	envName := common.Context().Config.EnvName
 	preFillTestLogins := envName == "test" || envName == "integration"
 	c.HTML(200, "users/sign_in.html", gin.H{
 		"cover":             helpers.GetCover(),
 		"preFillTestLogins": preFillTestLogins,
+		"requrl":            c.DefaultQuery("requrl", "/dashboard"),
 	})
 }
 
@@ -523,7 +530,9 @@ func SignInUser(c *gin.Context) (int, string, error) {
 	}
 	c.Set("CurrentUser", user)
 
-	redirectTo = "/dashboard"
+	// Now, on sign-in, we get the requrl from the POST form,
+	// because we put in there in SignInShow() above.
+	redirectTo = c.DefaultPostForm("requrl", "/dashboard")
 	if user.IsTwoFactorUser() {
 		redirectTo = "/users/2fa_choose"
 	}

@@ -2,6 +2,7 @@ package webui_test
 
 import (
 	"net/http"
+	"os"
 	"regexp"
 	"testing"
 
@@ -594,4 +595,27 @@ func TestUserSignInShow(t *testing.T) {
 		assert.Contains(t, html, "Recent Work Items")
 		assert.Contains(t, html, "Deposits by Storage Option")
 	}
+}
+
+func TestSignInWithRedirect(t *testing.T) {
+	os.Setenv("APT_ENV", "test")
+	testutil.InitHTTPTests(t)
+	client := testutil.GetAnonymousClient(t)
+
+	path := "/work_items"
+	queryString := "per_page=20&name=coal.tar&etag=&institution_id=&date_processed__gteq=&date_processed__lteq=&needs_admin_review=&object_identifier=&generic_file_identifier=&storage_option=&alt_identifier=&bag_group_identifier=&bucket=&user=&bagit_profile_identifier=&redis_only=&size__gteq=&size__lteq=&report="
+	redirectUrl := path + "/?" + queryString
+
+	// Make sure they can sign in and are redirected to whatever requrl says
+	resp := client.POST("/users/sign_in").
+		WithHeader("Referer", testutil.BaseURL).
+		WithFormField("email", "system@aptrust.org").
+		WithFormField("password", "password").
+		WithFormField("requrl", redirectUrl).
+		Expect().Status(http.StatusOK)
+
+	location, err := resp.Raw().Request.Response.Location()
+	require.Nil(t, err)
+	assert.Contains(t, location.Path, path)
+	assert.Contains(t, location.RawQuery, queryString)
 }
