@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/http/httputil"
 	"os"
 	"strconv"
 	"strings"
@@ -563,16 +564,23 @@ func UserFinishPasskeyRegistration(c *gin.Context) {
 	c.Request.Header.Add("Content-Type", "application/json")
 
 	session := user.EncryptedPasskeySession
-	webauthnuser := &PasskeyUser{ID: []byte(user.Name), DisplayName: user.Name, Name: user.Name}
+	webauthnuser := ReturnTruePasskeyUser(user.Name)
 	sessionparts := strings.Split(session, "~")
-	bytestr := []byte(sessionparts[3])
-	allowedCreds := [][]byte{[]byte(bytestr)}
+	// bytestr := []byte(sessionparts[3])
+	// allowedCreds := [][]byte{[]byte(bytestr)}
 	layout := "2006-01-02 15:04:05"
 	expire, _ := time.Parse(layout, sessionparts[4])
 	// webauthnsession := PasskeySession{Challenge: sessionparts[0], RelyingPartyID: sessionparts[1], UserID: []byte(sessionparts[2]), AllowedCredentialIDs: allowedCreds, Expires: expire}
-	wasession := webauthn.SessionData{Challenge: sessionparts[0], RelyingPartyID: sessionparts[1], UserID: []byte(sessionparts[2]), AllowedCredentialIDs: allowedCreds, Expires: expire}
+	wasession := webauthn.SessionData{Challenge: sessionparts[0], UserID: []byte(sessionparts[2]), Expires: expire, UserVerification: "preferred"}
 
-	_, err := common.Context().WebAuthn.FinishRegistration(webauthnuser, wasession, c.Request) // webauthn.User and webauthn.SessionData
+	//d2, err := json.Marshal(webauthnuser)
+	//_ = os.WriteFile("/tmp/passkeyerrs", d2, 0644)
+	//d2, err := json.Marshal(wasession)
+	//_ = os.WriteFile("/tmp/passkeyerrs", d2, 0644)
+	d3, err := httputil.DumpRequest(c.Request, true)
+	_ = os.WriteFile("/tmp/passkeyerrs", d3, 0644)
+
+	_, err = common.Context().WebAuthn.FinishRegistration(webauthnuser, wasession, c.Request) // webauthn.User and webauthn.SessionData
 
 	d1 = []byte(err.Error())
 	_ = os.WriteFile("/tmp/passkeyerrs", d1, 0644)
