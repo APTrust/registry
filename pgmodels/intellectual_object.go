@@ -131,6 +131,14 @@ func (obj *IntellectualObject) Delete() error {
 	obj.State = constants.StateDeleted
 	obj.UpdatedAt = time.Now().UTC()
 
+	// We require a BagItProfileIdentifier on the object.
+	// However, older objects (before 2022) do not have one.
+	// If the BagItProfileIdentifier is not set on the object, we assign it to a default value.
+	// In this way, we can validate the object successfully before deleting it.
+	if obj.BagItProfileIdentifier == "" {
+		obj.BagItProfileIdentifier = constants.DefaultProfileIdentifier
+	}
+
 	valErr := obj.Validate()
 	if valErr != nil {
 		return valErr
