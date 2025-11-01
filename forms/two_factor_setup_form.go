@@ -21,7 +21,7 @@ func (f *TwoFactorSetupForm) init() {
 	f.Fields["AuthyStatus"] = &Field{
 		Name:        "AuthyStatus",
 		Label:       "Preferred Method for Two-Factor Auth",
-		Placeholder: "",
+		Placeholder: "Authy",
 		ErrMsg:      "Please choose your preferred method.",
 		Options:     TwoFactorMethodList,
 		Attrs: map[string]string{

@@ -1,0 +1,52 @@
+{{ define "users/setup_authenticator_app.html" }}
+
+<!-- Show the header unless query string says modal=true -->
+{{ if not .showAsModal }}
+  {{ template "shared/_header.html" .}}
+{{ end }}
+
+<div class="box" style="padding: 5px 30px;">
+  <div class="box-header">
+    <h2>Set Up Authenticator App</h2>
+  </div>
+
+  <div class="modal-content">
+    <p class="mb-5">Using your authenticator app, please scan the QR code displayed below. Then, follow the instructions in your authenticator app. When you're done setting up your authenticator app, click Continue.</p>
+    <p class="mb-5">If you cannot or do not wish to continue with the setup, click on the Cancel Setup button.</p>
+
+    <img src="data:image/png;base64,{{ .otpQRImage }}" alt="This is the QR code image used to set up your authenticator app." />
+    <p class="mb-5">If you would rather enter a setup key into your app instead of scanning the QR code, please click the Show Setup Key button below.</p>
+    <button class="button" onclick="showSecVal()">Show Setup Key</button>
+    <p class="mb-5" id="secValSection" style="display:none;">
+        <br/><br/>
+        Enter this Setup Key into your authenticator app.<br />
+        Note: Please enter the exact Setup Key with care. Your authenticator app may not show any message or error if the Setup Key is entered incorrectly.<br />
+        In the next step, you will have the opportunity to validate that the authenticator app is set up correctly. If you are having trouble validating in the next step, you will be able to cancel setup and try again.<br />
+        Please do not share the Setup Key with anyone.
+        <br /><br/>
+        <span style="font-family: 'Courier New', Courier, monospace; font-size: 20pt; font-weight: bold;">{{ .secVal }}</span>
+    </p>
+    <br/><br/>
+    <form name="finishTOTPSetup" method="get" action="/users/validate_totp">
+        <input class="text" type="text" name="firstConfirm" value="firstConfirm" style="display:none;">
+        <input class="button is-primary" type="submit" value="Continue"><br />
+        <input class="button" onclick="cancelSetup()" value="Cancel Setup">
+    </form>
+  </div>
+</div>
+
+<script>
+    function showSecVal(){
+        document.getElementById('secValSection').style.display = "block"    
+    }
+    function cancelSetup(){
+        window.location = "/users/my_account"
+    }
+</script>
+<!-- Show the footer unless query string says modal=true -->
+{{ if not .showAsModal }}
+  {{ template "shared/_footer.html" .}}
+{{ end }}
+
+
+{{ end }}

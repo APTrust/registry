@@ -263,6 +263,11 @@ func initRoutes(router *gin.Engine) {
 		webRoutes.POST("/users/2fa_push", webui.UserTwoFactorPush)
 		webRoutes.POST("/users/2fa_verify", webui.UserTwoFactorVerify)
 
+		// Generate and validate Time-based One-Time Passwords for MFA
+		webRoutes.GET("/users/generate_totp", webui.UserGenerateTOTP)
+		webRoutes.GET("/users/validate_totp", webui.UserValidateTOTPView)
+		webRoutes.POST("/users/validate_totp", webui.UserValidateTOTP)
+
 		// User forgot password
 		webRoutes.GET("/users/forgot_password", webui.UserShowForgotPasswordForm)
 		webRoutes.POST("/users/forgot_password", webui.UserSendForgotPasswordMessage)
