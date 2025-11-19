@@ -94,7 +94,7 @@ type PasskeySession struct {
 	UserVerification protocol.UserVerificationRequirement
 	Extensions       protocol.AuthenticationExtensions
 	CredParams       []protocol.CredentialParameter
-	Mediation        protocol.CredentialMediationRequirement
+	// Mediation        protocol.CredentialMediationRequirement
 }
 
 // UserTwoFactorChoose shows a list of radio button options so a user
@@ -509,9 +509,9 @@ func UserBeginPasskeyRegistration(c *gin.Context) {
 		if session.Challenge != "" {
 			challenge = string(session.Challenge)
 		}
-		if session.RelyingPartyID != "" {
+		/*if session.RelyingPartyID != "" {
 			relyingPartyID = string(session.RelyingPartyID)
-		}
+		}*/
 		if session.UserID != nil {
 			userID = string(session.UserID)
 		}
@@ -613,11 +613,11 @@ func UserBeginLoginWithPasskey(c *gin.Context) {
 	}
 	// Save session to DB table
 	challenge := string(session.Challenge)
-	relyingPartyID := string(session.RelyingPartyID)
+	// relyingPartyID := string(session.RelyingPartyID)
 	userID := string(session.UserID)
 	allowedCredentialsIDs := string(session.AllowedCredentialIDs[0])
 	expires := session.Expires.String()
-	webauthnsession := challenge + "~" + relyingPartyID + "~" + userID + "~" + allowedCredentialsIDs + "~" + expires
+	webauthnsession := challenge + "~" + "" + "~" + userID + "~" + allowedCredentialsIDs + "~" + expires
 	user.EncryptedPasskeySession = webauthnsession
 
 	user.EncryptedPasskeySession = webauthnsession
@@ -639,7 +639,7 @@ func UserFinishLoginWithPasskey(c *gin.Context) {
 	layout := "2006-01-02 15:04:05"
 	expire, _ := time.Parse(layout, sessionparts[4])
 	// webauthnsession := PasskeySession{Challenge: sessionparts[0], RelyingPartyID: sessionparts[1], UserID: []byte(sessionparts[2]), AllowedCredentialIDs: allowedCreds, Expires: expire}
-	wasession := webauthn.SessionData{Challenge: sessionparts[0], RelyingPartyID: sessionparts[1], UserID: []byte(sessionparts[2]), AllowedCredentialIDs: allowedCreds, Expires: expire}
+	wasession := webauthn.SessionData{Challenge: sessionparts[0], UserID: []byte(sessionparts[2]), AllowedCredentialIDs: allowedCreds, Expires: expire}
 	_, err := common.Context().WebAuthn.FinishLogin(webauthnuser, wasession, c.Request)
 	if AbortIfError(c, err) {
 		return
