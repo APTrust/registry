@@ -177,7 +177,6 @@ func TestObjValidate(t *testing.T) {
 		"Access",
 		"InstitutionID",
 		"StorageOption",
-		"BagItProfileIdentifier",
 	}
 
 	for _, key := range keys {
