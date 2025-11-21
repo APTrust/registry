@@ -90,6 +90,12 @@ func CountObjectsThatCanBeDeleted(institutionID int64, objIDs []int64) (int, err
 // if IntellectualObject.ID is zero. Otherwise, it updates.
 func (obj *IntellectualObject) Save() error {
 	obj.SetTimestamps()
+
+	// Add a default BagItProfileIdentifier if one is missing
+	if obj.BagItProfileIdentifier == "" {
+		obj.BagItProfileIdentifier = constants.DefaultProfileIdentifier
+	}
+
 	err := obj.Validate()
 	if err != nil {
 		return err
@@ -130,6 +136,10 @@ func (obj *IntellectualObject) Delete() error {
 
 	obj.State = constants.StateDeleted
 	obj.UpdatedAt = time.Now().UTC()
+	// Add a default BagItProfileIdentifier if one is missing
+	if obj.BagItProfileIdentifier == "" {
+		obj.BagItProfileIdentifier = constants.DefaultProfileIdentifier
+	}
 
 	valErr := obj.Validate()
 	if valErr != nil {
@@ -220,6 +230,9 @@ func (obj *IntellectualObject) Validate() *common.ValidationError {
 	}
 	if !v.IsIn(obj.StorageOption, constants.StorageOptions...) {
 		errors["StorageOption"] = "Invalid storage option"
+	}
+	if common.IsEmptyString(obj.BagItProfileIdentifier) {
+		errors["BagItProfileIdentifier"] = "BagItProfileIdentifier is required"
 	}
 	if len(errors) > 0 {
 		return &common.ValidationError{Errors: errors}
