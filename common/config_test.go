@@ -202,7 +202,6 @@ var expectedConfigJson = `{
   "RetentionMinimum": {
     "Glacier": 90,
     "GlacierDeep": 180,
-    "Wasabi": 90,
     "Standard": 0
   },
   "BatchDeletionKey": "****key",

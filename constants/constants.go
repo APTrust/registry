@@ -118,9 +118,6 @@ const (
 	StorageOptionGlacierOR     = "Glacier-OR"
 	StorageOptionGlacierVA     = "Glacier-VA"
 	StorageOptionStandard      = "Standard"
-	StorageOptionWasabiOR      = "Wasabi-OR"
-	StorageOptionWasabiTX      = "Wasabi-TX"
-	StorageOptionWasabiVA      = "Wasabi-VA"
 	SystemUser                 = "system@aptrust.org"
 	TopicDelete                = "delete_item"
 	TopicE2EDelete             = "e2e_deletion_post_test"
@@ -276,9 +273,6 @@ var StorageOptions = []string{
 	StorageOptionGlacierOR,
 	StorageOptionGlacierVA,
 	StorageOptionStandard,
-	StorageOptionWasabiOR,
-	StorageOptionWasabiTX,
-	StorageOptionWasabiVA,
 }
 
 var UserActions = []string{

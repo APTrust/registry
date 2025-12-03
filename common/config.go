@@ -108,7 +108,6 @@ type RedisConfig struct {
 type RetentionMinimum struct {
 	Glacier     int
 	GlacierDeep int
-	Wasabi      int
 	Standard    int
 }
 
@@ -122,8 +121,6 @@ func (rm *RetentionMinimum) For(storageOption string) int {
 		days = rm.GlacierDeep
 	case constants.StorageOptionGlacierOH, constants.StorageOptionGlacierOR, constants.StorageOptionGlacierVA:
 		days = rm.Glacier
-	case constants.StorageOptionWasabiOR, constants.StorageOptionWasabiVA:
-		days = rm.Wasabi
 	case constants.StorageOptionStandard:
 		days = rm.Standard
 	default:
@@ -301,7 +298,6 @@ func loadConfig() *Config {
 		RetentionMinimum: &RetentionMinimum{
 			Glacier:     v.GetInt("RETENTION_MINIMUM_GLACIER"),
 			GlacierDeep: v.GetInt("RETENTION_MINIMUM_GLACIER_DEEP"),
-			Wasabi:      v.GetInt("RETENTION_MINIMUM_WASABI"),
 			Standard:    v.GetInt("RETENTION_MINIMUM_STANDARD"),
 		},
 	}
