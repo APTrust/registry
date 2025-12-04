@@ -2,7 +2,7 @@
 
 This directory contains binaries to run services used in unit and integration tests. The [test script](../test.sh) controls the starting and stopping of these services.
 
-* NSQ version is 1.2.0
+* NSQ version is 1.3.0
 * Redis version is 5.0.7
 
 The NSQ binaries were downloaded from their respective download pages. Redis was built from scratch on OSX Catalina 10.15.2 and on Ubuntu 14.04.6 LTS (GNU/Linux 4.4.0-148-generic x86_64) with gcc version gcc (Ubuntu 4.8.4-2ubuntu1~14.04.4) 4.8.4.
