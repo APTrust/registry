@@ -29,58 +29,58 @@ returns void as $$
 begin
     update premis_events
     set event_type_int = case event_type
-        when 'fixity check' then 1
-        when 'access assignment' then 2
-        -- accession
-        -- appraisal
-        -- capture
-        -- compiling
-        -- compression
-        when 'creation' then 8
-        -- deaccession
-        -- decompression
-        -- decryption
-        when 'deletion' then 12
-        -- digital signature generation
-        -- digital signature validation
-        -- displaying
-        -- dissemination
-        -- encryption
-        -- execution
-        -- exporting
-        -- extraction
-        -- filename change
-        -- forensic feature analysis
-        -- format identification
-        when 'identifier assignment' then 25
-        -- imaging
-        -- information package creation
-        -- information package merging
-        -- information package splitting
-        when 'ingestion' then 30
-        -- ingestion end
-     -- ingestion start
-     -- interpreting
-     when 'message digest calculation' then 34
-     -- metadata extraction
-     -- metadata modification
-     -- migration
-     -- modification
-     -- normalization
-     -- packing
-     -- policy assignment
-     -- printing
-     -- quarantine
-     -- recovery
-     -- redaction
-     -- refreshment
-     -- rendering
-     when 'replication' then 48
-     -- transfer
-     -- unpacking
-     -- unquarantine
-     when 'validation' then 52
-     -- virus check
+        when 'access assignment' then 1
+        when 'accession' then 2
+        when 'appraisal' then 3
+        when 'capture' then 4
+        when 'compiling' then 5
+        when 'compression' then 6
+        when 'creation' then 7
+        when 'deaccession' then 8
+        when 'decompression' then 9
+        when 'decryption' then 10
+        when 'deletion' then 11
+        when 'digital signature generation' then 12
+        when 'digital signature validation' then 13
+        when 'displaying' then 14
+        when 'dissemination' then 15
+        when 'encryption' then 16
+        when 'execution' then 17
+        when 'exporting' then 18
+        when 'extraction' then 19
+        when 'filename change' then 20
+        when 'fixity check' then 21
+        when 'forensic feature analysis' then 22
+        when 'format identification' then 23
+        when 'identifier assignment' then 24
+        when 'imaging' then 25
+        when 'information package creation' then 26
+        when 'information package merging' then 27
+        when 'information package splitting' then 28
+        when 'ingestion' then 29
+        when 'ingestion end' then 30
+        when 'ingestion start' then 31
+        when 'interpreting' then 32
+        when 'message digest calculation' then 33
+        when 'metadata extraction' then 34
+        when 'metadata modification' then 35
+        when 'migration' then 36
+        when 'modification' then 37
+        when 'normalization' then 38
+        when 'packing' then 39
+        when 'policy assignment' then 40
+        when 'printing' then 41
+        when 'quarantine' then 42
+        when 'recovery' then 43
+        when 'redaction' then 44
+        when 'refreshment' then 45
+        when 'rendering' then 46
+        when 'replication' then 47
+        when 'transfer' then 48
+        when 'unpacking' then 49
+        when 'unquarantine' then 50
+        when 'validation' then 51
+        when 'virus check' then 52
         else 0  -- default
     end;
 end;
@@ -178,6 +178,8 @@ alter table checksums drop column created_at;
 alter table checksums drop column updated_at;
 
 -- storage records url
+
+
 
 -- Now mark the migration as completed.
 update schema_migrations set finished_at = now() where "version" = '013_shrink_db_size';
