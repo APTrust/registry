@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"net/http/httputil"
 	"os"
 	"strconv"
 	"strings"
@@ -555,8 +554,8 @@ func UserFinishPasskeyRegistration(c *gin.Context) {
 	req := NewRequest(c)
 	user := req.CurrentUser
 
-	d1 := []byte(c.PostForm("attestation"))
-	_ = os.WriteFile("/tmp/passkeyerrs", d1, 0644)
+	// d1 := []byte(c.PostForm("attestation"))
+	// _ = os.WriteFile("/tmp/passkeyerrs", d1, 0644)
 
 	newAttestation := []byte(c.PostForm("attestation"))
 	c.Request.Body = io.NopCloser(bytes.NewBuffer(newAttestation))
@@ -577,21 +576,21 @@ func UserFinishPasskeyRegistration(c *gin.Context) {
 	//_ = os.WriteFile("/tmp/passkeyerrs", d2, 0644)
 	//d2, err := json.Marshal(wasession)
 	//_ = os.WriteFile("/tmp/passkeyerrs", d2, 0644)
-	d3, err := httputil.DumpRequest(c.Request, true)
-	_ = os.WriteFile("/tmp/passkeyerrs", d3, 0644)
+	// d3, err := httputil.DumpRequest(c.Request, true)
+	// _ = os.WriteFile("/tmp/passkeyerrs", d3, 0644)
 
-	_, err = common.Context().WebAuthn.FinishRegistration(webauthnuser, wasession, c.Request) // webauthn.User and webauthn.SessionData
+	webauthncredential, err := common.Context().WebAuthn.FinishRegistration(webauthnuser, wasession, c.Request) // webauthn.User and webauthn.SessionData
 
-	d1 = []byte(err.Error())
-	_ = os.WriteFile("/tmp/passkeyerrs", d1, 0644)
+	// d1 = []byte(err.Error())
+	_ = os.WriteFile("/tmp/passkeyerrs", []byte(webauthncredential.AttestationType), 0644)
 
 	if AbortIfError(c, err) {
 		return
 	}
 
 	// GET credential from FinishRegistration above
-	// user.EncryptedPasskeyCredential = webauthncredential // credential
-
+	// Save Credentials in separate table
+	user.EncryptedPasskeyCredential = "" // webauthncredential
 	user.EncryptedPasskeySession = ""
 	user.Save()
 
@@ -619,7 +618,7 @@ func UserBeginLoginWithPasskey(c *gin.Context) {
 	expires := session.Expires.String()
 	webauthnsession := challenge + "~" + "" + "~" + userID + "~" + allowedCredentialsIDs + "~" + expires
 	user.EncryptedPasskeySession = webauthnsession
-
+	// _ = os.WriteFile("/tmp/passkeyerrs", []byte(webauthnsession), 0644)
 	user.EncryptedPasskeySession = webauthnsession
 	user.Save()
 	req.TemplateData["sessionKey"] = sessionID // options.sessionKey // header?
@@ -634,6 +633,7 @@ func UserFinishLoginWithPasskey(c *gin.Context) {
 	// session := user.EncryptedPasskeySession
 	webauthnuser := &PasskeyUser{ID: []byte(string(user.ID)), DisplayName: user.Name, Name: user.Name}
 	sessionparts := strings.Split(session, "~")
+	// _ = os.WriteFile("/tmp/passkeyerrs", []byte(session), 0644)
 	bytestr := []byte(sessionparts[3])
 	allowedCreds := [][]byte{[]byte(bytestr)}
 	layout := "2006-01-02 15:04:05"

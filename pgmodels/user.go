@@ -204,7 +204,7 @@ type User struct {
 	EncryptedPasskeySession string `json:"-" form:"-" pg:"encrypted_passkey_session"`
 
 	// EncryptedPasskeyCredential saves the user's device passkey
-	// EncryptedPasskeyCredential string `json:"-" form:"-" pg:"encrypted_passkey_credential"`
+	EncryptedPasskeyCredential string `json:"-" form:"-" pg:"encrypted_passkey_credential"`
 }
 
 // UserByID returns the institution with the specified id.
