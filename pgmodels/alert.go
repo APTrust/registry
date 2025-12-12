@@ -240,7 +240,7 @@ func CreateAlert(alert *Alert, templateName string, alertData map[string]interfa
 	// confirmation URLS in this alert so we can
 	// review and test them.
 	common.ConsoleDebug("***********************")
-	common.ConsoleDebug(alert.Content)
+	common.ConsoleDebug("%s", alert.Content)
 	common.ConsoleDebug("***********************")
 
 	return alert, err

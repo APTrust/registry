@@ -74,6 +74,6 @@ func (client *SNSClient) sendDummySMS(phoneNumber, message string) error {
 	// fmt.Println(msg)
 
 	// Print to log.
-	client.logger.Info().Msgf(msg)
+	client.logger.Info().Msgf("%s", msg)
 	return nil
 }
