@@ -84,6 +84,6 @@ func (client *SESClient) sendRealEmail(emailAddress, subject, message string) er
 
 func (client *SESClient) sendDummyEmail(emailAddress, subject, message string) error {
 	msg := fmt.Sprintf("SES is disabled per config settings. Email to %s. Subject: %s\n\n. %s", emailAddress, subject, message)
-	client.logger.Info().Msgf(msg)
+	client.logger.Info().Msgf("%s", msg)
 	return nil
 }
