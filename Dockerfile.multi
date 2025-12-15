@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM golang:1.25-alpine AS builder
+FROM golang:1.23-alpine AS builder
 
 RUN apk update && apk add --no-cache upx make build-base bash git openssl bind-tools curl
 
@@ -20,7 +20,7 @@ COPY . .
 RUN ./build_for_docker.sh ./main
 
 
-FROM golang:1.25-alpine
+FROM golang:1.23-alpine
 
 RUN apk update && apk add --no-cache upx make build-base bash git openssl bind-tools curl
 
