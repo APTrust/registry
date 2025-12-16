@@ -22,10 +22,9 @@ type PremisEventView struct {
 	tableName                    struct{}  `pg:"premis_events_view"`
 	ID                           int64     `json:"id" form:"id"`
 	Agent                        string    `json:"agent"`
-	CreatedAt                    time.Time `json:"created_at"`
 	DateTime                     time.Time `json:"date_time"`
 	Detail                       string    `json:"detail"`
-	EventType                    string    `json:"event_type"`
+	EventType                    int32     `json:"event_type"`
 	GenericFileID                int64     `json:"generic_file_id"`
 	GenericFileIdentifier        string    `json:"generic_file_identifier"`
 	Identifier                   string    `json:"identifier"`

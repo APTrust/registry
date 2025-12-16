@@ -54,7 +54,7 @@ func addDummyFailures(t *testing.T) {
 		for i := 0; i < 3; i++ {
 			file := files[i]
 			failure := pgmodels.PremisEvent{
-				Agent:                "Registry Unit Test",
+				Agent:                0, // "Registry Unit Test",
 				DateTime:             June012025,
 				Detail:               "Failed fixity check for unit tests",
 				EventType:            constants.EventFixityCheck,
@@ -62,7 +62,7 @@ func addDummyFailures(t *testing.T) {
 				Identifier:           uuid.NewString(),
 				InstitutionID:        instID,
 				IntellectualObjectID: file.IntellectualObjectID,
-				Object:               "Go language crypto/sha256",
+				Object:               0, // "Go language crypto/sha256",
 				OldUUID:              "",
 				Outcome:              "Failed",
 				OutcomeDetail:        "Yadda yadda",
