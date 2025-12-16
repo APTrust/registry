@@ -67,12 +67,8 @@
         <dd class="text-table">{{ yesNo .user.ConfirmedTwoFactor }}</dd>
         <dt class="text-label text-xs is-grey-dark">2FA Required By</dt>
         <dd class="text-table">{{ dateUS .user.GracePeriod }}</dd>
-        <dt class="text-label text-xs is-grey-dark">Authy Status</dt>
-        <dd class="text-table">{{ defaultString .user.AuthyStatus "N/A" }}</dd>
-        <dt class="text-label text-xs is-grey-dark">Authy ID</dt>
-        <dd class="text-table">{{ defaultString .user.AuthyID "N/A" }}</dd>
-        <dt class="text-label text-xs is-grey-dark">Last Authy SignIn</dt>
-        <dd class="text-table">{{ dateUS .user.LastSignInWithAuthy }}</dd>
+        <dt class="text-label text-xs is-grey-dark">MFA Status</dt>
+        <dd class="text-table">{{ defaultString .user.MFAStatus "N/A" }}</dd>
       </dl>
 
       <dl class="data-list">
