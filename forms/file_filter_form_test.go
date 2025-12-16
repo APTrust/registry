@@ -22,7 +22,7 @@ func getFileFilters() *pgmodels.FilterCollection {
 	fc.Add("state", []string{constants.StateActive})
 	fc.Add("size__gteq", []string{"100"})
 	fc.Add("size__lteq", []string{"500"})
-	fc.Add("storage_option", []string{constants.StorageOptionGlacierDeepOR, constants.StorageOptionWasabiVA})
+	fc.Add("storage_option", []string{constants.StorageOptionGlacierDeepOR})
 	return fc
 }
 

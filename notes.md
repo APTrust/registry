@@ -341,7 +341,6 @@ The term "items" below refers to Intellectual Objects, Generic Files, Checksums,
   * ingest and restoration services
   * interim processing data in redis
   * AWS (IAM, S3 and Glacier)
-  * Wasabi
 
 # Two Factor Authentication
 
@@ -371,7 +370,7 @@ Depositors and APTrust should be able to get reports on demand describing:
     * byte count
     * by institution
     * totals for member + subaccounts
-* deposits by storage type (standard, glacier, glacier-deep, wasabi - this report can be use to calculate billing)
+* deposits by storage type (standard, glacier, glacier-deep - this report can be use to calculate billing)
 * deposits by region and technology
 * show deleted objects/files/bytes and (ideally) when those items were deleted, and by whom
 * cost breakdown

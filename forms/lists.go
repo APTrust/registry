@@ -73,9 +73,6 @@ var StorageOptionList = []*ListOption{
 	{constants.StorageOptionGlacierOR, "Glacier - Oregon", false},
 	{constants.StorageOptionGlacierVA, "Glacier - Virginia", false},
 	{constants.StorageOptionStandard, "Standard", false},
-	{constants.StorageOptionWasabiOR, "Wasabi - Oregon", false},
-	{constants.StorageOptionWasabiTX, "Wasabi - Texas", false},
-	{constants.StorageOptionWasabiVA, "Wasabi - Virginia", false},
 }
 
 var TwoFactorMethodList = []*ListOption{

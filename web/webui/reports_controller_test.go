@@ -55,12 +55,9 @@ func TestDepositReportShow(t *testing.T) {
 		"Institution Two</td>",
 		"Test Institution (for integration tests)</td>",
 		"Standard</td>",
-		"Wasabi-OR</td>",
-		"Wasabi-VA</td>",
 		"Glacier-OR</td>",
 		"Glacier-Deep-OH</td>",
 		"Glacier-Deep-VA</td>",
-		"Wasabi-OR</td>",
 		"Total</td>",
 	}
 
