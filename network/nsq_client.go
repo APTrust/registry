@@ -3,6 +3,7 @@ package network
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -239,7 +240,7 @@ func (client *NSQClient) applyToAll(action string) error {
 		}
 	}
 	if len(errMsg) > 0 {
-		err = fmt.Errorf(errMsg)
+		err = errors.New(errMsg)
 	}
 	return err
 }
