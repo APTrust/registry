@@ -86,6 +86,7 @@ const (
 	RoleSysAdmin               = "admin"
 	SecondFactorAuthy          = "Authy"
 	SecondFactorBackupCode     = "Backup Code"
+	SecondFactorPasskey        = "Passkey"
 	SecondFactorSMS            = "SMS"
 	StageAvailableInS3         = "Available in S3"
 	StageCleanup               = "Cleanup"
@@ -134,6 +135,7 @@ const (
 	TopicObjectRestore         = "restore_object"
 	TwoFactorAuthy             = "onetouch"
 	TwoFactorNone              = "none"
+	TwoFactorPasskey           = "passkey"
 	TwoFactorSMS               = "sms"
 )
 

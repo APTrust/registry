@@ -1,8 +1,16 @@
 package webui
 
 import (
+	"bytes"
+	"crypto/rand"
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
+	"os"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/APTrust/registry/common"
@@ -10,8 +18,83 @@ import (
 	"github.com/APTrust/registry/forms"
 	"github.com/APTrust/registry/helpers"
 	"github.com/gin-gonic/gin"
+	"github.com/go-webauthn/webauthn/protocol"
+	"github.com/go-webauthn/webauthn/webauthn"
 	"github.com/stretchr/stew/slice"
 )
+
+// Passkey user model
+type PasskeyUser struct {
+	ID          []byte
+	DisplayName string
+	Name        string
+	creds       []webauthn.Credential
+}
+
+type PasskeyRealUser interface {
+	webauthn.User
+	AddCredential(*webauthn.Credential)
+	UpdateCredential(*webauthn.Credential)
+}
+
+func ReturnTruePasskeyUser(u string) PasskeyRealUser {
+	return &PasskeyUser{ID: []byte(u), DisplayName: u, Name: u}
+}
+
+func (o *PasskeyUser) WebAuthnIcon() string {
+	return "https://pics.com/avatar.png"
+}
+
+func (o *PasskeyUser) AddCredential(credential *webauthn.Credential) {
+	o.creds = append(o.creds, *credential)
+}
+
+func (o *PasskeyUser) UpdateCredential(credential *webauthn.Credential) {
+	for i, c := range o.creds {
+		if string(c.ID) == string(credential.ID) {
+			o.creds[i] = *credential
+		}
+	}
+}
+
+func (o *PasskeyUser) WebAuthnCredentials() []webauthn.Credential {
+	return o.creds
+}
+
+func (o *PasskeyUser) WebAuthnDisplayName() string {
+	return o.DisplayName
+}
+
+func (o *PasskeyUser) WebAuthnID() []byte {
+	return o.ID
+}
+
+func (o *PasskeyUser) WebAuthnName() string {
+	return o.Name
+}
+
+func GenSessionID() (string, error) {
+	b := make([]byte, 32)
+	_, err := rand.Read(b)
+	if err != nil {
+		return "", err
+	}
+
+	return base64.URLEncoding.EncodeToString(b), nil
+}
+
+type PasskeySession struct {
+	Challenge            string
+	RelyingPartyID       string
+	UserID               []byte
+	AllowedCredentialIDs [][]byte
+	Expires              time.Time
+
+	UserVerification protocol.UserVerificationRequirement
+	Extensions       protocol.AuthenticationExtensions
+	CredParams       []protocol.CredentialParameter
+	// Mediation        protocol.CredentialMediationRequirement
+}
 
 // UserTwoFactorChoose shows a list of radio button options so a user
 // can choose their two-factor auth method (Authy, Backup Code, SMS).
@@ -195,6 +278,12 @@ func UserComplete2FASetup(c *gin.Context) {
 	err = user.Save()
 	if AbortIfError(c, err) {
 		return
+	}
+
+	if prefs.UsePasskey() {
+		c.HTML(http.StatusOK, "users/passkey_register.html", req.TemplateData)
+		// UserBeginPasskeyRegistration(c)
+		// return
 	}
 
 	if prefs.UseAuthy() {
@@ -396,4 +485,172 @@ func UserCompleteSMSSetup(req *Request) error {
 func OTPTokenIsExpired(tokenSentAt time.Time) bool {
 	expiration := tokenSentAt.Add(common.Context().Config.TwoFactor.OTPExpiration)
 	return time.Now().After(expiration)
+}
+
+// To run when a user is enrolling their device in passkey auth for the first time.
+func UserBeginPasskeyRegistration(c *gin.Context) {
+	req := NewRequest(c)
+	user := req.CurrentUser
+	webauthnuser := ReturnTruePasskeyUser(user.Name)
+	resstring := ""
+	if common.Context().WebAuthn != nil {
+		options, session, err := common.Context().WebAuthn.BeginRegistration(webauthnuser) // webauthn.User with Id, Name, DisplayName
+		if AbortIfError(c, err) {
+			c.HTML(http.StatusOK, "users/my_account.html", req.TemplateData)
+		}
+
+		challenge := ""
+		relyingPartyID := ""
+		userID := ""
+		allowedCredentialsIDs := ""
+		expires := ""
+		// Save session to DB table
+		if session.Challenge != "" {
+			challenge = string(session.Challenge)
+		}
+		/*if session.RelyingPartyID != "" {
+			relyingPartyID = string(session.RelyingPartyID)
+		}*/
+		if session.UserID != nil {
+			userID = string(session.UserID)
+		}
+		if len(session.AllowedCredentialIDs) > 0 {
+			allowedCredentialsIDs = string(session.AllowedCredentialIDs[0])
+		}
+		expires = session.Expires.String()
+		webauthnsession := challenge + "~" + relyingPartyID + "~" + userID + "~" + allowedCredentialsIDs + "~" + expires
+		user.EncryptedPasskeySession = webauthnsession
+
+		user.Save()
+
+		var buf bytes.Buffer
+		encoder := json.NewEncoder(&buf)
+		err = encoder.Encode(options)
+		if AbortIfError(c, err) {
+			c.HTML(http.StatusOK, "users/my_account.html", req.TemplateData)
+		}
+		reader := io.Reader(&buf)
+		res, err := io.ReadAll(reader)
+		if AbortIfError(c, err) {
+			c.HTML(http.StatusOK, "users/my_account.html", req.TemplateData)
+		}
+		resstring = string(res)
+
+		sessionID, err := GenSessionID()
+		if AbortIfError(c, err) {
+			c.HTML(http.StatusOK, "users/my_account.html", req.TemplateData)
+		}
+		req.TemplateData["sessionKey"] = sessionID // options.sessionKey // header?
+	}
+	req.TemplateData["public_key"] = resstring
+	c.HTML(http.StatusOK, "users/passkey_finish_registration.html", req.TemplateData)
+	// c.JSON(http.StatusOK, json.RawMessage(resstring))
+}
+
+// To run in order to finish device registration with a passkey.
+func UserFinishPasskeyRegistration(c *gin.Context) {
+	// Get Session-Key from header
+	// Get Session from DB
+	req := NewRequest(c)
+	user := req.CurrentUser
+
+	// d1 := []byte(c.PostForm("attestation"))
+	// _ = os.WriteFile("/tmp/passkeyerrs", d1, 0644)
+
+	newAttestation := []byte(c.PostForm("attestation"))
+	c.Request.Body = io.NopCloser(bytes.NewBuffer(newAttestation))
+	c.Request.ContentLength = int64(len(newAttestation))
+	c.Request.Header.Add("Content-Type", "application/json")
+
+	session := user.EncryptedPasskeySession
+	webauthnuser := ReturnTruePasskeyUser(user.Name)
+	sessionparts := strings.Split(session, "~")
+	// bytestr := []byte(sessionparts[3])
+	// allowedCreds := [][]byte{[]byte(bytestr)}
+	layout := "2006-01-02 15:04:05"
+	expire, _ := time.Parse(layout, sessionparts[4])
+	// webauthnsession := PasskeySession{Challenge: sessionparts[0], RelyingPartyID: sessionparts[1], UserID: []byte(sessionparts[2]), AllowedCredentialIDs: allowedCreds, Expires: expire}
+	wasession := webauthn.SessionData{Challenge: sessionparts[0], UserID: []byte(sessionparts[2]), Expires: expire, UserVerification: "preferred"}
+
+	//d2, err := json.Marshal(webauthnuser)
+	//_ = os.WriteFile("/tmp/passkeyerrs", d2, 0644)
+	//d2, err := json.Marshal(wasession)
+	//_ = os.WriteFile("/tmp/passkeyerrs", d2, 0644)
+	// d3, err := httputil.DumpRequest(c.Request, true)
+	// _ = os.WriteFile("/tmp/passkeyerrs", d3, 0644)
+
+	webauthncredential, err := common.Context().WebAuthn.FinishRegistration(webauthnuser, wasession, c.Request) // webauthn.User and webauthn.SessionData
+
+	// d1 = []byte(err.Error())
+	_ = os.WriteFile("/tmp/passkeyerrs", []byte(webauthncredential.AttestationType), 0644)
+
+	if AbortIfError(c, err) {
+		return
+	}
+
+	// GET credential from FinishRegistration above
+	// Save Credentials in separate table
+	user.EncryptedPasskeyCredential = "" // webauthncredential
+	user.EncryptedPasskeySession = ""
+	user.Save()
+
+	c.Redirect(http.StatusFound, "/users/my_account")
+}
+
+// To run in order to begin logging in with a passkey.
+func UserBeginLoginWithPasskey(c *gin.Context) {
+	req := NewRequest(c)
+	user := req.CurrentUser
+	webauthnuser := &PasskeyUser{ID: []byte(strconv.FormatInt(user.ID, 10)), DisplayName: user.Name, Name: user.Name}
+	_, session, err := common.Context().WebAuthn.BeginLogin(webauthnuser)
+	if AbortIfError(c, err) {
+		return
+	}
+	sessionID, err := GenSessionID()
+	if AbortIfError(c, err) {
+		return
+	}
+	// Save session to DB table
+	challenge := string(session.Challenge)
+	// relyingPartyID := string(session.RelyingPartyID)
+	userID := string(session.UserID)
+	allowedCredentialsIDs := string(session.AllowedCredentialIDs[0])
+	expires := session.Expires.String()
+	webauthnsession := challenge + "~" + "" + "~" + userID + "~" + allowedCredentialsIDs + "~" + expires
+	user.EncryptedPasskeySession = webauthnsession
+	// _ = os.WriteFile("/tmp/passkeyerrs", []byte(webauthnsession), 0644)
+	user.EncryptedPasskeySession = webauthnsession
+	user.Save()
+	req.TemplateData["sessionKey"] = sessionID // options.sessionKey // header?
+	c.HTML(http.StatusOK, "users/passkey_login.html", req.TemplateData)
+}
+
+// To run when completing login with a passkey.
+func UserFinishLoginWithPasskey(c *gin.Context) {
+	req := NewRequest(c)
+	user := req.CurrentUser
+	session := user.EncryptedPasskeySession
+	// session := user.EncryptedPasskeySession
+	webauthnuser := &PasskeyUser{ID: []byte(string(user.ID)), DisplayName: user.Name, Name: user.Name}
+	sessionparts := strings.Split(session, "~")
+	// _ = os.WriteFile("/tmp/passkeyerrs", []byte(session), 0644)
+	bytestr := []byte(sessionparts[3])
+	allowedCreds := [][]byte{[]byte(bytestr)}
+	layout := "2006-01-02 15:04:05"
+	expire, _ := time.Parse(layout, sessionparts[4])
+	// webauthnsession := PasskeySession{Challenge: sessionparts[0], RelyingPartyID: sessionparts[1], UserID: []byte(sessionparts[2]), AllowedCredentialIDs: allowedCreds, Expires: expire}
+	wasession := webauthn.SessionData{Challenge: sessionparts[0], UserID: []byte(sessionparts[2]), AllowedCredentialIDs: allowedCreds, Expires: expire}
+	_, err := common.Context().WebAuthn.FinishLogin(webauthnuser, wasession, c.Request)
+	if AbortIfError(c, err) {
+		return
+	}
+	// if credential.Authenticator.CloneWarning {
+	// req.TemplateData["cloneWarningMessage"] = "Error: CloneWarning"
+	// }
+
+	// user.EncryptedPasskeyCredential = credential
+	user.EncryptedPasskeySession = ""
+	user.Save()
+
+	c.Redirect(http.StatusFound, "/dashboard")
 }

@@ -1,0 +1,66 @@
+{{ define "users/passkey_finish_registration.html" }}
+
+<!-- Show the header unless query string says modal=true -->
+{{ if not .showAsModal }}
+  {{ template "shared/_header.html" .}}
+{{ end }}
+
+<div class="modal-detail">
+  <div id="modalTitle" id="modalTitle" class="modal-title-row is-flex is-justify-content-space-between is-align-items-center">
+    <h2>Passkey Registration Complete</h2>
+    <a class="modal-exit is-grey-dark" href="#">
+      <span class="material-icons" aria-hidden="true">close</span>
+      <span class="is-sr-only">Close</span>
+    </a>
+  </div>
+
+  <div class="modal-content">
+    <p class="mb-5">Your passkey enrollment is complete.</p>
+
+
+    <button class="button" onclick="registerPasskey()" value="Set up Passkey">Test</button>
+    <form method="POST" name="finishPasskeyRegistrationForm" action="/users/finish_passkey_registration">
+      <input type="hidden" name="attestation"></input>
+      <button class="button" type="submit" value="Set up Passkey">Finish</button>
+      {{ template "forms/csrf_token.html" . }}
+    </form>
+  </div>
+</div>
+
+<script>
+  async function registerPasskey() {
+      const challenge = "{{ .public_key }}";
+      let finalc = challenge.replace("\\u0022", "\"")
+      attestationResponse = await SimpleWebAuthnBrowser.startRegistration(JSON.parse(finalc)["publicKey"])
+      // trueAttestation = attestationResponse["response"]
+      let form = document.forms["finishPasskeyRegistrationForm"]
+      form.elements["attestation"].value = JSON.stringify(attestationResponse)
+      // add form inputs for attestation response
+
+     /*const verificationResponse = await fetch('/users/finish_passkey_registration', {  
+          method: 'POST',  
+          headers: {  
+              'Content-Type': 'application/json',  
+              'Session-Key': "{{ .sessionKey }}"
+          },  
+          body: JSON.stringify(attestationResponse)  
+      });  
+
+      const msg = await verificationResponse.json();  
+      if (verificationResponse.ok) {  
+        // good
+      } else {  
+        // bad     
+      }  */
+  }
+</script>
+
+<script src="/static/js/simplewebauthn.index.umd.min.js"></script>
+
+<!-- Show the footer unless query string says modal=true -->
+{{ if not .showAsModal }}
+  {{ template "shared/_footer.html" .}}
+{{ end }}
+
+
+{{ end }}

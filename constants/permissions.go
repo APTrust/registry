@@ -67,11 +67,15 @@ const (
 	StorageRecordDelete                = "StorageRecordDelete"
 	StorageRecordRead                  = "StorageRecordRead"
 	StorageRecordUpdate                = "StorageRecordUpdate"
+	UserBeginLoginWithPasskey          = "UserBeginLoginWithPasskey"
+	UserBeginPasskeyRegistration       = "UserBeginPasskeyRegistration"
 	UserComplete2FASetup               = "UserComplete2FASetup"
 	UserConfirmPhone                   = "UserConfirmPhone"
 	UserCreate                         = "UserCreate"
 	UserDelete                         = "UserDelete"
 	UserDeleteSelf                     = "UserDeleteSelf"
+	UserFinishLoginWithPasskey         = "UserFinishLoginWithPasskey"
+	UserFinishPasskeyRegistration      = "UserFinishPasskeyRegistration"
 	UserGenerateBackupCodes            = "UserGenerateBackupCodes"
 	UserInit2FASetup                   = "UserInit2FASetup"
 	UserRead                           = "UserRead"
@@ -146,11 +150,15 @@ var Permissions = []Permission{
 	StorageRecordDelete,
 	StorageRecordRead,
 	StorageRecordUpdate,
+	UserBeginLoginWithPasskey,
+	UserBeginPasskeyRegistration,
 	UserComplete2FASetup,
 	UserConfirmPhone,
 	UserCreate,
 	UserDelete,
 	UserDeleteSelf,
+	UserFinishLoginWithPasskey,
+	UserFinishPasskeyRegistration,
 	UserGenerateBackupCodes,
 	UserInit2FASetup,
 	UserRead,
@@ -225,8 +233,12 @@ func initPermissions() {
 	instUser[IntellectualObjectRestore] = true
 	instUser[ReportRead] = true
 	instUser[StorageRecordRead] = true
+	instUser[UserBeginLoginWithPasskey] = true
+	instUser[UserBeginPasskeyRegistration] = true
 	instUser[UserComplete2FASetup] = true
 	instUser[UserConfirmPhone] = true
+	instUser[UserFinishLoginWithPasskey] = true
+	instUser[UserFinishPasskeyRegistration] = true
 	instUser[UserGenerateBackupCodes] = true
 	instUser[UserInit2FASetup] = true
 	instUser[UserReadSelf] = true
@@ -263,10 +275,14 @@ func initPermissions() {
 	instAdmin[IntellectualObjectRestore] = true
 	instAdmin[ReportRead] = true
 	instAdmin[StorageRecordRead] = true
+	instAdmin[UserBeginLoginWithPasskey] = true
+	instAdmin[UserBeginPasskeyRegistration] = true
 	instAdmin[UserComplete2FASetup] = true
 	instAdmin[UserConfirmPhone] = true
 	instAdmin[UserCreate] = true
 	instAdmin[UserDelete] = true
+	instAdmin[UserFinishLoginWithPasskey] = true
+	instAdmin[UserFinishPasskeyRegistration] = true
 	instAdmin[UserGenerateBackupCodes] = true
 	instAdmin[UserInit2FASetup] = true
 	instAdmin[UserReadSelf] = true
@@ -335,11 +351,15 @@ func initPermissions() {
 	sysAdmin[StorageRecordDelete] = true
 	sysAdmin[StorageRecordRead] = true
 	sysAdmin[StorageRecordUpdate] = true
+	sysAdmin[UserBeginLoginWithPasskey] = true
+	sysAdmin[UserBeginPasskeyRegistration] = true
 	sysAdmin[UserComplete2FASetup] = true
 	sysAdmin[UserConfirmPhone] = true
 	sysAdmin[UserCreate] = true
 	sysAdmin[UserDeleteSelf] = true
 	sysAdmin[UserDelete] = true
+	sysAdmin[UserFinishLoginWithPasskey] = true
+	sysAdmin[UserFinishPasskeyRegistration] = true
 	sysAdmin[UserGenerateBackupCodes] = true
 	sysAdmin[UserInit2FASetup] = true
 	sysAdmin[UserReadSelf] = true

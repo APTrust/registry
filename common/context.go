@@ -8,6 +8,7 @@ import (
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/network"
 	"github.com/go-pg/pg/v10"
+	"github.com/go-webauthn/webauthn/webauthn"
 	"github.com/rs/zerolog"
 )
 
@@ -46,6 +47,9 @@ type APTContext struct {
 	// SMTPClient is for sending emails from a private subnet that
 	// is not using a NAT gateway.
 	SMTPClient *network.SMTPClient
+
+	// WebAuthnClient is used for passkey authentication
+	WebAuthn *webauthn.WebAuthn
 }
 
 // Context returns an APTContext object, which includes
@@ -90,6 +94,7 @@ func Context() *APTContext {
 			SESClient:   network.NewSESClient(config.Email.Enabled, config.TwoFactor.AWSRegion, config.Email.SesEndpoint, config.Email.SesUser, config.Email.SesPassword, config.Email.FromAddress, zlogger),
 			SNSClient:   network.NewSNSClient(config.TwoFactor.SMSEnabled, config.TwoFactor.AWSRegion, config.TwoFactor.SNSEndpoint, config.TwoFactor.SNSUser, config.TwoFactor.SNSPassword, zlogger),
 			SMTPClient:  network.NewSMTPClient(config.Email.Enabled, config.TwoFactor.AWSRegion, config.Email.SesEndpoint, config.Email.SesUser, config.Email.SesPassword, config.Email.FromAddress, zlogger),
+			WebAuthn:    network.NewWebAuthn(),
 			RedisClient: redisClient,
 		}
 	}
