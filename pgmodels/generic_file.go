@@ -223,13 +223,13 @@ func (gf *GenericFile) saveEventsTx(tx *pg.Tx) error {
 		event.SetTimestamps()
 		validationErr := event.Validate()
 		if validationErr != nil {
-			common.Context().Log.Error().Msgf("GenericFile save failed on validation of event (%s) - %s. Error: %s", gf.Identifier, event.EventType, validationErr.Error())
+			common.Context().Log.Error().Msgf("GenericFile save failed on validation of event (%s) - %d. Error: %s", gf.Identifier, event.EventType, validationErr.Error())
 			return validationErr
 		}
 		// Premis events can only be inserted, not updated.
 		_, err := tx.Model(event).Insert()
 		if err != nil {
-			common.Context().Log.Error().Msgf("GenericFile batch insertion failed on insert of event (%s) - %s. Error: %s", gf.Identifier, event.EventType, err.Error())
+			common.Context().Log.Error().Msgf("GenericFile batch insertion failed on insert of event (%s) - %d. Error: %s", gf.Identifier, event.EventType, err.Error())
 			return err
 		}
 	}

@@ -10,6 +10,30 @@ insert into schema_migrations ("version", started_at) values ('013_shrink_db_siz
 on conflict ("version") do update set started_at = now();
 
 --
+-- We need to remove the created_at and updated_at columns from the view first.
+DROP VIEW premis_events_view;
+CREATE VIEW public.premis_events_view
+AS SELECT pe.id,
+    pe.identifier,
+    pe.institution_id,
+    i.name AS institution_name,
+    pe.intellectual_object_id,
+    io.identifier AS intellectual_object_identifier,
+    pe.generic_file_id,
+    gf.identifier AS generic_file_identifier,
+    pe.event_type,
+    pe.date_time,
+    pe.detail,
+    pe.outcome,
+    pe.outcome_detail,
+    pe.outcome_information,
+    pe.object,
+    pe.agent
+   FROM premis_events pe
+     LEFT JOIN institutions i ON pe.institution_id = i.id
+     LEFT JOIN intellectual_objects io ON pe.intellectual_object_id = io.id
+     LEFT JOIN generic_files gf ON pe.generic_file_id = gf.id;
+
 alter table premis_events drop column created_at;
 alter table premis_events drop column updated_at;
 
@@ -17,7 +41,7 @@ alter table premis_events drop column old_uuid;
 
 -- alter table premis_events event_type; --
 
-alter table premis_events add COLUMN event_type_int smallint;
+/*alter table premis_events add COLUMN event_type_int smallint;
  
 -- IMPORTANT --
 -- TO DO: If there is a value in the current premis_events table --
@@ -97,6 +121,61 @@ create table if not exists event_type_lookup (
      id int primary key,
      event_type varchar not null
 );
+
+insert into event_type_lookup (id, event_type) values 
+(0, "No Event Type"),
+(1, "access assignment"),
+(2, "accession"),
+(3, "appraisal"),
+(4, "capture"),
+(5, "compiling"),
+(6, "compression"),
+(7, "creation"),
+(8, "deaccession"),
+(9, "decompression"),
+(10, "decryption"),
+(11, "deletion"),
+(12, "digital signature generation"),
+(13, "digital signature validation"),
+(14, "displaying"),
+(15, "dissemination"),
+(16, "encryption"),
+(17, "execution"),
+(18, "exporting"),
+(19, "extraction"),
+(20, "filename change"),
+(21, "fixity check"),
+(22, "forensic feature analysis"),
+(23, "format identification"),
+(24, "identifier assignment"),
+(25, "imaging"),
+(26, "information package creation"),
+(27, "information package merging"),
+(28, "information package splitting"),
+(29, "ingestion"),
+(30, "ingestion end"),
+(31, "ingestion start"),
+(32, "interpreting"),
+(33, "message digest calculation"),
+(34, "metadata extraction"),
+(35, "metadata modification"),
+(36, "migration"),
+(37, "modification"),
+(38, "normalization"),
+(39, "packing"),
+(40, "policy assignment"),
+(41, "printing"),
+(42, "quarantine"),
+(43, "recovery"),
+(44, "redaction"),
+(45, "refreshment"),
+(46, "rendering"),
+(47, "replication"),
+(48, "transfer"),
+(49, "unpacking"),
+(50, "unquarantine"),
+(51, "validation"),
+(52, "virus check");
 
 -- add foreign key restraint to event_type to map to event_type_lookup
 alter table premis_events add constraint event_type_fk FOREIGN KEY event_type REFERENCES event_type_lookup(id)
@@ -179,7 +258,7 @@ alter table checksums drop column updated_at;
 
 -- storage records url
 
-
+*/
 
 -- Now mark the migration as completed.
 update schema_migrations set finished_at = now() where "version" = '013_shrink_db_size';

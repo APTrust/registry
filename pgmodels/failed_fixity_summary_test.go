@@ -63,7 +63,6 @@ func addDummyFailures(t *testing.T) {
 				InstitutionID:        instID,
 				IntellectualObjectID: file.IntellectualObjectID,
 				Object:               0, // "Go language crypto/sha256",
-				OldUUID:              "",
 				Outcome:              "Failed",
 				OutcomeDetail:        "Yadda yadda",
 				OutcomeInformation:   "Not a real failure. This is test data.",
