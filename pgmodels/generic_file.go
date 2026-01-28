@@ -223,13 +223,13 @@ func (gf *GenericFile) saveEventsTx(tx *pg.Tx) error {
 		event.SetTimestamps()
 		validationErr := event.Validate()
 		if validationErr != nil {
-			common.Context().Log.Error().Msgf("GenericFile save failed on validation of event (%s) - %s. Error: %s", gf.Identifier, event.EventType, validationErr.Error())
+			common.Context().Log.Error().Msgf("GenericFile save failed on validation of event (%s) - %d. Error: %s", gf.Identifier, event.EventType, validationErr.Error())
 			return validationErr
 		}
 		// Premis events can only be inserted, not updated.
 		_, err := tx.Model(event).Insert()
 		if err != nil {
-			common.Context().Log.Error().Msgf("GenericFile batch insertion failed on insert of event (%s) - %s. Error: %s", gf.Identifier, event.EventType, err.Error())
+			common.Context().Log.Error().Msgf("GenericFile batch insertion failed on insert of event (%s) - %d. Error: %s", gf.Identifier, event.EventType, err.Error())
 			return err
 		}
 	}
@@ -435,11 +435,11 @@ func (gf *GenericFile) LastDeletionEvent() (*PremisEvent, error) {
 	return gf.lastEvent(constants.EventDeletion)
 }
 
-func (gf *GenericFile) lastEvent(eventType string) (*PremisEvent, error) {
+func (gf *GenericFile) lastEvent(eventType int) (*PremisEvent, error) {
 	query := NewQuery().
 		Where("generic_file_id", "=", gf.ID).
 		Where("event_type", "=", eventType).
-		OrderBy("created_at", "desc").
+		OrderBy("date_time", "desc").
 		Offset(0).
 		Limit(1)
 	return PremisEventGet(query)
@@ -520,7 +520,7 @@ func (gf *GenericFile) NewDeletionEvent() (*PremisEvent, error) {
 	}
 	now := time.Now().UTC()
 	return &PremisEvent{
-		Agent:                "APTrust preservation services",
+		Agent:                0, // "APTrust preservation services",
 		DateTime:             now,
 		Detail:               "All copies of this file have been deleted from preservation storage",
 		EventType:            constants.EventDeletion,
@@ -528,7 +528,7 @@ func (gf *GenericFile) NewDeletionEvent() (*PremisEvent, error) {
 		InstitutionID:        gf.InstitutionID,
 		IntellectualObjectID: gf.IntellectualObjectID,
 		GenericFileID:        gf.ID,
-		Object:               "Minio S3 library",
+		Object:               0, // "Minio S3 library",
 		Outcome:              constants.OutcomeSuccess,
 		OutcomeDetail:        deletionRequestView.RequestedByEmail,
 		OutcomeInformation:   fmt.Sprintf("File deleted at the request of %s. Institutional approver: %s. This event confirms all preservation copies have been deleted.", deletionRequestView.RequestedByEmail, deletionRequestView.ConfirmedByEmail),
