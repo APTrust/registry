@@ -87,8 +87,8 @@ github.com/go-gl/glfw v0.0.0-20190409004039-e6da0acd62b1/go.mod h1:vR7hzQXu2zJy9
 github.com/go-kit/kit v0.8.0/go.mod h1:xBxKIO96dXMWWy0MnWVtmwkA9/13aqxPnvrjFYMA2as=
 github.com/go-logfmt/logfmt v0.3.0/go.mod h1:Qt1PoO58o5twSAckw1HlFXLmHsOX5/0LbT9GBnD5lWE=
 github.com/go-logfmt/logfmt v0.4.0/go.mod h1:3RMwSq7FuexP4Kalkev3ejPJsZTpXXBr9+V4qmtdjCk=
-github.com/go-pg/pg/v10 v10.12.0 h1:rBmfDDHTN7FQW0OemYmcn5UuBy6wkYWgh/Oqt1OBEB8=
-github.com/go-pg/pg/v10 v10.12.0/go.mod h1:USA08CdIasAn0F6wC1nBf5nQhMHewVQodWoH89RPXaI=
+github.com/go-pg/pg/v10 v10.15.0 h1:6DQwbaxJz/e4wvgzbxBkBLiL/Uuk87MGgHhkURtzx24=
+github.com/go-pg/pg/v10 v10.15.0/go.mod h1:FIn/x04hahOf9ywQ1p68rXqaDVbTRLYlu4MQR0lhoB8=
 github.com/go-pg/zerochecker v0.2.0 h1:pp7f72c3DobMWOb2ErtZsnrPaSvHd2W4o9//8HtF4mU=
 github.com/go-pg/zerochecker v0.2.0/go.mod h1:NJZ4wKL0NmTtz0GKCoJ8kym6Xn/EQzXRl2OnAe7MmDo=
 github.com/go-playground/assert/v2 v2.2.0 h1:JvknZsQTYeFEAhQwI4qEt9cyV5ONwRHC+lYKSsYSR8s=

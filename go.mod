@@ -10,7 +10,7 @@ require (
 	github.com/gavv/httpexpect/v2 v2.14.0
 	github.com/gin-contrib/logger v0.0.2
 	github.com/gin-gonic/gin v1.9.1
-	github.com/go-pg/pg/v10 v10.12.0
+	github.com/go-pg/pg/v10 v10.15.0
 	github.com/go-redis/redis/v7 v7.4.1
 	github.com/google/uuid v1.2.0
 	github.com/gorilla/securecookie v1.1.1
