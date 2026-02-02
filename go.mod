@@ -1,8 +1,6 @@
 module github.com/APTrust/registry
 
-go 1.23.0
-
-toolchain go1.23.3
+go 1.24.11
 
 require (
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d
