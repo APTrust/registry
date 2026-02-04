@@ -73,7 +73,7 @@ publish: registry_login
 release: build publish ## Make a release by building and publishing the `{version}` as `latest` tagged containers to Gitlab
 
 push: ## Push the Docker image up to the registry
-	docker push  $(REGISTRY)/$(REPOSITORY)/$(TAG)-$(BRANCH)
+	docker push  aptrust/$(TAG)-$(BRANCH)
 
 update-template: ## Update Cloudformation template with latest container version
 	@echo "Overwriting container revision and branch from the CFN template to the CFN deployment YAML document."
