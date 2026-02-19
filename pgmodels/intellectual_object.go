@@ -140,7 +140,7 @@ func (obj *IntellectualObject) Delete() error {
 	if err != nil {
 		return err
 	}
-	deletionEvent.SetTimestamps()
+	// deletionEvent.SetTimestamps()
 	valErr = deletionEvent.Validate()
 	if valErr != nil {
 		return valErr

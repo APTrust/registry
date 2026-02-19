@@ -28,20 +28,22 @@ AS SELECT pe.id,
     pe.outcome_detail,
     pe.outcome_information,
     pe.object,
-    pe.agent
+    pe.agent,
+    pe.created_at,
+    pe.updated_at
    FROM premis_events pe
      LEFT JOIN institutions i ON pe.institution_id = i.id
      LEFT JOIN intellectual_objects io ON pe.intellectual_object_id = io.id
      LEFT JOIN generic_files gf ON pe.generic_file_id = gf.id;
 
-alter table premis_events drop column created_at;
-alter table premis_events drop column updated_at;
+-- alter table premis_events drop column created_at; --
+-- alter table premis_events drop column updated_at; --
 
 alter table premis_events drop column old_uuid;
 
 -- alter table premis_events event_type; --
 
-/*alter table premis_events add COLUMN event_type_int smallint;
+alter table premis_events add COLUMN event_type_int smallint;
  
 -- IMPORTANT --
 -- TO DO: If there is a value in the current premis_events table --
@@ -182,14 +184,14 @@ alter table premis_events add constraint event_type_fk FOREIGN KEY event_type RE
 
 -- lookup table for object in premis
 
-alter table premis_events add COLUMN object_int smallint;
+-- alter table premis_events add COLUMN object_int smallint;
  
 -- IMPORTANT --
 -- TO DO: If there is a value in the current premis_events table --
 -- for object that is NOT a match for any values in this function, --
 -- probably we need to abort and roll back. If it converts to a 0, --
 -- we will lose whatever information was in there. --
-create or replace function convert_event_objects()
+/* create or replace function convert_event_objects()
 returns void as $$
 begin
     update premis_events

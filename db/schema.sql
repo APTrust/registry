@@ -242,7 +242,7 @@ CREATE INDEX index_password_archivable ON public.old_passwords USING btree (pass
 CREATE TABLE public.premis_events (
 	id serial4 NOT NULL,
 	identifier varchar NULL,
-	event_type int NULL,
+	event_type varchar NULL,
 	date_time timestamp NULL,
 	outcome_detail varchar NULL,
 	detail varchar NULL,
