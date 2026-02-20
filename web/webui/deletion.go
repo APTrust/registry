@@ -148,9 +148,6 @@ func NewDeletionForReview(deletionRequestID int64, currentUser *pgmodels.User, b
 	if !common.ComparePasswords(del.DeletionRequest.EncryptedConfirmationToken, token) {
 		return nil, common.ErrInvalidToken
 	}
-	if err != nil {
-		return nil, err
-	}
 
 	err = del.loadInstAdmins()
 	return del, err
@@ -245,13 +242,13 @@ func (del *Deletion) initObjectDeletionRequest(institutionID int64, objIDs []int
 func (del *Deletion) CreateObjDeletionWorkItem(obj *pgmodels.IntellectualObject) error {
 	if del.DeletionRequest == nil || del.DeletionRequest.ID == 0 {
 		errMsg := "Cannot create deletion work item because deletion request id is zero."
-		common.Context().Log.Error().Msgf(errMsg)
-		return fmt.Errorf(errMsg)
+		common.Context().Log.Error().Msgf("%s", errMsg)
+		return fmt.Errorf("%s", errMsg)
 	}
 	common.Context().Log.Warn().Msgf("Creating deletion work item for object %d - %s", obj.ID, obj.Identifier)
 	workItem, err := pgmodels.NewDeletionItem(obj, nil, del.DeletionRequest.RequestedBy, del.DeletionRequest.ConfirmedBy, del.DeletionRequest.ID)
 	if err != nil {
-		common.Context().Log.Error().Msgf(err.Error())
+		common.Context().Log.Error().Msgf("%s", err.Error())
 		return err
 	}
 	common.Context().Log.Warn().Msgf("Created deletion work item %d with deletion request id %d", workItem.ID, workItem.DeletionRequestID)
