@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"strings"
 
 	"github.com/nsqio/nsq/nsqd"
 	"github.com/rs/zerolog"
@@ -63,7 +64,7 @@ func (data *NSQStatsData) ClientIsRunning(hostname string) bool {
 	for _, topic := range data.Topics {
 		for _, channel := range topic.Channels {
 			for _, client := range channel.Clients {
-				if client.Hostname == hostname {
+				if strings.Contains(client.String(), hostname) {
 					return true
 				}
 			}
