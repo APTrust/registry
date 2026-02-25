@@ -16,6 +16,8 @@ const (
 	ActionRestoreFile          = "Restore File"
 	ActionGlacierRestore       = "Glacier Restore"
 	ActionIngest               = "Ingest"
+	ActionMove                 = "Move"
+	ActionMoveOutOfGlacier     = "Move From Glacier"
 	ActionRead                 = "Read"
 	ActionRequestDelete        = "RequestDelete"
 	ActionRestoreObject        = "Restore Object"
@@ -131,6 +133,8 @@ const (
 	TopicFileRestore           = "restore_file"
 	TopicFixity                = "fixity_check"
 	TopicGlacierRestore        = "restore_glacier"
+	TopicMove                  = "move"
+	TopicMoveFromGlacier       = "move_from_glacier"
 	TopicObjectRestore         = "restore_object"
 	TwoFactorAuthy             = "onetouch"
 	TwoFactorNone              = "none"
@@ -297,6 +301,8 @@ var WorkItemActions = []string{
 	ActionDelete,
 	ActionGlacierRestore,
 	ActionIngest,
+	ActionMove,
+	ActionMoveOutOfGlacier,
 	ActionRestoreFile,
 	ActionRestoreObject,
 }
@@ -343,6 +349,10 @@ func TopicFor(action, stage string) (string, error) {
 		topic = TopicObjectRestore
 	case ActionIngest:
 		topic = NSQIngestTopicFor[stage]
+	case ActionMove:
+		topic = TopicMove
+	case ActionMoveOutOfGlacier:
+		topic = TopicMoveFromGlacier
 	default:
 		topic = ""
 	}

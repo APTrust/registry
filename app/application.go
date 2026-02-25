@@ -201,6 +201,8 @@ func initRoutes(router *gin.Engine) {
 		webRoutes.GET("/objects/show/:id", webui.IntellectualObjectShow)
 		webRoutes.GET("/objects/request_delete/:id", webui.IntellectualObjectRequestDelete)
 		webRoutes.POST("/objects/init_delete/:id", webui.IntellectualObjectInitDelete)
+		webRoutes.GET("/objects/request_move/:id", webui.IntellectualObjectRequestMove)
+		webRoutes.POST("/objects/init_move/:id", webui.IntellectualObjectInitMove)
 		webRoutes.GET("/objects/request_restore/:id", webui.IntellectualObjectRequestRestore)
 		webRoutes.POST("/objects/init_restore/:id", webui.IntellectualObjectInitRestore)
 		webRoutes.GET("/objects/events/:id", webui.IntellectualObjectEvents)

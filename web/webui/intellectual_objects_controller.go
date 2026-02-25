@@ -47,6 +47,42 @@ func IntellectualObjectInitDelete(c *gin.Context) {
 	c.HTML(http.StatusCreated, "objects/deletion_requested.html", req.TemplateData)
 }
 
+// IntellectualObjectRequestMove shows a message asking if the user
+// really wants to move this object.
+// GET /objects/request_move/:id
+func IntellectualObjectRequestMove(c *gin.Context) {
+	req := NewRequest(c)
+	obj, err := pgmodels.IntellectualObjectViewByID(req.Auth.ResourceID)
+	if AbortIfError(c, err) {
+		return
+	}
+	req.TemplateData["object"] = obj
+	req.TemplateData["error"] = err
+	c.HTML(http.StatusOK, "objects/_request_move.html", req.TemplateData)
+}
+
+// IntellectualObjectInitMove creates an object move request,
+// which is really just a WorkItem that gets queued. Transfer can take
+// seconds or hours, depending on where the object is stored and how big it is.
+// POST /objects/init_move/:id
+func IntellectualObjectInitMove(c *gin.Context) {
+	req := NewRequest(c)
+	c.Set("showErrorInModal", true)
+	obj, err := pgmodels.IntellectualObjectByID(req.Auth.ResourceID)
+	if AbortIfError(c, err) {
+		return
+	}
+
+	_, err = InitObjectMove(obj, req.CurrentUser)
+	if AbortIfError(c, err) {
+		return
+	}
+
+	// Respond
+	req.TemplateData["objIdentifier"] = obj.Identifier
+	c.HTML(http.StatusCreated, "objects/move_requested.html", req.TemplateData)
+}
+
 // IntellectualObjectRequestRestore shows a message asking if the user
 // really wants to delete this object.
 // GET /objects/request_restore/:id
@@ -229,6 +265,39 @@ func loadEvents(req *Request, objID int64) error {
 	req.TemplateData["events"] = events
 	req.TemplateData["eventPager"] = pager
 	return err
+}
+
+func InitObjectMove(obj *pgmodels.IntellectualObject, user *pgmodels.User) (*pgmodels.WorkItem, error) {
+	// Make sure there are no pending work items...
+	pendingWorkItems, err := pgmodels.WorkItemsPendingForObject(obj.InstitutionID, obj.BagName)
+	if err != nil {
+		return nil, err
+	}
+	if len(pendingWorkItems) > 0 {
+		return nil, common.ErrPendingWorkItems
+	}
+
+	// Create the new move work item
+	workItem, err := pgmodels.NewMoveItem(obj, nil, user)
+	if err != nil {
+		return nil, err
+	}
+
+	// Queue the new work item in NSQ
+	topic, err := constants.TopicFor(workItem.Action, workItem.Stage)
+	if err != nil {
+		return nil, err
+	}
+
+	ctx := common.Context()
+	err = ctx.NSQClient.Enqueue(topic, workItem.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	workItem.QueuedAt = time.Now().UTC()
+	err = workItem.Save()
+	return workItem, err
 }
 
 func InitObjectRestoration(obj *pgmodels.IntellectualObject, user *pgmodels.User) (*pgmodels.WorkItem, error) {

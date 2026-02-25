@@ -467,6 +467,41 @@ func NewItemFromLastSuccessfulIngest(objID int64) (*WorkItem, error) {
 	return newItem, err
 }
 
+// NewMoveItem creates and saves a new WorkItem
+// for an object transfer.
+//
+// Param obj (required) is the object to be moved.
+// Param user is the
+// user initiating the restoration.
+//
+// Before creating a move WorkItem, the caller should ensure
+// that the object has no pending work items. See
+// WorkItemsPendingForObject().
+func NewMoveItem(obj *IntellectualObject, gf *GenericFile, user *User) (*WorkItem, error) {
+	if obj == nil {
+		return nil, common.ErrInvalidParam
+	}
+
+	moveItem, err := NewItemFromLastSuccessfulIngest(obj.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	// Figure out the move type. This determines which
+	// queue it will go into and which worker will handle it.
+	if obj.IsGlacierOnly() {
+		moveItem.Action = constants.ActionMoveOutOfGlacier
+	} else {
+		// TODO: Test, because this should resolve https://trello.com/c/GirQ712I
+		// If so, close that out.
+		moveItem.Action = constants.ActionMove
+	}
+
+	moveItem.User = user.Email
+	err = moveItem.Save()
+	return moveItem, err
+}
+
 // NewRestorationItem creates and saves a new WorkItem
 // for an object or file restoration.
 //

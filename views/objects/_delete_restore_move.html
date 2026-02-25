@@ -1,4 +1,4 @@
-{{ define "objects/_delete_restore.html" }}
+{{ define "objects/_delete_restore_move.html" }}
 
 <div class="is-flex is-justify-content-space-between mb-5">
     {{ if userCan .CurrentUser "IntellectualObjectRequestDelete" .object.InstitutionID }}
@@ -16,6 +16,14 @@
       <button class="button" disabled title="Object cannot be restored until pending work items are complete." data-modal="modal-one" data-xhr-url="/objects/request_restore/{{ .object.ID }}">Restore</button>
       {{ else }}
         <button class="button is-primary" data-modal="modal-one" data-xhr-url="/objects/request_restore/{{ .object.ID }}">Restore</button>
+      {{ end }}
+    {{ end }}
+
+    {{ if userCan .CurrentUser "IntellectualObjectMove" .object.InstitutionID }}
+      {{ if .hasPendingWorkItems }}
+      <button class="button" disabled title="Object cannot be moved until pending work items are complete." data-modal="modal-one" data-xhr-url="/objects/request_move/{{ .object.ID }}">Move</button>
+      {{ else }}
+        <button class="button is-primary" data-modal="modal-one" data-xhr-url="/objects/request_move/{{ .object.ID }}">Move</button>
       {{ end }}
     {{ end }}
 

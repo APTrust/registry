@@ -23,6 +23,7 @@ func TestPermissions(t *testing.T) {
 	assert.True(t, constants.CheckPermission(constants.RoleInstAdmin, constants.FileRestore))
 	assert.True(t, constants.CheckPermission(constants.RoleInstAdmin, constants.IntellectualObjectRequestDelete))
 	assert.True(t, constants.CheckPermission(constants.RoleInstAdmin, constants.IntellectualObjectRestore))
+	assert.True(t, constants.CheckPermission(constants.RoleInstAdmin, constants.IntellectualObjectMove))
 
 	assert.False(t, constants.CheckPermission(constants.RoleInstAdmin, constants.EventDelete))
 	assert.False(t, constants.CheckPermission(constants.RoleInstAdmin, constants.ChecksumUpdate))

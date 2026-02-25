@@ -34,7 +34,7 @@
     <!-- Top Right Box: Buttons and events -->
     <div class="column is-one-third">
         {{ if eq .object.State "A" }}
-        {{ template "objects/_delete_restore.html" . }}
+        {{ template "objects/_delete_restore_move.html" . }}
         {{ end }}
       
         {{ template "objects/_events.html" . }}

@@ -52,6 +52,7 @@ const (
 	IntellectualObjectCreate           = "IntellectualObjectCreate"
 	IntellectualObjectDelete           = "IntellectualObjectDelete"
 	IntellectualObjectFinishBulkDelete = "IntellectualObjectFinishBulkDelete"
+	IntellectualObjectMove             = "IntellectualObjectMove"
 	IntellectualObjectRead             = "IntellectualObjectRead"
 	IntellectualObjectRequestDelete    = "IntellectualObjectRequestDelete"
 	IntellectualObjectRestore          = "IntellectualObjectRestore"
@@ -131,6 +132,7 @@ var Permissions = []Permission{
 	IntellectualObjectCreate,
 	IntellectualObjectDelete,
 	IntellectualObjectFinishBulkDelete,
+	IntellectualObjectMove,
 	IntellectualObjectRead,
 	IntellectualObjectRequestDelete,
 	IntellectualObjectRestore,
@@ -258,6 +260,7 @@ func initPermissions() {
 	instAdmin[InstitutionRead] = true
 	instAdmin[InstitutionUpdatePrefs] = true
 	instAdmin[IntellectualObjectDelete] = true
+	instAdmin[IntellectualObjectMove] = true
 	instAdmin[IntellectualObjectRead] = true
 	instAdmin[IntellectualObjectRequestDelete] = true
 	instAdmin[IntellectualObjectRestore] = true
@@ -320,6 +323,7 @@ func initPermissions() {
 	sysAdmin[IntellectualObjectCreate] = true
 	sysAdmin[IntellectualObjectDelete] = true           // preserv workers do this with sys admin account
 	sysAdmin[IntellectualObjectFinishBulkDelete] = true // not implemented yet
+	sysAdmin[IntellectualObjectMove] = true
 	sysAdmin[IntellectualObjectRead] = true
 	sysAdmin[IntellectualObjectRequestDelete] = false // inst admin only
 	sysAdmin[IntellectualObjectRestore] = true

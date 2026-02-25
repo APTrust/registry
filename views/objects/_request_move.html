@@ -1,0 +1,55 @@
+{{ define "objects/_request_move.html" }}
+
+<div class="modal-detail">
+  <div id="modalTitle" class="modal-title-row is-flex is-justify-content-space-between is-align-items-center">
+    <h2>Move Object</h2>
+    <a class="modal-exit is-grey-dark" href="#">
+      <span class="material-icons" aria-hidden="true">close</span>
+      <span class="is-sr-only">Close</span>
+    </a>
+  </div>
+
+  <div class="modal-content">
+    <p class="mb-3">Select a storage class and location from the dropdown below. When you click on Confirm, this object will be moved to the storage class and location you have chosen here.</p>
+    <p class="mb-3">Your storage costs for this item may change after it is moved to a different storage class or location. Please check current costs for the desired storage class and location before you Confirm this action.</p>
+    <p class="mb-3">You may not Restore, Delete or Move this object while it is in transit. All files in this object will be moved together. If an unrecoverable error is encountered, the Move will automatically rollback, and errors will be logged in the Work Item.</p>
+    <p class="mb-5">Transfer times vary. Large objects take longer than smaller objects. Items moving from Glacier and Glacier Deep Archive take longer than items moving from S3.</p>
+
+    <p>Source: {{ .object.StorageOption }}</p>
+    <div class="column">
+      Destination:
+          {{ template "forms/select.html" .filterForm.Fields.storage_option }}
+    </div>
+
+    Object Details:
+    <dl class="data-list mb-3">
+      <dt>Identifier</dt>
+      <dd>{{ .object.Identifier }}</dd>
+
+      <dt>Bag Group Identifier</dt>
+      <dd>{{ .object.BagGroupIdentifier }}</dd>
+
+      <dt>Alt Identifier</dt>
+      <dd>{{ .object.AltIdentifier }}</dd>
+
+      <dt>File</dt>
+      <dd>{{ .object.FileCount }} files / {{ humanSize .object.Size }}</dd>
+
+      <dt>Description</dt>
+      <dd>{{ truncate .object.Description 200 }}</dd>
+
+    </dl>
+
+    <div class="is-flex">
+        <button class="button modal-exit mr-5">Cancel</button>
+        <button class="button is-primary" data-modal-post-form="objMoveForm" data-modal-post-target="modal-one">Confirm</button>
+    </div>
+  
+    <form method="post" id="objMoveForm" action="/objects/init_move/{{ .object.ID }}">
+      <input type="hidden" name="id" value="{{ .object.ID }}"/>
+      {{ template "forms/csrf_token.html" . }}
+    </form>
+  </div>
+</div>
+
+{{ end }}

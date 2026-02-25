@@ -1,0 +1,28 @@
+{{ define "objects/move_requested.html" }}
+
+
+<div class="modal-detail">
+  <div id="modalTitle" class="modal-title-row is-flex is-justify-content-space-between is-align-items-center">
+    <h2>Move Requested</h2>
+    <a class="modal-exit is-grey-dark" href="#">
+      <span class="material-icons" aria-hidden="true">close</span>
+      <span class="is-sr-only">Close</span>
+    </a>
+  </div>
+
+  <div class="modal-content">
+
+    <p class="mb-3">Object <b>{{ .objIdentifier }}</b> has been queued to move.</p>
+
+    <p class="mb-3">This object will be moved to (insert option here). Transit time
+        depends on object size (larger items take longer to move) and origin storage option (items currently in Glacier
+        and Glacier Deep Archive take longer to move).
+    </p>
+
+    <div class="is-flex">
+      <button class="button modal-exit mr-5">OK</button>
+    </div>      
+  </div>
+</div>
+
+{{ end }}
