@@ -160,7 +160,7 @@ type User struct {
 	// push, so they can login with one-touch. Anything else means SMS,
 	// but call IsTwoFactorUser() to make sure they're actually require
 	// two-factor auth before trying to text them.
-	AuthyStatus string `json:"authy_status" pg:"authy_status"`
+	MFAStatus string `json:"authy_status" pg:"authy_status"`
 
 	// EmailVerified will be true once the system has verified that the
 	// user's email address is correct.
