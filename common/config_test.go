@@ -61,7 +61,6 @@ func TestNewConfig(t *testing.T) {
 	config.Email.SesUser = "mask-me-sesuser"
 	config.Email.SesPassword = "mask-me-pwd-ses"
 	config.Redis.Password = "mask-me-pwd-redis"
-	config.TwoFactor.AuthyAPIKey = "mask-me-authy"
 	config.TwoFactor.SNSUser = "user-1234"
 	config.TwoFactor.SNSPassword = "password-5678"
 	config.TwoFactor.SNSEndpoint = "sns.example.com:886"
@@ -177,8 +176,6 @@ var expectedConfigJson = `{
   },
   "NsqUrl": "http://localhost:4151",
   "TwoFactor": {
-    "AuthyEnabled": false,
-    "AuthyAPIKey": "****thy",
     "AWSRegion": "",
     "SMSEnabled": false,
     "OTPExpiration": 900000000000,

@@ -61,14 +61,12 @@ type LoggingConfig struct {
 }
 
 // TwoFactorConfig contains info for sending push messages
-// through Authy and SMS text messages through AWS SNS.
+// through SMS text messages through AWS SNS.
 // If SNSEndpoint is empty, we'll use the default public
 // SNS endpoint for the specified region. If non-empty,
 // we'll use the explicit SNSEndpoint. Should be non-empty
 // if we're on a private subnet without a NAT gateway.
 type TwoFactorConfig struct {
-	AuthyEnabled  bool
-	AuthyAPIKey   string
 	AWSRegion     string
 	SMSEnabled    bool
 	OTPExpiration time.Duration
@@ -276,8 +274,6 @@ func loadConfig() *Config {
 		EmailServiceType: emailServiceType,
 		MaintenanceMode:  v.GetBool("MAINTENANCE_MODE"),
 		TwoFactor: &TwoFactorConfig{
-			AuthyAPIKey:   v.GetString("AUTHY_API_KEY"),
-			AuthyEnabled:  v.GetBool("ENABLE_TWO_FACTOR_AUTHY"),
 			AWSRegion:     v.GetString("AWS_REGION"),
 			SMSEnabled:    v.GetBool("ENABLE_TWO_FACTOR_SMS"),
 			OTPExpiration: v.GetDuration("OTP_EXPIRATION"),
@@ -385,7 +381,6 @@ func (config *Config) ToJSON() (string, error) {
 	copyOfConfig.Email.SesUser = maskString(config.Email.SesUser)
 	copyOfConfig.Email.SesPassword = maskString(config.Email.SesPassword)
 	copyOfConfig.Redis.Password = maskString(config.Redis.Password)
-	copyOfConfig.TwoFactor.AuthyAPIKey = maskString(config.TwoFactor.AuthyAPIKey)
 	copyOfConfig.TwoFactor.SNSUser = maskString(config.TwoFactor.SNSUser)
 	copyOfConfig.TwoFactor.SNSPassword = maskString(config.TwoFactor.SNSPassword)
 

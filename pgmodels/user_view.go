@@ -35,8 +35,6 @@ type UserView struct {
 	DeactivatedAt          time.Time `json:"deactivated_at" pg:"deactivated_at"`
 	EnabledTwoFactor       bool      `json:"enabled_two_factor" pg:"enabled_two_factor"`
 	ConfirmedTwoFactor     bool      `json:"confirmed_two_factor" pg:"confirmed_two_factor"`
-	AuthyID                string    `json:"-" pg:"authy_id"`
-	LastSignInWithAuthy    time.Time `json:"last_sign_in_with_authy" pg:"last_sign_in_with_authy"`
 	MFAStatus              string    `json:"authy_status" pg:"authy_status"`
 	EmailVerified          bool      `json:"email_verified" pg:"email_verified"`
 	InitialPasswordUpdated bool      `json:"initial_password_updated" pg:"initial_password_updated"`
