@@ -150,7 +150,7 @@ type User struct {
 	// MFA. The current only option is SMS,
 	// but call IsTwoFactorUser() to make sure they're actually require
 	// two-factor auth before trying to text them.
-	MFAStatus string `json:"authy_status" pg:"authy_status"`
+	MFAStatus string `json:"mfa_status" pg:"mfa_status"`
 
 	// EmailVerified will be true once the system has verified that the
 	// user's email address is correct.

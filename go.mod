@@ -8,7 +8,6 @@ require (
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d
 	github.com/aws/aws-sdk-go v1.49.23
 	github.com/brianvoe/gofakeit/v6 v6.9.0
-	github.com/dcu/go-authy v1.0.1
 	github.com/gavv/httpexpect/v2 v2.14.0
 	github.com/gin-contrib/logger v0.0.2
 	github.com/gin-gonic/gin v1.9.1
@@ -45,8 +44,6 @@ require (
 	github.com/go-playground/validator/v10 v10.14.0 // indirect
 	github.com/gobwas/glob v0.2.3 // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
-	github.com/gojektech/heimdall v5.0.2+incompatible // indirect
-	github.com/gojektech/valkyrie v0.0.0-20190210220504-8f62c1e7ba45 // indirect
 	github.com/golang/protobuf v1.5.0 // indirect
 	github.com/golang/snappy v0.0.3 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
@@ -70,7 +67,6 @@ require (
 	github.com/nsqio/go-nsq v1.0.7 // indirect
 	github.com/pelletier/go-toml v1.2.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.8 // indirect
-	github.com/pkg/errors v0.8.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/sanity-io/litter v1.5.5 // indirect
 	github.com/sergi/go-diff v1.0.0 // indirect
