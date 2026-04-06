@@ -239,7 +239,7 @@ func (client *NSQClient) applyToAll(action string) error {
 		}
 	}
 	if len(errMsg) > 0 {
-		err = fmt.Errorf(errMsg)
+		err = fmt.Errorf("%s", errMsg)
 	}
 	return err
 }
