@@ -173,8 +173,6 @@ func TestUserTwoComplete2FASetup(t *testing.T) {
 	// These have been manually tested. Automated tests cover only
 	// a few cases.
 
-	aptContext := common.Context()
-
 	// Submit with no change
 	expect := testutil.Inst1UserClient.POST("/users/2fa_setup").
 		WithHeader("Referer", testutil.BaseURL).
