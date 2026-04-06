@@ -6,14 +6,12 @@
 insert into schema_migrations ("version", started_at) values ('013_remove_authy', now())
 on conflict ("version") do update set started_at = now();
 
-alter table public.users	drop column authy_id;
-alter table public.users drop column last_sign_in_with_authy;
-alter table public.users drop column authy_status varchar NULL;
+-- Add a generic MFA status column to replace the Authy one.
 alter table public.users add column mfa_status varchar NULL;
 
-drop index index_users_on_authy_id on public.users;
-
-CREATE OR REPLACE VIEW public.users_view
+-- Drop and recreate the user view
+drop view public.users_view;
+CREATE VIEW public.users_view
 AS SELECT u.id,
     u.name,
     u.email,
@@ -55,6 +53,14 @@ AS SELECT u.id,
    FROM users u
      LEFT JOIN institutions i ON u.institution_id = i.id
      LEFT JOIN institutions i2 ON i.member_institution_id = i2.id;
+
+-- Drop Authy columns.
+alter table public.users	drop column if exists authy_id;
+alter table public.users drop column if exists last_sign_in_with_authy;
+alter table public.users drop column if exists authy_status;
+
+-- Drop Authy index.
+drop index if exists index_users_on_authy_id;
 
 -- Now mark the migration as completed.
 update schema_migrations set finished_at = now() where "version" = '013_remove_authy';
