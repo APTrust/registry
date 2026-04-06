@@ -36,7 +36,7 @@ func AuthorizeResource(c *gin.Context) *ResourceAuthorization {
 		ginCtx: c,
 	}
 	r.init()
-	common.ConsoleDebug(r.String())
+	common.ConsoleDebug("%s", r.String())
 	return r
 }
 
@@ -103,9 +103,7 @@ func (r *ResourceAuthorization) readRequestIds() {
 		idStr := r.ginCtx.Param("id")
 		// Not sure why we sometimes get this leading slash.
 		// It's dirty, and we should fix it.
-		if strings.HasPrefix(idStr, "/") {
-			idStr = idStr[1:]
-		}
+		idStr = strings.TrimPrefix(idStr, "/")
 		r.ResourceIdentifier = idStr
 		r.ResourceID, r.Error = r.idFromIdentifier()
 	}

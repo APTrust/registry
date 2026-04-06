@@ -301,7 +301,7 @@ func loadConfig() *Config {
 		RetentionMinimum: &RetentionMinimum{
 			Glacier:     v.GetInt("RETENTION_MINIMUM_GLACIER"),
 			GlacierDeep: v.GetInt("RETENTION_MINIMUM_GLACIER_DEEP"),
-			Wasabi:      v.GetInt("RETENTION_MINIMUM_WASABI"),
+			Wasabi:      v.GetInt("RETENTION_MINIMUM_NEWSTORAGEOPTION"),
 			Standard:    v.GetInt("RETENTION_MINIMUM_STANDARD"),
 		},
 	}

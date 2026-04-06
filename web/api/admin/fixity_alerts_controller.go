@@ -3,11 +3,13 @@ package admin_api
 import (
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/pgmodels"
+	"github.com/APTrust/registry/web/api"
 	"github.com/gin-gonic/gin"
 )
 
@@ -20,18 +22,18 @@ import (
 func GenerateFailedFixityAlerts(c *gin.Context) {
 	ctx := common.Context()
 	ctx.Log.Info().Msg("Received request to generate failed fixity alerts.")
-	type Response struct {
-		Error     string                          `json:"error"`
-		Summaries []*pgmodels.FailedFixitySummary `json:"summaries"`
-	}
-	response := Response{}
+
+	response := &api.JsonList{}
 
 	// Find out when this process was last run.
 	lastRunDate, err := FailedFixityLastRunDate()
 	if err != nil {
 		ctx.Log.Error().Msgf("Could not get last run date for failed fixity alerts: %v", err)
-		response.Error = err.Error()
-		c.JSON(http.StatusInternalServerError, response)
+		reqError := api.RequestError{
+			StatusCode: http.StatusInternalServerError,
+			Error:      err.Error(),
+		}
+		c.JSON(http.StatusInternalServerError, reqError)
 		return
 	}
 
@@ -40,8 +42,11 @@ func GenerateFailedFixityAlerts(c *gin.Context) {
 	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.UTC)
 	if lastRunDate.Equal(today) {
 		ctx.Log.Info().Msgf("Not generating failed fixity alerts because they were last generated on %v", lastRunDate)
-		response.Error = "Note: failed fixity alerts have already been generated today. Controller is returning without running them again."
-		c.JSON(http.StatusConflict, response)
+		reqError := api.RequestError{
+			StatusCode: http.StatusConflict,
+			Error:      "Note: failed fixity alerts have already been generated today. Controller is returning without running them again.",
+		}
+		c.JSON(http.StatusConflict, reqError)
 		return
 	}
 
@@ -49,12 +54,15 @@ func GenerateFailedFixityAlerts(c *gin.Context) {
 	summaries, err := pgmodels.FailedFixitySummarySelect(lastRunDate, now)
 	if err != nil {
 		ctx.Log.Error().Msgf("Error querying for failed fixity alerts: %v", err)
-		response.Error = err.Error()
-		c.JSON(http.StatusInternalServerError, response)
+		reqError := api.RequestError{
+			StatusCode: http.StatusInternalServerError,
+			Error:      err.Error(),
+		}
+		c.JSON(http.StatusInternalServerError, reqError)
 		return
 	}
 	ctx.Log.Info().Msgf("Result: failed fixity check query returned %d summaries", len(summaries))
-	response.Summaries = summaries
+	response.Results = summaries
 
 	// Generate a fixity failure alert for each institution.
 	// If there's an error in the alert generation process,
@@ -63,20 +71,28 @@ func GenerateFailedFixityAlerts(c *gin.Context) {
 	// being sent.
 	for _, summary := range summaries {
 		ctx.Log.Info().Msgf("%s has %d failed fixity checks between %s and %s", summary.InstitutionName, summary.Failures, lastRunDate.Format(time.RFC3339), now.Format(time.RFC3339))
-		err = GenerateFailedFixityAlert(summary, lastRunDate)
+		err = GenerateFailedFixityAlert(c.Request.Host, summary, lastRunDate)
 		if err != nil {
-			response.Error = fmt.Sprintf("%s; %s", response.Error, err.Error())
+			// Log this error, but keep going, so other institutions
+			// can get their alerts.
+			errMsg := fmt.Sprintf("Error generating failed fixity alert for institution %s: %v", summary.InstitutionName, err)
+			ctx.Log.Error().Msg(errMsg)
+			summary.Error = errMsg
 		}
+		response.Count += int(summary.Failures)
 	}
 
 	// Generate only one report for APTrust admins. This will
 	// include all failures at all institutions, and the embedded
 	// link will show them all.
-	err = AlertAPTrustOfFailedFixities(summaries, lastRunDate)
+	err = AlertAPTrustOfFailedFixities(c.Request.Host, summaries, lastRunDate)
 	if err != nil {
 		ctx.Log.Error().Msgf("Error generating failed fixity alerts for APTrust admins: %v", err)
-		response.Error = err.Error()
-		c.JSON(http.StatusInternalServerError, response)
+		reqError := api.RequestError{
+			StatusCode: http.StatusInternalServerError,
+			Error:      err.Error(),
+		}
+		c.JSON(http.StatusInternalServerError, reqError)
 		return
 	}
 
@@ -87,9 +103,11 @@ func GenerateFailedFixityAlerts(c *gin.Context) {
 		ctx.Log.Info().Msgf("Set last failed fixity run date in DB to %s", now.Format(time.RFC3339))
 	}
 
-	if len(response.Summaries) > 0 {
+	if response.Count > 0 {
+		ctx.Log.Info().Msgf("Responding to client with HTTP status 201 because we created alerts for %d institutions", len(summaries))
 		c.JSON(http.StatusCreated, response)
 	} else {
+		ctx.Log.Info().Msg("Responding to client with HTTP status 200 because we didn't create any alerts.")
 		c.JSON(http.StatusOK, response)
 	}
 }
@@ -131,12 +149,13 @@ func SetFailedFixityLastRunDate(ts time.Time) error {
 	} else if err != nil {
 		return err
 	}
+	metadata.Value = ts.Format(time.RFC3339)
 	return metadata.Save()
 }
 
 // GenerateFailedFixityAlert creates fixity failure alerts
 // for each admin at the institution in summary.InstitutionID.
-func GenerateFailedFixityAlert(summary *pgmodels.FailedFixitySummary, lastRunDate time.Time) error {
+func GenerateFailedFixityAlert(hostname string, summary *pgmodels.FailedFixitySummary, lastRunDate time.Time) error {
 	ctx := common.Context()
 	ctx.Log.Info().Msgf("Generating failed fixity alert for %s with %d failures.", summary.InstitutionName, summary.Failures)
 
@@ -163,7 +182,7 @@ func GenerateFailedFixityAlert(summary *pgmodels.FailedFixitySummary, lastRunDat
 	alertData := map[string]interface{}{
 		"StartDate": lastRunDate.Format("2006-01-02"),
 		"EndDate":   today.Format("2006-01-02"),
-		"AlertURL":  FailedFixityReportURL(institution.ID, lastRunDate, today),
+		"AlertURL":  FailedFixityReportURL(hostname, institution.ID, lastRunDate, today.Add(24*time.Hour)),
 	}
 
 	alert, err = pgmodels.CreateAlert(alert, "alerts/failed_fixity.txt", alertData)
@@ -179,7 +198,7 @@ func GenerateFailedFixityAlert(summary *pgmodels.FailedFixitySummary, lastRunDat
 	return nil
 }
 
-func AlertAPTrustOfFailedFixities(summaries []*pgmodels.FailedFixitySummary, lastRunDate time.Time) error {
+func AlertAPTrustOfFailedFixities(hostname string, summaries []*pgmodels.FailedFixitySummary, lastRunDate time.Time) error {
 	if len(summaries) == 0 {
 		return nil
 	}
@@ -205,9 +224,21 @@ func AlertAPTrustOfFailedFixities(summaries []*pgmodels.FailedFixitySummary, las
 		return err
 	}
 
-	aptrustAdmins, err := institution.GetAdmins()
+	// Get a list of APTrust admins, except for the system@aptrust.org user,
+	// because that's a service account, not a real person.
+	query := pgmodels.NewQuery().
+		Where("institution_id", "=", institution.ID).
+		Where("email", "!=", constants.SystemUser).
+		IsNull("deactivated_at")
+	ctx.Log.Info().Msgf("Looking for APTrust admins by selecting from users table WHERE %s", query.WhereClause())
+
+	aptrustAdmins, err := pgmodels.UserSelect(query)
 	if err != nil {
 		ctx.Log.Error().Msgf("Error getting list of APTrust admins for admin/ops email: %v", err)
+		return err
+	}
+	if len(aptrustAdmins) == 0 {
+		ctx.Log.Error().Msg("Error getting list of APTrust admins: query returned no users, which should be impossible.")
 		return err
 	}
 
@@ -216,7 +247,7 @@ func AlertAPTrustOfFailedFixities(summaries []*pgmodels.FailedFixitySummary, las
 	alertData := map[string]interface{}{
 		"StartDate": lastRunDate.Format("2006-01-02"),
 		"EndDate":   today.Format("2006-01-02"),
-		"AlertURL":  FailedFixityReportURL(0, lastRunDate, today),
+		"AlertURL":  FailedFixityReportURL(hostname, 0, lastRunDate, today.Add(24*time.Hour)),
 	}
 
 	alert, err = pgmodels.CreateAlert(alert, "alerts/failed_fixity.txt", alertData)
@@ -259,27 +290,27 @@ func GetFailedFixityEvents(institutionID int64, lastRunDate time.Time) ([]*pgmod
 // with pre-applied filters to display failed fixity checks for
 // the specified institution between the report's last run date
 // and today.
-func FailedFixityReportURL(institutionID int64, lastRunDate, currentRunDate time.Time) string {
-	var domainAndPort string
-	environment := common.Context().Config.EnvName
-	switch environment {
-	case "prod":
-		domainAndPort = "repo.aptrust.org"
-	case "demo":
-		domainAndPort = "demo.aptrust.org"
-	case "staging":
-		domainAndPort = "staging.aptrust.org"
-	default:
-		domainAndPort = "localhost:8080"
-	}
+//
+// Note that to correctly display fixity failures in this
+// date range, we need to add one day to end date because
+// some events occurred after midnight on the end date.
+func FailedFixityReportURL(hostname string, institutionID int64, lastRunDate, currentRunDate time.Time) string {
 	startDateString := lastRunDate.Format("2006-01-02")
 	endDateString := currentRunDate.Format("2006-01-02")
+	correctedHostName := hostname
+	if strings.Contains(hostname, ".demo") {
+		correctedHostName = "demo.aptrust.org"
+	} else if strings.Contains(hostname, ".staging") {
+		correctedHostName = "staging.aptrust.org"
+	} else if strings.Contains(hostname, ".prod") || strings.Contains(hostname, ".repo") {
+		correctedHostName = "repo.aptrust.org"
+	}
 	if institutionID == 0 {
 		return fmt.Sprintf(
 			"%s://%s/events?event_type=fixity+check&outcome=Failed&date_time__gteq=%s&date_time__lteq=%s",
-			common.Context().Config.HTTPScheme(), domainAndPort, startDateString, endDateString)
+			common.Context().Config.HTTPScheme(), correctedHostName, startDateString, endDateString)
 	}
 	return fmt.Sprintf(
 		"%s://%s/events?event_type=fixity+check&outcome=Failed&institution_id=%d&date_time__gteq=%s&date_time__lteq=%s",
-		common.Context().Config.HTTPScheme(), domainAndPort, institutionID, startDateString, endDateString)
+		common.Context().Config.HTTPScheme(), correctedHostName, institutionID, startDateString, endDateString)
 }

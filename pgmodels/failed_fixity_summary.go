@@ -10,6 +10,7 @@ type FailedFixitySummary struct {
 	Failures        int64  `json:"failures"`
 	InstitutionID   int64  `json:"institution_id"`
 	InstitutionName string `json:"institution_name"`
+	Error           string `json:"error"`
 }
 
 var failedFixityQuery = `select count(id) as "failures", pev.institution_id, pev.institution_name
