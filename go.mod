@@ -6,7 +6,6 @@ require (
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d
 	github.com/aws/aws-sdk-go v1.49.23
 	github.com/brianvoe/gofakeit/v6 v6.9.0
-	github.com/dcu/go-authy v1.0.1
 	github.com/gavv/httpexpect/v2 v2.14.0
 	github.com/gin-contrib/logger v0.0.2
 	github.com/gin-gonic/gin v1.9.1
@@ -68,7 +67,6 @@ require (
 	github.com/nsqio/go-nsq v1.1.0 // indirect
 	github.com/pelletier/go-toml v1.2.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.8 // indirect
-	github.com/pkg/errors v0.8.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/sanity-io/litter v1.5.5 // indirect
 	github.com/sergi/go-diff v1.0.0 // indirect

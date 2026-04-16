@@ -13,14 +13,14 @@ import (
 func TestTwoFactorSetupForm(t *testing.T) {
 	user := &pgmodels.User{}
 	user.ID = 99999
-	user.AuthyStatus = constants.TwoFactorSMS
+	user.MFAStatus = constants.TwoFactorSMS
 	user.PhoneNumber = "+1 505-867-5309"
 	form := forms.NewTwoFactorSetupForm(user)
 	require.NotNil(t, form)
 	assert.Equal(t, 2, len(form.Fields))
 
-	assert.NotNil(t, form.Fields["AuthyStatus"])
-	assert.Equal(t, user.AuthyStatus, form.Fields["AuthyStatus"].Value)
+	assert.NotNil(t, form.Fields["MFAStatus"])
+	assert.Equal(t, user.MFAStatus, form.Fields["MFAStatus"].Value)
 	assert.NotNil(t, form.Fields["PhoneNumber"])
 	assert.Equal(t, user.PhoneNumber, form.Fields["PhoneNumber"].Value)
 

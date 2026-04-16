@@ -210,8 +210,6 @@ Resources:
           ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/APT_ENV'
         - Name: LOG_DIR
           ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/LOG_DIR'
-        - Name: AUTHY_API_KEY
-          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/AUTHY_API_KEY'
         - Name: AWS_ACCESS_KEY_ID
           ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/AWS_ACCESS_KEY_ID'
         - Name: AWS_REGION
@@ -246,8 +244,6 @@ Resources:
           ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/EMAIL_ENABLED'
         - Name: EMAIL_FROM_ADDRESS
           ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/EMAIL_FROM_ADDRESS'
-        - Name: ENABLE_TWO_FACTOR_AUTHY
-          ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/ENABLE_TWO_FACTOR_AUTHY'
         - Name: ENABLE_TWO_FACTOR_SMS
           ValueFrom: !Sub 'arn:aws:ssm:us-east-1:997427182289:parameter/${Envn}/REGISTRY/ENABLE_TWO_FACTOR_SMS'
         - Name: FLASH_COOKIE_NAME
