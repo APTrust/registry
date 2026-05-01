@@ -237,6 +237,7 @@ func ExemptFromAuth(c *gin.Context) bool {
 		p == "/users/forgot_password" ||
 		p == "/ui_components" ||
 		p == "/maintenance" ||
+		p == "/accessibility_statement" ||
 		strings.HasPrefix(p, "/static") ||
 		strings.HasPrefix(p, "/favicon") ||
 		strings.HasPrefix(p, "/error") ||
