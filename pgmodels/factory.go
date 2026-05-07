@@ -180,16 +180,16 @@ func RandomGenericFile(objID int64, objIdentifier string) *GenericFile {
 
 // RandomPremisEvent returns a random premis event of the specified
 // type. Caller should set GenericFileID and IntellectualObjectID.
-func RandomPremisEvent(eventType string) *PremisEvent {
+func RandomPremisEvent(eventType int) *PremisEvent {
 	now := time.Now().UTC()
 	return &PremisEvent{
-		Agent:              gofakeit.FarmAnimal(),
+		Agent:              gofakeit.Number(0, 10),
 		DateTime:           now,
 		Detail:             gofakeit.Sentence(4),
 		EventType:          eventType,
 		Identifier:         uuid.NewString(),
 		InstitutionID:      4,
-		Object:             gofakeit.Sentence(4),
+		Object:             gofakeit.Number(0, 10),
 		Outcome:            gofakeit.Sentence(5),
 		OutcomeDetail:      gofakeit.BeerName(),
 		OutcomeInformation: gofakeit.AppAuthor(),
