@@ -10,19 +10,23 @@ import (
 
 type PremisEvent struct {
 	TimestampModel
-	Agent                string    `json:"agent"`
+	Agent                int       `json:"agent"`
 	DateTime             time.Time `json:"date_time"`
 	Detail               string    `json:"detail"`
-	EventType            string    `json:"event_type"`
+	EventType            int       `json:"event_type"`
 	GenericFileID        int64     `json:"generic_file_id"`
 	Identifier           string    `json:"identifier"`
 	InstitutionID        int64     `json:"institution_id"`
 	IntellectualObjectID int64     `json:"intellectual_object_id"`
-	Object               string    `json:"object"`
-	OldUUID              string    `json:"old_uuid"`
+	Object               int       `json:"object"`
 	Outcome              string    `json:"outcome"`
 	OutcomeDetail        string    `json:"outcome_detail"`
 	OutcomeInformation   string    `json:"outcome_information"`
+}
+
+type PremisEventType struct {
+	EventTypeID int    `json:"event_type_id"`
+	EventType   string `json:"event_type"`
 }
 
 // PremisEventByID returns the event with the specified id.
@@ -76,8 +80,8 @@ func (event *PremisEvent) Save() error {
 // Validate returns errors if this event isn't valid.
 func (event *PremisEvent) Validate() *common.ValidationError {
 	errors := make(map[string]string)
-	if common.IsEmptyString(event.Agent) {
-		errors["Agent"] = "Event Agent cannot be empty"
+	if event.Agent <= 0 {
+		errors["Agent"] = "Event requires a valid Agent"
 	}
 	if event.DateTime.IsZero() {
 		errors["DateTime"] = "Event DateTime is required"
@@ -99,8 +103,8 @@ func (event *PremisEvent) Validate() *common.ValidationError {
 	if event.IntellectualObjectID <= 0 {
 		errors["IntellectualObjectID"] = "Event requires a valid intellectual object id"
 	}
-	if common.IsEmptyString(event.Object) {
-		errors["Object"] = "Event Object cannot be empty"
+	if event.Object <= 0 {
+		errors["Object"] = "Event requires a valid Object"
 	}
 	if !slice.Contains(constants.EventOutcomes, event.Outcome) {
 		errors["Outcome"] = "Event requires a valid Outcome value"
@@ -126,4 +130,12 @@ func (event *PremisEvent) Validate() *common.ValidationError {
 // check, etc.).
 func ObjectEventCount(intellectualObjectID int64) (int, error) {
 	return common.Context().DB.Model((*PremisEvent)(nil)).Where(`intellectual_object_id = ? and generic_file_id is null`, intellectualObjectID).Count()
+}
+
+// Provides the full string description of an event type given its int code.
+func LookupEventType(eventTypeID int) (string, error) {
+	query := NewQuery().Columns("id").Where(`"lookup_event_type"."eventType"`, "=", eventTypeID)
+	var premisEventType PremisEventType
+	err := query.Select(&premisEventType)
+	return premisEventType.EventType, err
 }
