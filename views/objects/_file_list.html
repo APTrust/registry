@@ -47,7 +47,7 @@
     </thead>
     {{ range $index, $file := .files }}
     <tr>
-      <td class="clickable" data-toggle-table-row="file-{{ $file.ID }}">[+]</td>
+      <td class="clickable" tabindex="0" data-toggle-table-row="file-{{ $file.ID }}" onkeydown="handleKeyPressWhileFileExpandFocused(event, this)">Expand [+]</td>
       <td class="is-grey-dark">{{ truncateStart $file.Identifier 60 }}</td>
       <td class="is-grey-dark">{{ $file.FileFormat }}</td>
       <td class="is-grey-dark num text-sm has-text-right">{{ humanSize $file.Size }}</td>
@@ -117,6 +117,13 @@
 
 </div>
 
-
+<script>
+  /* If a file has focus, you can expand details by pressing the Enter key. */
+  function handleKeyPressWhileFileExpandFocused(event, file) {
+    if (event.key == "Enter") {
+      file.click()
+    }
+  }
+</script>
 
 {{ end }}

@@ -40,19 +40,16 @@ func (f *ObjectFilterForm) init() {
 		Options:     Options(constants.AccessSettings),
 	}
 	f.Fields["alt_identifier__starts_with"] = &Field{
-		Name:        "alt_identifier__starts_with",
-		Label:       "Alternate Identifier (Prefix or Exact)",
-		Placeholder: "Alternate Identifier",
+		Name:  "alt_identifier__starts_with",
+		Label: "Alternate Identifier (Prefix or Exact)",
 	}
 	f.Fields["bag_group_identifier__starts_with"] = &Field{
-		Name:        "bag_group_identifier__starts_with",
-		Label:       "Bag Group Identifier (Prefix or Exact)",
-		Placeholder: "Bag Group Identifier",
+		Name:  "bag_group_identifier__starts_with",
+		Label: "Bag Group Identifier (Prefix or Exact)",
 	}
 	f.Fields["bag_name"] = &Field{
-		Name:        "bag_name",
-		Label:       "Bag Name",
-		Placeholder: "Bag Name",
+		Name:  "bag_name",
+		Label: "Bag Name",
 	}
 	f.Fields["bagit_profile_identifier"] = &Field{
 		Name:        "bagit_profile_identifier",
@@ -76,14 +73,12 @@ func (f *ObjectFilterForm) init() {
 		Placeholder: "ETag",
 	}
 	f.Fields["file_count__gteq"] = &Field{
-		Name:        "file_count__gteq",
-		Label:       "Min File Count",
-		Placeholder: "Min File Count",
+		Name:  "file_count__gteq",
+		Label: "Minimum File Count",
 	}
 	f.Fields["file_count__lteq"] = &Field{
-		Name:        "file_count__lteq",
-		Label:       "Max File Count",
-		Placeholder: "Max File Count",
+		Name:  "file_count__lteq",
+		Label: "Maximum File Count",
 	}
 	f.Fields["identifier"] = &Field{
 		Name:        "identifier",
@@ -91,9 +86,8 @@ func (f *ObjectFilterForm) init() {
 		Placeholder: "Object Identifier",
 	}
 	f.Fields["identifier__starts_with"] = &Field{
-		Name:        "identifier__starts_with",
-		Label:       "Object Identifier (Prefix or Exact)",
-		Placeholder: "Object Identifier (Prefix or Exact)",
+		Name:  "identifier__starts_with",
+		Label: "Object Identifier (Prefix or Exact)",
 	}
 	f.Fields["institution_id"] = &Field{
 		Name:        "institution_id",
@@ -108,19 +102,16 @@ func (f *ObjectFilterForm) init() {
 		Options:     f.instOptions,
 	}
 	f.Fields["internal_sender_identifier"] = &Field{
-		Name:        "internal_sender_identifier",
-		Label:       "Internal Sender Identifier",
-		Placeholder: "Internal Sender Identifier",
+		Name:  "internal_sender_identifier",
+		Label: "Internal Sender Identifier",
 	}
 	f.Fields["size__gteq"] = &Field{
-		Name:        "size__gteq",
-		Label:       "Min Size",
-		Placeholder: "Min Size",
+		Name:  "size__gteq",
+		Label: "Minimum Size",
 	}
 	f.Fields["size__lteq"] = &Field{
-		Name:        "size__lteq",
-		Label:       "Max Size",
-		Placeholder: "Max Size",
+		Name:  "size__lteq",
+		Label: "Maximum Size",
 	}
 	f.Fields["source_organization"] = &Field{
 		Name:        "source_organization",

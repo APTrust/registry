@@ -6,7 +6,7 @@
 // fillColors are used in bar charts, pie charts, etc. rendered
 // by chart.js on the front end. Used by helpers/templates.go.
 const fillColors = [
-	"rgba(187, 149, 102, 1)",
+	"rgba(125, 107, 25, 1)",
 	"rgba(19, 19, 92, 1)",
 	"rgba(51, 48, 48, 1)",
 	"rgba(96, 130, 146, 1)",
@@ -17,7 +17,7 @@ const fillColors = [
 // barBorders are used in bar charts, pie charts, etc. rendered
 // by chart.js on the front end. Used by helpers/templates.go.
 const barBorders = [
-	"rgba(187, 149, 102, 1)",
+	"rgba(125, 107, 25, 1)",
 	"rgba(19, 19, 92, 1)",
 	"rgba(51, 48, 48, 1)",
 	"rgba(96, 130, 146, 1)",

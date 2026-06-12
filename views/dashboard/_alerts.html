@@ -7,7 +7,7 @@
       Recent Notifications
     </h1>
     <a class="is-flex is-align-items-center is-grey-dark is-not-underlined" href="/alerts">
-      see all
+      See All Recent Notifications
       <span class="material-icons md-16 ml-2" aria-hidden="true">arrow_forward</span>
     </a>
   </div>
@@ -35,5 +35,14 @@
     </tbody>
   </table>
 </div>
+
+<script>
+  /* If an alert has focus, you can open details by pressing the Enter key. */
+  function handleKeyPressWhileAlertFocused(event, recentAlert) {
+    if (event.key == "Enter") {
+      recentAlert.click()
+    }
+  }
+</script>
 
 {{ end }}
