@@ -501,7 +501,7 @@ func TestWorkItemsPendingForObjectBatch(t *testing.T) {
 
 func TestIsRestorationSpotTest(t *testing.T) {
 
-	// This is not a spot test because it's not even a restoration.
+	// This is not even a restoration item
 	query := pgmodels.NewQuery().Where("action", "=", constants.ActionIngest).Limit(1)
 	item, err := pgmodels.WorkItemGet(query)
 	require.Nil(t, err)
@@ -513,8 +513,8 @@ func TestIsRestorationSpotTest(t *testing.T) {
 	assert.Nil(t, obj)
 	assert.Nil(t, err)
 
-	// Should not alert, because this is not a successful spot test
-	assert.Nil(t, item.AlertOnSuccessfulSpotTest())
+	// Should not alert, because this is not a successful restore.
+	assert.Nil(t, item.AlertOnSuccessfulRestore())
 
 	// Although this one in an object restoration, it's not a spot
 	// test because it's not tied to any institution.last_spot_restore_work_item_id.
@@ -529,10 +529,10 @@ func TestIsRestorationSpotTest(t *testing.T) {
 	assert.Nil(t, obj)
 	assert.Nil(t, err)
 
-	// Should not alert, because this is not a successful spot test
-	assert.Nil(t, item.AlertOnSuccessfulSpotTest())
+	// Should alert, this is a regular restoration.
+	assert.NotEmpty(t, item.AlertOnSuccessfulRestore())
 
-	// Now link this to an institution, and we should get a yes.
+	// Now link this to an institution...
 	inst, err = pgmodels.InstitutionByID(item.InstitutionID)
 	require.Nil(t, err)
 	require.NotNil(t, inst)
@@ -559,7 +559,7 @@ func TestIsRestorationSpotTest(t *testing.T) {
 }
 
 func testAlertOnSuccessfulSpotTest(t *testing.T, item *pgmodels.WorkItem) {
-	alert := item.AlertOnSuccessfulSpotTest()
+	alert := item.AlertOnSuccessfulRestore()
 	require.NotNil(t, alert)
 
 	assert.Equal(t, "Restoration Spot Test Completed", alert.Subject)
