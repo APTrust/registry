@@ -530,9 +530,9 @@ func TestIsRestorationSpotTest(t *testing.T) {
 	assert.Nil(t, err)
 
 	// Should alert, this is a regular restoration.
-	assert.NotEmpty(t, item.AlertOnSuccessfulRestore())
+	testAlertOnSuccessfulRestore(t, item)
 
-	// Now link this to an institution...
+	// Now link this to an institution and test the spot test alert...
 	inst, err = pgmodels.InstitutionByID(item.InstitutionID)
 	require.Nil(t, err)
 	require.NotNil(t, inst)
@@ -567,6 +567,24 @@ func testAlertOnSuccessfulSpotTest(t *testing.T, item *pgmodels.WorkItem) {
 	assert.Contains(t, alert.Content, "https://s3.example.com/photos.tar")
 	assert.Contains(t, alert.Content, "Your institution runs spot tests every 30 days.")
 	assert.Contains(t, alert.Content, "logging into the Registry at http://localhost")
+
+	assert.Equal(t, 3, len(alert.Users))
+	for _, user := range alert.Users {
+		assert.EqualValues(t, 2, user.InstitutionID)
+	}
+
+	require.Equal(t, 1, len(alert.WorkItems))
+	assert.Equal(t, item.ID, alert.WorkItems[0].ID)
+}
+
+func testAlertOnSuccessfulRestore(t *testing.T, item *pgmodels.WorkItem) {
+	alert := item.AlertOnSuccessfulRestore()
+	require.NotNil(t, alert)
+
+	assert.Equal(t, "Restoration Completed", alert.Subject)
+	assert.Contains(t, alert.Content, "APTrust System")
+	assert.Contains(t, alert.Content, "institution1.edu/photos")
+	assert.Contains(t, alert.Content, "https://s3.example.com/photos.tar")
 
 	assert.Equal(t, 3, len(alert.Users))
 	for _, user := range alert.Users {

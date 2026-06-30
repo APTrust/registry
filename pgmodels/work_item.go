@@ -347,17 +347,32 @@ func (item *WorkItem) AlertOnSuccessfulRestore() *Alert {
 		urlWithTrailingPeriod := parts[1]
 		restorationURL := urlWithTrailingPeriod[0 : len(urlWithTrailingPeriod)-1]
 
-		registryURL := fmt.Sprintf("%s://%s", ctx.Config.HTTPScheme(), ctx.Config.Cookies.Domain)
-
 		templateName := "alerts/restoration_completed.txt"
+
+		obj, err := IntellectualObjectByID(item.IntellectualObjectID)
+		if err != nil {
+			ctx.Log.Error().Msgf("AlertOnSuccessfulRestore: Error getting Object for restoration alert: %v", err)
+			return nil
+		}
+		if obj == nil {
+			ctx.Log.Error().Msgf("AlertOnSuccessfulRestore: Error getting Object for restoration alert: Object not found for WorkItem: %v", item.ID)
+			return nil
+		}
+
+		requester, err := UserByEmail(item.User)
+		if err != nil {
+			ctx.Log.Error().Msgf("AlertOnSuccessfulRestore: Error getting requester name for restoration alert: %v", err)
+			return nil
+		}
+
 		alertData := map[string]interface{}{
+			"RequesterName":  requester.Name,
 			"ItemName":       obj.Identifier,
 			"RestorationURL": restorationURL,
-			"RegistryURL":    registryURL,
 		}
 
 		alert := &Alert{
-			InstitutionID: inst.ID,
+			InstitutionID: obj.InstitutionID,
 			Type:          constants.AlertRestorationCompleted,
 			Subject:       "Restoration Completed",
 			Content:       "Your fries are ready.",
