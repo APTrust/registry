@@ -335,7 +335,7 @@ func (item *WorkItem) AlertOnSuccessfulRestore() *Alert {
 		query := NewQuery().Where("institution_id", "=", item.InstitutionID).IsNull("deactivated_at")
 		users, err := UserSelect(query)
 		if err != nil {
-			ctx.Log.Error().Msgf("AlertOnSuccessfulRestore: Error getting users for institution %s: %v", inst.Identifier, err)
+			ctx.Log.Error().Msgf("AlertOnSuccessfulRestore: Error getting users for institution %d: %v", item.InstitutionID, err)
 			return nil
 		}
 
