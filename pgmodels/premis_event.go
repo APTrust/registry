@@ -10,7 +10,7 @@ import (
 
 type PremisEvent struct {
 	TimestampModel
-	Agent                int       `json:"agent"`
+	Agent                string    `json:"agent"`
 	DateTime             time.Time `json:"date_time"`
 	Detail               string    `json:"detail"`
 	EventType            int       `json:"event_type"`
@@ -18,7 +18,7 @@ type PremisEvent struct {
 	Identifier           string    `json:"identifier"`
 	InstitutionID        int64     `json:"institution_id"`
 	IntellectualObjectID int64     `json:"intellectual_object_id"`
-	Object               int       `json:"object"`
+	Object               string    `json:"object"`
 	Outcome              string    `json:"outcome"`
 	OutcomeDetail        string    `json:"outcome_detail"`
 	OutcomeInformation   string    `json:"outcome_information"`
@@ -80,7 +80,7 @@ func (event *PremisEvent) Save() error {
 // Validate returns errors if this event isn't valid.
 func (event *PremisEvent) Validate() *common.ValidationError {
 	errors := make(map[string]string)
-	if event.Agent <= 0 {
+	if common.IsEmptyString(event.Agent) {
 		errors["Agent"] = "Event requires a valid Agent"
 	}
 	if event.DateTime.IsZero() {
@@ -103,7 +103,7 @@ func (event *PremisEvent) Validate() *common.ValidationError {
 	if event.IntellectualObjectID <= 0 {
 		errors["IntellectualObjectID"] = "Event requires a valid intellectual object id"
 	}
-	if event.Object <= 0 {
+	if common.IsEmptyString(event.Object) {
 		errors["Object"] = "Event requires a valid Object"
 	}
 	if !slice.Contains(constants.EventOutcomes, event.Outcome) {

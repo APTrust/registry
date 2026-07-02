@@ -370,14 +370,14 @@ func (obj *IntellectualObject) NewDeletionEvent() (*PremisEvent, error) {
 	}
 	now := time.Now().UTC()
 	return &PremisEvent{
-		Agent:                0, // "APTrust preservation services",
+		Agent:                "APTrust preservation services",
 		DateTime:             now,
 		Detail:               "Object deleted from preservation storage",
 		EventType:            constants.EventDeletion,
 		Identifier:           uuid.NewString(),
 		InstitutionID:        obj.InstitutionID,
 		IntellectualObjectID: obj.ID,
-		Object:               0, //"Minio S3 library",
+		Object:               "Minio S3 library",
 		Outcome:              constants.OutcomeSuccess,
 		OutcomeDetail:        deletionRequestView.RequestedByEmail,
 		OutcomeInformation:   fmt.Sprintf("Object deleted at the request of %s. Institutional approver: %s.", deletionRequestView.RequestedByEmail, deletionRequestView.ConfirmedByEmail),
