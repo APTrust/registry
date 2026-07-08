@@ -217,7 +217,7 @@ func loadEvents(req *Request, objID int64) error {
 	eventQuery := pgmodels.NewQuery().
 		Where("intellectual_object_id", "=", objID).
 		IsNull("generic_file_id").
-		OrderBy("date_time", "desc").
+		OrderBy("created_at", "desc").
 		Limit(pager.PerPage).
 		Offset(pager.QueryOffset)
 	events, err := pgmodels.PremisEventSelect(eventQuery)

@@ -15,14 +15,14 @@ var IconMap = map[string]string{
 	// Premis Event Icons.
 	// Note that we use only 7 or so event types,
 	// so we don't define an icon for every type.
-	constants.EventAccessAssignmentString:     "admin_panel_settings",
-	constants.EventCreationString:             "add_circle_outline",
-	constants.EventDeletionString:             "delete_forever",
-	constants.EventDigestCalculationString:    "description",
-	constants.EventFixityCheckString:          "fingerprint",
-	constants.EventIdentifierAssignmentString: "search",
-	constants.EventIngestionString:            "file_upload",
-	constants.EventReplicationString:          "library_books",
+	constants.EventStringAccessAssignment:     "admin_panel_settings",
+	constants.EventStringCreation:             "add_circle_outline",
+	constants.EventStringDeletion:             "delete_forever",
+	constants.EventStringDigestCalculation:    "description",
+	constants.EventStringFixityCheck:          "fingerprint",
+	constants.EventStringIdentifierAssignment: "search",
+	constants.EventStringIngestion:            "file_upload",
+	constants.EventStringReplication:          "library_books",
 
 	// WorkItem actions
 	constants.ActionDelete:         "delete_forever",

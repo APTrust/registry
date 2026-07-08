@@ -64,24 +64,24 @@ const (
 	EventSignatureValidation        = 13 //"digital signature validation"
 	EventValidation                 = 51 //"validation"
 	EventVirusCheck                 = 52 //"virus check"
-	EventAccessAssignmentString     = "access assignment"
-	EventCaptureString              = "capture"
-	EventCompressionString          = "compression"
-	EventCreationString             = "creation"
-	EventDeaccessionString          = "deaccession"
-	EventDecompressionString        = "decompression"
-	EventDecryptionString           = "decryption"
-	EventDeletionString             = "deletion"
-	EventDigestCalculationString    = "message digest calculation"
-	EventFixityCheckString          = "fixity check"
-	EventIdentifierAssignmentString = "identifier assignment"
-	EventIngestionString            = "ingestion"
-	EventMigrationString            = "migration"
-	EventNormalizationString        = "normalization"
-	EventReplicationString          = "replication"
-	EventSignatureValidationString  = "digital signature validation"
-	EventValidationString           = "validation"
-	EventVirusCheckString           = "virus check"
+	EventStringAccessAssignment     = "access assignment"
+	EventStringCapture              = "capture"
+	EventStringCompression          = "compression"
+	EventStringCreation             = "creation"
+	EventStringDeaccession          = "deaccession"
+	EventStringDecompression        = "decompression"
+	EventStringDecryption           = "decryption"
+	EventStringDeletion             = "deletion"
+	EventStringDigestCalculation    = "message digest calculation"
+	EventStringFixityCheck          = "fixity check"
+	EventStringIdentifierAssignment = "identifier assignment"
+	EventStringIngestion            = "ingestion"
+	EventStringMigration            = "migration"
+	EventStringNormalization        = "normalization"
+	EventStringReplication          = "replication"
+	EventStringSignatureValidation  = "digital signature validation"
+	EventStringValidation           = "validation"
+	EventStringVirusCheck           = "virus check"
 	IngestPreFetch                  = "ingest01_prefetch"
 	IngestValidation                = "ingest02_bag_validation"
 	IngestReingestCheck             = "ingest03_reingest_check"
@@ -210,15 +210,15 @@ var EventTypes = []int{
 }
 
 var EventTypesString = []string{
-	EventAccessAssignmentString,
-	EventCreationString,
-	EventDeletionString,
-	EventDigestCalculationString,
-	EventFixityCheckString,
-	EventIdentifierAssignmentString,
-	EventIngestionString,
-	EventReplicationString,
-	EventValidationString,
+	EventStringAccessAssignment,
+	EventStringCreation,
+	EventStringDeletion,
+	EventStringDigestCalculation,
+	EventStringFixityCheck,
+	EventStringIdentifierAssignment,
+	EventStringIngestion,
+	EventStringReplication,
+	EventStringValidation,
 }
 
 var GlacierOnlyOptions = []string{

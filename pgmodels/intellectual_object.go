@@ -150,7 +150,7 @@ func (obj *IntellectualObject) Delete() error {
 	if err != nil {
 		return err
 	}
-	// deletionEvent.SetTimestamps()
+	deletionEvent.SetTimestamps()
 	valErr = deletionEvent.Validate()
 	if valErr != nil {
 		return valErr
@@ -201,7 +201,7 @@ func (obj *IntellectualObject) lastEvent(eventType int) (*PremisEvent, error) {
 		Where("intellectual_object_id", "=", obj.ID).
 		Where("event_type", "=", eventType).
 		IsNull("generic_file_id").
-		OrderBy("date_time", "desc").
+		OrderBy("created_at", "desc").
 		Offset(0).
 		Limit(1)
 	return PremisEventGet(query)

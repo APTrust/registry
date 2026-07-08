@@ -439,7 +439,7 @@ func (gf *GenericFile) lastEvent(eventType int) (*PremisEvent, error) {
 	query := NewQuery().
 		Where("generic_file_id", "=", gf.ID).
 		Where("event_type", "=", eventType).
-		OrderBy("date_time", "desc").
+		OrderBy("created_at", "desc").
 		Offset(0).
 		Limit(1)
 	return PremisEventGet(query)
