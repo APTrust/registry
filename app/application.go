@@ -260,7 +260,6 @@ func initRoutes(router *gin.Engine) {
 		webRoutes.GET("/users/2fa_backup", webui.UserTwoFactorBackup)
 		webRoutes.GET("/users/2fa_choose", webui.UserTwoFactorChoose)
 		webRoutes.POST("/users/2fa_sms", webui.UserTwoFactorGenerateSMS)
-		webRoutes.POST("/users/2fa_push", webui.UserTwoFactorPush)
 		webRoutes.POST("/users/2fa_verify", webui.UserTwoFactorVerify)
 
 		// User forgot password
