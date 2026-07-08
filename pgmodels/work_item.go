@@ -329,70 +329,16 @@ func (item *WorkItem) AlertOnSuccessfulRestore() *Alert {
 		return nil
 	}
 
-	// This is a regular successful restoration, not a spot test.
-	// We will send an alert.
-	if inst == nil || inst.ID == 0 || obj == nil || obj.ID == 0 {
-		query := NewQuery().Where("institution_id", "=", item.InstitutionID).IsNull("deactivated_at")
-		users, err := UserSelect(query)
-		if err != nil {
-			ctx.Log.Error().Msgf("AlertOnSuccessfulRestore: Error getting users for institution %d: %v", item.InstitutionID, err)
-			return nil
-		}
+	// If we got back a valid institution and object, then this is a spot test restoration.
+	isSpotTest := inst != nil && inst.ID != 0 && obj != nil && obj.ID != 0
 
-		parts := strings.Split(item.Note, " restored to ")
-		if len(parts) < 2 {
-			ctx.Log.Error().Msgf("AlertOnSuccessfulRestore: Error extracting URL from WorkItem note. Note is: %s", item.Note)
-			return nil
-		}
-		urlWithTrailingPeriod := parts[1]
-		restorationURL := urlWithTrailingPeriod[0 : len(urlWithTrailingPeriod)-1]
+	templateName := "alerts/restoration_completed.txt"
+	alertSubject := "Restoration Completed"
 
-		templateName := "alerts/restoration_completed.txt"
-
-		obj, err := IntellectualObjectByID(item.IntellectualObjectID)
-		if err != nil {
-			ctx.Log.Error().Msgf("AlertOnSuccessfulRestore: Error getting Object for restoration alert: %v", err)
-			return nil
-		}
-		if obj == nil {
-			ctx.Log.Error().Msgf("AlertOnSuccessfulRestore: Error getting Object for restoration alert: Object not found for WorkItem: %v", item.ID)
-			return nil
-		}
-
-		requester, err := UserByEmail(item.User)
-		if err != nil {
-			ctx.Log.Error().Msgf("AlertOnSuccessfulRestore: Error getting requester name for restoration alert: %v", err)
-			return nil
-		}
-
-		alertData := map[string]interface{}{
-			"RequesterName":  requester.Name,
-			"ItemName":       obj.Identifier,
-			"RestorationURL": restorationURL,
-		}
-
-		alert := &Alert{
-			InstitutionID: obj.InstitutionID,
-			Type:          constants.AlertRestorationCompleted,
-			Subject:       "Restoration Completed",
-			Content:       "Your fries are ready.",
-			PremisEvents:  nil,
-			Users:         users,
-			WorkItems:     []*WorkItem{item},
-		}
-
-		restorationAlert, err := CreateAlert(alert, templateName, alertData)
-		if err != nil {
-			ctx.Log.Error().Msgf("AlertOnSuccessfulRestore: CreateAlert returned error %v", err)
-		} else {
-			ctx.Log.Info().Msgf("Created restoration alert %d for WorkItem %d going to %d users", restorationAlert.ID, item.ID, len(users))
-		}
-		return restorationAlert
-	}
 	query := NewQuery().Where("institution_id", "=", item.InstitutionID).IsNull("deactivated_at")
 	users, err := UserSelect(query)
 	if err != nil {
-		ctx.Log.Error().Msgf("AlertOnSuccessfulRestore: Error getting users for institution %s: %v", inst.Identifier, err)
+		ctx.Log.Error().Msgf("AlertOnSuccessfulRestore: Error getting users for institution with ID %d: %v", item.InstitutionID, err)
 		return nil
 	}
 
@@ -401,23 +347,69 @@ func (item *WorkItem) AlertOnSuccessfulRestore() *Alert {
 		ctx.Log.Error().Msgf("AlertOnSuccessfulRestore: Error extracting URL from WorkItem note. Note is: %s", item.Note)
 		return nil
 	}
-	urlWithTrailingPeriod := parts[1]
-	restorationURL := urlWithTrailingPeriod[0 : len(urlWithTrailingPeriod)-1]
+	restorationURL := strings.TrimSuffix(parts[1], ".")
 
-	registryURL := fmt.Sprintf("%s://%s", ctx.Config.HTTPScheme(), ctx.Config.Cookies.Domain)
+	requester, err := UserByEmail(item.User)
+	requesterName := "Unknown Requester"
+	if err != nil {
+		ctx.Log.Error().Msgf("AlertOnSuccessfulRestore: Error getting requester name for restoration alert: %v", err)
+		return nil
+	}
+	if requester != nil {
+		requesterName = requester.Name
+	}
 
-	templateName := "alerts/restoration_spot_test_completed.txt"
+	restoredObject, err := IntellectualObjectByID(item.IntellectualObjectID)
+	if err != nil {
+		ctx.Log.Error().Msgf("AlertOnSuccessfulRestore: Error getting Object for restoration alert: %v", err)
+		return nil
+	}
+	if restoredObject == nil {
+		ctx.Log.Error().Msgf("AlertOnSuccessfulRestore: Error getting Object for restoration alert: Object not found for WorkItem: %v", item.ID)
+		return nil
+	}
+
+	// The alert will contain the identifier of the object if we've restored a whole object.
+	// If we've only restored a file, we'll instead include the identifier of that file.
+	itemName := restoredObject.Identifier
+	if item.GenericFileID != 0 {
+		gf, err := GenericFileByID(item.GenericFileID)
+		if err != nil {
+			ctx.Log.Error().Msgf("AlertOnSuccessfulRestore: Error getting generic file for restoration alert: %v", err)
+			return nil
+		}
+		if gf == nil {
+			ctx.Log.Error().Msgf("AlertOnSuccessfulRestore: Error with restoration alert: generic file was nil with ID %d", item.GenericFileID)
+			return nil
+		}
+		itemName = gf.Identifier
+	}
+
 	alertData := map[string]interface{}{
-		"ItemName":       obj.Identifier,
+		"RequesterName":  requesterName,
+		"ItemName":       itemName,
 		"RestorationURL": restorationURL,
-		"SpotTestDays":   strconv.FormatInt(inst.SpotRestoreFrequency, 10),
-		"RegistryURL":    registryURL,
+	}
+
+	// If it's a restoration spot test, we need to use a different template and subject.
+	// We also load some different data.
+	if isSpotTest {
+		templateName = "alerts/restoration_spot_test_completed.txt"
+		alertSubject = "Restoration Spot Test Completed"
+
+		registryURL := fmt.Sprintf("%s://%s", ctx.Config.HTTPScheme(), ctx.Config.Cookies.Domain)
+		alertData = map[string]interface{}{
+			"ItemName":       obj.Identifier,
+			"RestorationURL": restorationURL,
+			"SpotTestDays":   strconv.FormatInt(inst.SpotRestoreFrequency, 10),
+			"RegistryURL":    registryURL,
+		}
 	}
 
 	alert := &Alert{
-		InstitutionID: inst.ID,
+		InstitutionID: restoredObject.InstitutionID,
 		Type:          constants.AlertRestorationCompleted,
-		Subject:       "Restoration Spot Test Completed",
+		Subject:       alertSubject,
 		Content:       "Your fries are ready.",
 		PremisEvents:  nil,
 		Users:         users,
@@ -428,8 +420,9 @@ func (item *WorkItem) AlertOnSuccessfulRestore() *Alert {
 	if err != nil {
 		ctx.Log.Error().Msgf("AlertOnSuccessfulRestore: CreateAlert returned error %v", err)
 	} else {
-		ctx.Log.Info().Msgf("Created spot test restoration alert %d for WorkItem %d going to %d users", restorationAlert.ID, item.ID, len(users))
+		ctx.Log.Info().Msgf("Created restoration alert %d for WorkItem %d going to %d users", restorationAlert.ID, item.ID, len(users))
 	}
+
 	return restorationAlert
 }
 

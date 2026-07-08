@@ -513,7 +513,7 @@ func TestIsRestorationSpotTest(t *testing.T) {
 	assert.Nil(t, obj)
 	assert.Nil(t, err)
 
-	// Should not alert, because this is not a successful restore.
+	// Should not alert, because this is not a successful restore - rather, it is an ingest.
 	assert.Nil(t, item.AlertOnSuccessfulRestore())
 
 	// Although this one in an object restoration, it's not a spot
