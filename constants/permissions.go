@@ -63,7 +63,6 @@ const (
 	ReportRead                         = "ReportRead"
 	RedisList                          = "RedisList"
 	RedisRead                          = "RedisRead"
-	ShowAccessibilityStatement         = "ShowAccessibilityStatement"
 	StorageRecordCreate                = "StorageRecordCreate"
 	StorageRecordDelete                = "StorageRecordDelete"
 	StorageRecordRead                  = "StorageRecordRead"
