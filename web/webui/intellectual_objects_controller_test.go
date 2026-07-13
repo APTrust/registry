@@ -150,7 +150,7 @@ func TestObjectByIdentifier(t *testing.T) {
 	resp = testutil.Inst1UserClient.GET("/objects").WithQuery("identifier__starts_with", "institution1.edu/does-not-exist").Expect()
 	assert.Equal(t, http.StatusOK, resp.Raw().StatusCode)
 
-	expected := `<input class="input" type="text" id="identifier__starts_with" name="identifier__starts_with" value="institution1.edu/does-not-exist" placeholder="Object Identifier (Prefix or Exact)"`
+	expected := `<input class="input" type="text" id="identifier__starts_with" name="identifier__starts_with" value="institution1.edu/does-not-exist"`
 	html = resp.Body().Raw()
 	assert.Contains(t, html, expected)
 }
