@@ -15,7 +15,11 @@
     </div>
     {{ end }}
 
+    {{ if .isEdit }}
+    <h1>Edit User</h1>
+    {{ else }}
     <h1>Add New User</h1>
+    {{ end }}
 
     <div class="columns">
       <div class="column">{{ template "forms/text_input.html" .form.Fields.Name }}</div>
