@@ -153,7 +153,7 @@ func (item *WorkItem) Save() error {
 	} else {
 		err = update(item)
 	}
-	if err == nil && item.Action == constants.ActionRestoreObject && item.Status == constants.StatusSuccess {
+	if err == nil && (item.Action == constants.ActionRestoreObject || item.Action == constants.ActionRestoreFile) && item.Status == constants.StatusSuccess {
 		item.AlertOnSuccessfulRestore()
 	}
 	return err
