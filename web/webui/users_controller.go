@@ -77,6 +77,7 @@ func UserNew(c *gin.Context) {
 		return
 	}
 	req.TemplateData["form"] = form
+	req.TemplateData["isEdit"] = false
 	c.HTML(http.StatusOK, form.Template, req.TemplateData)
 }
 
@@ -111,6 +112,7 @@ func UserEdit(c *gin.Context) {
 		return
 	}
 	req.TemplateData["form"] = form
+	req.TemplateData["isEdit"] = true
 	c.HTML(http.StatusOK, form.Template, req.TemplateData)
 }
 
