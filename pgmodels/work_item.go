@@ -316,9 +316,8 @@ func (item *WorkItem) GetSpotTestDetails() (*Institution, *IntellectualObject, e
 // Zero does not necessarily indicate failure. It just means we didn't create
 // an alert, and there may be valid reasons for not doing so.
 func (item *WorkItem) AlertOnSuccessfulRestore() *Alert {
-
 	// If this is not a successful restoration, quit now.
-	if item.Action != constants.ActionRestoreObject || item.Status != constants.StatusSuccess {
+	if !strings.HasPrefix(item.Action, "Restore") || item.Status != constants.StatusSuccess {
 		return nil
 	}
 
