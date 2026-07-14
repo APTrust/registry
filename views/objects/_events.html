@@ -11,9 +11,9 @@
       <li class="clickable is-flex is-align-items-center mb-5" data-modal="modal-one" data-xhr-url="/events/show_xhr/{{ $event.ID }}">
         <span class="is-flex is-align-items-center">
           <span class="action-icon mr-3">
-            <span class="material-icons md-16" aria-hidden="true"><span>{{ iconFor $event.EventType }}</span></span>
+            <span class="material-icons md-16" aria-hidden="true"><span>{{ iconForEvent $event.EventType }}</span></span>
           </span>
-          <span class="is-capitalized">{{ $event.EventType }}</span>
+          <span class="is-capitalized">{{ convertEventTypeToString $event.EventType }}</span>
         </span>
         <span class="ml-auto">{{ dateUS $event.DateTime }}</span>
       </li>

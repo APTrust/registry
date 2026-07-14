@@ -347,7 +347,7 @@ func TestIntellectualObjectEvents(t *testing.T) {
 
 	expected := []string{
 		"Object Event History",
-		"29",
+		"ingestion",
 		"Aug 26, 2016",
 	}
 	testutil.AssertMatchesAll(t, html, expected)

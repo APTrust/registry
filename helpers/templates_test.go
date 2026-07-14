@@ -137,6 +137,20 @@ func TestIconFor(t *testing.T) {
 		helpers.IconFor("** missing **"))
 }
 
+func TestIconForEvent(t *testing.T) {
+	// Should return item defined in map
+	assert.Equal(
+		t,
+		template.HTML(helpers.IconEventMap[constants.EventIngestion]),
+		helpers.IconForEvent(constants.EventIngestion))
+
+	// If item is not defined in map, should return IconMissing
+	assert.Equal(
+		t,
+		template.HTML(helpers.IconMissing),
+		helpers.IconFor("** missing **"))
+}
+
 var longString = "Somewhere in la Mancha, in a place whose name I do not care to remember, a gentleman lived not long ago, one of those who has a lance and ancient shield on a shelf and keeps a skinny nag and a greyhound for racing."
 
 func TestTruncateMiddle(t *testing.T) {

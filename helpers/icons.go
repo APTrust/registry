@@ -32,6 +32,22 @@ var IconMap = map[string]string{
 	constants.ActionGlacierRestore: "file_download",
 }
 
+// IconMap maps events to Material icons.
+var IconEventMap = map[int]string{
+
+	// Premis Event Icons.
+	// Note that we use only 7 or so event types,
+	// so we don't define an icon for every type.
+	constants.EventAccessAssignment:     "admin_panel_settings",
+	constants.EventCreation:             "add_circle_outline",
+	constants.EventDeletion:             "delete_forever",
+	constants.EventDigestCalculation:    "description",
+	constants.EventFixityCheck:          "fingerprint",
+	constants.EventIdentifierAssignment: "search",
+	constants.EventIngestion:            "file_upload",
+	constants.EventReplication:          "library_books",
+}
+
 // BadgeClassMap maps work item status and other constant values
 // to css badge classes.
 var BadgeClassMap = map[string]string{
