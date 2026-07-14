@@ -501,7 +501,7 @@ func TestWorkItemsPendingForObjectBatch(t *testing.T) {
 
 func TestIsRestorationSpotTest(t *testing.T) {
 
-	// This is not a spot test because it's not even a restoration.
+	// This is not even a restoration item
 	query := pgmodels.NewQuery().Where("action", "=", constants.ActionIngest).Limit(1)
 	item, err := pgmodels.WorkItemGet(query)
 	require.Nil(t, err)
@@ -513,8 +513,23 @@ func TestIsRestorationSpotTest(t *testing.T) {
 	assert.Nil(t, obj)
 	assert.Nil(t, err)
 
-	// Should not alert, because this is not a successful spot test
-	assert.Nil(t, item.AlertOnSuccessfulSpotTest())
+	// Should not alert, because this is not a successful restore - rather, it is an ingest.
+	assert.Nil(t, item.AlertOnSuccessfulRestore())
+
+	// Test alerts for file restore
+	query = pgmodels.NewQuery().Where("action", "=", constants.ActionRestoreFile).Where("status", "=", constants.StatusSuccess).IsNotNull("generic_file_id").Limit(1)
+	item, err = pgmodels.WorkItemGet(query)
+	require.Nil(t, err)
+	require.NotNil(t, item)
+	require.NotEmpty(t, item.ID)
+
+	inst, obj, err = item.GetSpotTestDetails()
+	assert.Nil(t, inst)
+	assert.Nil(t, obj)
+	assert.Nil(t, err)
+
+	// Should alert, this is a regular restoration.
+	testAlertOnSuccessfulFileRestore(t, item)
 
 	// Although this one in an object restoration, it's not a spot
 	// test because it's not tied to any institution.last_spot_restore_work_item_id.
@@ -529,10 +544,10 @@ func TestIsRestorationSpotTest(t *testing.T) {
 	assert.Nil(t, obj)
 	assert.Nil(t, err)
 
-	// Should not alert, because this is not a successful spot test
-	assert.Nil(t, item.AlertOnSuccessfulSpotTest())
+	// Should alert, this is a regular restoration.
+	testAlertOnSuccessfulRestore(t, item)
 
-	// Now link this to an institution, and we should get a yes.
+	// Now link this to an institution and test the spot test alert...
 	inst, err = pgmodels.InstitutionByID(item.InstitutionID)
 	require.Nil(t, err)
 	require.NotNil(t, inst)
@@ -559,7 +574,7 @@ func TestIsRestorationSpotTest(t *testing.T) {
 }
 
 func testAlertOnSuccessfulSpotTest(t *testing.T, item *pgmodels.WorkItem) {
-	alert := item.AlertOnSuccessfulSpotTest()
+	alert := item.AlertOnSuccessfulRestore()
 	require.NotNil(t, alert)
 
 	assert.Equal(t, "Restoration Spot Test Completed", alert.Subject)
@@ -571,6 +586,42 @@ func testAlertOnSuccessfulSpotTest(t *testing.T, item *pgmodels.WorkItem) {
 	assert.Equal(t, 3, len(alert.Users))
 	for _, user := range alert.Users {
 		assert.EqualValues(t, 2, user.InstitutionID)
+	}
+
+	require.Equal(t, 1, len(alert.WorkItems))
+	assert.Equal(t, item.ID, alert.WorkItems[0].ID)
+}
+
+func testAlertOnSuccessfulRestore(t *testing.T, item *pgmodels.WorkItem) {
+	alert := item.AlertOnSuccessfulRestore()
+	require.NotNil(t, alert)
+
+	assert.Equal(t, "Restoration Completed", alert.Subject)
+	assert.Contains(t, alert.Content, "APTrust System")
+	assert.Contains(t, alert.Content, "institution1.edu/photos")
+	assert.Contains(t, alert.Content, "https://s3.example.com/photos.tar")
+
+	assert.Equal(t, 3, len(alert.Users))
+	for _, user := range alert.Users {
+		assert.EqualValues(t, 2, user.InstitutionID)
+	}
+
+	require.Equal(t, 1, len(alert.WorkItems))
+	assert.Equal(t, item.ID, alert.WorkItems[0].ID)
+}
+
+func testAlertOnSuccessfulFileRestore(t *testing.T, item *pgmodels.WorkItem) {
+	alert := item.AlertOnSuccessfulRestore()
+	require.NotNil(t, alert)
+
+	assert.Equal(t, "Restoration Completed", alert.Subject)
+	assert.Contains(t, alert.Content, "APTrust System")
+	assert.Contains(t, alert.Content, "institution2.edu/toads/toad10")
+	assert.Contains(t, alert.Content, "https://s3.example.com/toads/toad10.png")
+
+	assert.Equal(t, 2, len(alert.Users))
+	for _, user := range alert.Users {
+		assert.EqualValues(t, 3, user.InstitutionID)
 	}
 
 	require.Equal(t, 1, len(alert.WorkItems))

@@ -137,7 +137,7 @@ func TestWorkItemIndex(t *testing.T) {
 		testutil.AssertMatchesAll(t, html, commonFilters)
 		if client == testutil.SysAdminClient {
 			testutil.AssertMatchesAll(t, html, adminFilters)
-			testutil.AssertMatchesResultCount(t, html, 32)
+			testutil.AssertMatchesResultCount(t, html, 33)
 		} else {
 			testutil.AssertMatchesNone(t, html, adminFilters)
 			testutil.AssertMatchesResultCount(t, html, 16)
@@ -146,7 +146,7 @@ func TestWorkItemIndex(t *testing.T) {
 
 	// Apply a filter
 	objRestorationLinks := []string{
-		"/work_items/show/33",
+		"/work_items/show/34",
 	}
 	for _, client := range testutil.AllClients {
 		html := client.GET("/work_items").
