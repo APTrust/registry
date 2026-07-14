@@ -27,10 +27,40 @@
         <span style="font-family: 'Courier New', Courier, monospace; font-size: 20pt; font-weight: bold;">{{ .secVal }}</span>
     </p>
     <br/><br/>
+    <div class="box" style="padding: 5px 30px;">
+    <div class="box-header">
+      <h2>Enter One-Time Code From Your Authenticator App</h2>
+    </div>
+
+    <div class="modal-content">
+      <p class="mb-5">Using your authenticator app, please enter the one-time code that you see for APTrust.</p>
+
+      {{ if .errorMessage }}
+        <p class="mb-5">{{ .errorMessage }}</p> 
+      {{ end }}
+
+      <form name="validateTOTP" method="post" action="/users/validate_totp">
+        <input name="totpCode" type="password" label="One-Time Code" autofocus>
+        {{ if .firstConfirm }}
+            <input name="firstConfirm" type="text" value="firstConfirm" style="visibility:hidden">  
+        {{ end }}
+        {{ template "forms/csrf_token.html" . }}
+        <input class="button" type="submit" value="Continue">
+        {{ if .firstConfirm }}
+            <input class="button" onclick="cancelSetup()" value="Cancel Setup">
+        {{ end }}
+      </form>
+      <br/><br/>
+    </div>
+  </div>
     <form name="finishTOTPSetup" method="get" action="/users/validate_totp">
         <input class="text" type="text" name="firstConfirm" value="firstConfirm" style="display:none;">
-        <input class="button is-primary" type="submit" value="Continue"><br />
+        <!-- input class="button is-primary" type="submit" value="Continue"><br / -->
         <input class="button" onclick="cancelSetup()" value="Cancel Setup">
+    </form>
+    <form name="cancelSetupForm" method="post" action="">
+      <input class="is-hidden" type="hidden" name="cancel_setup" value="" />
+      <!-- CSRF token is in script below -->
     </form>
   </div>
 </div>
@@ -39,8 +69,24 @@
     function showSecVal(){
         document.getElementById('secValSection').style.display = "block"    
     }
+    // If cancelling setup, we need to reset user's preference
     function cancelSetup(){
-        window.location = "/users/my_account"
+        let form = document.forms["cancelSetupForm"]
+        let csrfToken = "{{ .csrf_token }}"
+        form["cancel_setup"].value = true
+        addCsrf(form, csrfToken)
+        form.method = "post"
+        form.action = "/users/2fa_totp_cancel_setup/"
+        form.submit()
+    }
+    function addCsrf(form, token) {
+      if (form["csrf_token"] == null) {
+        let input = document.createElement("input");
+        input.setAttribute("type", "hidden");
+        input.setAttribute("name", "csrf_token");
+        input.setAttribute("value", token);
+        form.appendChild(input);
+      }
     }
 </script>
 <!-- Show the footer unless query string says modal=true -->

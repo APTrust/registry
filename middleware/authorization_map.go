@@ -137,6 +137,7 @@ var AuthMap = map[string]AuthMetadata{
 	"UserTwoFactorGenerateSMS":           {"User", constants.UserTwoFactorGenerateSMS, "Generate SMS Message"},
 	"UserTwoFactorPush":                  {"User", constants.UserTwoFactorPush, "Send Push Message"},
 	"UserTwoFactorResend":                {"User", constants.UserTwoFactorResend, "Resent Two-Factor Token"},
+	"UserTwoFactorTotpCancelSetup":       {"User", constants.UserTwoFactorTotpCancelSetup, "Auth App Cancel Setup"},
 	"UserTwoFactorVerify":                {"User", constants.UserTwoFactorVerify, "Verify Two-Factor Authentication Method"},
 	"UserUndelete":                       {"User", constants.UserUpdate, "Reactivate User"},
 	"UserUpdate":                         {"User", constants.UserUpdate, "Update User"},

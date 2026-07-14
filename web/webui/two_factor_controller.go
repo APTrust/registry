@@ -87,6 +87,23 @@ func UserTwoFactorPush(c *gin.Context) {
 	c.Redirect(http.StatusFound, "/users/sign_out")
 }
 
+// Cancels setup using 2FA authenticator app for user.
+//
+// POST /users/2fa_totp_cancel_setup/
+func UserTwoFactorTotpCancelSetup(c *gin.Context) {
+	req := NewRequest(c)
+	shouldCancel := c.PostForm("cancel_setup")
+	user := req.CurrentUser
+	if shouldCancel == "true" {
+		user.AuthyStatus = ""
+		err := user.Save()
+		if AbortIfError(c, err) {
+			return
+		}
+	}
+	c.Redirect(http.StatusFound, "/users/my_account")
+}
+
 // UserTwoFactorVerify verifies the SMS or backup code that the user
 // entered on TwoFactorEnter.
 //
@@ -461,7 +478,8 @@ func UserGenerateTOTP(c *gin.Context) {
 		}
 		// req.TemplateData["sec"] = secret // temp - remove
 	}
-	otpURL := fmt.Sprintf("otpauth://totp/%s:%s?secret=%s&issuer=%s", constants.TOTPSecretIssuer, user.Email, user.EncryptedAuthAppSecret, constants.TOTPSecretIssuer)
+	issuer := constants.TOTPSecretIssuer + "/" + common.Context().Config.EnvName
+	otpURL := fmt.Sprintf("otpauth://totp/%s:%s?secret=%s&issuer=%s", issuer, user.Email, user.EncryptedAuthAppSecret, issuer)
 	//otpURL := fmt.Sprintf("otpauth://totp/%s:%s?secret=%s&issuer=%s", constants.TOTPSecretIssuer, user.Email, "nonesuch", constants.TOTPSecretIssuer)
 	png, err := qrcode.Encode(otpURL, qrcode.Medium, 256)
 	if err != nil {
@@ -495,7 +513,7 @@ func UserValidateTOTP(c *gin.Context) {
 	isValid := totp.Validate(totpCode, user.EncryptedAuthAppSecret)
 	// isValid := totp.Validate(totpCode, "nonesuch")
 	if !isValid {
-		req.TemplateData["errorMessage"] = "Oops! That wasn't the right code. Please try again."
+		req.TemplateData["errorMessage"] = "Oops! That wasn't the right code. Please try again. Do note that the demo and production environments will have separate codes."
 		c.HTML(http.StatusOK, "users/validate_totp.html", req.TemplateData)
 		return
 	} else {

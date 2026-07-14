@@ -84,6 +84,7 @@ const (
 	UserTwoFactorGenerateSMS           = "UserTwoFactorGenerateSMS"
 	UserTwoFactorPush                  = "UserTwoFactorPush"
 	UserTwoFactorResend                = "UserTwoFactorResend"
+	UserTwoFactorTotpCancelSetup       = "UserTwoFactorTotpCancelSetup"
 	UserTwoFactorVerify                = "UserTwoFactorVerify"
 	UserUpdate                         = "UserUpdate"
 	UserUpdateSelf                     = "UserUpdateSelf"
@@ -166,6 +167,7 @@ var Permissions = []Permission{
 	UserTwoFactorGenerateSMS,
 	UserTwoFactorPush,
 	UserTwoFactorResend,
+	UserTwoFactorTotpCancelSetup,
 	UserTwoFactorVerify,
 	UserUpdate,
 	UserUpdateSelf,
@@ -244,6 +246,7 @@ func initPermissions() {
 	instUser[UserTwoFactorGenerateSMS] = true
 	instUser[UserTwoFactorPush] = true
 	instUser[UserTwoFactorResend] = true
+	instUser[UserTwoFactorTotpCancelSetup] = true
 	instUser[UserTwoFactorVerify] = true
 	instUser[UserValidateTOTP] = true
 	instUser[UserValidateTOTPView] = true
@@ -288,6 +291,7 @@ func initPermissions() {
 	instAdmin[UserTwoFactorGenerateSMS] = true
 	instAdmin[UserTwoFactorPush] = true
 	instAdmin[UserTwoFactorResend] = true
+	instAdmin[UserTwoFactorTotpCancelSetup] = true
 	instAdmin[UserTwoFactorVerify] = true
 	instAdmin[UserValidateTOTP] = true
 	instAdmin[UserValidateTOTPView] = true
@@ -364,6 +368,7 @@ func initPermissions() {
 	sysAdmin[UserTwoFactorGenerateSMS] = true
 	sysAdmin[UserTwoFactorPush] = true
 	sysAdmin[UserTwoFactorResend] = true
+	sysAdmin[UserTwoFactorTotpCancelSetup] = true
 	sysAdmin[UserTwoFactorVerify] = true
 	sysAdmin[UserValidateTOTP] = true
 	sysAdmin[UserValidateTOTPView] = true
