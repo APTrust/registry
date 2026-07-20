@@ -424,7 +424,6 @@ func TestGenericFileCreateBatch(t *testing.T) {
 			assert.Equal(t, gf.InstitutionID, event.InstitutionID)
 			assert.Equal(t, constants.EventIngestion, event.EventType)
 			assert.False(t, event.DateTime.IsZero())
-			assert.False(t, event.CreatedAt.IsZero())
 		}
 
 		// Check checksums
@@ -435,8 +434,6 @@ func TestGenericFileCreateBatch(t *testing.T) {
 			assert.Equal(t, gf.ID, cs.GenericFileID)
 			assert.Equal(t, constants.AlgSha1, cs.Algorithm)
 			assert.False(t, cs.DateTime.IsZero())
-			assert.False(t, cs.CreatedAt.IsZero())
-			assert.False(t, cs.UpdatedAt.IsZero())
 		}
 
 		// And storage records

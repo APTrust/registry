@@ -9,7 +9,7 @@ import (
 )
 
 type Checksum struct {
-	TimestampModel
+	BaseModel
 	Algorithm     string       `json:"algorithm"`
 	DateTime      time.Time    `json:"datetime" pg:"datetime"`
 	Digest        string       `json:"digest"`
@@ -45,7 +45,6 @@ func ChecksumSelect(query *Query) ([]*Checksum, error) {
 // we add a new checksum, so that we have records for all checksums that
 // have existed over time.
 func (cs *Checksum) Save() error {
-	cs.SetTimestamps()
 	err := cs.Validate()
 	if err != nil {
 		return err

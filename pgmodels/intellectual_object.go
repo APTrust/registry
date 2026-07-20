@@ -150,7 +150,6 @@ func (obj *IntellectualObject) Delete() error {
 	if err != nil {
 		return err
 	}
-	deletionEvent.SetTimestamps()
 	valErr = deletionEvent.Validate()
 	if valErr != nil {
 		return valErr
@@ -327,7 +326,7 @@ func (obj *IntellectualObject) assertNotAlreadyDeleted() error {
 		if err != nil {
 			err = fmt.Errorf("Error checking for last deletion event: %v", err)
 		}
-		if lastDeletionEvent != nil && lastDeletionEvent.CreatedAt.After(lastIngestEvent.CreatedAt) {
+		if lastDeletionEvent != nil && lastDeletionEvent.DateTime.After(lastIngestEvent.DateTime) {
 			err = fmt.Errorf("Object has already been deleted since last ingest")
 		}
 	}
