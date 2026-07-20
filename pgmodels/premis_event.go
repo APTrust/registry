@@ -19,7 +19,6 @@ type PremisEvent struct {
 	InstitutionID        int64     `json:"institution_id"`
 	IntellectualObjectID int64     `json:"intellectual_object_id"`
 	Object               string    `json:"object"`
-	OldUUID              string    `json:"old_uuid"`
 	Outcome              string    `json:"outcome"`
 	OutcomeDetail        string    `json:"outcome_detail"`
 	OutcomeInformation   string    `json:"outcome_information"`

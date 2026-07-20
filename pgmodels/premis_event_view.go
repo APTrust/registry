@@ -34,7 +34,6 @@ type PremisEventView struct {
 	IntellectualObjectID         int64     `json:"intellectual_object_id"`
 	IntellectualObjectIdentifier string    `json:"intellectual_object_identifier"`
 	Object                       string    `json:"object"`
-	OldUUID                      string    `json:"old_uuid"`
 	Outcome                      string    `json:"outcome"`
 	OutcomeDetail                string    `json:"outcome_detail"`
 	OutcomeInformation           string    `json:"outcome_information"`
