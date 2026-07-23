@@ -39,7 +39,12 @@ insert into event_agent_lookup (id, event_agent) values
 (3, 'https://github.com/minio/minio-go v6'),
 (4, 'https://github.com/minio/minio-go v7'),
 (5, 'Registry Unit Test'),
-(6, 'APTrust preservation services');
+(6, 'APTrust preservation services'),
+(7, 'http://golang.org/pkg/crypto/sha256/'),
+(8, 'Maxwell Smart'),
+(9, 'http://golang.org/pkg/crypto/md5/'),
+(10, 'https://github.com/APTrust/preservation-services')
+(11, 'http://github.com/google/uuid');
 
 insert into event_object_lookup (id, event_object) values 
 (0, 'unknown event object'),
@@ -61,6 +66,11 @@ begin
         when agent='https://github.com/minio/minio-go v7' then 4
         when agent='Registry Unit Test' then 5
         when agent='APTrust preservation services' then 6
+        when agent='http://golang.org/pkg/crypto/sha256/' then 7
+        when agent='Maxwell Smart' then 8
+        when agent='http://golang.org/pkg/crypto/md5/' then 9
+        when agent='https://github.com/APTrust/preservation-services' then 10
+        when agent='http://github.com/google/uuid' then 11
         else 0  -- default
     end;
 end;
