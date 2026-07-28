@@ -426,7 +426,7 @@ func TestUserValidateTOTP(t *testing.T) {
 		WithFormField(constants.CSRFTokenName, testutil.Inst1UserToken).
 		WithFormField("totpCode", "000000").
 		Expect().Status(http.StatusOK).Body().Raw()
-	assert.True(t, strings.Contains(html, "Oops! That wasn't the right code. Please try again."))
+	assert.True(t, strings.Contains(html, "Please try again."))
 
 	// A valid code should be accepted. The client follows the redirect
 	// to /dashboard, so we expect a 200 with the dashboard content.

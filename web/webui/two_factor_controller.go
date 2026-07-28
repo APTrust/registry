@@ -511,7 +511,6 @@ func UserValidateTOTP(c *gin.Context) {
 	totpCode := c.PostForm("totpCode")
 	confirming := c.PostForm("firstConfirm")
 	isValid := totp.Validate(totpCode, user.EncryptedAuthAppSecret)
-	// isValid := totp.Validate(totpCode, "nonesuch")
 	if !isValid {
 		req.TemplateData["errorMessage"] = "Oops! That wasn't the right code. Please try again. Do note that the demo and production environments will have separate codes."
 		c.HTML(http.StatusOK, "users/validate_totp.html", req.TemplateData)
