@@ -14,6 +14,7 @@ drop materialized view public.premis_event_counts;
 drop view public.premis_events_view;
 drop index index_checksums_on_generic_file_id;
 drop view public.checksums_view;
+drop view public.generic_files_view;
 
 -- Now we can remove the redundant data
 alter table premis_events drop column created_at;
@@ -55,7 +56,8 @@ AS SELECT pe.id,
     pe.outcome_detail,
     pe.outcome_information,
     pe.object,
-    pe.agent
+    pe.agent,
+    pe.old_uuid
    FROM premis_events pe
      LEFT JOIN institutions i ON pe.institution_id = i.id
      LEFT JOIN intellectual_objects io ON pe.intellectual_object_id = io.id
@@ -76,7 +78,48 @@ AS SELECT cs.id,
    FROM checksums cs
      LEFT JOIN generic_files gf ON cs.generic_file_id = gf.id;
 
--- possibly need to recreate public.generic_files_view
+CREATE OR REPLACE VIEW public.generic_files_view
+AS SELECT gf.id,
+    gf.file_format,
+    gf.size,
+    gf.identifier,
+    gf.intellectual_object_id,
+    io.identifier AS object_identifier,
+    io.access,
+    gf.state,
+    gf.last_fixity_check,
+    gf.institution_id,
+    i.name AS institution_name,
+    i.identifier AS institution_identifier,
+    gf.storage_option,
+    gf.uuid,
+    gf.mod_time,
+    ( SELECT checksums.digest
+           FROM checksums
+          WHERE checksums.generic_file_id = gf.id AND checksums.algorithm::text = 'md5'::text
+          ORDER BY checksums.datetime DESC
+         LIMIT 1) AS md5,
+    ( SELECT checksums.digest
+           FROM checksums
+          WHERE checksums.generic_file_id = gf.id AND checksums.algorithm::text = 'sha1'::text
+          ORDER BY checksums.datetime DESC
+         LIMIT 1) AS sha1,
+    ( SELECT checksums.digest
+           FROM checksums
+          WHERE checksums.generic_file_id = gf.id AND checksums.algorithm::text = 'sha256'::text
+          ORDER BY checksums.datetime DESC
+         LIMIT 1) AS sha256,
+    ( SELECT checksums.digest
+           FROM checksums
+          WHERE checksums.generic_file_id = gf.id AND checksums.algorithm::text = 'sha512'::text
+          ORDER BY checksums.datetime DESC
+         LIMIT 1) AS sha512,
+    gf.created_at,
+    gf.updated_at
+   FROM generic_files gf
+     LEFT JOIN intellectual_objects io ON io.id = gf.intellectual_object_id
+     LEFT JOIN institutions i ON i.id = gf.institution_id;
+
 
 -- Now mark the migration as completed.
 update schema_migrations set finished_at = now() where "version" = '017_create_update_timestamp_removal';

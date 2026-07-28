@@ -61,7 +61,7 @@ func GenericFileByID(id int64) (*GenericFile, error) {
 			return q.Order("premis_event.date_time desc"), nil
 		}).
 		Relation("Checksums", func(q *pg.Query) (*pg.Query, error) {
-			return q.Order("checksum.created_at desc"), nil
+			return q.Order("checksum.datetime desc"), nil
 		}).
 		Relation("Institution").
 		Relation("IntellectualObject").
@@ -436,7 +436,7 @@ func (gf *GenericFile) lastEvent(eventType string) (*PremisEvent, error) {
 	query := NewQuery().
 		Where("generic_file_id", "=", gf.ID).
 		Where("event_type", "=", eventType).
-		OrderBy("created_at", "desc").
+		OrderBy("date_time", "desc").
 		Offset(0).
 		Limit(1)
 	return PremisEventGet(query)
