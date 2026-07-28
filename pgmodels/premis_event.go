@@ -19,6 +19,7 @@ type PremisEvent struct {
 	InstitutionID        int64     `json:"institution_id"`
 	IntellectualObjectID int64     `json:"intellectual_object_id"`
 	Object               string    `json:"object"`
+	OldUUID              string    `json:"old_uuid"`
 	Outcome              string    `json:"outcome"`
 	OutcomeDetail        string    `json:"outcome_detail"`
 	OutcomeInformation   string    `json:"outcome_information"`
@@ -81,7 +82,7 @@ func (event *PremisEvent) Save() error {
 func (event *PremisEvent) Validate() *common.ValidationError {
 	errors := make(map[string]string)
 	if common.IsEmptyString(event.Agent) {
-		errors["Agent"] = "Event requires a valid Agent"
+		errors["Agent"] = "Event Agent cannot be empty"
 	}
 	if event.DateTime.IsZero() {
 		errors["DateTime"] = "Event DateTime is required"
@@ -104,7 +105,7 @@ func (event *PremisEvent) Validate() *common.ValidationError {
 		errors["IntellectualObjectID"] = "Event requires a valid intellectual object id"
 	}
 	if common.IsEmptyString(event.Object) {
-		errors["Object"] = "Event requires a valid Object"
+		errors["Object"] = "Event Object cannot be empty"
 	}
 	if !slice.Contains(constants.EventOutcomes, event.Outcome) {
 		errors["Outcome"] = "Event requires a valid Outcome value"

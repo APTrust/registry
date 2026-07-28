@@ -1,25 +1,26 @@
--- 013_shrink_db_size.sql
+-- 013_convert_event_type.sql
 --
--- This migration contains several optimizations that will reduce the size of the database.
--- They include:
--- Removing columns that are no longer used
--- Converting certain enumerated string fields to integer and adding lookup tables
+-- This migration helps to shrink the size of our database by optimizing premis events.
+-- By converting event_type from a string to an int, and indexing these int values,
+-- we will save on space to store each event.
 
 -- Note that we're starting the migration.
-insert into schema_migrations ("version", started_at) values ('013_shrink_db_size', now())
+insert into schema_migrations ("version", started_at) values ('013_convert_event_type', now())
 on conflict ("version") do update set started_at = now();
 
+-- First we need to drop related indices and views temporarily.
+-- We will recreate them at the end.
 drop index index_premis_events_on_event_type;
 drop index index_premis_events_on_event_type_and_outcome;
 drop index ix_premis_event_counts;
 drop materialized view public.premis_event_counts;
 drop view public.premis_events_view;
 
-alter table premis_events drop column old_uuid;
+-- Add a new temporary column for the event_type as int
 alter table premis_events add COLUMN event_type_int smallint;
 
--- create table event_type_lookup
--- Most of these, we are not using at the moment
+-- Create a lookup table for these new event_type ints.
+-- Each int is linked to a string describing the event type.
 drop table if exists event_type_lookup;
 create table event_type_lookup (
      id int primary key,
@@ -81,11 +82,7 @@ insert into event_type_lookup (id, event_type) values
 (51, 'validation'),
 (52, 'virus check');
  
--- IMPORTANT
--- TO DO: If there is a value in the current premis_events table
--- for eventType that is NOT a match for any values in this function,
--- probably we need to abort and roll back. If it converts to a 0,
--- we will lose whatever information was in there. Same for object and agent fields
+-- Function that performs the actual conversion.
 create or replace function convert_event_types()
 returns void as $$
 begin
@@ -147,13 +144,16 @@ begin
 end;
 $$ language plpgsql;
 
+-- Run the function.
 select convert_event_types();
 
--- if exists
+-- Now that we have converted every event, we can drop the old event_type column.
 alter table premis_events drop column event_type;
+
+-- Rename the event_type_int column to event_type.
 alter table premis_events rename column event_type_int TO event_type;
 
--- add foreign key restraint to event_type to map to event_type_lookup
+-- Add foreign key restraint to event_type to map to event_type_lookup
 alter table premis_events add constraint event_type_fk FOREIGN KEY (event_type) REFERENCES event_type_lookup(id);
 
 -- Recreate indices and views that use this and reindex - may take some time before indexing is complete
@@ -192,15 +192,12 @@ AS SELECT pe.id,
     pe.object,
     pe.agent,
     pe.created_at,
-    pe.updated_at
+    pe.updated_at,
+    pe.old_uuid
    FROM premis_events pe
      LEFT JOIN institutions i ON pe.institution_id = i.id
      LEFT JOIN intellectual_objects io ON pe.intellectual_object_id = io.id
      LEFT JOIN generic_files gf ON pe.generic_file_id = gf.id;
 
-
--- lookup table for object in premis
--- alter table premis_events add COLUMN object_int smallint;
-
 -- Now mark the migration as completed.
-update schema_migrations set finished_at = now() where "version" = '013_shrink_db_size';
+update schema_migrations set finished_at = now() where "version" = '013_convert_event_type';
