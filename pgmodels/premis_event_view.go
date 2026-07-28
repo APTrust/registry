@@ -25,7 +25,7 @@ type PremisEventView struct {
 	CreatedAt                    time.Time `json:"created_at"`
 	DateTime                     time.Time `json:"date_time"`
 	Detail                       string    `json:"detail"`
-	EventType                    string    `json:"event_type"`
+	EventType                    int       `json:"event_type"`
 	GenericFileID                int64     `json:"generic_file_id"`
 	GenericFileIdentifier        string    `json:"generic_file_identifier"`
 	Identifier                   string    `json:"identifier"`

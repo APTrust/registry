@@ -127,8 +127,22 @@ func TestIconFor(t *testing.T) {
 	// Should return item defined in map
 	assert.Equal(
 		t,
-		template.HTML(helpers.IconMap[constants.EventIngestion]),
-		helpers.IconFor(constants.EventIngestion))
+		template.HTML(helpers.IconMap[constants.EventStringIngestion]),
+		helpers.IconFor(constants.EventStringIngestion))
+
+	// If item is not defined in map, should return IconMissing
+	assert.Equal(
+		t,
+		template.HTML(helpers.IconMissing),
+		helpers.IconFor("** missing **"))
+}
+
+func TestIconForEvent(t *testing.T) {
+	// Should return item defined in map
+	assert.Equal(
+		t,
+		template.HTML(helpers.IconEventMap[constants.EventIngestion]),
+		helpers.IconForEvent(constants.EventIngestion))
 
 	// If item is not defined in map, should return IconMissing
 	assert.Equal(

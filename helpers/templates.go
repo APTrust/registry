@@ -153,6 +153,17 @@ func IconFor(str string) template.HTML {
 	return template.HTML(icon)
 }
 
+// IconForEvent returns a FontAwesome icon for the specified string, as defined
+// in helpers.IconEventMap. If the IconEventMap has no entry for the string, this
+// returns helpers.IconMissing.
+func IconForEvent(eventCode int) template.HTML {
+	icon := IconEventMap[eventCode]
+	if icon == "" {
+		icon = IconMissing
+	}
+	return template.HTML(icon)
+}
+
 // BadgeClass returns the css class for the specified string, where
 // string is a work item status or other value defined in Constants.
 func BadgeClass(str string) template.HTML {
