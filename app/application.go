@@ -283,6 +283,9 @@ func initRoutes(router *gin.Engine) {
 		webRoutes.POST("/nsq/init", webui.NsqInit)
 		webRoutes.POST("/nsq/admin", webui.NsqAdmin)
 
+		// Accessibility Statement
+		webRoutes.GET("/accessibility_statement", webui.ShowAccessibilityStatement)
+
 		// Error page
 		webRoutes.GET("/error", webui.ErrorShow)
 

@@ -76,13 +76,13 @@ func IsAPIRoute(c *gin.Context) bool {
 // the path doesn't exist.
 func showNotCheckedError(c *gin.Context, auth *ResourceAuthorization) {
 	fmt.Println(auth.String())
-	common.Context().Log.Error().Msgf(auth.GetError())
+	common.Context().Log.Error().Msgf("%s", auth.GetError())
 	errMsg := fmt.Sprintf("Missing authorization check for %s", c.Request.URL.Path)
 	showError(c, auth, errMsg, http.StatusNotFound)
 }
 
 func showAuthFailedError(c *gin.Context, auth *ResourceAuthorization) {
-	common.Context().Log.Error().Msgf(auth.GetNotAuthorizedMessage())
+	common.Context().Log.Error().Msgf("%s", auth.GetNotAuthorizedMessage())
 	errMsg := fmt.Sprintf("Permission denied for %s (institution %d).", c.FullPath(), auth.ResourceInstID)
 	if auth.Error != nil {
 		errMsg = fmt.Sprintf("%s %s", errMsg, auth.Error.Error())
@@ -91,7 +91,7 @@ func showAuthFailedError(c *gin.Context, auth *ResourceAuthorization) {
 }
 
 func showNotFoundError(c *gin.Context, auth *ResourceAuthorization) {
-	common.Context().Log.Error().Msgf(auth.GetError())
+	common.Context().Log.Error().Msgf("%s", auth.GetError())
 	errMsg := fmt.Sprintf("Not found: %s", c.Request.URL.Path)
 	showError(c, auth, errMsg, http.StatusNotFound)
 }

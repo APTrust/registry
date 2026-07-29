@@ -203,7 +203,8 @@ func TestToJSON(t *testing.T) {
 
 func TestUnixToISO(t *testing.T) {
 	ts := time.Date(2022, 5, 9, 14, 33, 24, 0, time.Local)
-	assert.Equal(t, ts.Format(time.RFC3339), helpers.UnixToISO(1652121204))
+	unixTimestamp := ts.Unix()
+	assert.Equal(t, ts.Format(time.RFC3339), helpers.UnixToISO(unixTimestamp))
 }
 
 func TestBadgeClass(t *testing.T) {
