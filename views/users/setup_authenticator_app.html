@@ -88,6 +88,11 @@
         form.appendChild(input);
       }
     }
+
+    function mfaTimeout() {
+      cancelSetup()
+    }
+    setTimeout(mfaTimeout, 600000)
 </script>
 <!-- Show the footer unless query string says modal=true -->
 {{ if not .showAsModal }}

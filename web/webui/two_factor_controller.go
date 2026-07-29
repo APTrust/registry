@@ -226,18 +226,6 @@ func UserComplete2FASetup(c *gin.Context) {
 	if prefs.UseAuthenticatorApp() {
 		userCompleteAuthenticatorAppSetup(c, req, prefs)
 		return
-		/* if AbortIfError(c, err) {
-			return
-		}
-		if ok {
-			helpers.SetFlashCookie(c, "Your two-factor setup is complete. Next time you log in, you will need to use your authenticator app and provide a six-digit one-time code to complete the sign-in process.")
-			c.Redirect(http.StatusFound, "/users/my_account")
-			return
-		} else {
-			// User did not approve
-			c.Redirect(http.StatusFound, "/users/sign_out")
-			return
-		} */
 	}
 
 	if prefs.UseAuthy() {
@@ -420,14 +408,7 @@ func userCompleteAuthySetup(req *Request, prefs *TwoFactorPreferences) (ok bool,
 }
 
 func userCompleteAuthenticatorAppSetup(c *gin.Context, req *Request, prefs *TwoFactorPreferences) {
-	if prefs.NeedsAuthenticatorAppRegistration() {
-		c.Redirect(http.StatusFound, "/users/generate_totp")
-		return
-	} else if prefs.NeedsAuthenticatorAppConfirmation() {
-		c.Redirect(http.StatusFound, "/users/validate_totp")
-		return
-	}
-	c.Redirect(http.StatusFound, "/users/my_account")
+	c.Redirect(http.StatusFound, "/users/generate_totp")
 }
 
 func UserCompleteSMSSetup(req *Request) error {

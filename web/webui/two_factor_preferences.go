@@ -88,11 +88,6 @@ func (p *TwoFactorPreferences) NeedsAuthyConfirmation() bool {
 	return p.NeedsConfirmation() && p.NewMethod == constants.TwoFactorAuthy
 }
 
-func (p *TwoFactorPreferences) NeedsAuthenticatorAppRegistration() bool {
-	return true
-	// return p.NewAuthAppMethod == constants.TwoFactorTOTP && p.User.TOTPSecret == ""
-}
-
 func (p *TwoFactorPreferences) NeedsAuthenticatorAppConfirmation() bool {
 	return p.NeedsConfirmation() && p.NewMethod == constants.TwoFactorTOTP
 }
