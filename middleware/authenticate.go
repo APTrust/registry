@@ -224,7 +224,7 @@ func respondToAuthError(c *gin.Context, err error) {
 			"suppressSideNav": true,
 			"suppressTopNav":  true,
 			"error":           "Please log in",
-			"redirectURL":     fmt.Sprintf("/?requrl=%s", c.Request.URL),
+			"redirectURL":     c.Request.URL,
 		})
 	}
 }
