@@ -35,46 +35,38 @@ func NewPremisEventFilterForm(fc *pgmodels.FilterCollection, actingUser *pgmodel
 
 func (f *PremisEventFilterForm) init() {
 	f.Fields["date_time__gteq"] = &Field{
-		Name:        "date_time__gteq",
-		Label:       "Date on or After",
-		Placeholder: "Date on or After",
+		Name:  "date_time__gteq",
+		Label: "Date on or After",
 	}
 	f.Fields["date_time__lteq"] = &Field{
-		Name:        "date_time__lteq",
-		Label:       "Date on or Before",
-		Placeholder: "Date on or Before",
+		Name:  "date_time__lteq",
+		Label: "Date on or Before",
 	}
 	f.Fields["event_type"] = &Field{
-		Name:        "event_type",
-		Label:       "Event Type",
-		Placeholder: "Event Type",
-		Options:     Options(constants.EventTypes),
+		Name:    "event_type",
+		Label:   "Event Type",
+		Options: Options(constants.EventTypes),
 	}
 	f.Fields["generic_file_identifier"] = &Field{
-		Name:        "generic_file_identifier",
-		Label:       "File Identifier",
-		Placeholder: "File Identifier",
+		Name:  "generic_file_identifier",
+		Label: "File Identifier",
 	}
 	f.Fields["identifier"] = &Field{
-		Name:        "identifier",
-		Label:       "Identifier (UUID)",
-		Placeholder: "Identifier (UUID)",
+		Name:  "identifier",
+		Label: "Identifier (UUID)",
 	}
 	f.Fields["institution_id"] = &Field{
-		Name:        "institution_id",
-		Label:       "Institution",
-		Placeholder: "Institution",
-		Options:     f.instOptions,
+		Name:    "institution_id",
+		Label:   "Institution",
+		Options: f.instOptions,
 	}
 	f.Fields["intellectual_object_identifier"] = &Field{
-		Name:        "intellectual_object_identifier",
-		Label:       "Object Identifier",
-		Placeholder: "Object Identifier",
+		Name:  "intellectual_object_identifier",
+		Label: "Object Identifier",
 	}
 	f.Fields["outcome"] = &Field{
-		Name:        "outcome",
-		Label:       "Outcome",
-		Placeholder: "Outcome",
+		Name:  "outcome",
+		Label: "Outcome",
 		// Fix options: https://trello.com/c/VooirpKZ
 		//Options:     Options(constants.EventOutcomes),
 		Options: Options([]string{"Success", "Failed"}),

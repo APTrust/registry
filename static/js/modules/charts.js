@@ -9,9 +9,9 @@ const fillColors = [
 	"rgba(125, 107, 25, 1)",
 	"rgba(19, 19, 92, 1)",
 	"rgba(51, 48, 48, 1)",
-	"rgba(96, 130, 146, 1)",
+	"rgba(84, 114, 128, 1)",
 	"rgba(147, 90, 21, 1)",
-	"rgba(96, 151, 205, 1)",
+	"rgba(77, 122, 166, 1)",
 ]
 
 // barBorders are used in bar charts, pie charts, etc. rendered
@@ -20,9 +20,9 @@ const barBorders = [
 	"rgba(125, 107, 25, 1)",
 	"rgba(19, 19, 92, 1)",
 	"rgba(51, 48, 48, 1)",
-	"rgba(96, 130, 146, 1)",
+	"rgba(84, 114, 128, 1)",
 	"rgba(147, 90, 21, 1)",
-	"rgba(96, 151, 205, 1)",
+	"rgba(77, 122, 166, 1)",
 ]
 
 // fillColor returns a color for a bar, pie slice, etc. in a

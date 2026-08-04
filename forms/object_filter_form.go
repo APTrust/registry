@@ -34,10 +34,9 @@ func NewObjectFilterForm(fc *pgmodels.FilterCollection, actingUser *pgmodels.Use
 
 func (f *ObjectFilterForm) init() {
 	f.Fields["access"] = &Field{
-		Name:        "access",
-		Label:       "Access",
-		Placeholder: "Access",
-		Options:     Options(constants.AccessSettings),
+		Name:    "access",
+		Label:   "Access",
+		Options: Options(constants.AccessSettings),
 	}
 	f.Fields["alt_identifier__starts_with"] = &Field{
 		Name:  "alt_identifier__starts_with",
@@ -52,25 +51,21 @@ func (f *ObjectFilterForm) init() {
 		Label: "Bag Name",
 	}
 	f.Fields["bagit_profile_identifier"] = &Field{
-		Name:        "bagit_profile_identifier",
-		Label:       "BagIt Profile",
-		Placeholder: "BagIt Profile",
-		Options:     BagItProfileIdentifiers,
+		Name:    "bagit_profile_identifier",
+		Label:   "BagIt Profile",
+		Options: BagItProfileIdentifiers,
 	}
 	f.Fields["created_at__lteq"] = &Field{
-		Name:        "created_at__lteq",
-		Label:       "Created On or Before",
-		Placeholder: "Created On or Before",
+		Name:  "created_at__lteq",
+		Label: "Created On or Before",
 	}
 	f.Fields["created_at__gteq"] = &Field{
-		Name:        "created_at__gteq",
-		Label:       "Created On or After",
-		Placeholder: "Created On or After",
+		Name:  "created_at__gteq",
+		Label: "Created On or After",
 	}
 	f.Fields["etag"] = &Field{
-		Name:        "etag",
-		Label:       "ETag",
-		Placeholder: "ETag",
+		Name:  "etag",
+		Label: "ETag",
 	}
 	f.Fields["file_count__gteq"] = &Field{
 		Name:  "file_count__gteq",
@@ -81,25 +76,22 @@ func (f *ObjectFilterForm) init() {
 		Label: "Maximum File Count",
 	}
 	f.Fields["identifier"] = &Field{
-		Name:        "identifier",
-		Label:       "Object Identifier",
-		Placeholder: "Object Identifier",
+		Name:  "identifier",
+		Label: "Object Identifier",
 	}
 	f.Fields["identifier__starts_with"] = &Field{
 		Name:  "identifier__starts_with",
 		Label: "Object Identifier (Prefix or Exact)",
 	}
 	f.Fields["institution_id"] = &Field{
-		Name:        "institution_id",
-		Label:       "Institution",
-		Placeholder: "Institution",
-		Options:     f.instOptions,
+		Name:    "institution_id",
+		Label:   "Institution",
+		Options: f.instOptions,
 	}
 	f.Fields["institution_parent_id"] = &Field{
-		Name:        "institution_parent_id",
-		Label:       "Parent Institution",
-		Placeholder: "Parent Institution",
-		Options:     f.instOptions,
+		Name:    "institution_parent_id",
+		Label:   "Parent Institution",
+		Options: f.instOptions,
 	}
 	f.Fields["internal_sender_identifier"] = &Field{
 		Name:  "internal_sender_identifier",
@@ -114,31 +106,26 @@ func (f *ObjectFilterForm) init() {
 		Label: "Maximum Size",
 	}
 	f.Fields["source_organization"] = &Field{
-		Name:        "source_organization",
-		Label:       "Source Organization",
-		Placeholder: "Source Organization",
+		Name:  "source_organization",
+		Label: "Source Organization",
 	}
 	f.Fields["state"] = &Field{
-		Name:        "state",
-		Label:       "State",
-		Placeholder: "State",
-		Options:     ObjectStateList,
+		Name:    "state",
+		Label:   "State",
+		Options: ObjectStateList,
 	}
 	f.Fields["storage_option"] = &Field{
-		Name:        "storage_option",
-		Label:       "Storage Option",
-		Placeholder: "Storage Option",
-		Options:     StorageOptionList,
+		Name:    "storage_option",
+		Label:   "Storage Option",
+		Options: StorageOptionList,
 	}
 	f.Fields["updated_at__lteq"] = &Field{
-		Name:        "updated_at__lteq",
-		Label:       "Updated On or Before",
-		Placeholder: "Updated On or Before",
+		Name:  "updated_at__lteq",
+		Label: "Updated On or Before",
 	}
 	f.Fields["updated_at__gteq"] = &Field{
-		Name:        "updated_at__gteq",
-		Label:       "Updated On or After",
-		Placeholder: "Updated On or After",
+		Name:  "updated_at__gteq",
+		Label: "Updated On or After",
 	}
 }
 

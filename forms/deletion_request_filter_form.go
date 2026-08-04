@@ -34,32 +34,27 @@ func NewDeletionRequestFilterForm(fc *pgmodels.FilterCollection, actingUser *pgm
 
 func (f *DeletionRequestFilterForm) init() {
 	f.Fields["institution_id"] = &Field{
-		Name:        "institution_id",
-		Label:       "Institution",
-		Placeholder: "Institution",
-		Options:     f.instOptions,
+		Name:    "institution_id",
+		Label:   "Institution",
+		Options: f.instOptions,
 	}
 	f.Fields["requested_at__lteq"] = &Field{
-		Name:        "requested_at__lteq",
-		Label:       "Requested On or Before",
-		Placeholder: "Requested On or Before",
+		Name:  "requested_at__lteq",
+		Label: "Requested On or Before",
 	}
 	f.Fields["requested_at__gteq"] = &Field{
-		Name:        "requested_at__gteq",
-		Label:       "Requested On or After",
-		Placeholder: "Requested On or After",
+		Name:  "requested_at__gteq",
+		Label: "Requested On or After",
 	}
 	f.Fields["stage"] = &Field{
-		Name:        "stage",
-		Label:       "Work Item Stage",
-		Placeholder: "Work Item Stage",
-		Options:     Options(constants.Stages),
+		Name:    "stage",
+		Label:   "Work Item Stage",
+		Options: Options(constants.Stages),
 	}
 	f.Fields["status"] = &Field{
-		Name:        "status",
-		Label:       "Work Item Status",
-		Placeholder: "Work Item Status",
-		Options:     Options(constants.Statuses),
+		Name:    "status",
+		Label:   "Work Item Status",
+		Options: Options(constants.Statuses),
 	}
 }
 
