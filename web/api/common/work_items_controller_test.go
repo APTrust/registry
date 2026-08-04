@@ -65,7 +65,7 @@ func TestWorkItemIndex(t *testing.T) {
 	list := api.WorkItemViewList{}
 	err := json.Unmarshal([]byte(resp.Body().Raw()), &list)
 	require.Nil(t, err)
-	assert.Equal(t, 32, list.Count)
+	assert.Equal(t, 33, list.Count)
 	assert.Equal(t, "/member-api/v3/items?page=3&per_page=5", list.Next)
 	assert.Equal(t, "/member-api/v3/items?page=1&per_page=5", list.Previous)
 	assert.Equal(t, tu.Inst2User.InstitutionID, list.Results[0].InstitutionID)
@@ -78,8 +78,8 @@ func TestWorkItemIndex(t *testing.T) {
 	list = api.WorkItemViewList{}
 	err = json.Unmarshal([]byte(resp.Body().Raw()), &list)
 	require.Nil(t, err)
-	assert.Equal(t, 16, list.Count)
-	assert.Equal(t, 16, len(list.Results))
+	assert.Equal(t, 17, list.Count)
+	assert.Equal(t, 17, len(list.Results))
 	for _, item := range list.Results {
 		assert.Equal(t, tu.Inst2Admin.InstitutionID, item.InstitutionID)
 		assert.Equal(t, "institution2.edu", item.InstitutionIdentifier)
