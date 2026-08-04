@@ -38,25 +38,28 @@ insert into event_agent_lookup (id, event_agent) values
 (2, 'https://github.com/minio/minio-go v5'),
 (3, 'https://github.com/minio/minio-go v6'),
 (4, 'https://github.com/minio/minio-go v7'),
-(5, 'Registry Unit Test'),
+(5, 'https://github.com/APTrust/preservation-services'),
 (6, 'APTrust preservation services'),
-(7, 'http://golang.org/pkg/crypto/sha256/'),
-(8, 'Maxwell Smart'),
+(7, 'http://github.com/google/uuid'),
+(8, 'http://golang.org/pkg/crypto/sha256/'),
 (9, 'http://golang.org/pkg/crypto/md5/'),
-(10, 'https://github.com/APTrust/preservation-services')
-(11, 'http://github.com/google/uuid');
+(10, 'Registry Unit Test'),
+(11, 'Maxwell Smart');
 
 insert into event_object_lookup (id, event_object) values 
 (0, 'unknown event object'),
-(1, 'preservation-services + Minio S3 client'),
+(1, 'APTrust preservation services'),
 (2, 'Minio S3 client'),
-(3, 'APTrust preservation services'),
-(4, 'Go uuid library + Minio S3 library')
-(5, 'Go language crypto/sha256'),
-(6, 'Minio S3 library');
- 
+(3, 'Minio S3 library'),
+(4, 'preservation-services + Minio S3 client'),
+(5, 'Go uuid library + Minio S3 library')
+(6, 'Go language crypto/sha256'),
+(7, 'Go language crypto/md5'),
+(8, 'scissors'),
+(9, 'APTrust exchange/ingest processor');
+
 -- IMPORTANT - Rollback if any agents or objects appear as 0
-create or replace function convert_event_agents()
+create or replace function convert_event_agents_and_objects()
 returns void as $$
 begin
     update premis_events set event_agent_int = case
@@ -64,36 +67,32 @@ begin
         when agent='https://github.com/minio/minio-go v5' then 2
         when agent='https://github.com/minio/minio-go v6' then 3
         when agent='https://github.com/minio/minio-go v7' then 4
-        when agent='Registry Unit Test' then 5
+        when agent='https://github.com/APTrust/preservation-services' then 5
         when agent='APTrust preservation services' then 6
-        when agent='http://golang.org/pkg/crypto/sha256/' then 7
-        when agent='Maxwell Smart' then 8
+        when agent='http://github.com/google/uuid' then 7
+        when agent='http://golang.org/pkg/crypto/sha256/' then 8
         when agent='http://golang.org/pkg/crypto/md5/' then 9
-        when agent='https://github.com/APTrust/preservation-services' then 10
-        when agent='http://github.com/google/uuid' then 11
+        when agent='Registry Unit Test' then 10
+        when agent='Maxwell Smart' then 11
         else 0  -- default
-    end;
-end;
-$$ language plpgsql;
-
-create or replace function convert_event_objects()
-returns void as $$
-begin
-    update premis_events set event_object_int = case
-        when "object"='preservation-services + Minio S3 client' then 1
+    end,
+    event_object_int = case
+        when "object"='APTrust preservation services' then 1
         when "object"='Minio S3 client' then 2
-        when "object"='APTrust preservation services' then 3
-        when "object"='Go uuid library + Minio S3 library' then 4
-        when "object"='Go language crypto/sha256' then 5
-        when "object"='Minio S3 library' then 6
+        when "object"='Minio S3 library' then 3
+        when "object"='preservation-services + Minio S3 client' then 4
+        when "object"='Go uuid library + Minio S3 library' then 5
+        when "object"='Go language crypto/sha256' then 6
+        when "object"='Go language crypto/md5' then 7
+        when "object"='scissors' then 8
+        when "object"='APTrust exchange/ingest processor' then 9
         else 0  -- default
     end;
 end;
 $$ language plpgsql;
 
--- Call functions
-select convert_event_agents();
-select convert_event_objects();
+-- Call function
+select convert_event_agents_and_objects();
 
 -- if exists
 alter table premis_events drop column agent;
