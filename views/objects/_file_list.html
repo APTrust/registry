@@ -21,11 +21,13 @@
   </div>
 
   <div class="box-content">
-    <div class="columns">
-      <div class="field is-grouped column is-half">
-        <label class="label is-sr-only" for="fileFilter">Basic Text Input</label>
+    <div>
+      <div class="field">
+        <label class="label file-filter" for="fileFilter">Filter by partial identifier or exact checksum:</label>
+      </div>
+      <div class="field is-grouped">
         <div class="control is-expanded">
-          <input class="input" type="text" placeholder="Filter by partial identifier or exact checksum" id="fileFilter"
+          <input class="input" type="text" id="fileFilter"
             value="{{ .fileFilter }}">
         </div>
         <div class="control">

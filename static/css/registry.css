@@ -6542,7 +6542,7 @@ ol {
 }
 
 a {
-  color: hsl(207deg, 61%, 53%);
+  color: #2D6899;
   text-decoration: underline;
 }
 a:hover {
@@ -7259,4 +7259,26 @@ body.freeze {
     -moz-hyphens: auto;
     -webkit-hyphens: auto;
     hyphens: auto;
+}
+
+/* If an element has the hidden-accessible attribute, it will not be displayed */
+[hidden-accessible] {
+      display:none;
+}
+
+/* Icon for pages opening in a new window. */
+.new-window-icon {
+    fill: currentColor;
+    height: 0.75rem;
+    margin-inline-start: 0.3em;
+    vertical-align: middle;
+    width: 0.75rem;
+}
+
+/* Styling for label on file filter on Object Details page. */
+.file-filter {
+  display: flex;
+  align-items: center;
+  font-size: 12pt;
+  padding-right: 20px;
 }
