@@ -56,11 +56,11 @@ func (f *FileFilterForm) init() {
 	}
 	f.Fields["size__gteq"] = &Field{
 		Name:  "size__gteq",
-		Label: "Min Size",
+		Label: "Minimum Size",
 	}
 	f.Fields["size__lteq"] = &Field{
 		Name:  "size__lteq",
-		Label: "Max Size",
+		Label: "Maximum Size",
 	}
 	f.Fields["storage_option"] = &Field{
 		Name:    "storage_option",
