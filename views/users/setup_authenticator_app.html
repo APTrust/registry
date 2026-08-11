@@ -40,7 +40,7 @@
       {{ end }}
 
       <form name="validateTOTP" method="post" action="/users/validate_totp">
-        <input name="totpCode" type="password" label="One-Time Code" autofocus>
+        <input name="totpCode" label="One-Time Code" autofocus>
         {{ if .firstConfirm }}
             <input name="firstConfirm" type="text" value="firstConfirm" style="visibility:hidden">  
         {{ end }}
