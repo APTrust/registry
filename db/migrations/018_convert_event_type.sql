@@ -1,28 +1,28 @@
--- 013_convert_event_type.sql
+-- 018_convert_event_type.sql
 --
 -- This migration helps to shrink the size of our database by optimizing premis events.
 -- By converting event_type from a string to an int, and indexing these int values,
 -- we will save on space to store each event.
 
 -- Note that we're starting the migration.
-insert into schema_migrations ("version", started_at) values ('013_convert_event_type', now())
+insert into schema_migrations ("version", started_at) values ('018_convert_event_type', now())
 on conflict ("version") do update set started_at = now();
 
 -- First we need to drop related indices and views temporarily.
 -- We will recreate them at the end.
-drop index index_premis_events_on_event_type;
-drop index index_premis_events_on_event_type_and_outcome;
-drop index ix_premis_event_counts;
+drop index if exists index_premis_events_on_event_type;
+drop index if exists index_premis_events_on_event_type_and_outcome;
+drop index if exists ix_premis_event_counts;
 drop materialized view public.premis_event_counts;
-drop view public.premis_events_view;
+drop view if exists public.premis_events_view;
 
 -- Add a new temporary column for the event_type as int
-alter table premis_events add COLUMN event_type_int smallint;
+alter table premis_events add COLUMN if not exists event_type_int smallint;
 
 -- Create a lookup table for these new event_type ints.
 -- Each int is linked to a string describing the event type.
 drop table if exists event_type_lookup;
-create table event_type_lookup (
+create table if not exists event_type_lookup (
      id int primary key,
      event_type varchar not null
 );
@@ -148,17 +148,17 @@ $$ language plpgsql;
 select convert_event_types();
 
 -- Now that we have converted every event, we can drop the old event_type column.
-alter table premis_events drop column event_type;
+alter table premis_events drop column if exists event_type;
 
 -- Rename the event_type_int column to event_type.
-alter table premis_events rename column event_type_int TO event_type;
+alter table premis_events rename column if exists event_type_int TO event_type;
 
 -- Add foreign key restraint to event_type to map to event_type_lookup
 alter table premis_events add constraint event_type_fk FOREIGN KEY (event_type) REFERENCES event_type_lookup(id);
 
 -- Recreate indices and views that use this and reindex - may take some time before indexing is complete
-CREATE INDEX index_premis_events_on_event_type ON public.premis_events USING btree (event_type);
-CREATE INDEX index_premis_events_on_event_type_and_outcome ON public.premis_events USING btree (event_type, outcome);
+CREATE INDEX if not exists index_premis_events_on_event_type ON public.premis_events USING btree (event_type);
+CREATE INDEX if not exists index_premis_events_on_event_type_and_outcome ON public.premis_events USING btree (event_type, outcome);
 
 CREATE MATERIALIZED VIEW public.premis_event_counts
 TABLESPACE pg_default
@@ -172,7 +172,7 @@ AS SELECT premis_events.institution_id,
   ORDER BY premis_events.institution_id, premis_events.event_type, premis_events.outcome
 WITH DATA;
 
-CREATE UNIQUE INDEX ix_premis_event_counts ON public.premis_event_counts USING btree (institution_id, event_type, outcome);
+CREATE if not exists UNIQUE INDEX ix_premis_event_counts ON public.premis_event_counts USING btree (institution_id, event_type, outcome);
 
 CREATE OR REPLACE VIEW public.premis_events_view
 AS SELECT pe.id,
@@ -190,14 +190,11 @@ AS SELECT pe.id,
     pe.outcome_detail,
     pe.outcome_information,
     pe.object,
-    pe.agent,
-    pe.created_at,
-    pe.updated_at,
-    pe.old_uuid
+    pe.agent
    FROM premis_events pe
      LEFT JOIN institutions i ON pe.institution_id = i.id
      LEFT JOIN intellectual_objects io ON pe.intellectual_object_id = io.id
      LEFT JOIN generic_files gf ON pe.generic_file_id = gf.id;
 
 -- Now mark the migration as completed.
-update schema_migrations set finished_at = now() where "version" = '013_convert_event_type';
+update schema_migrations set finished_at = now() where "version" = '018_convert_event_type';

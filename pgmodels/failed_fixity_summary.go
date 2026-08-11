@@ -1,9 +1,11 @@
 package pgmodels
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/APTrust/registry/common"
+	"github.com/APTrust/registry/constants"
 )
 
 type FailedFixitySummary struct {
@@ -15,7 +17,7 @@ type FailedFixitySummary struct {
 
 var failedFixityQuery = `select count(id) as "failures", pev.institution_id, pev.institution_name
 	from premis_events_view pev
-	where pev.event_type = 21
+	where pev.event_type = ` + strconv.Itoa(constants.EventFixityCheck) + `
 	and pev.outcome = 'Failed'
 	and pev.date_time > ?
 	and pev.date_time < ?
