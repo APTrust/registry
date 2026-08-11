@@ -112,6 +112,12 @@ type User struct {
 	// we're waiting for a user to enter a text/SMS OTP.
 	EncryptedOTPSentAt time.Time `json:"-" form:"-" pg:"encrypted_otp_sent_at"`
 
+	// EncryptedAuthAppSecret is a secret value shared with the user's device.
+	// This value is not used for SMS OTP - that would be the EncryptedOTPSecret.
+	// Rather, this value is used with authenticator apps if the user has
+	// Authenticator App MFA enabled.
+	EncryptedAuthAppSecret string `json:"-" form:"-" pg:"encrypted_auth_app_secret"`
+
 	// ConsumedTimestep is a legacy field from Devise, which used it
 	// for time-based one-time passwords. Not used.
 	// TODO: Delete this.
@@ -377,6 +383,12 @@ func (user *User) IsAuthyOneTouchUser() bool {
 	return user.IsTwoFactorUser() && (user.AuthyStatus == constants.TwoFactorAuthy)
 }
 
+// IsAuthenticatorAppUser returns true if the user has enabled an authenticator app
+// for two-factor login.
+func (user *User) IsAuthenticatorAppUser() bool {
+	return user.IsTwoFactorUser() && (user.AuthyStatus == constants.TwoFactorTOTP)
+}
+
 // IsTwoFactorUser returns true if this user has enabled and confirmed
 // two factor authentication.
 //
@@ -401,7 +413,10 @@ func (user *User) TwoFactorMethod() string {
 	if user.IsSMSUser() {
 		return constants.TwoFactorSMS
 	}
-	return constants.TwoFactorAuthy
+	if user.IsAuthyOneTouchUser() {
+		return constants.TwoFactorAuthy
+	}
+	return constants.TwoFactorTOTP
 }
 
 // CreateOTPToken creates a new one-time password token, typically
