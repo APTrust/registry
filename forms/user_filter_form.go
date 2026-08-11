@@ -34,31 +34,26 @@ func NewUserFilterForm(fc *pgmodels.FilterCollection, actingUser *pgmodels.User)
 
 func (f *UserFilterForm) init() {
 	f.Fields["email__contains"] = &Field{
-		Name:        "email__contains",
-		Label:       "Email Contains",
-		Placeholder: "Email Contains",
+		Name:  "email__contains",
+		Label: "Email Contains",
 	}
 	f.Fields["name__contains"] = &Field{
-		Name:        "name__contains",
-		Label:       "Name Contains",
-		Placeholder: "Name Contains",
+		Name:  "name__contains",
+		Label: "Name Contains",
 	}
 	f.Fields["institution_id"] = &Field{
-		Name:        "institution_id",
-		Label:       "Institution",
-		Placeholder: "Institution",
-		Options:     f.instOptions,
+		Name:    "institution_id",
+		Label:   "Institution",
+		Options: f.instOptions,
 	}
 	f.Fields["role"] = &Field{
-		Name:        "role",
-		Label:       "Role",
-		Placeholder: "Role",
-		Options:     AllRolesList,
+		Name:    "role",
+		Label:   "Role",
+		Options: AllRolesList,
 	}
 	f.Fields["deactivated_at__is_null"] = &Field{
-		Name:        "deactivated_at__is_null",
-		Label:       "Status",
-		Placeholder: "Status",
+		Name:  "deactivated_at__is_null",
+		Label: "Status",
 		Options: []*ListOption{
 			{"true", "Active", false},
 			{"false", "Inactive", false},

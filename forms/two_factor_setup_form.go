@@ -29,10 +29,9 @@ func (f *TwoFactorSetupForm) init() {
 		},
 	}
 	f.Fields["PhoneNumber"] = &Field{
-		Name:        "PhoneNumber",
-		Label:       "PhoneNumber",
-		Placeholder: "PhoneNumber",
-		ErrMsg:      pgmodels.ErrUserPhone,
+		Name:   "PhoneNumber",
+		Label:  "PhoneNumber",
+		ErrMsg: pgmodels.ErrUserPhone,
 		Attrs: map[string]string{
 			"required": "",
 		},

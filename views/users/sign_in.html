@@ -77,10 +77,19 @@
         <option value="admin@test.edu">admin@test.edu (Test.edu Admin)</option>
         <option value="user@test.edu">user@test.edu (Test.edu User)</option>
       </select>
-      <input type="password" name="password" placeholder="Password" value="password">
+      <label>
+        Password:
+        <input type="password" name="password" value="password">
+      </label>
       {{ else }}
-      <input type="text" name="email" id="emailInput" placeholder="Email address" autofocus>
-      <input type="password" name="password" placeholder="Password">
+      <label>
+        Email address:
+        <input type="text" name="email" id="emailInput" autofocus>
+      </label>
+      <label>
+        Password:
+        <input type="password" name="password" value="password">
+      </label>
       {{ end }}
       <div class="sign-in-submit">
         <input type="submit" value="Sign In">
