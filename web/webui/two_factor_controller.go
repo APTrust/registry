@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/APTrust/registry/common"
@@ -459,7 +460,20 @@ func UserGenerateTOTP(c *gin.Context) {
 		}
 		// req.TemplateData["sec"] = secret // temp - remove
 	}
-	issuer := constants.TOTPSecretIssuer + "/" + common.Context().Config.EnvName
+	issuer := constants.TOTPSecretIssuer
+
+	// Adds a qualifier to the issuer so that users can differentiate between
+	// Registry environments in their authenticator app.
+	// There will be completely separate entries for Registry staging, demo and production.
+	// They each use a separate user account, and therefore a separate token for separate one-time codes.
+	// For the production Registry site, the entry will read "APTrust" with no qualifier.
+	hostname := c.Request.Host
+	if strings.Contains(hostname, ".staging") {
+		issuer += "/staging"
+	} else if strings.Contains(hostname, ".demo") {
+		issuer += "/demo"
+	}
+
 	otpURL := fmt.Sprintf("otpauth://totp/%s:%s?secret=%s&issuer=%s", issuer, user.Email, user.EncryptedAuthAppSecret, issuer)
 	//otpURL := fmt.Sprintf("otpauth://totp/%s:%s?secret=%s&issuer=%s", constants.TOTPSecretIssuer, user.Email, "nonesuch", constants.TOTPSecretIssuer)
 	png, err := qrcode.Encode(otpURL, qrcode.Medium, 256)
