@@ -97,6 +97,7 @@ begin
         when event_type='deaccession' then 8
         when event_type='decompression' then 9
         when event_type='decryption' then 10
+        when event_type='delete' then 11
         when event_type='deletion' then 11
         when event_type='digital signature generation' then 12
         when event_type='digital signature validation' then 13
