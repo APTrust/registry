@@ -468,9 +468,9 @@ func UserGenerateTOTP(c *gin.Context) {
 	// They each use a separate user account, and therefore a separate token for separate one-time codes.
 	// For the production Registry site, the entry will read "APTrust" with no qualifier.
 	hostname := c.Request.Host
-	if strings.Contains(hostname, ".staging") {
+	if strings.Contains(hostname, "staging") {
 		issuer += "/staging"
-	} else if strings.Contains(hostname, ".demo") {
+	} else if strings.Contains(hostname, "demo") {
 		issuer += "/demo"
 	}
 
