@@ -1,23 +1,18 @@
--- 016_convert_event_agent_object.sql
---
+-- 019_convert_event_agent_object.sql
 -- Creates lookup tables for agent and object fields of premis_events.
 -- This allows us to save space in the database. Currently these fields are of type varchar.
 -- But because of repetition in the data, we can convert these columns to type smallint and add lookup tables.
 
 -- Note that we're starting the migration.
-insert into schema_migrations ("version", started_at) values ('016_convert_event_agent_object', now())
+insert into schema_migrations ("version", started_at) values ('019_convert_event_agent_object', now()) 
 on conflict ("version") do update set started_at = now();
 
--- We'll need to drop and recreate premis_event dependent objects
-drop index index_premis_events_on_event_type;
-drop index index_premis_events_on_event_type_and_outcome;
-drop index ix_premis_event_counts;
-drop materialized view public.premis_event_counts;
-drop view public.premis_events_view;
+-- We'll need to drop and recreate the premis events view
+drop view if exists public.premis_events_view;
 
 -- Add the new columns.
-alter table premis_events add COLUMN agent_int smallint;
-alter table premis_events add COLUMN object_int smallint;
+alter table premis_events add COLUMN if not exists agent_int smallint;
+alter table premis_events add COLUMN if not exists object_int smallint;
 
 -- Create lookup tables.
 drop table if exists event_agent_lookup;
@@ -56,7 +51,8 @@ insert into event_object_lookup (id, event_object) values
 (6, 'Go language crypto/sha256'),
 (7, 'Go language crypto/md5'),
 (8, 'scissors'),
-(9, 'APTrust exchange/ingest processor');
+(9, 'APTrust exchange/ingest processor'),
+(10, 'Fake event object');
 
 -- IMPORTANT - Rollback if any agents or objects appear as 0
 create or replace function convert_event_agents_and_objects()
@@ -86,6 +82,7 @@ begin
         when "object"='Go language crypto/md5' then 7
         when "object"='scissors' then 8
         when "object"='APTrust exchange/ingest processor' then 9
+        when "object"='Fake event object' then 10
         else 0  -- default
     end;
 end;
@@ -94,34 +91,17 @@ $$ language plpgsql;
 -- Call function
 select convert_event_agents_and_objects();
 
--- if exists
-alter table premis_events drop column agent;
-alter table premis_events drop column "object";
+-- Drop original data and now rename the columns
+alter table premis_events drop column if exists agent;
+alter table premis_events drop column if exists "object";
 alter table premis_events rename column event_agent_int TO agent;
 alter table premis_events rename column event_object_int TO "object";
 
--- add foreign key restraint to map columns to lookup tables
+-- Add foreign key restraint to map columns to lookup tables
 alter table premis_events add constraint event_agent_fk FOREIGN KEY (agent) REFERENCES event_agent_lookup(id);
 alter table premis_events add constraint event_object_fk FOREIGN KEY ("object") REFERENCES event_object_lookup(id);
 
--- Recreate indices and views that use this and reindex - may take some time before indexing is complete
-CREATE INDEX index_premis_events_on_event_type ON public.premis_events USING btree (event_type);
-CREATE INDEX index_premis_events_on_event_type_and_outcome ON public.premis_events USING btree (event_type, outcome);
-
-CREATE MATERIALIZED VIEW public.premis_event_counts
-TABLESPACE pg_default
-AS SELECT premis_events.institution_id,
-    count(premis_events.id) AS row_count,
-    premis_events.event_type,
-    premis_events.outcome,
-    CURRENT_TIMESTAMP AS updated_at
-   FROM premis_events
-  GROUP BY CUBE(premis_events.institution_id, premis_events.event_type, premis_events.outcome)
-  ORDER BY premis_events.institution_id, premis_events.event_type, premis_events.outcome
-WITH DATA;
-
-CREATE UNIQUE INDEX ix_premis_event_counts ON public.premis_event_counts USING btree (institution_id, event_type, outcome);
-
+-- Recreate view
 CREATE OR REPLACE VIEW public.premis_events_view
 AS SELECT pe.id,
     pe.identifier,
@@ -138,13 +118,11 @@ AS SELECT pe.id,
     pe.outcome_detail,
     pe.outcome_information,
     pe.object,
-    pe.agent,
-    pe.created_at,
-    pe.updated_at
+    pe.agent
    FROM premis_events pe
      LEFT JOIN institutions i ON pe.institution_id = i.id
      LEFT JOIN intellectual_objects io ON pe.intellectual_object_id = io.id
      LEFT JOIN generic_files gf ON pe.generic_file_id = gf.id;
 
 -- Now mark the migration as completed.
-update schema_migrations set finished_at = now() where "version" = '016_convert_event_agent_object';
+update schema_migrations set finished_at = now() where "version" = '019_convert_event_agent_object';

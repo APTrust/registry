@@ -454,14 +454,14 @@ func testObjectDelete(t *testing.T, obj *pgmodels.IntellectualObject) {
 }
 
 func testObjDeletionEventProperties(t *testing.T, obj *pgmodels.IntellectualObject, event *pgmodels.PremisEvent) {
-	assert.Equal(t, "APTrust preservation services", event.Agent)
+	assert.Equal(t, constants.EventAgentStringPreservAlt, event.Agent)
 	assert.True(t, event.DateTime.After(time.Now().UTC().Add(-5*time.Second)))
 	assert.Equal(t, "Object deleted from preservation storage", event.Detail)
 	assert.Equal(t, constants.EventDeletion, event.EventType)
 	assert.True(t, common.LooksLikeUUID(event.Identifier))
 	assert.Equal(t, obj.InstitutionID, event.InstitutionID)
 	assert.Equal(t, obj.ID, event.IntellectualObjectID)
-	assert.Equal(t, "Minio S3 library", event.Object)
+	assert.Equal(t, constants.EventObjectStringMinioAlt, event.Object)
 	assert.Equal(t, constants.OutcomeSuccess, event.Outcome)
 }
 

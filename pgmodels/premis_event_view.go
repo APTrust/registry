@@ -21,7 +21,7 @@ var PremisEventFilters = []string{
 type PremisEventView struct {
 	tableName                    struct{}  `pg:"premis_events_view"`
 	ID                           int64     `json:"id" form:"id"`
-	Agent                        string    `json:"agent"`
+	Agent                        int       `json:"agent"`
 	CreatedAt                    time.Time `json:"created_at"`
 	DateTime                     time.Time `json:"date_time"`
 	Detail                       string    `json:"detail"`
@@ -33,7 +33,7 @@ type PremisEventView struct {
 	InstitutionName              string    `json:"institution_name"`
 	IntellectualObjectID         int64     `json:"intellectual_object_id"`
 	IntellectualObjectIdentifier string    `json:"intellectual_object_identifier"`
-	Object                       string    `json:"object"`
+	Object                       int       `json:"object"`
 	OldUUID                      string    `json:"old_uuid"`
 	Outcome                      string    `json:"outcome"`
 	OutcomeDetail                string    `json:"outcome_detail"`

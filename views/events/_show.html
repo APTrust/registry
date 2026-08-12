@@ -30,11 +30,11 @@
     </tr>
     <tr>
       <th>Object</th>
-      <td>{{ .event.Object }}</td>
+      <td>{{ convertEventObjectToString .event.Object }}</td>
     </tr>
     <tr>
       <th>Agent</th>
-      <td>{{ .event.Agent }}</td>
+      <td>{{ convertEventAgentToString .event.Agent }}</td>
     </tr>
     <tr>
       <th>Intellectual Object</th>

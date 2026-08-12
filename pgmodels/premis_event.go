@@ -76,7 +76,7 @@ func (event *PremisEvent) Save() error {
 // Validate returns errors if this event isn't valid.
 func (event *PremisEvent) Validate() *common.ValidationError {
 	errors := make(map[string]string)
-	if event.Agent > 0 {
+	if event.Agent <= 0 {
 		errors["Agent"] = "Event requires a valid Agent"
 	}
 	if event.DateTime.IsZero() {
@@ -99,7 +99,7 @@ func (event *PremisEvent) Validate() *common.ValidationError {
 	if event.IntellectualObjectID <= 0 {
 		errors["IntellectualObjectID"] = "Event requires a valid intellectual object id"
 	}
-	if event.Object > 0 {
+	if event.Object <= 0 {
 		errors["Object"] = "Event requires a valid Object"
 	}
 	if !slice.Contains(constants.EventOutcomes, event.Outcome) {
