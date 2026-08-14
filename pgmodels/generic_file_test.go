@@ -377,7 +377,7 @@ func testGenericFileDeleteSuccess(t *testing.T, gf *pgmodels.GenericFile) {
 }
 
 func testFileDeletionEventProperties(t *testing.T, gf *pgmodels.GenericFile, event *pgmodels.PremisEvent) {
-	assert.Equal(t, constants.EventAgentStringPreservAlt, event.Agent)
+	assert.Equal(t, constants.EventAgentPreservAlt, event.Agent)
 	assert.True(t, event.DateTime.After(time.Now().UTC().Add(-5*time.Second)))
 	assert.Equal(t, "All copies of this file have been deleted from preservation storage", event.Detail)
 	assert.Equal(t, constants.EventDeletion, event.EventType)
@@ -385,7 +385,7 @@ func testFileDeletionEventProperties(t *testing.T, gf *pgmodels.GenericFile, eve
 	assert.Equal(t, gf.InstitutionID, event.InstitutionID)
 	assert.Equal(t, gf.IntellectualObjectID, event.IntellectualObjectID)
 	assert.Equal(t, gf.ID, event.GenericFileID)
-	assert.Equal(t, constants.EventObjectStringMinioAlt, event.Object)
+	assert.Equal(t, constants.EventObjectMinioAlt, event.Object)
 	assert.Equal(t, constants.OutcomeSuccess, event.Outcome)
 	assert.Equal(t, "user@test.edu", event.OutcomeDetail)
 	assert.Equal(t, "File deleted at the request of user@test.edu. Institutional approver: admin@test.edu. This event confirms all preservation copies have been deleted.", event.OutcomeInformation)

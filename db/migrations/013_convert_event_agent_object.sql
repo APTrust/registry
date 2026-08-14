@@ -1,10 +1,10 @@
--- 019_convert_event_agent_object.sql
+-- 013_convert_event_agent_object.sql
 -- Creates lookup tables for agent and object fields of premis_events.
 -- This allows us to save space in the database. Currently these fields are of type varchar.
 -- But because of repetition in the data, we can convert these columns to type smallint and add lookup tables.
 
 -- Note that we're starting the migration.
-insert into schema_migrations ("version", started_at) values ('019_convert_event_agent_object', now()) 
+insert into schema_migrations ("version", started_at) values ('013_convert_event_agent_object', now())
 on conflict ("version") do update set started_at = now();
 
 -- We'll need to drop and recreate the premis events view
@@ -39,7 +39,9 @@ insert into event_agent_lookup (id, event_agent) values
 (8, 'http://golang.org/pkg/crypto/sha256/'),
 (9, 'http://golang.org/pkg/crypto/md5/'),
 (10, 'Registry Unit Test'),
-(11, 'Maxwell Smart');
+(11, 'Maxwell Smart')
+(12, 'https://github.com/APTrust/exchange'),
+(13, 'http://github.com/satori/go.uuid');
 
 insert into event_object_lookup (id, event_object) values 
 (0, 'unknown event object'),
@@ -52,7 +54,11 @@ insert into event_object_lookup (id, event_object) values
 (7, 'Go language crypto/md5'),
 (8, 'scissors'),
 (9, 'APTrust exchange/ingest processor'),
-(10, 'Fake event object');
+(10, 'Fake event object'),
+(11, 'APTrust Go Exchange + Amazon S3 client'),
+(12, 'SHA-256 thingy'),
+(13, 'Exchange ingest code'),
+(14, 'Deleterbot code');
 
 -- IMPORTANT - Rollback if any agents or objects appear as 0
 create or replace function convert_event_agents_and_objects()
@@ -70,7 +76,9 @@ begin
         when agent='http://golang.org/pkg/crypto/md5/' then 9
         when agent='Registry Unit Test' then 10
         when agent='Maxwell Smart' then 11
-        else 0  -- default
+        when agent='https://github.com/APTrust/exchange' then 12
+        when agent='http://github.com/satori/go.uuid' then 13
+        else 0
     end,
     event_object_int = case
         when "object"='APTrust preservation services' then 1
@@ -83,7 +91,11 @@ begin
         when "object"='scissors' then 8
         when "object"='APTrust exchange/ingest processor' then 9
         when "object"='Fake event object' then 10
-        else 0  -- default
+        when "object"='APTrust Go Exchange + Amazon S3 client' then 11
+        when "object"='SHA-256 thingy' then 12
+        when "object"='Exchange ingest code' then 13
+        when "object"='Deleterbot code' then 14
+        else 0
     end;
 end;
 $$ language plpgsql;
@@ -118,11 +130,14 @@ AS SELECT pe.id,
     pe.outcome_detail,
     pe.outcome_information,
     pe.object,
-    pe.agent
+    pe.agent,
+    pe.created_at,
+    pe.updated_at,
+    pe.old_uuid
    FROM premis_events pe
      LEFT JOIN institutions i ON pe.institution_id = i.id
      LEFT JOIN intellectual_objects io ON pe.intellectual_object_id = io.id
      LEFT JOIN generic_files gf ON pe.generic_file_id = gf.id;
 
 -- Now mark the migration as completed.
-update schema_migrations set finished_at = now() where "version" = '019_convert_event_agent_object';
+update schema_migrations set finished_at = now() where "version" = '013_convert_event_agent_object';

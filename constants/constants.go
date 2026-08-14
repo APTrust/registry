@@ -71,6 +71,8 @@ const (
 	EventAgentStringTestAlt    = "Maxwell Smart"
 	EventAgentFixture          = 12
 	EventAgentStringFixture    = "https://github.com/APTrust/exchange"
+	EventAgentUUIDPast         = 13
+	EventAgentStringUUIDPast   = "http://github.com/satori/go.uuid"
 	EventCapture               = "capture"
 	EventCompression           = "compression"
 	EventCreation              = "creation"
@@ -108,7 +110,7 @@ const (
 	EventObjectStringFixS3     = "APTrust Go Exchange + Amazon S3 client"
 	EventObjectFixSHA          = 12
 	EventObjectStringFixSHA    = "SHA-256 thingy"
-	EventObjectFixExcha        = 13
+	EventObjectFixExch         = 13
 	EventObjectStringFixExch   = "Exchange ingest code"
 	EventObjectFixDelete       = 14
 	EventObjectStringFixDelete = "Deleterbot code"
