@@ -27,10 +27,9 @@ func NewInstitutionForm(institution *pgmodels.Institution) (*InstitutionForm, er
 
 func (f *InstitutionForm) init() {
 	f.Fields["Name"] = &Field{
-		Name:        "Name",
-		Label:       "Name",
-		Placeholder: "Name",
-		ErrMsg:      pgmodels.ErrInstName,
+		Name:   "Name",
+		Label:  "Name",
+		ErrMsg: pgmodels.ErrInstName,
 		Attrs: map[string]string{
 			"required": "",
 			"min":      "2",
@@ -39,32 +38,29 @@ func (f *InstitutionForm) init() {
 	// The regex here matches the DNSName regex in
 	// github.com/asaskevich/govalidator/patterns.go
 	f.Fields["Identifier"] = &Field{
-		Name:        "Identifier",
-		Label:       "Identifier",
-		Placeholder: "Identifier",
-		ErrMsg:      pgmodels.ErrInstIdentifier,
+		Name:   "Identifier",
+		Label:  "Identifier",
+		ErrMsg: pgmodels.ErrInstIdentifier,
 		Attrs: map[string]string{
 			"required": "",
 			"pattern":  `^([a-zA-Z0-9_]{1}[a-zA-Z0-9_-]{0,62}){1}(\.[a-zA-Z0-9_]{1}[a-zA-Z0-9_-]{0,62})*[\._]?$`,
 		},
 	}
 	f.Fields["Type"] = &Field{
-		Name:        "Type",
-		Label:       "Institution Type",
-		Placeholder: "Institution Type",
-		ErrMsg:      pgmodels.ErrInstType,
-		Options:     InstTypeList,
+		Name:    "Type",
+		Label:   "Institution Type",
+		ErrMsg:  pgmodels.ErrInstType,
+		Options: InstTypeList,
 		Attrs: map[string]string{
 			"required": "",
 		},
 	}
 	f.Fields["MemberInstitutionID"] = &Field{
-		Name:        "MemberInstitutionID",
-		Label:       "Parent Institution",
-		Placeholder: "Parent Institution",
-		ErrMsg:      pgmodels.ErrInstMemberID,
-		Options:     f.instOptions,
-		Attrs:       map[string]string{},
+		Name:    "MemberInstitutionID",
+		Label:   "Parent Institution",
+		ErrMsg:  pgmodels.ErrInstMemberID,
+		Options: f.instOptions,
+		Attrs:   map[string]string{},
 	}
 	f.Fields["OTPEnabled"] = &Field{
 		Name:        "OTPEnabled",
@@ -86,18 +82,16 @@ func (f *InstitutionForm) init() {
 		},
 	}
 	f.Fields["ReceivingBucket"] = &Field{
-		Name:        "Receiving Bucket",
-		Label:       "Receiving Bucket",
-		Placeholder: "Receiving Bucket",
+		Name:  "Receiving Bucket",
+		Label: "Receiving Bucket",
 		Attrs: map[string]string{
 			"disabled": "",
 			"readonly": "",
 		},
 	}
 	f.Fields["RestoreBucket"] = &Field{
-		Name:        "Restoration Bucket",
-		Label:       "Restoration Bucket",
-		Placeholder: "Restoration Bucket",
+		Name:  "Restoration Bucket",
+		Label: "Restoration Bucket",
 		Attrs: map[string]string{
 			"disabled": "",
 			"readonly": "",

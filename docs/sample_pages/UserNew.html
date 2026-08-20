@@ -26,7 +26,10 @@
 </div>
 
 <div class="column column-80">
-  <input type="text" placeholder="Search for objects, files, work items...">
+  <label>
+    Search for objects, files, work items...
+    <input type="text">
+  </label>
   <i class="fa fa-search"></i>
 </div>
 
@@ -105,7 +108,7 @@
   
 
 <label>Name
-<input type="text" name="Name" placeholder="Name" required="" oninvalid="this.setCustomValidity('Name must contain at least 2 characters.')" oninput="this.setCustomValidity('')">
+<input type="text" name="Name" required="" oninvalid="this.setCustomValidity('Name must contain at least 2 characters.')" oninput="this.setCustomValidity('')">
 </label>
 
 
@@ -115,7 +118,7 @@
   
 
 <label>Email Address
-  <input type="email" name="Email" placeholder="Email Address" required="" oninvalid="this.setCustomValidity('Email address is required.')" oninput="this.setCustomValidity('')">
+  <input type="email" name="Email" required="" oninvalid="this.setCustomValidity('Email address is required.')" oninput="this.setCustomValidity('')">
 </label>
 
 
@@ -124,8 +127,8 @@
 
   
 
-<label>Phone
-  <input type="tel" name="PhoneNumber" placeholder="Phone in format 212-555-1212" oninvalid="this.setCustomValidity('Please enter a phone number in format \u002b2125551212.')" oninput="this.setCustomValidity('')">
+<label>Phone in format 212-555-1212
+  <input type="tel" name="PhoneNumber" oninvalid="this.setCustomValidity('Please enter a phone number in format \u002b2125551212.')" oninput="this.setCustomValidity('')">
 </label>
 
 
@@ -153,8 +156,8 @@
 
   
 
-<label>Must enable two-factor auth by
-<input type="date" name="GracePeriod" placeholder="mm/dd/yyyy" max="2099-12-31" min="2021-01-01" oninvalid="this.setCustomValidity('Enter a date specifying when this user must enable two-factor authentication.')" oninput="this.setCustomValidity('')">
+<label>Must enable two-factor auth by (mm/dd/yyyy)
+<input type="date" name="GracePeriod" max="2099-12-31" min="2021-01-01" oninvalid="this.setCustomValidity('Enter a date specifying when this user must enable two-factor authentication.')" oninput="this.setCustomValidity('')">
 </label>
 
 

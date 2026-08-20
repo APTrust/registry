@@ -20,7 +20,7 @@
     <li><a href="/work_items"><span class="material-icons" aria-hidden="true">build</span> Work Items</a></li>
     {{ end }}
 
-    <li><hr /></li>
+    <li><hr role="presentation" /></li>
   
     {{ if userCan .CurrentUser "DepositReportShow" .CurrentUser.InstitutionID }}
     <li><a href="/reports/deposits?storage_option=Total"><span class="material-icons" aria-hidden="true">insert_chart</span> Reports</a></li>
@@ -77,7 +77,7 @@
       </ul>
     </li>
 
-    <li><hr /></li>
+    <li><hr role="presentation" /></li>
   
     <li><a href="/users/sign_out"><span class="material-icons" aria-hidden="true">logout</span> Sign Out</a></li>
   </ul>
