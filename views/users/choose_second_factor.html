@@ -25,6 +25,7 @@
   <div class="modal-content">
     <p class="mb-3">How would you like to complete your login?</p>
 
+    {{ if .hasAuthenticatorAppSetup }}
     <div class="two-factor-option mb-3">
       <button class="button is-primary" onclick="submitSecondFactor('totp')">Authenticator App</button>
       <article id="two-factor-method-totp" class="message is-info mt-4 two-factor-message" style="display:none">
@@ -41,6 +42,7 @@
         </form>
       </article>
     </div>
+    {{ end }}
     <div class="two-factor-option mb-3">
       <button class="button is-primary" onclick="submitSecondFactor('authy')" disabled title="Authy is temporarily not available. APTrust is working to resolve this issue.">Authy</button>
       <article id="two-factor-method-authy" class="message is-info mt-4 two-factor-message" style="display:none">
