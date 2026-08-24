@@ -15,6 +15,7 @@ type Checksum struct {
 	Digest        string       `json:"digest"`
 	GenericFileID int64        `json:"generic_file_id" pg:"generic_file_id"`
 	GenericFile   *GenericFile `json:"-" pg:"rel:has-one"`
+	CreatedAt     time.Time    `json:"created_at" pg:"created_at"`
 }
 
 // ChecksumByID returns the file with the specified id.

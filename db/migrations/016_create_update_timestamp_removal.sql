@@ -14,7 +14,6 @@ drop view if exists public.generic_files_view;
 -- Now we can remove the redundant data
 alter table premis_events drop column if exists created_at;
 alter table premis_events drop column if exists updated_at;
-alter table checksums drop column if exists created_at;
 alter table checksums drop column if exists updated_at;
 
 -- Recreate views

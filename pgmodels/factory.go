@@ -204,6 +204,7 @@ func RandomChecksum(alg string) *Checksum {
 		Algorithm: alg,
 		DateTime:  now,
 		Digest:    ETag(),
+		CreatedAt: now,
 	}
 }
 
