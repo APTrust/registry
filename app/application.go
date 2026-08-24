@@ -261,6 +261,12 @@ func initRoutes(router *gin.Engine) {
 		webRoutes.GET("/users/2fa_choose", webui.UserTwoFactorChoose)
 		webRoutes.POST("/users/2fa_sms", webui.UserTwoFactorGenerateSMS)
 		webRoutes.POST("/users/2fa_verify", webui.UserTwoFactorVerify)
+		webRoutes.POST("/users/2fa_totp_cancel_setup", webui.UserTwoFactorTotpCancelSetup)
+
+		// Generate and validate Time-based One-Time Passwords for MFA
+		webRoutes.GET("/users/generate_totp", webui.UserGenerateTOTP)
+		webRoutes.GET("/users/validate_totp", webui.UserValidateTOTPView)
+		webRoutes.POST("/users/validate_totp", webui.UserValidateTOTP)
 
 		// User forgot password
 		webRoutes.GET("/users/forgot_password", webui.UserShowForgotPasswordForm)
@@ -275,6 +281,9 @@ func initRoutes(router *gin.Engine) {
 		webRoutes.GET("/nsq", webui.NsqShow)
 		webRoutes.POST("/nsq/init", webui.NsqInit)
 		webRoutes.POST("/nsq/admin", webui.NsqAdmin)
+
+		// Accessibility Statement
+		webRoutes.GET("/accessibility_statement", webui.ShowAccessibilityStatement)
 
 		// Error page
 		webRoutes.GET("/error", webui.ErrorShow)

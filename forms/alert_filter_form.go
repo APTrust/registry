@@ -40,32 +40,27 @@ func NewAlertFilterForm(fc *pgmodels.FilterCollection, actingUser *pgmodels.User
 
 func (f *AlertFilterForm) init() {
 	f.Fields["created_at__gteq"] = &Field{
-		Name:        "created_at__gteq",
-		Label:       "Created On or After",
-		Placeholder: "Created On or After",
+		Name:  "created_at__gteq",
+		Label: "Created On or After",
 	}
 	f.Fields["created_at__lteq"] = &Field{
-		Name:        "created_at__lteq",
-		Label:       "Created On or Before",
-		Placeholder: "Created On or Before",
+		Name:  "created_at__lteq",
+		Label: "Created On or Before",
 	}
 	f.Fields["institution_id"] = &Field{
-		Name:        "institution_id",
-		Label:       "Institution",
-		Placeholder: "Institution",
-		Options:     f.instOptions,
+		Name:    "institution_id",
+		Label:   "Institution",
+		Options: f.instOptions,
 	}
 	f.Fields["type"] = &Field{
-		Name:        "type",
-		Label:       "Alert Type",
-		Placeholder: "Alert Type",
-		Options:     Options(constants.AlertTypes),
+		Name:    "type",
+		Label:   "Alert Type",
+		Options: Options(constants.AlertTypes),
 	}
 	f.Fields["user_id"] = &Field{
-		Name:        "user_id",
-		Label:       "Recipient",
-		Placeholder: "Recipient",
-		Options:     f.userOptions,
+		Name:    "user_id",
+		Label:   "Recipient",
+		Options: f.userOptions,
 	}
 }
 

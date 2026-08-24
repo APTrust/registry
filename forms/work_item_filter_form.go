@@ -35,98 +35,81 @@ func NewWorkItemFilterForm(fc *pgmodels.FilterCollection, actingUser *pgmodels.U
 
 func (f *WorkItemFilterForm) init() {
 	f.Fields["action__in"] = &Field{
-		Name:        "action__in",
-		Label:       "Action",
-		Placeholder: "Action",
-		Options:     Options(constants.WorkItemActions),
+		Name:    "action__in",
+		Label:   "Action",
+		Options: Options(constants.WorkItemActions),
 		Attrs: map[string]string{
 			"multiple": "multiple",
 		},
 	}
 	f.Fields["alt_identifier"] = &Field{
-		Name:        "alt_identifier",
-		Label:       "Alternate Identifier",
-		Placeholder: "Alternate Identifier",
+		Name:  "alt_identifier",
+		Label: "Alternate Identifier",
 	}
 	f.Fields["bag_date__gteq"] = &Field{
-		Name:        "bag_date__gteq",
-		Label:       "Bag Date On or After",
-		Placeholder: "Bag Date On or After",
+		Name:  "bag_date__gteq",
+		Label: "Bag Date On or After",
 	}
 	f.Fields["bag_date__lteq"] = &Field{
-		Name:        "bag_date__lteq",
-		Label:       "Bag Date On or Before",
-		Placeholder: "Bag Date On or Before",
+		Name:  "bag_date__lteq",
+		Label: "Bag Date On or Before",
 	}
 	f.Fields["bag_group_identifier"] = &Field{
-		Name:        "bag_group_identifier",
-		Label:       "Bag Group Identifier",
-		Placeholder: "Bag Group Identifier",
+		Name:  "bag_group_identifier",
+		Label: "Bag Group Identifier",
 	}
 	f.Fields["bagit_profile_identifier"] = &Field{
-		Name:        "bagit_profile_identifier",
-		Label:       "BagIt Profile",
-		Placeholder: "BagIt Profile",
-		Options:     BagItProfileIdentifiers,
+		Name:    "bagit_profile_identifier",
+		Label:   "BagIt Profile",
+		Options: BagItProfileIdentifiers,
 	}
 	f.Fields["bucket"] = &Field{
-		Name:        "bucket",
-		Label:       "Bucket",
-		Placeholder: "Bucket",
+		Name:  "bucket",
+		Label: "Bucket",
 	}
 	f.Fields["date_processed__gteq"] = &Field{
-		Name:        "date_processed__gteq",
-		Label:       "Processed On or After",
-		Placeholder: "Processed On or After",
+		Name:  "date_processed__gteq",
+		Label: "Processed On or After",
 	}
 	f.Fields["date_processed__lteq"] = &Field{
-		Name:        "date_processed__lteq",
-		Label:       "Processed On or Before",
-		Placeholder: "Processed On or Before",
+		Name:  "date_processed__lteq",
+		Label: "Processed On or Before",
 	}
 	f.Fields["etag"] = &Field{
-		Name:        "etag",
-		Label:       "ETag (from S3 upload)",
-		Placeholder: "ETag",
+		Name:  "etag",
+		Label: "ETag (from S3 upload)",
 	}
 	f.Fields["generic_file_identifier"] = &Field{
-		Name:        "generic_file_identifier",
-		Label:       "File Identifier",
-		Placeholder: "File Identifier",
+		Name:  "generic_file_identifier",
+		Label: "File Identifier",
 	}
 	f.Fields["institution_id"] = &Field{
-		Name:        "institution_id",
-		Label:       "Institution",
-		Placeholder: "Institution",
-		Options:     f.instOptions,
+		Name:    "institution_id",
+		Label:   "Institution",
+		Options: f.instOptions,
 	}
 	f.Fields["name"] = &Field{
-		Name:        "name",
-		Label:       "Name of tar file",
-		Placeholder: "Name of tar file",
+		Name:  "name",
+		Label: "Name of tar file",
 	}
 	f.Fields["needs_admin_review"] = &Field{
-		Name:        "needs_admin_review",
-		Label:       "Needs Admin Review",
-		Placeholder: "Needs Admin Review",
-		Options:     YesNoList,
+		Name:    "needs_admin_review",
+		Label:   "Needs Admin Review",
+		Options: YesNoList,
 	}
 	f.Fields["node__not_null"] = &Field{
-		Name:        "node__not_null",
-		Label:       "Has Worker",
-		Placeholder: "Has Worker",
-		Options:     YesNoList,
+		Name:    "node__not_null",
+		Label:   "Has Worker",
+		Options: YesNoList,
 	}
 	f.Fields["object_identifier"] = &Field{
-		Name:        "object_identifier",
-		Label:       "Object Identifier",
-		Placeholder: "Object Identifier",
+		Name:  "object_identifier",
+		Label: "Object Identifier",
 	}
 	// Special field for admin reporting.
 	f.Fields["report"] = &Field{
-		Name:        "report",
-		Label:       "Quick Reports",
-		Placeholder: "Quick Reports",
+		Name:  "report",
+		Label: "Quick Reports",
 		Options: []*ListOption{
 			{"in_process", "In Process - Last 30 Days", false},
 			{"cancelled_failed", "Canceled/Failed/Suspended - Last 30 Days", false},
@@ -135,51 +118,44 @@ func (f *WorkItemFilterForm) init() {
 		},
 	}
 	f.Fields["size__gteq"] = &Field{
-		Name:        "size__gteq",
-		Label:       "Min Size",
-		Placeholder: "Min Size",
+		Name:  "size__gteq",
+		Label: "Minimum Size",
 	}
 	f.Fields["size__lteq"] = &Field{
-		Name:        "size__lteq",
-		Label:       "Max Size",
-		Placeholder: "Max Size",
+		Name:  "size__lteq",
+		Label: "Maximum Size",
 	}
 	f.Fields["stage__in"] = &Field{
-		Name:        "stage__in",
-		Label:       "Work Item Stage",
-		Placeholder: "Work Item Stage",
-		Options:     Options(constants.Stages),
+		Name:    "stage__in",
+		Label:   "Work Item Stage",
+		Options: Options(constants.Stages),
 		Attrs: map[string]string{
 			"multiple": "multiple",
 		},
 	}
 	f.Fields["status__in"] = &Field{
-		Name:        "status__in",
-		Label:       "Status",
-		Placeholder: "Status",
-		Options:     Options(constants.Statuses),
+		Name:    "status__in",
+		Label:   "Status",
+		Options: Options(constants.Statuses),
 		Attrs: map[string]string{
 			"multiple": "multiple",
 		},
 	}
 	f.Fields["storage_option"] = &Field{
-		Name:        "storage_option",
-		Label:       "Storage Option",
-		Placeholder: "Storage Option",
-		Options:     StorageOptionList,
+		Name:    "storage_option",
+		Label:   "Storage Option",
+		Options: StorageOptionList,
 	}
 	f.Fields["user"] = &Field{
-		Name:        "user",
-		Label:       "Initiated By",
-		Placeholder: "User email address",
+		Name:  "user",
+		Label: "Initiated By (User email address)",
 	}
 	// This is a special case. Doesn't quite
 	// fit with our framework.
 	f.Fields["redis_only"] = &Field{
-		Name:        "redis_only",
-		Label:       "Redis Only",
-		Placeholder: "Redis Only",
-		Options:     YesNoList,
+		Name:    "redis_only",
+		Label:   "Redis Only",
+		Options: YesNoList,
 	}
 }
 

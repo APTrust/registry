@@ -102,9 +102,12 @@ Remember, depdenency hell and mountains of garbage code are only one npm package
 ### Login
 
 * Email/password login
+* Two-factor authenticator app (recommended)
 * Two-factor text/sms
 
 To ensure users won't have to change their passwords when moving from the Rails app, implement the same password encryption scheme as Devise. The scheme is described [here](https://www.freecodecamp.org/news/how-does-devise-keep-your-passwords-safe-d367f6e816eb/), and the [Go bcrypt library](https://pkg.go.dev/golang.org/x/crypto/bcrypt) should be able to support it.
+
+You can utilize any authenticator app that supports QR codes for two-factor authentication, including but not limited to Google Authenticator, Microsoft Authenticator, or Duo.
 
 ### Edit
 
@@ -341,6 +344,8 @@ The term "items" below refers to Intellectual Objects, Generic Files, Checksums,
   * Wasabi
 
 # Two Factor Authentication
+
+The recommended method currently is to use an authenticator app on your device. You can use any authenticator app that supports QR codes, such as Google Authenticator, Microsoft Authenticator, or Duo.
 
 Current Pharos users who have enabled two-factor authentication receive one-time passwords through SMS. This method was chosen after long discussion with depositors and we cannot change this without another long discussion. So for now, we're sticking with these two.
 

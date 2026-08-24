@@ -84,6 +84,7 @@ const (
 	RoleInstUser               = "institutional_user"
 	RoleNone                   = "none"
 	RoleSysAdmin               = "admin"
+	SecondFactorTOTP           = "Authenticator App"
 	SecondFactorBackupCode     = "Backup Code"
 	SecondFactorSMS            = "SMS"
 	StageAvailableInS3         = "Available in S3"
@@ -131,6 +132,8 @@ const (
 	TopicFixity                = "fixity_check"
 	TopicGlacierRestore        = "restore_glacier"
 	TopicObjectRestore         = "restore_object"
+	TOTPSecretIssuer           = "APTrust"
+	TwoFactorTOTP              = "totp"
 	TwoFactorNone              = "none"
 	TwoFactorSMS               = "sms"
 )

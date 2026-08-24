@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM golang:1.23-alpine
+FROM golang:1.25-alpine
 
 RUN apk update && \
     apk add --no-cache upx make build-base bash git
@@ -31,8 +31,8 @@ ENV DB_PASSWORD="password"
 ENV DB_PORT=5432
 ENV DB_USE_SSL=false
 
-ENV COOKIE_HASH_KEY='y0b6|UBJQ(N$KB)jAJYL-aj=:q?;yK64^TPch0=|1XNnv{X@QrL#?80u$1]LcBF'
-ENV COOKIE_BLOCK_KEY='4Qdnm4acxfAILGEFQ3jUj0PoLbMWbyMm'
+ENV COOKIE_HASH_KEY='hashkey'
+ENV COOKIE_BLOCK_KEY='blockkey'
 
 ENV COOKIE_DOMAIN="localhost"
 ENV SESSION_MAX_AGE=43200

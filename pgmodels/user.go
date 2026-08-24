@@ -112,6 +112,12 @@ type User struct {
 	// we're waiting for a user to enter a text/SMS OTP.
 	EncryptedOTPSentAt time.Time `json:"-" form:"-" pg:"encrypted_otp_sent_at"`
 
+	// EncryptedAuthAppSecret is a secret value shared with the user's device.
+	// This value is not used for SMS OTP - that would be the EncryptedOTPSecret.
+	// Rather, this value is used with authenticator apps if the user has
+	// Authenticator App MFA enabled.
+	EncryptedAuthAppSecret string `json:"-" form:"-" pg:"encrypted_auth_app_secret"`
+
 	// ConsumedTimestep is a legacy field from Devise, which used it
 	// for time-based one-time passwords. Not used.
 	// TODO: Delete this.
@@ -358,7 +364,13 @@ func (user *User) IsAdmin() bool {
 // IsSMSUser returns true if this user has enabled two-factor authentication
 // with SMS/text message.
 func (user *User) IsSMSUser() bool {
-	return user.IsTwoFactorUser()
+	return user.IsTwoFactorUser() && (user.MFAStatus == constants.TwoFactorSMS)
+}
+
+// IsAuthenticatorAppUser returns true if the user has enabled an authenticator app
+// for two-factor login.
+func (user *User) IsAuthenticatorAppUser() bool {
+	return user.IsTwoFactorUser() && (user.MFAStatus == constants.TwoFactorTOTP)
 }
 
 // IsTwoFactorUser returns true if this user has enabled and confirmed
@@ -376,12 +388,16 @@ func (user *User) IsTwoFactorUser() bool {
 //
 // constants.TwoFactorSMS if the user receives two-factor OTP code via
 // text/SMS
+// constants.TwoFactorTOTP if the user uses an authenticator app
 func (user *User) TwoFactorMethod() string {
 	if !user.IsTwoFactorUser() {
 		return constants.TwoFactorNone
 	}
-	// If using 2FA, must be SMS
-	return constants.TwoFactorSMS
+	if user.IsSMSUser() {
+		return constants.TwoFactorSMS
+	}
+	// If using 2FA, and not SMS, must be using authenticator apps.
+	return constants.TwoFactorTOTP
 }
 
 // CreateOTPToken creates a new one-time password token, typically

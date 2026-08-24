@@ -39,29 +39,26 @@ func NewUserForm(userToEdit *pgmodels.User, actingUser *pgmodels.User) (*UserFor
 
 func (f *UserForm) init() {
 	f.Fields["Name"] = &Field{
-		Name:        "Name",
-		ErrMsg:      pgmodels.ErrUserName,
-		Label:       "Name",
-		Placeholder: "Name",
+		Name:   "Name",
+		ErrMsg: pgmodels.ErrUserName,
+		Label:  "Name",
 		Attrs: map[string]string{
 			"required": "",
 		},
 	}
 	f.Fields["Email"] = &Field{
-		Name:        "Email",
-		ErrMsg:      pgmodels.ErrUserEmail,
-		Label:       "Email Address",
-		Placeholder: "Email Address",
+		Name:   "Email",
+		ErrMsg: pgmodels.ErrUserEmail,
+		Label:  "Email Address",
 		Attrs: map[string]string{
 			"required": "",
 		},
 	}
 	f.Fields["PhoneNumber"] = &Field{
-		Name:        "PhoneNumber",
-		ErrMsg:      pgmodels.ErrUserPhone,
-		Label:       "Phone",
-		Placeholder: "Phone in format 212-555-1212",
-		Attrs:       map[string]string{
+		Name:   "PhoneNumber",
+		ErrMsg: pgmodels.ErrUserPhone,
+		Label:  "Phone in format 212-555-1212",
+		Attrs:  map[string]string{
 			//"pattern": "[0-9]{10,11}",
 		},
 	}
@@ -75,10 +72,9 @@ func (f *UserForm) init() {
 		},
 	}
 	f.Fields["GracePeriod"] = &Field{
-		Name:        "GracePeriod",
-		Label:       "Must enable two-factor auth by",
-		Placeholder: "mm/dd/yyyy",
-		ErrMsg:      pgmodels.ErrUserGracePeriod,
+		Name:   "GracePeriod",
+		Label:  "Must enable two-factor auth by (mm/dd/yyyy)",
+		ErrMsg: pgmodels.ErrUserGracePeriod,
 		Attrs: map[string]string{
 			"min": "2021-01-01",
 			"max": "2099-12-31",

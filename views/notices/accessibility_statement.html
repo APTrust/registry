@@ -1,0 +1,42 @@
+{{ define "notices/accessibility_statement.html" }}
+
+<!-- Show the header unless query string says modal=true -->
+{{ if not .showAsModal }}
+{{ template "shared/_header.html" .}}
+{{ end }}
+
+<div class="modal-edit">
+    <div id="modalTitle" class="modal-title-row is-flex is-justify-content-space-between is-align-items-center">
+        <h2>Academic Preservation Trust Accessibility Statement</h2>
+        {{ if .showAsModal }}
+        <a class="modal-exit is-grey-dark" href="#">
+            <span class="material-icons" aria-hidden="true">close</span>
+            <span class="is-sr-only">Close</span>
+        </a>
+        {{ end }}
+    </div>
+
+    <p class="mb-3">To further this commitment, we are using <a href="https://www.w3.org/TR/WCAG22/#conformance-reqs" target="_blank">Web Content Accessibility Guidelines 2.2, Level AA</a>, which provides standards for making web content more accessible for all visitors, including people with disabilities.</p>
+    
+    <h2>Continuous Monitoring of Content</h2>
+    
+    <p class="mb-3">In the interest of staying ahead of emerging technology, the Academic Preservation Trust Registry website is tested regularly with the latest software and methodologies to maintain accessible content for all. Specifically, the Academic Preservation Trust Registry website is tested with assistive technology, including screen reader software, alternative input (keyboard only) functionality, color contrast analyzers, and magnification software.  In addition to accessibility compatibility testing, the Academic Preservation Trust Registry website is also tested for usability. It is our goal not only to meet the minimum accessibility standards but also to exceed them by ensuring the website is usable. We are committed to addressing any issues that may arise when accessing our digital content and will readily provide assistance as needed if immediate solutions are unavailable.</p>
+    
+    <h2>Do You Need Assistance?</h2>
+    
+    <p class="mb-3">If you are having issues accessing any information on our website, please contact us promptly at 434-928-0042 or info@aptrust.org. Your experience and ideas are our highest priority. No issue is too small, and we welcome your feedback.</p>
+    
+    <h2>Endorsement</h2>
+    
+    <p class="mb-3">Endorsed by <a href="https://ablr360.com/what-is-an-accessibility-statement/" target="_blank">Ablr</a>, an accessibility company that employs and utilizes people who are blind and visually impaired in providing audits, training, and consulting for all digital content.</p>
+
+    <a href="https://ablr360.com/what-is-an-accessibility-statement/" target="_blank"><img src="/static/img/ablr-logo.png" alt="Ablr logo" width="180" height="111" /></a>
+</div>
+
+<!-- Show the footer unless query string says modal=true -->
+{{ if not .showAsModal }}
+{{ template "shared/_footer.html" .}}
+{{ end }}
+
+
+{{ end }}

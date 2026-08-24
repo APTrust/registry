@@ -25,10 +25,16 @@ func TestTwoFactorPreferences(t *testing.T) {
 	prefs.NewMethod = constants.TwoFactorNone
 	assert.True(t, prefs.DoNotUseTwoFactor())
 	assert.False(t, prefs.UseSMS())
+	assert.False(t, prefs.UseAuthenticatorApp())
 
 	prefs.NewMethod = constants.TwoFactorSMS
 	assert.False(t, prefs.DoNotUseTwoFactor())
 	assert.True(t, prefs.UseSMS())
-
+	assert.False(t, prefs.UseAuthenticatorApp())
 	assert.True(t, prefs.NeedsSMSConfirmation())
+
+	prefs.NewMethod = constants.TwoFactorTOTP
+	assert.False(t, prefs.DoNotUseTwoFactor())
+	assert.False(t, prefs.UseSMS())
+	assert.True(t, prefs.UseAuthenticatorApp())
 }
