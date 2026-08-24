@@ -61,7 +61,7 @@ func GenericFileByID(id int64) (*GenericFile, error) {
 			return q.Order("premis_event.date_time desc"), nil
 		}).
 		Relation("Checksums", func(q *pg.Query) (*pg.Query, error) {
-			return q.Order("checksum.created_at desc"), nil
+			return q.Order("checksum.datetime desc"), nil
 		}).
 		Relation("Institution").
 		Relation("IntellectualObject").
@@ -175,7 +175,6 @@ func (gf *GenericFile) saveChecksumsTx(tx *pg.Tx) error {
 			continue
 		}
 		checksum.GenericFileID = gf.ID
-		checksum.SetTimestamps()
 		validationErr := checksum.Validate()
 		if validationErr != nil {
 			common.Context().Log.Error().Msgf("GenericFile batch insertion failed on validation of checksum (%s) - %s. Error: %s", gf.Identifier, checksum.Digest, validationErr.Error())
@@ -220,7 +219,6 @@ func (gf *GenericFile) saveEventsTx(tx *pg.Tx) error {
 		event.InstitutionID = gf.InstitutionID
 		event.IntellectualObjectID = gf.IntellectualObjectID
 		event.GenericFileID = gf.ID
-		event.SetTimestamps()
 		validationErr := event.Validate()
 		if validationErr != nil {
 			common.Context().Log.Error().Msgf("GenericFile save failed on validation of event (%s) - %s. Error: %s", gf.Identifier, event.EventType, validationErr.Error())
@@ -395,7 +393,6 @@ func (gf *GenericFile) Delete() error {
 	if err != nil {
 		return err
 	}
-	deletionEvent.SetTimestamps()
 	valErr = deletionEvent.Validate()
 	if valErr != nil {
 		return valErr
@@ -439,7 +436,7 @@ func (gf *GenericFile) lastEvent(eventType string) (*PremisEvent, error) {
 	query := NewQuery().
 		Where("generic_file_id", "=", gf.ID).
 		Where("event_type", "=", eventType).
-		OrderBy("created_at", "desc").
+		OrderBy("date_time", "desc").
 		Offset(0).
 		Limit(1)
 	return PremisEventGet(query)

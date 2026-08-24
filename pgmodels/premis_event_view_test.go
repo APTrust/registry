@@ -22,7 +22,7 @@ func TestPremisEventView(t *testing.T) {
 
 	query := pgmodels.NewQuery().
 		Where("intellectual_object_id", "=", 1).
-		OrderBy("created_at", "asc")
+		OrderBy("date_time", "asc")
 	eventViews, err := pgmodels.PremisEventViewSelect(query)
 	require.Nil(t, err)
 	assert.Equal(t, 13, len(eventViews))

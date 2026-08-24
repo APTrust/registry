@@ -150,7 +150,6 @@ func (obj *IntellectualObject) Delete() error {
 	if err != nil {
 		return err
 	}
-	deletionEvent.SetTimestamps()
 	valErr = deletionEvent.Validate()
 	if valErr != nil {
 		return valErr
@@ -201,7 +200,7 @@ func (obj *IntellectualObject) lastEvent(eventType string) (*PremisEvent, error)
 		Where("intellectual_object_id", "=", obj.ID).
 		Where("event_type", "=", eventType).
 		IsNull("generic_file_id").
-		OrderBy("created_at", "desc").
+		OrderBy("date_time", "desc").
 		Offset(0).
 		Limit(1)
 	return PremisEventGet(query)
@@ -327,7 +326,7 @@ func (obj *IntellectualObject) assertNotAlreadyDeleted() error {
 		if err != nil {
 			err = fmt.Errorf("Error checking for last deletion event: %v", err)
 		}
-		if lastDeletionEvent != nil && lastDeletionEvent.CreatedAt.After(lastIngestEvent.CreatedAt) {
+		if lastDeletionEvent != nil && lastDeletionEvent.DateTime.After(lastIngestEvent.DateTime) {
 			err = fmt.Errorf("Object has already been deleted since last ingest")
 		}
 	}
