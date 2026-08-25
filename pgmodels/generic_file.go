@@ -520,7 +520,7 @@ func (gf *GenericFile) NewDeletionEvent() (*PremisEvent, error) {
 	}
 	now := time.Now().UTC()
 	return &PremisEvent{
-		Agent:                6,
+		Agent:                constants.EventAgentPreservAlt,
 		DateTime:             now,
 		Detail:               "All copies of this file have been deleted from preservation storage",
 		EventType:            constants.EventDeletion,
@@ -528,7 +528,7 @@ func (gf *GenericFile) NewDeletionEvent() (*PremisEvent, error) {
 		InstitutionID:        gf.InstitutionID,
 		IntellectualObjectID: gf.IntellectualObjectID,
 		GenericFileID:        gf.ID,
-		Object:               6,
+		Object:               constants.EventObjectMinioAlt,
 		Outcome:              constants.OutcomeSuccess,
 		OutcomeDetail:        deletionRequestView.RequestedByEmail,
 		OutcomeInformation:   fmt.Sprintf("File deleted at the request of %s. Institutional approver: %s. This event confirms all preservation copies have been deleted.", deletionRequestView.RequestedByEmail, deletionRequestView.ConfirmedByEmail),

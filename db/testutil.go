@@ -1,6 +1,7 @@
 package db
 
 import (
+	"encoding/csv"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -225,6 +226,17 @@ func loadCSVFiles(db *pg.DB) error {
 	return nil
 }
 
+// csvHeaderColumns returns the column names listed in the first row
+// of the given CSV file.
+func csvHeaderColumns(file string) ([]string, error) {
+	f, err := os.Open(file)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	return csv.NewReader(f).Read()
+}
+
 // Loads data from a CSV file into a table.
 // The CSV files were created with the Postgres COPY command.
 func loadCSVFile(db *pg.DB, table string) error {
@@ -244,8 +256,18 @@ func loadCSVFile(db *pg.DB, table string) error {
 		file = tmpFile
 	}
 
-	sql := fmt.Sprintf(`copy "%s" from '%s' csv header`, table, file)
-	err := runTransaction(db, sql)
+	// COPY ... CSV HEADER matches columns positionally, using the header
+	// row only to skip the first line. It does NOT map columns by name.
+	// Migrations can change a table's physical column order (e.g. by
+	// dropping and renaming columns), so we read the CSV header here and
+	// pass it explicitly to COPY to ensure values land in the right columns.
+	columns, err := csvHeaderColumns(file)
+	if err != nil {
+		return err
+	}
+
+	sql := fmt.Sprintf(`copy "%s" ("%s") from '%s' csv header`, table, strings.Join(columns, `", "`), file)
+	err = runTransaction(db, sql)
 	if err != nil {
 		err = fmt.Errorf(`Error executing "%s": %v`, sql, err)
 	}

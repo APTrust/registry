@@ -11,8 +11,8 @@ on conflict ("version") do update set started_at = now();
 drop view if exists public.premis_events_view;
 
 -- Add the new columns.
-alter table premis_events add COLUMN if not exists agent_int smallint;
-alter table premis_events add COLUMN if not exists object_int smallint;
+alter table premis_events add COLUMN if not exists event_agent_int smallint;
+alter table premis_events add COLUMN if not exists event_object_int smallint;
 
 -- Create lookup tables.
 drop table if exists event_agent_lookup;
@@ -39,7 +39,7 @@ insert into event_agent_lookup (id, event_agent) values
 (8, 'http://golang.org/pkg/crypto/sha256/'),
 (9, 'http://golang.org/pkg/crypto/md5/'),
 (10, 'Registry Unit Test'),
-(11, 'Maxwell Smart')
+(11, 'Maxwell Smart'),
 (12, 'https://github.com/APTrust/exchange'),
 (13, 'http://github.com/satori/go.uuid');
 
@@ -49,7 +49,7 @@ insert into event_object_lookup (id, event_object) values
 (2, 'Minio S3 client'),
 (3, 'Minio S3 library'),
 (4, 'preservation-services + Minio S3 client'),
-(5, 'Go uuid library + Minio S3 library')
+(5, 'Go uuid library + Minio S3 library'),
 (6, 'Go language crypto/sha256'),
 (7, 'Go language crypto/md5'),
 (8, 'scissors'),
