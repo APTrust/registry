@@ -3,6 +3,7 @@ package middleware
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 
@@ -225,7 +226,7 @@ func respondToAuthError(c *gin.Context, err error) {
 			"suppressSideNav": true,
 			"suppressTopNav":  true,
 			"error":           "Please log in",
-			"redirectURL":     fmt.Sprintf("/?requrl=%s", c.Request.URL),
+			"redirectURL":     fmt.Sprintf("/?requrl=%s", url.QueryEscape(c.Request.URL.String())),
 		})
 	}
 }
