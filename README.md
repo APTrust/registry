@@ -17,6 +17,26 @@ This will be the third-generation of our registry software, based on the [Gin We
 
 If you're looking for our member API documentation, check out our [Member API documentation](https://docs.aptrust.org/api/).
 
+The Registry has two APIs, and each has an OpenAPI 3.0 spec in this repo:
+
+* [member_api_v3.yml](member_api_v3.yml) describes the **Member API**, which
+  depositors use. It is published for members at
+  https://docs.aptrust.org/api/.
+* [admin_api_v3.yml](admin_api_v3.yml) describes the **Admin API**, which is
+  restricted to APTrust system administrators and is used primarily by
+  [preservation-services](https://github.com/APTrust/preservation-services).
+  This one is internal and is not published for members. Because
+  preservation-services writes nearly all of the data in the Registry, treat
+  this spec as the Registry's write contract: changing a request or response
+  shape documented there will break ingest.
+
+The admin spec is hand-written, so `web/api/admin/admin_api_spec_test.go`
+checks it against the running router on every test run. It fails if a route is
+added or removed without a matching change to the spec, if an `operationId`
+stops matching its handler function name, or if an index route's documented
+query params drift from the filters in `pgmodels`. If that test fails, update
+[admin_api_v3.yml](admin_api_v3.yml).
+
 # Requirements
 
 To run the registry on your local dev machine, you will need the following for ALL operations:
