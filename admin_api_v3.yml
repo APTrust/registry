@@ -519,6 +519,7 @@ components:
         size:
           type: integer
           format: int64
+          minimum: 0
           description: The size (in bytes) of the file.
         identifier:
           type: string
@@ -1038,6 +1039,7 @@ components:
             - ingestion
             - message digest calculation
             - replication
+            - validation
         generic_file_id:
           type: integer
           format: int64
@@ -1046,7 +1048,7 @@ components:
         identifier:
           type: string
           format: uuid
-          description: A unique identifier for this event.
+          description: A unique identifier for this event. The caller generates this UUID; the Registry does not assign it.
         institution_id:
           type: integer
           format: int64
@@ -1113,6 +1115,7 @@ components:
             - ingestion
             - message digest calculation
             - replication
+            - validation
         generic_file_id:
           type: integer
           format: int64
@@ -1125,7 +1128,7 @@ components:
         identifier:
           type: string
           format: uuid
-          description: A unique identifier for this event.
+          description: A unique identifier for this event. The caller generates this UUID; the Registry does not assign it.
         institution_id:
           type: integer
           format: int64
@@ -1217,6 +1220,7 @@ components:
           description: The ID of the GenericFile stored in preservation.
         url:
           type: string
+          format: uri
           description: The URL of the GenericFile in preservation storage.
 
 
@@ -1386,9 +1390,13 @@ components:
           format: int64
         name:
           type: string
+          minLength: 1
+          maxLength: 1000
           description: The name of the original tar file uploaded to the receiving bucket for ingest. Cannot be changed after creation.
         etag:
           type: string
+          minLength: 32
+          maxLength: 40
           description: The etag of the tar file uploaded for ingest. Cannot be changed after creation.
         institution_id:
           type: integer
@@ -1406,6 +1414,8 @@ components:
           nullable: true
         bucket:
           type: string
+          minLength: 1
+          maxLength: 1000
           description: The name of the receiving bucket into which the original bag was uploaded for ingest.
         user:
           type: string
@@ -1705,6 +1715,140 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/WorkItemView'
+
+    # Request schemas. These carry the same properties as the models above,
+    # and add the validation rules the Registry enforces on write. See each
+    # model's Validate() method in pgmodels for the authoritative rules.
+
+    ChecksumRequest:
+      description: |
+        A checksum submitted for creation.
+
+        `id`, `created_at` and `updated_at` are assigned by the server and are
+        ignored on input. Checksums cannot be updated or deleted once created.
+      allOf:
+        - $ref: '#/components/schemas/Checksum'
+      required:
+        - algorithm
+        - datetime
+        - digest
+        - generic_file_id
+
+    GenericFileRequest:
+      description: |
+        A file submitted for creation or update.
+
+        `id`, `created_at` and `updated_at` are assigned by the server. On
+        update, `id` must match the id in the URL.
+
+        `institution_id` must match the `institution_id` in the URL on create,
+        and cannot change on update. `identifier` cannot change on update.
+        `storage_option` cannot change while the file is active; the Registry
+        silently restores the stored value rather than rejecting the request.
+
+        `size` is optional and defaults to 0, but may not be negative.
+      allOf:
+        - $ref: '#/components/schemas/GenericFile'
+      required:
+        - file_format
+        - identifier
+        - institution_id
+        - intellectual_object_id
+        - state
+        - storage_option
+        - uuid
+
+    IntellectualObjectRequest:
+      description: |
+        An object submitted for creation or update.
+
+        `id`, `created_at` and `updated_at` are assigned by the server. On
+        update, `id` must match the id in the URL.
+
+        `institution_id` must match the `institution_id` in the URL on create,
+        and cannot change on update. `identifier` cannot change on update.
+        `storage_option` cannot change while the object is active; the Registry
+        silently restores the stored value rather than rejecting the request.
+      allOf:
+        - $ref: '#/components/schemas/IntellectualObject'
+      required:
+        - access
+        - bagit_profile_identifier
+        - identifier
+        - institution_id
+        - state
+        - storage_option
+        - title
+
+    PremisEventRequest:
+      description: |
+        An event submitted for creation.
+
+        **This route does not validate its input.** Unlike every other write
+        endpoint in this API, `POST /admin-api/v3/events/create` saves the
+        event without calling the model's validation, and the premis_events
+        table has no NOT NULL constraints and no foreign keys on
+        `institution_id`, `intellectual_object_id` or `generic_file_id`. An
+        incomplete or internally inconsistent event will be accepted and
+        stored. No properties are therefore marked required here, because the
+        server does not require them.
+
+        Callers should nonetheless send a complete event. The same event
+        submitted inside `POST /admin-api/v3/files/create_batch/{institution_id}`
+        *is* validated, and is rejected unless all of the following hold:
+
+        * `agent`, `detail`, `object`, `outcome_detail` and
+          `outcome_information` are non-empty
+        * `date_time` is set
+        * `event_type` is one of the values in the enum below
+        * `outcome` is either Success or Failure
+        * `identifier` is a UUID, which the caller generates
+        * `institution_id` and `intellectual_object_id` are greater than zero
+        * `generic_file_id` is optional, since not every event pertains to a
+          file
+
+        `id`, `created_at` and `updated_at` are assigned by the server. Events
+        cannot be updated or deleted once created.
+      allOf:
+        - $ref: '#/components/schemas/PremisEvent'
+
+    StorageRecordRequest:
+      description: |
+        A storage record submitted for creation.
+
+        `id` is assigned by the server. There is no endpoint for updating or
+        deleting a storage record.
+      allOf:
+        - $ref: '#/components/schemas/StorageRecord'
+      required:
+        - generic_file_id
+        - url
+
+    WorkItemRequest:
+      description: |
+        A work item submitted for creation or update.
+
+        `id`, `created_at` and `updated_at` are assigned by the server. On
+        update, `id` must match the id in the URL, and `institution_id`,
+        `intellectual_object_id`, `generic_file_id`, `name`, `etag` and
+        `action` cannot change.
+
+        Note that `note` and `outcome` are not currently validated, despite
+        appearances: the validator checks the length of `name` in the places
+        it means to check those two fields.
+      allOf:
+        - $ref: '#/components/schemas/WorkItem'
+      required:
+        - action
+        - bag_date
+        - bucket
+        - date_processed
+        - etag
+        - institution_id
+        - name
+        - stage
+        - status
+        - user
 
   parameters:
     page:
@@ -2082,6 +2226,8 @@ paths:
 
         Checksums cannot be updated or deleted. The Registry keeps every
         checksum ever calculated for a file so that fixity history is complete.
+        Submitting a checksum with a non-zero `id` returns 405, because that
+        would be an update.
       tags:
         - Checksums
       parameters:
@@ -2091,7 +2237,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Checksum'
+              $ref: '#/components/schemas/ChecksumRequest'
       responses:
         '201':
           description: The newly created checksum.
@@ -2107,6 +2253,12 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           description: There is no generic file with the specified generic_file_id.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RequestError'
+        '405':
+          description: The submitted checksum has a non-zero id. Checksums cannot be updated.
           content:
             application/json:
               schema:
@@ -2434,7 +2586,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GenericFile'
+              $ref: '#/components/schemas/GenericFileRequest'
       responses:
         '201':
           description: The newly created file.
@@ -2477,7 +2629,7 @@ paths:
             schema:
               type: array
               items:
-                $ref: '#/components/schemas/GenericFile'
+                $ref: '#/components/schemas/GenericFileRequest'
       responses:
         '201':
           description: The newly created files.
@@ -2515,7 +2667,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GenericFile'
+              $ref: '#/components/schemas/GenericFileRequest'
       responses:
         '200':
           description: The updated file.
@@ -2899,7 +3051,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/IntellectualObject'
+              $ref: '#/components/schemas/IntellectualObjectRequest'
       responses:
         '201':
           description: The newly created object.
@@ -2933,7 +3085,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/IntellectualObject'
+              $ref: '#/components/schemas/IntellectualObjectRequest'
       responses:
         '200':
           description: The updated object.
@@ -3118,6 +3270,7 @@ paths:
               - ingestion
               - message digest calculation
               - replication
+              - validation
         - name: generic_file_id
           in: query
           description: Return events pertaining to the specified file.
@@ -3231,7 +3384,12 @@ paths:
       description: |
         Premis events are the Registry's audit trail. They cannot be updated or
         deleted once created, and there is no institution id in this URL; the
-        event's own `institution_id` determines ownership.
+        event's own `institution_id` determines ownership. Submitting an event
+        with a non-zero `id` returns 405, because that would be an update.
+
+        **Unlike the other write endpoints, this one does not validate its
+        input.** See the PremisEventRequest schema for what that means and for
+        the fields a well-formed event should carry.
 
         When the submitted event has type "fixity check", the Registry also
         updates the `last_fixity_check` timestamp on the file named in
@@ -3245,7 +3403,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PremisEvent'
+              $ref: '#/components/schemas/PremisEventRequest'
       responses:
         '201':
           description: The newly created event.
@@ -3260,7 +3418,13 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
         '404':
-          description: A fixity check event named a generic_file_id that does not exist.
+          description: A fixity check event named a generic_file_id that does not exist. Note that the event itself has already been saved by the time this check runs.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RequestError'
+        '405':
+          description: The submitted event has a non-zero id. Premis events cannot be updated.
           content:
             application/json:
               schema:
@@ -3353,6 +3517,10 @@ paths:
         There is deliberately no endpoint for deleting a storage record. To
         remove one, delete the generic file it belongs to, which runs the full
         set of deletion preconditions.
+
+        Note that despite the name, this endpoint also updates. Submitting a
+        storage record with a non-zero `id` updates that existing record rather
+        than creating a new one, and still returns 201.
       tags:
         - Storage Records
       parameters:
@@ -3362,7 +3530,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/StorageRecord'
+              $ref: '#/components/schemas/StorageRecordRequest'
       responses:
         '201':
           description: The newly created storage record.
@@ -3679,7 +3847,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/WorkItem'
+              $ref: '#/components/schemas/WorkItemRequest'
       responses:
         '201':
           description: The newly created work item.
@@ -3714,7 +3882,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/WorkItem'
+              $ref: '#/components/schemas/WorkItemRequest'
       responses:
         '200':
           description: The updated work item.

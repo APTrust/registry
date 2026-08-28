@@ -33,8 +33,9 @@ The Registry has two APIs, and each has an OpenAPI 3.0 spec in this repo:
 The admin spec is hand-written, so `web/api/admin/admin_api_spec_test.go`
 checks it against the running router on every test run. It fails if a route is
 added or removed without a matching change to the spec, if an `operationId`
-stops matching its handler function name, or if an index route's documented
-query params drift from the filters in `pgmodels`. If that test fails, update
+stops matching its handler function name, if an index route's documented query
+params drift from the filters in `pgmodels`, or if a write endpoint doesn't
+document a request body. If that test fails, update
 [admin_api_v3.yml](admin_api_v3.yml).
 
 # Requirements

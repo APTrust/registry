@@ -39,6 +39,7 @@ type specParam struct {
 type specOperation struct {
 	OperationID string      `yaml:"operationId"`
 	Parameters  []specParam `yaml:"parameters"`
+	RequestBody interface{} `yaml:"requestBody"`
 }
 
 type apiSpec struct {
@@ -190,4 +191,38 @@ func TestAdminAPISpecDocumentsAllFilters(t *testing.T) {
 		tested++
 	}
 	assert.NotZero(t, tested, "Found no index routes to check. Has the route table or handler naming changed?")
+}
+
+// bodylessWrites are the POST and PUT routes that genuinely take no request
+// body. Everything else that writes must document one.
+var bodylessWrites = map[string]bool{
+	"post /admin-api/v3/alerts/generate_failed_fixity_alerts": true,
+	"post /admin-api/v3/objects/init_restore/{id}":            true,
+	"post /admin-api/v3/prepare_file_delete/{id}":             true,
+	"post /admin-api/v3/prepare_object_delete/{id}":           true,
+}
+
+// TestAdminAPISpecDocumentsRequestBodies checks that every write endpoint says
+// what to send it. A POST or PUT documented with no request body tells a caller
+// nothing about the shape the Registry expects, which is the easiest detail to
+// leave out when hand-writing a spec.
+//
+// If you add a write route that really takes no body, add it to bodylessWrites
+// above rather than deleting this test.
+func TestAdminAPISpecDocumentsRequestBodies(t *testing.T) {
+	spec := loadSpec(t)
+
+	missing := make([]string, 0)
+	for key, op := range specOperations(spec) {
+		method := strings.SplitN(key, " ", 2)[0]
+		if method != "post" && method != "put" {
+			continue
+		}
+		if bodylessWrites[key] || op.RequestBody != nil {
+			continue
+		}
+		missing = append(missing, key)
+	}
+	sort.Strings(missing)
+	assert.Empty(t, missing, "These write endpoints don't document a request body")
 }
