@@ -41,7 +41,15 @@ insert into event_agent_lookup (id, event_agent) values
 (10, 'Registry Unit Test'),
 (11, 'Maxwell Smart')
 (12, 'https://github.com/APTrust/exchange'),
-(13, 'http://github.com/satori/go.uuid');
+(13, 'http://github.com/satori/go.uuid'),
+(14, 'http://github.com/nu7hatch/gouuid'),
+(15, 'https://github.com/APTrust/bagman'),
+(16, 'https://github.com/aws/aws-sdk-go'),
+(17, 'https://github.com/crowdmob/goamz'),
+(18, 'https://github.com/marcel/aws-s3/tree/master'),
+(19, 'https://github.com/satori/go.uuid'),
+(20, 'https://launchpad.net/goamz'),
+(21, 'https://github.com/APTrust/auditing/blob/1.0/cleanup_001.py');
 
 insert into event_object_lookup (id, event_object) values 
 (0, 'unknown event object'),
@@ -58,7 +66,27 @@ insert into event_object_lookup (id, event_object) values
 (11, 'APTrust Go Exchange + Amazon S3 client'),
 (12, 'SHA-256 thingy'),
 (13, 'Exchange ingest code'),
-(14, 'Deleterbot code');
+(14, 'Deleterbot code'),
+(15, 'APTrust bagman'),
+(16, 'APTrust bag processor'),
+(17, 'APTrust exchange'),
+(18, 'APTrust Exchange apt_delete service'),
+(19, 'APTrust Exchange ingest services'),
+(20, 'APTrust exchange using Satori go.uuid'),
+(21, 'AWS Go SDK S3 client'),
+(22, 'AWS Go SDK S3 Library'),
+(23, 'bagman + goamz s3 client'),
+(24, 'exchange + AWS Go SDK S3 client'),
+(25, 'exchange + goamz S3 client'),
+(26, 'goamz S3 client'),
+(27, 'Goamz S3 Client'),
+(28, 'Go language cryptohash'),
+(29, 'Go crypto/md5'),
+(30, 'Go uuid library + APTrust DPN services'),
+(31, 'Go uuid library + AWS Go SDK S3 library'),
+(32, 'Go uuid library + goamz S3 library'),
+(33, 'Ruby aws-s3 gem'),
+(34, 'APTrust audit and cleanup scripts for audit_001');
 
 -- IMPORTANT - Rollback if any agents or objects appear as 0
 create or replace function convert_event_agents_and_objects()
@@ -78,6 +106,14 @@ begin
         when agent='Maxwell Smart' then 11
         when agent='https://github.com/APTrust/exchange' then 12
         when agent='http://github.com/satori/go.uuid' then 13
+        when agent='http://github.com/nu7hatch/gouuid' then 14
+        when agent='https://github.com/APTrust/bagman' then 15
+        when agent='https://github.com/aws/aws-sdk-go' then 16
+        when agent='https://github.com/crowdmob/goamz' then 17
+        when agent='https://github.com/marcel/aws-s3/tree/master' then 18
+        when agent='https://github.com/satori/go.uuid' then 19
+        when agent='https://launchpad.net/goamz' then 20
+        when agent='https://github.com/APTrust/auditing/blob/1.0/cleanup_001.py' then 21
         else 0
     end,
     event_object_int = case
@@ -95,6 +131,26 @@ begin
         when "object"='SHA-256 thingy' then 12
         when "object"='Exchange ingest code' then 13
         when "object"='Deleterbot code' then 14
+        when "object"='APTrust bagman' then 15
+        when "object"='APTrust bag processor' then 16
+        when "object"='APTrust exchange' then 17
+        when "object"='APTrust Exchange apt_delete service' then 18
+        when "object"='APTrust Exchange ingest services' then 19
+        when "object"='APTrust exchange using Satori go.uuid' then 20
+        when "object"='AWS Go SDK S3 client' then 21
+        when "object"='AWS Go SDK S3 Library' then 22
+        when "object"='bagman + goamz s3 client' then 23
+        when "object"='exchange + AWS Go SDK S3 client' then 24
+        when "object"='exchange + goamz S3 client' then 25
+        when "object"='goamz S3 client' then 26
+        when "object"='Goamz S3 Client' then 27
+        when "object"='Go language cryptohash' then 28
+        when "object"='Go crypto/md5' then 29
+        when "object"='Go uuid library + APTrust DPN services' then 30
+        when "object"='Go uuid library + AWS Go SDK S3 library' then 31
+        when "object"='Go uuid library + goamz S3 library' then 32
+        when "object"='Ruby aws-s3 gem' then 33
+        when "object"='APTrust audit and cleanup scripts for audit_001' then 34
         else 0
     end;
 end;
