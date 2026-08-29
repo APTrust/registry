@@ -350,7 +350,7 @@ func TestIsSMSUser(t *testing.T) {
 	assert.True(t, user.IsSMSUser())
 
 	user.MFAStatus = ""
-	assert.False(t, user.IsSMSUser())
+	assert.True(t, user.IsSMSUser())
 
 	user.MFAStatus = constants.TwoFactorSMS
 	user.ConfirmedTwoFactor = false

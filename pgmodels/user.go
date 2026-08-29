@@ -364,7 +364,7 @@ func (user *User) IsAdmin() bool {
 // IsSMSUser returns true if this user has enabled two-factor authentication
 // with SMS/text message.
 func (user *User) IsSMSUser() bool {
-	return user.IsTwoFactorUser() && (user.MFAStatus == constants.TwoFactorSMS)
+	return user.IsTwoFactorUser() && (user.MFAStatus != constants.TwoFactorTOTP)
 }
 
 // IsAuthenticatorAppUser returns true if the user has enabled an authenticator app
