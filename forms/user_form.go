@@ -50,7 +50,7 @@ func (f *UserForm) init() {
 	f.Fields["Email"] = &Field{
 		Name:        "Email",
 		ErrMsg:      pgmodels.ErrUserEmail,
-		Label:       "Email Address",
+		Label:       "Email Address in format user@example.com",
 		Placeholder: "Email Address",
 		Attrs: map[string]string{
 			"required": "",
@@ -60,9 +60,9 @@ func (f *UserForm) init() {
 		Name:        "PhoneNumber",
 		ErrMsg:      pgmodels.ErrUserPhone,
 		Label:       "Phone",
-		Placeholder: "Phone in format 212-555-1212",
-		Attrs:       map[string]string{
-			//"pattern": "[0-9]{10,11}",
+		Placeholder: "Phone in format 2125551212",
+		Attrs: map[string]string{
+			"pattern": "\\(?[0-9]{3}\\)?\\-?[0-9]{3}\\-?[0-9]{4}$",
 		},
 	}
 	f.Fields["OTPRequiredForLogin"] = &Field{

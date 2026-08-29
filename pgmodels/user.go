@@ -16,7 +16,7 @@ var reNumeric = regexp.MustCompile("[^0-9]+")
 
 const (
 	ErrUserName         = "Name must contain at least 2 characters."
-	ErrUserEmail        = "Email address is required."
+	ErrUserEmail        = "Please enter the user's email address in the format user@example.com."
 	ErrUserPhone        = "Please enter a phone number in format +2125551212."
 	ErrUser2Factor      = "Please choose yes or no."
 	ErrUserGracePeriod  = "Enter a date specifying when this user must enable two-factor authentication."

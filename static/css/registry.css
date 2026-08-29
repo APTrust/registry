@@ -887,6 +887,8 @@ a.box:active {
   color: #333030;
 }
 .button:focus, .button.is-focused {
+  padding: 2px;
+  border-width: 2px;
   border-color: hsl(229deg, 53%, 53%);
   color: #333030;
 }
@@ -6748,6 +6750,10 @@ pre.with-wrap {
   cursor: pointer;
   line-height: 1.25rem;
   padding: 0 0.5rem;
+}
+.badge.filter-chip:focus {
+  padding: 2px;
+  border-width: 2px;
 }
 .badge.filter-chip .icon {
   margin-left: 0.5rem;
