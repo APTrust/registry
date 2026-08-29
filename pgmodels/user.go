@@ -396,8 +396,11 @@ func (user *User) TwoFactorMethod() string {
 	if user.IsSMSUser() {
 		return constants.TwoFactorSMS
 	}
-	// If using 2FA, and not SMS, must be using authenticator apps.
-	return constants.TwoFactorTOTP
+	if user.IsAuthenticatorAppUser() {
+		return constants.TwoFactorTOTP
+	}
+	// If using 2FA, and type not otherwise specified, default to SMS
+	return constants.TwoFactorSMS
 }
 
 // CreateOTPToken creates a new one-time password token, typically

@@ -7,11 +7,11 @@ insert into schema_migrations ("version", started_at) values ('014_remove_authy'
 on conflict ("version") do update set started_at = now();
 
 -- Add a generic MFA status column to replace the Authy one.
-alter table public.users rename column if exists authy_status to mfa_status varchar NULL;
+alter table public.users rename column authy_status to mfa_status;
 
 -- Users were given 2 weeks of notice for demo and 3 weeks of notice for prod to update their MFA settings
 -- If they have not done so by now, we will turn off their MFA as described in email communications
-UPDATE public.users SET mfa_status = "none" WHERE mfa_status = "onetouch";
+UPDATE public.users SET mfa_status = 'none', enabled_two_factor = false WHERE mfa_status = 'onetouch';
 
 -- Drop and recreate the user view
 drop view public.users_view;
