@@ -13,8 +13,7 @@ import (
 // also serialize info about the users who created, approved, or
 // cancelled the request. In this context, we do not want to serialize
 // info about the user that we would typically serialize in a user management
-// endpoint. This would include things like whether the user has registered
-// for Authy two-factor authentication, where the last logged in from, etc.
+// endpoint. This would include things like where the last logged in from, etc.
 //
 // All we really need to serialize in such a case is the user's name, id, and
 // email address.

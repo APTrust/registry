@@ -85,7 +85,6 @@ const (
 	RoleNone                   = "none"
 	RoleSysAdmin               = "admin"
 	SecondFactorTOTP           = "Authenticator App"
-	SecondFactorAuthy          = "Authy"
 	SecondFactorBackupCode     = "Backup Code"
 	SecondFactorSMS            = "SMS"
 	StageAvailableInS3         = "Available in S3"
@@ -135,7 +134,6 @@ const (
 	TopicObjectRestore         = "restore_object"
 	TOTPSecretIssuer           = "APTrust"
 	TwoFactorTOTP              = "totp"
-	TwoFactorAuthy             = "onetouch"
 	TwoFactorNone              = "none"
 	TwoFactorSMS               = "sms"
 )
@@ -233,7 +231,6 @@ var Roles = []string{
 }
 
 var SecondFactorTypes = []string{
-	SecondFactorAuthy,
 	SecondFactorBackupCode,
 	SecondFactorSMS,
 }

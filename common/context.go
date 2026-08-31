@@ -24,10 +24,6 @@ type APTContext struct {
 	// Log is our logger.
 	Log zerolog.Logger
 
-	// AuthyClient sends push notifications to users who have enabled
-	// two-factor auth via push.
-	AuthyClient network.AuthyClientInterface
-
 	// NSQClient lets registry queue work items for preservation services
 	// and lets us view NSQ admin stats.
 	NSQClient *network.NSQClient
@@ -85,7 +81,6 @@ func Context() *APTContext {
 			Config:      config,
 			DB:          db,
 			Log:         zlogger,
-			AuthyClient: network.NewAuthyClient(config.TwoFactor.AuthyEnabled, config.TwoFactor.AuthyAPIKey, zlogger),
 			NSQClient:   network.NewNSQClient(config.NsqUrl, zlogger),
 			SESClient:   network.NewSESClient(config.Email.Enabled, config.TwoFactor.AWSRegion, config.Email.SesEndpoint, config.Email.SesUser, config.Email.SesPassword, config.Email.FromAddress, zlogger),
 			SNSClient:   network.NewSNSClient(config.TwoFactor.SMSEnabled, config.TwoFactor.AWSRegion, config.TwoFactor.SNSEndpoint, config.TwoFactor.SNSUser, config.TwoFactor.SNSPassword, zlogger),
