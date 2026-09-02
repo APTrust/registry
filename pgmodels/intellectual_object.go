@@ -377,7 +377,7 @@ func (obj *IntellectualObject) NewDeletionEvent() (*PremisEvent, error) {
 		Identifier:           uuid.NewString(),
 		InstitutionID:        obj.InstitutionID,
 		IntellectualObjectID: obj.ID,
-		Object:               6,
+		Object:               3,
 		Outcome:              constants.OutcomeSuccess,
 		OutcomeDetail:        deletionRequestView.RequestedByEmail,
 		OutcomeInformation:   fmt.Sprintf("Object deleted at the request of %s. Institutional approver: %s.", deletionRequestView.RequestedByEmail, deletionRequestView.ConfirmedByEmail),

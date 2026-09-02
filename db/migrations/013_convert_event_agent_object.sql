@@ -39,7 +39,7 @@ insert into event_agent_lookup (id, event_agent) values
 (8, 'http://golang.org/pkg/crypto/sha256/'),
 (9, 'http://golang.org/pkg/crypto/md5/'),
 (10, 'Registry Unit Test'),
-(11, 'Maxwell Smart')
+(11, 'Maxwell Smart'),
 (12, 'https://github.com/APTrust/exchange'),
 (13, 'http://github.com/satori/go.uuid'),
 (14, 'http://github.com/nu7hatch/gouuid'),
@@ -92,7 +92,7 @@ insert into event_object_lookup (id, event_object) values
 create or replace function convert_event_agents_and_objects()
 returns void as $$
 begin
-    update premis_events set event_agent_int = case
+    update premis_events set agent_int = case
         when agent='https://github.com/minio/minio-go v4' then 1
         when agent='https://github.com/minio/minio-go v5' then 2
         when agent='https://github.com/minio/minio-go v6' then 3
@@ -116,7 +116,7 @@ begin
         when agent='https://github.com/APTrust/auditing/blob/1.0/cleanup_001.py' then 21
         else 0
     end,
-    event_object_int = case
+    object_int = case
         when "object"='APTrust preservation services' then 1
         when "object"='Minio S3 client' then 2
         when "object"='Minio S3 library' then 3
