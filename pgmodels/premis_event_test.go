@@ -108,14 +108,14 @@ func TestEventValidate(t *testing.T) {
 	assert.NotEmpty(t, valErr.Errors["OutcomeDetail"])
 	assert.NotEmpty(t, valErr.Errors["OutcomeInformation"])
 
-	event.Agent = "Agent 99"
+	event.Agent = 1
 	event.DateTime = time.Now().UTC()
 	event.Detail = "Some little detail"
 	event.EventType = "*** Not a valid event type ***"
 	event.Identifier = "*** Not a valid uuid ***"
 	event.InstitutionID = 4
 	event.IntellectualObjectID = 21
-	event.Object = "The apple of my eye"
+	event.Object = 2
 	event.Outcome = "*** Not a valid outcome ***"
 	event.OutcomeDetail = "The proof is in the pudding"
 	event.OutcomeInformation = "The info"

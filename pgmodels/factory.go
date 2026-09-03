@@ -183,13 +183,13 @@ func RandomGenericFile(objID int64, objIdentifier string) *GenericFile {
 func RandomPremisEvent(eventType string) *PremisEvent {
 	now := time.Now().UTC()
 	return &PremisEvent{
-		Agent:              gofakeit.FarmAnimal(),
+		Agent:              1,
 		DateTime:           now,
 		Detail:             gofakeit.Sentence(4),
 		EventType:          eventType,
 		Identifier:         uuid.NewString(),
 		InstitutionID:      4,
-		Object:             gofakeit.Sentence(4),
+		Object:             1,
 		Outcome:            gofakeit.Sentence(5),
 		OutcomeDetail:      gofakeit.BeerName(),
 		OutcomeInformation: gofakeit.AppAuthor(),
