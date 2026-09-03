@@ -290,6 +290,7 @@ func InitObjectMove(obj *pgmodels.IntellectualObject, user *pgmodels.User) (*pgm
 	}
 
 	ctx := common.Context()
+	ctx.Log.Warn().Msgf("Enqueued the transfer request to topic: %s, %d", topic, workItem.ID)
 	err = ctx.NSQClient.Enqueue(topic, workItem.ID)
 	if err != nil {
 		return nil, err

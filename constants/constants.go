@@ -105,6 +105,9 @@ const (
 	StageStore                 = "Store"
 	StageUnpack                = "Unpack"
 	StageValidate              = "Validate"
+	StageTransferring          = "Transfer"
+	StageValidateTransfer      = "Validate Transfer"
+	StageTransferCleanup       = "Cleanup Transfer"
 	StateActive                = "A"
 	StateDeleted               = "D"
 	StatusCancelled            = "Cancelled"
@@ -136,6 +139,9 @@ const (
 	TopicMove                  = "move"
 	TopicMoveFromGlacier       = "move_from_glacier"
 	TopicObjectRestore         = "restore_object"
+	TopicTransferCopy          = "transfer01_copier"
+	TopicTransferValidate      = "transfer02_validate"
+	TopicTransferCleanup       = "transfer03_cleanup"
 	TwoFactorAuthy             = "onetouch"
 	TwoFactorNone              = "none"
 	TwoFactorSMS               = "sms"
@@ -256,6 +262,9 @@ var Stages = []string{
 	StageStore,
 	StageUnpack,
 	StageValidate,
+	StageTransferring,
+	StageValidateTransfer,
+	StageTransferCleanup,
 }
 
 var States = []string{
@@ -313,6 +322,9 @@ var NonIngestTopics = []string{
 	TopicFixity,
 	TopicGlacierRestore,
 	TopicObjectRestore,
+	TopicTransferCopy,
+	TopicTransferValidate,
+	TopicTransferCleanup,
 }
 
 // NSQIngestTopicFor maps ingest stage names to NSQ topics.
@@ -326,6 +338,13 @@ var NSQIngestTopicFor = map[string]string{
 	StageStorageValidation:    IngestStorageValidation,
 	StageRecord:               IngestRecord,
 	StageCleanup:              IngestCleanup,
+}
+
+var NSQTransferTopicFor = map[string]string{
+	StageRequested:        TopicTransferCopy,
+	StageTransferring:     TopicTransferCopy,
+	StageValidateTransfer: TopicTransferValidate,
+	StageTransferCleanup:  TopicTransferCleanup,
 }
 
 // All other common errors are defined in common. We had to move this
@@ -350,7 +369,9 @@ func TopicFor(action, stage string) (string, error) {
 	case ActionIngest:
 		topic = NSQIngestTopicFor[stage]
 	case ActionMove:
-		topic = TopicMove
+		topic = NSQTransferTopicFor[stage]
+	// case ActionMove:
+	// topic = TopicMove
 	case ActionMoveOutOfGlacier:
 		topic = TopicMoveFromGlacier
 	default:
