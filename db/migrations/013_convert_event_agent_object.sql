@@ -57,7 +57,7 @@ insert into event_object_lookup (id, event_object) values
 (2, 'Minio S3 client'),
 (3, 'Minio S3 library'),
 (4, 'preservation-services + Minio S3 client'),
-(5, 'Go uuid library + Minio S3 library')
+(5, 'Go uuid library + Minio S3 library'),
 (6, 'Go language crypto/sha256'),
 (7, 'Go language crypto/md5'),
 (8, 'scissors'),
@@ -162,8 +162,8 @@ select convert_event_agents_and_objects();
 -- Drop original data and now rename the columns
 alter table premis_events drop column if exists agent;
 alter table premis_events drop column if exists "object";
-alter table premis_events rename column event_agent_int TO agent;
-alter table premis_events rename column event_object_int TO "object";
+alter table premis_events rename column agent_int TO agent;
+alter table premis_events rename column object_int TO "object";
 
 -- Add foreign key restraint to map columns to lookup tables
 alter table premis_events add constraint event_agent_fk FOREIGN KEY (agent) REFERENCES event_agent_lookup(id);
