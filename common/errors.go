@@ -87,14 +87,6 @@ var ErrCrossOriginReferer = errors.New("csrf error: cross origin request forbidd
 // does not meet minimum requirements.
 var ErrPasswordReqs = errors.New("password does not meet minimum requirements")
 
-// ErrAlreadyHasAuthyID occurs when we try to register a user with Authy
-// and they already have an Authy ID.
-var ErrAlreadyHasAuthyID = errors.New("user is already registered with authy")
-
-// ErrNoAuthyID occurs when a user requests two-factor login via Authy
-// but does not have an Authy ID.
-var ErrNoAuthyID = errors.New("user does not have an authy id")
-
 // ErrWrongAPI occurs when a non-admin user tries to access the admin API.
 // While the member and admin APIs share some common handlers, and members
 // do technically have access to a number of read-only operations in both

@@ -24,7 +24,7 @@
       </div>
 
       <div class="columns">
-        <div class="column">{{ template "forms/radio.html" .form.Fields.AuthyStatus }}</div>
+        <div class="column">{{ template "forms/radio.html" .form.Fields.MFAStatus }}</div>
       </div>
 
       {{ template "forms/csrf_token.html" . }}
@@ -36,9 +36,9 @@
 </div>
 
 <script>
- let currentMethod = '{{ .CurrentUser.AuthyStatus }}'
+ let currentMethod = '{{ .CurrentUser.MFAStatus }}'
  function confirmChange() {
-     let selectedMethod = document.forms['twoFactorSetupForm']['AuthyStatus'].value
+     let selectedMethod = document.forms['twoFactorSetupForm']['MFAStatus'].value
      if (selectedMethod != currentMethod && selectedMethod.toLowerCase() == 'none') {
          return confirm('Are you sure you want to turn off two-factor authentication?')
      }

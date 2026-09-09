@@ -345,44 +345,19 @@ func TestIsSMSUser(t *testing.T) {
 	user := &pgmodels.User{
 		EnabledTwoFactor:   true,
 		ConfirmedTwoFactor: true,
-		AuthyStatus:        constants.TwoFactorSMS,
+		MFAStatus:          constants.TwoFactorSMS,
 	}
 	assert.True(t, user.IsSMSUser())
 
-	user.AuthyStatus = ""
+	user.MFAStatus = ""
 	assert.True(t, user.IsSMSUser())
 
-	user.AuthyStatus = constants.TwoFactorAuthy
-	assert.False(t, user.IsSMSUser())
-
-	user.AuthyStatus = constants.TwoFactorSMS
+	user.MFAStatus = constants.TwoFactorSMS
 	user.ConfirmedTwoFactor = false
 	assert.False(t, user.IsSMSUser())
 
 	user.EnabledTwoFactor = false
 	assert.False(t, user.IsSMSUser())
-}
-
-func TestIsAuthyOneTouchUser(t *testing.T) {
-	user := &pgmodels.User{
-		EnabledTwoFactor:   true,
-		ConfirmedTwoFactor: true,
-		AuthyStatus:        constants.TwoFactorAuthy,
-	}
-	assert.True(t, user.IsAuthyOneTouchUser())
-
-	user.AuthyStatus = ""
-	assert.False(t, user.IsAuthyOneTouchUser())
-
-	user.AuthyStatus = constants.TwoFactorSMS
-	assert.False(t, user.IsAuthyOneTouchUser())
-
-	user.AuthyStatus = constants.TwoFactorAuthy
-	user.ConfirmedTwoFactor = false
-	assert.False(t, user.IsAuthyOneTouchUser())
-
-	user.EnabledTwoFactor = false
-	assert.False(t, user.IsAuthyOneTouchUser())
 }
 
 func TestIsTwoFactorUser(t *testing.T) {
@@ -403,17 +378,14 @@ func TestTwoFactorMethod(t *testing.T) {
 	user := &pgmodels.User{
 		EnabledTwoFactor:   true,
 		ConfirmedTwoFactor: true,
-		AuthyStatus:        constants.TwoFactorSMS,
+		MFAStatus:          constants.TwoFactorSMS,
 	}
 	assert.Equal(t, constants.TwoFactorSMS, user.TwoFactorMethod())
 
 	// Holdover from old system. A confirmed two-factor user
-	// with empty authy status is an SMS user.
-	user.AuthyStatus = ""
+	// with empty MFA status is an SMS user.
+	user.MFAStatus = ""
 	assert.Equal(t, constants.TwoFactorSMS, user.TwoFactorMethod())
-
-	user.AuthyStatus = constants.TwoFactorAuthy
-	assert.Equal(t, constants.TwoFactorAuthy, user.TwoFactorMethod())
 
 	user.EnabledTwoFactor = false
 	assert.Equal(t, constants.TwoFactorNone, user.TwoFactorMethod())
