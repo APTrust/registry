@@ -58,6 +58,12 @@ func IntellectualObjectRequestMove(c *gin.Context) {
 	}
 	req.TemplateData["object"] = obj
 	req.TemplateData["error"] = err
+	// specify {{ template "forms/select.html" .filterForm.Fields.storage_option }} in the view
+	// form, err := forms.NewObjectTransferRequestForm()
+	// if AbortIfError(c, err) {
+	// return
+	// }
+	// req.TemplateData["form"] = form
 	c.HTML(http.StatusOK, "objects/_request_move.html", req.TemplateData)
 }
 
