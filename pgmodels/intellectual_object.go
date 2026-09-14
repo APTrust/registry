@@ -189,7 +189,7 @@ func (obj *IntellectualObject) LastIngestEvent() (*PremisEvent, error) {
 	return obj.lastEvent(constants.EventIngestion)
 }
 
-// LastDeleationEvent returns the latest deletion event for this object,
+// LastDeletionEvent returns the latest deletion event for this object,
 // which may be nil.
 func (obj *IntellectualObject) LastDeletionEvent() (*PremisEvent, error) {
 	return obj.lastEvent(constants.EventDeletion)

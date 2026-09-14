@@ -1,9 +1,9 @@
--- 016_create_update_timestamp_removal
+-- 017_create_update_timestamp_removal
 --
 -- Removes created_at and updated_at where redundant/unneeded.
 
 -- Note that we're starting the migration.
-insert into schema_migrations ("version", started_at) values ('016_create_update_timestamp_removal', now())
+insert into schema_migrations ("version", started_at) values ('017_create_update_timestamp_removal', now())
 on conflict ("version") do update set started_at = now();
 
 -- We need to recreate affected views
@@ -98,4 +98,4 @@ AS SELECT gf.id,
      LEFT JOIN institutions i ON i.id = gf.institution_id;
 
 -- Now mark the migration as completed.
-update schema_migrations set finished_at = now() where "version" = '016_create_update_timestamp_removal';
+update schema_migrations set finished_at = now() where "version" = '017_create_update_timestamp_removal';
