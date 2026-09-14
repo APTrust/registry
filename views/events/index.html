@@ -56,9 +56,9 @@
         <td class="pl-5">
           <div class="is-flex is-align-items-center">
             <span class="action-icon mr-3">
-              <span class="material-icons md-16" aria-hidden="true"><span>{{ iconFor $event.EventType }}</span></span>
+              <span class="material-icons md-16" aria-hidden="true"><span>{{ iconForEvent $event.EventType }}</span></span>
             </span>
-            <span class="is-grey-dark">{{ $event.EventType }}</span>
+            <span class="is-grey-dark">{{ convertEventTypeToString $event.EventType }}</span>
           </div>
         </td>
         <td class="is-grey-dark text-sm is-uppercase">

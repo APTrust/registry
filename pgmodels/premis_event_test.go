@@ -58,7 +58,7 @@ func TestPremisEventSave(t *testing.T) {
 
 	invalidEvent := event
 	invalidEvent.ID = 0
-	invalidEvent.EventType = ""
+	invalidEvent.EventType = 5000
 	err = invalidEvent.Save()
 	assert.NotNil(t, err)
 }
@@ -111,7 +111,7 @@ func TestEventValidate(t *testing.T) {
 	event.Agent = "Agent 99"
 	event.DateTime = time.Now().UTC()
 	event.Detail = "Some little detail"
-	event.EventType = "*** Not a valid event type ***"
+	event.EventType = 6000
 	event.Identifier = "*** Not a valid uuid ***"
 	event.InstitutionID = 4
 	event.IntellectualObjectID = 21
