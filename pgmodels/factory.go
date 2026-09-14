@@ -193,10 +193,6 @@ func RandomPremisEvent(eventType string) *PremisEvent {
 		Outcome:            gofakeit.Sentence(5),
 		OutcomeDetail:      gofakeit.BeerName(),
 		OutcomeInformation: gofakeit.AppAuthor(),
-		TimestampModel: TimestampModel{
-			CreatedAt: now,
-			UpdatedAt: now,
-		},
 	}
 }
 
@@ -205,13 +201,10 @@ func RandomPremisEvent(eventType string) *PremisEvent {
 func RandomChecksum(alg string) *Checksum {
 	now := time.Now().UTC()
 	return &Checksum{
-		TimestampModel: TimestampModel{
-			CreatedAt: now,
-			UpdatedAt: now,
-		},
 		Algorithm: alg,
 		DateTime:  now,
 		Digest:    ETag(),
+		CreatedAt: now,
 	}
 }
 

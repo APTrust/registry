@@ -9,7 +9,7 @@ import (
 )
 
 type PremisEvent struct {
-	TimestampModel
+	BaseModel
 	Agent                string    `json:"agent"`
 	DateTime             time.Time `json:"date_time"`
 	Detail               string    `json:"detail"`
@@ -65,7 +65,6 @@ func PremisEventSelect(query *Query) ([]*PremisEvent, error) {
 // if PremisEvent.ID is zero. Otherwise, it updates.
 func (event *PremisEvent) Save() error {
 	if event.ID == int64(0) {
-		event.SetTimestamps()
 		return insert(event)
 	}
 	// Premis events cannot be updated
