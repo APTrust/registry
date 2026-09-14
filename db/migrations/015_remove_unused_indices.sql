@@ -1,10 +1,10 @@
--- 014_remove_unused_indices.sql
+-- 015_remove_unused_indices.sql
 --
 -- Optimizing the database by removing indices that don't seem to be used much.
 -- We can always rebuild them later if we need to.
 
 -- Note that we're starting the migration.
-insert into schema_migrations ("version", started_at) values ('014_remove_unused_indices', now())
+insert into schema_migrations ("version", started_at) values ('015_remove_unused_indices', now())
 on conflict ("version") do update set started_at = now();
 
 -- Drop indices and reclaim total space of approximately 14.3 GB
@@ -14,4 +14,4 @@ drop index if exists index_premis_events_on_event_type_and_outcome; -- 4.7 GB, b
 drop index if exists index_premis_events_on_outcome; -- 4.4 GB, not used recently
 
 -- Now mark the migration as completed.
-update schema_migrations set finished_at = now() where "version" = '014_remove_unused_indices';
+update schema_migrations set finished_at = now() where "version" = '015_remove_unused_indices';
