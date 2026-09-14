@@ -1,13 +1,13 @@
--- 015_old_uuid_removal.sql
+-- 016_old_uuid_removal.sql
 --
 -- Removes unneeded old_uuid column from PremisEvents.
 
 -- Note that we're starting the migration.
-insert into schema_migrations ("version", started_at) values ('015_old_uuid_removal', now())
+insert into schema_migrations ("version", started_at) values ('016_old_uuid_removal', now())
 on conflict ("version") do update set started_at = now();
 
 -- First we have to remove dependent objects temporarily
-drop view public.premis_events_view;
+drop view if exists public.premis_events_view;
 
 -- Drop the column.
 alter table premis_events drop column if exists old_uuid;
@@ -38,4 +38,4 @@ AS SELECT pe.id,
      LEFT JOIN generic_files gf ON pe.generic_file_id = gf.id;
 
 -- Now mark the migration as completed.
-update schema_migrations set finished_at = now() where "version" = '015_old_uuid_removal';
+update schema_migrations set finished_at = now() where "version" = '016_old_uuid_removal';
