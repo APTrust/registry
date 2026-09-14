@@ -6660,10 +6660,11 @@ pre.with-wrap {
   white-space: nowrap;
 }
 
-/* TODO: This is not too pretty, but serviceable for now. */
+/* The flash cookie shows messages in the banner. */
 .flash {
   padding: 8px;
-  background-color: #6097cd;
+  background-color: #13135c;
+  color: #fff;
   margin-bottom: 1rem;
   border-radius: 4px;
 }

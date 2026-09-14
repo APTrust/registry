@@ -34,15 +34,13 @@ func NewInstitutionFilterForm(fc *pgmodels.FilterCollection, actingUser *pgmodel
 
 func (f *InstitutionFilterForm) init() {
 	f.Fields["name__contains"] = &Field{
-		Name:        "name__contains",
-		Label:       "Name Contains",
-		Placeholder: "Name Contains",
+		Name:  "name__contains",
+		Label: "Name Contains",
 	}
 	f.Fields["type"] = &Field{
-		Name:        "type",
-		Label:       "Type",
-		Placeholder: "Type",
-		Options:     InstTypeList,
+		Name:    "type",
+		Label:   "Type",
+		Options: InstTypeList,
 	}
 }
 

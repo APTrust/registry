@@ -17,17 +17,17 @@ type TwoFactorPreferences struct {
 
 func NewTwoFactorPreferences(req *Request) (*TwoFactorPreferences, error) {
 	oldPhone := req.CurrentUser.PhoneNumber
-	oldMethod := req.CurrentUser.AuthyStatus
+	oldMethod := req.CurrentUser.MFAStatus
 	oldAuthAppMethod := constants.TwoFactorNone // req.CurrentUser.UseAuthenticatorApp
 
-	// Get phone and authy data submitted in the form.
+	// Get phone and method data submitted in the form.
 	user := &pgmodels.User{}
 	err := req.GinContext.ShouldBind(user)
 	if err != nil {
 		return nil, err
 	}
 
-	// Make sure phone is formatted the way Authy & SMS/SNS like it,
+	// Make sure phone is formatted the way SMS/SNS likes it,
 	// with leading + and country code. https://trello.com/c/QLMjQiyj
 	user.ReformatPhone()
 
@@ -35,7 +35,7 @@ func NewTwoFactorPreferences(req *Request) (*TwoFactorPreferences, error) {
 		OldPhone:         oldPhone,
 		NewPhone:         user.PhoneNumber,
 		OldMethod:        oldMethod,
-		NewMethod:        user.AuthyStatus,
+		NewMethod:        user.MFAStatus,
 		User:             user,
 		OldAuthAppMethod: oldAuthAppMethod,
 		NewAuthAppMethod: constants.TwoFactorNone,
@@ -72,20 +72,8 @@ func (p *TwoFactorPreferences) UseAuthenticatorApp() bool {
 	return p.NewMethod == constants.TwoFactorTOTP
 }
 
-func (p *TwoFactorPreferences) UseAuthy() bool {
-	return p.NewMethod == constants.TwoFactorAuthy
-}
-
 func (p *TwoFactorPreferences) UseSMS() bool {
 	return p.NewMethod == constants.TwoFactorSMS
-}
-
-func (p *TwoFactorPreferences) NeedsAuthyRegistration() bool {
-	return p.NewMethod == constants.TwoFactorAuthy && p.User.AuthyID == ""
-}
-
-func (p *TwoFactorPreferences) NeedsAuthyConfirmation() bool {
-	return p.NeedsConfirmation() && p.NewMethod == constants.TwoFactorAuthy
 }
 
 func (p *TwoFactorPreferences) NeedsAuthenticatorAppConfirmation() bool {

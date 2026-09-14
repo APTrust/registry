@@ -9,7 +9,6 @@ import (
 
 	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
-	"github.com/APTrust/registry/network"
 
 	"github.com/APTrust/registry/pgmodels"
 	"github.com/APTrust/registry/web/testutil"
@@ -51,17 +50,17 @@ func TestUserTwoFactorChoose(t *testing.T) {
 	// Sign in as two-factor user and make sure we get the choice page.
 	wasEnabled := testutil.SmsUser.EnabledTwoFactor
 	wasConfirmed := testutil.SmsUser.ConfirmedTwoFactor
-	oldMethod := testutil.SmsUser.AuthyStatus
+	oldMethod := testutil.SmsUser.MFAStatus
 	defer func() {
 		testutil.SmsUser.EnabledTwoFactor = wasEnabled
 		testutil.SmsUser.ConfirmedTwoFactor = wasConfirmed
-		testutil.SmsUser.AuthyStatus = oldMethod
+		testutil.SmsUser.MFAStatus = oldMethod
 		testutil.SmsUser.Save()
 	}()
 
 	testutil.SmsUser.EnabledTwoFactor = true
 	testutil.SmsUser.ConfirmedTwoFactor = true
-	testutil.SmsUser.AuthyStatus = constants.TwoFactorSMS
+	testutil.SmsUser.MFAStatus = constants.TwoFactorSMS
 	require.Nil(t, testutil.SmsUser.Save())
 
 	signInForm := map[string]string{
@@ -75,7 +74,6 @@ func TestUserTwoFactorChoose(t *testing.T) {
 
 	itemsOnChoosePage := []string{
 		"csrf_token",
-		"submitSecondFactor('authy')",
 		"submitSecondFactor('sms')",
 		"submitSecondFactor('backup')",
 	}
@@ -139,27 +137,6 @@ func TestUserTwoFactorGenerateSMS(t *testing.T) {
 	assert.NotEqual(t, oldTimestamp, reloadedUser.EncryptedOTPSentAt)
 }
 
-func TestUserTwoFactorPush(t *testing.T) {
-	aptContext := common.Context()
-	originalAuthyClient := aptContext.AuthyClient
-	aptContext.AuthyClient = network.NewMockAuthyClient()
-
-	origAuthyID := testutil.Inst1User.AuthyID
-	testutil.Inst1User.AuthyID = "abc123"
-	require.Nil(t, testutil.Inst1User.Save())
-
-	defer func() {
-		aptContext.AuthyClient = originalAuthyClient
-		testutil.Inst1User.AuthyID = origAuthyID
-		testutil.Inst1User.Save()
-	}()
-
-	testutil.Inst1UserClient.POST("/users/2fa_push").
-		WithHeader("Referer", testutil.BaseURL).
-		WithFormField(constants.CSRFTokenName, testutil.Inst1UserToken).
-		Expect().Status(http.StatusOK)
-}
-
 func TestUserTwoFactorVerify(t *testing.T) {
 	targetURL := "/users/2fa_verify"
 	failureStrings := []string{
@@ -178,7 +155,6 @@ func TestUserTwoInit2FASetup(t *testing.T) {
 	testutil.InitHTTPTests(t)
 	expected := []string{
 		`name="PhoneNumber"`,
-		`name="AuthyStatus"`,
 		"confirmChange()",
 	}
 	html := testutil.Inst1UserClient.GET("/users/2fa_setup").
@@ -192,27 +168,18 @@ func TestUserTwoComplete2FASetup(t *testing.T) {
 	// to use a throwaway user, or ensure we can revert user
 	// to known state expected by other tests.
 	//
-	// - Changing to Authy (can't test fully unless we mock Authy)
 	// - Changing to SMS   (partially tested above in TestCompleteSMSSetup)
 	// - Changing to None
 	//
 	// These have been manually tested. Automated tests cover only
 	// a few cases.
 
-	aptContext := common.Context()
-	originalAuthyClient := aptContext.AuthyClient
-	aptContext.AuthyClient = network.NewMockAuthyClient()
-
-	defer func() {
-		aptContext.AuthyClient = originalAuthyClient
-	}()
-
 	// Submit with no change
 	expect := testutil.Inst1UserClient.POST("/users/2fa_setup").
 		WithHeader("Referer", testutil.BaseURL).
 		WithFormField(constants.CSRFTokenName, testutil.Inst1UserToken).
 		WithFormField("PhoneNumber", testutil.Inst1User.PhoneNumber).
-		WithFormField("AuthyStatus", testutil.Inst1User.AuthyStatus).
+		WithFormField("MFAStatus", testutil.Inst1User.MFAStatus).
 		Expect()
 	html := expect.Body().Raw()
 	assert.True(t, strings.Contains(html, "Your two-factor preferences remain unchanged."))
@@ -222,28 +189,17 @@ func TestUserTwoComplete2FASetup(t *testing.T) {
 		WithHeader("Referer", testutil.BaseURL).
 		WithFormField(constants.CSRFTokenName, testutil.Inst1UserToken).
 		WithFormField("PhoneNumber", "+12223334444").
-		WithFormField("AuthyStatus", "").
+		WithFormField("MFAStatus", "").
 		Expect()
 	html = expect.Body().Raw()
 	assert.True(t, strings.Contains(html, "Your phone number has been updated."))
-
-	// Submit with change to Phone number and AuthyStatus
-	expect = testutil.Inst1UserClient.POST("/users/2fa_setup").
-		WithHeader("Referer", testutil.BaseURL).
-		WithFormField(constants.CSRFTokenName, testutil.Inst1UserToken).
-		WithFormField("PhoneNumber", "+15556662627").
-		WithFormField("AuthyStatus", constants.TwoFactorAuthy).
-		Expect()
-	html = expect.Body().Raw()
-	assert.True(t, strings.Contains(html, "Your two-factor setup is complete."))
-	assert.True(t, strings.Contains(html, "receive a push notification from Authy to complete the sign-in process."))
 
 	// Submit with change to Phone number and SMS
 	expect = testutil.Inst1UserClient.POST("/users/2fa_setup").
 		WithHeader("Referer", testutil.BaseURL).
 		WithFormField(constants.CSRFTokenName, testutil.Inst1UserToken).
 		WithFormField("PhoneNumber", "+15556662888").
-		WithFormField("AuthyStatus", constants.TwoFactorSMS).
+		WithFormField("MFAStatus", constants.TwoFactorSMS).
 		Expect()
 	html = expect.Body().Raw()
 	assert.True(t, strings.Contains(html, "Enter the code we just texted you into the box below."))
@@ -253,7 +209,7 @@ func TestUserTwoComplete2FASetup(t *testing.T) {
 		WithHeader("Referer", testutil.BaseURL).
 		WithFormField(constants.CSRFTokenName, testutil.Inst1UserToken).
 		WithFormField("PhoneNumber", "+15556662888").
-		WithFormField("AuthyStatus", constants.TwoFactorNone).
+		WithFormField("MFAStatus", constants.TwoFactorNone).
 		Expect()
 	html = expect.Body().Raw()
 	assert.True(t, strings.Contains(html, "Two-factor authentication has been turned off for your account."))
@@ -263,7 +219,7 @@ func TestUserTwoComplete2FASetup(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, user)
 	assert.False(t, user.EnabledTwoFactor)
-	assert.Empty(t, user.AuthyStatus)
+	assert.Empty(t, user.MFAStatus)
 }
 
 func TestUserConfirmPhone(t *testing.T) {
@@ -509,11 +465,11 @@ func TestUserValidateTOTPFirstConfirm(t *testing.T) {
 func TestUserComplete2FASetupTOTP(t *testing.T) {
 	testutil.InitHTTPTests(t)
 
-	origStatus := testutil.Inst1User.AuthyStatus
+	origStatus := testutil.Inst1User.MFAStatus
 	origPhone := testutil.Inst1User.PhoneNumber
 	origSecret := testutil.Inst1User.EncryptedAuthAppSecret
 	defer func() {
-		testutil.Inst1User.AuthyStatus = origStatus
+		testutil.Inst1User.MFAStatus = origStatus
 		testutil.Inst1User.PhoneNumber = origPhone
 		testutil.Inst1User.EncryptedAuthAppSecret = origSecret
 		testutil.Inst1User.Save()
@@ -524,14 +480,14 @@ func TestUserComplete2FASetupTOTP(t *testing.T) {
 	testutil.Inst1User.EncryptedAuthAppSecret = ""
 	require.Nil(t, testutil.Inst1User.Save())
 
-	// Submitting the 2FA setup form with AuthyStatus=totp should cause
+	// Submitting the 2FA setup form with MFAStatus=totp should cause
 	// the controller to redirect to /users/generate_totp, which in turn
 	// renders the setup_authenticator_app.html page.
 	html := testutil.Inst1UserClient.POST("/users/2fa_setup").
 		WithHeader("Referer", testutil.BaseURL).
 		WithFormField(constants.CSRFTokenName, testutil.Inst1UserToken).
 		WithFormField("PhoneNumber", testutil.Inst1User.PhoneNumber).
-		WithFormField("AuthyStatus", constants.TwoFactorTOTP).
+		WithFormField("MFAStatus", constants.TwoFactorTOTP).
 		Expect().Status(http.StatusOK).Body().Raw()
 
 	expected := []string{
