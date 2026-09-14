@@ -9,20 +9,24 @@ import (
 )
 
 type PremisEvent struct {
-	TimestampModel
+	BaseModel
 	Agent                int       `json:"agent"`
 	DateTime             time.Time `json:"date_time"`
 	Detail               string    `json:"detail"`
-	EventType            string    `json:"event_type"`
+	EventType            int       `json:"event_type"`
 	GenericFileID        int64     `json:"generic_file_id"`
 	Identifier           string    `json:"identifier"`
 	InstitutionID        int64     `json:"institution_id"`
 	IntellectualObjectID int64     `json:"intellectual_object_id"`
 	Object               int       `json:"object"`
-	OldUUID              string    `json:"old_uuid"`
 	Outcome              string    `json:"outcome"`
 	OutcomeDetail        string    `json:"outcome_detail"`
 	OutcomeInformation   string    `json:"outcome_information"`
+}
+
+type PremisEventType struct {
+	EventTypeID int    `json:"event_type_id"`
+	EventType   string `json:"event_type"`
 }
 
 // PremisEventByID returns the event with the specified id.
@@ -66,7 +70,6 @@ func PremisEventSelect(query *Query) ([]*PremisEvent, error) {
 // if PremisEvent.ID is zero. Otherwise, it updates.
 func (event *PremisEvent) Save() error {
 	if event.ID == int64(0) {
-		event.SetTimestamps()
 		return insert(event)
 	}
 	// Premis events cannot be updated
@@ -126,4 +129,12 @@ func (event *PremisEvent) Validate() *common.ValidationError {
 // check, etc.).
 func ObjectEventCount(intellectualObjectID int64) (int, error) {
 	return common.Context().DB.Model((*PremisEvent)(nil)).Where(`intellectual_object_id = ? and generic_file_id is null`, intellectualObjectID).Count()
+}
+
+// Provides the full string description of an event type given its int code.
+func LookupEventType(eventTypeID int) (string, error) {
+	query := NewQuery().Columns("id").Where(`"lookup_event_type"."eventType"`, "=", eventTypeID)
+	var premisEventType PremisEventType
+	err := query.Select(&premisEventType)
+	return premisEventType.EventType, err
 }

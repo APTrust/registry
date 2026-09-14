@@ -35,32 +35,28 @@ func NewBillingReportFilterForm(fc *pgmodels.FilterCollection, actingUser *pgmod
 
 func (f *BillingReportFilterForm) init() {
 	f.Fields["start_date"] = &Field{
-		Name:        "start_date",
-		Label:       "Deposits from date",
-		Placeholder: "Deposits from",
-		Options:     ListDepositReportDates(false),
-		Attrs:       make(map[string]string),
+		Name:    "start_date",
+		Label:   "Deposits from date",
+		Options: ListDepositReportDates(false),
+		Attrs:   make(map[string]string),
 	}
 	f.Fields["end_date"] = &Field{
-		Name:        "end_date",
-		Label:       "Deposits up to date",
-		Placeholder: "Deposits up to",
-		Options:     ListDepositReportDates(false),
-		Attrs:       make(map[string]string),
+		Name:    "end_date",
+		Label:   "Deposits up to date",
+		Options: ListDepositReportDates(false),
+		Attrs:   make(map[string]string),
 	}
 	f.Fields["institution_id"] = &Field{
-		Name:        "institution_id",
-		Label:       "Institution",
-		Placeholder: "Institution",
-		Options:     f.instOptions,
-		Attrs:       make(map[string]string),
+		Name:    "institution_id",
+		Label:   "Institution",
+		Options: f.instOptions,
+		Attrs:   make(map[string]string),
 	}
 	f.Fields["storage_option"] = &Field{
-		Name:        "storage_option",
-		Label:       "Storage Option",
-		Placeholder: "Storage Option",
-		Options:     Options(constants.StorageOptions),
-		Attrs:       make(map[string]string),
+		Name:    "storage_option",
+		Label:   "Storage Option",
+		Options: Options(constants.StorageOptions),
+		Attrs:   make(map[string]string),
 	}
 }
 

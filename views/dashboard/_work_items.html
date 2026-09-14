@@ -4,7 +4,7 @@
   <div class="box-header is-flex is-justify-content-space-between is-align-items-center">
     <h1 class="h2">Recent Work Items</h1>
     <a class="is-flex is-align-items-center is-grey-dark is-not-underlined" href="/work_items">
-      see all
+      See All Recent Work Items
       <span class="material-icons md-16 ml-2" aria-hidden="true">arrow_forward</span>
     </a>
   </div>
@@ -12,7 +12,7 @@
   <table class="table is-hoverable is-fullwidth has-padding is-borderless">
     <tbody>
       {{ range $index, $item := .items }}
-      <tr class="clickable" onclick="document.location.href='/work_items/show/{{ $item.ID }}'">
+      <tr class="clickable" tabindex="0" onclick="document.location.href='/work_items/show/{{ $item.ID }}'" onkeydown="handleKeyPressWhileWorkItemFocused(event, this)">
         <td class="pl-5">
           <div class="is-flex is-align-items-center wrap-long-words">
             <span class="action-icon mr-3">
@@ -29,5 +29,14 @@
     </tbody>
   </table>
 </div>
+
+<script>
+  /* If a work item has focus, you can open details by pressing the Enter key. */
+  function handleKeyPressWhileWorkItemFocused(event, workItem) {
+    if (event.key == "Enter") {
+      workItem.click()
+    }
+  }
+</script>
 
 {{ end }}

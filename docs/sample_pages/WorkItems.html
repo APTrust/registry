@@ -28,7 +28,10 @@
     </div>
 
     <div class="column column-80">
-      <input type="text" placeholder="Search for objects, files, work items...">
+      <label>
+        Search for objects, files, work items...
+        <input type="text">
+      </label>
       <i class="fa fa-search"></i>
     </div>
 
@@ -214,7 +217,7 @@
 
 
             <label>Name of tar file
-              <input type="text" name="name" placeholder="Name of tar file">
+              <input type="text" name="name">
             </label>
 
 
@@ -225,7 +228,7 @@
 
 
             <label>ETag (from S3 upload)
-              <input type="text" name="etag" placeholder="ETag">
+              <input type="text" name="etag">
             </label>
 
 
@@ -267,7 +270,7 @@
 
 
             <label>Processed On or After
-              <input type="date" name="date_processed__gteq" placeholder="Processed On or After">
+              <input type="date" name="date_processed__gteq">
             </label>
 
 
@@ -278,7 +281,7 @@
 
 
             <label>Processed On or Before
-              <input type="date" name="date_processed__lteq" placeholder="Processed On or Before">
+              <input type="date" name="date_processed__lteq">
             </label>
 
 
@@ -312,7 +315,7 @@
 
 
             <label>Object Identifier
-              <input type="text" name="object_identifier" placeholder="Object Identifier">
+              <input type="text" name="object_identifier">
             </label>
 
 
@@ -323,7 +326,7 @@
 
 
             <label>File Identifier
-              <input type="text" name="generic_file_identifier" placeholder="File Identifier">
+              <input type="text" name="generic_file_identifier">
             </label>
 
 
@@ -373,7 +376,7 @@
 
 
             <label>Alternate Identifier
-              <input type="text" name="alt_identifier" placeholder="Alternate Identifier">
+              <input type="text" name="alt_identifier">
             </label>
 
 
@@ -384,7 +387,7 @@
 
 
             <label>Bag Group Identifier
-              <input type="text" name="bag_group_identifier" placeholder="Bag Group Identifier">
+              <input type="text" name="bag_group_identifier">
             </label>
 
 
@@ -395,7 +398,7 @@
 
 
             <label>Bucket
-              <input type="text" name="bucket" placeholder="Bucket">
+              <input type="text" name="bucket">
             </label>
 
 
@@ -408,8 +411,8 @@
           <div class="column col-30">
 
 
-            <label>Initiated By
-              <input type="text" name="user" placeholder="User email address">
+            <label>Initiated By (User email address)
+              <input type="text" name="user">
             </label>
 
 
@@ -445,8 +448,8 @@
           <div class="column col-30">
 
 
-            <label>Min Size
-              <input type="number" name="size__gteq" placeholder="Min Size">
+            <label>Minimum Size
+              <input type="number" name="size__gteq">
             </label>
 
 
@@ -456,8 +459,8 @@
           <div class="column col-30">
 
 
-            <label>Max Size
-              <input type="number" name="size__lteq" placeholder="Max Size">
+            <label>Maximum Size
+              <input type="number" name="size__lteq">
             </label>
 
 

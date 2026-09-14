@@ -35,47 +35,41 @@ func NewDepositReportFilterForm(fc *pgmodels.FilterCollection, actingUser *pgmod
 
 func (f *DepositReportFilterForm) init() {
 	f.Fields["start_date"] = &Field{
-		Name:        "start_date",
-		Label:       "Deposits from",
-		Placeholder: "Deposits from",
-		Options:     ListDepositReportDates(false),
-		Attrs:       make(map[string]string),
+		Name:    "start_date",
+		Label:   "Deposits from",
+		Options: ListDepositReportDates(false),
+		Attrs:   make(map[string]string),
 	}
 	f.Fields["end_date"] = &Field{
-		Name:        "end_date",
-		Label:       "Deposits up to",
-		Placeholder: "Deposits up to",
-		Options:     ListDepositReportDates(true),
-		Attrs:       make(map[string]string),
+		Name:    "end_date",
+		Label:   "Deposits up to",
+		Options: ListDepositReportDates(true),
+		Attrs:   make(map[string]string),
 	}
 	f.Fields["institution_id"] = &Field{
-		Name:        "institution_id",
-		Label:       "Institution",
-		Placeholder: "Institution",
-		Options:     f.instOptions,
-		Attrs:       make(map[string]string),
+		Name:    "institution_id",
+		Label:   "Institution",
+		Options: f.instOptions,
+		Attrs:   make(map[string]string),
 	}
 
 	storageOpts := Options(constants.StorageOptions)
 	storageOpts = append(storageOpts, &ListOption{Value: "Total", Text: "Total"})
 	f.Fields["storage_option"] = &Field{
-		Name:        "storage_option",
-		Label:       "Storage Option",
-		Placeholder: "Storage Option",
-		Options:     storageOpts,
-		Attrs:       make(map[string]string),
+		Name:    "storage_option",
+		Label:   "Storage Option",
+		Options: storageOpts,
+		Attrs:   make(map[string]string),
 	}
 	f.Fields["chart_metric"] = &Field{
-		Name:        "chart_metric",
-		Label:       "Chart Metric",
-		Placeholder: "Chart Metric",
-		Options:     DepositChartMetrics,
-		Attrs:       make(map[string]string),
+		Name:    "chart_metric",
+		Label:   "Chart Metric",
+		Options: DepositChartMetrics,
+		Attrs:   make(map[string]string),
 	}
 	f.Fields["report_type"] = &Field{
-		Name:        "report_type",
-		Label:       "Report Type",
-		Placeholder: "Report Type",
+		Name:  "report_type",
+		Label: "Report Type",
 		Options: []*ListOption{
 			{"by_inst", "Deposits by Institution", false},
 			{"over_time", "Deposits Over Time", false},

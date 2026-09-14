@@ -275,7 +275,7 @@ func AlertAPTrustOfFailedFixities(hostname string, summaries []*pgmodels.FailedF
 // the admin's own institution.
 func GetFailedFixityEvents(institutionID int64, lastRunDate time.Time) ([]*pgmodels.PremisEvent, error) {
 	query := pgmodels.NewQuery().
-		Where("event_type", "=", "fixity check").
+		Where("event_type", "=", constants.EventFixityCheck).
 		Where("outcome", "=", "Failed").
 		Where("date_time", ">", lastRunDate)
 

@@ -19,7 +19,7 @@
       <dt class="text-label text-xs is-grey-dark">Identifier</dt>
       <dd class="text-table">{{ .event.Identifier }}</dd>
       <dt class="text-label text-xs is-grey-dark">Event Type</dt>
-      <dd class="text-table">{{ .event.EventType }}</dd>
+      <dd class="text-table">{{ convertEventTypeToString .event.EventType }}</dd>
       <dt class="text-label text-xs is-grey-dark">Outcome</dt>
       <dd class="text-table">{{ .event.Outcome }}</dd>
       <dt class="text-label text-xs is-grey-dark">Date/Time</dt>

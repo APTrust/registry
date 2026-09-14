@@ -74,7 +74,7 @@
         <dd class="text-table">
           {{ range $index, $event := .file.PremisEvents }}
           <a href="#" data-modal="modal-one" data-xhr-url="/events/show_xhr/{{ $event.ID }}">{{ dateUS $event.DateTime
-            }} - {{ $event.EventType }} - {{ $event.Outcome }}</a><br />
+            }} - {{ convertEventTypeToString $event.EventType }} - {{ $event.Outcome }}</a><br />
           {{ end }}
         </dd>
       </dl>

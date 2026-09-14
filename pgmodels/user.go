@@ -112,6 +112,12 @@ type User struct {
 	// we're waiting for a user to enter a text/SMS OTP.
 	EncryptedOTPSentAt time.Time `json:"-" form:"-" pg:"encrypted_otp_sent_at"`
 
+	// EncryptedAuthAppSecret is a secret value shared with the user's device.
+	// This value is not used for SMS OTP - that would be the EncryptedOTPSecret.
+	// Rather, this value is used with authenticator apps if the user has
+	// Authenticator App MFA enabled.
+	EncryptedAuthAppSecret string `json:"-" form:"-" pg:"encrypted_auth_app_secret"`
+
 	// ConsumedTimestep is a legacy field from Devise, which used it
 	// for time-based one-time passwords. Not used.
 	// TODO: Delete this.
@@ -119,11 +125,11 @@ type User struct {
 
 	// OTPRequiredForLogin indicates whether, as a matter of policy, the
 	// user must use some form of OTP to log in. If true, the user should
-	// be allowed to log in only with Authy one-touch, six-digit SMS
-	// code, or backup code.
+	// be allowed to log in only with six-digit SMS
+	// code or backup code.
 	//
 	// Use IsTwoFactorUser() to actually determine whether we should
-	// force this user to use Authy, SMS, or backup code to get it.
+	// force this user to use SMS or backup code to get it.
 	// This is messy because it has to mirror the legacy Rails implementation
 	// for now.
 	OTPRequiredForLogin bool `json:"otp_required_for_login" pg:"otp_required_for_login"`
@@ -139,28 +145,18 @@ type User struct {
 	EnabledTwoFactor bool `json:"enabled_two_factor" form:"-" pg:"enabled_two_factor"`
 
 	// ConfirmedTwoFactor indicates that the system has confirmed this
-	// user's phone number (for SMS) and Authy account (for Authy 2FA).
+	// user's phone number (for SMS)
 	ConfirmedTwoFactor bool `json:"confirmed_two_factor" form:"-" pg:"confirmed_two_factor"`
 
 	// OTPBackupCodes is a list of backup codes the user can use to
-	// log if they can't get in via SMS or Authy.
+	// log if they can't get in via SMS.
 	OTPBackupCodes []string `json:"-" form:"-" pg:"otp_backup_codes,array"`
 
-	// AuthyID is the user's Authy ID. We need this to send them push
-	// messages to complete one-touch sign-in. This will be empty for
-	// those who don't use Authy.
-	AuthyID string `json:"-" form:"-" pg:"authy_id"`
-
-	// LastSignInWithAuthy is the timestamp of this user's last
-	// successful sign-in with Authy.
-	LastSignInWithAuthy time.Time `json:"last_sign_in_with_authy" form:"-" pg:"last_sign_in_with_authy"`
-
-	// AuthyStatus indicates how the user wants to authenticate with
-	// Authy. If it's constants.TwoFactorAuthy, we should send them a
-	// push, so they can login with one-touch. Anything else means SMS,
+	// MFAStatus indicates how the user wants to authenticate with
+	// MFA. The current only option is SMS,
 	// but call IsTwoFactorUser() to make sure they're actually require
 	// two-factor auth before trying to text them.
-	AuthyStatus string `json:"authy_status" pg:"authy_status"`
+	MFAStatus string `json:"mfa_status" pg:"mfa_status"`
 
 	// EmailVerified will be true once the system has verified that the
 	// user's email address is correct.
@@ -177,7 +173,7 @@ type User struct {
 	ForcePasswordUpdate bool `json:"force_password_update" form:"-" pg:"force_password_update"`
 
 	// GracePeriod is a legacy field from the old Rails app. It held the
-	// date by which a user MUST complete either Authy or SMS two-factor
+	// date by which a user MUST complete SMS two-factor
 	// setup. This feature was universally despised, and we won't be
 	// using it unless someone complains. For now, consider this as
 	// unused.
@@ -185,7 +181,7 @@ type User struct {
 
 	// AwaitingSecondFactor indicates that the user has logged in with
 	// email and password, but has not yet completed the second login
-	// step (Authy, SMS OTP, or backup code). This flag is only set on
+	// step (SMS OTP or backup code). This flag is only set on
 	// users going through the two-factor process. Middleware checks it
 	// to prevent partially logged-in users from accessing any pages other
 	// than those required to complete the two-factor login process.
@@ -368,13 +364,13 @@ func (user *User) IsAdmin() bool {
 // IsSMSUser returns true if this user has enabled two-factor authentication
 // with SMS/text message.
 func (user *User) IsSMSUser() bool {
-	return user.IsTwoFactorUser() && (user.AuthyStatus == constants.TwoFactorSMS || user.AuthyStatus == "")
+	return user.IsTwoFactorUser() && (user.MFAStatus != constants.TwoFactorTOTP)
 }
 
-// IsAuthyOneTouchUser returns true if the user has enabled Authy one touch
+// IsAuthenticatorAppUser returns true if the user has enabled an authenticator app
 // for two-factor login.
-func (user *User) IsAuthyOneTouchUser() bool {
-	return user.IsTwoFactorUser() && (user.AuthyStatus == constants.TwoFactorAuthy)
+func (user *User) IsAuthenticatorAppUser() bool {
+	return user.IsTwoFactorUser() && (user.MFAStatus == constants.TwoFactorTOTP)
 }
 
 // IsTwoFactorUser returns true if this user has enabled and confirmed
@@ -390,10 +386,9 @@ func (user *User) IsTwoFactorUser() bool {
 //
 // constants.TwoFactorNone if the user does not use two-factor auth.
 //
-// constants.TwoFactorAuthy if the user uses two-factor auth via Authy.
-//
 // constants.TwoFactorSMS if the user receives two-factor OTP code via
 // text/SMS
+// constants.TwoFactorTOTP if the user uses an authenticator app
 func (user *User) TwoFactorMethod() string {
 	if !user.IsTwoFactorUser() {
 		return constants.TwoFactorNone
@@ -401,7 +396,11 @@ func (user *User) TwoFactorMethod() string {
 	if user.IsSMSUser() {
 		return constants.TwoFactorSMS
 	}
-	return constants.TwoFactorAuthy
+	if user.IsAuthenticatorAppUser() {
+		return constants.TwoFactorTOTP
+	}
+	// If using 2FA, and type not otherwise specified, default to SMS
+	return constants.TwoFactorSMS
 }
 
 // CreateOTPToken creates a new one-time password token, typically

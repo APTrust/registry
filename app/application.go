@@ -56,6 +56,7 @@ func initTemplates(router *gin.Engine) {
 		"buildDate":                  helpers.BuildDate,
 		"convertEventAgentToString":  common.ConvertEventAgentToString,
 		"convertEventObjectToString": common.ConvertEventObjectToString,
+		"convertEventTypeToString":   common.ConvertEventTypeToString,
 		"currentYear":                helpers.CurrentYear,
 		"dateISO":                    helpers.DateISO,
 		"dateTimeISO":                helpers.DateTimeISO,
@@ -70,6 +71,7 @@ func initTemplates(router *gin.Engine) {
 		"formatInt64":                helpers.FormatInt64,
 		"humanSize":                  helpers.HumanSize,
 		"iconFor":                    helpers.IconFor,
+		"iconForEvent":               helpers.IconForEvent,
 		"linkifyUrls":                helpers.LinkifyUrls,
 		"replace":                    strings.Replace,
 		"revisionURL":                helpers.RevisionURL,
@@ -262,8 +264,13 @@ func initRoutes(router *gin.Engine) {
 		webRoutes.GET("/users/2fa_backup", webui.UserTwoFactorBackup)
 		webRoutes.GET("/users/2fa_choose", webui.UserTwoFactorChoose)
 		webRoutes.POST("/users/2fa_sms", webui.UserTwoFactorGenerateSMS)
-		webRoutes.POST("/users/2fa_push", webui.UserTwoFactorPush)
 		webRoutes.POST("/users/2fa_verify", webui.UserTwoFactorVerify)
+		webRoutes.POST("/users/2fa_totp_cancel_setup", webui.UserTwoFactorTotpCancelSetup)
+
+		// Generate and validate Time-based One-Time Passwords for MFA
+		webRoutes.GET("/users/generate_totp", webui.UserGenerateTOTP)
+		webRoutes.GET("/users/validate_totp", webui.UserValidateTOTPView)
+		webRoutes.POST("/users/validate_totp", webui.UserValidateTOTP)
 
 		// User forgot password
 		webRoutes.GET("/users/forgot_password", webui.UserShowForgotPasswordForm)
