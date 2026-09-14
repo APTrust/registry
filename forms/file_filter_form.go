@@ -33,57 +33,47 @@ func NewFileFilterForm(fc *pgmodels.FilterCollection, actingUser *pgmodels.User)
 
 func (f *FileFilterForm) init() {
 	f.Fields["created_at__lteq"] = &Field{
-		Name:        "created_at__lteq",
-		Label:       "Created On or Before",
-		Placeholder: "Created On or Before",
+		Name:  "created_at__lteq",
+		Label: "Created On or Before",
 	}
 	f.Fields["created_at__gteq"] = &Field{
-		Name:        "created_at__gteq",
-		Label:       "Created On or After",
-		Placeholder: "Created On or After",
+		Name:  "created_at__gteq",
+		Label: "Created On or After",
 	}
 	f.Fields["identifier"] = &Field{
-		Name:        "identifier",
-		Label:       "File Identifier",
-		Placeholder: "File Identifier",
+		Name:  "identifier",
+		Label: "File Identifier",
 	}
 	f.Fields["institution_id"] = &Field{
-		Name:        "institution_id",
-		Label:       "Institution",
-		Placeholder: "Institution",
-		Options:     f.instOptions,
+		Name:    "institution_id",
+		Label:   "Institution",
+		Options: f.instOptions,
 	}
 	f.Fields["state"] = &Field{
-		Name:        "state",
-		Label:       "State",
-		Placeholder: "State",
-		Options:     ObjectStateList,
+		Name:    "state",
+		Label:   "State",
+		Options: ObjectStateList,
 	}
 	f.Fields["size__gteq"] = &Field{
-		Name:        "size__gteq",
-		Label:       "Min Size",
-		Placeholder: "Min Size",
+		Name:  "size__gteq",
+		Label: "Minimum Size",
 	}
 	f.Fields["size__lteq"] = &Field{
-		Name:        "size__lteq",
-		Label:       "Max Size",
-		Placeholder: "Max Size",
+		Name:  "size__lteq",
+		Label: "Maximum Size",
 	}
 	f.Fields["storage_option"] = &Field{
-		Name:        "storage_option",
-		Label:       "Storage Option",
-		Placeholder: "Storage Option",
-		Options:     StorageOptionList,
+		Name:    "storage_option",
+		Label:   "Storage Option",
+		Options: StorageOptionList,
 	}
 	f.Fields["updated_at__lteq"] = &Field{
-		Name:        "updated_at__lteq",
-		Label:       "Updated On or Before",
-		Placeholder: "Updated On or Before",
+		Name:  "updated_at__lteq",
+		Label: "Updated On or Before",
 	}
 	f.Fields["updated_at__gteq"] = &Field{
-		Name:        "updated_at__gteq",
-		Label:       "Updated On or After",
-		Placeholder: "Updated On or After",
+		Name:  "updated_at__gteq",
+		Label: "Updated On or After",
 	}
 }
 

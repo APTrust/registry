@@ -124,10 +124,10 @@ func TestGetCountFromView(t *testing.T) {
 
 	count, err = pgmodels.GetCountFromView(q, pgmodels.WorkItem{})
 	require.Nil(t, err)
-	assert.EqualValues(t, 32, count)
+	assert.EqualValues(t, 33, count)
 	count, err = pgmodels.GetCountFromView(q, pgmodels.WorkItemView{})
 	require.Nil(t, err)
-	assert.EqualValues(t, 32, count)
+	assert.EqualValues(t, 33, count)
 
 	q.Where("institution_id", "=", 3)
 	count, err = pgmodels.GetCountFromView(q, pgmodels.GenericFile{})
@@ -153,10 +153,10 @@ func TestGetCountFromView(t *testing.T) {
 
 	count, err = pgmodels.GetCountFromView(q, pgmodels.WorkItem{})
 	require.Nil(t, err)
-	assert.EqualValues(t, 16, count)
+	assert.EqualValues(t, 17, count)
 	count, err = pgmodels.GetCountFromView(q, pgmodels.WorkItemView{})
 	require.Nil(t, err)
-	assert.EqualValues(t, 16, count)
+	assert.EqualValues(t, 17, count)
 
 	q.Where("state", "=", "A")
 	count, err = pgmodels.GetCountFromView(q, pgmodels.GenericFile{})

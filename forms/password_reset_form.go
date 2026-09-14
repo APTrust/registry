@@ -19,26 +19,23 @@ func NewPasswordResetForm(userToEdit *pgmodels.User) *PasswordResetForm {
 
 func (f *PasswordResetForm) init() {
 	f.Fields["OldPassword"] = &Field{
-		Name:        "OldPassword",
-		ErrMsg:      pgmodels.ErrUserPwdIncorrect,
-		Label:       "Current Password",
-		Placeholder: "Current Password",
+		Name:   "OldPassword",
+		ErrMsg: pgmodels.ErrUserPwdIncorrect,
+		Label:  "Current Password",
 		Attrs: map[string]string{
 			"required": "",
 		},
 	}
 	f.Fields["NewPassword"] = &Field{
-		Name:        "NewPassword",
-		Label:       "New Password",
-		Placeholder: "New Password",
+		Name:  "NewPassword",
+		Label: "New Password",
 		Attrs: map[string]string{
 			"required": "",
 		},
 	}
 	f.Fields["ConfirmNewPassword"] = &Field{
-		Name:        "ConfirmNewPassword",
-		Label:       "Confirm New Password",
-		Placeholder: "Confirm New Password",
+		Name:  "ConfirmNewPassword",
+		Label: "Confirm New Password",
 		Attrs: map[string]string{
 			"required": "",
 		},

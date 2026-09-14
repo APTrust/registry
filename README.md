@@ -37,7 +37,7 @@ Right-click each of the NSQ binaries, then hold the Shift key and select Open fr
 
 ## Requirements for Two Factor Authentication
 
-As a developer, you generally won't need to send Authy or SMS messages for two-factor authentication. If you're running this in a demo or production environment, you will.
+As a developer, you generally won't need to send SMS messages for two-factor authentication. If you're running this in a demo or production environment, you will.
 
 The AWS SNS library, which sends two-factor auth codes via text/SMS, requires the following config files:
 
@@ -166,17 +166,16 @@ You can call `testutil.InitHTTPTests()` before any HTTP tests to ensure HTTP tes
 
 # External Services
 
-If you want to send two-factor OTP codes through SMS, or two-factor Authy push notifications, or password reset emails, you'll need to enable these in the .env (or .env.test) file. Set the following:
+If you want to send two-factor OTP codes through SMS, or password reset emails, you'll need to enable these in the .env (or .env.test) file. Set the following:
 
 ```
 ENABLE_TWO_FACTOR_SMS=true
-ENABLE_TWO_FACTOR_AUTHY=true
 EMAIL_ENABLED=true
 ```
 
 If these services are causing problems on your dev machine, you can turn them off by changing the settings to `false`. You can still log in with two-factor authentication when these services are turned off locally. The registry will print the OTP to the terminal console during development. You can cut and paste the OTP code from there.
 
-You'll have to manually set a test user's phone number and/or Authy ID to send OTP messages successfully.
+You'll have to manually set a test user's phone number to send OTP messages successfully.
 
 ## AWS Environment Variables
 
@@ -188,9 +187,6 @@ AWS_SECRET_ACCESS_KEY=<your secret key>
 AWS_REGION="us-east-1"
 ```
 
-## Authy Environment Variables
-
-To use Authy for OTP, set the `AUTHY_API_KEY` environment variable.
 
 # Notes on Routes
 
@@ -225,7 +221,7 @@ Routes excepted from auth checks include:
 
 The "forgot password" and "password reset" pages both use a secure token in the query string to identify the user.
 
-The authentication middleware also hijacks all requests in cases where a user must complete registration activities. For example, if a user needs to reset their password, confirm an Authy account, or provide the second factor for multi-factor auth, the middleware will not let them past the reset/confirmation/token page until they've provided the required info.
+The authentication middleware also hijacks all requests in cases where a user must complete registration activities. For example, if a user needs to reset their password or provide the second factor for multi-factor auth, the middleware will not let them past the reset/confirmation/token page until they've provided the required info.
 
 # Notes on JSON Serialization
 
