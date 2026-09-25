@@ -26,6 +26,9 @@ import (
 // GET /users/2fa_choose/
 func UserTwoFactorChoose(c *gin.Context) {
 	req := NewRequest(c)
+	if req.CurrentUser.AuthyStatus == "totp" {
+		req.TemplateData["hasAuthenticatorAppSetup"] = "true"
+	}
 	c.HTML(http.StatusOK, "users/choose_second_factor.html", req.TemplateData)
 }
 
