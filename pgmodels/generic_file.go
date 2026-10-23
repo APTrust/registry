@@ -175,6 +175,10 @@ func (gf *GenericFile) saveChecksumsTx(tx *pg.Tx) error {
 			continue
 		}
 		checksum.GenericFileID = gf.ID
+		now := time.Now().UTC()
+		if checksum.CreatedAt.IsZero() {
+			checksum.CreatedAt = now
+		}
 		validationErr := checksum.Validate()
 		if validationErr != nil {
 			common.Context().Log.Error().Msgf("GenericFile batch insertion failed on validation of checksum (%s) - %s. Error: %s", gf.Identifier, checksum.Digest, validationErr.Error())

@@ -15,7 +15,7 @@ type Checksum struct {
 	Digest        string       `json:"digest"`
 	GenericFileID int64        `json:"generic_file_id" pg:"generic_file_id"`
 	GenericFile   *GenericFile `json:"-" pg:"rel:has-one"`
-	CreatedAt     time.Time    `json:"created_at" pg:"created_at"`
+	CreatedAt     time.Time    `bun:",nullzero" json:"created_at,omitempty"`
 }
 
 // ChecksumByID returns the file with the specified id.
@@ -46,6 +46,10 @@ func ChecksumSelect(query *Query) ([]*Checksum, error) {
 // we add a new checksum, so that we have records for all checksums that
 // have existed over time.
 func (cs *Checksum) Save() error {
+	now := time.Now().UTC()
+	if cs.CreatedAt.IsZero() {
+		cs.CreatedAt = now
+	}
 	err := cs.Validate()
 	if err != nil {
 		return err
