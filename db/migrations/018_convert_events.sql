@@ -1,11 +1,11 @@
--- 018_convert_event_type.sql
+-- 018_convert_events.sql
 --
 -- This migration helps to shrink the size of our database by optimizing premis events.
 -- By converting event_type from a string to an int, and indexing these int values,
 -- we will save on space to store each event.
 
 -- Note that we're starting the migration.
-insert into schema_migrations ("version", started_at) values ('018_convert_event_type', now())
+insert into schema_migrations ("version", started_at) values ('018_convert_events', now())
 on conflict ("version") do update set started_at = now();
 
 -- Function that performs the actual conversion - create this first
@@ -148,7 +148,7 @@ returns void as $$
             total_processed := total_processed + current_batch;
             current_iteration := current_iteration + 1;
       
-            -- Exit if no rows were deleted
+            -- Exit if no rows were updated
             EXIT WHEN current_batch = 0;
       
             RAISE NOTICE 'Updated % events so far', total_processed;
@@ -167,7 +167,7 @@ returns void as $$
         -- when we are ready by using the logged messages from the loop to determine
         -- where we left off.
 
-        IF completed_event_migration == 1 THEN
+        IF completed_event_migration = 1 THEN
             -- Now that we have converted every event, we can drop the old event_type column.
             alter table premis_events drop column if exists event_type;
             alter table premis_events drop column if exists agent;
@@ -182,58 +182,6 @@ returns void as $$
             alter table premis_events add constraint event_type_fk FOREIGN KEY (event_type) REFERENCES event_type_lookup(id);
             alter table premis_events add constraint event_agent_fk FOREIGN KEY (agent) REFERENCES event_agent_lookup(id);
             alter table premis_events add constraint event_object_fk FOREIGN KEY ("object") REFERENCES event_object_lookup(id);
-
-            -- Reclaim disk space
-            vacuum full;
-
-            -- Recreate views
-            CREATE OR REPLACE VIEW public.premis_events_view
-            AS SELECT pe.id,
-                pe.identifier,
-                pe.institution_id,
-                i.name AS institution_name,
-                pe.intellectual_object_id,
-                io.identifier AS intellectual_object_identifier,
-                pe.generic_file_id,
-                gf.identifier AS generic_file_identifier,
-                pe.event_type,
-                pe.date_time,
-                pe.detail,
-                pe.outcome,
-                pe.outcome_detail,
-                pe.outcome_information,
-                pe.object,
-                pe.agent
-            FROM premis_events pe
-                LEFT JOIN institutions i ON pe.institution_id = i.id
-                LEFT JOIN intellectual_objects io ON pe.intellectual_object_id = io.id
-                LEFT JOIN generic_files gf ON pe.generic_file_id = gf.id;
-
-            CREATE MATERIALIZED VIEW public.premis_event_counts
-            TABLESPACE pg_default
-            AS SELECT premis_events.institution_id,
-                count(premis_events.id) AS row_count,
-                premis_events.event_type,
-                premis_events.outcome,
-                CURRENT_TIMESTAMP AS updated_at
-            FROM premis_events
-            GROUP BY CUBE(premis_events.institution_id, premis_events.event_type, premis_events.outcome)
-            ORDER BY premis_events.institution_id, premis_events.event_type, premis_events.outcome
-            WITH DATA;
-
-            -- Recreate indices that use this and reindex - may take some time before indexing is complete, days
-            CREATE INDEX CONCURRENTLY if not exists index_premis_events_on_event_type ON public.premis_events USING btree (event_type);
-            CREATE INDEX CONCURRENTLY if not exists index_premis_events_on_event_type_and_outcome ON public.premis_events USING btree (event_type, outcome);
-            CREATE UNIQUE INDEX CONCURRENTLY if not exists ix_premis_event_counts ON public.premis_event_counts USING btree (institution_id, event_type, outcome);
-
-            -- Recreate all indices concurrently
-            CREATE INDEX CONCURRENTLY index_premis_events_date_time_desc ON public.premis_events USING btree (date_time DESC);
-            CREATE INDEX CONCURRENTLY index_premis_events_on_generic_file_id ON public.premis_events USING btree (generic_file_id);
-            CREATE UNIQUE INDEX CONCURRENTLY index_premis_events_on_identifier ON public.premis_events USING btree (identifier);
-            CREATE INDEX CONCURRENTLY index_premis_events_on_intellectual_object_id ON public.premis_events USING btree (intellectual_object_id);
-
-            -- Now mark the migration as completed.
-            update schema_migrations set finished_at = now() where "version" = '018_convert_event_type';
         END IF;
 
     end;
@@ -242,13 +190,9 @@ $$ language plpgsql;
 -- First we need to drop related indices and views temporarily.
 -- We will recreate them at the end.
 drop index if exists index_premis_events_on_event_type;
-drop index if exists index_premis_events_on_event_type_and_outcome;
 drop index if exists ix_premis_event_counts;
-
 drop materialized view public.premis_event_counts;
 drop view if exists public.premis_events_view;
-
--- Recreate these concurrently at the end
 drop index if exists index_premis_events_date_time_desc;
 drop index if exists index_premis_events_on_generic_file_id;
 drop index if exists index_premis_events_on_identifier;
@@ -397,4 +341,54 @@ insert into event_object_lookup (id, event_object) values
 (34, 'APTrust audit and cleanup scripts for audit_001');
 
 -- Run the function.
-select convert_event_types();
+select convert_events();
+
+-- Recreate views
+CREATE OR REPLACE VIEW public.premis_events_view
+AS SELECT pe.id,
+    pe.identifier,
+    pe.institution_id,
+    i.name AS institution_name,
+    pe.intellectual_object_id,
+    io.identifier AS intellectual_object_identifier,
+    pe.generic_file_id,
+    gf.identifier AS generic_file_identifier,
+    pe.event_type,
+    pe.date_time,
+    pe.detail,
+    pe.outcome,
+    pe.outcome_detail,
+    pe.outcome_information,
+    pe.object,
+    pe.agent
+FROM premis_events pe
+    LEFT JOIN institutions i ON pe.institution_id = i.id
+    LEFT JOIN intellectual_objects io ON pe.intellectual_object_id = io.id
+    LEFT JOIN generic_files gf ON pe.generic_file_id = gf.id;
+
+CREATE MATERIALIZED VIEW public.premis_event_counts
+TABLESPACE pg_default
+AS SELECT premis_events.institution_id,
+    count(premis_events.id) AS row_count,
+    premis_events.event_type,
+    premis_events.outcome,
+    CURRENT_TIMESTAMP AS updated_at
+FROM premis_events
+GROUP BY CUBE(premis_events.institution_id, premis_events.event_type, premis_events.outcome)
+ORDER BY premis_events.institution_id, premis_events.event_type, premis_events.outcome
+WITH DATA;
+
+-- MANUAL RUN: Reclaim disk space
+-- VACUUM FULL premis_events;
+
+-- MANUAL RUN: Comment these out and run CREATE INDEX CONCURRENTLY... and CREATE UNIQUE INDEX CONCURRENTLY... for all
+-- Recreate indices that use this and reindex - may take some time before indexing is complete, days
+CREATE INDEX if not exists index_premis_events_on_event_type ON public.premis_events USING btree (event_type);
+CREATE UNIQUE INDEX if not exists ix_premis_event_counts ON public.premis_event_counts USING btree (institution_id, event_type, outcome);
+CREATE INDEX index_premis_events_date_time_desc ON public.premis_events USING btree (date_time DESC);
+CREATE INDEX index_premis_events_on_generic_file_id ON public.premis_events USING btree (generic_file_id);
+CREATE UNIQUE INDEX index_premis_events_on_identifier ON public.premis_events USING btree (identifier);
+CREATE INDEX index_premis_events_on_intellectual_object_id ON public.premis_events USING btree (intellectual_object_id);
+
+-- Now mark the migration as completed.
+update schema_migrations set finished_at = now() where "version" = '018_convert_events';
