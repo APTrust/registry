@@ -8,13 +8,251 @@
 insert into schema_migrations ("version", started_at) values ('018_convert_event_type', now())
 on conflict ("version") do update set started_at = now();
 
+-- Function that performs the actual conversion - create this first
+create or replace function convert_events()
+returns void as $$
+    declare
+      batch_size INTEGER := 100000;
+      total_processed INTEGER := 0;
+      current_batch INTEGER;
+      current_iteration INTEGER := 0;
+      completed_event_migration INTEGER := 0;
+    begin
+        while true loop
+            with update_batch as (
+                select id
+                from premis_events
+                limit batch_size
+                offset batch_size*current_iteration
+            )
+            update premis_events set event_type_int = case
+                when event_type='access assignment' then 1
+                when event_type='accession' then 2
+                when event_type='appraisal' then 3
+                when event_type='capture' then 4
+                when event_type='compiling' then 5
+                when event_type='compression' then 6
+                when event_type='creation' then 7
+                when event_type='deaccession' then 8
+                when event_type='decompression' then 9
+                when event_type='decryption' then 10
+                when event_type='delete' then 11
+                when event_type='deletion' then 11
+                when event_type='digital signature generation' then 12
+                when event_type='digital signature validation' then 13
+                when event_type='displaying' then 14
+                when event_type='dissemination' then 15
+                when event_type='encryption' then 16
+                when event_type='execution' then 17
+                when event_type='exporting' then 18
+                when event_type='extraction' then 19
+                when event_type='filename change' then 20
+                when event_type='fixity check' then 21
+                when event_type='forensic feature analysis' then 22
+                when event_type='format identification' then 23
+                when event_type='identifier assignment' then 24
+                when event_type='imaging' then 25
+                when event_type='information package creation' then 26
+                when event_type='information package merging' then 27
+                when event_type='information package splitting' then 28
+                when event_type='ingestion' then 29
+                when event_type='ingestion end' then 30
+                when event_type='ingestion start' then 31
+                when event_type='interpreting' then 32
+                when event_type='message digest calculation' then 33
+                when event_type='metadata extraction' then 34
+                when event_type='metadata modification' then 35
+                when event_type='migration' then 36
+                when event_type='modification' then 37
+                when event_type='normalization' then 38
+                when event_type='packing' then 39
+                when event_type='policy assignment' then 40
+                when event_type='printing' then 41
+                when event_type='quarantine' then 42
+                when event_type='recovery' then 43
+                when event_type='redaction' then 44
+                when event_type='refreshment' then 45
+                when event_type='rendering' then 46
+                when event_type='replication' then 47
+                when event_type='transfer' then 48
+                when event_type='unpacking' then 49
+                when event_type='unquarantine' then 50
+                when event_type='validation' then 51
+                when event_type='virus check' then 52
+                else 0  -- default
+            end, 
+            agent_int = case
+                when agent='https://github.com/minio/minio-go v4' then 1
+                when agent='https://github.com/minio/minio-go v5' then 2
+                when agent='https://github.com/minio/minio-go v6' then 3
+                when agent='https://github.com/minio/minio-go v7' then 4
+                when agent='https://github.com/APTrust/preservation-services' then 5
+                when agent='APTrust preservation services' then 6
+                when agent='http://github.com/google/uuid' then 7
+                when agent='http://golang.org/pkg/crypto/sha256/' then 8
+                when agent='http://golang.org/pkg/crypto/md5/' then 9
+                when agent='Registry Unit Test' then 10
+                when agent='Maxwell Smart' then 11
+                when agent='https://github.com/APTrust/exchange' then 12
+                when agent='http://github.com/satori/go.uuid' then 13
+                when agent='http://github.com/nu7hatch/gouuid' then 14
+                when agent='https://github.com/APTrust/bagman' then 15
+                when agent='https://github.com/aws/aws-sdk-go' then 16
+                when agent='https://github.com/crowdmob/goamz' then 17
+                when agent='https://github.com/marcel/aws-s3/tree/master' then 18
+                when agent='https://github.com/satori/go.uuid' then 19
+                when agent='https://launchpad.net/goamz' then 20
+                when agent='https://github.com/APTrust/auditing/blob/1.0/cleanup_001.py' then 21
+                else 0
+            end,
+            object_int = case
+                when "object"='APTrust preservation services' then 1
+                when "object"='Minio S3 client' then 2
+                when "object"='Minio S3 library' then 3
+                when "object"='preservation-services + Minio S3 client' then 4
+                when "object"='Go uuid library + Minio S3 library' then 5
+                when "object"='Go language crypto/sha256' then 6
+                when "object"='Go language crypto/md5' then 7
+                when "object"='scissors' then 8
+                when "object"='APTrust exchange/ingest processor' then 9
+                when "object"='Fake event object' then 10
+                when "object"='APTrust Go Exchange + Amazon S3 client' then 11
+                when "object"='SHA-256 thingy' then 12
+                when "object"='Exchange ingest code' then 13
+                when "object"='Deleterbot code' then 14
+                when "object"='APTrust bagman' then 15
+                when "object"='APTrust bag processor' then 16
+                when "object"='APTrust exchange' then 17
+                when "object"='APTrust Exchange apt_delete service' then 18
+                when "object"='APTrust Exchange ingest services' then 19
+                when "object"='APTrust exchange using Satori go.uuid' then 20
+                when "object"='AWS Go SDK S3 client' then 21
+                when "object"='AWS Go SDK S3 Library' then 22
+                when "object"='bagman + goamz s3 client' then 23
+                when "object"='exchange + AWS Go SDK S3 client' then 24
+                when "object"='exchange + goamz S3 client' then 25
+                when "object"='goamz S3 client' then 26
+                when "object"='Goamz S3 Client' then 27
+                when "object"='Go language cryptohash' then 28
+                when "object"='Go crypto/md5' then 29
+                when "object"='Go uuid library + APTrust DPN services' then 30
+                when "object"='Go uuid library + AWS Go SDK S3 library' then 31
+                when "object"='Go uuid library + goamz S3 library' then 32
+                when "object"='Ruby aws-s3 gem' then 33
+                when "object"='APTrust audit and cleanup scripts for audit_001' then 34
+                else 0
+            end
+            where id in (select id from update_batch);
+
+            get diagnostics current_batch = ROW_COUNT;
+            total_processed := total_processed + current_batch;
+            current_iteration := current_iteration + 1;
+      
+            -- Exit if no rows were deleted
+            EXIT WHEN current_batch = 0;
+      
+            RAISE NOTICE 'Updated % events so far', total_processed;
+        end loop;
+
+        completed_event_migration := 1;
+        RAISE NOTICE 'Phew... done updating events. Still a bit more migration to go. Total events updated: %', total_processed;
+
+        -- The rest of the migration is all within the function because we dont want to run
+        -- any of this SQL until the entire migration of ALL rows is complete
+        -- which could take, potentially, days for hundreds of millions of events.
+        -- If this following code were outside the scope of this function,
+        -- we could end up in a nasty situation where force cancelling the migration
+        -- would end the loop but would skip down to removing all the unneeded event data,
+        -- making it impossible to try the migration again. We can resume from this point
+        -- when we are ready by using the logged messages from the loop to determine
+        -- where we left off.
+
+        IF completed_event_migration == 1 THEN
+            -- Now that we have converted every event, we can drop the old event_type column.
+            alter table premis_events drop column if exists event_type;
+            alter table premis_events drop column if exists agent;
+            alter table premis_events drop column if exists "object";
+
+            -- Rename the event_type_int column to event_type.
+            alter table premis_events rename column event_type_int TO event_type;
+            alter table premis_events rename column agent_int TO agent;
+            alter table premis_events rename column object_int TO "object";
+
+            -- Add foreign key restraint to event_type to map to event_type_lookup, may take some time
+            alter table premis_events add constraint event_type_fk FOREIGN KEY (event_type) REFERENCES event_type_lookup(id);
+            alter table premis_events add constraint event_agent_fk FOREIGN KEY (agent) REFERENCES event_agent_lookup(id);
+            alter table premis_events add constraint event_object_fk FOREIGN KEY ("object") REFERENCES event_object_lookup(id);
+
+            -- Reclaim disk space
+            vacuum full;
+
+            -- Recreate views
+            CREATE OR REPLACE VIEW public.premis_events_view
+            AS SELECT pe.id,
+                pe.identifier,
+                pe.institution_id,
+                i.name AS institution_name,
+                pe.intellectual_object_id,
+                io.identifier AS intellectual_object_identifier,
+                pe.generic_file_id,
+                gf.identifier AS generic_file_identifier,
+                pe.event_type,
+                pe.date_time,
+                pe.detail,
+                pe.outcome,
+                pe.outcome_detail,
+                pe.outcome_information,
+                pe.object,
+                pe.agent
+            FROM premis_events pe
+                LEFT JOIN institutions i ON pe.institution_id = i.id
+                LEFT JOIN intellectual_objects io ON pe.intellectual_object_id = io.id
+                LEFT JOIN generic_files gf ON pe.generic_file_id = gf.id;
+
+            CREATE MATERIALIZED VIEW public.premis_event_counts
+            TABLESPACE pg_default
+            AS SELECT premis_events.institution_id,
+                count(premis_events.id) AS row_count,
+                premis_events.event_type,
+                premis_events.outcome,
+                CURRENT_TIMESTAMP AS updated_at
+            FROM premis_events
+            GROUP BY CUBE(premis_events.institution_id, premis_events.event_type, premis_events.outcome)
+            ORDER BY premis_events.institution_id, premis_events.event_type, premis_events.outcome
+            WITH DATA;
+
+            -- Recreate indices that use this and reindex - may take some time before indexing is complete, days
+            CREATE INDEX CONCURRENTLY if not exists index_premis_events_on_event_type ON public.premis_events USING btree (event_type);
+            CREATE INDEX CONCURRENTLY if not exists index_premis_events_on_event_type_and_outcome ON public.premis_events USING btree (event_type, outcome);
+            CREATE UNIQUE INDEX CONCURRENTLY if not exists ix_premis_event_counts ON public.premis_event_counts USING btree (institution_id, event_type, outcome);
+
+            -- Recreate all indices concurrently
+            CREATE INDEX CONCURRENTLY index_premis_events_date_time_desc ON public.premis_events USING btree (date_time DESC);
+            CREATE INDEX CONCURRENTLY index_premis_events_on_generic_file_id ON public.premis_events USING btree (generic_file_id);
+            CREATE UNIQUE INDEX CONCURRENTLY index_premis_events_on_identifier ON public.premis_events USING btree (identifier);
+            CREATE INDEX CONCURRENTLY index_premis_events_on_intellectual_object_id ON public.premis_events USING btree (intellectual_object_id);
+
+            -- Now mark the migration as completed.
+            update schema_migrations set finished_at = now() where "version" = '018_convert_event_type';
+        END IF;
+
+    end;
+$$ language plpgsql;
+
 -- First we need to drop related indices and views temporarily.
 -- We will recreate them at the end.
 drop index if exists index_premis_events_on_event_type;
 drop index if exists index_premis_events_on_event_type_and_outcome;
 drop index if exists ix_premis_event_counts;
+
 drop materialized view public.premis_event_counts;
 drop view if exists public.premis_events_view;
+
+-- Recreate these concurrently at the end
+drop index if exists index_premis_events_date_time_desc;
+drop index if exists index_premis_events_on_generic_file_id;
+drop index if exists index_premis_events_on_identifier;
+drop index if exists index_premis_events_on_intellectual_object_id;
 
 -- Add a new temporary column for the event_type as int
 alter table premis_events add COLUMN if not exists event_type_int smallint;
@@ -157,187 +395,6 @@ insert into event_object_lookup (id, event_object) values
 (32, 'Go uuid library + goamz S3 library'),
 (33, 'Ruby aws-s3 gem'),
 (34, 'APTrust audit and cleanup scripts for audit_001');
- 
--- Function that performs the actual conversion.
-create or replace function convert_event_types()
-returns void as $$
-begin
-    update premis_events set event_type_int = case
-        when event_type='access assignment' then 1
-        when event_type='accession' then 2
-        when event_type='appraisal' then 3
-        when event_type='capture' then 4
-        when event_type='compiling' then 5
-        when event_type='compression' then 6
-        when event_type='creation' then 7
-        when event_type='deaccession' then 8
-        when event_type='decompression' then 9
-        when event_type='decryption' then 10
-        when event_type='delete' then 11
-        when event_type='deletion' then 11
-        when event_type='digital signature generation' then 12
-        when event_type='digital signature validation' then 13
-        when event_type='displaying' then 14
-        when event_type='dissemination' then 15
-        when event_type='encryption' then 16
-        when event_type='execution' then 17
-        when event_type='exporting' then 18
-        when event_type='extraction' then 19
-        when event_type='filename change' then 20
-        when event_type='fixity check' then 21
-        when event_type='forensic feature analysis' then 22
-        when event_type='format identification' then 23
-        when event_type='identifier assignment' then 24
-        when event_type='imaging' then 25
-        when event_type='information package creation' then 26
-        when event_type='information package merging' then 27
-        when event_type='information package splitting' then 28
-        when event_type='ingestion' then 29
-        when event_type='ingestion end' then 30
-        when event_type='ingestion start' then 31
-        when event_type='interpreting' then 32
-        when event_type='message digest calculation' then 33
-        when event_type='metadata extraction' then 34
-        when event_type='metadata modification' then 35
-        when event_type='migration' then 36
-        when event_type='modification' then 37
-        when event_type='normalization' then 38
-        when event_type='packing' then 39
-        when event_type='policy assignment' then 40
-        when event_type='printing' then 41
-        when event_type='quarantine' then 42
-        when event_type='recovery' then 43
-        when event_type='redaction' then 44
-        when event_type='refreshment' then 45
-        when event_type='rendering' then 46
-        when event_type='replication' then 47
-        when event_type='transfer' then 48
-        when event_type='unpacking' then 49
-        when event_type='unquarantine' then 50
-        when event_type='validation' then 51
-        when event_type='virus check' then 52
-        else 0  -- default
-        end, agent_int = case
-        when agent='https://github.com/minio/minio-go v4' then 1
-        when agent='https://github.com/minio/minio-go v5' then 2
-        when agent='https://github.com/minio/minio-go v6' then 3
-        when agent='https://github.com/minio/minio-go v7' then 4
-        when agent='https://github.com/APTrust/preservation-services' then 5
-        when agent='APTrust preservation services' then 6
-        when agent='http://github.com/google/uuid' then 7
-        when agent='http://golang.org/pkg/crypto/sha256/' then 8
-        when agent='http://golang.org/pkg/crypto/md5/' then 9
-        when agent='Registry Unit Test' then 10
-        when agent='Maxwell Smart' then 11
-        when agent='https://github.com/APTrust/exchange' then 12
-        when agent='http://github.com/satori/go.uuid' then 13
-        when agent='http://github.com/nu7hatch/gouuid' then 14
-        when agent='https://github.com/APTrust/bagman' then 15
-        when agent='https://github.com/aws/aws-sdk-go' then 16
-        when agent='https://github.com/crowdmob/goamz' then 17
-        when agent='https://github.com/marcel/aws-s3/tree/master' then 18
-        when agent='https://github.com/satori/go.uuid' then 19
-        when agent='https://launchpad.net/goamz' then 20
-        when agent='https://github.com/APTrust/auditing/blob/1.0/cleanup_001.py' then 21
-        else 0
-    end,
-    object_int = case
-        when "object"='APTrust preservation services' then 1
-        when "object"='Minio S3 client' then 2
-        when "object"='Minio S3 library' then 3
-        when "object"='preservation-services + Minio S3 client' then 4
-        when "object"='Go uuid library + Minio S3 library' then 5
-        when "object"='Go language crypto/sha256' then 6
-        when "object"='Go language crypto/md5' then 7
-        when "object"='scissors' then 8
-        when "object"='APTrust exchange/ingest processor' then 9
-        when "object"='Fake event object' then 10
-        when "object"='APTrust Go Exchange + Amazon S3 client' then 11
-        when "object"='SHA-256 thingy' then 12
-        when "object"='Exchange ingest code' then 13
-        when "object"='Deleterbot code' then 14
-        when "object"='APTrust bagman' then 15
-        when "object"='APTrust bag processor' then 16
-        when "object"='APTrust exchange' then 17
-        when "object"='APTrust Exchange apt_delete service' then 18
-        when "object"='APTrust Exchange ingest services' then 19
-        when "object"='APTrust exchange using Satori go.uuid' then 20
-        when "object"='AWS Go SDK S3 client' then 21
-        when "object"='AWS Go SDK S3 Library' then 22
-        when "object"='bagman + goamz s3 client' then 23
-        when "object"='exchange + AWS Go SDK S3 client' then 24
-        when "object"='exchange + goamz S3 client' then 25
-        when "object"='goamz S3 client' then 26
-        when "object"='Goamz S3 Client' then 27
-        when "object"='Go language cryptohash' then 28
-        when "object"='Go crypto/md5' then 29
-        when "object"='Go uuid library + APTrust DPN services' then 30
-        when "object"='Go uuid library + AWS Go SDK S3 library' then 31
-        when "object"='Go uuid library + goamz S3 library' then 32
-        when "object"='Ruby aws-s3 gem' then 33
-        when "object"='APTrust audit and cleanup scripts for audit_001' then 34
-        else 0
-    end;
-end;
-$$ language plpgsql;
 
 -- Run the function.
 select convert_event_types();
-
--- Now that we have converted every event, we can drop the old event_type column.
-alter table premis_events drop column if exists event_type;
-alter table premis_events drop column if exists agent;
-alter table premis_events drop column if exists "object";
-
--- Rename the event_type_int column to event_type.
-alter table premis_events rename column event_type_int TO event_type;
-alter table premis_events rename column agent_int TO agent;
-alter table premis_events rename column object_int TO "object";
-
--- Add foreign key restraint to event_type to map to event_type_lookup
-alter table premis_events add constraint event_type_fk FOREIGN KEY (event_type) REFERENCES event_type_lookup(id);
-alter table premis_events add constraint event_agent_fk FOREIGN KEY (agent) REFERENCES event_agent_lookup(id);
-alter table premis_events add constraint event_object_fk FOREIGN KEY ("object") REFERENCES event_object_lookup(id);
-
--- Recreate indices and views that use this and reindex - may take some time before indexing is complete
-CREATE INDEX if not exists index_premis_events_on_event_type ON public.premis_events USING btree (event_type);
-CREATE INDEX if not exists index_premis_events_on_event_type_and_outcome ON public.premis_events USING btree (event_type, outcome);
-
-CREATE MATERIALIZED VIEW public.premis_event_counts
-TABLESPACE pg_default
-AS SELECT premis_events.institution_id,
-    count(premis_events.id) AS row_count,
-    premis_events.event_type,
-    premis_events.outcome,
-    CURRENT_TIMESTAMP AS updated_at
-   FROM premis_events
-  GROUP BY CUBE(premis_events.institution_id, premis_events.event_type, premis_events.outcome)
-  ORDER BY premis_events.institution_id, premis_events.event_type, premis_events.outcome
-WITH DATA;
-
-CREATE UNIQUE INDEX if not exists ix_premis_event_counts ON public.premis_event_counts USING btree (institution_id, event_type, outcome);
-
-CREATE OR REPLACE VIEW public.premis_events_view
-AS SELECT pe.id,
-    pe.identifier,
-    pe.institution_id,
-    i.name AS institution_name,
-    pe.intellectual_object_id,
-    io.identifier AS intellectual_object_identifier,
-    pe.generic_file_id,
-    gf.identifier AS generic_file_identifier,
-    pe.event_type,
-    pe.date_time,
-    pe.detail,
-    pe.outcome,
-    pe.outcome_detail,
-    pe.outcome_information,
-    pe.object,
-    pe.agent
-   FROM premis_events pe
-     LEFT JOIN institutions i ON pe.institution_id = i.id
-     LEFT JOIN intellectual_objects io ON pe.intellectual_object_id = io.id
-     LEFT JOIN generic_files gf ON pe.generic_file_id = gf.id;
-
--- Now mark the migration as completed.
-update schema_migrations set finished_at = now() where "version" = '018_convert_event_type';
