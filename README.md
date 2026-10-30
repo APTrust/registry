@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.com/APTrust/registry.svg?branch=master)](https://travis-ci.com/APTrust/registry)
 [![Maintainability](https://api.codeclimate.com/v1/badges/e4c7cfd351d6bae759e3/maintainability)](https://codeclimate.com/github/APTrust/registry/maintainability)
-[![REST API Documentation](https://img.shields.io/badge/documentation-REST%20API-blue)](https://aptrust.github.io/registry/)
+[![REST API Documentation](https://img.shields.io/badge/documentation-REST%20API-blue)](https://docs.aptrust.org/api/)
 <!---
 Test coverage report is incorrect because Travis blows up and reports incorrect numbers.
 Actual coverage is around 80%. We can uncomment this when we move away from Travis.
@@ -15,7 +15,7 @@ This will be the third-generation of our registry software, based on the [Gin We
 
 # REST API
 
-If you're looking for our member API documentation, check out our [interactive Swagger docs](https://aptrust.github.io/registry/).
+If you're looking for our member API documentation, check out our [Member API documentation](https://docs.aptrust.org/api/).
 
 # Requirements
 
