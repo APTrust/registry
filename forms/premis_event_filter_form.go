@@ -80,6 +80,10 @@ func (f *PremisEventFilterForm) SetValues() {
 			common.ConsoleDebug("No filter for %s", fieldName)
 			continue
 		}
-		f.Fields[fieldName].Value = f.FilterCollection.ValueOf(fieldName)
+		if fieldName == "event_type" {
+			f.Fields["event_type"].Value = common.ConvertEventTypeToInt(f.FilterCollection.ValueOf(fieldName))
+		} else {
+			f.Fields[fieldName].Value = f.FilterCollection.ValueOf(fieldName)
+		}
 	}
 }
