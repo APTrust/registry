@@ -26,6 +26,8 @@ RUN apk update && apk add --no-cache upx make build-base bash git openssl bind-t
 
 WORKDIR /app
 
+RUN apk upgrade --no-cache ca-certificates-bundle ca-certificates
+
 COPY --from=builder /app/main /app/main
 COPY --from=builder /app/static /app/static
 COPY --from=builder /app/views /app/views
