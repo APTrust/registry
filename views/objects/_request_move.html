@@ -18,7 +18,15 @@
     <p>Source: {{ .object.StorageOption }}</p>
     <div class="column">
       Destination:
-          {{ template "forms/select.html" .filterForm.Fields.storage_option }}
+          <select name="destination" id="moveObjectDestination" onselect="setDestination()">
+              <option value="Standard">Standard</option>
+              <option value="Glacier-OH">Glacier - Ohio</option>
+              <option value="Glacier-OR">Glacier - Oregon</option>
+              <option value="Glacier-VA">Glacier - Virginia</option>
+              <option value="Glacier-Deep-OH">Glacier Deep - Ohio</option>
+              <option value="Glacier-Deep-OR">Glacier Deep - Oregon</option>
+              <option value="Glacier-Deep-VA">Glacier Deep - Virginia</option>
+          </select>
     </div>
 
     Object Details:
@@ -45,11 +53,19 @@
         <button class="button is-primary" data-modal-post-form="objMoveForm" data-modal-post-target="modal-one">Confirm</button>
     </div>
   
-    <form method="post" id="objMoveForm" action="/objects/init_move/{{ .object.ID }}">
+    <form method="post" name="objMove" id="objMoveForm" action="/objects/init_move/{{ .object.ID }}">
       <input type="hidden" name="id" value="{{ .object.ID }}"/>
+      <input type="hidden" name="destinationSelected" value=""/>
       {{ template "forms/csrf_token.html" . }}
     </form>
   </div>
 </div>
+
+<script>
+  function setDestination(){
+    let destinationSelected = document.elements['destination'].value;
+    document.forms.elements['destinationSelected'].value = destinationSelected;
+  }
+</script>
 
 {{ end }}

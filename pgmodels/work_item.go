@@ -477,7 +477,7 @@ func NewItemFromLastSuccessfulIngest(objID int64) (*WorkItem, error) {
 // Before creating a move WorkItem, the caller should ensure
 // that the object has no pending work items. See
 // WorkItemsPendingForObject().
-func NewMoveItem(obj *IntellectualObject, gf *GenericFile, user *User) (*WorkItem, error) {
+func NewMoveItem(obj *IntellectualObject, destination string, user *User) (*WorkItem, error) {
 	if obj == nil {
 		return nil, common.ErrInvalidParam
 	}
@@ -496,6 +496,9 @@ func NewMoveItem(obj *IntellectualObject, gf *GenericFile, user *User) (*WorkIte
 		// If so, close that out.
 		moveItem.Action = constants.ActionMove
 	}
+
+	// Adding destination field to work item
+	moveItem.Note = destination
 
 	moveItem.User = user.Email
 	err = moveItem.Save()

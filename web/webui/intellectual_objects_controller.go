@@ -78,8 +78,9 @@ func IntellectualObjectInitMove(c *gin.Context) {
 	if AbortIfError(c, err) {
 		return
 	}
+	destination := c.PostForm("destinationSelected")
 
-	_, err = InitObjectMove(obj, req.CurrentUser)
+	_, err = InitObjectMove(obj, destination, req.CurrentUser)
 	if AbortIfError(c, err) {
 		return
 	}
@@ -273,7 +274,7 @@ func loadEvents(req *Request, objID int64) error {
 	return err
 }
 
-func InitObjectMove(obj *pgmodels.IntellectualObject, user *pgmodels.User) (*pgmodels.WorkItem, error) {
+func InitObjectMove(obj *pgmodels.IntellectualObject, destination string, user *pgmodels.User) (*pgmodels.WorkItem, error) {
 	// Make sure there are no pending work items...
 	pendingWorkItems, err := pgmodels.WorkItemsPendingForObject(obj.InstitutionID, obj.BagName)
 	if err != nil {
@@ -284,7 +285,7 @@ func InitObjectMove(obj *pgmodels.IntellectualObject, user *pgmodels.User) (*pgm
 	}
 
 	// Create the new move work item
-	workItem, err := pgmodels.NewMoveItem(obj, nil, user)
+	workItem, err := pgmodels.NewMoveItem(obj, destination, user)
 	if err != nil {
 		return nil, err
 	}
