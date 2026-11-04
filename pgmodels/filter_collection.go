@@ -2,6 +2,7 @@ package pgmodels
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/APTrust/registry/common"
@@ -158,6 +159,20 @@ func (p *ParamFilter) ChipValue() string {
 	} else if len(p.Values) > 0 && p.Values[0] == constants.BTRProfileIdentifier {
 		return "BTR"
 	} else {
+		// If showing an event type chip value,
+		// we need to convert the type back to its
+		// readable name.
+		if strings.ToLower(p.Column) == "event_type" {
+			chipValues := p.Values
+			for index, val := range p.Values {
+				eventType, err := strconv.Atoi(val)
+				if err != nil {
+					return "EVENT_TYPE = invalid type"
+				}
+				chipValues[index] = common.ConvertEventTypeToString(eventType)
+			}
+			return fmt.Sprintf("%s %s", p.SQLOp, strings.Join(chipValues, ", "))
+		}
 		return fmt.Sprintf("%s %s", p.SQLOp, strings.Join(p.Values, ", "))
 	}
 }

@@ -108,15 +108,6 @@ func (req *Request) GetFilterCollection() *pgmodels.FilterCollection {
 
 		filter, _ := fc.Add(key, queryValues)
 		if !common.ListIsEmpty(queryValues) {
-
-			// If filtering by event type, we want the original
-			// string values for event type to appear in the chip
-			// while querying with the integer version of the event
-			// code.
-			if filter.Key == "event_type" {
-				filter.Values = req.GinContext.QueryArray(key)
-			}
-
 			chips = append(chips, filter)
 		}
 	}
