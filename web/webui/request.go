@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"reflect"
+	"slices"
+	"strconv"
 	"strings"
 
 	"github.com/APTrust/registry/common"
@@ -85,8 +87,36 @@ func (req *Request) GetFilterCollection() *pgmodels.FilterCollection {
 	fc := pgmodels.NewFilterCollection()
 	for _, key := range allowedFilters {
 		queryValues := req.GinContext.QueryArray(key)
+
+		// If filtering by event type, we need to convert
+		// This is because older URLs into Registry will have
+		// event type strings. These need to be converted to
+		// their corresponding integer event codes before filtering.
+		if key == "event_type" {
+			initialQueryValues := req.GinContext.QueryArray(key)
+			eventCode := 0
+			for index, val := range initialQueryValues {
+				eventCode = common.ConvertEventTypeToInt(val)
+
+				if eventCode != 0 {
+					queryValues[index] = strconv.Itoa(eventCode)
+				} else {
+					queryValues = slices.Delete(queryValues, index, index+1)
+				}
+			}
+		}
+
 		filter, _ := fc.Add(key, queryValues)
 		if !common.ListIsEmpty(queryValues) {
+
+			// If filtering by event type, we want the original
+			// string values for event type to appear in the chip
+			// while querying with the integer version of the event
+			// code.
+			if filter.Key == "event_type" {
+				filter.Values = req.GinContext.QueryArray(key)
+			}
+
 			chips = append(chips, filter)
 		}
 	}
