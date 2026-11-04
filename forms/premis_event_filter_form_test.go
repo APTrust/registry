@@ -3,6 +3,7 @@ package forms_test
 import (
 	"testing"
 
+	"github.com/APTrust/registry/common"
 	"github.com/APTrust/registry/constants"
 	"github.com/APTrust/registry/forms"
 	"github.com/APTrust/registry/pgmodels"
@@ -74,9 +75,11 @@ func TestPremisEventFilterFormNonAdmin(t *testing.T) {
 }
 
 func testPremisEventFields(t *testing.T, fc *pgmodels.FilterCollection, fields map[string]*forms.Field) {
+	eventType := common.ConvertEventTypeToString(fields["event_type"].Value.(int))
+	assert.NotEmpty(t, eventType)
 	assert.Equal(t, fc.ValueOf("date_time__gteq"), fields["date_time__gteq"].Value)
 	assert.Equal(t, fc.ValueOf("date_time__lteq"), fields["date_time__lteq"].Value)
-	assert.Equal(t, fc.ValueOf("event_type"), fields["event_type"].Value)
+	assert.Equal(t, fc.ValueOf("event_type"), eventType)
 	assert.Equal(t, fc.ValueOf("generic_file_identifier"), fields["generic_file_identifier"].Value)
 	assert.Equal(t, fc.ValueOf("identifier"), fields["identifier"].Value)
 	assert.Equal(t, fc.ValueOf("institution_id"), fields["institution_id"].Value)
