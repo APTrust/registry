@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"reflect"
-	"slices"
 	"strconv"
 	"strings"
 
@@ -97,11 +96,8 @@ func (req *Request) GetFilterCollection() *pgmodels.FilterCollection {
 			eventCode := 0
 			for index, val := range initialQueryValues {
 				eventCode = common.ConvertEventTypeToInt(val)
-
 				if eventCode != 0 {
 					queryValues[index] = strconv.Itoa(eventCode)
-				} else {
-					queryValues = slices.Delete(queryValues, index, index+1)
 				}
 			}
 		}

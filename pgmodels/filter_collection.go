@@ -163,7 +163,7 @@ func (p *ParamFilter) ChipValue() string {
 		// we need to convert the type back to its
 		// readable name.
 		if strings.ToLower(p.Column) == "event_type" {
-			chipValues := p.Values
+			chipValues := make([]string, len(p.Values))
 			for index, val := range p.Values {
 				eventType, err := strconv.Atoi(val)
 				if err != nil {
