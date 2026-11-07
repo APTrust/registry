@@ -39,7 +39,7 @@ func NewUserForm(userToEdit *pgmodels.User, actingUser *pgmodels.User) (*UserFor
 
 func (f *UserForm) init() {
 	f.Fields["Name"] = &Field{
-		Name:   "Name",
+		Name:   "Name*",
 		ErrMsg: pgmodels.ErrUserName,
 		Label:  "Name",
 		Attrs: map[string]string{
@@ -47,7 +47,7 @@ func (f *UserForm) init() {
 		},
 	}
 	f.Fields["Email"] = &Field{
-		Name:   "Email",
+		Name:   "Email*",
 		ErrMsg: pgmodels.ErrUserEmail,
 		Label:  "Email Address",
 		Attrs: map[string]string{
@@ -94,7 +94,7 @@ func (f *UserForm) init() {
 		rolesList = AllRolesList
 	}
 	f.Fields["Role"] = &Field{
-		Name:    "Role",
+		Name:    "Role*",
 		ErrMsg:  pgmodels.ErrUserRole,
 		Label:   "Role",
 		Options: rolesList,

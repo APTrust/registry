@@ -15,13 +15,13 @@ var rePhone = regexp.MustCompile("^\\+[0-9]{11}$")
 var reNumeric = regexp.MustCompile("[^0-9]+")
 
 const (
-	ErrUserName         = "Name must contain at least 2 characters."
-	ErrUserEmail        = "Email address is required."
+	ErrUserName         = "Please include the user's name. Name must contain at least 2 characters. Email address and role are also required."
+	ErrUserEmail        = "Email address is required. User's name and role are also required."
 	ErrUserPhone        = "Please enter a phone number in format +2125551212."
 	ErrUser2Factor      = "Please choose yes or no."
 	ErrUserGracePeriod  = "Enter a date specifying when this user must enable two-factor authentication."
 	ErrUserInst         = "Please choose an institution."
-	ErrUserRole         = "Please choose a role for this user."
+	ErrUserRole         = "Please choose a role for this user. User's name and email are also required."
 	ErrUserInstNotFound = "Internal error: cannot find institution."
 	ErrUserInvalidAdmin = "Sys Admin role is not valid for this institution."
 	ErrUserPwdMissing   = "Encrypted password is missing."
