@@ -346,7 +346,7 @@ template {
 }
 
 .is-grey {
-  color: #a2a2a2;
+  color: #8c8c8c;
 }
 
 .is-grey-light {
@@ -362,7 +362,7 @@ template {
 }
 
 .is-gold {
-  color: #bb9566;
+  color: #b38e61;
 }
 
 .is-not-underlined {
@@ -1562,7 +1562,8 @@ a.box:active {
   color: #fff;
 }
 .button.is-success:focus, .button.is-success.is-focused {
-  border-color: transparent;
+  border-color: #000000;
+  border-width: 4px;
   color: #fff;
 }
 .button.is-success:focus:not(:active), .button.is-success.is-focused:not(:active) {
@@ -6753,7 +6754,8 @@ pre.with-wrap {
 }
 .badge.filter-chip:focus {
   padding: 2px;
-  border-width: 2px;
+  border-width: 4px;
+  border-color: #000000;
 }
 .badge.filter-chip .icon {
   margin-left: 0.5rem;
