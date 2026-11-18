@@ -1,0 +1,77 @@
+{{ define "moves/index.html" }} {{ template "shared/_header.html" .}}
+
+<div class="box">
+  <div class="box-header">
+    <h1 class="h2">Moves</h1>
+  </div>
+
+  <div class="box-content">{{ template "moves/_filters.html" . }}</div>
+
+  <!-- .items type is []MoveRequestView -->
+
+  {{ template "shared/_pager.html" dict "pager" .pager }}
+
+  <table class="table is-hoverable is-fullwidth has-padding">
+    <thead>
+      <tr>
+        <th class="pl-5">
+          <a href="{{ sortUrl .currentUrl `requested_by_name` }}" class="is-grey-dark">Requested By
+            <span class="material-icons sort-icon" aria-hidden="true">{{ sortIcon .currentUrl `requested_by_name`
+              }}</span></a>
+        </th>
+        <th>
+          <a href="{{ sortUrl .currentUrl `requested_at` }}" class="is-grey-dark">Request Date<span class="material-icons sort-icon"
+              aria-hidden="true">{{ sortIcon .currentUrl `requested_at` }}</span></a>
+        </th>
+        <th>
+          <a href="{{ sortUrl .currentUrl `confirmed_at` }}" class="is-grey-dark">Confirmed At
+            <span class="material-icons sort-icon" aria-hidden="true">{{ sortIcon .currentUrl `confirmed_at`
+              }}</span></a>
+        </th>
+        <th>
+          <a href="{{ sortUrl .currentUrl `file_count` }}" class="is-grey-dark">Files
+            <span class="material-icons sort-icon" aria-hidden="true">{{ sortIcon .currentUrl `file_count` }}</span></a>
+        </th>
+        <th>
+          <a href="{{ sortUrl .currentUrl `object_count` }}" class="is-grey-dark">Objects
+            <span class="material-icons sort-icon" aria-hidden="true">{{ sortIcon .currentUrl `object_count`
+              }}</span></a>
+        </th>
+        <th>
+          <a href="{{ sortUrl .currentUrl `status` }}" class="is-grey-dark">Status
+            <span class="material-icons sort-icon" aria-hidden="true">{{ sortIcon .currentUrl `status` }}</span></a>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      {{ range $index, $move := .items }}
+      <tr class="clickable" data-modal="modal-one" data-xhr-url="/moves/show/{{ $move.ID }}?modal=true">
+        <td class="pl-5">
+          <div class="is-flex is-align-items-center">
+            <span class="action-icon mr-3">
+              <span class="material-icons md-16" aria-hidden="true"><span>move</span></span>
+            </span>
+            <span class="is-grey-dark">{{ $move.RequestedByName }}</span>
+          </div>
+        </td>
+        <td class="is-grey-dark text-sm is-uppercase">
+          {{ dateUS $move.RequestedAt }}
+        </td>
+        <td class="is-grey-dark text-sm is-uppercase">
+          {{ dateUS $move.ConfirmedAt }}
+        </td>
+        <td class="is-grey-dark num text-sm">{{ $move.FileCount }}</td>
+        <td class="is-grey-dark num text-sm">{{ $move.ObjectCount }}</td>
+        <td>
+          <span class="badge {{ badgeClass $move.DisplayStatus }}">{{ $move.DisplayStatus }}</span>
+        </td>
+        <!-- TODO Make status change classes, these statuses don't appear to be in the constants -->
+      </tr>
+      {{ end }}
+    </tbody>
+  </table>
+
+  {{ template "shared/_pager.html" dict "pager" .pager }}
+</div>
+
+{{ template "shared/_footer.html" .}} {{ end }}

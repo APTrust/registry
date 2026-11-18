@@ -166,6 +166,16 @@ func initRoutes(router *gin.Engine) {
 		webRoutes.POST("/deletions/cancel/:id", webui.DeletionRequestCancel)
 		webRoutes.GET("/deletions/", webui.DeletionRequestIndex)
 
+		// Move Requests
+		// Note that these routes are for read-only views.
+		// Routes for initiating, approving and rejecting moves
+		// are in the IntellectualObjects controller.
+		webRoutes.GET("/moves/show/:id", webui.MoveRequestShow)
+		webRoutes.GET("/moves/review/:id", webui.MoveRequestReview)
+		webRoutes.POST("/moves/approve/:id", webui.MoveRequestApprove)
+		webRoutes.POST("/moves/cancel/:id", webui.MoveRequestCancel)
+		webRoutes.GET("/moves/", webui.MoveRequestIndex)
+
 		// Dashboard
 		webRoutes.GET("/dashboard", webui.DashboardShow)
 
@@ -390,6 +400,7 @@ func initRoutes(router *gin.Engine) {
 		adminAPI.DELETE("/objects/delete/:id", admin_api.IntellectualObjectDelete)
 		adminAPI.POST("/objects/init_restore/:id", admin_api.IntellectualObjectInitRestore)
 		adminAPI.POST("/objects/init_batch_delete", admin_api.IntellectualObjectInitBatchDelete)
+		adminAPI.POST("/objects/init_batch_move", admin_api.IntellectualObjectInitBatchMove)
 
 		// Premis Events
 		adminAPI.POST("/events/create", admin_api.PremisEventCreate)
@@ -412,5 +423,6 @@ func initRoutes(router *gin.Engine) {
 		// Special test endpoints
 		adminAPI.POST("/prepare_file_delete/:id", admin_api.PrepareFileDelete)
 		adminAPI.POST("/prepare_object_delete/:id", admin_api.PrepareObjectDelete)
+		adminAPI.POST("/prepare_object_move/:id", admin_api.PrepareObjectMove)
 	}
 }

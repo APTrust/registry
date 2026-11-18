@@ -1,0 +1,59 @@
+{{ define "moves/show.html" }}
+
+<!-- Show the header unless query string says modal=true -->
+{{ if not .showAsModal }}
+  {{ template "shared/_header.html" .}}
+{{ end }}
+
+<div class="modal-detail">
+  <div id="modalTitle" class="modal-title-row is-flex is-justify-content-space-between is-align-items-center">
+    <h2>Move Request</h2>
+    <a class="modal-exit is-grey-dark" href="#">
+      <span class="material-icons" aria-hidden="true">close</span>
+      <span class="is-sr-only">Close</span>
+    </a>
+  </div>
+
+  <dl class="modal-list modal-list-row">
+    <dt class="text-label text-xs is-grey-dark">Requested By</dt>
+    <dd class="text-table">{{ .moveRequest.RequestedBy.Name }}</dd>
+    <dt class="text-label text-xs is-grey-dark">Requested At</dt>
+    <dd class="text-table">{{ dateUS .moveRequest.RequestedAt }}</dd>
+    {{ if .moveRequest.ConfirmedBy }}
+    <dt class="text-label text-xs is-grey-dark">Confirmed By</dt>
+    <dd class="text-table">{{ .moveRequest.ConfirmedBy.Name }}</dd>
+    <dt class="text-label text-xs is-grey-dark">Confirmed On</dt>
+    <dd class="text-table">{{ dateUS .moveRequest.ConfirmedAt }}</dd>
+    {{ end }}
+    {{ if .moveRequest.CancelledBy }}
+    <dt class="text-label text-xs is-grey-dark">Cancelled By</dt>
+    <dd class="text-table">{{ .moveRequest.CancelledBy.Name }}</dd>
+    <dt class="text-label text-xs is-grey-dark">Cancelled On</dt>
+    <dd class="text-table">{{ dateUS .moveRequest.CancelledAt }}</dd>
+    {{ end }}
+    {{ if .workItemURL }}
+    <dt class="text-label text-xs is-grey-dark">Work Item</dt>
+    <dd class="text-table"><a href="{{ .workItemURL }}">Work Item #{{ .moveRequest.WorkItemID }}</a></dd>
+    {{ end }}
+    {{ if .moveRequest.IntellectualObjects }}
+    <dt class="text-label text-xs is-grey-dark">Objects</dt>
+    {{ range $index, $obj := .moveRequest.IntellectualObjects }}
+      <dd class="text-table"><a href="/objects/show/{{ $obj.ID }}" target="_blank">{{ $obj.Identifier }}</a></dd>
+    {{ end }}
+    {{ end }}
+    {{ if .moveRequest.GenericFiles }}
+    <dt class="text-label text-xs is-grey-dark">Files</dt>
+    {{ range $index, $gf := .moveRequest.GenericFiles }}
+      <dd class="text-table"><a href="/files/show/{{ $gf.ID }}" target="_blank">{{ $gf.Identifier }}</a></dd>
+    {{ end }}
+    {{ end }}
+  </dl>
+</div>
+
+<!-- Show the footer unless query string says modal=true -->
+{{ if not .showAsModal }}
+  {{ template "shared/_footer.html" .}}
+{{ end }}
+
+
+{{ end }}

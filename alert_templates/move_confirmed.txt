@@ -1,0 +1,21 @@
+Hello from APTrust,
+
+The move requested by {{ .moveRequest.RequestedBy.Name }} has been approved by {{ .moveRequest.ConfirmedBy.Name }}. We'll send a confirmation email when the move is complete.
+
+For your reference, the link below has information about the request.
+
+{{ .moveReadOnlyURL }}
+
+The Work Items showing the status of this move are at 
+
+{{ range $index, $itemUrl := .workItemURLs }}
+{{ $itemUrl }}
+{{ end }}
+
+If you have questions, please contact us at help@aptrust.org.
+
+The APTrust Team
+https://aptrust.org
+help@aptrust.org
+
+More about moving objects: https://aptrust.github.io/userguide/preservation/moving/

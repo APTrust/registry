@@ -1,0 +1,48 @@
+{{ define "moves/_filters.html" }}
+
+<div class="filters-grid">
+  <h3 class="filters-grid-label text-label text-xs">Filter</h3>
+  <div class="filters-grid-content">
+
+    <form id="moveFilterForm" method="get">
+
+      <!-- Include this, so we don't lose it when user changes filters. -->
+      <input type="hidden" name="per_page" value="{{ .pager.PerPage }}">
+
+
+      <div class="columns">
+        <div class="column">
+          {{ template "forms/select.html" .filterForm.Fields.stage }}
+        </div>
+        <div class="column">
+          {{ template "forms/select.html" .filterForm.Fields.status }}
+        </div>
+        <div class="column">
+          {{ if .CurrentUser.IsAdmin }}
+          {{ template "forms/select.html" .filterForm.Fields.institution_id }}
+          {{ end }}
+        </div>
+        <div class="column is-align-self-flex-end">
+          <div class="filters-grid-controls">
+            <input class="filter-button button is-primary" type="submit" value="Filter">
+          </div>
+        </div>
+      </div>
+
+      <div class="columns">
+        <div class="column is-one-quarter">
+          {{ template "forms/date.html" .filterForm.Fields.requested_at__gteq }}
+        </div>
+        <div class="column is-one-quarter">
+          {{ template "forms/date.html" .filterForm.Fields.requested_at__lteq }}
+        </div>
+      </div>
+
+    </form>
+
+    {{ template "shared/_filter_chips.html" . }}
+
+  </div>
+</div>
+
+{{ end }}

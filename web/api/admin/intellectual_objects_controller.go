@@ -161,6 +161,87 @@ func IntellectualObjectInitBatchDelete(c *gin.Context) {
 	c.JSON(http.StatusCreated, del.DeletionRequest)
 }
 
+// IntellectualObjectInitBatchDelete creates an deletion request for
+// multiple objects. This request must be approved by an administrator
+// at the depositing institution before the deletion will actually be queued.
+//
+// Note that becaue this is part of the admin API, access to this call
+// is restricted to APTrust admins.
+//
+// POST /objects/init_batch_delete
+func IntellectualObjectInitBatchMove(c *gin.Context) {
+	req := api.NewRequest(c)
+
+	// We want to log this because this is a dangerous operation.
+	// We should never hit this line unless the request was submitted
+	// by an APTrust admin.
+	common.Context().Log.Warn().Msgf("Got batch deletion request from user %s, IP address %s", req.CurrentUser.Email, c.RemoteIP())
+
+	// If the batch deletion key is not set in the config, bail
+	// because this is unsafe.
+	if !common.LooksLikeUUID(common.Context().Config.BatchDeletionKey) {
+		message := "Configuration setting for BatchDeletionKey is missing or invalid"
+		common.Context().Log.Error().Msgf("IntellectualObjectInitBatchDelete: Rejecting object batch deletion request: %s", message)
+		api.AbortIfError(c, errors.New(message))
+		return
+	}
+
+	// The request body will be JSON, not a normal post form.
+	// See note on ObjectBatchDeleteParams above.
+	// First, read the request body into a byte slice.
+	requestJson, err := io.ReadAll(c.Request.Body)
+	if api.AbortIfError(c, err) {
+		common.Context().Log.Error().Msgf("IntellectualObjectInitBatchDelete: Could not read JSON from request body: %v", err)
+		return
+	}
+
+	// Now parse the json bytes.
+	params := ObjectBatchDeleteParams{}
+	err = json.Unmarshal(requestJson, &params)
+	if api.AbortIfError(c, err) {
+		common.Context().Log.Error().Msgf("IntellectualObjectInitBatchDelete: Error parsing JSON from request body: %v", err)
+		return
+	}
+
+	// OK, if the request doesn't include the secret key, reject it.
+	// We don't want anyone maliciously deleting files.
+	if params.SecretKey != common.Context().Config.BatchDeletionKey {
+		message := "Request secret key does not match configuration's BatchDeletionKey"
+		common.Context().Log.Error().Msgf("IntellectualObjectInitBatchDelete: Rejecting object batch deletion request: %s", message)
+		api.AbortIfError(c, common.ErrInvalidToken)
+		return
+	}
+
+	// If we made it this far, we're going to proceed with the request.
+	// Let the logs know.
+	common.Context().Log.Warn().Msgf("IntellectualObjectInitBatchDelete: Creating batch deletion request on behalf of user %d for %d objects belonging to institution %d. Current user is %s.",
+		params.RequestorID, len(params.ObjectIDs), params.InstitutionID, req.CurrentUser.Email)
+
+	// Create the batch deletion request. Note that this will fail if
+	// certain internal checks fail. E.g. RequestorID does not belong
+	// to an inst admin, one or more files in the batch belongs to another
+	// institution, or has already been deleted.
+	del, err := webui.NewDeletionForObjectBatch(params.RequestorID, params.InstitutionID, params.ObjectIDs, req.BaseURL())
+	if api.AbortIfError(c, err) {
+		common.Context().Log.Error().Msgf("IntellectualObjectInitBatchDelete: Creating batch deletion failed: %v", err)
+		return
+	}
+
+	// Now create the alert email to the institutional admin so they
+	// can review and approve or cancel the request. This last line
+	// of human intervention ensures batch deletions won't happen
+	// silently or without explicit approval.
+	_, err = del.CreateRequestAlert()
+	if api.AbortIfError(c, err) {
+		common.Context().Log.Error().Msgf("IntellectualObjectInitBatchDelete: Batch deletion created, but creation of confirmation email failed: %v", err)
+		return
+	}
+
+	// Now send the JSON response. This will be a pretty hefty chunk of JSON,
+	// since it will include an object record for each object in the batch.
+	c.JSON(http.StatusCreated, del.DeletionRequest)
+}
+
 // IntellectualObjectDelete marks an object record as deleted.
 // It also creates a deletion premis event. Before it does any of
 // that, it checks a number of pre-conditions. See the

@@ -1,0 +1,18 @@
+{{ define "moves/already_cancelled.html" }}
+
+{{ template "shared/_header.html" .}}
+
+<div class="box">
+  <div class="box-header"><h1>Move Previously Cancelled</h1></div>
+  <div class="box-content">
+    <p>The move of <b>{{ .itemIdentifier }}</b> was cancelled by {{ .moveRequest.CancelledBy.Name }} ({{ .moveRequest.CancelledBy.Email }} on {{ dateUS .moveRequest.CancelledAt }}.</p>
+
+    <p>This move request will not be executed. Unless the objects were moved by a subsequent request, these items should still exist in their current storage option.</p>
+
+    <a class="button mr-3" href="/moves">Back to Moving List</a>
+  </div>
+</div>
+
+{{ template "shared/_footer.html" .}}
+
+{{ end }}

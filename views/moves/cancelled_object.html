@@ -1,0 +1,32 @@
+{{ define "moves/cancelled_object.html" }}
+
+{{ template "shared/_header.html" .}}
+
+{{ $obj := (index .moveRequest.IntellectualObjects 0) }}
+
+<div class="box">
+  <div class="box-header"><h1>Move Cancelled</h1></div>
+  <div class="box-content">
+    <p>You have cancelled moving of the following objects:</p>
+
+    <ol class="mb-3 mt-3 ml-5" style="list-style: decimal">
+    {{ range $index, $obj := .moveRequest.IntellectualObjects }}
+        <li class="mb-1"><a target="_blank" href="/objects/show/{{ $obj.ID }}">{{ $obj.Identifier }}</a></li>
+    {{ end }}
+    </ol>
+
+    <p>
+      Requested: {{ .moveRequest.RequestedBy.Name }} on {{ dateUS .moveRequest.RequestedAt }} <br/>
+      Cancelled: {{ .moveRequest.CancelledBy.Name }}  on {{ dateUS .moveRequest.CancelledAt }} <br/>
+    </p>
+
+    <p>This object will <b>NOT</b> be moved from its current storage option, and no one else will be able to approve this move request. If anyone wants to move this object, they'll need to submit a new request.</p>
+
+    <a class="button mr-3" href="/moves">Back to Moving List</a>
+    
+  </div>
+</div>
+
+{{ template "shared/_footer.html" .}}
+
+{{ end }}

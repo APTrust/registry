@@ -26,3 +26,12 @@ func PrepareObjectDelete(c *gin.Context) {
 	api.AbortIfError(c, common.ErrNotSupported)
 	return
 }
+
+// PrepareObjectDelete is not implemented, except in test and
+// integration builds.
+//
+// POST /admin-api/v3/prepare_object_delete/:id
+func PrepareObjectMove(c *gin.Context) {
+	api.AbortIfError(c, common.ErrNotSupported)
+	return
+}

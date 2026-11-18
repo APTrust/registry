@@ -49,6 +49,7 @@ const (
 	InstitutionUpdate                  = "InstitutionUpdate"
 	InstitutionUpdatePrefs             = "InstitutionUpdatePrefs"
 	IntellectualObjectBatchDelete      = "IntellectualObjectBatchDelete"
+	IntellectualObjectBatchMove        = "IntellectualObjectBatchMove"
 	IntellectualObjectCreate           = "IntellectualObjectCreate"
 	IntellectualObjectDelete           = "IntellectualObjectDelete"
 	IntellectualObjectFinishBulkDelete = "IntellectualObjectFinishBulkDelete"
@@ -58,9 +59,13 @@ const (
 	IntellectualObjectRestore          = "IntellectualObjectRestore"
 	IntellectualObjectUpdate           = "IntellectualObjectUpdate"
 	InternalMetadataRead               = "InternalMetadataRead"
+	MoveRequestApprove                 = "MoveRequestApprove"
+	MoveRequestList                    = "MoveRequestList"
+	MoveRequestShow                    = "MoveRequestShow"
 	NsqAdmin                           = "NsqAdmin"
 	PrepareFileDelete                  = "PrepareFileDelete"
 	PrepareObjectDelete                = "PrepareObjectDelete"
+	PrepareObjectMove                  = "PrepareObjectMove"
 	ReportRead                         = "ReportRead"
 	RedisList                          = "RedisList"
 	RedisRead                          = "RedisRead"
@@ -138,9 +143,13 @@ var Permissions = []Permission{
 	IntellectualObjectRestore,
 	IntellectualObjectUpdate,
 	InternalMetadataRead,
+	MoveRequestApprove,
+	MoveRequestList,
+	MoveRequestShow,
 	NsqAdmin,
 	PrepareFileDelete,
 	PrepareObjectDelete,
+	PrepareObjectMove,
 	ReportRead,
 	RedisList,
 	RedisRead,
@@ -225,6 +234,8 @@ func initPermissions() {
 	instUser[InstitutionRead] = true
 	instUser[IntellectualObjectRead] = true
 	instUser[IntellectualObjectRestore] = true
+	instUser[MoveRequestList] = true
+	instUser[MoveRequestShow] = true
 	instUser[ReportRead] = true
 	instUser[StorageRecordRead] = true
 	instUser[UserComplete2FASetup] = true
@@ -264,6 +275,9 @@ func initPermissions() {
 	instAdmin[IntellectualObjectRead] = true
 	instAdmin[IntellectualObjectRequestDelete] = true
 	instAdmin[IntellectualObjectRestore] = true
+	instAdmin[MoveRequestApprove] = true
+	instAdmin[MoveRequestList] = true
+	instAdmin[MoveRequestShow] = true
 	instAdmin[ReportRead] = true
 	instAdmin[StorageRecordRead] = true
 	instAdmin[UserComplete2FASetup] = true
@@ -329,9 +343,13 @@ func initPermissions() {
 	sysAdmin[IntellectualObjectRestore] = true
 	sysAdmin[IntellectualObjectUpdate] = true
 	sysAdmin[InternalMetadataRead] = true
+	sysAdmin[MoveRequestApprove] = false // only inst admin can do this
+	sysAdmin[MoveRequestList] = true
+	sysAdmin[MoveRequestShow] = true
 	sysAdmin[NsqAdmin] = true
 	sysAdmin[PrepareFileDelete] = true
 	sysAdmin[PrepareObjectDelete] = true
+	sysAdmin[PrepareObjectMove] = true
 	sysAdmin[ReportRead] = true
 	sysAdmin[RedisList] = true
 	sysAdmin[RedisRead] = true
